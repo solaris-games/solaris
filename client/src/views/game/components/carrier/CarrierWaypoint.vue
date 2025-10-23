@@ -83,21 +83,22 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
+import gameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import gameHelper from "../../../../services/gameHelper";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type {CarrierWaypoint, CarrierWaypointActionType, MapObject} from "@solaris-common"
-import { useStore } from 'vuex';
+import {useStore} from 'vuex';
 import {saveWaypoints} from "@/services/typedapi/carrier";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   carrierId: string,
@@ -106,7 +107,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   onCloseRequested: [],
-  onOpenStarDetailRequested: [starId: string],
   onOpenCarrierDetailRequested: [carrierId: string],
 }>();
 
@@ -116,6 +116,8 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
+
+const gameServices = useGameServices();
 
 const game = computed(() => store.state.game);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
@@ -134,12 +136,6 @@ const intervalFunction = ref<number | null>(null);
 
 const onCloseRequested = () => {
   emit('onCloseRequested');
-};
-
-const onOpenStarDetailRequested = () => {
-  if (currentWaypoint.value) {
-    emit('onOpenStarDetailRequested', currentWaypoint.value.destination);
-  }
 };
 
 const getStarName = (starId: string) => {
@@ -273,9 +269,9 @@ const doSaveWaypoints = async (saveAndEdit = false) => {
   if (isOk(response)) {
     AudioService.join()
 
-    const newWaypoints = response.data.waypoints;
+    carrier.value.waypoints = response.data.waypoints;
 
-    // todo: recalculate waypoints
+    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
 
     toast.default(`${carrier.value.name} waypoints updated.`)
 

@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
@@ -89,12 +89,13 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {type Mode, ModeKind} from "@/game/map";
 import {toastInjectionKey} from "@/util/keys";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
+import {useStore} from 'vuex';
 import type {Carrier, Game, Player} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {saveWaypoints} from "@/services/typedapi/carrier";
 import type {TempWaypoint} from "@/types/waypoint";
+import {useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   carrierId: string,
@@ -115,6 +116,8 @@ const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const game = computed<Game>(() => store.state.game);
+
+const gameServices = useGameServices();
 
 const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
 const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle === 'compact');
@@ -189,13 +192,11 @@ const doSaveWaypoints = async (saveAndEdit = false) => {
   if (isOk(response)) {
     AudioService.join();
 
-    const newWaypoints = response.data.waypoints;
+    carrier.value.waypoints = response.data.waypoints;
 
+    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
 
-    // todo: recalculate waypoints, store waypoints in carrier
-
-
-    oldWaypoints.value = carrier.value.waypoints;
+    oldWaypoints.value = carrier.value.waypoints.slice(0);
     oldWaypointsLooped.value = carrier.value.waypointsLooped;
 
     toast.default(`${carrier.value.name} waypoints updated.`)

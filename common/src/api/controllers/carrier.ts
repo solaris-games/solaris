@@ -1,5 +1,5 @@
 import {DeleteRoute, PatchRoute, PostRoute, PutRoute} from ".";
-import { type CarrierWaypointBase } from "../../types/common/carrierWaypoint";
+import { type CarrierWaypointBase, type CarrierWaypoint } from "../../types/common/carrierWaypoint";
 import { type CombatResultShips } from "../../types/common/combat";
 
 export type CarrierSaveWaypointsRequest<ID> = {
@@ -8,7 +8,7 @@ export type CarrierSaveWaypointsRequest<ID> = {
 };
 
 export type SaveWaypointsResp<ID> = {
-    waypoints: CarrierWaypointBase<ID>[],
+    waypoints: CarrierWaypoint<ID>[],
 }
 
 export type TransferShipsReq<ID> = {
