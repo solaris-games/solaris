@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationError } from "solaris-common";
-import { DBObjectId } from "../../services/types/DBObjectId";
+import {DBObjectId, objectIdFromString} from "../../services/types/DBObjectId";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {logger} from "../../utils/logging";
 
 const log = logger("Player Mutex Middleware");
 
 export interface PlayerMutexMiddleware {
-    wait: () => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
+    wait: () => (req: Request<{ gameId?: string }>, res: Response, next: NextFunction) => Promise<any>;
     release: (ignoreCheckUserInGame?: boolean) => (req: Request<{ gameId?: DBObjectId }>, res: Response, next: NextFunction) => Promise<any>;
 }
 
@@ -15,14 +15,14 @@ export const middleware = (container: DependencyContainer): PlayerMutexMiddlewar
 
     return {
         wait: () => {
-            return async (req: Request<{gameId?: DBObjectId}>, res: Response, next: NextFunction) => {
+            return async (req: Request<{gameId?: string}>, res: Response, next: NextFunction) => {
                 try {
                     if (req.params.gameId == null) {
                         throw new ValidationError(`Game ID is required.`);
                     }
 
                     // Acquire the game's players here as we won't have loaded the game yet.
-                    let gamePlayers: { _id: DBObjectId, userId: DBObjectId | null }[] | undefined = await container.gameService.getPlayersLean(req.params.gameId);
+                    let gamePlayers: { _id: DBObjectId, userId: DBObjectId | null }[] | undefined = await container.gameService.getPlayersLean(objectIdFromString(req.params.gameId));
 
                     if (gamePlayers == null) {
                         // If the game Id was valid it'd be an empty array instead of null or undefined.'
