@@ -237,7 +237,7 @@ import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { useStore } from 'vuex';
 import MapEventBusEventNames from "@/eventBusEventNames/map";
-import type {CarrierWaypoint, MapObject} from "@solaris-common";
+import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {makeConfirm} from "@/util/confirm";
 
@@ -267,7 +267,7 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
-const settings = computed(() => store.state.settings);
+const settings = computed<UserGameSettings>(() => store.state.settings);
 
 const game = computed<Game>(() => store.state.game);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
@@ -279,7 +279,7 @@ const firstWaypointSource = computed(() => firstWaypoint.value ? GameHelper.getS
 const carrierOrbitingStar = computed(() => carrier.value.orbiting ? GameHelper.getStarById(game.value, carrier.value.orbiting) : null);
 const firstWaypointDestination = computed(() => firstWaypoint.value ? GameHelper.getStarById(game.value, firstWaypoint.value.destination) || null : null);
 
-const canGiftCarrier = computed<boolean>(() => Boolean(settings.value.specialGalaxy.giftCarriers === 'enabled'
+const canGiftCarrier = computed<boolean>(() => Boolean(game.value.settings.specialGalaxy.giftCarriers === 'enabled'
   && carrier.value
   && userPlayer.value
   && carrierOwningPlayer.value._id === userPlayer.value._id
@@ -324,7 +324,7 @@ const canTransferShips = computed(() => {
 });
 
 const canShowSpecialist = computed(() => {
-  return settings.value.specialGalaxy.specialistCost !== 'none' && (carrier.value.specialistId || isUserPlayerCarrier.value);
+  return game.value.settings.specialGalaxy.specialistCost !== 'none' && (carrier.value.specialistId || isUserPlayerCarrier.value);
 });
 
 const isDeadStar = computed(() => {
