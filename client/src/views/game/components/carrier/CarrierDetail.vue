@@ -267,6 +267,8 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
+const settings = computed(() => store.state.settings);
+
 const game = computed<Game>(() => store.state.game);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
@@ -354,7 +356,6 @@ const canHireSpecialist = computed(() => {
     && (!carrier.value.specialistId || !carrier.value.specialist!.oneShot);
 });
 
-const settings = computed(() => store.state.settings);
 const isStandardUIStyle = computed(() => settings.value.interface.uiStyle === 'standard');
 const isCompactUIStyle = computed(() => settings.value.interface.uiStyle === 'compact');
 
