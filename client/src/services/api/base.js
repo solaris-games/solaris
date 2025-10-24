@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { v7 as generateV7Uuid } from 'uuid';
 import router from '../../router';
 
 class BaseApiService {
@@ -27,16 +26,6 @@ class BaseApiService {
 
         return Promise.reject({ ...error })
       })
-  }
-
-  isUnsafeMethod(config) {
-    // Rather than just going for idempotent methods, ie the safe ones and put and delete,
-    // We are electing here to NOT trust that put or delete currently behave in an idempotent way on the server...
-    return !['get', 'head', 'options', 'trace'].includes(config.method);
-  }
-
-  buildIdempotencyKey() {
-    return `${generateV7Uuid()}`;
   }
 }
 
