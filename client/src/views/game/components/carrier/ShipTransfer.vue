@@ -86,7 +86,7 @@ import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 import MenuTitle from '../MenuTitle.vue';
 import StarLabel from '../star/StarLabel.vue';
-import { ref, computed, inject, watch } from 'vue';
+import { ref, computed, inject, watch, onMounted } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Game, Star, Carrier} from "@/types/game";
@@ -257,6 +257,26 @@ const onEditWaypointsRequested = async () => {
     emit('onEditWaypointsRequested', carrier.value!._id);
   }
 };
+
+onMounted(() => {
+  if (carrier.value && star.value) {
+    let cShips = carrier.value.ships || 0;
+    let sShips = star.value.ships || 0;
+
+    if (sShips === 0 && cShips === 0) {
+      return;
+    }
+
+    if ((cShips || 0) < 1) {
+      cShips = 1;
+      sShips = sShips - 1;
+    }
+
+    starShips.value = sShips;
+    carrierShips.value = cShips;
+  }
+
+})
 
 </script>
 
