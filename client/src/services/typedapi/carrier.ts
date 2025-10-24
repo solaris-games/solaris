@@ -5,7 +5,7 @@ import {
   type SaveWaypointsResp
 } from "@solaris-common";
 import { type Axios } from "axios";
-import {doDelete, doPatch, doPut, type ResponseResult} from "@/services/typedapi/index";
+import {doDelete, doPost, doPatch, doPut, type ResponseResult} from "@/services/typedapi/index";
 
 const routes = createCarrierRoutes<string>();
 
@@ -34,5 +34,5 @@ export const scuttle = (axios: Axios) => async (gameId: string, carrierId: strin
 }
 
 export const calculateCombat = (axios: Axios) => async (gameId: string, defender: { ships: number; weaponsLevel: number }, attacker: { ships: number; weaponsLevel: number }, isTurnBased: boolean): Promise<ResponseResult<CombatResultShips>> => {
-  return doPut(axios)(routes.calculateCombat, { gameId }, {}, { defender, attacker, isTurnBased }, { withCredentials: true });
+  return doPost(axios)(routes.calculateCombat, { gameId }, {}, { defender, attacker, isTurnBased }, { withCredentials: true });
 }
