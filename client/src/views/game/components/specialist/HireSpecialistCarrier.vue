@@ -72,6 +72,7 @@ import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Specialist} from "@solaris-common";
 import {makeConfirm} from "@/util/confirm";
 import {hireCarrier} from "@/services/typedapi/specialist";
+import {useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   carrierId: string,
@@ -94,6 +95,8 @@ const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carri
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const specialists = computed(() => store.state.carrierSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.carrier.indexOf(s.id) < 0));
 const isCurrentSpecialistOneShot = computed(() => Boolean(carrier.value.specialist?.oneShot));
+
+const gameServices = useGameServices();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -154,6 +157,8 @@ const hireSpecialist = async (specialist: Specialist) => {
     if (response.data.waypoints) {
       carrier.value.waypoints = response.data.waypoints.waypoints;
       carrier.value.waypointsLooped = response.data.waypoints.waypointsLooped;
+
+      gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
     }
 
     if (userPlayer.value.stats) {
