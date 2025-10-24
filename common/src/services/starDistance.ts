@@ -157,26 +157,20 @@ export class StarDistanceService {
         return sorted.slice(0, amount);
     }
 
-    getMaxGalaxyDiameter(locations: Location[]) {
-        const diameter = this.getGalaxyDiameter(locations);
+    getMaxGalaxyRadius(locations: Location[]) {
+        const center = this.getGalaxyCenterOfMass(locations);
 
-        return diameter.x > diameter.y ? diameter.x : diameter.y;
-    }
+        let maxDistance = 0;
 
-    getGalaxyDiameter(locations: Location[]) {
-        let xArray = locations.map((location) => { return location.x; });
-        let yArray = locations.map((location) => { return location.y; });
+        for (const loc of locations) {
+            const distance = this.distanceService.getDistanceBetweenLocations(center, loc);
 
-        let maxX = Math.max(...xArray);
-        let maxY = Math.max(...yArray);
+            if (distance > maxDistance) {
+                maxDistance = distance;
+            }
+        }
 
-        let minX = Math.min(...xArray);
-        let minY = Math.min(...yArray);
-
-        return {
-            x: maxX - minX,
-            y: maxY - minY
-        };
+        return maxDistance;
     }
 
     getGalaxyCenterOfMass(starLocations: Location[]) {

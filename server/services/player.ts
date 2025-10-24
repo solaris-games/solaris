@@ -292,13 +292,13 @@ export default class PlayerService extends EventEmitter {
         // doughnut galaxies need the distance from the center needs to be slightly more than others
         // spiral galaxies need the distance to be slightly less, and they have a different galactic center
         if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (3/4);
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (3/4);
         } else if(game.settings.galaxy.galaxyType === 'spiral') {
-            distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
+            distanceFromCenter = this.starDistanceService.getMaxGalaxyRadius(locations) / 2;
         } else{
             // The desired distance from the center is on two thirds from the galaxy center and the edge
             // for all galaxies other than doughnut and spiral.
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (2/3);
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (2/3);
         }
 
         return distanceFromCenter;
