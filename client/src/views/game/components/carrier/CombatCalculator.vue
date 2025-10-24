@@ -75,7 +75,7 @@
                   </div>
                   <div class="col col-sm-4">
                     <div class="d-grid gap-2">
-                      <button type="submit" class="btn btn-success" :disabled="isLoading" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
+                      <button type="submit" class="btn btn-success" :disabled="isLoading || isInvalid" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
                     </div>
                   </div>
                 </div>
@@ -140,6 +140,12 @@ const game = computed<Game>(() => store.state.game);
 const hasDefenderBonus = computed(() => game.value.settings.specialGalaxy.defenderBonus === 'enabled');
 
 const includeDefenderBonus = ref(hasDefenderBonus.value);
+
+const isInvalid = computed(() => {
+  return defender.value.weaponsLevel <= 0 ||
+         attacker.value.weaponsLevel <= 0 ||
+         attacker.value.ships <= 0;
+});
 
 const defender = ref<CombatSide>({
   ships: 0,
