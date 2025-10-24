@@ -264,7 +264,7 @@ const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
 
 const doSaveWaypoints = async (saveAndEdit = false) => {
   isSavingWaypoints.value = true
-  const response = await saveWaypoints(httpClient)(game.value, carrier.value._id, waypoints.value, carrier.value.waypointsLooped)
+  const response = await saveWaypoints(httpClient)(game.value._id, carrier.value._id, waypoints.value, carrier.value.waypointsLooped)
 
   if (isOk(response)) {
     AudioService.join()
