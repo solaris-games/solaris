@@ -22,6 +22,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     answer(routes.saveSettings, mw.auth.authenticate(), controller.saveSettings);
 
     answer(routes.getSubscriptions, mw.auth.authenticate(), controller.getSubscriptions);
+
+    answer(routes.saveSubscriptions, mw.auth.authenticate(), controller.saveSubscriptions);
     
     answer(routes.getCredits, mw.auth.authenticate(), controller.getCredits);
 
