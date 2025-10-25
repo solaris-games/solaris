@@ -195,14 +195,6 @@ export default class EventService {
         });
     }
 
-    async deleteByEventType(gameId: DBObjectId, gameTick: number, type: string) {
-        await this.eventRepo.deleteMany({
-            gameId,
-            tick: gameTick,
-            type
-        });
-    }
-
     async createGameEvent(gameId: DBObjectId, gameTick: number, type: string, data) {
         let event = new this.eventModel({
             gameId,
@@ -736,26 +728,17 @@ export default class EventService {
     async createGameDiplomacyPeaceDeclared(args: GameDiplomacyPeaceDeclaredEvent) {
         let data = args.status;
 
-        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
-
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
 
     async createGameDiplomacyWarDeclared(args: GameDiplomacyWarDeclaredEvent) {
         let data = args.status;
 
-        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
-
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
     async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
-
-        // Delete the event if it already exists - This prevents spam.
-        await this.deleteByEventType(gameId, gameTick, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED);
 
         await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
         await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
