@@ -281,6 +281,13 @@ export default class GameCreateService {
             this._validateTeamConquest(settings, isAdvancedCustomGalaxy);
         }
 
+        if (settings.general.mode === 'battleRoyale' && settings.general.readyToQuit !== "disabled") {
+            settings.general.readyToQuit = "disabled";
+            settings.general.readyToQuitVisibility = "hidden";
+            settings.general.readyToQuitFraction = undefined;
+            settings.general.readyToQuitTimerCycles = undefined;
+        }
+
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
         let desiredStarCount = 0;

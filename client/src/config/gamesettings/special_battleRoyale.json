@@ -16,9 +16,7 @@
         "advancedAI": "enabled",
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
-        "readyToQuit": "enabled",
-        "readyToQuitFraction": 0.9,
-        "awardRankTo": "all"
+        "readyToQuit": "disabled"
     },
     "galaxy": {
         "galaxyType": "circular",
