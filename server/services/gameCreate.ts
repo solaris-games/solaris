@@ -397,7 +397,7 @@ export default class GameCreateService {
                 name,
                 createdByUserId: userId,
                 fluxId: null, // will be applied later
-                featured: isOfficialGame,
+                featured: false,
                 timeMachine: isOfficialGame ? 'enabled' : 'disabled',
                 passwordRequired: Boolean(settings.general.password),
             },
