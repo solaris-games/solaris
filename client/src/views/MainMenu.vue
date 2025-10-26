@@ -117,7 +117,7 @@
 
     <hr />
 
-    <tutorial-game />
+    <community />
 
     <hr />
   </view-container>
@@ -135,7 +135,6 @@ import router from '../router'
 import ViewContainer from './components/ViewContainer.vue'
 import ViewTitle from './components/ViewTitle.vue'
 import Achievements from './game/components/player/Achievements.vue'
-import TutorialGame from './game/components/menu/TutorialGame.vue'
 import Poll from "./components/Poll.vue";
 import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
@@ -144,6 +143,7 @@ import { formatError, httpInjectionKey, isOk } from "@/services/typedapi/index";
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import type { UserPrivate, UserAchievements } from "@solaris-common";
+import Community from "@/views/game/components/menu/Community.vue";
 
 const store: Store<State> = useStore();
 

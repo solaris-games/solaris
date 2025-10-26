@@ -283,10 +283,6 @@
 
           <hr/>
 
-          <tutorial-game />
-
-          <hr/>
-
           <h4 class="mb-0">User Created Games</h4>
 
           <p class="mb-2"><small class="text-warning" v-if="userGames.length">Total Games: {{userGames.length}}</small></p>
@@ -486,7 +482,6 @@ import router from '../../router'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
-import TutorialGame from './components/menu/TutorialGame.vue'
 import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
