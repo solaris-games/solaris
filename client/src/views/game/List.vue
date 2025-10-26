@@ -571,7 +571,7 @@ const getFriendlyDate = (date: Date) => {
 };
 
 const startTutorial = async (tutorialKey: string) => {
-  const response = await createTutorial(httpClient)(tutorialKey)!;
+  const response = await createTutorial(httpClient)(tutorialKey);
 
   if (isOk(response)) {
     store.commit('clearTutorialPage')

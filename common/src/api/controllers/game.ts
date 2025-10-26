@@ -94,7 +94,7 @@ export const createGameRoutes = <ID>() => ({
     getDefaultSettings: new SimpleGetRoute<GameSettingsSpec>("/api/game/defaultSettings"),
     getCurrentFlux: new GetRoute<{}, {}, Flux | null>("/api/game/flux"),
     create: new PostRoute<{}, {}, GameSettingsSpec, { gameId: ID }>("/api/game/"),
-    createTutorial: new PostRoute<{ tutorialKey?: string }, {}, {}, { gameId: ID }>("/api/game/tutorial/:tutorialKey?"),
+    createTutorial: new PostRoute<{ tutorialKey?: string }, {}, {}, { gameId: ID }>("/api/game/tutorial/:tutorialKey"),
     listTutorials: new SimpleGetRoute<Tutorial[]>("/api/game/tutorial/list"),
     detailInfo: new GetRoute<{ gameId: ID }, {}, GameInfoDetail<ID>>("/api/game/:gameId/info"),
     detailState: new GetRoute<{ gameId: ID }, {}, GameStateDetail<ID>>("/api/game/:gameId/state"),

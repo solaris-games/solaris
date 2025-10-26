@@ -21,7 +21,7 @@ export const getDefaultSettings = (axios: Axios) => async (): Promise<ResponseRe
 }
 
 export const createTutorial = (axios: Axios) => async (tutorialKey?: string): Promise<ResponseResult<{ gameId: string }>> => {
-  return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, { withCredentials: true });
+  return doPost(axios)(routes.createTutorial, { tutorialKey }, {}, {}, { withCredentials: true });
 }
 
 export const listTutorials = (axios: Axios) => async (): Promise<ResponseResult<Tutorial[]>> => {
