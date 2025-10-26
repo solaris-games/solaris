@@ -1,127 +1,131 @@
 {
-  "general": {
-    "name": "Special Star Types",
-    "description": "Special Stars and Warp Gates.",
-    "createdFromTemplate": "special-star-types",
-    "type": "tutorial",
-    "mode": "conquest",
-    "password": null,
-    "playerLimit": 2,
-    "playerType": "all",
-    "anonymity": "extra",
-    "playerOnlineStatus": "hidden",
-    "timeMachine": "disabled",
-    "fluxEnabled": "disabled",
-    "advancedAI": "disabled",
-    "spectators": "disabled",
-    "readyToQuit": "disabled"
-  },
-  "galaxy": {
-    "galaxyType": "circular",
-    "starsPerPlayer": 3,
-    "productionTicks": 24
-  },
-  "specialGalaxy": {
-    "carrierCost": "standard",
-    "carrierUpkeepCost": "none",
-    "warpgateCost": "standard",
-    "specialistCost": "standard",
-    "specialistsCurrency": "creditsSpecialists",
-    "randomWarpGates": 0,
-    "randomWormHoles": 0,
-    "randomNebulas": 0,
-    "randomAsteroidFields": 0,
-    "randomBinaryStars": 0,
-    "randomBlackHoles": 0,
-    "randomPulsars": 0,
-    "darkGalaxy": "disabled",
-    "giftCarriers": "disabled",
-    "defenderBonus": "enabled",
-    "carrierToCarrierCombat": "enabled",
-    "resourceDistribution": "random",
-    "playerDistribution": "circular",
-    "carrierSpeed": 10,
-    "starCaptureReward": "enabled",
-    "specialistBans": {
-      "star": [],
-      "carrier": []
+    "general": {
+        "name": "Special Star Types",
+        "description": "Special Stars and Warp Gates.",
+        "createdFromTemplate": "special-star-types",
+        "type": "tutorial",
+        "mode": "conquest",
+        "password": null,
+        "playerLimit": 2,
+        "playerType": "all",
+        "anonymity": "extra",
+        "playerOnlineStatus": "hidden",
+        "timeMachine": "disabled",
+        "fluxEnabled": "disabled",
+        "advancedAI": "disabled",
+        "spectators": "disabled",
+        "readyToQuit": "disabled",
+        "awardRankTo": "all"
+    },
+    "galaxy": {
+        "galaxyType": "circular",
+        "starsPerPlayer": 3,
+        "productionTicks": 24
+    },
+    "specialGalaxy": {
+        "carrierCost": "standard",
+        "carrierUpkeepCost": "none",
+        "warpgateCost": "standard",
+        "specialistCost": "standard",
+        "specialistsCurrency": "creditsSpecialists",
+        "randomWarpGates": 0,
+        "randomWormHoles": 0,
+        "randomNebulas": 0,
+        "randomAsteroidFields": 0,
+        "randomBinaryStars": 0,
+        "randomBlackHoles": 0,
+        "randomPulsars": 0,
+        "darkGalaxy": "disabled",
+        "giftCarriers": "disabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "enabled",
+        "resourceDistribution": "random",
+        "playerDistribution": "circular",
+        "carrierSpeed": 10,
+        "starCaptureReward": "enabled",
+        "specialistBans": {
+            "star": [],
+            "carrier": []
+        }
+    },
+    "conquest": {
+        "victoryCondition": "starPercentage",
+        "victoryPercentage": 50,
+        "capitalStarElimination": "disabled"
+    },
+    "orbitalMechanics": {
+        "enabled": "disabled"
+    },
+    "player": {
+        "startingStars": 2,
+        "startingCredits": 1000,
+        "startingCreditsSpecialists": 10,
+        "startingShips": 30,
+        "startingInfrastructure": {
+            "economy": 10,
+            "industry": 5,
+            "science": 3
+        },
+        "developmentCost": {
+            "economy": "standard",
+            "industry": "standard",
+            "science": "standard"
+        },
+        "tradeCredits": false,
+        "tradeCreditsSpecialists": false,
+        "tradeCost": 0,
+        "tradeScanning": "all",
+        "populationCap": {
+            "enabled": "disabled",
+            "shipsPerStar": 100
+        },
+        "allowAbandonStars": "enabled"
+    },
+    "diplomacy": {
+        "enabled": "disabled",
+        "upkeepCost": "none",
+        "tradeRestricted": "disabled",
+        "maxAlliances": 1,
+        "globalEvents": "disabled"
+    },
+    "technology": {
+        "startingTechnologyLevel": {
+            "terraforming": 1,
+            "experimentation": 1,
+            "scanning": 1,
+            "hyperspace": 1,
+            "manufacturing": 1,
+            "banking": 1,
+            "weapons": 1,
+            "specialists": 1
+        },
+        "researchCosts": {
+            "terraforming": "standard",
+            "experimentation": "standard",
+            "scanning": "standard",
+            "hyperspace": "standard",
+            "manufacturing": "standard",
+            "banking": "standard",
+            "weapons": "standard",
+            "specialists": "standard"
+        },
+        "bankingReward": "standard",
+        "experimentationReward": "standard",
+        "specialistTokenReward": "standard",
+        "researchCostProgression": {
+            "progression": "standard"
+        }
+    },
+    "gameTime": {
+        "gameType": "turnBased",
+        "isTickLimited": "enabled",
+        "tickLimit": 240,
+        "startDelay": 0,
+        "turnJumps": 4,
+        "maxTurnWait": 1440,
+        "afk": {
+            "lastSeenTimeout": 1,
+            "turnTimeout": 1
+        }
     }
-  },
-  "conquest": {
-    "victoryCondition": "starPercentage",
-    "victoryPercentage": 50,
-    "capitalStarElimination": "disabled"
-  },
-  "orbitalMechanics": {
-    "enabled": "disabled"
-  },
-  "player": {
-    "startingStars": 2,
-    "startingCredits": 1000,
-    "startingCreditsSpecialists": 10,
-    "startingShips": 30,
-    "startingInfrastructure": {
-      "economy": 10,
-      "industry": 5,
-      "science": 3
-    },
-    "developmentCost": {
-      "economy": "standard",
-      "industry": "standard",
-      "science": "standard"
-    },
-    "tradeCredits": false,
-    "tradeCreditsSpecialists": false,
-    "tradeCost": 0,
-    "tradeScanning": "all",
-    "populationCap": {
-      "enabled": "disabled",
-      "shipsPerStar": 100
-    },
-    "allowAbandonStars": "enabled"
-  },
-  "diplomacy": {
-    "enabled": "disabled",
-    "upkeepCost": "none",
-    "tradeRestricted": "disabled",
-    "maxAlliances": 1,
-    "globalEvents": "disabled"
-  },
-  "technology": {
-    "startingTechnologyLevel": {
-      "terraforming": 1,
-      "experimentation": 1,
-      "scanning": 1,
-      "hyperspace": 1,
-      "manufacturing": 1,
-      "banking": 1,
-      "weapons": 1,
-      "specialists": 1
-    },
-    "researchCosts": {
-      "terraforming": "standard",
-      "experimentation": "standard",
-      "scanning": "standard",
-      "hyperspace": "standard",
-      "manufacturing": "standard",
-      "banking": "standard",
-      "weapons": "standard",
-      "specialists": "standard"
-    },
-    "bankingReward": "standard",
-    "experimentationReward": "standard",
-    "specialistTokenReward": "standard"
-  },
-  "gameTime": {
-    "gameType": "turnBased",
-    "isTickLimited": "enabled",
-    "tickLimit": 240,
-    "startDelay": 0,
-    "turnJumps": 4,
-    "maxTurnWait": 1440,
-    "afk": {
-      "lastSeenTimeout": 1,
-      "turnTimeout": 1
-    }
-  }
 }

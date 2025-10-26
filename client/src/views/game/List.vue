@@ -335,6 +335,10 @@
 
           <loading-spinner :loading="isLoading"/>
 
+          <p class="text-warning">
+            The tutorials are currently being reworked and may not function as expected.
+          </p>
+
           <p v-if="!isLoading && !tutorialGames.length" class="text-danger mb-2">
             There are no tutorial games currently available.
           </p>
@@ -570,7 +574,7 @@ const startTutorial = async (tutorialKey: string) => {
 
   if (isOk(response)) {
     store.commit('clearTutorialPage')
-    router.push({ name: 'game', query: { id: response.data } })
+    router.push({ name: 'game', query: { id: response.data.gameId } })
   } else {
     console.error(formatError(response));
   }
