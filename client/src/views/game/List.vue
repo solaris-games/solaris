@@ -227,6 +227,55 @@
               </div>
             </div>
 
+            <!-- Standard team -->
+            <div class="col-sm-6 col-md-6 col-lg-6" v-if="games.standardTeam">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTeam._id })">
+                <img class="card-img" :src="standardTeamImg" alt="Standard Team Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title">
+                    <i class="fas fa-users"></i>
+                    <span class="ms-2">{{games.standardTeam.settings.general.name}}</span>
+                  </h5>
+                  <p class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.standardTeam)}}
+                    ({{games.standardTeam.state.players}}/{{games.standardTeam.settings.general.playerLimit}})
+                  </p>
+                </div>
+                <locked-game-overlay :game="games.standardTeam"/>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 16 player relaxed -->
+            <div class="col-sm-6 col-md-6 col-lg-6" v-if="games.sixteenPlayerRelaxed">
+              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.sixteenPlayerRelaxed._id })">
+                <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
+                <div class="card-img-overlay">
+                  <h5 class="card-title">
+                    <i class="fas fa-users"></i>
+                    <span class="ms-2">{{games.sixteenPlayerRelaxed.settings.general.name}}</span>
+                  </h5>
+                  <p class="card-title card-subtitle">
+                    {{getGameTypeFriendlyText(games.sixteenPlayerRelaxed)}}
+                    ({{games.sixteenPlayerRelaxed.state.players}}/{{games.sixteenPlayerRelaxed.settings.general.playerLimit}})
+                  </p>
+                </div>
+                <locked-game-overlay :game="games.sixteenPlayerRelaxed"/>
+                <div class="card-arrow">
+                  <div class="card-arrow-top-left"></div>
+                  <div class="card-arrow-top-right"></div>
+                  <div class="card-arrow-bottom-left"></div>
+                  <div class="card-arrow-bottom-right"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
             <!-- 32 Player -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.thirtyTwoPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
@@ -250,31 +299,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- 16 player relaxed -->
-            <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.sixteenPlayerRelaxed">
-              <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.sixteenPlayerRelaxed._id })">
-                <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
-                <div class="card-img-overlay">
-                  <h5 class="card-title">
-                    <i class="fas fa-users"></i>
-                    <span class="ms-2">{{games.sixteenPlayerRelaxed.settings.general.name}}</span>
-                  </h5>
-                  <p class="card-title card-subtitle">
-                    {{getGameTypeFriendlyText(games.sixteenPlayerRelaxed)}}
-                    ({{games.sixteenPlayerRelaxed.state.players}}/{{games.sixteenPlayerRelaxed.settings.general.playerLimit}})
-                  </p>
-                </div>
-                <locked-game-overlay :game="games.sixteenPlayerRelaxed"/>
-                <div class="card-arrow">
-                  <div class="card-arrow-top-left"></div>
-                  <div class="card-arrow-top-right"></div>
-                  <div class="card-arrow-bottom-left"></div>
-                  <div class="card-arrow-bottom-right"></div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <div class="text-end" v-if="!isLoading">
             <router-link to="/game/create" tag="button" class="btn btn-info me-1"><i class="fas fa-gamepad"></i> Create Game</router-link>
@@ -482,6 +506,7 @@ import duelRtImg from '../../assets/screenshots/tiles/1v1_rt.jpg';
 import duelTbImg from '../../assets/screenshots/tiles/1v1_tb.jpg';
 import large32Img from '../../assets/screenshots/tiles/32_player.jpg';
 import relaxed16Img from '../../assets/screenshots/tiles/16_player_relaxed.jpg';
+import standardTeamImg from '../../assets/screenshots/tiles/standard_team.jpg';
 import router from '../../router'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
@@ -509,6 +534,8 @@ type Games = {
   thirtyTwoPlayerRT: ListGame<string> | undefined,
   sixteenPlayerRelaxed: ListGame<string> | undefined,
   special: ListGame<string> | undefined,
+  standardTeam: ListGame<string> | undefined,
+  standardTeam: ListGame<string> | undefined,
 };
 
 const httpClient = inject(httpInjectionKey)!;
@@ -599,6 +626,7 @@ onMounted(async () => {
       thirtyTwoPlayerRT: getOfficialGame('32_player_rt'),
       sixteenPlayerRelaxed: getOfficialGame('16_player_relaxed'),
       special: getSpecialGame(),
+      standardTeam: getOfficialGame('standard_team'),
     }
   } else {
     console.error(formatError(response));

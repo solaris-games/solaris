@@ -1232,6 +1232,7 @@ class GameHelper {
       'special_tinyGalaxy': 'Tiny Galaxy',
       'special_freeForAll': 'Free For All',
       'special_arcade': 'Arcade',
+      'standard_team': 'Standard Team',
     }[game.settings.general.type]
   }
 
