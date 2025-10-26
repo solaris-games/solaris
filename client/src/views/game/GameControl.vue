@@ -52,6 +52,10 @@ const props = defineProps<{
   game: GameInfoDetail<string>,
 }>();
 
+const emit = defineEmits<{
+  onGameModified: [],
+}>();
+
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
@@ -97,6 +101,9 @@ const pauseGame = async () => {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
+
+    emit('onGameModified');
+    isLoading.value = false;
   }
 };
 
@@ -112,6 +119,9 @@ const resumeGame = async () => {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
+
+    emit('onGameModified');
+    isLoading.value = false;
   }
 };
 
@@ -127,6 +137,9 @@ const fastForwardGame = async () => {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
+
+    emit('onGameModified');
+    isLoading.value = false;
   }
 };
 
@@ -142,6 +155,9 @@ const forceStartGame = async (withOpenSlots: boolean) => {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
+
+    emit('onGameModified');
+    isLoading.value = false;
   }
 };
 
@@ -159,7 +175,10 @@ const deleteGame = async () => {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
-  }
+
+    emit('onGameModified');
+    isLoading.value = false;
+    }
 };
 </script>
 <style scoped></style>

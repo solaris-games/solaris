@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <game-control :game="game" />
+      <game-control :game="game" @onGameModified="loadGame" />
 
       <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb' || game.settings.general.type === 'tutorial'">
         <div class="ratio ratio-16x9">
@@ -61,12 +61,13 @@ const gameId = useRoute().query.id?.toString();
 const isNewPlayerGame = computed(() => GameHelper.isNewPlayerGame(game.value));
 const isCustomFeaturedGame = computed(() => GameHelper.isCustomGame(game.value) && GameHelper.isFeaturedGame(game.value));
 
-onMounted(async () => {
+const loadGame = async () => {
   if (!gameId) {
     return;
   }
 
   isLoading.value = true;
+
   const response = await detailInfo(httpClient)(gameId);
 
   if (isOk(response)) {
@@ -77,6 +78,10 @@ onMounted(async () => {
   }
 
   isLoading.value = false;
+};
+
+onMounted(async () => {
+  await loadGame();
 });
 </script>
 
