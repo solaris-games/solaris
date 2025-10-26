@@ -160,11 +160,11 @@
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
                 <img class="card-img" :src="standardTbImg" alt="Standard Turn Based Game">
                 <div class="card-img-overlay">
-                  <h6 class="card-title">
+                  <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
                     <span class="ms-2">{{games.standardTB.settings.general.name}}</span>
                   </h6>
-                  <p class="card-title card-subtitle">
+                  <p class="card-title card-subtitle standard-card-subtitle">
                     {{getGameTypeFriendlyText(games.standardTB)}}
                     ({{games.standardTB.state.players}}/{{games.standardTB.settings.general.playerLimit}})
                   </p>
@@ -184,11 +184,11 @@
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
                 <img class="card-img" :src="duelRtImg" alt="1 vs. 1 Game">
                 <div class="card-img-overlay">
-                  <h6 class="card-title">
+                  <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-friends"></i>
                     <span class="ms-2">{{games.oneVsOneRT.settings.general.name}}</span>
                   </h6>
-                  <p class="card-title card-subtitle">
+                  <p class="card-title card-subtitle standard-card-subtitle">
                     {{getGameTypeFriendlyText(games.oneVsOneRT)}}
                     ({{games.oneVsOneRT.state.players}}/{{games.oneVsOneRT.settings.general.playerLimit}})
                   </p>
@@ -208,11 +208,11 @@
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
                 <img class="card-img" :src="duelTbImg" alt="1 vs. 1 Turn Based Game">
                 <div class="card-img-overlay">
-                  <h6 class="card-title">
+                  <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-friends"></i>
                     <span class="ms-2">{{games.oneVsOneTB.settings.general.name}}</span>
                   </h6>
-                  <p class="card-title card-subtitle">
+                  <p class="card-title card-subtitle standard-card-subtitle">
                     {{getGameTypeFriendlyText(games.oneVsOneTB)}}
                     ({{games.oneVsOneTB.state.players}}/{{games.oneVsOneTB.settings.general.playerLimit}})
                   </p>
@@ -257,7 +257,7 @@
                 <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-globe"></i>
                     <span class="ms-2">{{games.sixteenPlayerRelaxed.settings.general.name}}</span>
                   </h5>
                   <p class="card-title card-subtitle">
@@ -282,7 +282,7 @@
                 <img class="card-img" :src="large32Img" alt="32 Player Game">
                 <div class="card-img-overlay">
                   <h5 class="card-title">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-globe"></i>
                     <span class="ms-2">{{games.thirtyTwoPlayerRT.settings.general.name}}</span>
                   </h5>
                   <p class="card-title card-subtitle">
