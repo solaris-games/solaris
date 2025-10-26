@@ -535,7 +535,6 @@ type Games = {
   sixteenPlayerRelaxed: ListGame<string> | undefined,
   special: ListGame<string> | undefined,
   standardTeam: ListGame<string> | undefined,
-  standardTeam: ListGame<string> | undefined,
 };
 
 const httpClient = inject(httpInjectionKey)!;
