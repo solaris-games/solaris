@@ -150,8 +150,8 @@
           </span>
         </div>
         <div class="col-auto">
-          <span title="Weapons" v-if="star.ownedByPlayerId">
-            {{star.effectiveTechs!.weapons}} <i class="fas fa-gun ms-1"></i>
+          <span title="Weapons (not including carriers in orbit)" v-if="star.ownedByPlayerId">
+            {{effectiveWeapons}} <i class="fas fa-gun ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -234,10 +234,10 @@
 
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
           <div class="col">
-              Weapons
+              Weapons (not including carriers in orbit)
           </div>
-          <div class="col text-end" title="Weapons">
-            <span>{{star.effectiveTechs!.weapons}}</span>
+          <div class="col text-end" title="Weapons (not including carriers in orbit)">
+            <span>{{effectiveWeapons}}</span>
             <i class="fas fa-gun ms-2"></i>
           </div>
       </div>
@@ -441,12 +441,13 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
-import type {Carrier} from "@/types/game";
+import type {Carrier, Game, Player} from "@/types/game";
 import type {MapObject} from "@solaris-common";
 import {abandon} from "@/services/typedapi/star";
 import {makeWarpgateActions} from "@/views/game/components/star/upgrade";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   starId: string,
@@ -467,22 +468,25 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
+const game = computed<Game>(() => store.state.game);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const star = computed(() => GameHelper.getStarById(store.state.game, props.starId)!);
-const starOwningPlayer = computed(() => star.value.ownedByPlayerId && GameHelper.getPlayerById(store.state.game, star.value.ownedByPlayerId));
-const originalCapitalOwner = computed(() => GameHelper.getOriginalOwner(store.state.game, star.value));
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
-const canBuildWarpGates = computed(() => store.state.game.settings.specialGalaxy.warpgateCost !== 'none');
-const canDestroyWarpGates = computed(() => Boolean(store.state.game.state.startDate));
-const warpSpeedMultiplier = computed(() => store.state.game.constants.distances.warpSpeedMultiplier);
-const isSpecialistsEnabled = computed(() => store.state.game.settings.specialGalaxy.specialistCost !== 'none');
+const gameServices = useGameServices();
+
+const star = computed(() => GameHelper.getStarById(game.value, props.starId)!);
+const starOwningPlayer = computed<Player | undefined>(() => star.value.ownedByPlayerId && GameHelper.getPlayerById(game.value, star.value.ownedByPlayerId) || undefined);
+const originalCapitalOwner = computed(() => GameHelper.getOriginalOwner(game.value, star.value));
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const canBuildWarpGates = computed(() => game.value.settings.specialGalaxy.warpgateCost !== 'none');
+const canDestroyWarpGates = computed(() => Boolean(game.value.state.startDate));
+const warpSpeedMultiplier = computed(() => game.value.constants.distances.warpSpeedMultiplier);
+const isSpecialistsEnabled = computed(() => game.value.settings.specialGalaxy.specialistCost !== 'none');
 const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
 const isCompactUIStyle = computed(() => !isStandardUIStyle.value);
-const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
-const isGameInProgress = computed(() => GameHelper.isGameInProgress(store.state.game));
-const isGameAllowAbandonStars = computed(() => GameHelper.isGameAllowAbandonStars(store.state.game));
+const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
+const isGameInProgress = computed(() => GameHelper.isGameInProgress(game.value));
+const isGameAllowAbandonStars = computed(() => GameHelper.isGameAllowAbandonStars(game.value));
 const isOwnedByUserPlayer = computed(() => starOwningPlayer.value && userPlayer.value && starOwningPlayer.value._id === userPlayer.value._id);
 const isDeadStar = computed(() => GameHelper.isDeadStar(star.value));
 const wormHolePairStar = computed(() => {
@@ -490,7 +494,7 @@ const wormHolePairStar = computed(() => {
     return null;
   }
 
-  return GameHelper.getStarById(store.state.game, star.value.wormHoleToStarId)!;
+  return GameHelper.getStarById(game.value, star.value.wormHoleToStarId)!;
 });
 const canShowSpecialist = computed(() => isSpecialistsEnabled.value && (star.value.specialistId || isOwnedByUserPlayer.value) && !isDeadStar.value);
 const canHireSpecialist = computed(() => canShowSpecialist.value && !isGameFinished.value && (!star.value.specialistId || !star.value.specialist?.oneShot));
@@ -502,13 +506,13 @@ const title = computed(() => {
 
   return star.value.name;
 });
-const isGameDarkMode = computed(() => GameHelper.isDarkMode(store.state.game));
+const isGameDarkMode = computed(() => GameHelper.isDarkMode(game.value));
 
 const onCloseRequested = () => emit('onCloseRequested');
 const onViewHireStarSpecialistRequested = () => emit('onViewHireStarSpecialistRequested', star.value._id);
 const onShipTransferRequested = (carrierId: string) => emit('onShipTransferRequested', carrierId);
 
-const getCarriersInOrbit = () => GameHelper.getCarriersOrbitingStar(store.state.game, star.value);
+const getCarriersInOrbit = () => GameHelper.getCarriersOrbitingStar(game.value, star.value);
 
 const onOpenPlayerDetailRequested = () => star.value.ownedByPlayerId && emit('onOpenPlayerDetailRequested', star.value.ownedByPlayerId);
 const onOpenOriginalCapitalOwner = () => originalCapitalOwner.value && emit('onOpenPlayerDetailRequested', originalCapitalOwner.value._id);
@@ -517,8 +521,16 @@ const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsReq
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
 const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
 
+const effectiveWeapons = computed(() => {
+  if (!starOwningPlayer.value) {
+    return '0';
+  }
+
+  return gameServices.technologyService.getStarEffectiveWeaponsLevel(game.value, [starOwningPlayer.value], star.value, []);
+});
+
 const confirmAbandonStar = async (e) => {
-  const response = await abandon(httpClient)(store.state.game._id, star.value._id);
+  const response = await abandon(httpClient)(game.value._id, star.value._id);
 
   if (isOk(response)) {
     toast.default(`${star.value.name} has been abandoned.`);
