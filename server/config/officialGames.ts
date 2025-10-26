@@ -51,7 +51,10 @@ const carouselGames = (name: string, distribution: 'random' | 'sequential', conf
 const officialGameSettings = [
     standardGame('./game/settings/official/newPlayer'),
     standardGame('./game/settings/official/standard'),
-    standardGame('./game/settings/official/turnBased'),
+    carouselGames('turnBased', 'sequential', [
+        './game/settings/official/10tb/turnBased.json',
+        './game/settings/official/10tb/turnBased_ultraDark.json',
+    ]),
     standardGame('./game/settings/official/1v1'),
     standardGame('./game/settings/official/1v1turnBased'),
 ];

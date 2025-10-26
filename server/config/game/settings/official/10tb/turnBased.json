@@ -4,6 +4,7 @@
         "description": "The galaxy is ripe for the taking, will it be you who dominates and comes out on top? Forge alliances, set up trade, gather your ships and prove that you are the best.",
         "type": "standard_tb",
         "mode": "conquest",
+        "createdFromTemplate": "10player_turnBased",
         "password": null,
         "playerLimit": 10,
         "playerType": "all",
