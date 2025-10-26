@@ -1,8 +1,8 @@
 {
     "general": {
         "name": "[[[RANDOM]]]",
-        "description": "5v5 Player Team Game (Real Time)",
-        "createdFromTemplate": "10player_5v5_team_rt",
+        "description": "5x2 Player Team Game (Real Time)",
+        "createdFromTemplate": "10player_5x2_team_rt",
         "type": "standard_team",
         "mode": "teamConquest",
         "password": null,
@@ -59,7 +59,7 @@
         "victoryCondition": "starPercentage",
         "victoryPercentage": 33,
         "capitalStarElimination": "disabled",
-        "teamsCount": 2
+        "teamsCount": 5
     },
     "orbitalMechanics": {
         "enabled": "disabled",
@@ -95,7 +95,7 @@
         "lockedAlliances": "enabled",
         "upkeepCost": "none",
         "tradeRestricted": "enabled",
-        "maxAlliances": 4,
+        "maxAlliances": 1,
         "globalEvents": "disabled"
     },
     "technology": {

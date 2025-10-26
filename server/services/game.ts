@@ -322,10 +322,6 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot force start game: at least one human player is needed');
         }
 
-        if (aiSlots > 3) {
-            throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
-        }
-
         this.gameJoinService.assignNonUserPlayersToAI(game, withOpenSlots);
 
         this.gameJoinService.startGame(game);

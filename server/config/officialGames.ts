@@ -50,6 +50,7 @@ const carouselGames = (name: string, distribution: 'random' | 'sequential', conf
 
 const officialTeamGames = carouselGames('Team Games', 'sequential', [
     './game/settings/official/10team/10player_5v5_team_rt',
+    './game/settings/official/10team/10player_5x2_team_rt',
 ]);
 
 const officialGameSettings = [
