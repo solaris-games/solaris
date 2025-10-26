@@ -62,7 +62,6 @@ export default async (config, options) => {
     log.info(`Connecting to database: ${options.connectionString}`);
 
     const db = await mongoose.connect(options.connectionString, {
-        keepAlive: true,
         maxPoolSize: options.poolSize,
         socketTimeoutMS: 120000,
     });
