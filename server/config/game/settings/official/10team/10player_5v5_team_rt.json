@@ -1,0 +1,142 @@
+{
+    "general": {
+        "name": "[[[RANDOM]]]",
+        "description": "5v5 Player Team Game (Real Time)",
+        "createdFromTemplate": "16player_realTime",
+        "type": "standard_team",
+        "mode": "teamConquest",
+        "password": null,
+        "playerLimit": 10,
+        "playerType": "establishedPlayers",
+        "anonymity": "extra",
+        "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
+        "timeMachine": "enabled",
+        "fluxEnabled": "enabled",
+        "advancedAI": "enabled",
+        "spectators": "enabled",
+        "afkSlotsOpen": "enabled",
+        "readyToQuit": "enabled",
+        "readyToQuitFraction": 0.9,
+        "readyToQuitVisibility": "anonymous",
+        "joinRandomSlot": "enabled"
+    },
+    "galaxy": {
+        "galaxyType": "irregular",
+        "starsPerPlayer": 20,
+        "productionTicks": 20
+    },
+    "specialGalaxy": {
+        "carrierCost": "standard",
+        "carrierUpkeepCost": "standard",
+        "warpgateCost": "standard",
+        "specialistCost": "standard",
+        "specialistsCurrency": "creditsSpecialists",
+        "randomWarpGates": 10,
+        "randomWormHoles": 3,
+        "randomNebulas": 15,
+        "randomAsteroidFields": 10,
+        "randomBinaryStars": 10,
+        "randomBlackHoles": 5,
+        "randomPulsars": 1,
+        "darkGalaxy": "extra",
+        "giftCarriers": "enabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "enabled",
+        "splitResources": "disabled",
+        "resourceDistribution": "random",
+        "playerDistribution": "circular",
+        "carrierSpeed": 20,
+        "starCaptureReward": "enabled",
+        "specialistBans": {
+            "star": [
+                15
+            ],
+            "carrier": []
+        }
+    },
+    "conquest": {
+        "victoryCondition": "starPercentage",
+        "victoryPercentage": 33,
+        "capitalStarElimination": "disabled",
+        "teamsCount": 2
+    },
+    "orbitalMechanics": {
+        "enabled": "disabled",
+        "orbitSpeed": 3
+    },
+    "player": {
+        "startingStars": 6,
+        "startingCredits": 1000,
+        "startingCreditsSpecialists": 10,
+        "startingShips": 10,
+        "startingInfrastructure": {
+            "economy": 5,
+            "industry": 5,
+            "science": 2
+        },
+        "developmentCost": {
+            "economy": "standard",
+            "industry": "standard",
+            "science": "standard"
+        },
+        "tradeCredits": true,
+        "tradeCreditsSpecialists": false,
+        "tradeCost": 25,
+        "tradeScanning": "scanned",
+        "populationCap": {
+            "enabled": "disabled",
+            "shipsPerStar": 100
+        },
+        "allowAbandonStars": "disabled"
+    },
+    "diplomacy": {
+        "enabled": "enabled",
+        "lockedAlliances": "enabled",
+        "upkeepCost": "none",
+        "tradeRestricted": "enabled",
+        "maxAlliances": 4,
+        "globalEvents": "disabled"
+    },
+    "technology": {
+        "startingTechnologyLevel": {
+            "terraforming": 1,
+            "experimentation": 1,
+            "scanning": 3,
+            "hyperspace": 2,
+            "manufacturing": 1,
+            "banking": 1,
+            "weapons": 1,
+            "specialists": 1
+        },
+        "researchCosts": {
+            "terraforming": "standard",
+            "experimentation": "cheap",
+            "scanning": "cheap",
+            "hyperspace": "cheap",
+            "manufacturing": "standard",
+            "banking": "cheap",
+            "weapons": "expensive",
+            "specialists": "expensive"
+        },
+        "experimentationDistribution": "random",
+        "bankingReward": "standard",
+        "experimentationReward": "experimental",
+        "specialistTokenReward": "experimental",
+        "researchCostProgression": {
+            "progression": "exponential",
+            "growthFactor": "medium"
+        }
+    },
+    "gameTime": {
+        "gameType": "realTime",
+        "speed": 3600,
+        "isTickLimited": "disabled",
+        "startDelay": 480,
+        "afk": {
+            "lastSeenTimeout": 2,
+            "cycleTimeout": 3,
+            "turnTimeout": 3
+        }
+    }
+}

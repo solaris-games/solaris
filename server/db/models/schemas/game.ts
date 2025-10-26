@@ -26,6 +26,7 @@ const schema = new Schema({
 				'custom',
 				'standard_rt',
 				'standard_tb',
+                'standard_team',
 				'1v1_rt',
 				'1v1_tb',
 				'new_player_rt',
