@@ -67,7 +67,7 @@ window.addEventListener("unhandledrejection", (event) => {
 const eventBus: EventBus = new ClientEventBus();
 
 const redirectHome = () => {
-  router.push({ name: 'Home' });
+  router.push({ name: 'home' });
 };
 
 const httpClient = createHttpClient(redirectHome);
