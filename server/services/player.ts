@@ -391,7 +391,8 @@ export default class PlayerService extends EventEmitter {
             star.isPulsar = initialStar.isPulsar;
             star.name = initialStar.name;
             star.ownedByPlayerId = initialStar.ownedByPlayerId;
-            star.ships = initialStar.ships;
+            star.ships = initialStar.ships || 0;
+            star.shipsActual = initialStar.ships || 0;
             star.specialistId = initialStar.specialistId;
             star.specialistExpireTick = initialStar.specialistExpireTick;
             star.warpGate = initialStar.warpGate;
