@@ -155,6 +155,11 @@
           </span>
         </div>
         <div class="col-auto">
+          <span title="Defender Bonus" v-if="star.ownedByPlayerId">
+            {{defenderBonus}} <i class="fas fa-shield-alt ms-1"></i>
+          </span>
+        </div>
+        <div class="col-auto">
           <span v-if="star.ownedByPlayerId && !isDeadStar" title="Manufacturing">
             {{star.effectiveTechs!.manufacturing}} <i class="fas fa-industry ms-1"></i>
           </span>
@@ -240,6 +245,16 @@
             <span>{{effectiveWeapons}}</span>
             <i class="fas fa-gun ms-2"></i>
           </div>
+      </div>
+
+      <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
+        <div class="col">
+          Defender Bonus
+        </div>
+        <div class="col text-end" title="Defender Bonus">
+          <span>{{defenderBonus}}</span>
+          <i class="fas fa-shield-alt ms-2"></i>
+        </div>
       </div>
 
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1 bg-dark">
@@ -520,6 +535,8 @@ const onOpenCarrierDetailRequested = (carrier: Carrier) => emit('onOpenCarrierDe
 const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsRequested', carrierId);
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
 const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
+
+const defenderBonus = computed(() => gameServices.technologyService.getDefenderBonus(game.value, star.value));
 
 const effectiveWeapons = computed(() => {
   if (!starOwningPlayer.value) {
