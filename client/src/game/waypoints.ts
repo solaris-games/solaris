@@ -93,15 +93,16 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
 
     const graphics = new PIXI.Graphics()
 
-    // Start the line from where the carrier currently is.
-    let star
-
     graphics.moveTo(this.carrier!.location.x, this.carrier!.location.y)
 
     // Draw a line to each destination along the waypoints.
     for (let i = 0; i < this.carrier!.waypoints.length; i++) {
-      let waypoint = this.carrier!.waypoints[i]
-      star = this.game!.galaxy.stars.find(s => s._id === waypoint.destination)
+      const waypoint = this.carrier!.waypoints[i];
+      const star = this.game!.galaxy.stars.find(s => s._id === waypoint.destination);
+
+      if (!star) {
+        break;
+      }
 
       graphics.lineTo(star.location.x, star.location.y)
     }
