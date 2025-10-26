@@ -474,14 +474,14 @@
 </template>
 
 <script setup lang="ts">
-import featuredImg from '../../assets/screenshots/featured.png';
-import newPlayerRtImg from '../../assets/screenshots/new_player_rt.png';
-import standardRtImg from '../../assets/screenshots/standard_rt.png';
-import standardTbImg from '../../assets/screenshots/standard_tb.png';
-import duelRtImg from '../../assets/screenshots/1v1_rt.png';
-import duelTbImg from '../../assets/screenshots/1v1_tb.png';
-import large32Img from '../../assets/screenshots/32_player.png';
-import relaxed16Img from '../../assets/screenshots/16_player_relaxed.png';
+import featuredImg from '../../assets/screenshots/tiles/featured.jpg';
+import newPlayerRtImg from '../../assets/screenshots/tiles/new_player_rt.jpg';
+import standardRtImg from '../../assets/screenshots/tiles/standard_rt.jpg';
+import standardTbImg from '../../assets/screenshots/tiles/standard_tb.jpg';
+import duelRtImg from '../../assets/screenshots/tiles/1v1_rt.jpg';
+import duelTbImg from '../../assets/screenshots/tiles/1v1_tb.jpg';
+import large32Img from '../../assets/screenshots/tiles/32_player.jpg';
+import relaxed16Img from '../../assets/screenshots/tiles/16_player_relaxed.jpg';
 import router from '../../router'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
@@ -524,7 +524,7 @@ const recentlyCompletedGames: Ref<ListGame<string>[]> = ref([]);
 const tutorialGames: Ref<Tutorial[]> = ref([]);
 const games: Ref<Games | null> = ref(null);
 
-const specialGameSrc = computed(() => games.value?.special && new URL(`../../assets/screenshots/${games.value.special.settings.general.type}.png`, import.meta.url).href);
+const specialGameSrc = computed(() => games.value?.special && new URL(`../../assets/screenshots/tiles/${games.value.special.settings.general.type}.jpg`, import.meta.url).href);
 
 const getGameTypeFriendlyText = (tp) => gameHelper.getGameTypeFriendlyText(tp);
 

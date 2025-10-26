@@ -124,11 +124,11 @@
 </template>
 
 <script setup lang="ts">
-import home1 from '../assets/screenshots/home-1.png'
-import home2 from '../assets/screenshots/home-2.png'
-import home3 from '../assets/screenshots/home-3.png'
-import home4 from '../assets/screenshots/home-4.png'
-import home5 from '../assets/screenshots/home-5.png'
+import home1 from '../assets/screenshots/tiles/home-1.jpg'
+import home2 from '../assets/screenshots/tiles/home-2.jpg'
+import home3 from '../assets/screenshots/tiles/home-3.jpg'
+import home4 from '../assets/screenshots/tiles/home-4.jpg'
+import home5 from '../assets/screenshots/tiles/home-5.jpg'
 import { ref, onMounted, type Ref, inject } from 'vue';
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import router from '../router'
