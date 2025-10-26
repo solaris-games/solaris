@@ -647,7 +647,7 @@ export default class AIService {
                     if (assignment.totalShips >= requiredShips) {
                         const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
 
-                        if (!carrierResult) {
+                        if (!carrierResult || !assignment.carriers[0]) {
                             continue;
                         }
 
@@ -691,6 +691,10 @@ export default class AIService {
 
         for (const claim of newClaimedStars) {
             const star = context.starsById.get(claim)!;
+
+            if (!star) {
+                continue;
+            }
 
             if (!star.ownedByPlayerId) {
                 claimsInProgress.push(claim);
