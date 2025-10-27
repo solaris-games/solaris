@@ -92,6 +92,8 @@ const doRename = async (e: Event) => {
     carrier.value.name = trimmed;
 
     toast.default(`Carrier renamed to ${trimmed}.`);
+
+    emit('onOpenCarrierDetailRequested', props.carrierId);
   } else {
     toast.error('Failed to rename carrier.');
     console.error(formatError(response));
