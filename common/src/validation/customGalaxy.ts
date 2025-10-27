@@ -73,7 +73,14 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             banking: positiveInteger,
             manufacturing: positiveInteger,
             specialists: positiveInteger
-        })
+        }),
+        alias: or(stringValue({
+            minLength: 1,
+            maxLength: 30,
+            trim: true,
+            matches: UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
+            ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
+        }), just(undefined)),
     })), just(undefined)),
     carriers: or(sizedArray(0, 500, object({
         id: carrierId,

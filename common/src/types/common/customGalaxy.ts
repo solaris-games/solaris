@@ -16,6 +16,7 @@ export interface CustomGalaxyPlayer {
     credits: number;
     creditsSpecialists: number;
     technologies: PlayerTechnologyLevels;
+    alias?: string;
 }
 
 export interface CustomGalaxyStar {
