@@ -1,10 +1,10 @@
 import { Location } from '../types/Location'
-import DistanceService from "../distance";
-import GameTypeService from "../gameType";
+import { DistanceService } from 'solaris-common';
+import { GameTypeService } from 'solaris-common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
-import StarDistanceService from "../starDistance";
+import { StarDistanceService } from 'solaris-common';
 import { GalaxyDimensions } from '../types/Dimensions';
 const randomSeeded = require('random-seed');
 

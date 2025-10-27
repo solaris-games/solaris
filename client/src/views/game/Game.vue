@@ -31,13 +31,12 @@ import GameContainer from './components/GameContainer.vue'
 import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
-import GameApiService from '../../services/api/game'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '../../eventBus'
-import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, type Ref } from 'vue';
+import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
@@ -50,6 +49,8 @@ import type {State} from "@/store";
 import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
+import {detailGalaxy, detailState} from "@/services/typedapi/game";
+import {createGameServices, gameServicesKey} from "@/util/gameServices";
 
 const store: Store<State> = useStore();
 
@@ -76,6 +77,9 @@ const hasGame = computed(() => Boolean(store.state.game));
 const isLoggedIn = computed(() => Boolean(store.state.userId));
 
 const isHistorical = computed(() => store.state.tick !== store.state.game.state.tick);
+
+const gameServices = createGameServices(store);
+provide(gameServicesKey, gameServices);
 
 const onColourOverrideConfirmed = () => {
   colourOverride.value = null;
@@ -173,20 +177,20 @@ const reloadSettings = async () => {
 };
 
 const reloadGame = async () => {
-  try {
-    const galaxyResponse = await GameApiService.getGameGalaxy(route.query.id);
+  const response = await detailGalaxy(httpClient)(route.query.id as string);
 
+  if (isOk(response)) {
     // Make sure the player is still in the current game, they may have quickly
     // switched to another game.
-    if (route.query.id === galaxyResponse.data._id) {
-      store.commit('setGame', galaxyResponse.data); // Persist to storage
-      store.commit('setTick', galaxyResponse.data.state.tick);
-      store.commit('setProductionTick', galaxyResponse.data.state.productionTick);
+    if (route.query.id === response.data._id) {
+      store.commit('setGame', response.data); // Persist to storage
+      store.commit('setTick', response.data.state.tick);
+      store.commit('setProductionTick', response.data.state.productionTick);
 
-      document.title = galaxyResponse.data.settings.general.name + ' - Solaris';
+      document.title = response.data.settings.general.name + ' - Solaris';
     }
-  } catch (err) {
-    console.error(err);
+  } else {
+    console.error(formatError(response));
 
     toast.error('Game failed to load');
 
@@ -206,29 +210,25 @@ const reloadGameCheck = async () => {
   if (canTick) {
     ticking.value = true;
 
-    try {
-      const response = await GameApiService.getGameState(store.state.game._id);
+    const response = await detailState(httpClient)(store.state.game._id);
 
-      if (response.status === 200) {
-        if (store.state.tick < response.data.state.tick) {
-          // If the user is currently using the time machine then only set the state variables.
-          // Otherwise reload the current game tick.
-          if (isHistorical.value) {
-            store.commit('setTick', response.data.state.tick)
-            store.commit('setProductionTick', response.data.state.productionTick)
-          } else {
-            await reloadGame();
-          }
-
-          eventBus.emit(GameEventBusEventNames.OnGameTick);
-
-          toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
-
-          AudioService.download();
+    if (isOk(response)) {
+      if (store.state.tick < response.data.state.tick) {
+        // If the user is currently using the time machine then only set the state variables.
+        // Otherwise reload the current game tick.
+        if (isHistorical.value) {
+          store.commit('setTick', response.data.state.tick)
+          store.commit('setProductionTick', response.data.state.productionTick)
+        } else {
+          await reloadGame();
         }
+
+        eventBus.emit(GameEventBusEventNames.OnGameTick);
+
+        toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
+
+        AudioService.download();
       }
-    } catch (e) {
-      console.error(e)
     }
 
     ticking.value = false;

@@ -4,10 +4,10 @@ import { Game, GameUserNotification } from "./types/Game";
 import ConversationService from "./conversation";
 import EventService from "./event";
 import GameService from "./game";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import LeaderboardService from "./leaderboard";
 
-const moment = require('moment');
+import moment from "moment";
 
 export default class GameListService {
     gameRepo: Repository<Game>;

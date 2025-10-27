@@ -1,22 +1,23 @@
 import {Game, Team} from "./types/Game";
-import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam} from "./types/Leaderboard";
+import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam, PlayerStatistics} from "./types/Leaderboard";
 import { Player } from "./types/Player";
 import {EloRatingChangeResult, GameRanking, GameRankingResult} from "./types/Rating";
 import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import {maxBy, reverseSort, sorterByProperty} from "./utils";
+import {maxBy, reverseSort, sorterByProperty} from "solaris-common";
 import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
+import {isSpecialGameMode} from "./officialGames";
 
-const moment = require('moment');
+import moment from "moment";
 
 export enum GameWinnerKind {
     Player = 'player',
@@ -47,6 +48,12 @@ const teamWinner = (team: Team): GameWinner => {
         kind: GameWinnerKind.Team,
         team
     }
+}
+
+type PlayerAndStats = {
+    player: Player,
+    isKingOfTheHill: boolean,
+    stats: PlayerStatistics,
 }
 
 export default class LeaderboardService {
@@ -108,7 +115,7 @@ export default class LeaderboardService {
     }
 
     getGameLeaderboard(game: Game, sortingKey?: string): PlayerLeaderboard {
-        let SORTERS = LeaderboardService.LOCALSORTERS;
+        const SORTERS = LeaderboardService.LOCALSORTERS;
 
         let kingOfTheHillPlayer: Player | null = null;
 
@@ -116,15 +123,17 @@ export default class LeaderboardService {
             kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
         }
 
-        let playerStats = game.galaxy.players.map(p => {
-            let isKingOfTheHill = kingOfTheHillPlayer != null && p._id.toString() === kingOfTheHillPlayer._id.toString();
-            let stats = p.stats ?? this.playerStatisticsService.getStats(game, p);
+        const playerStats = game.galaxy.players.map(p => {
+            const isKingOfTheHill = kingOfTheHillPlayer != null && p._id.toString() === kingOfTheHillPlayer._id.toString();
+            const stats = p.stats ?? this.playerStatisticsService.getStats(game, p);
 
-            return {
+            const playerAndStats: PlayerAndStats = {
                 player: p,
                 isKingOfTheHill,
                 stats
             };
+
+            return playerAndStats;
         });
 
         const getNestedObject = (nestedObj, pathArr: string[]) => {
@@ -132,7 +141,7 @@ export default class LeaderboardService {
                 (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
         }
 
-        function sortPlayers(a, b) {
+        function sortPlayers(a: PlayerAndStats, b: PlayerAndStats) {
             if (sortingKey) {
                 if (getNestedObject(a, SORTERS[sortingKey].split('.')) > getNestedObject(b, SORTERS[sortingKey].split('.'))) return -1;
                 if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
@@ -174,17 +183,17 @@ export default class LeaderboardService {
         }
 
         // Sort the undefeated players first.
-        let undefeatedLeaderboard = playerStats
+        const undefeatedLeaderboard = playerStats
             .filter(x => !x.player.defeated)
             .sort(sortPlayers);
 
         // Sort the defeated players next.
-        let defeatedLeaderboard = playerStats
+        const defeatedLeaderboard = playerStats
             .filter(x => x.player.defeated)
             .sort(sortPlayers);
 
         // Join both sorted arrays together to produce the leaderboard.
-        let leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard);
+        const leaderboard = undefeatedLeaderboard.concat(defeatedLeaderboard);
 
         return {
             leaderboard,
@@ -377,7 +386,7 @@ export default class LeaderboardService {
             }
 
             // For special game modes, award x2 positive rank.
-            if (rankIncrease > 0 && this.gameTypeService.isSpecialGameMode(game)) {
+            if (rankIncrease > 0 && isSpecialGameMode(game)) {
                 rankIncrease *= 2;
             }
             
@@ -420,7 +429,7 @@ export default class LeaderboardService {
             this.badgeService.awardBadgeForUserVictor32PlayerGame(user, game);
         }
 
-        if (this.gameTypeService.isSpecialGameMode(game)) {
+        if (isSpecialGameMode(game)) {
             this.badgeService.awardBadgeForUserVictorySpecialGame(user, game);
         }
 
@@ -475,7 +484,7 @@ export default class LeaderboardService {
     getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
         let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
 
-        let key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
+        const key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
         leaderboard.sort(reverseSort(sorterByProperty(key)));
 
         if (isAllUndefeatedPlayersReadyToQuit) {

@@ -1,5 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-const mongoose = require('mongoose')
+import mongoose from 'mongoose';
 
 export default (container: DependencyContainer) => {
     return {

@@ -28,136 +28,136 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import GameApiService from '../../../../services/api/game'
 import MentionBox from '../shared/MentionBox.vue'
 import MentionHelper from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
-import { inject } from 'vue';
+import { ref, computed, inject, onMounted, useTemplateRef } from 'vue';
+import { useStore } from 'vuex';
+import {getNotes, writeNotes} from "@/services/typedapi/game";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
-    'mention-box': MentionBox,
-    'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinner
-  },
-  data() {
-    return {
-      isLoadingNotes: false,
-      isSavingNotes: false,
-      isEditing: false,
-      readonlyNotes: '',
-      notes: ''
-    }
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  mounted() {
-    this.loadGameNotes()
-  },
-  unmounted() {
-    this.$store.commit('resetMentions')
-  },
-  methods: {
-    beginEditing() {
-      this.isEditing = true
-      this.notes = MentionHelper.makeMentionsEditable(this.$store.state.game, this.readonlyNotes);
-    },
-    onSetMessageElement(element) {
-      this.$store.commit('setMentions', {
-        element,
-        callbacks: {
-          player: (player) => {
-            this.notes = MentionHelper.addMention(this.notes, this.$store.state.mentionReceivingElement, 'player', player.alias)
-          },
-          star: (star) => {
-            this.notes = MentionHelper.addMention(this.notes, this.$store.state.mentionReceivingElement, 'star', star.name)
-          }
-        }
-      })
-    },
-    onCloseRequested(e) {
-      this.$emit('onCloseRequested', e)
-    },
-    async loadGameNotes() {
-      try {
-        this.isLoadingNotes = true
+const emit = defineEmits<{
+  onCloseRequested: [e: Event],
+  onOpenPlayerDetailRequested: [playerId: string]
+}>();
 
-        let response = await GameApiService.getGameNotes(this.$store.state.game._id)
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-        if (response.status === 200) {
-          this.setReadonlyNotes(response.data.notes)
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const store = useStore();
 
-      this.isLoadingNotes = false
-    },
-    onReplaceInMessage(data) {
-      this.notes = MentionHelper.useSuggestion(this.notes, this.$store.state.mentionReceivingElement, data)
-    },
-    async updateGameNotes() {
-      try {
-        this.isEditing = false
-        this.isSavingNotes = true
+const isLoadingNotes = ref(false);
+const isSavingNotes = ref(false);
+const isEditing = ref(false);
+const readonlyNotes = ref('');
+const notes = ref('');
 
-        const newNotes = MentionHelper.makeMentionsStatic(this.$store.state.game, this.notes)
-        let response = await GameApiService.updateGameNotes(this.$store.state.game._id, newNotes)
+const notesReadonlyElement = useTemplateRef('notesReadonlyElement');
 
-        if (response.status === 200) {
-          this.setReadonlyNotes(newNotes)
-          this.$toast.success(`Game notes updated.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isSavingNotes = false
-    },
-    setReadonlyNotes(notes) {
-      MentionHelper.resetMessageElement(this.$refs.notesReadonlyElement)
-      this.readonlyNotes = notes || ''
-      MentionHelper.renderMessageWithMentionsAndLinks(this.$refs.notesReadonlyElement, this.readonlyNotes, this.onStarClicked, this.onPlayerClicked);
-    },
-    panToStar (id) {
-      const star = GameHelper.getStarById(this.$store.state.game, id)
-
-      if (star) {
-        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
-      } else {
-        this.$toast.error(`The location of the star is unknown.`)
-      }
-    },
-    onStarClicked(id) {
-      this.panToStar(id)
-    },
-    onPlayerClicked(id) {
-      this.$emit('onOpenPlayerDetailRequested', id)
-    }
-  },
-  computed: {
-    noteLength() {
-      if (this.notes == null) {
-        return 0
-      }
-
-      const staticText = MentionHelper.makeMentionsStatic(this.$store.state.game, this.notes)
-
-      return staticText.length
-    },
-    isExceededMaxLength() {
-      return this.noteLength > 2000
-    }
+const noteLength = computed(() => {
+  if (notes.value == null) {
+    return 0
   }
-}
+
+  const staticText = MentionHelper.makeMentionsStatic(store.state.game, notes.value)
+
+  return staticText.length
+});
+
+const isExceededMaxLength = computed(() => noteLength.value > 2000);
+
+const beginEditing = () => {
+  isEditing.value = true
+  notes.value = MentionHelper.makeMentionsEditable(store.state.game, readonlyNotes.value);
+};
+
+const onSetMessageElement = (element: HTMLElement) => {
+  store.commit('setMentions', {
+    element,
+    callbacks: {
+      player: (player) => {
+        notes.value = MentionHelper.addMention(notes.value, store.state.mentionReceivingElement, 'player', player.alias)
+      },
+      star: (star) => {
+        notes.value = MentionHelper.addMention(notes.value, store.state.mentionReceivingElement, 'star', star.name)
+      }
+    }
+  })
+};
+
+const onCloseRequested = (e: Event) => {
+  emit('onCloseRequested', e)
+};
+
+const onReplaceInMessage = (data: { type: string; id: string; name: string }) => {
+  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data)
+};
+
+const updateGameNotes = async () => {
+  isEditing.value = false;
+  isSavingNotes.value = true;
+
+  const newNotes = MentionHelper.makeMentionsStatic(store.state.game, notes.value);
+  const response = await writeNotes(httpClient)(store.state.game._id, newNotes);
+
+  if (isOk(response)) {
+    setReadonlyNotes(newNotes)
+    // @ts-ignore
+    toast.success(`Game notes updated.`)
+  } else {
+    console.error(formatError(response));
+  }
+
+  isSavingNotes.value = false
+};
+
+const setReadonlyNotes = (notesParam: string) => {
+  MentionHelper.resetMessageElement(notesReadonlyElement.value);
+  readonlyNotes.value = notesParam || ''
+  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value, readonlyNotes.value, onStarClicked, onPlayerClicked);
+};
+
+const panToStar = (id: string) => {
+  const star = GameHelper.getStarById(store.state.game, id)
+  if (star) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: star.location });
+  } else {
+    toast.error(`The location of the star is unknown.`)
+  }
+};
+
+const onStarClicked = (id: string) => {
+  panToStar(id);
+};
+
+const onPlayerClicked = (id: string) => {
+  emit('onOpenPlayerDetailRequested', id)
+};
+
+
+const loadGameNotes = async () => {
+  isLoadingNotes.value = true;
+
+  const response = await getNotes(httpClient)(store.state.game._id);
+  if (isOk(response)) {
+    setReadonlyNotes(response.data.notes || '')
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoadingNotes.value = false
+};
+
+onMounted(async () => {
+  await loadGameNotes();
+});
 </script>
 
 <style scoped>

@@ -6,7 +6,7 @@ import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';
@@ -21,7 +21,7 @@ import DiplomacyService from "./diplomacy";
 import TeamService from "./team";
 import CarrierService from './carrier';
 import { logger } from "../utils/logging";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import { DBObjectId } from "./types/DBObjectId";
 import CustomGalaxyService from "./customGalaxy";
 import {
@@ -281,6 +281,13 @@ export default class GameCreateService {
             this._validateTeamConquest(settings, isAdvancedCustomGalaxy);
         }
 
+        if (settings.general.mode === 'battleRoyale' && settings.general.readyToQuit !== "disabled") {
+            settings.general.readyToQuit = "disabled";
+            settings.general.readyToQuitVisibility = "hidden";
+            settings.general.readyToQuitFraction = undefined;
+            settings.general.readyToQuitTimerCycles = undefined;
+        }
+
         // For non-custom galaxies we need to check that the player has actually provided
         // enough stars for each player.
         let desiredStarCount = 0;
@@ -390,7 +397,7 @@ export default class GameCreateService {
                 name,
                 createdByUserId: userId,
                 fluxId: null, // will be applied later
-                featured: isOfficialGame,
+                featured: false,
                 timeMachine: isOfficialGame ? 'enabled' : 'disabled',
                 passwordRequired: Boolean(settings.general.password),
             },
@@ -485,7 +492,7 @@ export default class GameCreateService {
     _setGalaxyCenter(game: Game) {
         const starLocations = game.galaxy.stars.map(s => s.location);
 
-        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenter(starLocations);
+        game.constants.distances.galaxyCenterLocation = this.starDistanceService.getGalaxyCenterOfMass(starLocations);
     }
 
     _calculateStarsForVictory(game: Game) {

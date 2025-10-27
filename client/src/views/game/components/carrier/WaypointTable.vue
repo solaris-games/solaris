@@ -6,10 +6,14 @@
                 <td v-if="userPlayerOwnsCarrier">Delay</td>
                 <td>Destination</td>
                 <td v-if="!showAction" title="Show actions">
-                  <a href="javascript:;" @click="toggleShowAction">ETA</a>
+                  <a class="link-inactive" href="javascript:;" @click="toggleShowAction">
+                    [&nbsp;ETA&nbsp;|&nbsp;<span class="link-active">Action</span>&nbsp;]
+                  </a>
                 </td>
-                <td v-if="showAction" title="Show ETA's">
-                  <a href="javascript:;" @click="toggleShowAction">Action</a>
+                <td v-if="showAction" title="Show ETAs">
+                  <a class="link-inactive" href="javascript:;" @click="toggleShowAction">
+                    [&nbsp;<span class="link-active">ETA</span>&nbsp;|&nbsp;Action&nbsp;]
+                  </a>
                 </td>
                 <td class="text-end" v-if="!$isHistoricalMode() && canEditWaypoints">
                   <a href="javascript:;" @click="onEditWaypointsRequested">
@@ -75,4 +79,13 @@ export default {
 </script>
 
 <style scoped>
+.link-inactive {
+  text-decoration: none;
+  color: inherit;
+}
+
+.link-active {
+  text-decoration: underline;
+  color: var(--bs-theme);
+}
 </style>

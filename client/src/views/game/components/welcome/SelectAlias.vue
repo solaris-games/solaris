@@ -20,8 +20,8 @@
               <p v-if="avatar"><small class="linebreaks">{{ avatar.description }}</small></p>
 
               <div class="mb-2">
-                <input name="alias" class="form-control" required="required" placeholder="Enter your alias here"
-                  type="text" minlength="1" maxlength="24" v-model="alias" @change="onAliasChanged">
+                <input name="alias" class="form-control" :required="true" placeholder="Enter your alias here"
+                  type="text" minlength="1" maxlength="24" v-model="alias">
               </div>
 
               <div v-if="isAnonymousGame" class="alert alert-warning">
@@ -35,51 +35,48 @@
   </div>
 </template>
 
-<script>
-import { inject } from 'vue';
+<script setup lang="ts">
+import { inject, ref, onMounted, watch } from 'vue';
 import SelectAvatar from './SelectAvatar.vue'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { detailMe } from '@/services/typedapi/user';
+import type {UserAvatar} from "@solaris-common";
 
-export default {
-  components: {
-    'select-avatar': SelectAvatar
-  },
-  props: {
-    isAnonymousGame: Boolean,
-  },
-  setup() {
-    return {
-      httpClient: inject(httpInjectionKey),
-    };
-  },
-  data() {
-    return {
-      alias: null,
-      avatar: null,
-    }
-  },
-  async mounted() {
-    const response = await detailMe(this.httpClient)();
+const props = defineProps<{
+  isAnonymousGame: boolean,
+}>();
 
-    if (isOk(response)) {
-      this.alias = response.data.username
-      this.onAliasChanged(this.alias)
-    } else {
-      console.error(formatError(response));
-    }
-  },
-  methods: {
-    onAliasChanged(e) {
-      this.$emit('onAliasChanged', this.alias)
-    },
-    onAvatarChanged(e) {
-      this.avatar = e
+const emit = defineEmits<{
+  onAliasChanged: [alias: string],
+  onAvatarChanged: [avatar: number],
+}>();
 
-      this.$emit('onAvatarChanged', e)
-    }
+const httpClient = inject(httpInjectionKey)!;
+
+const alias = ref<string>("");
+const avatar = ref<UserAvatar | null>(null);
+
+const onAliasChanged = (value: string) => {
+  emit('onAliasChanged', value);
+};
+
+watch(alias, onAliasChanged);
+
+const onAvatarChanged = (e: UserAvatar) => {
+  avatar.value = e;
+  emit('onAvatarChanged', e.id);
+};
+
+onMounted(async () => {
+  const response = await detailMe(httpClient)();
+
+  if (isOk(response)) {
+    alias.value = response.data.username;
+    onAliasChanged(alias.value);
+  } else {
+    console.error(formatError(response));
   }
-}
+});
 </script>
 
 <style scoped>

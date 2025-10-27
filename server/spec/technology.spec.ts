@@ -1,6 +1,6 @@
-import TechnologyService from '../services/technology';
-import GameTypeService from "../services/gameType";
-const mongoose = require('mongoose');
+import { TechnologyService } from 'solaris-common';
+import { GameTypeService } from 'solaris-common'
+import mongoose from 'mongoose';
 
 let service,
     specialistService;

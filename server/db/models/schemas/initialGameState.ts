@@ -1,6 +1,6 @@
 import WaypointSchema from "./waypoint";
 
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 

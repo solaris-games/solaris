@@ -3,17 +3,16 @@ import {Player} from "./types/Player";
 import {KnownAttack} from "./types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import PlayerService from "./player";
 import ShipTransferService from "./shipTransfer";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import TechnologyService from "./technology";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
 import {Star} from "./types/Star";
 import {Carrier} from "./types/Carrier";
-import {getOrInsert, maxBy, minBy, notNull, reverseSort} from "./utils";
-import {CarrierWaypoint, CarrierWaypointActionType} from "./types/CarrierWaypoint";
+import {getOrInsert, maxBy, notNull, reverseSort} from "solaris-common";
+import {CarrierWaypoint, CarrierWaypointActionType} from "solaris-common";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
 import PlayerStatisticsService from "./playerStatistics";
@@ -23,9 +22,12 @@ import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import PathfindingService from "./pathfinding";
 import {logger} from "../utils/logging";
+import mongoose from 'mongoose';
+import SaveWaypointsService from "./saveWaypoints";
+import { TechnologyService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
 
 const Heap = require('qheap');
-const mongoose = require("mongoose");
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -136,7 +138,7 @@ export default class AIService {
     carrierService: CarrierService;
     starService: StarService;
     distanceService: DistanceService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     combatService: CombatService;
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
@@ -148,13 +150,15 @@ export default class AIService {
     shipService: ShipService;
     basicAIService: BasicAIService;
     pathfindingService: PathfindingService;
+    saveWaypointService: SaveWaypointsService;
+    starDataService: StarDataService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
         carrierService: CarrierService,
         starService: StarService,
         distanceService: DistanceService,
-        waypointService: WaypointService,
+        waypointService: WaypointService<DBObjectId>,
         combatService: CombatService,
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
@@ -165,7 +169,9 @@ export default class AIService {
         shipService: ShipService,
         playerStatisticsService: PlayerStatisticsService,
         basicAIService: BasicAIService,
-        pathfindingService: PathfindingService
+        pathfindingService: PathfindingService,
+        saveWaypointService: SaveWaypointsService,
+        starDataService: StarDataService,
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -183,6 +189,8 @@ export default class AIService {
         this.shipService = shipService;
         this.basicAIService = basicAIService;
         this.pathfindingService = pathfindingService;
+        this.saveWaypointService = saveWaypointService;
+        this.starDataService = starDataService;
     }
 
     isAIControlled(player: Player) {
@@ -639,13 +647,15 @@ export default class AIService {
                     if (assignment.totalShips >= requiredShips) {
                         const carrierResult = await this._useAssignment(context, game, player, assignments, assignment, this._createWaypointsFromTrace(trace), requiredShips);
 
-                        if (!carrierResult) {
+                        if (!carrierResult || !assignment.carriers[0]) {
                             continue;
                         }
 
+                        const ticksEtaTotal = this.waypointService.calculateWaypointTicksEta(game, assignment.carriers[0], carrierResult.waypoints[carrierResult.waypoints.length - 1]);
+
                         player.aiState!.invasionsInProgress.push({
                             star: order.star,
-                            arrivalTick: game.state.tick + (carrierResult.ticksEtaTotal || 0)
+                            arrivalTick: game.state.tick + (ticksEtaTotal || 0)
                         });
 
                         break;
@@ -682,6 +692,10 @@ export default class AIService {
         for (const claim of newClaimedStars) {
             const star = context.starsById.get(claim)!;
 
+            if (!star) {
+                continue;
+            }
+
             if (!star.ownedByPlayerId) {
                 claimsInProgress.push(claim);
             }
@@ -690,14 +704,14 @@ export default class AIService {
         player.aiState!.startedClaims = claimsInProgress;
     }
 
-    async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
+    async _useAssignment(context: Context, game: Game, player: Player, assignments: Map<string, Assignment>, assignment: Assignment, waypoints: CarrierWaypoint<DBObjectId>[], ships: number, onCarrierUsed: ((Carrier) => void) | null = null) {
         let shipsToTransfer = ships;
         const starId = assignment.star._id;
         let carrier: Carrier = assignment.carriers && assignment.carriers[0];
 
         if (carrier) {
             assignment.carriers.shift();
-        } else if (this.starService.isDeadStar(assignment.star)) {
+        } else if (this.starDataService.isDeadStar(assignment.star)) {
             return;
         } else {
             const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
@@ -712,7 +726,7 @@ export default class AIService {
             assignment.totalShips = assignment.star.ships!;
         }
 
-        const carrierResult = await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
+        const carrierResult = await this.saveWaypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         const carrierRemaining = assignment.carriers && assignment.carriers.length > 0;
 
         if (!carrierRemaining && assignment.totalShips === 0) {
@@ -726,7 +740,7 @@ export default class AIService {
         return carrierResult;
     }
 
-    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint[] {
+    _createWaypointsDropAndReturn(trace: TracePoint[], baseAction: CarrierWaypointActionType = "nothing"): CarrierWaypoint<DBObjectId>[] {
         const newTrace: TracePoint[] = trace.slice(0, trace.length - 1);
 
         newTrace.push({
@@ -744,8 +758,8 @@ export default class AIService {
         return this._createWaypointsFromTrace(newTrace.concat(backTrace));
     }
 
-    _createWaypointsFromTrace(trace: TracePoint[]): CarrierWaypoint[] {
-        const waypoints: CarrierWaypoint[] = [];
+    _createWaypointsFromTrace(trace: TracePoint[]): CarrierWaypoint<DBObjectId>[] {
+        const waypoints: CarrierWaypoint<DBObjectId>[] = [];
         let last = trace[0].starId;
 
         for (let i = 1; i < trace.length; i++) {
@@ -846,7 +860,7 @@ export default class AIService {
     }
 
     _calculateTravelDistance(star1: Star, star2: Star): number {
-        if (this.starService.isStarPairWormHole(star1, star2)) {
+        if (this.starDataService.isStarPairWormHole(star1, star2)) {
             return 0;
         } else {
             return this.distanceService.getDistanceBetweenLocations(star1.location, star2.location);
@@ -1317,7 +1331,7 @@ export default class AIService {
 
             await this.shipTransferService.transfer(game, player, carrier._id, carrierInitialShips + transferShips, movement.from._id, 0, false);
 
-            await this.waypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
+            await this.saveWaypointService.saveWaypointsForCarrier(game, player, carrier, waypoints, false, false);
         }
     }
 

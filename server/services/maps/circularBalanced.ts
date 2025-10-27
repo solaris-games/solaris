@@ -3,12 +3,12 @@ import {GameResourceDistribution} from "solaris-common";
 const RNG = require('random-seed');
 import { ValidationError } from "solaris-common";
 import { Location } from "../types/Location";
-import DistanceService from "../distance";
-import GameTypeService from "../gameType";
+import { DistanceService } from 'solaris-common';
+import { GameTypeService } from 'solaris-common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
-import StarDistanceService from "../starDistance";
+import { StarDistanceService } from 'solaris-common';
 
 export default class CircularBalancedMapService {
 
@@ -125,7 +125,7 @@ export default class CircularBalancedMapService {
         // choose home stars
 
         // The desired distance from the center is half way from the galaxy center and the edge.
-        const distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
+        const distanceFromCenter = this.starDistanceService.getMaxGalaxyRadius(locations);
         let playerAngle = (sectorAngle/2.0);//take a location from the middle of the sector
         let desiredLocation = this._getRotatedLocation({x: 0.0, y: distanceFromCenter}, playerAngle);
         let firstHomeLocation = this.distanceService.getClosestLocation(desiredLocation, locations);

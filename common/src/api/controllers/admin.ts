@@ -1,9 +1,9 @@
-import type { Announcement } from '../types/common/announcement';
-import type { GameSettingsGeneral, GameState } from '../types/common/game';
-import type { SettingEnabledDisabled } from '../types/common/settings';
-import type { UserRoles, UserWarning } from '../types/common/user';
-import type { Report } from '../types/common/report';
-import type { Conversation } from '../types/common/conversation';
+import type { Announcement } from '../../types/common/announcement';
+import type { GameSettingsGeneral, GameState } from '../../types/common/game';
+import type { SettingEnabledDisabled } from '../../types/common/settings';
+import type { UserRoles, UserWarning } from '../../types/common/user';
+import type { Report } from '../../types/common/report';
+import type { Conversation } from '../../types/common/conversation';
 import { GetRoute, PatchRoute, PostRoute, DeleteRoute, SimpleGetRoute, SimplePatchRoute, SimplePostRoute } from './index';
 
 export type GetInsight = {
@@ -55,7 +55,7 @@ export type SetCreditsReq = {
     credits: number,
 }
 
-export type ListGame<ID> = {
+export type AdminListGame<ID> = {
     _id: ID,
     settings: {
         general: GameSettingsGeneral<ID>,
@@ -102,7 +102,7 @@ export const createAdminRoutes = <ID>() => ({
     promoteToEstablishedPlayer: new PatchRoute<{ userId: string }, {}, null, null>('/api/admin/user/:userId/promoteToEstablishedPlayer'),
     impersonate: new PostRoute<{ userId: string }, {}, null, ImpersonateResp<ID>>('/api/admin/user/:userId/impersonate'),
     endImpersonate: new SimplePostRoute<null, ImpersonateResp<ID>>('/api/admin/endImpersonate'),
-    listGames: new SimpleGetRoute<ListGame<ID>[]>('/api/admin/game'),
+    listGames: new SimpleGetRoute<AdminListGame<ID>[]>('/api/admin/game'),
     setGameFeatured: new PatchRoute<{ gameId: string }, {}, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
     setGameTimeMachine: new PatchRoute<{ gameId: string }, {}, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),
     finishGame: new PatchRoute<{ gameId: string }, {}, null, null>('/api/admin/game/:gameId/finish'),

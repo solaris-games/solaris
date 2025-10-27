@@ -25,7 +25,7 @@
                   </td>
                   <td></td>
                   <td title="Type">
-                    <a href="javascript:;" @click="sort(['type'])">T</a>
+                    <a href="javascript:;" class="small text-decoration-none" @click="sort(['type'])"><i class="fas fa-star"></i> / <i class="fas fa-rocket"></i></a>
                     </td>
                   <td title="Specialist">
                     <a href="javascript:;" @click="sort(['specialist', 'name'])"><i class="fas fa-user-astronaut"></i></a>

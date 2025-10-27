@@ -44,17 +44,17 @@ const avatar: Ref<UserAvatar | null> = ref(null);
 const avatars: Ref<UserAvatar[]> = ref([]);
 
 const reloadAvatars = async () => {
-  isLoading.value = true
+  isLoading.value = true;
 
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    avatars.value = response.data;
+    avatars.value = response.data.sort((a, b) => a.purchased ? -1 : 1 || a.id - b.id);
   } else {
     console.error(formatError(response));
   }
 
-  isLoading.value = false
+  isLoading.value = false;
 };
 
 const onAvatarChanged = () => {

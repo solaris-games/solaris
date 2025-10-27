@@ -5,7 +5,7 @@ import { Star } from './types/Star';
 import CarrierService from './carrier';
 import SpecialistService from './specialist';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import { PlayerStatistics } from './types/Leaderboard';
 import ShipService from './ship';
 
@@ -31,19 +31,14 @@ export default class PlayerStatisticsService {
     }
 
     getStats(game: Game, player: Player): PlayerStatistics {
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
 
-        let totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
-        let totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
+        const totalStarSpecialists = this.calculateTotalStarSpecialists(playerStars);
+        const totalCarrierSpecialists = this.calculateTotalCarrierSpecialists(playerCarriers);
 
-        let totalStars = playerStars.length;
-        let totalHomeStars = this.calculateTotalHomeStars(playerStars);
-
-        // In BR mode, the player star count is based on living stars only. - TODO: Why?
-        if (game.settings.general.mode === 'battleRoyale') {
-            totalStars = playerStars.filter(s => !this.starService.isDeadStar(s)).length;
-        }
+        const totalStars = playerStars.length;
+        const totalHomeStars = this.calculateTotalHomeStars(playerStars);
 
         return {
             totalStars: totalStars,
@@ -63,7 +58,7 @@ export default class PlayerStatisticsService {
     }
 
     calculateTotalStars(player: Player, stars: Star[]) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(stars, player._id);
 
         return playerStars.length;
     }
@@ -73,9 +68,9 @@ export default class PlayerStatisticsService {
     }
 
     calculateTotalEconomy(playerStars: Star[]) {
-        let totalEconomy = playerStars.reduce((sum, s) => {
-            let multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
-            let eco = s.infrastructure?.economy ?? 0;
+        const totalEconomy = playerStars.reduce((sum, s) => {
+            const multiplier = this.specialistService.getEconomyInfrastructureMultiplier(s);
+            const eco = s.infrastructure?.economy ?? 0;
 
             return sum + (eco * multiplier)
         }, 0);
@@ -84,8 +79,8 @@ export default class PlayerStatisticsService {
     }
 
     calculateTotalIndustry(playerStars: Star[]) {
-        let totalIndustry = playerStars.reduce((sum, s) => {
-            let ind = s.infrastructure?.industry ?? 0;
+        const totalIndustry = playerStars.reduce((sum, s) => {
+            const ind = s.infrastructure?.industry ?? 0;
 
             return sum + ind;
         }, 0);
@@ -94,9 +89,9 @@ export default class PlayerStatisticsService {
     }
 
     calculateTotalScience(game: Game, playerStars: Star[]) {
-        let totalScience = playerStars.reduce((sum, s) => {
-            let specialistMultiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
-            let sci = s.infrastructure?.science ?? 0;
+        const totalScience = playerStars.reduce((sum, s) => {
+            const specialistMultiplier = this.specialistService.getScienceInfrastructureMultiplier(s);
+            const sci = s.infrastructure?.science ?? 0;
 
             return sum + Math.floor(sci * specialistMultiplier * game.constants.research.sciencePointMultiplier)
         }, 0);
@@ -118,7 +113,7 @@ export default class PlayerStatisticsService {
     }
 
     calculateTotalCarriers(player: Player, carriers: Carrier[]) {
-        let playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
+        const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(carriers, player._id);
 
         return playerCarriers.length;
     }

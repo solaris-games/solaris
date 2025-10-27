@@ -1,7 +1,7 @@
 <template>
   <div class="menu-page container">
-    <menu-title title="Hire Specialist" @onCloseRequested="onCloseRequested">
-      <button @click="onOpenCarrierDetailRequested(carrier)" class="btn btn-sm btn-outline-primary"
+    <menu-title title="Hire Specialist" @onCloseRequested="e => emit('onCloseRequested', e)">
+      <button @click="_ => emit('onOpenCarrierDetailRequested', carrier._id)" class="btn btn-sm btn-outline-primary"
               title="Back to Carrier"><i class="fas fa-arrow-left"></i></button>
     </menu-title>
 
@@ -13,7 +13,7 @@
 
     <div class="row mb-2 pt-1 pb-1 bg-dark" v-if="carrier">
       <div class="col">
-        <a href="javascript:;" @click="onOpenCarrierDetailRequested(carrier)"><i class="fas fa-rocket"></i>
+        <a href="javascript:;" @click="_ => emit('onOpenCarrierDetailRequested', carrier._id)"><i class="fas fa-rocket"></i>
           {{ carrier.name }}</a>
       </div>
       <div class="col-auto">
@@ -35,14 +35,14 @@
         </div>
         <div class="col-auto mt-2">
           <button class="btn btn-sm btn-success"
-                  v-if="!(carrier.specialistId && carrier.specialist.id === specialist.id)"
-                  :disabled="$isHistoricalMode() || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot"
+                  v-if="!(carrier.specialist && carrier.specialist.id === specialist.id)"
+                  :disabled="isHistoricalMode || isHiringSpecialist || cantAffordSpecialist(specialist) || isCurrentSpecialistOneShot"
                   @click="hireSpecialist(specialist)">
             <i class="fas fa-coins"></i>
             Hire for {{ getSpecialistActualCostString(specialist) }}
           </button>
           <span class="badge bg-primary"
-                v-if="carrier.specialistId && carrier.specialist.id === specialist.id">Active</span>
+                v-if="carrier.specialist && carrier.specialist.id === specialist.id">Active</span>
         </div>
         <div class="col-12 mt-2">
           <p>{{ specialist.description }}</p>
@@ -57,114 +57,123 @@
   </div>
 </template>
 
-<script>
-import MenuTitleVue from '../MenuTitle.vue'
+<script setup lang="ts">
+import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
-import SpecialistApiService from '../../../../services/api/specialist'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
-import {inject} from 'vue';
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import {computed, ref, inject} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import {useStore} from "vuex";
+import type {Game} from "@/types/game";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import type {Specialist} from "@solaris-common";
+import {makeConfirm} from "@/util/confirm";
+import {hireCarrier} from "@/services/typedapi/specialist";
+import {useGameServices} from "@/util/gameServices";
 
-export default {
-  components: {
-    'menu-title': MenuTitleVue,
-    'specialist-icon': SpecialistIconVue
-  },
-  props: {
-    carrierId: String
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data() {
-    return {
-      userPlayer: null,
-      carrier: null,
-      specialists: [],
-      isHiringSpecialist: false
-    }
-  },
-  mounted() {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+const props = defineProps<{
+  carrierId: string,
+}>();
 
-    const banList = this.$store.state.game.settings.specialGalaxy.specialistBans.carrier
+const emit = defineEmits<{
+  onCloseRequested: [e: Event],
+  onOpenCarrierDetailRequested: [carrierId: string],
+}>();
 
-    this.specialists = this.$store.state.carrierSpecialists.filter(s => banList.indexOf(s.id) < 0)
-  },
-  methods: {
-    onCloseRequested(e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenCarrierDetailRequested(carrier) {
-      this.$emit('onOpenCarrierDetailRequested', carrier._id)
-    },
-    async hireSpecialist(specialist) {
-      if (!await this.$confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${this.getSpecialistActualCostString(specialist)} on Carrier ${this.carrier.name}?`)) {
-        return
-      }
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (this.carrier.specialistId && !await this.$confirm('Replace specialist', `Are you sure you want to replace the existing specialist ${this.carrier.specialist.name} for a ${specialist.name}?`)) {
-        return
-      }
+const store = useStore();
+const confirm = makeConfirm(store);
 
-      this.isHiringSpecialist = true
+const game = computed<Game>(() => store.state.game);
+const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const specialists = computed(() => store.state.carrierSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.carrier.indexOf(s.id) < 0));
+const isCurrentSpecialistOneShot = computed(() => Boolean(carrier.value.specialist?.oneShot));
 
-      try {
-        let response = await SpecialistApiService.hireCarrierSpecialist(this.$store.state.game._id, this.carrierId, specialist.id)
+const gameServices = useGameServices();
 
-        if (response.status === 200) {
-          this.$toast.default(`${specialist.name} has been hired for the carrier ${this.carrier.name}.`)
+const isHistoricalMode = useIsHistoricalMode(store);
 
-          let currency = this.$store.state.game.settings.specialGalaxy.specialistsCurrency
+const isHiringSpecialist = ref(false);
 
-          this.carrier.specialistId = specialist.id
-          this.carrier.specialistExpireTick = specialist.expireTicks ? this.$store.state.game.state.tick + specialist.expireTicks : null
-          this.carrier.specialist = specialist
-          this.carrier.effectiveTechs = response.data.effectiveTechs
-          this.userPlayer[currency] -= specialist.cost[currency]
+const getSpecialistActualCost = (specialist: Specialist): number => {
+  const expenseConfig = game.value.constants.star.specialistsExpenseMultipliers[game.value.settings.specialGalaxy.specialistCost];
 
-          if (response.data.waypoints) {
-            this.carrier.waypoints = response.data.waypoints.waypoints
-            this.carrier.waypointsLooped = response.data.waypoints.waypointsLooped
-          }
-
-          this.userPlayer.stats.totalCarrierSpecialists++
-          this.userPlayer.stats.totalSpecialists++
-
-          this.eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: this.carrier});
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isHiringSpecialist = false
-    },
-    getSpecialistActualCost(specialist) {
-      return specialist.cost[this.$store.state.game.settings.specialGalaxy.specialistsCurrency]
-    },
-    getSpecialistActualCostString(specialist) {
-      let actualCost = this.getSpecialistActualCost(specialist)
-
-      switch (this.$store.state.game.settings.specialGalaxy.specialistsCurrency) {
-        case 'credits':
-          return `$${actualCost}`
-        case 'creditsSpecialists':
-          return `${actualCost} token${actualCost > 1 ? 's' : ''}`
-      }
-    },
-    cantAffordSpecialist(specialist) {
-      return this.userPlayer[this.$store.state.game.settings.specialGalaxy.specialistsCurrency] < this.getSpecialistActualCost(specialist)
-    }
-  },
-  computed: {
-    isCurrentSpecialistOneShot() {
-      return this.carrier.specialist && this.carrier.specialist.oneShot
-    }
+  if (game.value.settings.specialGalaxy.specialistsCurrency === 'credits') {
+    return specialist.baseCostCredits * expenseConfig;
+  } else if (game.value.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists') {
+    return specialist.baseCostCreditsSpecialists * expenseConfig;
+  } else {
+    throw new Error('Unknown specialists currency type');
   }
+};
+
+const getSpecialistActualCostString = (specialist: Specialist) => {
+  const actualCost = getSpecialistActualCost(specialist);
+
+  if (game.value.settings.specialGalaxy.specialistsCurrency === 'credits') {
+    return `$${actualCost}`
+  } else if (game.value.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists') {
+    return `${actualCost} token${actualCost > 1 ? 's' : ''}`
+  } else {
+    throw new Error('Unknown specialists currency type');
+  }
+};
+
+const cantAffordSpecialist = (specialist: Specialist) => {
+  return userPlayer.value[game.value.settings.specialGalaxy.specialistsCurrency] < getSpecialistActualCost(specialist);
+};
+
+const hireSpecialist = async (specialist: Specialist) => {
+  if (!await confirm('Hire specialist', `Are you sure you want to hire a ${specialist.name} for ${getSpecialistActualCostString(specialist)} on Carrier ${carrier.value.name}?`)) {
+    return;
+  }
+
+  if (carrier.value.specialist && !await confirm('Replace specialist', `Are you sure you want to replace the existing specialist ${carrier.value.specialist.name} for a ${specialist.name}?`)) {
+    return;
+  }
+
+  isHiringSpecialist.value = true;
+
+  const response = await hireCarrier(httpClient)(game.value._id, carrier.value._id, specialist.id);
+
+  if (isOk(response)) {
+    toast.default(`${specialist.name} has been hired for the carrier ${carrier.value.name}.`)
+
+    const currency = game.value.settings.specialGalaxy.specialistsCurrency;
+
+    carrier.value.specialistId = specialist.id;
+    carrier.value.specialistExpireTick = specialist.expireTicks ? game.value.state.tick + specialist.expireTicks : null;
+    carrier.value.specialist = specialist;
+    carrier.value.effectiveTechs = response.data.effectiveTechs;
+    userPlayer[currency] -= getSpecialistActualCost(specialist);
+
+    if (response.data.waypoints) {
+      carrier.value.waypoints = response.data.waypoints.waypoints;
+      carrier.value.waypointsLooped = response.data.waypoints.waypointsLooped;
+
+      gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
+    }
+
+    if (userPlayer.value.stats) {
+      userPlayer.value.stats.totalCarrierSpecialists++
+      userPlayer.value.stats.totalSpecialists++
+    }
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
+  } else {
+    toast.error(`An error occurred while trying to hire the specialist: ${formatError(response)}`);
+    console.error(formatError(response));
+  }
+
+
+  isHiringSpecialist.value = false;
 }
 </script>
 

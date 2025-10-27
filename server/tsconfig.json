@@ -1,25 +1,29 @@
 {
-  "compilerOptions": {
-    "target": "es2016",
-    "module": "commonjs",
-    "resolveJsonModule": true,
-    "sourceMap": true,
-    "outDir": "./dist",
-    "noEmit": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noImplicitAny": false,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "paths": {
-        "@solaris-common": ["../common/src/index.ts"]
-    }
-  },
-  "include": [
-    "**/*.ts",
-    "db/migrations/*.js",
-    "config/**/*.json",
-    "services/emailTemplates/*.html"
-  ]
+    "compilerOptions": {
+        "target": "es2016",
+        "module": "commonjs",
+        "resolveJsonModule": true,
+        "sourceMap": true,
+        "outDir": "./dist",
+        "noEmit": false,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitAny": false,
+        "noImplicitThis": true,
+        "useDefineForClassFields": true,
+        "skipLibCheck": true,
+        "allowJs": true,
+        "paths": {
+            "@solaris-common": [
+                "../common/src/index.ts"
+            ]
+        }
+    },
+    "include": [
+        "**/*.ts",
+        "db/migrations/*.js",
+        "config/**/*.json",
+        "services/emailTemplates/*.html"
+    ]
 }

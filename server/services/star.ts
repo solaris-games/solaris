@@ -1,7 +1,5 @@
-import { shuffle } from "./utils";
-
-const EventEmitter = require('events');
-const mongoose = require('mongoose');
+import { shuffle } from "solaris-common";
+import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -12,18 +10,20 @@ import { MapObjectWithVisibility } from './types/Map';
 import { Player } from './types/Player';
 import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import { User } from './types/User';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import NameService from './name';
 import RandomService from './random';
 import SpecialistService from './specialist';
-import StarDistanceService from './starDistance';
-import TechnologyService from './technology';
+import { StarDistanceService } from 'solaris-common';
+import { TechnologyService } from 'solaris-common';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
 import {GameSettings} from "solaris-common";
+import EventEmitter from "events";
+import { StarDataService } from "solaris-common";
 
 const RNG = require('random-seed');
 
@@ -34,7 +34,6 @@ export const StarServiceEvents = {
 }
 
 export default class StarService extends EventEmitter {
-
     gameRepo: Repository<Game>;
     randomService: RandomService;
     nameService: NameService;
@@ -46,6 +45,7 @@ export default class StarService extends EventEmitter {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     statisticsService: StatisticsService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -59,6 +59,7 @@ export default class StarService extends EventEmitter {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         statisticsService: StatisticsService,
+        starDataService: StarDataService,
     ) {
         super();
 
@@ -73,6 +74,7 @@ export default class StarService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
         this.statisticsService = statisticsService;
+        this.starDataService = starDataService;
     }
 
     generateUnownedStar(name: string, location: Location, naturalResources: NaturalResources) {
@@ -83,7 +85,7 @@ export default class StarService extends EventEmitter {
         };
 
         return {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             name,
             location,
             naturalResources,
@@ -185,14 +187,6 @@ export default class StarService extends EventEmitter {
         return stars.filter(s => s.ownedByPlayerId && ids.includes(s.ownedByPlayerId.toString()));
     }
 
-    isOwnedByPlayer(star: Star, player: Player) {
-        return star.ownedByPlayerId && star.ownedByPlayerId.toString() === player._id.toString();
-    }
-
-    listStarsAliveOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
-        return this.listStarsOwnedByPlayer(stars, playerId).filter(s => !this.isDeadStar(s));
-    }
-
     listStarIdsWithPlayerCarriersInOrbit(game: Game, playerId: DBObjectId): string[] {
         return game.galaxy.carriers
             .filter(c => c.orbiting)
@@ -220,7 +214,7 @@ export default class StarService extends EventEmitter {
 
         return starIds
             .map(id => this.getById(game, id))
-            .filter(s => !this.isDeadStar(s));
+            .filter(s => !this.starDataService.isDeadStar(s));
     }
 
     listStarsWithScanningRangeByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
@@ -234,7 +228,7 @@ export default class StarService extends EventEmitter {
 
         return starIds
             .map(id => this.getById(game, id))
-            .filter(s => !this.isDeadStar(s));
+            .filter(s => !this.starDataService.isDeadStar(s));
     }
 
     listStarsOwnedOrInOrbitByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
@@ -295,7 +289,7 @@ export default class StarService extends EventEmitter {
         // Stars may have different scanning ranges independently so we need to check
         // each star to check what is within its scanning range.
         const starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, players.map(p => p._id));
-        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.isDeadStar(s));
+        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
 
         // Seed the stars that are in range to be the stars owned or are in orbit of.
         let starsInRange: MapObjectWithVisibility[] = starsOwnedOrInOrbit.map(s => {
@@ -462,15 +456,6 @@ export default class StarService extends EventEmitter {
         });
     }
 
-    isStarPairWormHole(sourceStar: Star, destinationStar: Star) {
-        return sourceStar
-            && destinationStar
-            && sourceStar.wormHoleToStarId
-            && destinationStar.wormHoleToStarId
-            && sourceStar.wormHoleToStarId.toString() === destinationStar._id.toString()
-            && destinationStar.wormHoleToStarId.toString() === sourceStar._id.toString();
-    }
-
     canPlayersSeeStarShips(star: Star, playerIds: DBObjectId[]) {
         const ids = playerIds.map(p => p.toString());
         const isOwnedByPlayer = ids.includes((star.ownedByPlayerId || '').toString());
@@ -545,16 +530,8 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    isDeadStar(star: Star) {
-        if (!star.naturalResources) {
-            return true;
-        }
-
-        return star.naturalResources.economy <= 0 && star.naturalResources.industry <= 0 && star.naturalResources.science <= 0;
-    }
-
     addNaturalResources(game: Game, star: Star, amount: number) {
-        let wasDeadStar = this.isDeadStar(star);
+        let wasDeadStar = this.starDataService.isDeadStar(star);
 
         if (this.gameTypeService.isSplitResources(game)) {
             let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
@@ -582,7 +559,7 @@ export default class StarService extends EventEmitter {
         }
 
         // if the star reaches 0 of all resources then reduce the star to a dead hunk.
-        if (this.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             star.specialistId = null;
             star.warpGate = false;
             star.infrastructure.economy = 0;
@@ -612,7 +589,7 @@ export default class StarService extends EventEmitter {
     }
 
     reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources) {
-        if (!this.isDeadStar(star)) {
+        if (!this.starDataService.isDeadStar(star)) {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
 
@@ -714,7 +691,7 @@ export default class StarService extends EventEmitter {
     }
 
     getKingOfTheHillStar(game: Game) {
-        const center = this.starDistanceService.getGalaxyCenter(game.galaxy.stars.map(s => s.location));
+        const center = this.starDistanceService.getGalaxyCenterOfMass(game.galaxy.stars.map(s => s.location));
 
         // Note: We have to get the closest one to the center as its possible
         // to move the center star by using a stellar engine so we can't assume

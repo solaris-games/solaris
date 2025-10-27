@@ -6,7 +6,7 @@ import PlayerColourService from "./playerColour";
 import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
-import { CarrierWaypoint } from "./types/CarrierWaypoint";
+import { CarrierWaypoint } from "solaris-common";
 import {
     CustomGalaxy,
     CustomGalaxyCarrier,
@@ -20,7 +20,7 @@ import { Location } from "./types/Location";
 import { Player } from "./types/Player";
 import { Star } from "./types/Star";
 import {GameSettingsReq} from "./gameCreate";
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 export default class CustomGalaxyService {
     nameService: NameService;
@@ -182,6 +182,10 @@ export default class CustomGalaxyService {
         }
 
         if (customGalaxy.carriers) {
+            if (customGalaxy.carriers.length > 500) {
+                throw new ValidationError(`A maximum of 500 carriers are allowed in an advanced custom galaxy.`);
+            }
+
             const carrierIdSet = new Set<string>(customGalaxy.carriers.map(c => c.id));
             if (carrierIdSet.size !== customGalaxy.carriers.length) {
                 throw new ValidationError(`Multiple carriers cannot have the same ID.`);
@@ -331,6 +335,10 @@ export default class CustomGalaxyService {
             specialists: {level: customPlayer.technologies.specialists}
         };
 
+        if (customPlayer.alias) {
+            player.alias = customPlayer.alias;
+        }
+
         generatedPlayers.set(customPlayer.id, player);
         return player;
     }
@@ -377,13 +385,13 @@ export default class CustomGalaxyService {
             const ownerId = generatedPlayers.get(customCarrier.playerId)!._id;
 
             // Convert waypoints
-            const waypoints: CarrierWaypoint[] = [];
+            const waypoints: CarrierWaypoint<DBObjectId>[] = [];
             for (const customWaypoint of customCarrier.waypoints) {
                 const source = generatedStars.get(customWaypoint.source)!._id;
                 const destination = generatedStars.get(customWaypoint.destination)!._id;
 
                 waypoints.push({
-                    _id: mongoose.Types.ObjectId(),
+                    _id: new mongoose.Types.ObjectId(),
                     source: source,
                     destination: destination,
                     action: customWaypoint.action,
@@ -448,7 +456,7 @@ export default class CustomGalaxyService {
 
     _createUnownedCustomGalaxyStar(name: string, customStar: CustomGalaxyStar) {
         return {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             location: customStar.location,
             ownedByPlayerId: null,
             name: name,
@@ -480,9 +488,9 @@ export default class CustomGalaxyService {
         return linkedStarIds;
     }
 
-    _createCustomGalaxyCarrier(name: string, ownerId: DBObjectId, location: Location, orbiting: DBObjectId | null, waypoints: CarrierWaypoint[], customCarrier: CustomGalaxyCarrier) {
+    _createCustomGalaxyCarrier(name: string, ownerId: DBObjectId, location: Location, orbiting: DBObjectId | null, waypoints: CarrierWaypoint<DBObjectId>[], customCarrier: CustomGalaxyCarrier) {
         return {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             ownedByPlayerId: ownerId,
             location: location,
             name: name,

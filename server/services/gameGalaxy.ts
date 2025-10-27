@@ -1,15 +1,15 @@
-import { ValidationError } from "solaris-common";
+import {CarrierWaypointBase, ValidationError} from "solaris-common";
 import AvatarService from './avatar';
 import BattleRoyaleService from './battleRoyale';
 import CacheService from './cache';
 import CarrierService from './carrier';
 import DiplomacyService from './diplomacy';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import GameService from './game';
 import GameFluxService from './gameFlux';
 import GameMaskingService from "./gameMaskingService";
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import UserGuildService from './guildUser';
 import HistoryService from './history';
 import MapService from './map';
@@ -23,19 +23,21 @@ import SocketService from './socket';
 import SpecialistService from './specialist';
 import SpectatorService from './spectator';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import StarMovementService from './starMovement';
 import StarUpgradeService from './starUpgrade';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
+import { CarrierWaypoint } from 'solaris-common';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
-import { GameHistoryCarrier } from "./types/GameHistory";
+import {GameHistoryCarrier, GameHistoryCarrierWaypoint} from "./types/GameHistory";
 import { Guild, GuildUserWithTag } from './types/Guild';
 import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import { Star } from './types/Star';
-import WaypointService from './waypoint';
+import { WaypointService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
+import mongoose from 'mongoose';
 
 enum ViewpointKind {
     Basic,
@@ -62,7 +64,7 @@ export default class GameGalaxyService {
     starDistanceService: StarDistanceService;
     starUpgradeService: StarUpgradeService;
     carrierService: CarrierService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
     researchService: ResearchService;
     specialistService: SpecialistService;
     technologyService: TechnologyService;
@@ -79,6 +81,7 @@ export default class GameGalaxyService {
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
     gameMaskingService: GameMaskingService;
+    starDataService: StarDataService;
 
     constructor(
         cacheService: CacheService,
@@ -93,7 +96,7 @@ export default class GameGalaxyService {
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
         carrierService: CarrierService, 
-        waypointService: WaypointService,
+        waypointService: WaypointService<DBObjectId>,
         researchService: ResearchService,
         specialistService: SpecialistService,
         technologyService: TechnologyService,
@@ -110,6 +113,7 @@ export default class GameGalaxyService {
         gameFluxService: GameFluxService,
         spectatorService: SpectatorService,
         gameMaskingService: GameMaskingService,
+        starDataService: StarDataService,
     ) {
         this.cacheService = cacheService;
         this.socketService = socketService;
@@ -140,6 +144,7 @@ export default class GameGalaxyService {
         this.gameFluxService = gameFluxService;
         this.spectatorService = spectatorService;
         this.gameMaskingService = gameMaskingService;
+        this.starDataService = starDataService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -178,7 +183,7 @@ export default class GameGalaxyService {
         }
 
         // Check if the user is playing in this game.
-        let userPlayer = this._getUserPlayer(game, userId);
+        const userPlayer = this._getUserPlayer(game, userId);
 
         // Remove who created the game.
         delete game.settings.general.createdByUserId;
@@ -197,7 +202,7 @@ export default class GameGalaxyService {
         }
 
         // Calculate what perspectives the user can see, i.e which players the user is spectating.
-        const viewpoint = this._getViewpoint(game, userId);
+        const viewpoint = this._getViewpoint(game, userId, userPlayer);
 
         this._setReadyToQuitCount(game);
 
@@ -424,7 +429,7 @@ export default class GameGalaxyService {
                 }
 
                 // If the star is dead then it has no infrastructure.
-                if (this.starService.isDeadStar(s)) {
+                if (this.starDataService.isDeadStar(s)) {
                     delete s.infrastructure;
                 }
 
@@ -737,7 +742,7 @@ export default class GameGalaxyService {
         }) as any;
     }
 
-    _getViewpoint(game: Game, userId: DBObjectId | null): Viewpoint {
+    _getViewpoint(game: Game, userId: DBObjectId | null, userPlayer: Player | null): Viewpoint {
         if (this.gameStateService.isFinished(game)) {
             return {
                 kind: ViewpointKind.Finished
@@ -746,7 +751,6 @@ export default class GameGalaxyService {
 
         // Check if the user is playing in this game, if so they can only see from
         // their own perspective.
-        let userPlayer = this._getUserPlayer(game, userId);
 
         if (userPlayer) {
             return {
@@ -813,7 +817,7 @@ export default class GameGalaxyService {
             specialist: historyCarrier.specialistId && this.specialistService.getById(historyCarrier.specialistId, 'carrier'),
             specialistExpireTick: null,
             specialistId: historyCarrier.specialistId,
-            waypoints: historyCarrier.waypoints.map(w => this.waypointService.fromHistory(w)),
+            waypoints: historyCarrier.waypoints.map(w => this._waypointFromHistory(w)),
             waypointsLooped: false,
         } as any as Carrier;
     }
@@ -841,9 +845,9 @@ export default class GameGalaxyService {
             return;
         }
 
-        // Support for legacy games, not all history for players/stars/carriers have been logged so
+        // Support for legacy games, not all history for players/stars have been logged so
         // bomb out if we're missing any of those.
-        if (!history.players.length || !history.stars.length || !history.carriers.length) {
+        if (!history.players.length || !history.stars.length) {
             return;
         }
 
@@ -907,7 +911,7 @@ export default class GameGalaxyService {
             gameCarrier.specialistId = historyCarrier.specialistId;
             gameCarrier.isGift = historyCarrier.isGift;
             gameCarrier.location = historyCarrier.location;
-            gameCarrier.waypoints = historyCarrier.waypoints as CarrierWaypoint[];
+            gameCarrier.waypoints = historyCarrier.waypoints as CarrierWaypoint<DBObjectId>[];
         }
 
         // Add any carriers that were in the previous tick that do not exist in the current tick
@@ -950,6 +954,17 @@ export default class GameGalaxyService {
         for (let pendingStar of pendingStars) {
             pendingStar.targeted = true;
         }
+    }
+
+    _waypointFromHistory(wp: GameHistoryCarrierWaypoint) {
+        return {
+            _id: new mongoose.Types.ObjectId(),
+            source: wp.source,
+            destination: wp.destination,
+            action: 'nothing',
+            actionShips: 0,
+            delayTicks: 0
+        } as CarrierWaypointBase<DBObjectId>;
     }
 
 };

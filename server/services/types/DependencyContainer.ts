@@ -23,7 +23,7 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
-import DistanceService from "../distance";
+import { DistanceService } from 'solaris-common';
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -39,7 +39,7 @@ import GameMutexService from "../gameMutex";
 import GamePlayerMutexService from "../gamePlayerMutex";
 import GameStateService from "../gameState";
 import GameTickService from "../gameTick";
-import GameTypeService from "../gameType";
+import { GameTypeService } from 'solaris-common'
 import GuildService from "../guild";
 import UserGuildService from "../guildUser";
 import HistoryService from "../history";
@@ -75,22 +75,28 @@ import SpecialistHireService from "../specialistHire";
 import SpectatorService from "../spectator";
 import StarService from "../star";
 import StarContestedService from "../starContested";
-import StarDistanceService from "../starDistance";
+import { StarDistanceService } from 'solaris-common';
 import StarMovementService from "../starMovement";
 import StarUpgradeService from "../starUpgrade";
 import TeamService from "../team";
-import TechnologyService from "../technology";
+import { TechnologyService } from 'solaris-common';
 import TradeService from "../trade";
 import TutorialService from "../tutorial";
 import UserService from "../user";
 import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
-import WaypointService from "../waypoint";
+import { WaypointService } from 'solaris-common';
 import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
 import StatisticsService from "../statistics";
 import InitialGameStateService from "../initialGameState";
+import WaypointActionService from "../waypointAction";
+import SaveWaypointsService from "../saveWaypoints";
+import CullWaypointsService from "../cullWaypoints";
+import { CarrierTravelService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
+import {DBObjectId} from "./DBObjectId";
 
 export interface DependencyContainer {
     config: Config,
@@ -140,7 +146,7 @@ export interface DependencyContainer {
     technologyService: TechnologyService,
     tradeService: TradeService,
     userService: UserService,
-    waypointService: WaypointService,
+    waypointService: WaypointService<DBObjectId>,
     shipTransferService: ShipTransferService,
     historyService: HistoryService,
     ledgerService: LedgerService,
@@ -186,4 +192,9 @@ export interface DependencyContainer {
     starCaptureService: StarCaptureService,
     statisticsService: StatisticsService,
     initialGameStateService: InitialGameStateService,
+    waypointActionService: WaypointActionService,
+    saveWaypointsService: SaveWaypointsService,
+    cullWaypointsService: CullWaypointsService,
+    carrierTravelService: CarrierTravelService<DBObjectId>,
+    starDataService: StarDataService,
 };

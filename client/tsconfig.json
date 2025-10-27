@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "strict": true,
         "noImplicitAny": false,
         "paths": {
             "@solaris-common": [ "../common/src/index.ts" ],

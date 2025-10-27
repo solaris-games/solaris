@@ -1,11 +1,12 @@
 import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {Carrier} from "./types/Carrier";
-import {DBObjectId} from "./types/DBObjectId";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import StarService from "./star";
 import { Star } from "./types/Star";
-import WaypointService from "./waypoint";
+import { WaypointService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
+import {DBObjectId} from "./types/DBObjectId";
 
 // Copied and adapted from WaypointHelper in the frontend
 // Should probably be put into a shared library at some point
@@ -21,12 +22,14 @@ interface Node {
 export default class PathfindingService {
     distanceService: DistanceService;
     starService: StarService;
-    waypointService: WaypointService;
+    waypointService: WaypointService<DBObjectId>;
+    starDataService: StarDataService;
 
-    constructor(distanceService: DistanceService, starService: StarService, waypointService: WaypointService) {
+    constructor(distanceService: DistanceService, starService: StarService, waypointService: WaypointService<DBObjectId>, starDataService: StarDataService) {
         this.distanceService = distanceService;
         this.starService = starService;
         this.waypointService = waypointService;
+        this.starDataService = starDataService;
     }
 
     calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: string, destinStarId: string): Node[] {
@@ -44,7 +47,7 @@ export default class PathfindingService {
 
         const getNeighbors = (node: Node) => graph
             .filter(s => s.star._id.toString() !== node.star._id.toString())
-            .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starService.isStarPairWormHole(s.star, node.star));
+            .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starDataService.isStarPairWormHole(s.star, node.star));
 
         const start = graph.find(s => s.star._id.toString() === sourceStarId)!;
         const end = graph.find(s => s.star._id.toString() === destinStarId)!;

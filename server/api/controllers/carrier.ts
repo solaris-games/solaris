@@ -13,7 +13,7 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseCarrierSaveWaypointsRequest(req.body);
                 
-                let report = await container.waypointService.saveWaypoints(
+                let report = await container.saveWaypointsService.saveWaypoints(
                     req.game,
                     req.player,
                     req.params.carrierId,
@@ -30,7 +30,7 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseCarrierLoopWaypointsRequest(req.body);
                 
-                await container.waypointService.loopWaypoints(
+                await container.saveWaypointsService.loopWaypoints(
                     req.game,
                     req.player,
                     req.params.carrierId,

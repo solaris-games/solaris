@@ -66,7 +66,11 @@ window.addEventListener("unhandledrejection", (event) => {
 
 const eventBus: EventBus = new ClientEventBus();
 
-const httpClient = createHttpClient();
+const redirectHome = () => {
+  router.push({ name: 'home' });
+};
+
+const httpClient = createHttpClient(redirectHome);
 
 const socket: Socket = io(socketUrl, { withCredentials: true });
 
@@ -91,6 +95,8 @@ app.provide(eventBusInjectionKey, eventBus);
 app.provide(httpInjectionKey, httpClient);
 
 app.provide(toastInjectionKey, app.config.globalProperties.$toast);
+
+
 
 const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
 

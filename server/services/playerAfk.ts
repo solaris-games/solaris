@@ -1,12 +1,12 @@
 import {User} from "./types/User";
 
-const moment = require('moment');
-const EventEmitter = require('events');
+import moment from "moment";
+import EventEmitter from "events";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import StarService from './star';
 import GameStateService from './gameState';
 import PlayerService from './player';

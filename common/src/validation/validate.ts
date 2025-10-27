@@ -145,6 +145,22 @@ export const array = <A>(validator: Validator<A>): Validator<A[]> => {
     }
 }
 
+export const sizedArray = <A>(minSize: number, maxSize: number, validator: Validator<A>): Validator<A[]> => {
+    return v => {
+        const arr = array(validator)(v);
+
+        if (arr.length < minSize) {
+            throw new ValidationError(`Expected array of at least size ${minSize}, but got size ${arr.length}`);
+        }
+
+        if (arr.length > maxSize) {
+            throw new ValidationError(`Expected array of at most size ${maxSize}, but got size ${arr.length}`);
+        }
+
+        return arr;
+    }
+}
+
 export type ObjectValidator<T> = {
     [Property in keyof T]: Validator<T[Property]>
 }
@@ -304,7 +320,7 @@ export const username = stringValue({
     minLength: 3,
     maxLength: 30,
     trim: true,
-    matches: UNICODE_LETTERS_NUMBERS_PUNCTUATION,
+    matches: /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}]+[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}\p{Z}]*$/u,
 });
 
 export const email = stringValue({

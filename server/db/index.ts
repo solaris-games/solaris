@@ -1,6 +1,5 @@
 import {logger} from "../utils/logging";
-
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 import EventModel from './models/Event';
 import GameModel from './models/Game';
@@ -63,11 +62,7 @@ export default async (config, options) => {
     log.info(`Connecting to database: ${options.connectionString}`);
 
     const db = await mongoose.connect(options.connectionString, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        keepAlive: true,
-        poolSize: options.poolSize,
+        maxPoolSize: options.poolSize,
         socketTimeoutMS: 120000,
     });
 

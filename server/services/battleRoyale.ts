@@ -4,8 +4,8 @@ import CarrierService from "./carrier";
 import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";
 import StarService from "./star";
-import StarDistanceService from "./starDistance";
-import WaypointService from "./waypoint";
+import { StarDistanceService } from 'solaris-common';
+import CullWaypointsService from "./cullWaypoints";
 
 const PEACE_CYCLES = 3;
 
@@ -14,7 +14,7 @@ export default class BattleRoyaleService {
     carrierService: CarrierService;
     mapService: MapService;
     starDistanceService: StarDistanceService;
-    waypointService: WaypointService;
+    cullWaypointsService: CullWaypointsService;
     carrierMovementService: CarrierMovementService;
 
     constructor(
@@ -22,14 +22,14 @@ export default class BattleRoyaleService {
         carrierService: CarrierService,
         mapService: MapService,
         starDistanceService: StarDistanceService,
-        waypointService: WaypointService,
+        cullWaypointsService: CullWaypointsService,
         carrierMovementService: CarrierMovementService
     ) {
         this.starService = starService;
         this.carrierService = carrierService;
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
-        this.waypointService = waypointService;
+        this.cullWaypointsService = cullWaypointsService;
         this.carrierMovementService = carrierMovementService;
     }
 
@@ -78,7 +78,7 @@ export default class BattleRoyaleService {
         // Cull the waypoints of carriers that have the given star in its
         // waypoint queue and destroy those that are lost in space.
         for (let carrier of carriers) {
-            this.waypointService.cullWaypointsByHyperspaceRange(game, carrier);
+            this.cullWaypointsService.cullWaypointsByHyperspaceRange(game, carrier);
 
             if (this.carrierMovementService.isLostInSpace(game, carrier)) {
                 this.carrierService.destroyCarrier(game, carrier);

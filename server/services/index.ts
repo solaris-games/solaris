@@ -18,7 +18,7 @@ import AuthService from './auth';
 import BroadcastService from './broadcast';
 import CarrierService from './carrier';
 import CombatService from './combat';
-import DistanceService from './distance';
+import { DistanceService } from 'solaris-common';
 import EmailService from './email';
 import EventService from './event';
 import LeaderboardService from './leaderboard';
@@ -28,7 +28,7 @@ import GameCreateService from './gameCreate';
 import GameGalaxyService from './gameGalaxy';
 import GameListService from './gameList';
 import GameTickService from './gameTick';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import GameStateService from './gameState';
 import BattleRoyaleService from './battleRoyale';
 import MapService from './map';
@@ -39,12 +39,12 @@ import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import ResearchService from './research';
 import StarService from './star';
-import StarDistanceService from './starDistance';
+import { StarDistanceService } from 'solaris-common';
 import NameService from './name';
 import StarUpgradeService from './starUpgrade';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import TradeService from './trade';
-import WaypointService from './waypoint';
+import { WaypointService } from 'solaris-common';
 import ShipTransferService from './shipTransfer';
 import UserService from './user';
 import HistoryService from './history';
@@ -130,6 +130,11 @@ import StatisticsService from "./statistics";
 import CustomGalaxyService from "./customGalaxy";
 import {InitialGameState} from "./types/InitialGameState";
 import InitialGameStateService from "./initialGameState";
+import WaypointActionService from "./waypointAction";
+import CullWaypointsService from "./cullWaypoints";
+import SaveWaypointsService from "./saveWaypoints";
+import { CarrierTravelService } from 'solaris-common';
+import { StarDataService } from "solaris-common";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -196,26 +201,28 @@ export default (config: Config,
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const technologyService = new TechnologyService(specialistService, gameTypeService);
-    const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, gameTypeService, gameStateService, statisticsService);
+    const starDataService = new StarDataService();
+    const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, gameTypeService, gameStateService, statisticsService, starDataService);
     const carrierService = new CarrierService(gameRepository, distanceService, starService, technologyService, specialistService);
     const shipService = new ShipService(starService, technologyService, carrierService);
     const playerStatisticsService = new PlayerStatisticsService(starService, carrierService, technologyService, specialistService, shipService);
-    const playerCycleRewardsService = new PlayerCycleRewardsService(starService, technologyService, playerStatisticsService, specialistService);
+    const playerCycleRewardsService = new PlayerCycleRewardsService(starService, technologyService, playerStatisticsService, specialistService, starDataService);
     const diplomacyUpkeepService = new DiplomacyUpkeepService(playerCreditsService, playerCycleRewardsService);
     const diplomacyService = new DiplomacyService(gameRepository, eventRepository, diplomacyUpkeepService)
     const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService, statisticsService);
-    const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, userAchievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService, statisticsService);
+    const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, userAchievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService, statisticsService, starDataService);
     const starCaptureService = new StarCaptureService(specialistService, starService, gameTypeService, gameStateService, diplomacyService, technologyService, starUpgradeService, statisticsService);
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(gameRepository, diplomacyService, statisticsService);
-    const carrierMovementService = new CarrierMovementService(gameRepository, distanceService, starService, specialistService, diplomacyService, carrierGiftService, technologyService, starDistanceService);
+    const carrierTravelService = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService as any, starDataService); // todo: fix any once we consolidate common lib and server types
+    const carrierMovementService = new CarrierMovementService(gameRepository, distanceService, starService, specialistService, diplomacyService, carrierGiftService, technologyService, starDistanceService, carrierTravelService, starDataService);
     const resourceService = new ResourceService(randomService, distanceService, starDistanceService, gameTypeService);
     const circularMapService = new CircularMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const circularBalancedMapService = new CircularBalancedMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const spiralMapService = new SpiralMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const doughnutMapService = new DoughnutMapService(randomService, starService, starDistanceService, distanceService, resourceService, gameTypeService);
     const irregularMapService = new IrregularMapService(starService, starDistanceService, distanceService, resourceService, gameTypeService);
-    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService);
+    const mapService = new MapService(randomService, starService, starDistanceService, nameService, circularMapService, spiralMapService, doughnutMapService, circularBalancedMapService, irregularMapService, gameTypeService, starDataService);
     const playerReadyService = new PlayerReadyService(gameRepository, gameTypeService);
     const teamService = new TeamService(diplomacyService);
     const playerService = new PlayerService(gameRepository, randomService, mapService, starService, carrierService, starDistanceService, technologyService, specialistService, gameTypeService, playerReadyService, teamService, playerColourService, initialGameStateService);
@@ -236,18 +243,21 @@ export default (config: Config,
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
     const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService, statisticsService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
-    const waypointService = new WaypointService(gameRepository, carrierService, starService, distanceService, starDistanceService, technologyService, gameService, playerService, carrierMovementService, gameMaskingService, historyService);
+    const waypointActionService = new WaypointActionService();
+    const waypointService = new WaypointService<DBObjectId>(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
+    const cullWaypointsService = new CullWaypointsService(gameRepository, starService, playerService, waypointService, carrierTravelService, starDataService);
+    const saveWaypointsService = new SaveWaypointsService(gameRepository, carrierMovementService, starService, waypointService, carrierService, starDataService);
     const specialistBanService = new SpecialistBanService(specialistService);
-    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, waypointService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService, statisticsService);
+    const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, cullWaypointsService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService, statisticsService, starDataService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const pathfindingService = new PathfindingService(distanceService, starService, waypointService);
+    const pathfindingService = new PathfindingService(distanceService, starService, waypointService, starDataService);
     const basicAIService = new BasicAIService(starUpgradeService);
-    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService);
-    const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, waypointService, carrierMovementService);
-    const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, waypointService);
-    const gameGalaxyService = new GameGalaxyService(cacheService, socketService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService);
+    const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService, saveWaypointsService, starDataService);
+    const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, cullWaypointsService, carrierMovementService);
+    const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, cullWaypointsService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, socketService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService, starDataService);
     const scheduleBuyService = new ScheduleBuyService(gameRepository, starUpgradeService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, waypointService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService, waypointActionService, cullWaypointsService, carrierTravelService);
     const emailService = new EmailService(config, gameService, gameJoinService, userService, leaderboardService, playerService, playerReadyService, gameTypeService, gameStateService, gameTickService);
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameJoinService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);
@@ -361,5 +371,10 @@ export default (config: Config,
         starCaptureService,
         statisticsService,
         initialGameStateService,
+        waypointActionService,
+        cullWaypointsService,
+        saveWaypointsService,
+        carrierTravelService,
+        starDataService,
     };
 };

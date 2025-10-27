@@ -6,7 +6,6 @@ import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
 import ColourService from './services/api/colour.js';
-import SpecialistService from './services/api/specialist.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
@@ -17,6 +16,7 @@ import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {detailMe} from "@/services/typedapi/user";
 import type { OnPreStarParams } from './eventBusEventNames/map';
+import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -553,14 +553,27 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
   actions: {
     async loadSpecialistData ({ commit, state }, gameId: string) {
       const requests = [
-        SpecialistService.getCarrierSpecialists(gameId),
-        SpecialistService.getStarSpecialists(gameId)
-      ]
+        listCarrierForGame(httpClient)(gameId),
+        listStarForGame(httpClient)(gameId),
+      ];
 
       const responses = await Promise.all(requests)
 
-      commit('setCarrierSpecialists', responses[0].data)
-      commit('setStarSpecialists', responses[1].data)
+      const carrierResponse = responses[0];
+
+      if (isOk(carrierResponse)) {
+        commit('setCarrierSpecialists', carrierResponse.data);
+      } else {
+        console.error(formatError(carrierResponse));
+      }
+
+      const starResponse = responses[1];
+
+      if (isOk(starResponse)) {
+        commit('setStarSpecialists', starResponse.data);
+      } else {
+        console.error(formatError(starResponse));
+      }
     },
     async loadColourData ({ commit, state }: { commit: any, state: State }) {
       if (state.userId) {

@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-const mongooseLeanDefaults = require('mongoose-lean-defaults');
-
+import mongoose from "mongoose";
+import mongooseLeanDefaults from "mongoose-lean-defaults";
 import schema from './schemas/report';
 
 schema.plugin(mongooseLeanDefaults);

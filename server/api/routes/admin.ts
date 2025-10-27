@@ -12,10 +12,11 @@ import {
 import {SingleRouter} from "../singleRoute";
 import {createRoutes} from "../typedapi/routes";
 import {createAdminRoutes} from "solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = AdminController(container);
-    const routes = createAdminRoutes();
+    const routes = createAdminRoutes<DBObjectId>();
 
     const answer = createRoutes(router, mw);
 

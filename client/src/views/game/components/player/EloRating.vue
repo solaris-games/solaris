@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import type { UserPublic } from '@solaris-common';
+import type { InGameUser } from '@solaris-common';
 
 const props = defineProps<{
-  user: UserPublic<string>,
+  user: InGameUser<string>,
 }>();
 </script>
 

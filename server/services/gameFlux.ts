@@ -1,7 +1,7 @@
 import { Flux } from "solaris-common";
 import { Game } from "./types/Game";
 
-const moment = require('moment');
+import moment from "moment";
 const fluxes = require('../config/game/flux.json') as Flux[];
 
 export default class GameFluxService {

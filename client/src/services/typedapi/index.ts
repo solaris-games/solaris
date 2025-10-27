@@ -49,15 +49,15 @@ export const formatError = (response: ResponseResultRequestError | ResponseResul
   }
 }
 
-export const extractErrors = (response: ResponseResultRequestError | ResponseResultResponseError) => {
+export const extractErrors = (response: ResponseResultRequestError | ResponseResultResponseError): string[] => {
   if (response.kind === ResponseResultKind.ResponseError) {
     try {
       return response.data['errors'] || [];
     } catch (e) {
-      return null;
+      return [];
     }
   } else {
-    return null;
+    return [];
   }
 }
 

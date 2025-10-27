@@ -1,10 +1,10 @@
-const EventEmitter = require('events');
-const moment = require('moment');
+import EventEmitter from "events";
+import moment from "moment";
 import { LedgerType } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import LedgerService from './ledger';
 import PlayerService from './player';
 import PlayerAfkService from './playerAfk';
@@ -529,7 +529,7 @@ export default class TradeService extends EventEmitter {
                 playerId: e.playerId!,
                 type: e.type,
                 data: e.data,
-                sentDate: moment(e._id.getTimestamp()) as Date,
+                sentDate: moment(e._id.getTimestamp()).toDate(),
                 sentTick: e.tick
             }
         });

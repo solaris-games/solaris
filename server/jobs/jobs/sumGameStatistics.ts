@@ -2,7 +2,7 @@ import {logger} from "../../utils/logging";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {StatsSlice} from "solaris-common";
 import {DBObjectId, objectIdFromString} from "../../services/types/DBObjectId";
-import {groupBy} from "../../services/utils";
+import {groupBy} from "solaris-common";
 
 const log = logger("Sum game statistics Job");
 

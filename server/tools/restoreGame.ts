@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Carrier } from "../services/types/Carrier";
-import { DBObjectId, objectId } from "../services/types/DBObjectId";
+import {DBObjectId, objectId, objectIdFromString} from "../services/types/DBObjectId";
 import { Game } from "../services/types/Game";
 import { GameHistory, GameHistoryCarrier } from "../services/types/GameHistory";
 import { JobParameters, makeJob } from "./tool";
@@ -164,7 +164,7 @@ const job = makeJob('Restore game', async ({ log, container, mongo }: JobParamet
         throw new Error("Invalid arguments. Usage: npm run restore-game <gameId> <tick>");
     }
 
-    const gameId = mongoose.Types.ObjectId(gameIdS) as DBObjectId;
+    const gameId = objectIdFromString(gameIdS);
 
     const hist = await loadHistory(container, gameId, tick);
     if (!hist) {

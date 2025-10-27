@@ -1,6 +1,6 @@
 import {GetRoute, PostRoute, SimpleGetRoute} from "./index";
-import { type Badge} from "../types/common/badge";
-import { type AwardedBadge } from "../types/common/user";
+import { type Badge} from "../../types/common/badge";
+import { type AwardedBadge } from "../../types/common/user";
 
 export type PurchaseForPlayerReq = {
     badgeKey: string;

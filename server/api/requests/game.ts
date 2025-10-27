@@ -1,6 +1,4 @@
 import {customGalaxyValidator, ValidationError} from "solaris-common";
-import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
-import {CustomGalaxy} from "../../../common/src/api/types/common/customGalaxy";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
@@ -15,10 +13,9 @@ import {
     array,
     boolean,
     stringEnumeration,
-    positiveInteger,
     withDefault,
     numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
-} from "../../../common/src/validation/validate";
+} from "solaris-common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
     GAME_ALLIANCE_UPKEEP_COST,
@@ -67,7 +64,8 @@ import {
     READY_TO_QUIT_VISIBILITY,
     ReadyToQuitFraction,
     ReadyToQuitTimerCycles,
-    ReadyToQuitVisibility
+    ReadyToQuitVisibility,
+    GameJoinGameRequest,
 } from "solaris-common";
 import type {GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
@@ -110,6 +108,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     readyToQuitFraction: maybeUndefined(numberEnumeration<ReadyToQuitFraction, ReadyToQuitFraction[]>(READY_TO_QUIT_FRACTIONS)),
     readyToQuitTimerCycles: maybeUndefined(numberEnumeration<ReadyToQuitTimerCycles, ReadyToQuitTimerCycles[]>(READY_TO_QUIT_TIMER_CYCLES)),
     readyToQuitVisibility: withDefault('visible', stringEnumeration<ReadyToQuitVisibility, ReadyToQuitVisibility[]>(READY_TO_QUIT_VISIBILITY)),
+    joinRandomSlot: withDefault('disabled', enabledDisabled),
 });
 
 const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({
@@ -436,15 +435,8 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     gameTime: parseGameSettingsGameTime,
 });
 
-export interface GameJoinGameRequest {
-    playerId: DBObjectId;
-    alias: string;
-    avatar: number;
-    password: string | undefined;
-};
-
-export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
-    playerId: objectId,
+export const parseGameJoinGameRequest: Validator<GameJoinGameRequest<DBObjectId>> = object({
+    playerId: maybeUndefined(objectId),
     alias: stringValue({
         trim: true,
         minLength: 1,
@@ -453,7 +445,7 @@ export const parseGameJoinGameRequest: Validator<GameJoinGameRequest> = object({
         ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
     avatar: number,
-    password: or(string, just(undefined)),
+    password: maybeUndefined(string),
 });
 
 export interface GameSaveNotesRequest {

@@ -1,19 +1,19 @@
 import axios from 'axios';
-import { v7 as generateV7Uuid } from 'uuid';
 import router from '../../router';
+import {buildIdempotencyKey, isUnsafeMethod} from "@/util/http";
 
 class BaseApiService {
   constructor () {
     this.BASE_URL = import.meta.env.VUE_APP_API_HOST + '/api/'
 
     axios.interceptors.request.use(config => {
-      config.headers['Idempotency-Key'] = this.buildIdempotencyKey();
+      config.headers['Idempotency-Key'] = buildIdempotencyKey();
 
       return config;
     },
     error => {
       return Promise.reject(error);
-    }, { synchronous: true, runWhen: this.isUnsafeMethod });
+    }, { synchronous: true, runWhen: isUnsafeMethod });
 
     axios.interceptors.response.use(
       response => {
@@ -27,16 +27,6 @@ class BaseApiService {
 
         return Promise.reject({ ...error })
       })
-  }
-
-  isUnsafeMethod(config) {
-    // Rather than just going for idempotent methods, ie the safe ones and put and delete,
-    // We are electing here to NOT trust that put or delete currently behave in an idempotent way on the server...
-    return !['get', 'head', 'options', 'trace'].includes(config.method);
-  }
-
-  buildIdempotencyKey() {
-    return `${generateV7Uuid()}`;
   }
 }
 

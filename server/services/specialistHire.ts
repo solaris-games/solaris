@@ -2,53 +2,56 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { Specialist } from "./types/Specialist";
+import { Specialist } from 'solaris-common';
 import UserAchievementService from "./userAchievement";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import WaypointService from "./waypoint";
-
+import { StarDataService } from "solaris-common";
 import { ValidationError } from "solaris-common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import StatisticsService from "./statistics";
+import CullWaypointsService from "./cullWaypoints";
 
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
     specialistService: SpecialistService;
     achievementService: UserAchievementService;
-    waypointService: WaypointService;
+    cullWaypointsService: CullWaypointsService;
     playerCreditsService: PlayerCreditsService;
     starService: StarService;
     gameTypeService: GameTypeService;
     specialistBanService: SpecialistBanService;
     technologyService: TechnologyService;
     statisticsService: StatisticsService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
         specialistService: SpecialistService,
         achievementService: UserAchievementService,
-        waypointService: WaypointService,
+        cullWaypointsService: CullWaypointsService,
         playerCreditsService: PlayerCreditsService,
         starService: StarService,
         gameTypeService: GameTypeService,
         specialistBanService: SpecialistBanService,
         technologyService: TechnologyService,
         statisticsService: StatisticsService,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.specialistService = specialistService;
         this.achievementService = achievementService;
-        this.waypointService = waypointService;
+        this.cullWaypointsService = cullWaypointsService;
         this.playerCreditsService = playerCreditsService;
         this.starService = starService;
         this.gameTypeService = gameTypeService;
         this.specialistBanService = specialistBanService;
         this.technologyService = technologyService;
         this.statisticsService = statisticsService;
+        this.starDataService = starDataService;
     }
 
     async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
@@ -72,11 +75,11 @@ export default class SpecialistHireService {
 
         let star = this.starService.getById(game, carrier.orbiting);
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
         }
 
-        if (!this.starService.isOwnedByPlayer(star, player)) {
+        if (!this.starDataService.isOwnedByPlayer(star, player)) {
             throw new ValidationError('Cannot hire a specialist while in orbit of a star that you do not own.');
         }
 
@@ -135,7 +138,7 @@ export default class SpecialistHireService {
 
         carrier.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
 
-        let waypoints = await this.waypointService.cullWaypointsByHyperspaceRangeDB(game, carrier);
+        let waypoints = await this.cullWaypointsService.cullWaypointsByHyperspaceRangeDB(game, carrier);
 
         let result = {
             game,
@@ -163,7 +166,7 @@ export default class SpecialistHireService {
             throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
         }
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot hire a specialist on a dead star.');
         }
 

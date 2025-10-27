@@ -1,5 +1,10 @@
-import {ValidationError} from "solaris-common";
-import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "../../services/types/CarrierWaypoint";
+import {
+    CarrierCalculateCombatRequest,
+    CarrierSaveWaypointsRequest,
+    TransferShipsReq,
+    ValidationError
+} from "solaris-common";
+import { CarrierWaypointActionType, CarrierWaypointActionTypes } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     array,
@@ -13,20 +18,7 @@ import {
 import { keyHasBooleanValue, keyHasNumberValue, keyHasObjectValue, keyHasStringValue } from "./helpers";
 import {objectId} from "../../utils/validation";
 
-type CarrierSaveWaypoint = {
-    source: DBObjectId;
-    destination: DBObjectId;
-    action: CarrierWaypointActionType;
-    actionShips: number;
-    delayTicks: number;
-};
-
-export type CarrierSaveWaypointsRequest = {
-    waypoints: CarrierSaveWaypoint[];
-    looped: boolean;
-};
-
-export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest> = object({
+export const parseCarrierSaveWaypointsRequest: Validator<CarrierSaveWaypointsRequest<DBObjectId>> = object({
     waypoints: array(object({
         source: objectId,
         destination: objectId,
@@ -45,13 +37,7 @@ export const parseCarrierLoopWaypointsRequest: Validator<CarrierLoopWaypointsReq
     loop: boolean,
 });
 
-export type CarrierTransferShipsRequest = {
-    carrierShips: number;
-    starShips: number;
-    starId: DBObjectId;
-};
-
-export const parseCarrierTransferShipsRequest = object({
+export const parseCarrierTransferShipsRequest: Validator<TransferShipsReq<DBObjectId>> = object({
     carrierShips: positiveInteger,
     starShips: positiveInteger,
     starId: objectId,
@@ -70,18 +56,6 @@ export const parseCarrierRenameCarrierRequest: Validator<CarrierRenameCarrierReq
         ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
     }),
 });
-
-export interface CarrierCalculateCombatRequest {
-    defender: {
-        ships: number;
-        weaponsLevel: number;
-    },
-    attacker: {
-        ships: number;
-        weaponsLevel: number;
-    },
-    isTurnBased: boolean;
-};
 
 export const mapToCarrierCalculateCombatRequest = (body: any): CarrierCalculateCombatRequest => {
     let errors: string[] = [];

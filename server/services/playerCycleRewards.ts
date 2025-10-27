@@ -3,25 +3,29 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import PlayerStatisticsService from './playerStatistics';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import SpecialistService from './specialist';
+import { StarDataService } from "solaris-common";
 
 export default class PlayerCycleRewardsService {
     starService: StarService;
     technologyService: TechnologyService;
     playerStatisticsService: PlayerStatisticsService;
     specialistService: SpecialistService;
+    starDataService: StarDataService;
 
     constructor(
         starService: StarService,
         technologyService: TechnologyService,
         playerStatisticsService: PlayerStatisticsService,
-        specialistService: SpecialistService
+        specialistService: SpecialistService,
+        starDataService: StarDataService,
     ) {
         this.starService = starService;
         this.technologyService = technologyService;
         this.playerStatisticsService = playerStatisticsService;
-        this.specialistService = specialistService
+        this.specialistService = specialistService;
+        this.starDataService = starDataService;
     }
 
     calculatePlayerCreditsEndOfCycleRewards(game: Game, player: Player) {
@@ -100,7 +104,7 @@ export default class PlayerCycleRewardsService {
     giveFinancialAnalystCredits(game: Game) {
         for (let player of game.galaxy.players) {
             let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
-                                .filter(s => !this.starService.isDeadStar(s));
+                                .filter(s => !this.starDataService.isDeadStar(s));
 
             for (let star of playerStars) {
                 let creditsByScience = this.specialistService.getCreditsPerTickByScience(star);

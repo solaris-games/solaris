@@ -25,7 +25,7 @@ import { Game } from "./types/Game";
 import { GameEvent } from "./types/GameEvent";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
-import { Specialist } from "./types/Specialist";
+import { Specialist } from 'solaris-common';
 import { Star, StarCaptureResult } from "./types/Star";
 import { BaseGameEvent } from "./types/events/BaseGameEvent";
 import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
@@ -38,7 +38,7 @@ import GamePlayerJoinedEvent from "./types/events/GamePlayerJoined";
 import GamePlayerQuitEvent from "./types/events/GamePlayerQuit";
 import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
 
-const moment = require('moment');
+import moment from "moment";
 
 export default class EventService {
 
@@ -192,14 +192,6 @@ export default class EventService {
     async deleteByGameId(gameId: DBObjectId) {
         await this.eventRepo.deleteMany({
             gameId
-        });
-    }
-
-    async deleteByEventType(gameId: DBObjectId, gameTick: number, type: string) {
-        await this.eventRepo.deleteMany({
-            gameId,
-            tick: gameTick,
-            type
         });
     }
 
@@ -736,26 +728,17 @@ export default class EventService {
     async createGameDiplomacyPeaceDeclared(args: GameDiplomacyPeaceDeclaredEvent) {
         let data = args.status;
 
-        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
-
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
 
     async createGameDiplomacyWarDeclared(args: GameDiplomacyWarDeclaredEvent) {
         let data = args.status;
 
-        // Peace/war can be declared multiple times in a single tick, delete any existing declarations
-        await this._deleteGameDiplomacyDeclarationsInTick(args.gameId, args.gameTick, args.status);
-
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
     async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
         let data = status;
-
-        // Delete the event if it already exists - This prevents spam.
-        await this.deleteByEventType(gameId, gameTick, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED);
 
         await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
         await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);

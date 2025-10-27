@@ -13,16 +13,16 @@ import {Player} from "./types/Player";
 import {Star, StarCaptureResult} from "./types/Star";
 import {User} from "./types/User";
 import DiplomacyService from "./diplomacy";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "./player";
 import ReputationService from "./reputation";
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import StarCaptureService from "./starCapture";
 import StatisticsService from "./statistics";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',

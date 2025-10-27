@@ -1,6 +1,6 @@
 import moment from "moment/moment";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -10,7 +10,7 @@ import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import CarrierService from './carrier';
 import GameStateService from './gameState';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import PasswordService from './password';
 import PlayerService from './player';
 import StarService from './star';
@@ -322,10 +322,6 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot force start game: at least one human player is needed');
         }
 
-        if (aiSlots > 3) {
-            throw new ValidationError('Cannot force start game: only 3 AI players are allowed');
-        }
-
         this.gameJoinService.assignNonUserPlayersToAI(game, withOpenSlots);
 
         this.gameJoinService.startGame(game);
@@ -417,6 +413,10 @@ export default class GameService extends EventEmitter {
         }
         
         let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+
+        if (!player.userId) {
+            return null;
+        }
 
         return await this.userService.getInfoByIdLean(player.userId!, {
             'achievements.level': 1,

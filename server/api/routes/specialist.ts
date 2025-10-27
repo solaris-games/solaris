@@ -3,23 +3,29 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpecialistController from '../controllers/specialist';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createSpecialistRoutes} from "solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = SpecialistController(container);
+    const routes = createSpecialistRoutes<DBObjectId>();
 
-    router.get('/api/game/specialists/bans',
+    const answer = createRoutes(router, mw);
+
+    answer(routes.listBans,
             controller.listBans
     );
 
-    router.get('/api/game/specialists/carrier',
+    answer(routes.listCarrier,
             controller.listCarrier
     );
 
-    router.get('/api/game/specialists/star',
+    answer(routes.listStar,
             controller.listStar
     );
 
-    router.get('/api/game/:gameId/specialists/carrier',
+    answer(routes.listCarrierForGame,
             mw.game.loadGame({
                 lean: true,
                 settings: true,
@@ -30,7 +36,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listCarrierForGame
     );
 
-    router.get('/api/game/:gameId/specialists/star',
+    answer(routes.listStarForGame,
             mw.game.loadGame({
                 lean: true,
                 settings: true,
@@ -41,7 +47,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.listStarForGame
     );
 
-    router.put('/api/game/:gameId/carrier/:carrierId/hire/:specialistId',
+    answer(routes.hireCarrier,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -61,7 +67,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/star/:starId/hire/:specialistId',
+    answer(routes.hireStar,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({

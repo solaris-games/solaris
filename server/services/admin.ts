@@ -5,7 +5,7 @@ import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User } from './types/User';
 
-const moment = require('moment');
+import moment from "moment";
 
 export default class AdminService {
 

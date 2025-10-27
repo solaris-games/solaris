@@ -7,12 +7,12 @@ import {
     SimpleDeleteRoute,
     SimplePutRoute
 } from "./index";
-import type {LeaderboardUser} from "../types/common/leaderboard";
-import type {UserGameSettings} from "../types/common/settings";
-import type {UserSubscriptions} from "../types/common/subscriptions";
-import type {UserPrivate, UserPublic} from "../types/common/user";
-import type {UserAvatar} from "../types/common/avatar";
-import type {GuildDataForUser} from "../types/common/guild";
+import type {LeaderboardUser} from "../../types/common/leaderboard";
+import type {UserGameSettings} from "../../types/common/settings";
+import type {UserSubscriptions} from "../../types/common/subscriptions";
+import type {UserPrivate, UserPublic} from "../../types/common/user";
+import type {UserAvatar} from "../../types/common/avatar";
+import type {GuildDataForUser} from "../../types/common/guild";
 
 export type UserLeaderboard = {
     totalPlayers: number,

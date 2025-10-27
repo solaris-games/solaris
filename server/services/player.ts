@@ -1,25 +1,25 @@
 import DiplomacyService from "./diplomacy";
 
-const mongoose = require('mongoose');
-const moment = require('moment');
-const EventEmitter = require('events');
+import mongoose from 'mongoose';
+import moment from "moment";
+import EventEmitter from "events";
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
 import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
 import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import MapService from './map';
 import PlayerReadyService from './playerReady';
 import RandomService from './random';
 import SpecialistService from './specialist';
 import StarService from './star';
-import StarDistanceService from './starDistance';
-import TechnologyService from './technology';
+import { StarDistanceService } from 'solaris-common';
+import { TechnologyService } from 'solaris-common';
 import TeamService from "./team";
 import { ValidationError } from "solaris-common";
-import {shuffle} from "./utils";
+import {shuffle} from "solaris-common";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
@@ -127,7 +127,7 @@ export default class PlayerService extends EventEmitter {
         const researchingNext: ResearchTypeNotRandom = defaultTech;
 
         let player: Player = {
-            _id: mongoose.Types.ObjectId(),
+            _id: new mongoose.Types.ObjectId(),
             userId: null,
             homeStarId: null,
             alias: 'Empty Slot',
@@ -292,13 +292,13 @@ export default class PlayerService extends EventEmitter {
         // doughnut galaxies need the distance from the center needs to be slightly more than others
         // spiral galaxies need the distance to be slightly less, and they have a different galactic center
         if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (3/4);
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (3/4);
         } else if(game.settings.galaxy.galaxyType === 'spiral') {
-            distanceFromCenter = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2 / 2;
+            distanceFromCenter = this.starDistanceService.getMaxGalaxyRadius(locations) / 2;
         } else{
             // The desired distance from the center is on two thirds from the galaxy center and the edge
             // for all galaxies other than doughnut and spiral.
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyDiameter(locations) / 2) * (2/3);
+            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (2/3);
         }
 
         return distanceFromCenter;
@@ -391,7 +391,8 @@ export default class PlayerService extends EventEmitter {
             star.isPulsar = initialStar.isPulsar;
             star.name = initialStar.name;
             star.ownedByPlayerId = initialStar.ownedByPlayerId;
-            star.ships = initialStar.ships;
+            star.ships = initialStar.ships || 0;
+            star.shipsActual = initialStar.ships || 0;
             star.specialistId = initialStar.specialistId;
             star.specialistExpireTick = initialStar.specialistExpireTick;
             star.warpGate = initialStar.warpGate;
@@ -415,7 +416,7 @@ export default class PlayerService extends EventEmitter {
                 location: savedCarrier.location,
                 waypoints: savedCarrier.waypoints,
                 waypointsLooped: false,
-                _id: mongoose.Types.ObjectId(),
+                _id: new mongoose.Types.ObjectId(),
                 specialist: null,
                 locationNext: null,
                 toObject(): Carrier {

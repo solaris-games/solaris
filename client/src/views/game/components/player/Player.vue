@@ -49,16 +49,17 @@ import YourInfrastructure from './YourInfrastructure.vue'
 import Research from './Research.vue'
 import EloRating from './EloRating.vue'
 import PlayerReport from './PlayerReport.vue'
-import gameService from '../../../../services/api/game'
 import GameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, ref, computed, type Ref, onMounted } from 'vue';
-import type { Player, UserPublic } from '@solaris-common'
+import type { InGameUser, Player, UserPublic } from '@solaris-common'
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
+import { getPlayerUser } from '@/services/typedapi/game'
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 
 const props = defineProps<{
   playerId: string,
@@ -75,12 +76,13 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
 
 const isLoading = ref(false);
 const player: Ref<Player<string> | null> = ref(null);
-const user: Ref<UserPublic<string> | null> = ref(null);
+const user: Ref<InGameUser<string> | null> = ref(null);
 const userPlayer: Ref<Player<string> | null> = ref(null);
 const leaderboard: Ref<Player<string>[] | null> = ref(null);
 const playerIndex = ref(0);
@@ -98,12 +100,12 @@ onMounted(async () => {
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
     if (store.state.userId && !player.value!.isOpenSlot && GameHelper.isNormalAnonymity(store.state.game)) {
-      try {
-        const response = await gameService.getPlayerUserInfo(store.state.game._id, player.value!._id);
+      const response = await getPlayerUser(httpClient)(store.state.game._id, player.value!._id);
 
+      if (isOk(response)) {
         user.value = response.data;
-      } catch (err) {
-        console.error(err)
+      } else {
+        console.error(formatError(response));
       }
     }
 

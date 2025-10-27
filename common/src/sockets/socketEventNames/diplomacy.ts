@@ -1,4 +1,4 @@
-import { type DiplomaticStatus } from "../../api/types/common/diplomacy";
+import { type DiplomaticStatus } from "../../types/common/diplomacy";
 import { makeCastFunc } from "../../utilities/cast";
 import {type EventName} from "../../events";
 

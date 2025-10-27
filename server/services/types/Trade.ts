@@ -10,7 +10,7 @@ export interface TradeTechnology {
 export interface TradeEvent {
     playerId: DBObjectId;
     type: string;
-    data;
+    data: any; // todo
     sentDate: Date;
     sentTick: number;
 };

@@ -15,9 +15,7 @@ const log = logger("Game Controller");
 export default (container: DependencyContainer) => {
     return {
         getDefaultSettings: (req, res, next) => {
-            res.status(200).json({
-                settings: require('../../config/game/settings/user/standard.json'),
-            });
+            res.status(200).json(require('../../config/game/settings/user/standard.json'));
 
             return next();
         },
@@ -57,7 +55,9 @@ export default (container: DependencyContainer) => {
                     game = await container.gameCreateService.create(settings, req.session.userId);
                 }
     
-                res.status(201).json(game._id);
+                res.status(201).json({
+                    gameId: game._id,
+                });
                 return next();
             } catch (err) {
                 log.error(err);
@@ -82,9 +82,17 @@ export default (container: DependencyContainer) => {
         },
         detailGalaxy: async (req, res, next) => {
             try {
-                let tick = +req.query.tick || null;
-        
-                if (tick != null && tick < 0) {
+                const tickParam: string = req.query.tick;
+
+                let tick: number | null;
+
+                if (tickParam === null || tickParam === undefined || tickParam === '') {
+                    tick = null;
+                } else {
+                    tick = Number(tickParam);
+                }
+
+                if (tick !== null && tick < 0) {
                     throw new ValidationError(`Tick must be greater or equal to 0.`);
                 }
         
@@ -226,7 +234,7 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseGameJoinGameRequest(req.body);
                 
-                let gameIsFull = await container.gameJoinService.join(
+                let joinResult = await container.gameJoinService.join(
                     req.game,
                     req.session.userId,
                     reqObj.playerId,
@@ -236,9 +244,9 @@ export default (container: DependencyContainer) => {
     
                 res.sendStatus(200);
     
-                container.broadcastService.gamePlayerJoined(req.game, reqObj.playerId, reqObj.alias, reqObj.avatar);
+                container.broadcastService.gamePlayerJoined(req.game, joinResult.playerId, reqObj.alias, reqObj.avatar);
     
-                if (gameIsFull) {
+                if (joinResult.gameIsFull) {
                     container.broadcastService.gameStarted(req.game);
                 }
 

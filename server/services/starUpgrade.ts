@@ -1,6 +1,6 @@
 import {Carrier} from "./types/Carrier";
 
-const EventEmitter = require('events');
+import EventEmitter from "events";
 import {DBObjectId} from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
@@ -15,14 +15,15 @@ import {Player} from './types/Player';
 import {InfrastructureType, Star, TerraformedResources} from './types/Star';
 import UserAchievementService from './userAchievement';
 import CarrierService from './carrier';
-import GameTypeService from './gameType';
+import { GameTypeService } from 'solaris-common'
 import ResearchService from './research';
 import StarService from './star';
-import TechnologyService from './technology';
+import { TechnologyService } from 'solaris-common';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
 import StatisticsService from "./statistics";
 import {GameInfrastructureExpenseMultiplier} from "solaris-common";
+import { StarDataService } from "solaris-common";
 
 const Heap = require('qheap');
 
@@ -53,6 +54,7 @@ export default class StarUpgradeService extends EventEmitter {
     gameTypeService: GameTypeService;
     shipService: ShipService;
     statisticsService: StatisticsService;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -65,6 +67,7 @@ export default class StarUpgradeService extends EventEmitter {
         gameTypeService: GameTypeService,
         shipService: ShipService,
         statisticsService: StatisticsService,
+        starDataService: StarDataService,
     ) {
         super();
 
@@ -78,6 +81,7 @@ export default class StarUpgradeService extends EventEmitter {
         this.gameTypeService = gameTypeService;
         this.shipService = shipService;
         this.statisticsService = statisticsService;
+        this.starDataService = starDataService;
     }
 
     async buildWarpGate(game: Game, player: Player, starId: DBObjectId) {
@@ -97,7 +101,7 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError('The game settings has disabled the building of warp gates.');
         }
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot build a warp gate on a dead star.');
         }
 
@@ -180,7 +184,7 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Cannot build carrier, the star is not owned by the current player.`);
         }
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot build a carrier on a dead star.');
         }
 
@@ -258,7 +262,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     _calculateUpgradeInfrastructureCost(game: Game, star: Star, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback) {
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             return null;
         }
 
@@ -348,7 +352,7 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(`Cannot upgrade ${economyType}, the star is not owned by the current player.`);
         }
 
-        if (this.starService.isDeadStar(star)) {
+        if (this.starDataService.isDeadStar(star)) {
             throw new ValidationError('Cannot build infrastructure on a dead star.');
         }
 
@@ -455,7 +459,7 @@ export default class StarUpgradeService extends EventEmitter {
 
         const upgradeableStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id)
             .filter(s => {
-                if (this.starService.isDeadStar(s)) {
+                if (this.starDataService.isDeadStar(s)) {
                     return false;
                 }
 
@@ -853,7 +857,7 @@ export default class StarUpgradeService extends EventEmitter {
             carriers: null
         };
 
-        if (!this.starService.isDeadStar(star)) {
+        if (!this.starDataService.isDeadStar(star)) {
             let averageTerraformedResources = this.calculateAverageTerraformedResources(terraformedResources);
 
             upgradeCosts.economy = this.calculateEconomyCost(game, economyExpenseConfig, star.infrastructure.economy!, terraformedResources.economy);

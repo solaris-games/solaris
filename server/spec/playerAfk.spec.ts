@@ -1,14 +1,14 @@
 import moment from "moment";
 import CarrierService from "../services/carrier";
 import GameStateService from "../services/gameState";
-import GameTypeService from "../services/gameType";
+import { GameTypeService } from 'solaris-common'
 import PlayerService from "../services/player";
 import PlayerAfkService from "../services/playerAfk"
 import Repository from "../services/repository";
 import StarService from "../services/star";
 import { Game } from "../services/types/Game";
 import { Player } from "../services/types/Player";
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 describe('Player AFK Service', () => {
     let service: PlayerAfkService;
@@ -57,7 +57,7 @@ describe('Player AFK Service', () => {
         player = {
             defeated: false,
             afk: false,
-            userId: mongoose.Types.ObjectId(),
+            userId: new mongoose.Types.ObjectId(),
             lastSeen: null
         } as Player;
 
@@ -68,7 +68,7 @@ describe('Player AFK Service', () => {
     describe('Is AI Controlled', () => {
         it('should return true if the player is defeated', () => {
             player.defeated = true;
-            player.userId = mongoose.Types.ObjectId();
+            player.userId = new mongoose.Types.ObjectId();
 
             const result = service.isAIControlled(game, player, false);
     
@@ -86,7 +86,7 @@ describe('Player AFK Service', () => {
 
         it('should return false if the player is controlled by a user and is not defeated', () => {
             player.defeated = false;
-            player.userId = mongoose.Types.ObjectId();
+            player.userId = new mongoose.Types.ObjectId();
 
             const result = service.isAIControlled(game, player, false);
     
@@ -172,7 +172,7 @@ describe('Player AFK Service', () => {
         });
 
         it('should return true if the player has missed too many turns', () => {
-            gameTypeService.isTurnBasedGame = (game: Game) => { return true; };
+            gameTypeService.isTurnBasedGame = ((game: Game) => { return true; }) as any;
 
             player.lastSeen = moment().utc().toDate();
             player.missedTurns = game.settings.gameTime.afk.turnTimeout;

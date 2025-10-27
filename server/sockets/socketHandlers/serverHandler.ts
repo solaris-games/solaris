@@ -28,7 +28,7 @@ export class ServerHandler extends EventEmitter {
 
         this.socketOn(server.engine, ServerSocketEventNames.ConnectionError, (err: Error) => {
             if (err) {
-                logger.error(err);
+                logger.error(`Socket error: ${err}`);
             }
         });
     }

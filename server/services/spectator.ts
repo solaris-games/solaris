@@ -1,11 +1,10 @@
-import { ValidationError } from "solaris-common";
+import { ValidationError, notNull } from "solaris-common";
 import PlayerService from "./player";
 import Repository from "./repository";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game, GameSpectator } from "./types/Game";
 import { Player } from "./types/Player";
 import UserService from "./user";
-import {notNull} from "./utils";
 import {User} from "./types/User";
 
 export default class SpectatorService {

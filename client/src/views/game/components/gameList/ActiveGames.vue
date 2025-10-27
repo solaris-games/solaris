@@ -87,79 +87,69 @@
   </div>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
-import gameService from '../../../../services/api/game'
-import GameHelper from '../../../../services/gameHelper'
-import CountdownTimer from '../CountdownTimer.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
+import GameHelper from '../../../../services/gameHelper';
+import CountdownTimer from '../CountdownTimer.vue';
+import { loadLocalPreference, storeLocalPreference } from '@/util/localPreference';
+import type { UserActiveListGame } from '@solaris-common';
+import { ref, computed, type Ref, inject, onMounted, watch } from 'vue';
+import { listActive } from '@/services/typedapi/game';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'countdown-timer': CountdownTimer
-  },
-  data () {
-    return {
-      activeGames: [],
-      isLoadingActiveGames: true,
-      includeDefeated: true
-    }
-  },
-  mounted () {
-    this.loadActiveGames()
-  },
-  methods: {
-    async loadActiveGames () {
-      this.isLoadingActiveGames = true
+const INCLUDE_DEFEATED_PREF_KEY = 'activeGamesIncludeDefeated';
 
-      try {
-        let response = await gameService.listActiveGames()
+const httpClient = inject(httpInjectionKey)!;
 
-        this.activeGames = response.data
-          .sort((a, b) => (a.userNotifications.defeated - a.userNotifications.afk) - (b.userNotifications.defeated - b.userNotifications.afk))
-      } catch (err) {
-        console.error(err)
-      }
+const activeGames: Ref<UserActiveListGame<string>[]> = ref([]);
+const isLoadingActiveGames = ref(false);
+const includeDefeated = ref(loadLocalPreference('INCLUDE_DEFEATED_PREF_KEY', true));
 
-      this.isLoadingActiveGames = false
-    },
-    isRealTimeGame (game) {
-      return GameHelper.isRealTimeGame(game);
-    },
-    isGameWaitingForPlayers (game) {
-      return GameHelper.isGameWaitingForPlayers(game)
-    },
-    isGamePendingStart (game) {
-      return GameHelper.isGamePendingStart(game)
-    },
-    isGameInProgress (game) {
-      return GameHelper.isGameInProgress(game)
-    },
-    getNextCycleDate (game) {
-      // TODO: This doesn't work, for some reason getCountdownTime returns a number wtf
-      // if (GameHelper.isGamePendingStart(game)) {
-      //   return GameHelper.getCountdownTime(game, game.state.startDate)
-      // } else
-      if (GameHelper.isRealTimeGame(game)) {
-        return GameHelper.getCountdownTimeForProductionCycle(game)
-      } else if (GameHelper.isTurnBasedGame(game)) {
-        return GameHelper.getCountdownTimeForTurnTimeout(game)
-      }
-    },
-    getGameTypeFriendlyText (game) {
-      return GameHelper.getGameTypeFriendlyText(game)
-    }
-  },
-  computed: {
-    filteredActiveGames () {
-      if (this.includeDefeated) {
-        return this.activeGames
-      }
+watch(includeDefeated, (newValue) => storeLocalPreference(INCLUDE_DEFEATED_PREF_KEY, newValue));
 
-      return this.activeGames.filter(g => !g.userNotifications.defeated)
-    }
+const filteredActiveGames = computed(() => {
+  if (includeDefeated.value) {
+    return activeGames.value;
   }
-}
+
+  return activeGames.value.filter(g => !g.userNotifications.defeated);
+});
+
+const isRealTimeGame = (game: UserActiveListGame<string>) => GameHelper.isRealTimeGame(game);
+
+const isGameWaitingForPlayers = (game: UserActiveListGame<string>) => GameHelper.isGameWaitingForPlayers(game);
+
+const isGamePendingStart = (game: UserActiveListGame<string>) => GameHelper.isGamePendingStart(game);
+
+const isGameInProgress = (game: UserActiveListGame<string>) => GameHelper.isGameInProgress(game);
+
+const getNextCycleDate = (game: UserActiveListGame<string>) => {
+  if (GameHelper.isRealTimeGame(game)) {
+    return GameHelper.getCountdownTimeForProductionCycle(game);
+  } else if (GameHelper.isTurnBasedGame(game)) {
+    return GameHelper.getCountdownTimeForTurnTimeout(game);
+  }
+};
+
+const getGameTypeFriendlyText = (game: UserActiveListGame<string>) => GameHelper.getGameTypeFriendlyText(game);
+
+const loadActiveGames = async () => {
+  isLoadingActiveGames.value = true;
+
+  const response = await listActive(httpClient)();
+
+  if (isOk(response)) {
+    activeGames.value = response.data.sort((a, b) => (Number(a.userNotifications.defeated) - Number(a.userNotifications.afk)) - (Number(b.userNotifications.defeated)  - Number(b.userNotifications.afk)));
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoadingActiveGames.value = false;
+};
+
+onMounted(async () => {
+  await loadActiveGames();
+});
 </script>
 
 <style scoped>

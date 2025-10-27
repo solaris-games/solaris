@@ -7,7 +7,7 @@ import PlayerService from '../services/player';
 import UserGuildService from '../services/guildUser';
 import RatingService from '../services/rating';
 import GameService from '../services/game';
-import GameTypeService from '../services/gameType';
+import { GameTypeService } from 'solaris-common'
 import GameStateService from '../services/gameState';
 import BadgeService from '../services/badge';
 import PlayerStatisticsService from '../services/playerStatistics';
@@ -16,7 +16,7 @@ import { LeaderboardPlayer } from '../services/types/Leaderboard';
 import PlayerAfkService from '../services/playerAfk';
 import UserLevelService from '../services/userLevel';
 import TeamService from "../services/team";
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 describe('Leaderboard - Last man standing', () => {
     let playerService: PlayerService;
@@ -79,18 +79,18 @@ describe('Leaderboard - Last man standing', () => {
             galaxy: {
                 players: [
                     {
-                        _id: mongoose.Types.ObjectId(),
-                        userId: mongoose.Types.ObjectId(),
+                        _id: new mongoose.Types.ObjectId(),
+                        userId: new mongoose.Types.ObjectId(),
                         defeated: false
                     },
                     {
-                        _id: mongoose.Types.ObjectId(),
-                        userId: mongoose.Types.ObjectId(),
+                        _id: new mongoose.Types.ObjectId(),
+                        userId: new mongoose.Types.ObjectId(),
                         defeated: false
                     },
                     {
-                        _id: mongoose.Types.ObjectId(),
-                        userId: mongoose.Types.ObjectId(),
+                        _id: new mongoose.Types.ObjectId(),
+                        userId: new mongoose.Types.ObjectId(),
                         defeated: false
                     }
                 ]

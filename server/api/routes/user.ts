@@ -5,10 +5,11 @@ import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
 import { createUserRoutes } from "solaris-common";
 import { createRoutes } from "../typedapi/routes";
+import {DBObjectId} from "../../services/types/DBObjectId";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = UserController(container);
-    const routes = createUserRoutes();
+    const routes = createUserRoutes<DBObjectId>();
 
     const answer = createRoutes(router, mw);
 
@@ -21,6 +22,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     answer(routes.saveSettings, mw.auth.authenticate(), controller.saveSettings);
 
     answer(routes.getSubscriptions, mw.auth.authenticate(), controller.getSubscriptions);
+
+    answer(routes.saveSubscriptions, mw.auth.authenticate(), controller.saveSubscriptions);
     
     answer(routes.getCredits, mw.auth.authenticate(), controller.getCredits);
 

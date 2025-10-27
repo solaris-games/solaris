@@ -4,7 +4,7 @@
 
     <loading-spinner :loading="isLoading"/>
 
-    <div v-if="!isLoading">
+    <div v-if="!isLoading && game">
       <view-subtitle :title="game.settings.general.name" class="mt-2"/>
 
       <p class="description" v-if="game.settings.general.description">{{game.settings.general.description}}</p>
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <game-control :game="game" />
+      <game-control :game="game" @onGameModified="loadGame" />
 
       <div class="row mb-2" v-if="game.settings.general.type === 'new_player_rt' || game.settings.general.type === 'new_player_tb' || game.settings.general.type === 'tutorial'">
         <div class="ratio ratio-16x9">
@@ -36,75 +36,53 @@
   </view-container>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewSubtitle from '../components/ViewSubtitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import GameSettings from './components/settings/GameSettings.vue'
 import GameControl from './GameControl.vue'
-import gameService from '../../services/api/game'
-import router from '../../router'
 import GameHelper from '../../services/gameHelper'
+import { ref, inject, computed, type Ref, onMounted } from 'vue';
+import type { GameInfoDetail } from '@solaris-common'
+import { useRoute } from 'vue-router'
+import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import { detailInfo } from '@/services/typedapi/game'
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'view-subtitle': ViewSubtitle,
-    'game-settings': GameSettings,
-    'game-control': GameControl,
-  },
-  data () {
-    return {
-      isLoading: true,
-      errors: [],
-      game: {
-        _id: null,
-        settings: {
-          general: {
-            name: null,
-            description: null
-          }
-        }
-      }
-    }
-  },
-  created () {
-    this.game._id = this.$route.query.id
-  },
-  async mounted () {
-    await this.loadGame()
-  },
-  methods: {
-    async loadGame () {
-      this.isLoading = true
+const httpClient = inject(httpInjectionKey)!;
 
-      try {
-        let response = await gameService.getGameInfo(this.game._id)
+const isLoading = ref(false);
+const errors: Ref<string[]> = ref([]);
+const game: Ref<GameInfoDetail<string> | null> = ref(null);
 
-        this.game = response.data
-      } catch (err) {
-        this.errors = err.response.data.errors;
-        console.error(err)
-      }
+const gameId = useRoute().query.id?.toString();
 
-      this.isLoading = false
-    },
-  },
-  computed: {
-    isNewPlayerGame () {
-      return GameHelper.isNewPlayerGame(this.game)
-    },
-    isFluxGame () {
-      return GameHelper.isFluxGame(this.game)
-    },
-    isCustomFeaturedGame () {
-      return GameHelper.isCustomGame(this.game) && GameHelper.isFeaturedGame(this.game)
-    }
+const isNewPlayerGame = computed(() => GameHelper.isNewPlayerGame(game.value));
+const isCustomFeaturedGame = computed(() => GameHelper.isCustomGame(game.value) && GameHelper.isFeaturedGame(game.value));
+
+const loadGame = async () => {
+  if (!gameId) {
+    return;
   }
-}
+
+  isLoading.value = true;
+
+  const response = await detailInfo(httpClient)(gameId);
+
+  if (isOk(response)) {
+    game.value = response.data;
+  } else {
+    errors.value = extractErrors(response);
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+onMounted(async () => {
+  await loadGame();
+});
 </script>
 
 <style scoped>

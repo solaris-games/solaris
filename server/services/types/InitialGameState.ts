@@ -2,7 +2,7 @@ import {DBObjectId} from "./DBObjectId";
 import {Infrastructure, NaturalResources} from "./Star";
 import {PlayerDiplomaticState, PlayerResearch, ResearchType, ResearchTypeNotRandom} from "./Player";
 import {Location} from "./Location";
-import {CarrierWaypoint} from "./CarrierWaypoint";
+import {CarrierWaypoint} from "@solaris-common";
 
 export type InitialStar = {
     starId: DBObjectId,
@@ -42,7 +42,7 @@ export type InitialCarrier = {
     specialistExpireTick: number | null,
     isGift: boolean,
     location: Location,
-    waypoints: CarrierWaypoint[];
+    waypoints: CarrierWaypoint<DBObjectId>[];
 }
 
 export type InitialGameState = {

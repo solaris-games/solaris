@@ -127,6 +127,15 @@
         </div>
 
         <div class="mb-2">
+          <label for="joinRandomSlot" class="col-form-label">Random Player slots <help-tooltip tooltip="Players will only be able to join a random slot instead of choosing a specific one" /></label>
+          <select class="form-control" id="joinRandomSlot" v-model="settings.general.joinRandomSlot" :disabled="isCreatingGame">
+            <option v-for="opt in options.general.joinRandomSlot" v-bind:key="opt.value" v-bind:value="opt.value">
+              {{ opt.text }}
+            </option>
+          </select>
+        </div>
+
+        <div class="mb-2">
           <label for="advancedAI" class="col-form-label">Advanced AI <help-tooltip tooltip="Use the advanced AI to replace defeated players"></help-tooltip></label>
           <select class="form-control" id="advancedAI" v-model="settings.general.advancedAI" :disabled="isCreatingGame">
             <option v-for="opt in options.general.advancedAI" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -153,7 +162,7 @@
           </select>
         </div>
 
-        <div class="mb-2">
+        <div v-if="canRTQBeEnabled" class="mb-2">
           <label for="readyToQuit" class="col-form-label">Allow Ready To Quit <help-tooltip tooltip="Allow players to 'Ready To Quit' to finish games early"></help-tooltip></label>
           <select class="form-control" id="readyToQuit" v-model="settings.general.readyToQuit" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuit" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -162,7 +171,7 @@
           </select>
         </div>
 
-        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+        <div v-if="canRTQBeEnabled && settings.general.readyToQuit === 'enabled'" class="mb-2">
           <label for="readyToQuitFraction" class="col-form-label">Fraction of stars for RTQ <help-tooltip tooltip="Fraction of stars for triggering RTQ condition"></help-tooltip></label>
           <select class="form-control" id="readyToQuitFraction" v-model="settings.general.readyToQuitFraction" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuitFraction" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -171,7 +180,7 @@
           </select>
         </div>
 
-        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+        <div v-if="canRTQBeEnabled && settings.general.readyToQuit === 'enabled'" class="mb-2">
           <label for="readyToQuitTimerCycles" class="col-form-label">Timer for RTQ <help-tooltip tooltip="Time until game finishes after RTQ"></help-tooltip></label>
           <select class="form-control" id="readyToQuitTimerCycles" v-model="settings.general.readyToQuitTimerCycles" :disabled="isCreatingGame">
             <option v-for="opt in options.general.readyToQuitTimerCycles" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -180,7 +189,7 @@
           </select>
         </div>
 
-        <div v-if="settings.general.readyToQuit === 'enabled'" class="mb-2">
+        <div v-if="canRTQBeEnabled && settings.general.readyToQuit === 'enabled'" class="mb-2">
           <label for="readyToQuitVisibility" class="col-form-label">RTQ visibility <help-tooltip tooltip="Visibility of a player's RTQ state. Anonymous shows the number of RTQ'd players, but not their identity"></help-tooltip></label>
 
           <select class="form-control" id="readyToQuitVisibility" v-model="settings.general.readyToQuitVisibility" :disabled="isCreatingGame">
@@ -919,13 +928,12 @@ import FormErrorList from '../components/FormErrorList.vue'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import SpecialistBanListSelection from './components/specialist/SpecialistBanListSelection.vue'
 import FluxBar from './components/menu/FluxBar.vue'
-import gameService from '../../services/api/game'
 import router from '../../router'
 import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
 import { ref, onMounted, inject, type Ref, computed } from 'vue';
 import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
-import {createGame} from "@/services/typedapi/game";
-import {extractErrors, httpInjectionKey, isOk} from "@/services/typedapi";
+import {createGame, getDefaultSettings} from "@/services/typedapi/game";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 
@@ -937,6 +945,7 @@ const errors: Ref<string[]> = ref([]);
 const settings: Ref<GameSettingsSpec | null> = ref(null);
 
 const isAdvancedCustomGalaxy = computed(() => settings.value && settings.value.galaxy.galaxyType === 'custom' && settings.value.galaxy.advancedCustomGalaxyEnabled === 'enabled');
+const canRTQBeEnabled = computed(() => settings.value && settings.value.general.mode !== 'battleRoyale');
 
 const options = GAME_CREATION_OPTIONS;
 
@@ -1013,7 +1022,7 @@ const handleSubmit = async (e: Event) => {
 
     router.push({ name: 'game-detail', query: { id: response.data.gameId } })
   } else {
-    console.error(response.cause);
+    console.error(formatError(response));
 
     toast.error('Failed to create game');
     errors.value = extractErrors(response);
@@ -1046,10 +1055,6 @@ const onModeChanged = () => {
   }
 };
 
-const onSpecialistBanSelectionChanged = (e: SpecialistBans) => {
-  settings.value!.specialGalaxy.specialistBans = e;
-};
-
 const onPlayerLimitChanged = () => {
   if (settings.value!.general.playerLimit <= 2) {
     settings.value!.diplomacy.lockedAlliances = 'disabled';
@@ -1063,12 +1068,12 @@ const onTeamCountChanged = () => {
 };
 
 onMounted(async () => {
-  try {
-    const response = await gameService.getDefaultGameSettings();
+  const response = await getDefaultSettings(httpClient)();
 
-    settings.value = response.data.settings;
-  } catch (err) {
-    console.error(err)
+  if (isOk(response)) {
+    settings.value = response.data;
+  } else {
+    console.error(formatError(response));
   }
 });
 </script>

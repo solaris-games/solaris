@@ -1,10 +1,10 @@
 import { Game } from "./types/Game";
 import { Location } from "./types/Location";
 import { NaturalResources } from "./types/Star";
-import DistanceService from "./distance";
-import GameTypeService from "./gameType";
+import { DistanceService } from 'solaris-common';
+import { GameTypeService } from 'solaris-common'
 import RandomService from "./random";
-import StarDistanceService from "./starDistance";
+import { StarDistanceService } from 'solaris-common';
 import {GameResourceDistribution} from "solaris-common";
 
 export default class ResourceService {
@@ -74,7 +74,7 @@ export default class ResourceService {
         // The closer to the center of the galaxy, the more likely (exponentially) to find stars with higher resources.
         let minResources = game.constants.star.resources.minNaturalResources;
         let maxResources = game.constants.star.resources.maxNaturalResources;
-        let galaxyRadius = this.starDistanceService.getMaxGalaxyDiameter(locations) / 2;
+        let galaxyRadius = this.starDistanceService.getMaxGalaxyRadius(locations);
         let galacticCenter = { x: 0, y: 0 };
 
         if (game.settings.galaxy.galaxyType == 'circular-balanced') {

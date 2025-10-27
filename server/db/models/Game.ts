@@ -1,6 +1,5 @@
-import mongoose = require('mongoose');
-import mongooseLeanDefaults = require('mongoose-lean-defaults');
-
+import mongoose from "mongoose";
+import mongooseLeanDefaults from "mongoose-lean-defaults";
 import schema from './schemas/game';
 
 schema.plugin(mongooseLeanDefaults);

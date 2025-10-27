@@ -1,19 +1,23 @@
 import Repository from './repository';
-import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from './types/CarrierWaypoint';
-import { Game } from './types/Game';
-import { Player } from './types/Player';
-import { Star } from './types/Star';
-import { User } from './types/User';
+import {Carrier} from './types/Carrier';
+import {
+    CarrierWaypoint,
+    DistanceService,
+    StarDataService,
+    StarDistanceService,
+    TechnologyService
+} from 'solaris-common';
+import {Game} from './types/Game';
+import {Player} from './types/Player';
+import {Star} from './types/Star';
+import {User} from './types/User';
 import CarrierGiftService from './carrierGift';
 import DiplomacyService from './diplomacy';
-import DistanceService from './distance';
 import SpecialistService from './specialist';
 import StarService from './star';
-import WaypointService from "./waypoint";
-import TechnologyService from "./technology";
-import StarDistanceService from "./starDistance";
 import {logger} from "../utils/logging";
+import {DBObjectId} from "./types/DBObjectId";
+import { CarrierTravelService } from 'solaris-common';
 
 type CarrierMovementReport = {
     carrier: Carrier;
@@ -23,7 +27,7 @@ type CarrierMovementReport = {
     warpSpeed: boolean;
     instantSpeed: boolean | null;
     distancePerTick: number | null;
-    waypoint: CarrierWaypoint;
+    waypoint: CarrierWaypoint<DBObjectId>;
     combatRequiredStar: boolean;
     arrivedAtStar: boolean;
 }
@@ -39,6 +43,8 @@ export default class CarrierMovementService {
     carrierGiftService: CarrierGiftService;
     technologyService: TechnologyService;
     starDistanceService: StarDistanceService;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
+    starDataService: StarDataService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -49,6 +55,8 @@ export default class CarrierMovementService {
         carrierGiftService: CarrierGiftService,
         technologyService: TechnologyService,
         starDistanceService: StarDistanceService,
+        carrierTravelService: CarrierTravelService<DBObjectId>,
+        starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
         this.distanceService = distanceService;
@@ -58,30 +66,12 @@ export default class CarrierMovementService {
         this.carrierGiftService = carrierGiftService;
         this.technologyService = technologyService;
         this.starDistanceService = starDistanceService;
-    }
-
-    getCarrierDistancePerTick(game: Game, carrier: Carrier, warpSpeed: boolean = false, instantSpeed: boolean | null = false) {
-        if (instantSpeed) {
-            return null;
-        }
-
-        let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
-
-        if (carrier.specialistId) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-
-            if (specialist && specialist.modifiers.local) {
-                distanceModifier *= (specialist.modifiers.local.speed || 1);
-            }
-        }
-
-        return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
+        this.carrierTravelService = carrierTravelService;
+        this.starDataService = starDataService;
     }
 
     moveCarrierToCurrentWaypoint(carrier: Carrier, destinationStar: Star, distancePerTick: number) {
-        let nextLocation = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
-
-        carrier.location = nextLocation;
+        carrier.location = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
     }
 
     arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
@@ -111,7 +101,7 @@ export default class CarrierMovementService {
 
         // Reignite dead stars if applicable
         // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && this.starService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
+        if (!carrier.isGift && this.starDataService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
             let reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             // Double resources for binary stars.
@@ -149,13 +139,13 @@ export default class CarrierMovementService {
     }
 
     moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier): CarrierMovementReport | null {
-        let waypoint: CarrierWaypoint = carrierInTransit.waypoints[0];
+        let waypoint: CarrierWaypoint<DBObjectId> = carrierInTransit.waypoints[0];
 
         if (waypoint.delayTicks) {
             throw new Error(`Cannot move carrier, the waypoint has a delay.`);
         }
 
-        if (this.isLaunching(carrierInTransit)) {
+        if (this.carrierTravelService.isLaunching(carrierInTransit)) {
             const sourceStarId = carrierInTransit.orbiting!;
             const destinationStarId = waypoint.destination;
             const sourceStar = this.starService.getByIdBS(game, sourceStarId);
@@ -166,7 +156,7 @@ export default class CarrierMovementService {
                 return null;
             }
 
-            if (!this.isWithinHyperspaceRange(game, carrierInTransit, sourceStar, destinationStar)) {
+            if (!this.carrierTravelService.isWithinHyperspaceRange(game, carrierInTransit, sourceStar, destinationStar)) {
                 log.warn(`Carrier ${carrierInTransit._id} is trying to launch to a star that is out of hyperspace range.`, {
                     gameId: game._id.toString(),
                     carrierId: carrierInTransit._id.toString(),
@@ -188,9 +178,9 @@ export default class CarrierMovementService {
         const sourceStar = this.starService.getByIdBS(game, waypoint.source);
         const destinationStar = this.starService.getByIdBS(game, waypoint.destination);
         const carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrierInTransit.ownedByPlayerId!.toString())!;
-        const warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
-        const instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
-        const distancePerTick = this.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
+        const warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, carrierOwner, carrierInTransit, sourceStar, destinationStar);
+        const instantSpeed = this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
+        const distancePerTick = this.carrierTravelService.getCarrierDistancePerTick(game, carrierInTransit, warpSpeed, instantSpeed); // Null signifies instant travel
 
         const carrierMovementReport = {
             carrier: carrierInTransit,
@@ -230,8 +220,8 @@ export default class CarrierMovementService {
         let instantSpeed: boolean | null = false;
         
         if (sourceStar) {
-            warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
-            instantSpeed = this.starService.isStarPairWormHole(sourceStar, destinationStar);
+            warpSpeed = this.carrierTravelService.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            instantSpeed = this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
         }
 
         let nextLocation;
@@ -243,7 +233,7 @@ export default class CarrierMovementService {
             distancePerTick = distanceToDestination;
             nextLocation = destinationStar.location;
         } else {
-            distancePerTick = this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)!;
+            distancePerTick = this.carrierTravelService.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)!;
 
             if (distancePerTick >= distanceToDestination) {
                 distancePerTick = distanceToDestination;
@@ -263,87 +253,6 @@ export default class CarrierMovementService {
         };
     }
 
-    isWithinHyperspaceRange(game: Game, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
-        // If the stars are a wormhole pair then they are always considered to be in hyperspace range.
-        if (this.starService.isStarPairWormHole(sourceStar, destinationStar)) {
-            return true;
-        }
-
-        let effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
-        let distanceBetweenStars = this.starDistanceService.getDistanceBetweenStars(sourceStar, destinationStar);
-
-        return distanceBetweenStars <= hyperspaceDistance;
-    }
-
-    canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star, destinationStar: Star) {
-        // Double check for destroyed stars.
-        if (sourceStar == null || destinationStar == null) {
-            return false;
-        }
-
-        // If both stars have warp gates and they are both owned by players...
-        if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
-            // If both stars are owned by the player or by allies then carriers can always move at warp.
-            let sourceAllied = sourceStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId!]));
-            let desinationAllied = destinationStar.ownedByPlayerId.toString() === carrier.ownedByPlayerId!.toString() || (this.diplomacyService.isFormalAlliancesEnabled(game) && this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId!]));
-
-            // If both stars are owned by the player then carriers can always move at warp.
-            if (sourceAllied && desinationAllied) {
-                return true;
-            }
-
-            // If one of the stars are not owned by the current player then we need to check for
-            // warp scramblers.
-
-            // But if the carrier has the warp stabilizer specialist then it can travel at warp speed no matter
-            // which player it belongs to or whether the stars it is travelling to or from have locked warp gates.
-            if (carrier.specialistId) {
-                let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
-
-                if (carrierSpecialist && carrierSpecialist.modifiers.special && carrierSpecialist.modifiers.special.unlockWarpGates) {
-                    return true;
-                }
-            }
-
-            // If either star has a warp scrambler present then carriers cannot move at warp.
-            // Note that we only need to check for scramblers on stars that do not belong to the player.
-            if (!sourceAllied && sourceStar.specialistId) {
-                let specialist = this.specialistService.getByIdStar(sourceStar.specialistId);
-
-                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                    return false;
-                }
-            }
-
-            if (!desinationAllied && destinationStar.specialistId) {
-                let specialist = this.specialistService.getByIdStar(destinationStar.specialistId);
-
-                if (specialist && specialist.modifiers.special && specialist.modifiers.special.lockWarpGates) {
-                    return false;
-                }
-            }
-
-            // If none of the stars have scramblers then warp speed ahead.
-            return true;
-        }
-
-        return false;
-    }
-
-    isInTransit(carrier: Carrier) {
-        return !carrier.orbiting;
-    }
-
-    isInTransitTo(carrier: Carrier, star: Star) {
-        return this.isInTransit(carrier) && carrier.waypoints[0].destination.toString() === star._id.toString();
-    }
-
-    isLaunching(carrier: Carrier) {
-        return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
-    }
-
     getCarriersEnRouteToStar(game: Game, star: Star) {
         return game.galaxy.carriers.filter(c => 
             c.waypoints && c.waypoints.length && c.waypoints.find(w => w.destination.toString() === star._id.toString()) != null
@@ -352,7 +261,7 @@ export default class CarrierMovementService {
 
     isLostInSpace(game: Game, carrier: Carrier) {
         // If not in transit then it obviously isn't lost in space
-        if (!this.isInTransit(carrier)) {
+        if (!this.carrierTravelService.isInTransit(carrier)) {
             return false;
         }
 

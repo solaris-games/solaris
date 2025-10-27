@@ -227,6 +227,16 @@ export const GAME_CREATION_OPTIONS = {
                 "text": "Visible"
             }
         ],
+        "joinRandomSlot": [
+            {
+                "value": "enabled",
+                "text": "Enabled"
+            },
+            {
+                "value": "disabled",
+                "text": "Disabled"
+            }
+        ],
         "awardRankTo": [
             {
                 "value": "all",

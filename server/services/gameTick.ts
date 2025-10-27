@@ -7,10 +7,10 @@ import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DiplomacyService from "./diplomacy";
-import DistanceService from "./distance";
+import { DistanceService } from 'solaris-common';
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import HistoryService from "./history";
 import LeaderboardService, {GameWinner} from "./leaderboard";
 import StarMovementService from "./starMovement";
@@ -20,9 +20,8 @@ import ResearchService from "./research";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import TechnologyService from "./technology";
+import { TechnologyService } from 'solaris-common';
 import UserService from "./user";
-import WaypointService from "./waypoint";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
 import { GameRankingResult } from "./types/Rating";
@@ -43,9 +42,12 @@ import {Moment} from "moment";
 import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
+import WaypointActionService from "./waypointAction";
+import CullWaypointsService from "./cullWaypoints";
+import { CarrierTravelService } from 'solaris-common';
 
-const EventEmitter = require('events');
-const moment = require('moment');
+import EventEmitter from "events";
+import moment from "moment";
 
 const log = logger("Game Tick Service");
 
@@ -66,7 +68,6 @@ export default class GameTickService extends EventEmitter {
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
     historyService: HistoryService;
-    waypointService: WaypointService;
     combatService: CombatService;
     leaderboardService: LeaderboardService;
     userService: UserService;
@@ -91,6 +92,9 @@ export default class GameTickService extends EventEmitter {
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
     statisticsService: StatisticsService;
+    waypointActionService: WaypointActionService;
+    cullWaypointsService: CullWaypointsService;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
 
     constructor(
         distanceService: DistanceService,
@@ -100,7 +104,6 @@ export default class GameTickService extends EventEmitter {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         historyService: HistoryService,
-        waypointService: WaypointService,
         combatService: CombatService,
         leaderboardService: LeaderboardService,
         userService: UserService,
@@ -125,6 +128,9 @@ export default class GameTickService extends EventEmitter {
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
         statisticsService: StatisticsService,
+        waypointActionService: WaypointActionService,
+        cullWaypointsService: CullWaypointsService,
+        carrierTravelService: CarrierTravelService<DBObjectId>,
     ) {
         super();
             
@@ -135,7 +141,6 @@ export default class GameTickService extends EventEmitter {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
         this.historyService = historyService;
-        this.waypointService = waypointService;
         this.combatService = combatService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
@@ -160,6 +165,9 @@ export default class GameTickService extends EventEmitter {
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
         this.statisticsService = statisticsService;
+        this.waypointActionService = waypointActionService;
+        this.cullWaypointsService = cullWaypointsService;
+        this.carrierTravelService = carrierTravelService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -191,7 +199,7 @@ export default class GameTickService extends EventEmitter {
             gameName: game.settings.general.name
         }, `[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
-        game.state.lastTickDate = moment().utc();
+        game.state.lastTickDate = moment().utc().toDate();
         game.state.forceTick = false;
 
         let taskTime = process.hrtime();
@@ -279,7 +287,7 @@ export default class GameTickService extends EventEmitter {
             this._orbitGalaxy(game);
             logTime('Orbital mechanics');
 
-            this.waypointService.cullAllWaypointsByHyperspaceRange(game);
+            this.cullWaypointsService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
             this._applyTickBasedSpecialistEffects(game);
@@ -387,8 +395,8 @@ export default class GameTickService extends EventEmitter {
         // and where they will be moving to.
         const carrierPositions: CarrierPosition[] = game.galaxy.carriers
             .filter(x => 
-                this.carrierMovementService.isInTransit(x)           // Carrier is already in transit
-                || this.carrierMovementService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
+                this.carrierTravelService.isInTransit(x)           // Carrier is already in transit
+                || this.carrierTravelService.isLaunching(x)        // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
             )
             .map(c => {
                 let waypoint = c.waypoints[0];
@@ -646,14 +654,14 @@ export default class GameTickService extends EventEmitter {
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
-        this.waypointService.performWaypointActionsDrops(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsDrops(game, actionWaypoints);
 
         // 4b. Build ships at star.
         this.shipService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
-        this.waypointService.performWaypointActionsCollects(game, actionWaypoints);
-        this.waypointService.performWaypointActionsGarrisons(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsCollects(game, actionWaypoints);
+        this.waypointActionService.performWaypointActionsGarrisons(game, actionWaypoints);
 
         // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
         // for performance reasons because it needs to calculate the scanning ranges of all players.
@@ -703,7 +711,7 @@ export default class GameTickService extends EventEmitter {
 
     _sanitiseDarkModeCarrierWaypoints(game: Game) {
         if (this.gameTypeService.isDarkMode(game)) {
-            this.waypointService.sanitiseAllCarrierWaypointsByScanningRange(game);
+            this.cullWaypointsService.sanitiseAllCarrierWaypointsByScanningRange(game);
         }
     }
 

@@ -5,7 +5,7 @@ import { User } from "./types/User";
 import GameService from "./game";
 import GameStateService from "./gameState";
 import GameTickService, { GameTickServiceEvents } from "./gameTick";
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService, { UserServiceEvents } from "./user";

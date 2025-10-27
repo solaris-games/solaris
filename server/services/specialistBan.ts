@@ -1,8 +1,8 @@
 import { Game } from "./types/Game";
-import { Specialist } from "./types/Specialist";
+import { Specialist } from 'solaris-common';
 import SpecialistService from "./specialist";
 const RNG = require('random-seed');
-const moment = require('moment');
+import moment from "moment";
 
 export default class SpecialistBanService {
     specialistService: SpecialistService;

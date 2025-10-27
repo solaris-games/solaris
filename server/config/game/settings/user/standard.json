@@ -20,7 +20,8 @@
        "readyToQuitTimerCycles": 0,
        "readyToQuitVisibility": "visible",
        "awardRankTo": "all",
-       "awardRankToTopN": 1
+       "awardRankToTopN": 1,
+       "joinRandomSlot": "disabled"
     },
     "galaxy":{
        "galaxyType":"irregular",

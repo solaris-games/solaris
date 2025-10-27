@@ -7,9 +7,9 @@ import {AwardedBadge, User} from './types/User';
 import PlayerService from './player';
 import UserService from './user';
 import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
-import GameTypeService from "./gameType";
+import { GameTypeService } from 'solaris-common'
 import GameStateService from "./gameState";
-const EventEmitter = require('events');
+import EventEmitter from "events";
 
 export const BadgeServiceEvents = {
     onGamePlayerBadgePurchased: 'onGamePlayerBadgePurchased'
