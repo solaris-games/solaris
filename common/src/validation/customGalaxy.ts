@@ -12,7 +12,7 @@ import {
     withDefault,
     UNICODE_PRINTABLE_CHARACTERS_WITH_WHITESPACE,
     UNICODE_INVISIBLE_CHARACTERS,
-    type Validator, named, maybeNull, maybeUndefined
+    type Validator, named, maybeNull, maybeUndefined, sizedArray
 } from "./validate";
 import type {CustomGalaxy} from "../types/common/customGalaxy";
 import { type CarrierWaypointActionType, CarrierWaypointActionTypes} from "../types/common/carrierWaypoint";
@@ -22,7 +22,7 @@ const carrierId = named("Carrier ID", stringValue({ minLength: 1 }));
 const playerId = named("Player ID", stringValue({ minLength: 1 }));
 
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
-    stars: array(object({
+    stars: sizedArray(1, 1500, object({
         id: starId,
         location: object({
             x: number,
@@ -59,7 +59,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
         }), just(undefined))
     })),
-    players: or(array(object({
+    players: or(sizedArray(2, 64, object({
         id: playerId,
         homeStarId: starId,
         credits: positiveInteger,
@@ -75,7 +75,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             specialists: positiveInteger
         })
     })), just(undefined)),
-    carriers: or(array(object({
+    carriers: or(sizedArray(0, 500, object({
         id: carrierId,
         playerId: playerId,
         orbiting: or(starId, just(null)),
@@ -91,7 +91,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
             actionShips: withDefault(0, positiveInteger),
             delayTicks: withDefault(0, positiveInteger)
         })),
-        progress: or(numberAdv({ sign: 'positive', range: { from: 0, to: 1 } }), just(undefined)),
+        progress: or(numberAdv({sign: 'positive', range: {from: 0, to: 1}}), just(undefined)),
         name: or(stringValue({
             minLength: 1,
             maxLength: 30,

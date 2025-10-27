@@ -182,6 +182,10 @@ export default class CustomGalaxyService {
         }
 
         if (customGalaxy.carriers) {
+            if (customGalaxy.carriers.length > 500) {
+                throw new ValidationError(`A maximum of 500 carriers are allowed in an advanced custom galaxy.`);
+            }
+
             const carrierIdSet = new Set<string>(customGalaxy.carriers.map(c => c.id));
             if (carrierIdSet.size !== customGalaxy.carriers.length) {
                 throw new ValidationError(`Multiple carriers cannot have the same ID.`);
