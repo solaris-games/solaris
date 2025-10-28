@@ -208,10 +208,10 @@ const recalculateWaypointEta = () => {
   let totalTicks = 0;
 
   for (let i = 0; i <= index; i++) {
-    const wp = waypoints[i];
+    const wp = waypoints.value[i];
 
     // wp.ticks includes delayTicks
-    totalTicks += wp.ticks;
+    totalTicks += wp.ticks!;
   }
 
   waypointEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicks);
