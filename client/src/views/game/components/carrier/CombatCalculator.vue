@@ -254,7 +254,9 @@ const calculate = async (e: Event) => {
 
   isLoading.value = true;
 
-  const response = await calculateCombat(httpClient)(game.value._id, { ships: defender.value.ships, weaponsLevel: defender.value.weaponsLevel }, { ships: attacker.value.ships, weaponsLevel: attacker.value.weaponsLevel }, isTurnBased.value);
+  const defenderWeapons = defender.value.weaponsLevel + (includeDefenderBonus.value ? 1 : 0);
+
+  const response = await calculateCombat(httpClient)(game.value._id, { ships: defender.value.ships, weaponsLevel: defenderWeapons }, { ships: attacker.value.ships, weaponsLevel: attacker.value.weaponsLevel }, isTurnBased.value);
 
   if (isOk(response)) {
     result.value = response.data;
