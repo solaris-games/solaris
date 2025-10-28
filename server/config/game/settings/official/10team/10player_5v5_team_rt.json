@@ -57,7 +57,7 @@
     },
     "conquest": {
         "victoryCondition": "starPercentage",
-        "victoryPercentage": 33,
+        "victoryPercentage": 75,
         "capitalStarElimination": "disabled",
         "teamsCount": 2
     },
