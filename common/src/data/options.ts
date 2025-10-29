@@ -306,7 +306,7 @@ export const GAME_CREATION_OPTIONS = {
         "specialistCost": [
             {
                 "value": "none",
-                "text": "No specialists"
+                "text": "No"
             },
             {
                 "value": "standard",
