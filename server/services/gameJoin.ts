@@ -254,6 +254,8 @@ export default class GameJoinService extends EventEmitter {
 
         if (!player.userId) {
             player.ready = true;
+        } else {
+            player.ready = false;
         }
 
         if (userId) {
