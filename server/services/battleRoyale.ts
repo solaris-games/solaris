@@ -38,7 +38,7 @@ export default class BattleRoyaleService {
         let starsToDestroy = this.getStarsToDestroyNow(game);
 
         for (let star of starsToDestroy) {
-            this.destroyStar(game, star);
+            this._destroyStar(game, star);
         }
     }
 
@@ -70,14 +70,14 @@ export default class BattleRoyaleService {
             .sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
     }
 
-    destroyStar(game: Game, star: Star) {
+    _destroyStar(game: Game, star: Star) {
         this.starService.destroyStar(game, star);
 
-        let carriers = this.carrierMovementService.getCarriersEnRouteToStar(game, star);
+        const carriersEnRoute = this.carrierMovementService.getCarriersEnRouteToStar(game, star);
 
         // Cull the waypoints of carriers that have the given star in its
         // waypoint queue and destroy those that are lost in space.
-        for (let carrier of carriers) {
+        for (let carrier of carriersEnRoute) {
             this.cullWaypointsService.cullWaypointsByHyperspaceRange(game, carrier);
 
             if (this.carrierMovementService.isLostInSpace(game, carrier)) {
@@ -86,9 +86,9 @@ export default class BattleRoyaleService {
         }
 
         // Destroy any carriers stationed at the star.
-        carriers = this.carrierService.getCarriersAtStar(game, star._id);
+        const carriersInOrbit = this.carrierService.getCarriersAtStar(game, star._id);
 
-        for (let carrier of carriers) {
+        for (let carrier of carriersInOrbit) {
             this.carrierService.destroyCarrier(game, carrier);
         }
     }
