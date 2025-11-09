@@ -99,7 +99,8 @@ const schema = new Schema({
             location: {
                 x: { type: Types.Number, required: true },
                 y: { type: Types.Number, required: true }
-            }
+            },
+            wormHoleToStarId: { type: Types.ObjectId, required: false, default: null },
         }
     ],
     carriers: [

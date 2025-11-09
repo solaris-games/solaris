@@ -46,7 +46,8 @@ export interface GameHistoryStar {
     warpGate: boolean;
     ignoreBulkUpgrade: IgnoreBulkUpgrade,
     infrastructure: Infrastructure,
-    location: Location
+    location: Location,
+    wormHoleToStarId: DBObjectId | null,
 };
 
 export interface GameHistoryCarrierWaypoint {
