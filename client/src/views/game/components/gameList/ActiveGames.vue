@@ -103,7 +103,7 @@ const httpClient = inject(httpInjectionKey)!;
 
 const activeGames: Ref<UserActiveListGame<string>[]> = ref([]);
 const isLoadingActiveGames = ref(false);
-const includeDefeated = ref(loadLocalPreference('INCLUDE_DEFEATED_PREF_KEY', true));
+const includeDefeated = ref(loadLocalPreference(INCLUDE_DEFEATED_PREF_KEY, true));
 
 watch(includeDefeated, (newValue) => storeLocalPreference(INCLUDE_DEFEATED_PREF_KEY, newValue));
 
