@@ -344,17 +344,17 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
   }
 
   drawWormHole () {
-    if (!this.data.wormHoleToStarId) {
-      return
-    }
-
     if (this.wormHoleSprite) {
-      this.fixedContainer.removeChild(this.wormHoleSprite)
-      this.wormHoleSprite = null
+      this.fixedContainer.removeChild(this.wormHoleSprite);
+      this.wormHoleSprite = null;
     }
 
-    let texture = TextureService.getRandomWormholeTexture()
-    this.wormHoleSprite = new Sprite(texture)
+    if (!this.data.wormHoleToStarId) {
+      return;
+    }
+
+    const texture = TextureService.getRandomWormholeTexture();
+    this.wormHoleSprite = new Sprite(texture);
 
     let spriteSize = 40
     this.wormHoleSprite.width = spriteSize
