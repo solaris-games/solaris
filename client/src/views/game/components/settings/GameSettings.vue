@@ -76,6 +76,10 @@
               tooltip="Time until game finishes after RTQ" :valueText="game.settings.general.readyToQuitTimerCycles"
               :value="game.settings.general.readyToQuitTimerCycles"
               :compareValue="compareSettings.general.readyToQuitTimerCycles" />
+            <game-setting-value title="RTQ Visibility" v-if="game.settings.general.readyToQuit === 'enabled'"
+                                tooltip="Visibility of RTQ votes" :valueText="game.settings.general.readyToQuitVisibility"
+                                :value="game.settings.general.readyToQuitVisibility"
+                                :compareValue="compareSettings.general.readyToQuitVisibility" />
             <game-setting-value title="Players that will receive rank" tooltip="Players that will receive rank"
               :valueText="getFriendlyText(game.settings.general.awardRankTo)" :value="game.settings.general.awardRankTo"
               :compareValue="compareSettings.general.awardRankTo" />
