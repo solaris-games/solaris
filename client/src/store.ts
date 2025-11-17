@@ -504,23 +504,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         }
       }
     },
-    starSpecialistHired (state: State, data) {
-      let star = GameHelper.getStarById(state.game!, data.starId)!
-
-      star.specialistId = data.specialist.id
-      star.specialist = data.specialist
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    },
-    carrierSpecialistHired (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
-
-      carrier.specialistId = data.specialist.id
-      carrier.specialist = data.specialist
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
-    },
-
     gameStarEconomyUpgraded (state: State, data) {
       data.type = 'economy'
       const star = GameHelper.starInfrastructureUpgraded(state.game!, data)

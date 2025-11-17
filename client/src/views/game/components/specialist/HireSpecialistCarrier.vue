@@ -152,7 +152,13 @@ const hireSpecialist = async (specialist: Specialist) => {
     carrier.value.specialistExpireTick = specialist.expireTicks ? game.value.state.tick + specialist.expireTicks : null;
     carrier.value.specialist = specialist;
     carrier.value.effectiveTechs = response.data.effectiveTechs;
-    userPlayer[currency] -= getSpecialistActualCost(specialist);
+
+    const cost = getSpecialistActualCost(specialist);
+    if (currency === "credits") {
+      userPlayer.value.credits -= cost;
+    } else if (currency === "creditsSpecialists") {
+      userPlayer.value.creditsSpecialists -= cost;
+    }
 
     if (response.data.waypoints) {
       carrier.value.waypoints = response.data.waypoints.waypoints;
