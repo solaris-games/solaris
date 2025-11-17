@@ -13,7 +13,7 @@
       </div>
 
       <div class="col">
-        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
+        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/5000</span>
       </div>
       <div class="col-auto mt-2 mb-2">
         <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
@@ -71,7 +71,7 @@ const noteLength = computed(() => {
   return staticText.length
 });
 
-const isExceededMaxLength = computed(() => noteLength.value > 2000);
+const isExceededMaxLength = computed(() => noteLength.value > 5000);
 
 const beginEditing = () => {
   isEditing.value = true
