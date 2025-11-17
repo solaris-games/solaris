@@ -238,16 +238,16 @@ class MentionHelper {
 
   makeMentionsEditable (game, text) {
     return text.replace(MentionHelper.INTERNAL_MENTION_REGEX, (_match, type, _id, name) => {
-      let mentionChar = ''
+      let mentionChar = '';
 
       if (type === 's') {
-        mentionChar = '#'
+        mentionChar = '#';
       } else if (type === 'p') {
-        mentionChar = '@'
+        mentionChar = '@';
       }
 
-      return mentionChar + name
-    })
+      return `${mentionChar}{${name}}`;
+    });
   }
 }
 
