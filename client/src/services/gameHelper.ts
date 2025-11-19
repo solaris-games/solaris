@@ -1305,30 +1305,25 @@ class GameHelper {
     return game.galaxy.teams.find(t => t._id === teamId);
   }
 
-  calculateTicksToBonusShip(shipsActual, manufacturing) {
-    if (manufacturing < 0) {
-      return null
+  calculateTicksToBonusShip(shipsActual: number | undefined, manufacturing: number | undefined) {
+    if (shipsActual == null || manufacturing == null || manufacturing < 0) {
+      return null;
     }
 
-    if (manufacturing == 0) {
+    if (Number.isInteger(manufacturing)) {
       return 'n/a';
     }
 
-    const next = 1;
-    const partialManufacturing = manufacturing - Math.floor(manufacturing);
-
-    if (partialManufacturing == 0) {
-      return 'n/a';
-    }
-
-    let current = shipsActual - Math.floor(shipsActual);
-    let count = 0;
-
-    while (current < next) {
+    const partialManufacturing: number = manufacturing - Math.floor(manufacturing);
+    const next: number =  Math.floor(shipsActual) + 1;
+  
+    let count: number = 0;
+  
+    while (shipsActual < next) {
       count++;
-      current += partialManufacturing;
+      shipsActual += partialManufacturing;
     }
-
+  
     return count;
   }
 }
