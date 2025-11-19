@@ -40,13 +40,13 @@ import GameHelper from '../../services/gameHelper'
 import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import GamePlayerControl from './GamePlayerControl.vue';
 import router from "../../router";
-import { ref, inject, computed, type Ref } from 'vue';
-import type { GameInfoDetail, GameGalaxy, GameGalaxyDetail } from '@solaris-common';
-import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { toastInjectionKey } from '@/util/keys';
-import { detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame } from '@/services/typedapi/game';
-import { useStore } from 'vuex';
-import { makeConfirm } from '@/util/confirm';
+import {ref, inject, computed, type Ref} from 'vue';
+import type {GameInfoDetail, GameGalaxy, GameGalaxyDetail} from '@solaris-common';
+import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typedapi';
+import {toastInjectionKey} from '@/util/keys';
+import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame} from '@/services/typedapi/game';
+import {useStore} from 'vuex';
+import {makeConfirm} from '@/util/confirm';
 
 const props = defineProps<{
   game: GameInfoDetail<string>,
@@ -68,9 +68,9 @@ const fullGame: Ref<GameGalaxyDetail<string> | null> = ref(null);
 
 const canModifyPauseState = computed(() => {
   return props.game.settings.general.isGameAdmin
-        && GameHelper.isGameStarted(props.game)
-        && !GameHelper.isGamePendingStart(props.game)
-        && !GameHelper.isGameFinished(props.game);
+    && GameHelper.isGameStarted(props.game)
+    && !GameHelper.isGamePendingStart(props.game)
+    && !GameHelper.isGameFinished(props.game);
 });
 
 const loadFullGame = async () => {
@@ -97,12 +97,12 @@ const pauseGame = async () => {
 
     if (isOk(response)) {
       toast.success(`The game has been paused.`);
+      emit('onGameModified');
     } else {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
 
-    emit('onGameModified');
     isLoading.value = false;
   }
 };
@@ -133,12 +133,12 @@ const fastForwardGame = async () => {
 
     if (isOk(response)) {
       toast.success(`The game has been fast-forwarded.`);
+      emit('onGameModified');
     } else {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
 
-    emit('onGameModified');
     isLoading.value = false;
   }
 };
@@ -151,18 +151,18 @@ const forceStartGame = async (withOpenSlots: boolean) => {
 
     if (isOk(response)) {
       toast.success(`The game has been force-started.`);
+      emit('onGameModified');
     } else {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
 
-    emit('onGameModified');
     isLoading.value = false;
   }
 };
 
 const deleteGame = async () => {
-    if (await confirm('Delete game', 'Are you sure you want to delete this game?')) {
+  if (await confirm('Delete game', 'Are you sure you want to delete this game?')) {
     isLoading.value = true;
 
     const response = await delGame(httpClient)(props.game._id);
@@ -170,15 +170,16 @@ const deleteGame = async () => {
     if (isOk(response)) {
       toast.success(`The game has been deleted.`);
 
+      emit('onGameModified');
+
       router.push({name: 'main-menu'})
     } else {
       console.error(formatError(response));
       errors.value = extractErrors(response);
     }
 
-    emit('onGameModified');
     isLoading.value = false;
-    }
+  }
 };
 </script>
 <style scoped></style>
