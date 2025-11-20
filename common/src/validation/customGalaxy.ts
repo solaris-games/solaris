@@ -28,10 +28,18 @@ const max200k = numberAdv({
     },
 });
 
+const max2000 = numberAdv({
+    range: {
+        from: 0,
+        to: 2000,
+    },
+});
+
+
 const max200 = numberAdv({
     range: {
         from: 0,
-        to: 200000,
+        to: 200,
     },
 });
 
@@ -44,9 +52,9 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         }),
         playerId: maybeNull(playerId),
         naturalResources: object({
-            economy: max200,
-            industry: max200,
-            science: max200
+            economy: max2000,
+            industry: max2000,
+            science: max2000
         }),
         shipsActual: maybeUndefined(max200k),
         specialistId: maybeNull(positiveInteger),
