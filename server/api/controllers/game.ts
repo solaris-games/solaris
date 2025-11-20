@@ -50,7 +50,8 @@ export default (container: DependencyContainer) => {
     
                 if (!game) {
                     const path = '../../config/game/settings/user/' + tutorial.file;
-                    const settings = require(path);
+                    const raw = require(path);
+                    const settings = parseGameSettingsReq(raw);
 
                     game = await container.gameCreateService.create(settings, req.session.userId);
                 }

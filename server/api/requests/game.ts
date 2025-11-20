@@ -408,13 +408,13 @@ export const parseGameSettingsReq: Validator<GameSettingsReq> = object({
     })),
     orbitalMechanics: object({
         enabled: enabledDisabled,
-        orbitSpeed: numberAdv({
+        orbitSpeed: withDefault(3, numberAdv({
             integer: true,
             range: {
                 from: 1,
                 to: 5,
             },
-        }),
+        })),
     }),
     player: parseGameSettingsPlayer,
     diplomacy: object({

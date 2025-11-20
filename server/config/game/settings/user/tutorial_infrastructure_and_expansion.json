@@ -10,12 +10,14 @@
         "playerType": "all",
         "anonymity": "extra",
         "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
         "timeMachine": "disabled",
         "fluxEnabled": "disabled",
         "advancedAI": "disabled",
         "spectators": "disabled",
         "readyToQuit": "disabled",
-        "awardRankTo": "all"
+        "awardRankTo": "all",
+        "afkSlotsOpen": "disabled"
     },
     "galaxy": {
         "galaxyType": "circular",
@@ -41,6 +43,7 @@
         "carrierToCarrierCombat": "enabled",
         "resourceDistribution": "random",
         "playerDistribution": "circular",
+        "splitResources":"disabled",
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
         "specialistBans": {
