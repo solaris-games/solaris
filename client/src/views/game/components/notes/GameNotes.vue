@@ -125,7 +125,7 @@ const setReadonlyNotes = (notesParam: string) => {
 };
 
 const panToStar = (id: string) => {
-  const star = GameHelper.getStarById(store.state.game, id)
+  const star = GameHelper.getStarById(store.state.game, id);
   if (star) {
     eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: star.location });
   } else {

@@ -34,7 +34,6 @@ const emit = defineEmits<{
 
 const store: Store<State> = useStore();
 
-const focused = ref(false);
 const suggestMentions = ref(false);
 const currentMention = ref<{ suggestions: string[], mention: Mention } | null>(null);
 const selectedSuggestion = ref<number | null>(null);
@@ -77,7 +76,7 @@ const onKeyDown = (e: KeyboardEvent) => {
     e.preventDefault();
     currentMention.value = null;
     emit('onFinish');
-  } else if (suggestMentions.value && currentMention.value && selectedSuggestion.value) {
+  } else if (suggestMentions.value && currentMention.value && selectedSuggestion.value !== null) {
     if (isEnterTabKey) {
       e.preventDefault();
       useSuggestion(currentMention.value.suggestions[selectedSuggestion.value]);
