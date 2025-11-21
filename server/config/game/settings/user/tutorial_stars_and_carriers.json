@@ -114,6 +114,7 @@
         },
         "bankingReward": "standard",
         "experimentationReward": "standard",
+        "experimentationDistribution": "random",
         "specialistTokenReward": "standard",
         "researchCostProgression": {
             "progression": "standard"

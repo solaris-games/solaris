@@ -253,11 +253,12 @@ export default class GameCreateService {
 
         // If a legit user (not the system) created the game then that game must be set as a custom game.
         if (!isOfficialGame) {
-            if (!isTutorial) {
+            if (isTutorial) {
+                settings.general.type = 'tutorial';
+            } else {
                 await this._validateUserCanCreateGame(userId!, settings);
+                settings.general.type = 'custom';
             }
-
-            settings.general.type = 'custom';
         }
 
         if (settings.general.playerLimit < 2) {
