@@ -36,7 +36,7 @@ import MentionHelper, {type Mention} from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
-import { ref, computed, inject, onMounted, useTemplateRef } from 'vue';
+import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import {getNotes, writeNotes} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -156,6 +156,10 @@ const loadGameNotes = async () => {
 };
 
 onMounted(async () => {
+  onUnmounted(() => {
+    store.commit('resetMentions');
+  });
+
   await loadGameNotes();
 });
 </script>
