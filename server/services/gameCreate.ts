@@ -395,6 +395,7 @@ export default class GameCreateService {
             ...settings,
             general: {
                 ...settings.general,
+                createdFromTemplate: settings.general.createdFromTemplate,
                 name,
                 createdByUserId: userId,
                 fluxId: null, // will be applied later

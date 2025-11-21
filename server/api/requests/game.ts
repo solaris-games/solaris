@@ -80,6 +80,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     }),
     description: maybeNull(string),
     password: maybeNull(string),
+    createdFromTemplate: maybeNull(string),
     type: stringEnumeration<GameType, GameType[]>(GAME_TYPES),
     mode: stringEnumeration<GameMode, GameMode[]>(GAME_MODES),
     playerLimit: numberAdv({
