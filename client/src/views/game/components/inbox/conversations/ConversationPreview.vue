@@ -1,5 +1,5 @@
 <template>
-<div class="container pt-1" 
+<div class="container pt-1"
   :class="{'bg-secondary': !isAllPlayersConversation, 'bg-primary': isAllPlayersConversation, 'bg-warning':conversation.unreadCount}"
     @click="openConversation">
     <div class="row pb-1">

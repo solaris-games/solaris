@@ -32,7 +32,7 @@
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MentionBox from '../shared/MentionBox.vue'
-import MentionHelper from '@/services/mentionHelper';
+import MentionHelper, {type Mention} from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
@@ -96,8 +96,8 @@ const onCloseRequested = (e: Event) => {
   emit('onCloseRequested', e)
 };
 
-const onReplaceInMessage = (data: { type: string; id: string; name: string }) => {
-  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data)
+const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
+  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data);
 };
 
 const updateGameNotes = async () => {
@@ -119,9 +119,9 @@ const updateGameNotes = async () => {
 };
 
 const setReadonlyNotes = (notesParam: string) => {
-  MentionHelper.resetMessageElement(notesReadonlyElement.value);
+  MentionHelper.resetMessageElement(notesReadonlyElement.value!);
   readonlyNotes.value = notesParam || ''
-  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value, readonlyNotes.value, onStarClicked, onPlayerClicked);
+  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value!, readonlyNotes.value, onStarClicked, onPlayerClicked);
 };
 
 const panToStar = (id: string) => {

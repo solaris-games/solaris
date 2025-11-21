@@ -11,105 +11,114 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { inject, ref, onMounted, onUnmounted, useTemplateRef, watch, computed } from 'vue';
+import MentionHelper, {type Mention} from '@/services/mentionHelper';
+import { useStore, type Store } from 'vuex';
+import { type State } from '@/store';
 
-import MentionHelper from '@/services/mentionHelper';
+const props = defineProps<{
+  placeholder: string,
+  rows: number,
+  modelValue: string,
+}>();
 
-export default {
-  props: {
-    placeholder: String,
-    rows: Number,
-    modelValue: String
-  },
-  data () {
-    return {
-      focused: false,
-      suggestMentions: false,
-      currentMention: null,
-      selectedSuggestion: null
-    }
-  },
-  mounted () {
-    this.$emit('onSetMessageElement', this.$refs.messageElement)
-    this.suggestMentions = this.$store.state.settings.interface.suggestMentions === 'enabled'
-  },
-  methods: {
-    useSuggestion (suggestion) {
-      if (this.suggestMentions && this.currentMention) {
-        this.selectedSuggestion = null
+type Replace = { mention: Mention, text: string };
 
-        this.$emit('onReplaceInMessage', {
-          mention: this.currentMention.mention,
-          text: suggestion
-        })
-      }
-    },
-    onMessageChange (e) {
-      this.$emit('update:modelValue', e.target.value)
-    },
-    setSelectedSuggestion (newSelected) {
-      const suggestions = this.currentMention.suggestions.length
-      //Modulo instead of remainder so instead of -1 we get the last suggestion
-      this.selectedSuggestion = ((newSelected % suggestions) + suggestions) % suggestions
-    },
-    async onKeyDown (e) {
-      const isEnterTabKey = e.key === 'Enter' || e.key === 'Tab'
+const emit = defineEmits<{
+  onSetMessageElement: [element: HTMLTextAreaElement],
+  onReplaceInMessage: [replace: Replace],
+  'update:modelValue': [value: string],
+  onFinish: [],
+}>();
 
-      if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault()
-        this.currentMention = null;
-        this.$emit('onFinish')
-      } else if (this.suggestMentions && this.currentMention) {
-        if (isEnterTabKey && this.selectedSuggestion !== null && this.selectedSuggestion !== undefined) {
-          e.preventDefault()
-          this.useSuggestion(this.currentMention.suggestions[this.selectedSuggestion])
-        } else if (e.key === 'ArrowDown' || e.key === 'Tab') {
-          e.preventDefault()
-          this.setSelectedSuggestion(this.selectedSuggestion + 1)
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault()
-          this.setSelectedSuggestion(this.selectedSuggestion - 1)
-        }
-      }
-    },
-    onFocus (e) {
-      this.$emit('onSetMessageElement', e.target)
-    },
-    updateSuggestions () {
-      if (this.suggestMentions) {
-        const oldMention = this.currentMention
+const store: Store<State> = useStore();
 
-        this.currentMention = MentionHelper.getCurrentMention(this.$store.state.game, this.$refs.messageElement)
-        const newSuggestions = this.currentMention && this.currentMention.suggestions && this.currentMention.suggestions.length
+const focused = ref(false);
+const suggestMentions = ref(false);
+const currentMention = ref<{ suggestions: string[], mention: Mention } | null>(null);
+const selectedSuggestion = ref<number | null>(null);
 
-        if (oldMention && !this.currentMention) {
-          this.selectedSuggestion = null //Mention was left
-        } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
-          this.selectedSuggestion = 0 //Mention was started
-        }
+const placeholderText = computed(() => !suggestMentions.value ? `${props.placeholder}...` : `${props.placeholder}\nUse @ for players and # for stars.`);
 
-        if (this.currentMention && this.selectedSuggestion != null) {
-          //When the number of new suggestions is smaller, the selection might not get displayed otherwise
-          this.setSelectedSuggestion(this.selectedSuggestion)
-        }
-      }
-    },
-  },
-  computed: {
-    placeholderText: function () {
-      return !this.suggestMentions ? `${this.placeholder}...` : `${this.placeholder}. Use @ for players and # for stars.`
-    }
-  },
-  watch: {
-    modelValue: function (v) {
-      if (!v || v === '') {
-        this.currentMention = null
-      }
+watch(() => props.modelValue, (v: string) => {
+  if (!v || v === '') {
+    currentMention.value = null;
+  }
+});
+
+const messageElement = useTemplateRef('messageElement');
+
+const useSuggestion = (suggestion: string) => {
+  if (suggestMentions.value && currentMention.value) {
+    selectedSuggestion.value = null;
+
+    emit('onReplaceInMessage', {
+      mention: currentMention.value.mention,
+      text: suggestion
+    });
+  }
+};
+
+const onMessageChange = (e: Event) => {
+  emit('update:modelValue', (e.target as HTMLTextAreaElement).value);
+};
+
+const setSelectedSuggestion = (newSelected: number) => {
+  const suggestions = currentMention.value?.suggestions?.length!;
+
+  selectedSuggestion.value = ((newSelected % suggestions) + suggestions) % suggestions;
+};
+
+const onKeyDown = (e: KeyboardEvent) => {
+  const isEnterTabKey = e.key === 'Enter' || e.key === 'Tab'
+
+  if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    currentMention.value = null;
+    emit('onFinish');
+  } else if (suggestMentions.value && currentMention.value && selectedSuggestion.value) {
+    if (isEnterTabKey) {
+      e.preventDefault();
+      useSuggestion(currentMention.value.suggestions[selectedSuggestion.value]);
+    } else if (e.key === 'ArrowDown' || e.key === 'Tab') {
+      e.preventDefault();
+      setSelectedSuggestion(selectedSuggestion.value + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestion(selectedSuggestion.value - 1);
     }
   }
-}
+};
 
+const onFocus = (e: FocusEvent) => {
+  emit('onSetMessageElement', e.target as HTMLTextAreaElement);
+};
 
+const updateSuggestions = () => {
+  if (suggestMentions.value) {
+    const oldMention = currentMention.value;
+
+    currentMention.value = MentionHelper.getCurrentMention(store.state.game, messageElement.value!);
+    const newSuggestions = currentMention.value?.suggestions?.length;
+
+    if (oldMention && !currentMention.value) {
+      selectedSuggestion.value = null; //Mention was left
+    } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
+      selectedSuggestion.value = 0; //Mention was started
+    }
+
+    if (currentMention.value && selectedSuggestion.value != null) {
+      //When the number of new suggestions is smaller, the selection might not get displayed otherwise
+      setSelectedSuggestion(selectedSuggestion.value);
+    }
+  }
+};
+
+onMounted(() => {
+  emit('onSetMessageElement', messageElement.value as HTMLTextAreaElement);
+  suggestMentions.value = store.state.settings.interface.suggestMentions === 'enabled';
+});
 </script>
 
 <style scoped>
