@@ -587,12 +587,12 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
               const resp2 = await detailMe(httpClient)();
               if (isOk(resp2)) {
                 commit('setUser', resp2.data);
+                userClientSocketEmitter.emitJoined();
               } else {
                 console.error('Failed to get user info', resp2);
               }
             }
 
-            userClientSocketEmitter.emitJoined();
             return true;
           }
         }

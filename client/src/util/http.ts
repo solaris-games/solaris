@@ -56,6 +56,8 @@ export const createHttpClient = (redirectHome: () => void) => {
       console.log(error);
       // If any Unauthorized responses come back, redirect to login page.
       if (error.response?.status === 401) {
+        console.log(`Redirecting home after call to ` + error.response?.url);
+
         redirectHome();
       }
 
