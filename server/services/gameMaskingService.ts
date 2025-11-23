@@ -8,13 +8,13 @@ export default class GameMaskingService {
         // If historical mode, then its all star data in the requested tick.
         // If not historical mode, then replace non-player owned star data.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
-            let gameStar = game.galaxy.stars[i];
+            const gameStar = game.galaxy.stars[i];
 
             if (!isHistorical && userPlayer && gameStar.ownedByPlayerId && gameStar.ownedByPlayerId.toString() === userPlayer._id.toString()) {
                 continue;
             }
 
-            let historyStar = history.stars.find(x => x.starId.toString() === gameStar._id.toString());
+            const historyStar = history.stars.find(x => x.starId.toString() === gameStar._id.toString());
 
             if (historyStar) {
                 // If the player has abandoned the star in the current tick, then display that representation of the star
@@ -33,6 +33,7 @@ export default class GameMaskingService {
                 gameStar.ignoreBulkUpgrade = historyStar.ignoreBulkUpgrade;
                 gameStar.infrastructure = historyStar.infrastructure;
                 gameStar.location = historyStar.location == null || (historyStar.location.x == null || historyStar.location.y == null) ? gameStar.location : historyStar.location; // TODO: May not have history for the star (BR Mode). Can delete this in a few months after the history is cleaned.
+                gameStar.wormHoleToStarId = historyStar.wormHoleToStarId;
             }
         }
     }

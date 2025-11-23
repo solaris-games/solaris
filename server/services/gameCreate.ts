@@ -253,11 +253,12 @@ export default class GameCreateService {
 
         // If a legit user (not the system) created the game then that game must be set as a custom game.
         if (!isOfficialGame) {
-            if (!isTutorial) {
+            if (isTutorial) {
+                settings.general.type = 'tutorial';
+            } else {
                 await this._validateUserCanCreateGame(userId!, settings);
+                settings.general.type = 'custom';
             }
-
-            settings.general.type = 'custom';
         }
 
         if (settings.general.playerLimit < 2) {
@@ -355,6 +356,10 @@ export default class GameCreateService {
             settings.general.readyToQuitTimerCycles = settings.general.readyToQuitTimerCycles || 0;
         }
 
+        if (settings.specialGalaxy.darkGalaxy === 'extra' && settings.diplomacy.lockedAlliances === 'disabled' && settings.player.tradeScanning === 'all') {
+            throw new ValidationError("Trading to all players in an ultra-dark galaxy is only enabled for locked alliances");
+        }
+
         // Clamp max alliances if its invalid (minimum of 1)
         let lockedAllianceMod = settings.diplomacy.lockedAlliances === 'enabled'
         && settings.general.playerLimit >= 3 ? 1 : 0;
@@ -394,6 +399,7 @@ export default class GameCreateService {
             ...settings,
             general: {
                 ...settings.general,
+                createdFromTemplate: settings.general.createdFromTemplate,
                 name,
                 createdByUserId: userId,
                 fluxId: null, // will be applied later

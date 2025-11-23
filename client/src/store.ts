@@ -504,23 +504,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         }
       }
     },
-    starSpecialistHired (state: State, data) {
-      let star = GameHelper.getStarById(state.game!, data.starId)!
-
-      star.specialistId = data.specialist.id
-      star.specialist = data.specialist
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    },
-    carrierSpecialistHired (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
-
-      carrier.specialistId = data.specialist.id
-      carrier.specialist = data.specialist
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
-    },
-
     gameStarEconomyUpgraded (state: State, data) {
       data.type = 'economy'
       const star = GameHelper.starInfrastructureUpgraded(state.game!, data)
@@ -604,12 +587,12 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
               const resp2 = await detailMe(httpClient)();
               if (isOk(resp2)) {
                 commit('setUser', resp2.data);
+                userClientSocketEmitter.emitJoined();
               } else {
                 console.error('Failed to get user info', resp2);
               }
             }
 
-            userClientSocketEmitter.emitJoined();
             return true;
           }
         }

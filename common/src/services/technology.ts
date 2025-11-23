@@ -140,12 +140,12 @@ export class TechnologyService {
     }
 
     getCarrierEffectiveTechnologyLevels<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sanitize: boolean = true) {
-        let player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
-        let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
+        const player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
+        const techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
 
         // Apply any specialist tech modifiers.
         if (carrier.specialistId) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+            const specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
             if (specialist && specialist.modifiers.local != null) {
                 this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);

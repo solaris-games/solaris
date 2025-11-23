@@ -15,7 +15,7 @@ const startup = async (jobName) => {
 
     mongo = await mongooseLoader(config, {
         syncIndexes: true,
-        poolSize: 1
+        poolSize: 1,
     });
 
     container = containerLoader(config, serverStub, log);

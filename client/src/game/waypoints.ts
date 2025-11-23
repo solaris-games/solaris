@@ -7,6 +7,7 @@ import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';
 import { createStarHighlight } from './highlight';
 import type { Location } from "@solaris-common";
+import { v7 as generateV7Uuid } from 'uuid';
 
 type Events = {
   onWaypointCreated: TempWaypoint,
@@ -178,33 +179,38 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   }
 
   _createWaypoint (destinationStarId: string) {
-    let newWaypoint: TempWaypoint = {
-      destination: destinationStarId,
-      action: 'collectAll',
-      actionShips: 0,
-      delayTicks: 0,
-      source: undefined,
-    };
+    let source: string;
 
     // If the carrier has waypoints, create a new waypoint from the last destination.
     if (this.carrier!.waypoints.length) {
-      const lastWaypoint = this._getLastWaypoint()
+      const lastWaypoint = this._getLastWaypoint();
 
       // // The waypoint cannot be the same as the previous waypoint.
       // if (newWaypoint.destination === lastWaypoint.destination) {
       //   return
       // }
 
-      newWaypoint.source = lastWaypoint.destination
+      source = lastWaypoint.destination;
     } else { // Otherwise use the current orbiting star
-      newWaypoint.source = this.carrier!.orbiting
+      source = this.carrier!.orbiting!;
     }
 
-    this.carrier!.waypoints.push(newWaypoint as any)
+    const newWaypoint = {
+      destination: destinationStarId,
+      action: 'collectAll' as const,
+      actionShips: 0,
+      delayTicks: 0,
+      source,
+    };
 
-    this.draw(this.carrier!)
+    this.carrier!.waypoints.push({
+      _id: generateV7Uuid(),
+      ...newWaypoint,
+    });
 
-    this.emit('onWaypointCreated', newWaypoint)
+    this.draw(this.carrier!);
+
+    this.emit('onWaypointCreated', newWaypoint);
   }
 
   _createWaypointRoute (sourceStarId: string, destinStarId: string) {

@@ -33,8 +33,11 @@ export default class HistoryService {
         this.gameService.on('onGameDeleted', (args) => this.deleteByGameId(args.gameId));
     }
 
-    async listIntel(gameId: DBObjectId, startTick: number, endTick: number) {
-        const game = await this.gameService.getById(gameId);
+    async listIntel(gameId: DBObjectId, startTick: number | undefined, endTick: number | undefined) {
+        const game = await this.gameService.getById(gameId, {
+            settings: 1,
+            state: 1,
+        });
 
         // change here
         if (!game?.settings || (game?.settings.specialGalaxy.darkGalaxy === 'extra' && !this.gameStateService.isFinished(game))) {
@@ -42,7 +45,7 @@ export default class HistoryService {
         }
 
         startTick = startTick || 0;
-        endTick = endTick || Number.MAX_VALUE;
+        endTick = endTick || game.state.tick || 0;
 
         let cacheKey = `intel_${gameId}_${startTick}_${endTick}`;
         let cached = cache.get(cacheKey);
@@ -161,7 +164,8 @@ export default class HistoryService {
                 warpGate: s.warpGate,
                 ignoreBulkUpgrade: s.ignoreBulkUpgrade!,
                 infrastructure: s.infrastructure,
-                location: s.location
+                location: s.location,
+                wormHoleToStarId: s.wormHoleToStarId,
             };
         });
 

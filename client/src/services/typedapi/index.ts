@@ -1,5 +1,5 @@
 import { type Route, type GetRoute, type PostRoute, type PatchRoute, type DeleteRoute, type PutRoute } from "@solaris-common";
-import { type Axios, type AxiosRequestConfig, isAxiosError } from "axios";
+import { type Axios, type AxiosRequestConfig, type AxiosError, isAxiosError } from "axios";
 import type { InjectionKey } from "vue";
 
 export type ReqOptions = AxiosRequestConfig;
@@ -80,21 +80,23 @@ const pathReplacement = <PP extends Object, QP extends Object, T1, T2>(route: Ro
 }
 
 const mapError = <T>(e: unknown, path: string): ResponseResult<T> => {
-  if (isAxiosError(e)) {
-    if (e.response) {
+  if (isAxiosError(e) || (e as Error).name === "AxiosError") {
+    const err = e as AxiosError;
+    if (err.response) {
       return {
         kind: ResponseResultKind.ResponseError,
-        status: e.response.status,
-        data: e.response.data,
-        cause: e,
+        status: err.response.status,
+        data: err.response.data as string,
+        cause: err,
       }
     } else {
       return {
         kind: ResponseResultKind.RequestError,
-        cause: e,
+        cause: err,
       }
     }
   } else {
+    console.error(JSON.stringify(e));
     throw new Error(`Error calling ${path}`, { cause: e });
   }
 }

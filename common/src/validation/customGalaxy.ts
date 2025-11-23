@@ -21,6 +21,28 @@ const starId = named("Star ID", stringValue({ minLength: 1 }));
 const carrierId = named("Carrier ID", stringValue({ minLength: 1 }));
 const playerId = named("Player ID", stringValue({ minLength: 1 }));
 
+const max200k = numberAdv({
+    range: {
+        from: 0,
+        to: 200000,
+    },
+});
+
+const max2000 = numberAdv({
+    range: {
+        from: 0,
+        to: 2000,
+    },
+});
+
+
+const max200 = numberAdv({
+    range: {
+        from: 0,
+        to: 200,
+    },
+});
+
 export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     stars: sizedArray(1, 1500, object({
         id: starId,
@@ -30,11 +52,11 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         }),
         playerId: maybeNull(playerId),
         naturalResources: object({
-            economy: positiveInteger,
-            industry: positiveInteger,
-            science: positiveInteger
+            economy: max2000,
+            industry: max2000,
+            science: max2000
         }),
-        shipsActual: or(numberAdv({ sign: 'positive' }), just(undefined)),
+        shipsActual: maybeUndefined(max200k),
         specialistId: maybeNull(positiveInteger),
         specialistExpireTick: maybeNull(positiveInteger),
         homeStar: boolean,
@@ -46,9 +68,9 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         isPulsar: boolean,
         wormHoleToStarId: maybeNull(starId),
         infrastructure: object({
-            economy: positiveInteger,
-            industry: positiveInteger,
-            science: positiveInteger
+            economy: max200,
+            industry: max200,
+            science: max200,
         }),
         isKingOfTheHillStar: maybeUndefined(boolean),
         name: or(stringValue({
@@ -62,17 +84,17 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
     players: or(sizedArray(2, 64, object({
         id: playerId,
         homeStarId: starId,
-        credits: positiveInteger,
-        creditsSpecialists: positiveInteger,
+        credits: max200k,
+        creditsSpecialists: max200k,
         technologies: object({
-            scanning: positiveInteger,
-            hyperspace: positiveInteger,
-            terraforming: positiveInteger,
-            experimentation: positiveInteger,
-            weapons: positiveInteger,
-            banking: positiveInteger,
-            manufacturing: positiveInteger,
-            specialists: positiveInteger
+            scanning: max200,
+            hyperspace: max200,
+            terraforming: max200,
+            experimentation: max200,
+            weapons: max200,
+            banking: max200,
+            manufacturing: max200,
+            specialists: max200,
         }),
         alias: or(stringValue({
             minLength: 1,
@@ -87,7 +109,7 @@ export const customGalaxyValidator: Validator<CustomGalaxy> = object({
         playerId: playerId,
         orbiting: or(starId, just(null)),
         waypointsLooped: boolean,
-        ships: numberAdv({ integer: true, sign: 'positive', range: { from: 1 } }),
+        ships: numberAdv({ integer: true, sign: 'positive', range: { from: 1, to: 20000 } }),
         specialistId: maybeNull(positiveInteger),
         specialistExpireTick: maybeNull(positiveInteger),
         isGift: boolean,

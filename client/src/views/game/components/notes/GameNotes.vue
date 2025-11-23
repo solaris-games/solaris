@@ -13,7 +13,7 @@
       </div>
 
       <div class="col">
-        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/2000</span>
+        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/5000</span>
       </div>
       <div class="col-auto mt-2 mb-2">
         <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
@@ -32,11 +32,11 @@
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MentionBox from '../shared/MentionBox.vue'
-import MentionHelper from '@/services/mentionHelper';
+import MentionHelper, {type Mention} from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
-import { ref, computed, inject, onMounted, useTemplateRef } from 'vue';
+import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import {getNotes, writeNotes} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -71,7 +71,7 @@ const noteLength = computed(() => {
   return staticText.length
 });
 
-const isExceededMaxLength = computed(() => noteLength.value > 2000);
+const isExceededMaxLength = computed(() => noteLength.value > 5000);
 
 const beginEditing = () => {
   isEditing.value = true
@@ -96,8 +96,8 @@ const onCloseRequested = (e: Event) => {
   emit('onCloseRequested', e)
 };
 
-const onReplaceInMessage = (data: { type: string; id: string; name: string }) => {
-  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data)
+const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
+  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data);
 };
 
 const updateGameNotes = async () => {
@@ -119,13 +119,13 @@ const updateGameNotes = async () => {
 };
 
 const setReadonlyNotes = (notesParam: string) => {
-  MentionHelper.resetMessageElement(notesReadonlyElement.value);
+  MentionHelper.resetMessageElement(notesReadonlyElement.value!);
   readonlyNotes.value = notesParam || ''
-  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value, readonlyNotes.value, onStarClicked, onPlayerClicked);
+  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value!, readonlyNotes.value, onStarClicked, onPlayerClicked);
 };
 
 const panToStar = (id: string) => {
-  const star = GameHelper.getStarById(store.state.game, id)
+  const star = GameHelper.getStarById(store.state.game, id);
   if (star) {
     eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: star.location });
   } else {
@@ -156,6 +156,10 @@ const loadGameNotes = async () => {
 };
 
 onMounted(async () => {
+  onUnmounted(() => {
+    store.commit('resetMentions');
+  });
+
   await loadGameNotes();
 });
 </script>

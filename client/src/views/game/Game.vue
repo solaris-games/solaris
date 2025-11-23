@@ -51,6 +51,7 @@ import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
+import {DEFAULT_SETTINGS} from "@solaris-common";
 
 const store: Store<State> = useStore();
 
@@ -166,6 +167,7 @@ const attemptLogin = () => {
   store.dispatch('verify');
 };
 
+// here is problem
 const reloadSettings = async () => {
   const response = await getSettings(httpClient)();
 
@@ -246,17 +248,27 @@ const GAME_BODY_CLASS = 'game-body';
 
 onMounted(async () => {
   attemptLogin();
-  await reloadSettings();
+
+  const isLoggedIn = Boolean(store.state.userId);
+
+  if (isLoggedIn) {
+    await reloadSettings();
+  } else {
+    store.commit('setSettings', DEFAULT_SETTINGS); // use default settings if user is not logged in
+  }
+
   await reloadGame();
 
   const userPlayer = GameHelper.getUserPlayer(store.state.game);
 
-  userClientSockerEmitter.emitJoined();
+  if (isLoggedIn) {
+    userClientSockerEmitter.emitJoined();
 
-  playerClientSocketEmitter.emitGameRoomJoined({
-    gameId: store.state.game._id,
-    playerId: userPlayer?._id
-  });
+    playerClientSocketEmitter.emitGameRoomJoined({
+      gameId: store.state.game._id,
+      playerId: userPlayer?._id
+    });
+  }
 
   //Remove scroll-bounce effect from the game screen
   document.body.classList.add(GAME_BODY_CLASS);
@@ -292,10 +304,12 @@ onBeforeUnmount(() => {
 onUnmounted(() => {
   const userPlayer = GameHelper.getUserPlayer(store.state.game);
 
-  playerClientSocketEmitter.emitGameRoomLeft({
-    gameId: store.state.game._id,
-    playerId: userPlayer?._id
-  });
+  if (userPlayer) {
+    playerClientSocketEmitter.emitGameRoomLeft({
+      gameId: store.state.game._id,
+      playerId: userPlayer?._id
+    });
+  }
 
   store.commit('clearGame');
 

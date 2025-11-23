@@ -627,7 +627,7 @@
           </select>
         </div>
 
-        <div class="mb-2" v-if="settings.player.tradeCost > 0">
+        <div class="mb-2" v-if="settings.player.tradeCost > 0 && canAllTradingBeEnabled">
           <label for="tradeScanning" class="col-form-label">Trade Scanning <help-tooltip tooltip="If enabled, players can only trade with other players who are in their scanning range"/></label>
           <select class="form-control" id="tradeScanning" v-model="settings.player.tradeScanning" :disabled="isCreatingGame">
             <option v-for="opt in options.player.tradeScanning" v-bind:key="opt.value" v-bind:value="opt.value">
@@ -950,6 +950,14 @@ const canRTQBeEnabled = computed(() => settings.value && settings.value.general.
 const options = GAME_CREATION_OPTIONS;
 
 const possibleTeamCounts: Ref<number[]> = ref([]);
+
+const canAllTradingBeEnabled = computed(() => {
+  if (!settings.value) {
+    return false;
+  }
+
+  return settings.value.specialGalaxy.darkGalaxy !== 'extra' || settings.value.diplomacy.lockedAlliances === 'enabled';
+});
 
 const loadSettingsFromTemplate = async (templateName: string) => {
   const template = await import(`../../config/gamesettings/${templateName}.json`);

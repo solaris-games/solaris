@@ -607,6 +607,8 @@ const startTutorial = async (tutorialKey: string) => {
 };
 
 onMounted(async () => {
+  isLoading.value = true;
+
   const response = await listSummary(httpClient)();
 
   if (isOk(response)) {
@@ -638,6 +640,8 @@ onMounted(async () => {
   } else {
     console.error(formatError(response2));
   }
+
+  isLoading.value = false;
 });
 </script>
 

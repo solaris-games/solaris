@@ -177,7 +177,13 @@ const hireSpecialist = async (specialist: Specialist) => {
       star.value.specialistExpireTick = specialist.expireTicks ? game.value.state.tick + specialist.expireTicks : null;
       star.value.specialist = specialist;
       star.value.effectiveTechs = response.data.effectiveTechs;
-      userPlayer.value[currency] -= getSpecialistActualCost(specialist);
+
+      const cost = getSpecialistActualCost(specialist);
+      if (currency === "credits") {
+        userPlayer.value.credits -= cost;
+      } else if (currency === "creditsSpecialists") {
+        userPlayer.value.creditsSpecialists -= cost;
+      }
 
       if (userPlayer.value.stats) {
         userPlayer.value.stats.totalStarSpecialists += 1;

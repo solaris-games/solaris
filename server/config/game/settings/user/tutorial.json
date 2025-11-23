@@ -45,6 +45,7 @@
         "playerDistribution": "circular",
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
+        "splitResources":"disabled",
         "specialistBans": {
             "star": [
                 16,

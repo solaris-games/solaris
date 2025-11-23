@@ -50,7 +50,8 @@ export default (container: DependencyContainer) => {
     
                 if (!game) {
                     const path = '../../config/game/settings/user/' + tutorial.file;
-                    const settings = require(path);
+                    const raw = require(path);
+                    const settings = parseGameSettingsReq(raw);
 
                     game = await container.gameCreateService.create(settings, req.session.userId);
                 }
@@ -219,10 +220,11 @@ export default (container: DependencyContainer) => {
         },
         getIntel: async (req, res, next) => {
             try {
-                let startTick = +req.query.startTick || 0;
-                let endTick = +req.query.endTick || Number.MAX_VALUE;
-                
-                let result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
+                const startTick = req.query.startTick ? Number(req.query.startTick) : undefined;
+
+                const endTick = req.query.endTick ? Number(req.query.endTick) : undefined;
+
+                const result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
     
                 res.status(200).json(result);
                 return next();

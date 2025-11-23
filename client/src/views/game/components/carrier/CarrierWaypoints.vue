@@ -95,7 +95,7 @@ import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {saveWaypoints} from "@/services/typedapi/carrier";
 import type {TempWaypoint} from "@/types/waypoint";
-import {useGameServices} from "@/util/gameServices";
+import {gameServicesKey, useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   carrierId: string,
@@ -124,13 +124,13 @@ const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle =
 
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
-const canLoop = computed<boolean>(() => GameHelper.canLoop(game.value, userPlayer.value, carrier.value));
+const canLoop = computed<boolean>(() => gameServices.waypointService.canLoop(game.value, carrier.value));
 const waypointAsList = computed<string>(() => carrier.value.waypoints.map(w => getStarName(w.destination)).join(', '));
 
 const isSavingWaypoints = ref(false);
 const oldWaypoints = ref<CarrierWaypoint<string>[]>([]);
 const oldWaypointsLooped = ref(false);
-const totalEtaTimeString = ref<string | null>(null);
+const totalEtaTimeString = ref<string | null>(null); // todo: use waypoint logic
 const errors = ref<string[]>([]);
 const display = ref(true);
 
@@ -154,7 +154,7 @@ const recalculateLooped = () => {
 };
 
 const recalculateTotalEta = () => {
-  const totalTicksEta = GameHelper.calculateWaypointTicksEta(game.value, carrier.value,
+  const totalTicksEta = gameServices.waypointService.calculateWaypointTicksEta(game.value, carrier.value,
     carrier.value.waypoints[carrier.value.waypoints.length - 1]);
 
   const relativeTime = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicksEta);

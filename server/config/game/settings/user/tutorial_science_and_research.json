@@ -10,12 +10,14 @@
         "playerType": "all",
         "anonymity": "extra",
         "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
         "timeMachine": "disabled",
         "fluxEnabled": "disabled",
         "advancedAI": "disabled",
         "spectators": "disabled",
         "readyToQuit": "disabled",
-        "awardRankTo": "all"
+        "awardRankTo": "all",
+        "afkSlotsOpen": "disabled"
     },
     "galaxy": {
         "galaxyType": "circular",
@@ -43,6 +45,7 @@
         "playerDistribution": "circular",
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
+        "splitResources":"disabled",
         "specialistBans": {
             "star": [],
             "carrier": []
@@ -111,6 +114,7 @@
         },
         "bankingReward": "standard",
         "experimentationReward": "standard",
+        "experimentationDistribution": "random",
         "specialistTokenReward": "standard",
         "researchCostProgression": {
             "progression": "standard"

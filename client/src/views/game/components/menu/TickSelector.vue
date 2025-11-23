@@ -34,7 +34,13 @@
           </button>
         </div>
         <div class="col-2 text-center">
-          {{ tick }}
+          <div v-if="isInputMode" class="tickInputContainer">
+            <input type="number" v-model="inputTick" class="tickInput" :min="minimumTick" :max="stateTick" />
+            <button class="btn btn-sm btn-primary" @click="confirmInput">Go</button>
+          </div>
+          <button v-else class="btn btn-sm btn-primary px-3" @click="toggleMode">
+            {{ tick }}
+          </button>
         </div>
         <div class="col-5 text-end">
           <button class="btn btn-sm btn-secondary" @click="loadNextTick(1)" :disabled="isLoading || tick >= stateTick"
@@ -54,12 +60,12 @@
 <script setup lang="ts">
 import {eventBusInjectionKey} from '../../../../eventBus'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
-import {inject, ref, onMounted, onUnmounted, computed} from 'vue'
-import { useStore, type Store } from 'vuex';
+import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
+import {type Store, useStore} from 'vuex';
 import type {State} from "@/store";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {detailGalaxy} from "@/services/typedapi/game";
-import {formatError, isOk, httpInjectionKey} from "@/services/typedapi";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -68,9 +74,11 @@ const store: Store<State> = useStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
+const isInputMode = ref(false);
 const isLoading = ref(false);
 const display = ref(false);
 const tick = ref(0);
+const inputTick = ref(0);
 
 const stateTick = computed(() => {
   return store.state.tick
@@ -94,6 +102,17 @@ const onGameTick = () => {
   }
 };
 
+const confirmInput = async () => {
+  tick.value = Math.max(minimumTick.value, Math.min(inputTick.value, stateTick.value));
+  isInputMode.value = false;
+
+  await onRequestedTickChanged();
+};
+
+const toggleMode = () => {
+  isInputMode.value = !isInputMode.value;
+};
+
 const toggleDisplay = () => {
   display.value = !display.value;
 };
@@ -112,6 +131,7 @@ const onRequestedTickChanged = async () => {
   if (isOk(response)) {
     store.commit('setGame', response.data);
     tick.value = response.data.state.tick;
+    inputTick.value = response.data.state.tick;
   } else {
     console.error(formatError(response));
   }
@@ -140,6 +160,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.tickInputContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tickInput {
+}
+
 .pointer {
   cursor: pointer;
 }

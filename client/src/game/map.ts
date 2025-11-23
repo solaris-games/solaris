@@ -81,7 +81,7 @@ export class Map {
   territories: Territories ;
   playerNames: PlayerNames ;
   background: Background ;
-  wormHoleLayer: WormHoleLayer | undefined;
+  wormHoleLayer: WormHoleLayer;
   tooltipLayer: TooltipLayer;
   orbitalLayer: OrbitalLocationLayer | undefined;
   lastViewportCenter: PIXI.Point | undefined;
@@ -199,11 +199,9 @@ export class Map {
 
     // -----------
     // Setup Worm Hole Paths
-    if (this._isWormHolesEnabled()) {
-      this.wormHoleLayer = new WormHoleLayer()
-      this.drawWormHoles()
-      this.wormHoleContainer!.addChild(this.wormHoleLayer.container)
-    }
+    this.wormHoleLayer = new WormHoleLayer();
+    this.drawWormHoles();
+    this.wormHoleContainer.addChild(this.wormHoleLayer.container);
 
     // -----------
     // Setup Orbital Locations
@@ -437,10 +435,10 @@ export class Map {
       if (existing) {
         existing.update(this.game, starData, userSettings);
       } else {
-        existing = this.setupStar(game, userSettings, starData)
+        existing = this.setupStar(game, userSettings, starData);
       }
 
-      this.drawStar(existing)
+      this.drawStar(existing);
     }
 
     // Update all of the carriers and add new ones that have been built.
@@ -607,19 +605,12 @@ export class Map {
   }
 
   drawWormHoles () {
-    if (this._isWormHolesEnabled()) {
-      if (!this.wormHoleLayer) {
-        this.wormHoleLayer = new WormHoleLayer();
-      }
-
-      this.wormHoleLayer!.setup(this.game)
-      this.wormHoleLayer!.draw()
-    }
+    this.wormHoleLayer.draw(this.game);
   }
 
   drawPlayerNames () {
     this.playerNames.setup(this.game, this.userSettings, this.context)
-    this.playerNames.draw()
+    this.playerNames.draw();
   }
 
   panToPlayer (game: Game, player: Player) {
