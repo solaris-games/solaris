@@ -295,5 +295,18 @@ const schema = new Schema({
 });
 
 schema.index({'state.endDate': 1}, {unique: false});
+schema.index({'state.startDate': 1}, {unique: false});
+schema.index({
+    'state.endDate': 1,
+    'settings.general.type': 1,
+}, { unique: false });
+schema.index({
+    'state.startDate': 1,
+    'settings.general.type': 1,
+}, { unique: false });
+schema.index({ 'state.endDate': 1, 'afkers': 1 }, { unique: false });
+schema.index({ 'state.endDate': 1, 'galaxy.players.userId': 1 }, {
+    unique: false,
+});
 
 export default schema;
