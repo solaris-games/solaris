@@ -14,6 +14,8 @@
     "start-db-recalc-ranks:prod": "node dist/server/tools/recalculateRankings.js",
     "start-db-recalc-stats:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateStats.ts",
     "start-db-recalc-stats:prod": "node dist/server/tools/recalculateStats.js",
+    "start-db-sync-indices:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/syncIndices.ts",
+    "start-db-sync-indices:prod": "node dist/server/tools/syncIndices.js",
     "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
