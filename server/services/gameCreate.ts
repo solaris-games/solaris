@@ -356,6 +356,10 @@ export default class GameCreateService {
             settings.general.readyToQuitTimerCycles = settings.general.readyToQuitTimerCycles || 0;
         }
 
+        if (settings.specialGalaxy.darkGalaxy === 'extra' && settings.diplomacy.lockedAlliances === 'disabled' && settings.player.tradeScanning === 'all') {
+            throw new ValidationError("Trading to all players in an ultra-dark galaxy is only enabled for locked alliances");
+        }
+
         // Clamp max alliances if its invalid (minimum of 1)
         let lockedAllianceMod = settings.diplomacy.lockedAlliances === 'enabled'
         && settings.general.playerLimit >= 3 ? 1 : 0;
