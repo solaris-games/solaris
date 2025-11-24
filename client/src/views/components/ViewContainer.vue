@@ -40,6 +40,7 @@ import {withMessages} from "../../util/messages";
 import { useStore, type Store } from 'vuex';
 import { onMounted } from 'vue';
 import type {State} from "@/store";
+import router from '@/router';
 
 const props = defineProps<{
   isAuthPage: boolean,
@@ -52,9 +53,13 @@ if (props.isAuthPage) {
   withMessages();
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (props.isAuthPage && !store.state.userId) {
-    store.dispatch('verify');
+    const isOk = await store.dispatch('verify');
+
+    if (!isOk) {
+      router.push({ name: 'home' });
+    }
   }
 });
 </script>
