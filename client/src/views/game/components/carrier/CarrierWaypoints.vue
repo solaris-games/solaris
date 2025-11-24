@@ -241,9 +241,6 @@ const removeAllWaypoints = () => {
 };
 
 const onWaypointCreated = ({ waypoint }: { waypoint: TempWaypoint }) => {
-  waypoint.action = store.state.settings.carrier.defaultAction;
-  waypoint.actionShips = store.state.settings.carrier.defaultAmount;
-
   AudioService.type();
 
   recalculateTotalEta();

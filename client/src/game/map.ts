@@ -160,8 +160,8 @@ export class Map {
 
     this.chunks = new Chunks(game, this.stars, this.carriers);
 
-    this.waypoints = new Waypoints()
-    this.waypoints.setup(game, this.context)
+    this.waypoints = new Waypoints();
+    this.waypoints.setup(game, this.context, userSettings);
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
 
@@ -463,7 +463,7 @@ export class Map {
     this.background = new Background(game, userSettings, this.context);
     this.background.draw();
 
-    this.waypoints.setup(game, this.context);
+    this.waypoints.setup(game, this.context, userSettings);
     this.tooltipLayer.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
@@ -913,11 +913,11 @@ export class Map {
   }
 
   onStarMouseOut (star: StarData) {
-    this.tooltipLayer!.clear()
+    this.tooltipLayer!.clear();
   }
 
   onWaypointCreated (waypoint: TempWaypoint) {
-    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint })
+    this.eventBus.emit(MapEventBusEventNames.MapOnWaypointCreated, { waypoint });
   }
 
   onWaypointOutOfRange () {

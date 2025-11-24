@@ -7,7 +7,6 @@ import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } fr
 import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
 import { eventBusInjectionKey } from '../../../eventBus'
-import type { TempWaypoint } from "../../../types/waypoint";
 import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
@@ -31,7 +30,6 @@ const emit = defineEmits<{
   onStarRightClicked: [starId: string],
   onCarrierClicked: [carrierId: string],
   onCarrierRightClicked: [carrierId: string],
-  onWaypointCreated: [waypoint: TempWaypoint],
   onObjectsClicked: [objects: ObjectClicked[]]
 }>();
 
@@ -109,10 +107,6 @@ onMounted(() => {
       emit("onCarrierRightClicked", carrier._id);
     };
 
-    const onWaypointCreatedHandler = ({ waypoint }: { waypoint: TempWaypoint }) => {
-      emit("onWaypointCreated", waypoint);
-    };
-
     const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
       emit("onObjectsClicked", objects);
     };
@@ -138,7 +132,6 @@ onMounted(() => {
     eventBus.on(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
     eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
 
     if (store.state.userId) {
@@ -161,7 +154,6 @@ onMounted(() => {
       eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreatedHandler);
       eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
     };
   });

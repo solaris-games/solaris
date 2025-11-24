@@ -160,19 +160,16 @@ const onOpenReportPlayerRequested = (playerId: string) => {
 };
 
 const attemptLogin = () => {
-  if (store.state.userId) {
-    return;
+  if (!store.state.userId) {
+    store.dispatch('verify');
   }
-
-  store.dispatch('verify');
 };
 
-// here is problem
 const reloadSettings = async () => {
   const response = await getSettings(httpClient)();
 
   if (isOk(response)) {
-    store.commit('setSettings', response.data) // Persist to storage
+    store.commit('setSettings', response.data);
   } else {
     console.error(formatError(response));
   }
@@ -249,19 +246,12 @@ const GAME_BODY_CLASS = 'game-body';
 onMounted(async () => {
   attemptLogin();
 
-  const isLoggedIn = Boolean(store.state.userId);
-
-  if (isLoggedIn) {
-    await reloadSettings();
-  } else {
-    store.commit('setSettings', DEFAULT_SETTINGS); // use default settings if user is not logged in
-  }
-
+  await reloadSettings();
   await reloadGame();
 
   const userPlayer = GameHelper.getUserPlayer(store.state.game);
 
-  if (isLoggedIn) {
+  if (userPlayer) {
     userClientSockerEmitter.emitJoined();
 
     playerClientSocketEmitter.emitGameRoomJoined({

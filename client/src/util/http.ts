@@ -28,7 +28,7 @@ export const buildIdempotencyKey = () => {
   return `${generateV7Uuid()}`;
 };
 
-export const createHttpClient = (redirectHome: () => void) => {
+export const createHttpClient = () => {
   const client = axios.create();
 
   client.interceptors.response.use((response) => {
@@ -48,21 +48,6 @@ export const createHttpClient = (redirectHome: () => void) => {
     error => {
       return Promise.reject(error);
     }, { synchronous: true, runWhen: isUnsafeMethod });
-
-  client.interceptors.response.use(
-    response => {
-      return response
-    }, error => {
-      console.log(error);
-      // If any Unauthorized responses come back, redirect to login page.
-      if (error.response?.status === 401) {
-        console.log(`Redirecting home after call to ` + error.response?.url);
-
-        redirectHome();
-      }
-
-      return Promise.reject({ ...error })
-    })
 
   return client
 }
