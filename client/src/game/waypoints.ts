@@ -6,7 +6,7 @@ import type {Game, Carrier as CarrierData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '../types/waypoint';
 import { createStarHighlight } from './highlight';
-import type { Location } from "@solaris-common";
+import type {Location, UserGameSettings} from "@solaris-common";
 import { v7 as generateV7Uuid } from 'uuid';
 
 type Events = {
@@ -20,6 +20,7 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   context: DrawingContext | undefined;
   lightYearDistance: number | undefined;
   carrier: CarrierData | undefined;
+  settings: UserGameSettings | undefined;
 
   constructor () {
     super()
@@ -27,10 +28,11 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     this.container = new PIXI.Container()
   }
 
-  setup (game: Game, context: DrawingContext) {
+  setup (game: Game, context: DrawingContext, settings: UserGameSettings) {
     this.game = game;
     this.context = context;
     this.lightYearDistance = game.constants.distances.lightYear;
+    this.settings = settings;
   }
 
   clear () {
@@ -197,8 +199,8 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
 
     const newWaypoint = {
       destination: destinationStarId,
-      action: 'collectAll' as const,
-      actionShips: 0,
+      action: this.settings?.carrier.defaultAction || 'collectAll',
+      actionShips: this.settings?.carrier.defaultAmount || 0,
       delayTicks: 0,
       source,
     };

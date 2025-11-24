@@ -236,7 +236,6 @@ import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { useStore } from 'vuex';
-import MapEventBusEventNames from "@/eventBusEventNames/map";
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {makeConfirm} from "@/util/confirm";
@@ -379,10 +378,6 @@ const onViewCombatCalculatorRequested = () => {
   emit('onViewCarrierCombatCalculatorRequested', carrier.value._id);
 };
 
-const onWaypointCreated = () => {
-
-};
-
 const onShipTransferRequested = (e: Event) => {
   e.preventDefault();
   emit('onShipTransferRequested', carrier.value._id);
@@ -516,15 +511,12 @@ const onConfirmGiftCarrier = async () => {
 };
 
 onMounted(() => {
-  eventBus.on(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreated);
-
   if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
     intervalFunction.value = setInterval(recalculateTimeRemaining, 250)
     recalculateTimeRemaining();
   }
 
   onUnmounted(() => {
-    eventBus.off(MapEventBusEventNames.MapOnWaypointCreated, onWaypointCreated);
     clearInterval(intervalFunction.value);
   });
 });
