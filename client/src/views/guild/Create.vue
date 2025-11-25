@@ -7,7 +7,7 @@
     <h4>Found a new guild</h4>
 
     <ul>
-      <li>Become the <strong>leader</strong> of a prestigeous guild.</li>
+      <li>Become the <strong>leader</strong> of a prestigious guild.</li>
       <li>Invite your friends and allies to join you.</li>
       <li>Show off your guild tag in games.</li>
       <li>Assign roles to <strong>Members</strong>, promote players to <strong class="text-info">Officers</strong>.</li>
@@ -17,7 +17,7 @@
     <form @submit="handleSubmit">
       <div class="mb-2">
         <label for="name">Guild Name</label>
-        <input type="text" required="required" class="form-control" minlength="4" maxlength="31" name="name" v-model="name" :disabled="isLoading"
+        <input type="text" required="required" class="form-control" minlength="4" maxlength="64" name="name" v-model="name" :disabled="isLoading"
           @change="onGuildNameChanged">
       </div>
 
