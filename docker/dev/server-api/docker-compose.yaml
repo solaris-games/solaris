@@ -1,0 +1,6 @@
+services:
+  solaris-api:
+    image: solaris-api-dev
+    build:
+      context: ../../../
+      dockerfile: docker/dev/server-api/Dockerfile
