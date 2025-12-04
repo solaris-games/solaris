@@ -1,6 +1,6 @@
 services:
   solaris-api:
-    image: solaris-jobs-prod
+    image: ghcr.io/solaris-games/solaris-jobs-prod
     build:
       context: ../../../
       dockerfile: docker/prod/server-jobs/Dockerfile

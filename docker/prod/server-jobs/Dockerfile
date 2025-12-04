@@ -1,4 +1,4 @@
-FROM solaris-base-prod
+FROM ghcr.io/solaris-games/solaris-base-prod
 
 WORKDIR /solaris/server
 
