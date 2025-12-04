@@ -61,7 +61,7 @@ jobs:
           push-to-registry: true
 
       - name: Build and push API docker image
-        id: push-base
+        id: push-api
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
@@ -74,11 +74,11 @@ jobs:
         uses: actions/attest-build-provenance@v1
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME}}
-          subject-digest: ${{ steps.push-base.outputs.digest }}
+          subject-digest: ${{ steps.push-api.outputs.digest }}
           push-to-registry: true
 
       - name: Build and push jobs docker image
-        id: push-base
+        id: push-jobs
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
@@ -91,5 +91,5 @@ jobs:
         uses: actions/attest-build-provenance@v1
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.JOBS_IMAGE_NAME}}
-          subject-digest: ${{ steps.push-base.outputs.digest }}
+          subject-digest: ${{ steps.push-jobs.outputs.digest }}
           push-to-registry: true
