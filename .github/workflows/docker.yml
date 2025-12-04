@@ -50,6 +50,7 @@ jobs:
           context: .
           file: docker/prod/base/Dockerfile
           push: true
+          load: true
           tags: ${{ env.REGISTRY }}/${{ env.BASE_IMAGE_NAME }}:${{ github.event.inputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -67,6 +68,7 @@ jobs:
           context: .
           file: docker/prod/server-api/Dockerfile
           push: true
+          load: true
           tags: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ github.event.inputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
 
@@ -84,6 +86,7 @@ jobs:
           context: .
           file: docker/prod/server-jobs/Dockerfile
           push: true
+          load: true
           tags: ${{ env.REGISTRY }}/${{ env.JOBS_IMAGE_NAME }}:${{ github.event.inputs.tag }}
           labels: ${{ steps.meta.outputs.labels }}
 
