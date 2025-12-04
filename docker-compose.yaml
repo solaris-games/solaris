@@ -1,20 +1,35 @@
 services:
   client:
-    build: ./client
+    image: solaris-client-dev
     ports:
       - "8080:8080"
 
   api:
-    build: ./server
-    command: npm run start-api:prod
+    image: solaris-api-dev
     ports:
       - "3000:3000"
+    environment:
+      PORT: 3000
+      CONNECTION_STRING: "mongodb://database:27017/solaris"
+      CLIENT_URL: "http://localhost:8080"
+      CORS_URLS: "http://localhost:8080"
+      SMTP_ENABLED: false
+      SERVER_URL: "http://localhost:3000"
+      SESSION_SECRET: top_secret
+      SESSION_SECURE_COOKIES: false
     depends_on:
       - database
       
   jobs:
-    build: ./server
-    command: npm run start-jobs:prod
+    image: solaris-jobs-dev
+    environment:
+      PORT: 3000
+      CONNECTION_STRING: "mongodb://database:27017/solaris"
+      CLIENT_URL: "http://localhost:8080"
+      CORS_URLS: "http://localhost:8080"
+      SMTP_ENABLED: false
+      SERVER_URL: "http://localhost:3000"
+
     depends_on:
       - database
 
