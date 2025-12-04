@@ -1,6 +1,6 @@
 services:
   solaris-base:
-    image: solaris-base-prod
+    image: ghcr.io/solaris-games/solaris-base-prod
     build:
       context: ../../..
       dockerfile:  docker/prod/base/Dockerfile
