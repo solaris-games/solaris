@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 const props = defineProps<{
   title: string,
@@ -23,7 +23,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  onToggle: (v: boolean) => void;
+  onToggle: [v: boolean];
 }>();
 
 const isCollapsed = ref(true);
@@ -32,7 +32,7 @@ const collapseText = computed(() => isCollapsed.value ? 'expand' : 'collapse');
 
 const toggle = () => {
   isCollapsed.value = !isCollapsed.value;
-  emit('onToggle', isCollapsed);
+  emit('onToggle', isCollapsed.value);
 };
 
 onMounted(() => {

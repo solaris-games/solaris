@@ -7,7 +7,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="email">Email Address</label>
-        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
+        <input type="email" :required="false" class="form-control" name="email" v-model="email" :disabled="isLoading">
       </div>
 
       <div>
@@ -41,7 +41,7 @@ const isLoading = ref(false);
 const errors = ref<string[]>([]);
 const email = ref('');
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e: Event) => {
   errors.value = [];
 
   if (!email.value) {
@@ -50,7 +50,7 @@ const handleSubmit = (e) => {
 
   e.preventDefault();
 
-  if (errors.length) {
+  if (errors.value.length) {
     return;
   }
 

@@ -5,13 +5,13 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="newPassword">New Password</label>
-        <input type="password" required="required" name="newPassword" class="form-control" v-model="newPassword"
+        <input type="password" :required="false" name="newPassword" class="form-control" v-model="newPassword"
           :disabled="isLoading">
       </div>
 
       <div class="mb-2">
         <label for="newPasswordConfirm">Confirm New Password</label>
-        <input type="password" required="required" name="newPasswordConfirm" class="form-control"
+        <input type="password" :required="false" name="newPasswordConfirm" class="form-control"
           v-model="newPasswordConfirm" :disabled="isLoading">
       </div>
 
@@ -43,14 +43,14 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const route = useRoute();
-const token = route.query.token;
+const token = route.query.token!.toString();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);
 const newPassword = ref('');
 const newPasswordConfirm = ref('');
 
-const handleSubmit = (e: Event) => {
+const handleSubmit = async (e: Event) => {
   errors.value = [];
 
   if (!newPassword.value) {
@@ -67,13 +67,13 @@ const handleSubmit = (e: Event) => {
 
   e.preventDefault();
 
-  if (this.errors.length) {
+  if (errors.value.length) {
     return;
   }
 
   isLoading.value = true;
 
-  const response = await resetPassword(this.httpClient)(this.token, this.newPassword);
+  const response = await resetPassword(httpClient)(token, newPassword.value);
 
   if (isOk(response)) {
     toast.success(`Your password has been reset.`);

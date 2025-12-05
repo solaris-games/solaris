@@ -312,7 +312,7 @@
 
       <view-subtitle title="Advanced Settings" class="centeredHeader"/>
 
-      <view-collapse-panel title="Flux">
+      <view-collapse-panel title="Flux" :starts-opened="false">
         <flux-bar />
 
         <div class="mb-2">
@@ -325,7 +325,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Galaxy Settings">
+      <view-collapse-panel title="Galaxy Settings" :starts-opened="false">
         <div class="mb-2">
           <label for="galaxyType" class="col-form-label">Galaxy Type <help-tooltip tooltip="The shape of the galaxy that will be generated for the game"/></label>
           <select class="form-control" id="galaxyType" v-model="settings.galaxy.galaxyType" :disabled="isCreatingGame">
@@ -368,7 +368,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Special Galaxy Settings">
+      <view-collapse-panel title="Special Galaxy Settings" :starts-opened="false">
         <div class="mb-2">
           <label for="carrierCost" class="col-form-label">Carrier Cost <help-tooltip tooltip="Determines how expensive carriers cost to build"/></label>
           <select class="form-control" id="carrierCost" v-model="settings.specialGalaxy.carrierCost" :disabled="isCreatingGame">
@@ -548,7 +548,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Orbital Mechanics">
+      <view-collapse-panel title="Orbital Mechanics" :starts-opened="false">
         <p class="mb-1 text-warning" v-if="settings.orbitalMechanics.enabled === 'enabled'">Warning: carrier-to-carrier combat is auto-disabled in orbital games.</p>
 
         <div class="mb-2">
@@ -570,7 +570,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Player Start Settings">
+      <view-collapse-panel title="Player Start Settings" :starts-opened="false">
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingStars" class="col-form-label">Starting Stars (<span class="text-warning">{{settings.player.startingStars}} stars</span>) <help-tooltip tooltip="Determines how many stars each player is allocated at the start of the game"/></label>
           <div class="col">
@@ -637,7 +637,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Ship Population Cap">
+      <view-collapse-panel title="Ship Population Cap" :starts-opened="false">
         <div class="mb-2">
           <label for="populationCapEnabled" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, the maximum ship population per player will be restricted"/></label>
           <select class="form-control" id="populationCapEnabled" v-model="settings.player.populationCap.enabled" :disabled="isCreatingGame">
@@ -655,7 +655,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Formal Alliances">
+      <view-collapse-panel title="Formal Alliances" :starts-opened="false">
         <p class="mb-2 text-warning" v-if="settings.general.mode === 'teamConquest'">Some diplomacy settings are unavailable because Team Conquest is selected as a game mode.</p>
         <div class="mb-2" v-if="settings.general.mode !== 'teamConquest'">
           <label for="diplomacy" class="col-form-label">Enabled <help-tooltip tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit each other's stars and support each other in combat"/></label>
@@ -705,7 +705,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Infrastructure Settings">
+      <view-collapse-panel title="Infrastructure Settings" :starts-opened="false">
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingInfrastructureEconomy" class="col-form-label">Starting Economic Infrastructure (<span class="text-warning">{{settings.player.startingInfrastructure.economy}} Economy</span>) <help-tooltip tooltip="Determines the infrastructure of the home star of each player at the start of the game"/></label>
           <div class="col">
@@ -747,7 +747,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Technology Settings">
+      <view-collapse-panel title="Technology Settings" :starts-opened="false">
         <div class="mb-2" v-if="!isAdvancedCustomGalaxy">
           <label for="startingTechLevelTerraforming" class="col-form-label">Starting Terraforming Technology (<span class="text-warning">{{settings.technology.startingTechnologyLevel.terraforming}} Terraforming</span>) <help-tooltip tooltip="Determines the starting technology levels for all players"/></label>
           <div class="col">
@@ -904,7 +904,7 @@
         </div>
       </view-collapse-panel>
 
-      <view-collapse-panel title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'">
+      <view-collapse-panel title="Specialist Bans" v-if="settings.specialGalaxy.specialistCost !== 'none'" :starts-opened="false">
         <div class="mb-2">
           <p><small>Choose to ban certain specialists from the game, they cannot be hired by any player.</small></p>
           <specialist-ban-list-selection :specialist-bans="settings.specialGalaxy.specialistBans" @updateSpecialistBans="bans => settings!.specialGalaxy.specialistBans = bans" />

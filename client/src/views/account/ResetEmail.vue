@@ -5,7 +5,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="email">New Email Address</label>
-        <input type="email" required="required" class="form-control" v-model="email" :disabled="isLoading" />
+        <input type="email" :required="false" class="form-control" v-model="email" :disabled="isLoading" />
       </div>
 
       <form-error-list v-bind:errors="errors" />
@@ -38,7 +38,7 @@ const isLoading = ref(false);
 const errors = ref<string[]>([]);
 const email = ref('');
 
-const handleSubmit = (e) => {
+const handleSubmit = async (e: Event) => {
   errors.value = [];
 
   if (!email.value) {

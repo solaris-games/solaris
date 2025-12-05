@@ -23,7 +23,7 @@
               @click="fastForwardGame">Fast Forward Game
       </button>
 
-      <view-collapse-panel @onToggle="togglePlayerControl" title="Player Control">
+      <view-collapse-panel @onToggle="togglePlayerControl" title="Player Control" :starts-opened="false">
         <game-player-control v-if="fullGame" :game="fullGame" @onGameModified="loadFullGame"/>
       </view-collapse-panel>
 
