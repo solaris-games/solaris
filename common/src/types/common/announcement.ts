@@ -1,8 +1,8 @@
 export type Announcement<ID> = {
     _id: ID,
-    title: String,
+    title: string,
     date: Date,
-    content: String
+    content: string
 }
 
 export type AnnouncementState<ID> = {
