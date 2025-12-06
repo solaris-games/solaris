@@ -4,100 +4,72 @@
         <td><a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(waypoint.destination)}}</a></td>
         <td v-if="!showAction">{{timeRemainingEta}}</td>
         <td v-if="showAction">
-            <span>{{getWaypointActionFriendlyText(waypoint)}}</span>
+            <span>{{formatAction(waypoint, waypoint.action)}}</span>
         </td>
-        <td class="text-end" v-if="!$isHistoricalMode() && canEditWaypoints">
+        <td class="text-end" v-if="!isHistoricalMode && canEditWaypoints">
           <a href="javascript:;" @click="editWaypoint">Edit</a>
         </td>
     </tr>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import GameHelper from '../../../../services/gameHelper';
+import type {Carrier, Game} from "@/types/game";
+import type {CarrierWaypoint} from "@solaris-common";
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useStore } from "vuex";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {formatAction} from "@/util/waypoint";
 
-export default {
-  props: {
-    carrier: Object,
-    waypoint: Object,
-    showAction: Boolean
-  },
-  data () {
-    return {
-      timeRemainingEta: null
-    }
-  },
-  mounted () {
-    this.recalculateTimeRemaining()
+const props = defineProps<{
+  carrier: Carrier,
+  waypoint: CarrierWaypoint<string>,
+  showAction: boolean,
+}>();
 
-    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
-      this.recalculateTimeRemaining()
-    }
-  },
-  unmounted () {
-    clearInterval(this.intervalFunction)
-  },
-  methods: {
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', this.waypoint.destination)
-    },
-    getStarName (starId) {
-      let star = this.$store.state.game.galaxy.stars.find(s => s._id === starId)
+const emit = defineEmits<{
+  onEditWaypointRequested: [waypoint: CarrierWaypoint<string>],
+  onOpenStarDetailRequested: [starId: string],
+}>();
 
-      return star ? star.name : '???'
-    },
-    editWaypoint (e) {
-      this.$emit('onEditWaypointRequested', this.waypoint)
-    },
-    getWaypointActionFriendlyText (waypoint, action) {
-      action = action || waypoint.action
+const store = useStore();
+const isHistoricalMode = useIsHistoricalMode(store);
+const game = computed<Game>(() => store.state.game);
 
-      switch (action) {
-        case 'nothing':
-          return 'Do Nothing'
-        case 'collectAll':
-          return 'Collect All Ships'
-        case 'dropAll':
-          return 'Drop All Ships'
-        case 'collect':
-          return `Collect ${waypoint.actionShips} Ships`
-        case 'drop':
-          return `Drop ${waypoint.actionShips} Ships`
-        case 'collectAllBut':
-          return `Collect All But ${waypoint.actionShips} Ships`
-        case 'dropAllBut':
-          return `Drop All But ${waypoint.actionShips} Ships`
-        case 'garrison':
-          return `Garrison ${waypoint.actionShips} Ships`
-        case 'collectPercentage':
-          return `Collect ${waypoint.actionShips}% Of Ships`
-        case 'dropPercentage':
-          return `Drop ${waypoint.actionShips}% Of Ships`
-      }
-    },
-    recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.waypoint.ticksEta)
-    },
-    isFirstWaypoint (waypoint) {
-      return this.carrier.waypoints.indexOf(waypoint) === 0
-    }
-  },
-  computed: {
-    userPlayer() {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    userPlayerOwnsCarrier: function () {
-      return this.userPlayer &&
-        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === this.userPlayer._id
-    },
-    canEditWaypoints: function () {
-      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier && !this.carrier.isGift
-    },
-    isInTransit () {
-      return !this.carrier.orbiting
-    }
+const timeRemainingEta = ref<string | null>(null);
+
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
+const canEditWaypoints = computed(() => !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
+const isInTransit = computed(() => !props.carrier.orbiting);
+
+const getStarName = (starId: string) => GameHelper.getStarById(game.value, starId)!.name;
+
+const onOpenStarDetailRequested = () => emit('onOpenStarDetailRequested', props.waypoint.destination);
+
+const editWaypoint = () => emit('onEditWaypointRequested', props.waypoint);
+
+const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
+  return props.carrier.waypoints.indexOf(waypoint) === 0;
+};
+
+const recalculateTimeRemaining = () => {
+  timeRemainingEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, props.waypoint.ticksEta);
+};
+
+onMounted(() => {
+  recalculateTimeRemaining();
+
+  let handle;
+
+  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+    handle = setInterval(recalculateTimeRemaining, 250);
   }
-}
+
+  onUnmounted(() => {
+    handle && clearInterval(handle);
+  });
+});
 </script>
 
 <style scoped>

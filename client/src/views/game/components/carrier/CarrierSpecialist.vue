@@ -7,7 +7,7 @@
             {{carrier.specialist.name}}
           </h5>
         </div>
-        <div v-if="!$isHistoricalMode() && canHireSpecialist && !isGameFinished" class="col-auto">
+        <div v-if="!isHistoricalMode && canHireSpecialist && !isGameFinished" class="col-auto">
             <button class="btn btn-sm btn-success" @click="onViewHireCarrierSpecialistRequested"><i class="fas fa-user-astronaut"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
@@ -21,50 +21,48 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import type {Carrier, Game} from "@/types/game";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'specialist-icon': SpecialistIconVue
-  },
-  props: {
-    carrierId: String
-  },
-  data () {
-    return {
-      carrier: null,
-      canHireSpecialist: false
-    }
-  },
-  mounted () {
-    this.carrier = GameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+const props = defineProps<{
+  carrierId: string,
+}>();
 
-    if (this.carrier.orbiting) {
-      let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-      let star = GameHelper.getCarrierOrbitingStar(this.$store.state.game, this.carrier)
-      let isDeadStar = GameHelper.isDeadStar(star)
+const emit = defineEmits<{
+  onViewHireCarrierSpecialistRequested: [carrierId: string];
+}>();
 
-      this.canHireSpecialist = userPlayer
-        && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'  // Specs are enabled
-        && userPlayer._id === this.carrier.ownedByPlayerId                     // User owns the carrier
-        && star.ownedByPlayerId === this.carrier.ownedByPlayerId               // User owns the star
-        && !isDeadStar                                                         // Star isn't dead
-        && (!this.carrier.specialistId || !this.carrier.specialist.oneShot)         // Carrier doesn't already have a spec on it
-    }
-  },
-  methods: {
-    onViewHireCarrierSpecialistRequested() {
-        this.$emit('onViewHireCarrierSpecialistRequested', this.carrierId)
-    }
-  },
-  computed: {
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    }
+const store = useStore();
+const isHistoricalMode = useIsHistoricalMode(store);
+const game = computed<Game>(() => store.state.game);
+const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
+
+const carrier = ref<Carrier | null>(null);
+const canHireSpecialist = ref(false);
+
+const onViewHireCarrierSpecialistRequested = () => emit('onViewHireCarrierSpecialistRequested', props.carrierId);
+
+onMounted(() => {
+  carrier.value = GameHelper.getCarrierById(game.value, props.carrierId)!;
+
+  if (carrier.value.orbiting) {
+    const userPlayer = GameHelper.getUserPlayer(game.value);
+    const star = GameHelper.getCarrierOrbitingStar(game.value, carrier.value)!;
+    const isDeadStar = GameHelper.isDeadStar(star);
+
+    canHireSpecialist.value = Boolean(userPlayer
+      && game.value.settings.specialGalaxy.specialistCost !== 'none'  // Specs are enabled
+      && userPlayer._id === carrier.value.ownedByPlayerId                     // User owns the carrier
+      && star.ownedByPlayerId === carrier.value.ownedByPlayerId               // User owns the star
+      && !isDeadStar                                                         // Star isn't dead
+      && (!carrier.value.specialistId || !carrier.value?.specialist?.oneShot));       // Carrier doesn't already have a spec on it
   }
-}
+});
 </script>
 
 <style scoped>

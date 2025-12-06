@@ -23,26 +23,35 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-      badges: Array,
-      userCredits: Number,
-      recipientName: String
-  },
-  methods: {
-    async purchaseBadge (badge) {
-        if (!await this.$confirm(`Purchase Badge`, `Are you sure you want to purchase the '${badge.name}' badge for ${this.recipientName}? It will cost ${badge.price} credit(s).`)) {
-            return
-        }
+<script setup lang="ts">
+import { useStore } from 'vuex';
+import {makeConfirm} from "@/util/confirm";
+import type {Badge} from "@solaris-common";
 
-        this.$emit('onPurchaseBadgeConfirmed', badge);
-    },
-    getBadgeSrc (badge) {
-      return new URL(`../../../../assets/badges/${badge.key}.png`, import.meta.url);
-    }
+const props = defineProps<{
+  badges: Badge[],
+  userCredits: number,
+  recipientName: string,
+}>();
+
+const emit = defineEmits<{
+  onPurchaseBadgeConfirmed: [badge: Badge],
+}>();
+
+const store = useStore();
+const confirm = makeConfirm(store);
+
+const purchaseBadge = async (badge: Badge) => {
+  if (!await confirm(`Purchase Badge`, `Are you sure you want to purchase the '${badge.name}' badge for ${props.recipientName}? It will cost ${badge.price} credit(s).`)) {
+    return;
   }
-}
+
+  emit('onPurchaseBadgeConfirmed', badge);
+};
+
+const getBadgeSrc = (badge: Badge) => {
+  return new URL(`../../../../assets/badges/${badge.key}.png`, import.meta.url).href;
+};
 </script>
 
 <style scoped>

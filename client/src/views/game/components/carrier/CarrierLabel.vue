@@ -2,46 +2,42 @@
   <a href="javascript:;" @click="pan">{{actualCarrierName}}<i class="fas fa-eye ms-1"></i></a>
 </template>
 
-<script>
-import { inject } from 'vue';
+<script setup lang="ts">
+import { onMounted, inject, ref } from 'vue';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
+import { useStore } from "vuex";
+import type {MapObject} from "@solaris-common";
 
-export default {
-  props: {
-    carrierId: String,
-    carrierName: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      actualCarrierName: null
-    }
-  },
-  mounted () {
-    if (this.carrierName) {
-      this.actualCarrierName = this.carrierName
-    } else {
-      const carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+const props = defineProps<{
+  carrierId: string,
+  carrierName?: string,
+}>();
 
-      this.actualCarrierName = carrier ? carrier.name : 'Unknown'
-    }
-  },
-  methods: {
-    pan (e) {
-      const carrier = gameHelper.getCarrierById(this.$store.state.game, this.carrierId)
+const eventBus = inject(eventBusInjectionKey)!;
 
-      if (carrier) {
-        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier });
-      }
-    }
+const store = useStore();
+
+const actualCarrierName = ref('');
+
+const pan = () => {
+  const carrier = gameHelper.getCarrierById(store.state.game, props.carrierId);
+
+  if (carrier) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier as MapObject<string> });
   }
 }
+
+onMounted(() => {
+  if (props.carrierName) {
+    actualCarrierName.value = props.carrierName;
+  } else {
+    const carrier = gameHelper.getCarrierById(store.state.game, props.carrierId);
+
+    actualCarrierName.value = carrier ? carrier.name : 'Unknown';
+  }
+});
 </script>
 
 <style scoped>
