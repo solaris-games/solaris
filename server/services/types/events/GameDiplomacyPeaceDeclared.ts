@@ -1,6 +1,7 @@
-import { DiplomaticStatus } from "../Diplomacy";
+import { DiplomaticStatus } from "solaris-common";
 import { BaseGameEvent } from "./BaseGameEvent";
+import {DBObjectId} from "../DBObjectId";
 
 export default interface GameDiplomacyPeaceDeclaredEvent extends BaseGameEvent {
-    status: DiplomaticStatus;
+    status: DiplomaticStatus<DBObjectId>;
 };

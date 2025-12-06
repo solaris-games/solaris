@@ -1,8 +1,7 @@
 import { DBObjectId } from "./DBObjectId";
-import { DiplomaticState } from "./Diplomacy";
+import { DiplomaticState } from "solaris-common";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
-import { ObjectId } from "mongoose";
 import { InfrastructureType } from "./Star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';

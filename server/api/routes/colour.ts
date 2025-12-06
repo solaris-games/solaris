@@ -2,7 +2,7 @@ import {MiddlewareContainer} from "../middleware";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {SingleRouter} from "../singleRoute";
 import ColourController from '../controllers/colour';
-import {createColourRoutes} from "@solaris-common";
+import {createColourRoutes} from "solaris-common";
 import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {

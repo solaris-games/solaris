@@ -3,41 +3,40 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import DiplomacyController from '../controllers/diplomacy';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createDiplomacyRoutes} from "solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = DiplomacyController(container);
+    const routes = createDiplomacyRoutes<DBObjectId>();
+    const answer = createRoutes(router, mw);
 
-    router.get('/api/game/:gameId/diplomacy',
+    answer(routes.listDiplomacy,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
                 lean: true,
                 'galaxy.players': true
-                // 'galaxy.players._id': 1,
-                // 'galaxy.players.userId': 1,
-                // 'galaxy.players.diplomacy': 1
             }),
             mw.player.loadPlayer,
             controller.list,
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/diplomacy/:toPlayerId',
+    answer(routes.detailDiplomacy,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
                 lean: true,
                 'galaxy.players': true
-                // 'galaxy.players._id': 1,
-                // 'galaxy.players.userId': 1,
-                // 'galaxy.players.diplomacy': 1
             }),
             mw.player.loadPlayer,
             controller.detail,
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/diplomacy/ally/:playerId',
+    answer(routes.ally,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -57,7 +56,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/diplomacy/enemy/:playerId',
+    answer(routes.enemy,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -77,7 +76,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/diplomacy/neutral/:playerId',
+    answer(routes.neutral,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({

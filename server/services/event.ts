@@ -20,7 +20,7 @@ import { Carrier } from "./types/Carrier";
 import { CombatResult } from "./types/Combat";
 import { Conversation } from "./types/Conversation";
 import { DBObjectId } from "./types/DBObjectId";
-import { DiplomaticStatus } from "./types/Diplomacy";
+import { DiplomaticStatus } from "solaris-common";
 import { Game } from "./types/Game";
 import { GameEvent } from "./types/GameEvent";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
@@ -702,7 +702,7 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
-    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
         await this.eventRepo.deleteMany({
             gameId,
             tick: gameTick,
@@ -737,8 +737,8 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
-    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
-        let data = status;
+    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
+        const data = status;
 
         await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
         await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);

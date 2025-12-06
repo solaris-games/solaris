@@ -1,9 +1,8 @@
 import EventEmitter from "events";
 const moment = require('moment')
 import { DBObjectId } from "./types/DBObjectId";
-import { ValidationError } from "solaris-common";
+import {DiplomacyEvent, DiplomaticState, DiplomaticStatus, ValidationError} from "solaris-common";
 import Repository from "./repository";
-import { DiplomacyEvent, DiplomaticState, DiplomaticStatus } from "./types/Diplomacy";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
@@ -18,7 +17,6 @@ export const DiplomacyServiceEvents = {
 }
 
 export default class DiplomacyService extends EventEmitter {
-
     gameRepo: Repository<Game>;
     eventRepo: Repository<GameEvent>;
     diplomacyUpkeepService: DiplomacyUpkeepService;
@@ -60,7 +58,7 @@ export default class DiplomacyService extends EventEmitter {
     }
 
     getDiplomaticStatusBetweenPlayers(game: Game, playerIds: DBObjectId[]): DiplomaticState {
-        let statuses: DiplomaticState[] = [];
+        const statuses: DiplomaticState[] = [];
 
         for (let i = 0; i < playerIds.length; i++) {
             for (let ii = 0; ii < playerIds.length; ii++) {
@@ -86,9 +84,9 @@ export default class DiplomacyService extends EventEmitter {
         return 'allies';
     }
 
-    getDiplomaticStatusToPlayer(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): DiplomaticStatus {
-        let playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
-        let playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
+    getDiplomaticStatusToPlayer(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): DiplomaticStatus<DBObjectId> {
+        const playerA: Player = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
+        const playerB: Player = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
 
         if (playerIdA.toString() === playerIdB.toString()) {
             return {
@@ -102,8 +100,8 @@ export default class DiplomacyService extends EventEmitter {
             };
         }
 
-        let statusTo: DiplomaticState = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())?.status ?? 'neutral';
-        let statusFrom: DiplomaticState = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())?.status ?? 'neutral';
+        const statusTo: DiplomaticState = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())?.status ?? 'neutral';
+        const statusFrom: DiplomaticState = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())?.status ?? 'neutral';
 
         let actualStatus: DiplomaticState;
 
@@ -126,8 +124,8 @@ export default class DiplomacyService extends EventEmitter {
         };
     }
 
-    getDiplomaticStatusToAllPlayers(game: Game, player: Player): DiplomaticStatus[] {
-        let diplomaticStatuses: DiplomaticStatus[] = [];
+    getDiplomaticStatusToAllPlayers(game: Game, player: Player): DiplomaticStatus<DBObjectId>[] {
+        let diplomaticStatuses: DiplomaticStatus<DBObjectId>[] = [];
 
         for (let otherPlayer of game.galaxy.players) {
             if (player._id.toString() === otherPlayer._id.toString()) {
@@ -397,7 +395,7 @@ export default class DiplomacyService extends EventEmitter {
         return newStatus;
     }
 
-    async listDiplomacyEventsBetweenPlayers(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): Promise<DiplomacyEvent[]> {
+    async listDiplomacyEventsBetweenPlayers(game: Game, playerIdA: DBObjectId, playerIdB: DBObjectId): Promise<DiplomacyEvent<DBObjectId>[]> {
         let events = await this.eventRepo.find({
             gameId: game._id,
             playerId: playerIdA,
