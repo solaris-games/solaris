@@ -5,11 +5,10 @@ import MenuEventBusEventNames from './eventBusEventNames/menu';
 import GameMutationNames from './mutationNames/gameMutationNames';
 import PlayerMutationNames from './mutationNames/playerMutationNames';
 import ApiAuthService from "./services/api/auth.js";
-import ColourService from './services/api/colour.js';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, UserGameSettings, UserRoles} from "@solaris-common";
+import type {Badge, PlayerColour, UserGameSettings, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -17,6 +16,7 @@ import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {detailMe} from "@/services/typedapi/user";
 import type { OnPreStarParams } from './eventBusEventNames/map';
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
+import {addColour, listColours} from "@/services/typedapi/colour";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -520,7 +520,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
 
-    internalAddColourMapping (state: State, data) {
+    internalAddColourMapping (state: State, data: { playerId: string, colour: PlayerColour }) {
       state.colourMapping = {
         ...state.colourMapping,
         [data.playerId]: data.colour
@@ -560,17 +560,21 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     },
     async loadColourData ({ commit, state }: { commit: any, state: State }) {
       if (state.userId) {
-        const resp = await ColourService.listColours();
-        commit('setColoursConfig', resp.data);
+        const resp = await listColours(httpClient)();
+        if (isOk(resp)) {
+          commit('setColoursConfig', resp.data);
+        }
       }
     },
-    async addColourMapping ({ commit, state }, data) {
-      console.warn('Adding colour mapping', data);
+    async addColourMapping ({ commit, state }, data: { playerId: string, colour: PlayerColour }) {
+      const resp = await addColour(httpClient)(state.game._id, data.playerId, data.colour);
+      if (isOk(resp)) {
+        commit('internalAddColourMapping', data);
 
-      await ColourService.addColour(state.game._id, data);
-      commit('internalAddColourMapping', data);
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
+        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
+      } else {
+        console.error(formatError(resp));
+      }
     },
     async verify({ commit, state }) {
       try {

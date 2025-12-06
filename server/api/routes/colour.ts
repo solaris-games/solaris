@@ -2,11 +2,16 @@ import {MiddlewareContainer} from "../middleware";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import {SingleRouter} from "../singleRoute";
 import ColourController from '../controllers/colour';
+import {createColourRoutes} from "@solaris-common";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const controller = ColourController(container);
+    const routes = createColourRoutes();
 
-    router.put('/api/game/:gameId/colour/override',
+    const answer = createRoutes(router, mw);
+
+    answer(routes.addColour,
         mw.auth.authenticate(),
         mw.playerMutex.wait(),
         mw.game.loadGame({
@@ -19,8 +24,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, container: Depend
         mw.playerMutex.release()
     );
 
-    router.get('/api/colour/list',
-        mw.auth.authenticate(),
-        controller.list
+    answer(routes.listColours,
+        controller.list,
     );
 }
