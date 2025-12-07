@@ -1,33 +1,32 @@
+import type {Game, Player} from "@/types/game";
+
 class DiplomacyHelper {
-  
-  isFormalAlliancesEnabled (game) {
+  isFormalAlliancesEnabled (game: Game) {
     return game.settings.diplomacy.enabled === 'enabled'
   }
 
-  isTradeRestricted (game) {
+  isTradeRestricted (game: Game) {
     return game.settings.diplomacy.tradeRestricted === 'enabled'
   }
 
-  maxAlliances (game) {
+  maxAlliances (game: Game) {
     return game.settings.diplomacy.maxAlliances
   }
 
-  isMaxAlliancesEnabled (game) {
+  isMaxAlliancesEnabled (game: Game) {
     return game.settings.diplomacy.maxAlliances < game.settings.general.playerLimit - 1
   }
 
-  isAllianceUpkeepEnabled (game) {
+  isAllianceUpkeepEnabled (game: Game) {
     return game.settings.diplomacy.upkeepCost !== 'none'
   }
 
-  getAllianceUpkeepCost (game, player, cycleCredits, allianceCount) {
+  getAllianceUpkeepCost (game: Game, player: Player, cycleCredits: number, allianceCount: number) {
     const costPerAlly = game.constants.diplomacy.upkeepExpenseMultipliers[game.settings.diplomacy.upkeepCost];
-    const upkeep = Math.round(allianceCount * costPerAlly * cycleCredits)
-
-    return upkeep
+    return Math.round(allianceCount * costPerAlly * cycleCredits)
   }
 
-  isDiplomaticStatusToPlayersAllied(game, playerId, toPlayerIds) {
+  isDiplomaticStatusToPlayersAllied(game: Game, playerId: string, toPlayerIds: string[]) {
     let playerIdA = playerId;
 
     for (let i = 0; i < toPlayerIds.length; i++) {
@@ -40,10 +39,10 @@ class DiplomacyHelper {
         }
     }
 
-    return true
+    return true;
   }
 
-  getDiplomaticStatusToPlayer(game, playerIdA, playerIdB) {
+  getDiplomaticStatusToPlayer(game: Game, playerIdA: string, playerIdB: string) {
     if (playerIdA.toString() === playerIdB.toString()) {
       return {
           playerIdFrom: playerIdA,
@@ -54,8 +53,8 @@ class DiplomacyHelper {
       }
     }
 
-    let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())
-    let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())
+    let playerA = game.galaxy.players.find(p => p._id.toString() === playerIdA.toString())!;
+    let playerB = game.galaxy.players.find(p => p._id.toString() === playerIdB.toString())!;
 
     let playerADiplo = playerA.diplomacy.find(x => x.playerId.toString() === playerB._id.toString())
     let playerBDiplo = playerB.diplomacy.find(x => x.playerId.toString() === playerA._id.toString())
@@ -81,7 +80,6 @@ class DiplomacyHelper {
         actualStatus
     }
   }
-
 }
 
-export default new DiplomacyHelper()
+export default new DiplomacyHelper();

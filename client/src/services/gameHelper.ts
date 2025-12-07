@@ -1,7 +1,7 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
-import type {Location, MapObject, Team} from '@solaris-common';
+import type {GameStateDetail, Location, MapObject, Team} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 
 class GameHelper {
@@ -469,8 +469,8 @@ class GameHelper {
     // If both stars have warp gates and they are both owned by players...
     if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
       // If both stars are owned by the player or by allies then carriers can always move at warp.
-      let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
-      let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+      let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId!]))
+      let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId!]))
 
       // If both stars are owned by the player then carriers can always move at warp.
       if (sourceAllied && desinationAllied) {
@@ -595,8 +595,8 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
-  isGameFinished(game) {
-    return game.state.endDate != null
+  isGameFinished(game: GameStateDetail<string>) {
+    return game.state.endDate != null;
   }
 
   isDarkModeExtra(game) {
@@ -1316,14 +1316,14 @@ class GameHelper {
 
     const partialManufacturing: number = manufacturing - Math.floor(manufacturing);
     const next: number =  Math.floor(shipsActual) + 1;
-  
+
     let count: number = 0;
-  
+
     while (shipsActual < next) {
       count++;
       shipsActual += partialManufacturing;
     }
-  
+
     return count;
   }
 }
