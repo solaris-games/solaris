@@ -1,8 +1,8 @@
 <template>
-    <div v-if="isTradeAllowed">
+    <div v-if="isTradeAllowed && player">
       <reputation v-if="player.isAIControlled" :playerId="player._id"/>
 
-      <div v-if="isTradePossibleByScanning && isTradePossibleByDiplomacy">
+      <div v-if="isTradePossibleByScanning && isTradePossibleByDiplomacy && userPlayer">
         <sendCredits v-if="tradeCreditsIsEnabled" :player="player" :userPlayer="userPlayer"/>
         <sendCreditsSpecialists v-if="tradeCreditsSpecialistsIsEnabled" :player="player" :userPlayer="userPlayer"/>
         <sendTechnology v-if="player && tradeTechnologyIsEnabled" :playerId="player._id"/>
@@ -13,92 +13,81 @@
     </div>
 </template>
 
-<script>
-import SendTechnology from './SendTechnology.vue'
-import SendCredits from './SendCredits.vue'
-import SendCreditsSpecialists from './SendCreditsSpecialists.vue'
-import Reputation from './Reputation.vue'
-import GameHelper from '../../../../services/gameHelper'
-import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import DiplomacyApiService from '../../../../services/api/diplomacy'
+<script setup lang="ts">
+import SendTechnology from './SendTechnology.vue';
+import SendCredits from './SendCredits.vue';
+import SendCreditsSpecialists from './SendCreditsSpecialists.vue';
+import Reputation from './Reputation.vue';
+import GameHelper from '../../../../services/gameHelper';
+import DiplomacyHelper from '../../../../services/diplomacyHelper';
+import { ref, inject, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import type {Game, Player} from "@/types/game";
+import type {DiplomaticStatus} from "@solaris-common";
+import {detailDiplomacy} from "@/services/typedapi/diplomacy";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
-export default {
-  components: {
-    'sendTechnology': SendTechnology,
-    'sendCredits': SendCredits,
-    'sendCreditsSpecialists': SendCreditsSpecialists,
-    'reputation': Reputation
-  },
-  props: {
-    playerId: String
-  },
-  data () {
-    return {
-      player: null,
-      userPlayer: null,
-      diplomaticStatus: null
-    }
-  },
-  async mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+const props = defineProps<{
+  playerId: string,
+}>();
 
-    await this.loadDiplomaticStatus()
-  },
-  methods: {
-    async loadDiplomaticStatus () {
-      if (!DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) || !DiplomacyHelper.isTradeRestricted(this.$store.state.game)) {
-        return
-      }
+const httpClient = inject(httpInjectionKey)!;
 
-      try {
-        const response = await DiplomacyApiService.getDiplomaticStatusToPlayer(this.$store.state.game._id, this.player._id)
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-        if (response.status === 200) {
-          this.diplomaticStatus = response.data
-        }
-      } catch (err) {
-        console.error(err)
-        this.diplomaticStatus = null
-      }
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    isTradeAllowed () {
-      return this.game.state.startDate
-        && this.userPlayer
-        && this.player != this.userPlayer
-        && !this.userPlayer.defeated
-        && !this.isGameFinished
-        && (this.tradeTechnologyIsEnabled || this.tradeCreditsIsEnabled || this.tradeCreditsSpecialistsIsEnabled)
-    },
-    isTradePossibleByScanning: function () {
-      return (this.player.stats.totalStars > 0 || GameHelper.isDarkModeExtra(this.$store.state.game))
-        && (this.$store.state.game.settings.player.tradeScanning === 'all' || (this.player && this.player.isInScanningRange))
-    },
-    isTradePossibleByDiplomacy: function () {
-      return !DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game) ||
-        !DiplomacyHelper.isTradeRestricted(this.$store.state.game) ||
-        (this.diplomaticStatus && this.diplomaticStatus.actualStatus == 'allies')
-    },
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    tradeCreditsIsEnabled () {
-      return this.game.settings.player.tradeCredits
-    },
-    tradeCreditsSpecialistsIsEnabled () {
-      return this.game.settings.player.tradeCreditsSpecialists
-        && this.game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
-    },
-    tradeTechnologyIsEnabled () {
-      return this.game.settings.player.tradeCost > 0
-    }
+const player = ref<Player | null>(null);
+const userPlayer = ref<Player | null>(null);
+const diplomaticStatus = ref<DiplomaticStatus<string> | null>(null);
+
+const tradeCreditsIsEnabled = computed(() => game.value.settings.player.tradeCredits);
+
+const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
+
+const isTradePossibleByScanning = computed(() =>
+  player.value &&
+  ((player.value.stats?.totalStars || 0) > 0 || GameHelper.isDarkModeExtra(game.value)) &&
+  (game.value.settings.player.tradeScanning === 'all' || player.value.isInScanningRange));
+
+const tradeCreditsSpecialistsIsEnabled = computed(() =>
+  game.value.settings.player.tradeCreditsSpecialists &&
+  game.value.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists');
+
+const tradeTechnologyIsEnabled = computed(() => game.value.settings.player.tradeCost > 0);
+
+const isTradePossibleByDiplomacy = computed(() =>
+  !DiplomacyHelper.isFormalAlliancesEnabled(game.value) ||
+  !DiplomacyHelper.isTradeRestricted(game.value) ||
+  (diplomaticStatus.value && diplomaticStatus.value.actualStatus == 'allies'));
+
+const isTradeAllowed = computed(() =>
+  game.value.state.startDate &&
+  userPlayer.value &&
+  player.value &&
+  userPlayer.value._id !== player.value._id &&
+  !userPlayer.value.defeated &&
+  !isGameFinished.value &&
+  (tradeTechnologyIsEnabled.value || tradeCreditsIsEnabled.value || tradeCreditsSpecialistsIsEnabled.value));
+
+const loadDiplomaticStatus = async () => {
+  if (!userPlayer.value || props.playerId === userPlayer.value._id) {
+    return;
   }
-}
+
+  const response = await detailDiplomacy(httpClient)(game.value._id, props.playerId);
+  if (isOk(response)) {
+    diplomaticStatus.value = response.data;
+  } else {
+    console.error(formatError(response));
+  }
+};
+
+onMounted(() => {
+  player.value = GameHelper.getPlayerById(game.value, props.playerId) || null;
+  userPlayer.value = GameHelper.getUserPlayer(game.value) || null;
+
+  loadDiplomaticStatus();
+});
 </script>
 
 <style scoped>

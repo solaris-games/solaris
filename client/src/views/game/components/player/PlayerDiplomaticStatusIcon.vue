@@ -6,44 +6,44 @@
   </span>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import DiplomacyApiService from '../../../../services/api/diplomacy'
+import { ref, onMounted, computed, inject } from 'vue'
+import type {DiplomaticStatus} from "@solaris-common";
+import { useStore } from 'vuex';
+import type {Game} from "@/types/game";
+import {detailDiplomacy} from "@/services/typedapi/diplomacy";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
-export default {
-  props: {
-    toPlayerId: String
-  },
-  data () {
-    return {
-      diplomaticStatus: null
-    }
-  },
-  async mounted () {
-    await this.loadDiplomaticStatus()
-  },
-  methods: {
-    async loadDiplomaticStatus () {
-      const userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+const props = defineProps<{
+  toPlayerId: string,
+}>();
 
-      if (!userPlayer || this.toPlayerId === userPlayer._id) {
-        return
-      }
+const httpClient = inject(httpInjectionKey)!;
 
-      try {
-        const response = await DiplomacyApiService.getDiplomaticStatusToPlayer(this.$store.state.game._id, this.toPlayerId)
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-        if (response.status === 200) {
-          this.diplomaticStatus = response.data
-        }
-      } catch (err) {
-        console.error(err)
+const diplomaticStatus = ref<DiplomaticStatus<string> | null>(null);
 
-        this.diplomaticStatus = null
-      }
-    }
+const loadDiplomaticStatus = async () => {
+  const userPlayer = GameHelper.getUserPlayer(game.value);
+
+  if (!userPlayer || props.toPlayerId === userPlayer._id) {
+    return;
   }
-}
+
+  const response = await detailDiplomacy(httpClient)(game.value._id, props.toPlayerId);
+  if (isOk(response)) {
+    diplomaticStatus.value = response.data;
+  } else {
+    console.error(formatError(response));
+  }
+};
+
+onMounted(() => {
+  loadDiplomaticStatus();
+});
 </script>
 
 <style scoped>
