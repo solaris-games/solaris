@@ -53,124 +53,107 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { eventBusInjectionKey } from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import Statistics from './Statistics.vue'
-import PlayerTitleVue from './PlayerTitle.vue'
+import PlayerTitle from './PlayerTitle.vue'
 import gameHelper from '../../../../services/gameHelper'
 import ConversationApiService from '../../../../services/api/conversation'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import { inject } from 'vue'
+import { ref, inject, computed, onMounted } from 'vue'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import type {Game, Player} from "@/types/game";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import { useStore } from 'vuex';
+import type {Conversation, ConversationOverview} from "@solaris-common";
+import GameHelper from "../../../../services/gameHelper";
+import {listPrivate} from "@/services/typedapi/conversation";
 
-export default {
-  components: {
-    'statistics': Statistics,
-    'player-title': PlayerTitleVue
-  },
-  props: {
-    playerId: String
-  },
-  data () {
-    return {
-      userPlayer: null,
-      player: null,
-      gameHasStarted: null,
-      gameHasFinished: null,
-      conversation: null
-    }
-    },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  async mounted () {
-    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
+const props = defineProps<{
+  playerId: string,
+}>();
 
-    this.gameHasStarted = this.$store.state.game.state.startDate != null
-    this.gameHasFinished = this.$store.state.game.state.endDate != null
+const emit = defineEmits<{
+  onViewColourOverrideRequested: [playerId: string],
+  onViewCompareIntelRequested: [playerId: string],
+  onOpenTradeRequested: [playerId: string],
+}>();
 
-    await this.loadConversation()
-  },
-  methods: {
-    onViewColourOverrideRequested (e) {
-      this.$emit('onViewColourOverrideRequested', this.playerId);
-    },
-    onViewConversationRequested (e) {
-      if (this.conversation) {
-        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-          conversationId: this.conversation._id
-        });
-      } else {
-        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-          participantIds: [
-            this.userPlayer._id,
-            this.player._id
-          ]
-        });
-      }
-    },
-    onViewCompareIntelRequested (e) {
-      this.$emit('onViewCompareIntelRequested', this.player._id)
-    },
-    onOpenTradeRequested (e) {
-      this.$emit('onOpenTradeRequested', this.playerId)
-    },
-    onOpenDiplomacyRequested (e) {
-      this.$store.commit('setMenuState', {
-        state: MENU_STATES.DIPLOMACY
-      })
-    },
-    onOpenLedgerRequested (e) {
-      this.$store.commit('setMenuState', {
-        state: MENU_STATES.LEDGER
-      })
-    },
-    getAvatarImage () {
-      try {
-        return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href
-      } catch (err) {
-        console.error(err)
+const httpClient = inject(httpInjectionKey)!;
+const eventBus = inject(eventBusInjectionKey)!;
 
-        return null
-      }
-    },
-    async loadConversation () {
-      if (this.userPlayer && this.userPlayer._id !== this.player._id) {
-        try {
-          let response = await ConversationApiService.privateChatSummary(this.$store.state.game._id, this.player._id)
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-          if (response.status === 200) {
-            this.conversation = response.data
-          }
-        } catch (err) {
-          console.error(err)
-        }
-      }
-    }
-  },
-  computed: {
-    isDarkModeExtra () {
-      return gameHelper.isDarkModeExtra(this.$store.state.game)
-    },
-    isTradeEnabled () {
-      return gameHelper.isTradeEnabled(this.$store.state.game)
-    },
-    canCreateConversation: function () {
-      return this.$store.state.game.settings.general.playerLimit > 2
-        && !gameHelper.isTutorialGame(this.$store.state.game)
-    },
-    isFormalAlliancesEnabled () {
-      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
-    },
-    isCompactUIStyle () {
-      return this.$store.state.settings.interface.uiStyle === 'compact';
+const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
+const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
+const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
+const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
+const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
+const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle !== 'standard');
+const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !GameHelper.isTutorialGame(game.value));
+
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+
+const conversation = ref<ConversationOverview<string> | null>(null);
+
+const getAvatarImage = () => {
+  return new URL(`../../../../assets/avatars/${player.value.avatar}`, import.meta.url).href;
+};
+
+const loadConversation = async () => {
+  if (userPlayer.value && userPlayer.value._id !== player.value._id) {
+    const response = await listPrivate(httpClient)(game.value._id, player.value._id);
+    if (isOk(response)) {
+      conversation.value = response.data;
+    } else {
+      console.error(formatError(response));
     }
   }
+};
+
+const onViewColourOverrideRequested = () => emit('onViewColourOverrideRequested', player.value._id);
+
+const onViewCompareIntelRequested = () => emit('onViewCompareIntelRequested', player.value._id);
+
+const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id);
+
+const onOpenDiplomacyRequested = () => {
+  store.commit('setMenuState', {
+    state: MENU_STATES.DIPLOMACY,
+  });
+};
+
+const onOpenLedgerRequested = () => {
+  store.commit('setMenuState', {
+    state: MENU_STATES.LEDGER,
+  });
+};
+
+const onViewConversationRequested = () => {
+  if (!userPlayer.value) {
+    return;
+  }
+
+  if (conversation.value) {
+    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
+      conversationId: conversation.value._id,
+    });
+  } else {
+    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
+      participantIds: [
+        userPlayer.value!._id,
+        player.value._id
+      ]
+    });
+  }
 }
+
+onMounted(async () => {
+  await loadConversation();
+});
 </script>
 
 <style scoped>
