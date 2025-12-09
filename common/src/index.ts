@@ -47,6 +47,7 @@ export * from "./api/controllers/specialist";
 export * from "./api/controllers/carrier";
 export * from "./api/controllers/colour";
 export * from "./api/controllers/diplomacy";
+export * from "./api/controllers/conversation";
 export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";
