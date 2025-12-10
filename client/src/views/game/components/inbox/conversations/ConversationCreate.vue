@@ -6,7 +6,7 @@
     </menu-title>
 
     <div class="row">
-      <form class="col-12 pb-2" @submit="createConversation">
+      <form class="col-12 pb-2" @submit="doCreateConversation">
         <div class="col-12">
             <form-error-list v-bind:errors="errors"/>
         </div>
@@ -34,96 +34,82 @@
 </div>
 </template>
 
-<script>
-import GameHelper from '../../../../../services/gameHelper'
-import ConversationApiService from '../../../../../services/api/conversation'
-import MenuTitle from '../../MenuTitle.vue'
-import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
-import FormErrorList from '../../../../components/FormErrorList.vue'
-import { inject } from 'vue'
-import { eventBusInjectionKey } from '../../../../../eventBus'
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+<script setup lang="ts">
+import GameHelper from '../../../../../services/gameHelper';
+import MenuTitle from '../../MenuTitle.vue';
+import FormErrorList from '../../../../components/FormErrorList.vue';
+import { inject, ref, computed, onMounted } from 'vue';
+import { eventBusInjectionKey } from '../../../../../eventBus';
+import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu';
+import { useStore } from 'vuex';
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {createConversation} from "@/services/typedapi/conversation";
+import type {Game, Player} from "@/types/game";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinnerVue,
-    'form-error-list': FormErrorList
-  },
-  props: {
-    participantIds: Array
-  },
-  data () {
-    return {
-      isLoading: false,
-      errors: [],
-      name: '',
-      participants: [],
-      possibleParticipants: []
-    }
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  mounted () {
-    let userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+const props = defineProps<{
+  participantIds: string[],
+}>();
 
-    this.possibleParticipants = this.$store.state.game.galaxy.players.filter(p => p._id !== userPlayer._id)
+const emit = defineEmits<{
+  onCloseRequested: [],
+}>();
 
-    // Pre-select any participants passed into the props.
-    if (this.participantIds && this.participantIds.length) {
-      this.participants = this.participantIds
-    }
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenInboxRequested (e) {
-      this.eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested, e);
-    },
-    async createConversation (e) {
-      this.errors = []
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
-      if (!this.name.length) {
-        this.errors.push('Name is required.')
-      }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-      if (!this.participants.length) {
-        this.errors.push('Must have at least one participant selected.')
-      }
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 
-      e.preventDefault()
+const isLoading = ref(false);
+const errors = ref<string[]>([]);
+const name = ref('');
+const participants = ref<string[]>([]);
+const possibleParticipants = ref<Player[]>([]);
 
-      if (this.errors.length) return
+const onCloseRequested = () => emit('onCloseRequested');
 
-      this.isLoading = true
+const onOpenInboxRequested = () => eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested);
 
-      try {
-        let response = await ConversationApiService.create(this.$store.state.game._id, this.name, this.participants)
+const doCreateConversation = async (e: Event) => {
+  errors.value = [];
 
-        if (response.status === 200) {
-          this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-            conversationId: response.data._id
-          });
-        }
-      } catch (err) {
-        console.error(err)
-
-        if (err.response.data.errors) {
-          this.errors = err.response.data.errors
-        }
-      }
-
-      this.isLoading = false
-    }
-  },
-  computed: {
-
+  if (!name.value.length) {
+    errors.value.push('Name is required.');
   }
-}
+
+  if (!participants.value.length) {
+    errors.value.push('Must have at least one participant selected.');
+  }
+
+  e.preventDefault();
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await createConversation(httpClient)(game.value._id, name.value, participants.value);
+  if (isOk(response)) {
+    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
+      conversationId: response.data._id,
+    });
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+onMounted(() => {
+  possibleParticipants.value = game.value.galaxy.players.filter(p => p._id !== userPlayer.value._id);
+
+  if (props.participantIds?.length) {
+    participants.value = props.participantIds.slice();
+  }
+});
 </script>
 
 <style scoped>

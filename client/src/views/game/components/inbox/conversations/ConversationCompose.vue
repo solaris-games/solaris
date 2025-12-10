@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-  <mention-box placeholder="Compose a message" :rows="3" v-model="$store.state.currentConversation.text" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
+  <mention-box placeholder="Compose a message" :rows="3" v-model="store.state.currentConversation.text" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
   <div class="mb-2 text-end">
     <div class="d-grid gap-2">
       <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
@@ -12,77 +12,79 @@
 </form>
 </template>
 
-<script>
-import MentionHelper from '../../../../../services/mentionHelper';
-import ConversationApiService from '../../../../../services/api/conversation'
-import AudioService from '../../../../../game/audio'
+<script setup lang="ts">
+import MentionHelper, {type Mention} from '../../../../../services/mentionHelper';
+import AudioService from '../../../../../game/audio';
 import MentionBox from '../../shared/MentionBox.vue';
+import { inject, ref, computed } from 'vue';
+import {httpInjectionKey, isOk} from "@/services/typedapi";
+import { useStore } from 'vuex';
+import type {Game, Player, Star} from "@/types/game";
+import {sendMessage} from "@/services/typedapi/conversation";
+import type {ConversationMessageSentResult} from "@solaris-common";
 
-export default {
-  components: {
-    'mention-box': MentionBox
-  },
-  props: {
-    conversationId: String,
-  },
-  data () {
-    return {
-      isSendingMessage: false,
-      currentMention: null,
-      selectedSuggestion: null
-    }
-  },
-  methods: {
-    onSetMessageElement (element) {
-      this.$store.commit('setMentions', {
-        element,
-        callbacks: {
-          player: (player) => {
-            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'player', player.alias))
-          },
-          star: (star) => {
-            this.$store.commit('updateCurrentConversationText', MentionHelper.addMention(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, 'star', star.name))
-          }
-        }
-      })
-    },
-    onReplaceInMessage (data) {
-      this.$store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(this.$store.state.currentConversation.text, this.$store.state.mentionReceivingElement, data))
-    },
-    async send () {
-      let messageText = ''
+const props = defineProps<{
+  conversationId: string,
+}>();
 
-      if (this.$store.state.currentConversation) {
-        messageText = this.$store.state.currentConversation.text
+const emit = defineEmits<{
+  onConversationMessageSent: [res: ConversationMessageSentResult<string>],
+}>();
 
-        if (!messageText) {
-          return
-        }
+const httpClient = inject(httpInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const isSendingMessage = ref(false);
+const currentMention = ref<string | null>(null);
+const selectedSuggestion = ref<string | null>(null);
+
+const onSetMessageElement = (element: HTMLElement) => {
+  store.commit('setMentions', {
+    element,
+    callbacks: {
+      player: (player: Player) => {
+        store.commit('updateCurrentConversationText', MentionHelper.addMention(store.state.currentConversation.text, store.state.mentionReceivingElement, 'player', player.alias))
+      },
+      star: (star: Star) => {
+        store.commit('updateCurrentConversationText', MentionHelper.addMention(store.state.currentConversation.text, store.state.mentionReceivingElement, 'star', star.name))
       }
-
-      const message = MentionHelper.makeMentionsStatic(this.$store.state.game, messageText)
-
-      try {
-        this.isSendingMessage = true
-
-        let response = await ConversationApiService.send(this.$store.state.game._id, this.conversationId, message)
-
-        if (response.status === 200) {
-          AudioService.type()
-
-          this.$emit('onConversationMessageSent', response.data)
-
-          this.$store.commit('resetCurrentConversationText')
-          this.currentMention = null
-        }
-      } catch (e) {
-        console.error(e)
-      }
-
-      this.isSendingMessage = false
     }
-  },
-}
+  });
+};
+
+const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
+  store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(store.state.currentConversation.text, store.state.mentionReceivingElement, data))
+};
+
+const send = async () => {
+  let messageText = '';
+
+  if (store.state.currentConversation) {
+    messageText = store.state.currentConversation.text;
+
+    if (!messageText) {
+      return;
+    }
+  }
+
+  const message = MentionHelper.makeMentionsStatic(game.value, messageText);
+
+  isSendingMessage.value = true;
+
+  const response = await sendMessage(httpClient)(game.value._id, props.conversationId, message);
+  if (isOk(response)) {
+    AudioService.type();
+
+    emit('onConversationMessageSent', response.data);
+
+    store.commit('resetCurrentConversationText');
+    currentMention.value = null;
+  }
+
+  isSendingMessage.value = false
+};
 </script>
 
 <style scoped>
