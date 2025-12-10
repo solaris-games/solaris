@@ -58,15 +58,13 @@ import { eventBusInjectionKey } from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import Statistics from './Statistics.vue'
 import PlayerTitle from './PlayerTitle.vue'
-import gameHelper from '../../../../services/gameHelper'
-import ConversationApiService from '../../../../services/api/conversation'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import { ref, inject, computed, onMounted } from 'vue'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
-import type {Game, Player} from "@/types/game";
+import type {Game} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { useStore } from 'vuex';
-import type {Conversation, ConversationOverview} from "@solaris-common";
+import type {ConversationOverview} from "@solaris-common";
 import GameHelper from "../../../../services/gameHelper";
 import {listPrivate} from "@/services/typedapi/conversation";
 
