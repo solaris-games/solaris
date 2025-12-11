@@ -13,74 +13,69 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import gameHelper from "../../../../../services/gameHelper";
-import ConversationApiService from "../../../../../services/api/conversation";
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
 import MenuEventBusEventNames from "../../../../../eventBusEventNames/menu";
+import type {ConversationMessage, Conversation} from "@solaris-common";
+import type {Game, Player} from "@/types/game";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import { useStore } from "vuex";
+import {listPrivate} from "@/services/typedapi/conversation";
 
-export default {
-  name: "ConversationMessageContextMenu",
-  props: {
-    message: Object,
-    conversation: Object,
-    userPlayer: Object
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
+const props = defineProps<{
+  message: ConversationMessage<string>,
+  conversation: Conversation<string>,
+  userPlayer: Player,
+}>();
+
+const emit = defineEmits<{
+  onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
+const isFromUserPlayer = computed(() => props.message.fromPlayerId === props.userPlayer._id);
+
+const loadConversation = async (playerId: string) => {
+  if (props.userPlayer && props.userPlayer._id !== playerId) {
+    const response = await listPrivate(httpClient)(game.value._id, playerId);
+    if (isOk(response)) {
+      return response.data;
+    } else {
+      console.error(formatError(response));
     }
-  },
-  methods: {
-    async onViewConversationRequested (playerId) {
-      const conversation = await this.loadConversation(playerId);
-
-      if (conversation) {
-        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-          conversationId: conversation._id
-        });
-      } else {
-        this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-          participantIds: [
-            this.userPlayer._id,
-            this.message.fromPlayerId
-          ]
-        });
-      }
-    },
-    async loadConversation (playerId) {
-      if (this.userPlayer && this.userPlayer._id !== playerId) {
-        try {
-          let response = await ConversationApiService.privateChatSummary(this.$store.state.game._id, playerId)
-
-          if (response.status === 200) {
-            return response.data
-          }
-        } catch (err) {
-          console.error(err)
-        }
-        return null;
-      }
-    },
-    reportMessage () {
-      this.$emit('onOpenReportPlayerRequested', {
-        playerId: this.message.fromPlayerId,
-        messageId: this.message._id,
-        conversationId: this.conversation._id
-      })
-    },
-  },
-  computed: {
-    canCreateConversation: function () {
-      return this.$store.state.game.settings.general.playerLimit > 2
-        && !gameHelper.isTutorialGame(this.$store.state.game)
-    },
-    isFromUserPlayer: function () {
-      return this.message.fromPlayerId === this.userPlayer._id
-    },
   }
-}
+
+  return null;
+};
+
+const reportMessage = () => {
+  emit('onOpenReportPlayerRequested', {
+    playerId: props.message.fromPlayerId!,
+    messageId: props.message._id!,
+    conversationId: props.conversation._id,
+  })
+};
+
+const onViewConversationRequested = async (playerId: string) => {
+  const conversation = await loadConversation(playerId);
+
+  if (conversation) {
+    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
+      conversationId: conversation._id,
+    });
+  } else {
+    // todo: select participants
+    eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, {});
+  }
+};
 </script>
 
 <style scoped>
