@@ -9,7 +9,7 @@ Solaris is a slow-burn browser game heavily inspired by [Neptune's Pride](https:
 - Research new technologies to gain an edge over your opponents.
 - Hire specialists which grant special abilities to stars and carriers like increased weapons and speed.
 - Set up trade with your allies to get ahead of the curve.
-- Play games with up to 32 players at a time.
+- Play games with up to 64 players at a time.
 - Participate in group chats with your allies to discuss strategy.
 - Fight other players and capture stars to win the game.
 - Games last around 2-3 weeks, and you don't need to commit a lot of time to play!
@@ -32,8 +32,8 @@ The client uses the following tech:
 
 ## Development Environment Setup
 1. Install the prerequisites.
-    - [Node.js](https://nodejs.org/en/) v20
-    - [MongoDB](https://www.mongodb.com/) v5.0
+    - [Node.js](https://nodejs.org/en/) v22
+    - [MongoDB](https://www.mongodb.com/) v7.0
 2. Clone the repository.
 3. Checkout `master`.
 4. `npm install` in the root directory
@@ -68,11 +68,10 @@ Once configured, you can browse to the site locally (default [http://localhost:8
 
 
 ## Run with docker
-1. Install [Docker](https://docs.docker.com/engine/install/).
-2. Create a `.env` file in `server/` (See `.env.example`).
-3. Create a `.env` file in `client/` (See `.env.example`).
-4. Run `docker compose up` in the project folder
-5. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
+
+A docker compose config for development use can be found in `docker-compose.yml`. These images are **not** suitable for production usage.
+The `docker/prod/` directory contains definitions for prod images, but no docker-compose is provided, it needs to be adapted from the dev version. 
+The images can also possibly be found in the GitHub Registry but there is no guarantee that they are up-to-date.
 
 ## Contributing
 See [here](CONTRIBUTING.md).
