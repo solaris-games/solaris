@@ -28,7 +28,7 @@
     <div class="messages-container">
       <div class="pt-0 mb-2 mt-2" v-if="toggleDisplay && filteredMessages.length">
         <div v-for="message in filteredMessages" v-bind:key="message.sentDate.toISOString()" class="mb-1">
-          <conversation-message v-if="message.type === 'message'" :conversation="conversation" :message="message"
+          <conversation-message v-if="message.type === 'message'" :conversation="conversation" :message="message as CMessage<string>"
             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
             @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
             @onMinimizeConversationRequested="toggleConversationWindow"/>

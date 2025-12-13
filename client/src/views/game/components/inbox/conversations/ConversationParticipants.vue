@@ -17,44 +17,34 @@
       <router-link :to="{ name: 'guidelines' }">Community Guidelines</router-link>
     </p>
   </div>
-  <!-- {{getPlayersString()}} -->
-  <!-- <div v-for="participant in conversation.participants" :key="participant">
-    {{getPlayer(participant).alias}}
-  </div> -->
 </div>
 </template>
 
-<script>
-import GameHelper from '../../../../../services/gameHelper'
-import PlayerIconVue from '../../player/PlayerIcon.vue'
+<script setup lang="ts">
+import GameHelper from '../../../../../services/gameHelper';
+import PlayerIcon from '../../player/PlayerIcon.vue';
+import type {Conversation} from "@solaris-common";
+import { computed } from 'vue';
+import type {Game} from "@/types/game";
+import { useStore } from "vuex";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    conversation: Object
-  },
-  methods: {
-    onOpenPlayerDetailRequested (playerId) {
-      this.$emit('onOpenPlayerDetailRequested', playerId)
-    },
-    getPlayer (playerId) {
-      return GameHelper.getPlayerById(this.$store.state.game, playerId)
-    },
-    getPlayersString () {
-      return this.conversation.participants.map(p => this.getPlayer(p).alias).join(', ')
-    }
-  },
-  computed: {
-    isPartialPlayers: function () {
-      return this.conversation.participants.length !== this.$store.state.game.galaxy.players.length
-    },
-    isOneVsOne: function () {
-      return this.$store.state.game.settings.general.playerLimit === 2
-    }
-  }
-}
+const props = defineProps<{
+  conversation: Conversation<string>,
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const isPartialPlayers = computed(() => props.conversation.participants.length !== game.value.galaxy.players.length);
+const isOneVsOne = computed(() => game.value.settings.general.playerLimit === 2);
+
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+
+const getPlayer = (playerId: string) => GameHelper.getPlayerById(game.value, playerId)!;
 </script>
 
 <style scoped>

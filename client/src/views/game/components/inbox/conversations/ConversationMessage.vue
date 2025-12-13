@@ -11,9 +11,9 @@
         </span>
       </div>
       <div class="col-auto thumbtack" v-if="conversation.createdBy">
-        <conversation-message-pin :conversationId="conversation._id" :messageId="message._id" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
+        <conversation-message-pin :conversationId="conversation._id" :messageId="message._id!" :pinned="message.pinned" @onPinned="onPinned" @onUnpinned="onUnpinned" />
       </div>
-      <conversation-message-context-menu :conversation="conversation" :message="message" @onOpenReportPlayerRequested="onOpenReportPlayerRequested" :user-player="getUserPlayer()" />
+      <conversation-message-context-menu :conversation="conversation" :message="message" @onOpenReportPlayerRequested="onOpenReportPlayerRequested" :user-player="userPlayer" />
       <div class="col-12">
         <p class="mt-0 mb-0">
           <i class="fas fa-envelope me-2" v-if="!userPlayerHasReadMessage"></i>
@@ -29,96 +29,89 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../../services/gameHelper'
-import PlayerIconVue from '../../player/PlayerIcon.vue'
-import ConversationMessagePinVue from './ConversationMessagePin.vue'
+import PlayerIcon from '../../player/PlayerIcon.vue'
+import ConversationMessagePin from './ConversationMessagePin.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
 import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue";
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+import { inject, onMounted, computed, useTemplateRef } from 'vue';
+import type {Conversation, ConversationMessage, MapObject} from "@solaris-common";
+import { useStore } from "vuex";
+import type {Game} from "@/types/game";
+import {isMobile} from "@/util/mobile";
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
-    'conversation-message-context-menu': ConversationMessageContextMenu,
-    'player-icon': PlayerIconVue,
-    'conversation-message-pin': ConversationMessagePinVue
-  },
-  props: {
-    conversation: Object,
-    message: Object
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  mounted () {
-    const onStarClicked = (id) => {
-      this.panToStar(id)
+const props = defineProps<{
+  conversation: Conversation<string>,
+  message: ConversationMessage<string>
+}>();
 
-      if (this.$isMobile()) {
-        this.$emit('onMinimizeConversationRequested')
-      }
-    }
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+  onMinimizeConversationRequested: [],
+  onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
+}>();
 
-    const onPlayerClicked = (id) => this.$emit('onOpenPlayerDetailRequested', id)
+const eventBus = inject(eventBusInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-    mentionHelper.renderMessageWithMentionsAndLinks(this.$refs.messageElement, this.message.message, onStarClicked, onPlayerClicked)
-  },
-  methods: {
-    onOpenReportPlayerRequested (e) {
-      this.$emit('onOpenReportPlayerRequested', e);
-    },
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    getFriendlyColour (colour) {
-      return GameHelper.getFriendlyColour(colour)
-    },
-    onOpenPlayerDetailRequested () {
-      this.$emit('onOpenPlayerDetailRequested', this.message.fromPlayerId)
-    },
-    onPinned () {
-      this.message.pinned = true
-    },
-    onUnpinned () {
-      this.message.pinned = false
-    },
-    panToStar (id) {
-      const star = GameHelper.getStarById(this.$store.state.game, id)
+const messageElement = useTemplateRef("messageElement");
 
-      if (star) {
-        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
-      } else {
-        this.$toast.error(`The location of the star is unknown.`)
-      }
-    },
-  },
-  computed: {
-    isFromUserPlayer: function () {
-      return this.message.fromPlayerId === this.getUserPlayer()._id
-    },
-    fromPlayer: function () {
-      return GameHelper.getPlayerById(this.$store.state.game, this.message.fromPlayerId)
-    },
-    userPlayerHasReadMessage: function () {
-      return this.message.readBy.find(x => this.getUserPlayer()._id === x) != null
-    },
-    dateText: function () {
-      const date = GameHelper.getDateString(this.message.sentDate)
-      let tick = ''
-      if (this.message.sentTick || this.message.sentTick === 0) {
-        tick = ` (tick ${this.message.sentTick})`
-      }
-      return date + tick
-    },
-    fromColour () {
-      return this.$store.getters.getColourForPlayer(this.fromPlayer._id).value
-    }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const isFromUserPlayer = computed(() => props.message.fromPlayerId === userPlayer.value._id);
+const fromPlayer = computed(() => GameHelper.getPlayerById(game.value, props.message.fromPlayerId!));
+const userPlayerHasReadMessage = computed(() => props.message.readBy.find(x => userPlayer.value._id === x) != null);
+const fromColour = computed(() => store.getters.getColourForPlayer(fromPlayer.value!._id).value);
+const dateText = computed(() => {
+  const date = GameHelper.getDateString(props.message.sentDate);
+  let tick = '';
+
+  if (props.message.sentTick || props.message.sentTick === 0) {
+    tick = ` (tick ${props.message.sentTick})`;
   }
-}
+
+  return date + tick;
+});
+
+const panToStar = (id: string) => {
+  const star = GameHelper.getStarById(game.value, id);
+
+  if (star) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star as MapObject<string> });
+  } else {
+    toast.error(`The location of the star is unknown.`);
+  }
+};
+
+const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, conversationId: string }) => emit('onOpenReportPlayerRequested', e);
+
+const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);
+
+const onOpenPlayerDetailRequested = () => props.message.fromPlayerId && emit('onOpenPlayerDetailRequested', props.message.fromPlayerId);
+
+const onPinned = () => props.message.pinned = true;
+
+const onUnpinned = () => props.message.pinned = false;
+
+onMounted(() => {
+  const onStarClicked = (id: string) => {
+    panToStar(id);
+
+    if (isMobile()) {
+      emit('onMinimizeConversationRequested');
+    }
+  };
+
+  const onPlayerClicked = (id) => emit('onOpenPlayerDetailRequested', id);
+
+  mentionHelper.renderMessageWithMentionsAndLinks(messageElement.value!, props.message.message, onStarClicked, onPlayerClicked);
+});
 </script>
 
 <style scoped>
