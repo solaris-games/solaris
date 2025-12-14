@@ -3,7 +3,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ConversationController from '../controllers/conversation';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createConversationRoutes} from "@solaris-common";
+import {createConversationRoutes} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 
