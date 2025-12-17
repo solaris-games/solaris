@@ -160,8 +160,17 @@ const job = makeJob('Restore game', async ({ log, container, mongo }: JobParamet
     const gameIdS = process.argv[2];
     const tick = Number.parseInt(process.argv[3]);
 
+    const deleteNewerHistoryS = process.argv[4];
+    let deleteNewerHistory = false;
+
     if (!gameIdS || !tick) {
-        throw new Error("Invalid arguments. Usage: npm run restore-game <gameId> <tick>");
+        throw new Error("Invalid arguments. Usage: npm run restore-game <gameId> <tick> <--delete-newer?>");
+    }
+
+    if (deleteNewerHistoryS === "--delete-newer") {
+        deleteNewerHistory = true;
+    } else if (deleteNewerHistoryS) {
+        throw new Error("Invalid argument: " + deleteNewerHistoryS + " expected --delete-newer or nothing");
     }
 
     const gameId = objectIdFromString(gameIdS);
@@ -171,7 +180,7 @@ const job = makeJob('Restore game', async ({ log, container, mongo }: JobParamet
         throw new Error("History not found");
     }
 
-    console.log("Loaded history entry");
+    log.info("Loaded history entry");
 
     const currentState = await container.gameService.getByIdAll(gameId);
     if (!currentState) {
@@ -187,6 +196,17 @@ const job = makeJob('Restore game', async ({ log, container, mongo }: JobParamet
     await currentState.save();
 
     log.info("Game state saved");
+
+    if (deleteNewerHistory) {
+        log.info("Deleting newer history entries");
+
+        await container.historyService.historyRepo.deleteMany({
+            gameId,
+            tick: {
+                $gt: tick,
+            }
+        });
+    }
 });
 
 job();
