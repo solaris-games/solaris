@@ -12,5 +12,5 @@ export const addColour = (axios: Axios) => async (gameId: string, playerId: stri
   return doPut(axios)(routes.addColour, { gameId }, {}, {
     playerId,
     colour,
-  });
+  }, { withCredentials: true });
 }
