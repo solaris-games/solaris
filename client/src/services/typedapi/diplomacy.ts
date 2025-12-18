@@ -9,7 +9,7 @@ export const listDiplomacy = (axios: Axios) => async (gameId: string): Promise<R
 }
 
 export const detailDiplomacy = (axios: Axios) => async (gameId: string, playerId: string): Promise<ResponseResult<DiplomaticStatus<string>>> => {
-  return doGet(axios)(routes.detailDiplomacy, { gameId, toPlayer: playerId }, {}, { withCredentials: true });
+  return doGet(axios)(routes.detailDiplomacy, { gameId, toPlayerId: playerId }, {}, { withCredentials: true });
 }
 
 export const ally = (axios: Axios) => async (gameId: string, playerId: string): Promise<ResponseResult<DiplomaticStatus<string>>> => {
