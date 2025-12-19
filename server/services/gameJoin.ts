@@ -175,7 +175,9 @@ export default class GameJoinService extends EventEmitter {
             throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
         }
 
-        const aliasCheckPlayer = game.galaxy.players.find(x => x.userId && x.alias.toLowerCase() === alias.toLowerCase());
+        const normalizedAlias = this._normalizePlayerAlias(alias);
+
+        const aliasCheckPlayer = game.galaxy.players.find(x => x.userId && this._normalizePlayerAlias(x.alias) === normalizedAlias);
 
         if (aliasCheckPlayer && !isRejoiningAfkSlot) {
             throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
@@ -351,6 +353,10 @@ export default class GameJoinService extends EventEmitter {
                 player.isOpenSlot = slotsOpen;
             }
         }
+    }
+
+    _normalizePlayerAlias(alias: string): string {
+        return alias.toLowerCase().replace(/\s/, '');
     }
 
 };
