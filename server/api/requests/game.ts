@@ -91,7 +91,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
         integer: true,
     }),
     playerType: stringEnumeration<GamePlayerType, GamePlayerType[]>(['all', 'establishedPlayers']),
-    anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra']),
+    anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra', 'revealAtEnd']),
     playerOnlineStatus: stringEnumeration<GamePlayerOnlineStatus, GamePlayerOnlineStatus[]>(['hidden', 'visible']),
     playerIPWarning: enabledDisabled,
     awardRankTo: withDefault('all', stringEnumeration<GameAwardRankTo, GameAwardRankTo[]>(GAME_AWARD_RANK_TO)),

@@ -42,7 +42,7 @@ export const GAME_MODES = [
 
 export type GameMode = typeof GAME_MODES[number];
 export type GamePlayerType = 'all'|'establishedPlayers';
-export type GamePlayerAnonymity = 'normal'|'extra';
+export type GamePlayerAnonymity = 'normal'|'extra'|'revealAtEnd';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
 

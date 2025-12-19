@@ -100,7 +100,7 @@
         </div>
 
         <div class="mb-2">
-          <label for="anonymity" class="col-form-label">Anonymity <help-tooltip tooltip="Extra anonymity will hide player identities such as their Victories, Rank and Renown"/></label>
+          <label for="anonymity" class="col-form-label">Anonymity <help-tooltip tooltip="Anonymous will hide player identities such as their Victories, Rank and Renown. Identities are revealed after the game ends"/></label>
           <select class="form-control" id="anonymity" v-model="settings.general.anonymity" :disabled="isCreatingGame">
             <option v-for="opt in options.general.anonymity" v-bind:key="opt.value" v-bind:value="opt.value">
               {{ opt.text }}

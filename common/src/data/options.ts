@@ -99,8 +99,12 @@ export const GAME_CREATION_OPTIONS = {
                 "text": "Normal"
             },
             {
+                "value": "revealAtEnd",
+                "text": "Anonymous"
+            },
+            {
                 "value": "extra",
-                "text": "Extra"
+                "text": "Anonymous (no revealing)"
             }
         ],
         "playerOnlineStatus": [
