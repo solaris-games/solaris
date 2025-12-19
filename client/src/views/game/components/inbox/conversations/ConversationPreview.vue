@@ -31,7 +31,7 @@
         <div class="col-12" v-if="hasLastMessage && lastMessageSender">
           <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
             <player-icon v-if="lastMessage!.fromPlayerId" :playerId="lastMessageSender._id" />
-            {{lastMessageText}}
+            <span class="lastMessage">{{lastMessageText}}</span>
           </p>
         </div>
         <div class="col-12" v-if="hasLastMessage && lastMessage">
@@ -98,5 +98,9 @@ const openConversation = () => {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+}
+
+.lastMessage {
+  margin-left: 12px;
 }
 </style>
