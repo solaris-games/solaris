@@ -464,6 +464,8 @@ export class Map {
     this.background.draw();
 
     this.waypoints.setup(game, this.context, userSettings);
+    this.waypoints.clear();
+
     this.tooltipLayer.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
@@ -863,8 +865,7 @@ export class Map {
       //highlight carrier path if selected
       if (selectedCarrier?.isSelected) {
         this.waypoints!.draw(selectedCarrier!.data!, false);
-      }
-      else {
+      } else {
         this.waypoints!.clear();
       }
 
