@@ -29,16 +29,16 @@ const game = computed<Game>(() => store.state.game);
 
 const togglePinned = async () => {
   if (props.pinned) {
-    const response = await pinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
+    const response = await unpinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
     if (isOk(response)) {
-      emit("onPinned");
+      emit("onUnpinned");
     } else {
       console.error(formatError(response));
     }
   } else {
-    const response = await unpinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
+    const response = await pinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
     if (isOk(response)) {
-      emit("onUnpinned");
+      emit("onPinned");
     } else {
       console.error(formatError(response));
     }
