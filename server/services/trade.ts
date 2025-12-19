@@ -4,7 +4,7 @@ import { LedgerType } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService, ResearchTypeNotRandom } from 'solaris-common'
 import LedgerService from './ledger';
 import PlayerService from './player';
 import PlayerAfkService from './playerAfk';
@@ -15,7 +15,7 @@ import ReputationService from './reputation';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { GameEvent } from './types/GameEvent';
-import { Player, PlayerReputation, ResearchTypeNotRandom } from './types/Player';
+import { Player, PlayerReputation } from './types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
 import { User } from './types/User';
 import UserService from './user';

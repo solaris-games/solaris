@@ -1,5 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
-import { ResearchTypeNotRandom } from "./Player";
+import { ResearchTypeNotRandom } from "solaris-common";
 
 export interface TradeTechnology {
     name: ResearchTypeNotRandom;

@@ -3,14 +3,37 @@ import type { PlayerStatistics } from "./leaderboard";
 import type { InfrastructureType } from "./star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
-export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
-export type ResearchTypeNotRandom = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists';
+
+export const RESEARCH_TYPES_NOT_RANDOM = [
+    'scanning',
+    'hyperspace',
+    'terraforming',
+    'experimentation',
+    'weapons',
+    'banking',
+    'manufacturing',
+    'specialists',
+] as const;
+
+export const RESEARCH_TYPES = [
+    'scanning',
+    'hyperspace',
+    'terraforming',
+    'experimentation',
+    'weapons',
+    'banking',
+    'manufacturing',
+    'specialists',
+    'random',
+] as const;
+
+export type ResearchType = typeof RESEARCH_TYPES[number];
+export type ResearchTypeNotRandom = typeof RESEARCH_TYPES_NOT_RANDOM[number];
 
 export interface PlayerColour {
     alias: string;
     value: string;
 };
-
 
 export interface PlayerLedger<ID> {
     credits: PlayerLedgerDebt<ID>[];

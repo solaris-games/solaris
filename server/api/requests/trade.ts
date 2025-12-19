@@ -1,6 +1,5 @@
-import { ValidationError } from "solaris-common";
+import { ValidationError, ResearchTypeNotRandom } from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import { ResearchTypeNotRandom } from "../../services/types/Player";
 import { keyHasNumberValue, keyHasStringValue } from "./helpers";
 
 export interface TradeSendToPlayerRequest {

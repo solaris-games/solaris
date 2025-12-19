@@ -1,12 +1,10 @@
 import { DBObjectId } from "./DBObjectId";
-import { DiplomaticState } from "solaris-common";
+import {DiplomaticState, ResearchType, ResearchTypeNotRandom} from "solaris-common";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
 import { InfrastructureType } from "./Star";
 
 export type PlayerShape = 'circle'|'square'|'diamond'|'hexagon';
-export type ResearchType = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists'|'random';
-export type ResearchTypeNotRandom = 'scanning'|'hyperspace'|'terraforming'|'experimentation'|'weapons'|'banking'|'manufacturing'|'specialists';
 
 export interface PlayerColour {
     alias: string;
