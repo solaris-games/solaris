@@ -18,7 +18,7 @@ import AuthService from './auth';
 import BroadcastService from './broadcast';
 import CarrierService from './carrier';
 import CombatService from './combat';
-import { DistanceService } from 'solaris-common';
+import {DistanceService, PathfindingService} from 'solaris-common';
 import EmailService from './email';
 import EventService from './event';
 import LeaderboardService from './leaderboard';
@@ -87,10 +87,7 @@ import DiscordService from './discord';
 import ShipService from './ship';
 import SpectatorService from './spectator';
 import ScheduleBuyService from './scheduleBuy';
-import PathfindingService from "./pathfinding";
-
 import { DependencyContainer } from './types/DependencyContainer';
-
 import Repository from './repository';
 import { Game } from './types/Game';
 import { User } from './types/User';
@@ -250,7 +247,7 @@ export default (config: Config,
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, cullWaypointsService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService, statisticsService, starDataService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);
-    const pathfindingService = new PathfindingService(distanceService, starService, waypointService, starDataService);
+    const pathfindingService = new PathfindingService(distanceService, waypointService, starDataService);
     const basicAIService = new BasicAIService(starUpgradeService);
     const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService, saveWaypointsService, starDataService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, cullWaypointsService, carrierMovementService);

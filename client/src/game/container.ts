@@ -9,12 +9,13 @@ import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import type {ServiceProvider} from "@/services/services";
 
 export interface DrawingContext {
   getPlayerColour: (playerId: string) => string;
 }
 
-export const createGameContainer = async (drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+export const createGameContainer = async (serviceProvider: ServiceProvider, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {
   const settings: UserGameSettings = userSettings || DEFAULT_SETTINGS;
   const antialiasing = settings.map.antiAliasing === 'enabled';
 
@@ -34,7 +35,7 @@ export const createGameContainer = async (drawingContext: DrawingContext, game: 
   await textureService.loadAssets();
   textureService.initialize();
 
-  return new GameContainer(drawingContext, game, settings, reportGameError, eventBus, app);
+  return new GameContainer(serviceProvider, drawingContext, game, settings, reportGameError, eventBus, app);
 }
 
 export class GameContainer {
@@ -53,7 +54,7 @@ export class GameContainer {
   unsubscribe: (() => void) | undefined;
   reportGameError: ((err: string) => void);
 
-  constructor (drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
+  constructor (serviceProvider: ServiceProvider, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
     this.eventBus = eventBus;
     this.reportGameError = reportGameError;
     this.context = drawingContext;
@@ -84,7 +85,7 @@ export class GameContainer {
     this.game = game;
 
     // Add a new map to the viewport
-    this.map = new Map(this.app, this.viewport, this.context, eventBus, this.game, userSettings);
+    this.map = new Map(serviceProvider, this.app, this.viewport, this.context, eventBus, this.game, userSettings);
     this.viewport.addChild(this.map.container);
 
     this.subscribe();

@@ -23,7 +23,7 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
-import { DistanceService } from 'solaris-common';
+import {DistanceService, PathfindingService} from 'solaris-common';
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -49,7 +49,6 @@ import MapService from "../map";
 import NameService from "../name";
 import NotificationService from "../notification";
 import PasswordService from "../password";
-import PathfindingService from "../pathfinding";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
 import PlayerAfkService from '../playerAfk';
@@ -180,7 +179,7 @@ export interface DependencyContainer {
     shipService: ShipService,
     spectatorService: SpectatorService,
     teamService: TeamService,
-    pathfindingService: PathfindingService,
+    pathfindingService: PathfindingService<DBObjectId>,
     scheduleBuyService: ScheduleBuyService,
     gamePlayerMutexService: GamePlayerMutexService,
     gameMutexService: GameMutexService,

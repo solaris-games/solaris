@@ -1,42 +1,38 @@
-import {Game} from "./types/Game";
-import {Player} from "./types/Player";
-import {Carrier} from "./types/Carrier";
-import { DistanceService } from 'solaris-common';
-import StarService from "./star";
-import { Star } from "./types/Star";
-import { WaypointService } from 'solaris-common';
-import { StarDataService } from "solaris-common";
-import {DBObjectId} from "./types/DBObjectId";
+import type {DistanceService} from "./distance";
+import type {WaypointService} from "./waypoint";
+import type {StarDataService} from "./starData";
+import type {Game} from "../types/common/game";
+import type {Carrier} from "../types/common/carrier";
+import type {Player} from "../types/common/player";
+import type {Id} from "../types/id";
+import type {Star} from "../types/common/star";
 
-// Copied and adapted from WaypointHelper in the frontend
-// Should probably be put into a shared library at some point
-
-interface Node {
+interface Node<ID> {
+    id: ID,
     cost: number;
     costFromStart: number;
-    neighbors: Node[] | null;
-    parent: Node | null;
-    star: Star;
+    neighbors: Node<ID>[] | null;
+    parent: Node<ID> | null;
+    star: Star<ID>;
 }
 
-export default class PathfindingService {
+export class PathfindingService<ID extends Id> {
     distanceService: DistanceService;
-    starService: StarService;
-    waypointService: WaypointService<DBObjectId>;
+    waypointService: WaypointService<ID>;
     starDataService: StarDataService;
 
-    constructor(distanceService: DistanceService, starService: StarService, waypointService: WaypointService<DBObjectId>, starDataService: StarDataService) {
+    constructor(distanceService: DistanceService, waypointService: WaypointService<ID>, starDataService: StarDataService) {
         this.distanceService = distanceService;
-        this.starService = starService;
         this.waypointService = waypointService;
         this.starDataService = starDataService;
     }
 
-    calculateShortestRoute(game: Game, player: Player, carrier: Carrier, sourceStarId: string, destinStarId: string): Node[] {
+    calculateShortestRoute(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStarId: string, destinStarId: string): Node<ID>[] {
         const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, player.research.hyperspace.level);
 
-        const graph: Node[] = game.galaxy.stars.map(star => {
+        const graph: Node<ID>[] = game.galaxy.stars.map(star => {
             return {
+                id: star._id,
                 star,
                 cost: 0,
                 costFromStart: 0,
@@ -45,15 +41,15 @@ export default class PathfindingService {
             }
         })
 
-        const getNeighbors = (node: Node) => graph
+        const getNeighbors = (node: Node<ID>) => graph
             .filter(s => s.star._id.toString() !== node.star._id.toString())
             .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starDataService.isStarPairWormHole(s.star, node.star));
 
         const start = graph.find(s => s.star._id.toString() === sourceStarId)!;
         const end = graph.find(s => s.star._id.toString() === destinStarId)!;
 
-        const openSet: Node[] = [start]
-        const closedSet: Node[] = []
+        const openSet: Node<ID>[] = [start]
+        const closedSet: Node<ID>[] = []
 
         while (openSet.length) {
             // This sort makes us look at the nodes where we can get the quickest first.
@@ -73,7 +69,7 @@ export default class PathfindingService {
             if (current.star._id.toString() === end.star._id.toString()) {
                 let temp = current;
 
-                const path: Node[] = [];
+                const path: Node<ID>[] = [];
 
                 path.push(temp);
 
@@ -118,6 +114,6 @@ export default class PathfindingService {
             }
         }
 
-        return []
+        return [];
     }
 }

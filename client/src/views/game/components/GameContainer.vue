@@ -18,12 +18,15 @@ import {createGameContainer} from "@/game/container";
 import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
+import {useGameServices} from "@/util/gameServices";
 
 const store = useStore() as Store<State>;
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast: ToastPluginApi = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
+
+const serviceProvider = useGameServices();
 
 const emit = defineEmits<{
   onStarClicked: [starId: string],
@@ -39,7 +42,7 @@ const el: Ref<HTMLElement | null> = ref(null);
 onMounted(() => {
   let unsubscribe;
 
-  createGameContainer(new StoreDrawingContext(store), store.state.game!, store.state.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+  createGameContainer(serviceProvider, new StoreDrawingContext(store), store.state.game!, store.state.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 
