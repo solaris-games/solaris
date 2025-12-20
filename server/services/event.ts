@@ -1,4 +1,4 @@
-import { LedgerType } from 'solaris-common';
+import {BaseGameEvent, LedgerType} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
@@ -22,7 +22,6 @@ import { Conversation } from "./types/Conversation";
 import { DBObjectId } from "./types/DBObjectId";
 import { DiplomaticStatus } from "solaris-common";
 import { Game } from "./types/Game";
-import { GameEvent } from "./types/GameEvent";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
 import { Specialist } from 'solaris-common';
@@ -83,7 +82,7 @@ export default class EventService {
     }
     
     eventModel;
-    eventRepo: Repository<GameEvent>;
+    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     broadcastService: BroadcastService;
     gameService: GameService;
     gameJoinService: GameJoinService;
@@ -102,7 +101,7 @@ export default class EventService {
 
     constructor(
         eventModel,
-        eventRepo: Repository<GameEvent>,
+        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         broadcastService: BroadcastService,
         gameService: GameService,
         gameJoinService: GameJoinService,

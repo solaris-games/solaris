@@ -3,9 +3,10 @@ import type { CombatResult } from "../combat";
 import type {BulkUpgradeReport} from "../infrastructureUpgrade";
 
 export interface BaseGameEvent<ID> {
+    _id: ID;
     gameId: ID;
-    tick: number;
     playerId: ID | null;
+    tick: number;
     type: string;
     read: boolean;
     date?: Date;

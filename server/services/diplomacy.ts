@@ -1,14 +1,13 @@
 import EventEmitter from "events";
-const moment = require('moment')
+import moment from 'moment';
 import { DBObjectId } from "./types/DBObjectId";
-import {DiplomacyEvent, DiplomaticState, DiplomaticStatus, ValidationError} from "solaris-common";
+import {BaseGameEvent, DiplomacyEvent, DiplomaticState, DiplomaticStatus, ValidationError} from "solaris-common";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";
 import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
-import { GameEvent } from "./types/GameEvent";
 
 export const DiplomacyServiceEvents = {
     onDiplomacyStatusChanged: 'onDiplomacyStatusChanged',
@@ -18,12 +17,12 @@ export const DiplomacyServiceEvents = {
 
 export default class DiplomacyService extends EventEmitter {
     gameRepo: Repository<Game>;
-    eventRepo: Repository<GameEvent>;
+    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     diplomacyUpkeepService: DiplomacyUpkeepService;
 
     constructor(
         gameRepo: Repository<Game>,
-        eventRepo: Repository<GameEvent>,
+        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         diplomacyUpkeepService: DiplomacyUpkeepService
     ) {
         super();
@@ -411,8 +410,10 @@ export default class DiplomacyService extends EventEmitter {
             return {
                 playerId: e.playerId!,
                 type: e.type,
+                // TODO
+                //@ts-ignore
                 data: e.data,
-                sentDate: moment(e._id.getTimestamp()) as Date,
+                sentDate: moment(e._id.getTimestamp()).toDate(),
                 sentTick: e.tick
             }
         });

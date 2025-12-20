@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import moment from "moment";
-import { LedgerType } from 'solaris-common';
+import {BaseGameEvent, LedgerType} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
@@ -14,7 +14,6 @@ import Repository from './repository';
 import ReputationService from './reputation';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
-import { GameEvent } from './types/GameEvent';
 import { Player, PlayerReputation } from './types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
 import { User } from './types/User';
@@ -34,7 +33,7 @@ export const TradeServiceEvents = {
 
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
-    eventRepo: Repository<GameEvent>;
+    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     userService: UserService;
     playerService: PlayerService;
     diplomacyService: DiplomacyService;
@@ -49,7 +48,7 @@ export default class TradeService extends EventEmitter {
 
     constructor(
         gameRepo: Repository<Game>,
-        eventRepo: Repository<GameEvent>,
+        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         userService: UserService,
         playerService: PlayerService,
         diplomacyService: DiplomacyService,
@@ -528,6 +527,8 @@ export default class TradeService extends EventEmitter {
             return {
                 playerId: e.playerId!,
                 type: e.type,
+                // TODO
+                // @ts-ignore
                 data: e.data,
                 sentDate: moment(e._id.getTimestamp()).toDate(),
                 sentTick: e.tick
