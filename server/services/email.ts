@@ -10,8 +10,8 @@ import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService, { UserServiceEvents } from "./user";
 import { Player } from "./types/Player";
-import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
-import { BaseGameEvent } from "./types/events/BaseGameEvent";
+import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
+import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
 import PlayerReadyService, { PlayerReadyServiceEvents } from "./playerReady";
 import {logger} from "../utils/logging";
@@ -231,7 +231,7 @@ export default class EmailService {
         ]);
     }
 
-    async sendGameStartedEmail(args: BaseGameEvent) {
+    async sendGameStartedEmail(args: InternalGameEvent) {
         let game = (await this.gameService.getById(args.gameId))!;
         let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
         let gameName = game.settings.general.name;
@@ -388,7 +388,7 @@ export default class EmailService {
         }
     }
 
-    async sendGamePlayerAfkEmail(args: GamePlayerAFKEvent) {
+    async sendGamePlayerAfkEmail(args: InternalGamePlayerAFKEvent) {
         let game = (await this.gameService.getById(args.gameId))!;
 
         // Don't bother sending AFK emails for tutorials.

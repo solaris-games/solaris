@@ -6,8 +6,8 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
-import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
-import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
+import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";
+import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
 import { GameEvent } from "./types/GameEvent";
 
 export const DiplomacyServiceEvents = {
@@ -299,7 +299,7 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for peace reached
         if (this.isGlobalEventsEnabled(game) && isFriendly && newStatus.actualStatus !== oldState) {
-            let e: GameDiplomacyPeaceDeclaredEvent = {
+            let e: InternalGameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
@@ -338,7 +338,7 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for enemy declaration.
         if (this.isGlobalEventsEnabled(game) && !wasAtWar) {
-            let e: GameDiplomacyWarDeclaredEvent = {
+            let e: InternalGameDiplomacyWarDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
@@ -383,7 +383,7 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for peace reached if both players were at war.
         if (this.isGlobalEventsEnabled(game) && wasAtWar && isNeutral) {
-            let e: GameDiplomacyPeaceDeclaredEvent = {
+            let e: InternalGameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus

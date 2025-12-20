@@ -10,11 +10,11 @@ import GameService from './game';
 import GameTickService, { GameTickServiceEvents } from './gameTick';
 import ResearchService, { ResearchServiceEvents } from './research';
 import TradeService, { TradeServiceEvents } from './trade';
-import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
-import { BaseGameEvent } from './types/events/BaseGameEvent';
-import GameEndedEvent from './types/events/GameEnded';
-import GameTurnEndedEvent from './types/events/GameTurnEnded';
-import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
+import PlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
+import { InternalGameEvent } from './types/internalEvents/InternalGameEvent';
+import InternalGameEndedEvent from './types/internalEvents/GameEnded';
+import InternalGameTurnEndedEvent from './types/internalEvents/GameTurnEnded';
+import InternalConversationMessageSentEvent from './types/internalEvents/ConversationMessageSent';
 import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 import {logger} from "../utils/logging";
 import PlayerReadyService, { PlayerReadyServiceEvents } from './playerReady';
@@ -175,7 +175,7 @@ export default class NotificationService {
         }
     }
 
-    async onGameStarted(args: BaseGameEvent) {
+    async onGameStarted(args: InternalGameEvent) {
         // Send the game started notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameStarted',
             async (game: Game, user: User) => {
@@ -185,7 +185,7 @@ export default class NotificationService {
             });
     }
 
-    async onGameEnded(args: GameEndedEvent) {
+    async onGameEnded(args: InternalGameEndedEvent) {
         // Send the game ended notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameEnded', 
             async (game: Game, user: User) => {
@@ -195,7 +195,7 @@ export default class NotificationService {
             });
     }
 
-    async onGameTurnEnded(args: GameTurnEndedEvent) {
+    async onGameTurnEnded(args: InternalGameTurnEndedEvent) {
         // Send the game turn ended notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameTurnEnded', 
             async (game: Game, user: User) => {
@@ -367,7 +367,7 @@ export default class NotificationService {
             });
     }
 
-    async onConversationMessageSent(args: ConversationMessageSentEvent) {
+    async onConversationMessageSent(args: InternalConversationMessageSentEvent) {
         const toPlayerIds = args.sentMessageResult.toPlayerIds.map(id => id.toString());
         const readBy = args.sentMessageResult.readBy.map(id => id.toString());
 

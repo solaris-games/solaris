@@ -1,7 +1,7 @@
 import { DBObjectId } from "../DBObjectId";
-import { BaseGameEvent } from "./BaseGameEvent";
+import { InternalGameEvent } from "./InternalGameEvent";
 
-export default interface GamePlayerBadgePurchasedEvent extends BaseGameEvent {
+export default interface InternalGamePlayerBadgePurchasedEvent extends InternalGameEvent {
     purchasedByPlayerId: DBObjectId;
     purchasedByPlayerAlias: string;
     purchasedForPlayerId: DBObjectId;

@@ -31,10 +31,10 @@ import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
-import PlayerGalacticCycleCompletedEvent from "./types/events/PlayerGalacticCycleComplete"
-import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
-import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
-import GameEndedEvent from "./types/events/GameEnded";
+import PlayerGalacticCycleCompletedEvent from "./types/internalEvents/PlayerGalacticCycleComplete"
+import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDefeated";
+import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
+import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import ScheduleBuyService from "./scheduleBuy";
@@ -814,7 +814,7 @@ export default class GameTickService extends EventEmitter {
                         this.playerAfkService.incrementAfkCount(user);
                     }
 
-                    let e: GamePlayerAFKEvent = {
+                    let e: InternalGamePlayerAFKEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
@@ -832,7 +832,7 @@ export default class GameTickService extends EventEmitter {
                         }
                     }
 
-                    let e: GamePlayerDefeatedEvent = {
+                    let e: InternalGamePlayerDefeatedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
@@ -901,7 +901,7 @@ export default class GameTickService extends EventEmitter {
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
 
-                let e: GameEndedEvent = {
+                let e: InternalGameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult

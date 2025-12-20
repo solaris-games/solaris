@@ -1,6 +1,6 @@
-import { BaseGameEvent } from "./BaseGameEvent";
+import { InternalGameEvent } from "./InternalGameEvent";
 
-export default interface PlayerGalacticCycleCompleteEvent extends BaseGameEvent {
+export default interface InternalPlayerGalacticCycleCompleteEvent extends InternalGameEvent {
     creditsEconomy: number;
     creditsBanking: number;
     creditsSpecialists: number;

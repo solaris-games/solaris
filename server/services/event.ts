@@ -27,16 +27,16 @@ import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
 import { Specialist } from 'solaris-common';
 import { Star, StarCaptureResult } from "./types/Star";
-import { BaseGameEvent } from "./types/events/BaseGameEvent";
-import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
-import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
-import GameEndedEvent from "./types/events/GameEnded";
-import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
-import GamePlayerBadgePurchasedEvent from "./types/events/GamePlayerBadgePurchased";
-import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
-import GamePlayerJoinedEvent from "./types/events/GamePlayerJoined";
-import GamePlayerQuitEvent from "./types/events/GamePlayerQuit";
-import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
+import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
+import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";
+import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
+import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
+import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
+import InternalGamePlayerBadgePurchasedEvent from "./types/internalEvents/GamePlayerBadgePurchased";
+import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDefeated";
+import InternalGamePlayerJoinedEvent from "./types/internalEvents/GamePlayerJoined";
+import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
+import InternalPlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
 
 import moment from "moment";
 
@@ -353,7 +353,7 @@ export default class EventService {
 
     /* GLOBAL EVENTS */
 
-    async createPlayerJoinedEvent(args: GamePlayerJoinedEvent) {
+    async createPlayerJoinedEvent(args: InternalGamePlayerJoinedEvent) {
         let data = {
             playerId: args.playerId,
             alias: args.playerAlias
@@ -362,7 +362,7 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
     }
 
-    async createPlayerQuitEvent(args: GamePlayerQuitEvent) {
+    async createPlayerQuitEvent(args: InternalGamePlayerQuitEvent) {
         let data = {
             playerId: args.playerId,
             alias: args.playerAlias
@@ -371,7 +371,7 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
     }
 
-    async createPlayerDefeatedEvent(args: GamePlayerDefeatedEvent) {
+    async createPlayerDefeatedEvent(args: InternalGamePlayerDefeatedEvent) {
         let data = {
             playerId: args.playerId,
             alias: args.playerAlias,
@@ -381,7 +381,7 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
     }
 
-    async createPlayerAfkEvent(args: GamePlayerAFKEvent) {
+    async createPlayerAfkEvent(args: InternalGamePlayerAFKEvent) {
         let data = {
             playerId: args.playerId,
             alias: args.playerAlias
@@ -390,13 +390,13 @@ export default class EventService {
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
     }
 
-    async createGameStartedEvent(args: BaseGameEvent) {
+    async createGameStartedEvent(args: InternalGameEvent) {
         let data = {};
 
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_STARTED, data);
     }
 
-    async createGameEndedEvent(args: GameEndedEvent) {
+    async createGameEndedEvent(args: InternalGameEndedEvent) {
         let data = {
             rankingResult: args.rankingResult
         };
@@ -406,7 +406,7 @@ export default class EventService {
 
     /* PLAYER EVENTS */
 
-    async createPlayerGalacticCycleCompleteEvent(data: PlayerGalacticCycleCompletedEvent) {
+    async createPlayerGalacticCycleCompleteEvent(data: InternalPlayerGalacticCycleCompletedEvent) {
         return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
@@ -689,7 +689,7 @@ export default class EventService {
         await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
     }
 
-    async createGamePlayerBadgePurchased(args: GamePlayerBadgePurchasedEvent) {
+    async createGamePlayerBadgePurchased(args: InternalGamePlayerBadgePurchasedEvent) {
         let data = {
             purchasedByPlayerId: args.purchasedByPlayerId,
             purchasedByPlayerAlias: args.purchasedByPlayerAlias,
@@ -725,13 +725,13 @@ export default class EventService {
         });
     }
 
-    async createGameDiplomacyPeaceDeclared(args: GameDiplomacyPeaceDeclaredEvent) {
+    async createGameDiplomacyPeaceDeclared(args: InternalGameDiplomacyPeaceDeclaredEvent) {
         let data = args.status;
 
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
 
-    async createGameDiplomacyWarDeclared(args: GameDiplomacyWarDeclaredEvent) {
+    async createGameDiplomacyWarDeclared(args: InternalGameDiplomacyWarDeclaredEvent) {
         let data = args.status;
 
         return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);

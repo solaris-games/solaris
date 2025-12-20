@@ -13,8 +13,8 @@ import PlayerService from './player';
 import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
-import GamePlayerJoinedEvent from './types/events/GamePlayerJoined';
-import { BaseGameEvent } from './types/events/BaseGameEvent';
+import InternalGamePlayerJoinedEvent from './types/internalEvents/GamePlayerJoined';
+import { InternalGameEvent } from './types/internalEvents/InternalGameEvent';
 import RandomService from './random';
 import SpectatorService from './spectator';
 
@@ -202,7 +202,7 @@ export default class GameJoinService extends EventEmitter {
             await this.achievementService.incrementJoined(player.userId);
         }
 
-        let playerJoinedEvent: GamePlayerJoinedEvent = {
+        let playerJoinedEvent: InternalGamePlayerJoinedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
@@ -212,7 +212,7 @@ export default class GameJoinService extends EventEmitter {
         this.emit(GameJoinServiceEvents.onPlayerJoined, playerJoinedEvent);
 
         if (gameIsFull) {
-            let e: BaseGameEvent = {
+            let e: InternalGameEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick
             };

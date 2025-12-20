@@ -1,6 +1,6 @@
 import { DBObjectId } from "../DBObjectId";
 
-export interface BaseGameEvent {
+export interface InternalGameEvent {
     gameId: DBObjectId;
     gameTick: number;
     playerId?: DBObjectId;
