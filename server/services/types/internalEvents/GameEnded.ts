@@ -1,6 +1,7 @@
-import { GameRankingResult } from "../Rating";
 import { InternalGameEvent } from "./InternalGameEvent";
+import {GameRankingResult} from "solaris-common";
+import {DBObjectId} from "../DBObjectId";
 
 export default interface InternalGameEndedEvent extends InternalGameEvent {
-    rankingResult: GameRankingResult | null;
+    rankingResult: GameRankingResult<DBObjectId> | null;
 };

@@ -1,7 +1,14 @@
 import EventEmitter from "events";
 import moment from 'moment';
 import { DBObjectId } from "./types/DBObjectId";
-import {BaseGameEvent, DiplomacyEvent, DiplomaticState, DiplomaticStatus, ValidationError} from "solaris-common";
+import {
+    BaseGameEvent,
+    BasePlayerEvent,
+    DiplomacyEvent,
+    DiplomaticState,
+    DiplomaticStatus,
+    ValidationError
+} from "solaris-common";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";
@@ -327,7 +334,7 @@ export default class DiplomacyService extends EventEmitter {
         await this._declareStatus(game, playerId, playerIdTarget, 'enemies', saveToDB);
         await this._declareStatus(game, playerIdTarget, playerId, 'enemies', saveToDB);
 
-        let newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
+        const newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
         this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
             gameId: game._id,
@@ -337,7 +344,7 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for enemy declaration.
         if (this.isGlobalEventsEnabled(game) && !wasAtWar) {
-            let e: InternalGameDiplomacyWarDeclaredEvent = {
+            const e: InternalGameDiplomacyWarDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus
@@ -407,14 +414,16 @@ export default class DiplomacyService extends EventEmitter {
 
         return events
         .map(e => {
+            const ev = e as BasePlayerEvent<DBObjectId>;
+
             return {
-                playerId: e.playerId!,
-                type: e.type,
+                playerId: ev.playerId!,
+                type: ev.type,
                 // TODO
                 //@ts-ignore
-                data: e.data,
-                sentDate: moment(e._id.getTimestamp()).toDate(),
-                sentTick: e.tick
+                data: ev.data,
+                sentDate: moment(ev._id.getTimestamp()).toDate(),
+                sentTick: ev.tick
             }
         });
     }

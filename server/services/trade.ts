@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 import moment from "moment";
-import {BaseGameEvent, LedgerType} from 'solaris-common';
+import {BaseGameEvent, BasePlayerEvent, LedgerType} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
@@ -524,14 +524,16 @@ export default class TradeService extends EventEmitter {
 
         return events
         .map(e => {
+            const ev = e as BasePlayerEvent<DBObjectId>;
+
             return {
-                playerId: e.playerId!,
-                type: e.type,
+                playerId: ev.playerId!,
+                type: ev.type,
                 // TODO
                 // @ts-ignore
-                data: e.data,
-                sentDate: moment(e._id.getTimestamp()).toDate(),
-                sentTick: e.tick
+                data: ev.data,
+                sentDate: moment(ev._id.getTimestamp()).toDate(),
+                sentTick: ev.tick
             }
         });
     }

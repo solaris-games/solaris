@@ -1,6 +1,7 @@
 import {GameWinnerKind} from "../services/leaderboard";
 import {User} from '../services/types/User';
 import {JobParameters, makeJob} from './tool';
+import {EVENT_TYPES} from "solaris-common";
 
 const binarySearchUsers = (users: User[], id: string) => {
     let start = 0;
@@ -149,7 +150,7 @@ const job = makeJob('Recalculate rankings', async ({log, container, mongo}: JobP
             // Recalculate rank and victories
             const rankingResult = container.gameTickService._awardEndGameRank(game, users, false);
 
-            const gameEndEvent = await eventRepo.findOne({ gameId: game._id, type: container.eventService.EVENT_TYPES.GAME_ENDED });
+            const gameEndEvent = await eventRepo.findOne({ gameId: game._id, type: EVENT_TYPES.GAME_ENDED });
 
             if (gameEndEvent) {
                 await eventRepo.updateOne({_id: gameEndEvent!._id}, {

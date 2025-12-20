@@ -1,4 +1,4 @@
-import {BaseGameEvent, LedgerType} from 'solaris-common';
+import {BaseGameEvent, EVENT_TYPES, LedgerType} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
@@ -37,50 +37,7 @@ import InternalGamePlayerJoinedEvent from "./types/internalEvents/GamePlayerJoin
 import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
 import InternalPlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
 
-import moment from "moment";
-
 export default class EventService {
-
-    EVENT_TYPES = {
-        GAME_PLAYER_JOINED: 'gamePlayerJoined',
-        GAME_PLAYER_QUIT: 'gamePlayerQuit',
-        GAME_PLAYER_DEFEATED: 'gamePlayerDefeated',
-        GAME_PLAYER_AFK: 'gamePlayerAFK',
-        GAME_STARTED: 'gameStarted',
-        GAME_ENDED: 'gameEnded',
-        GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
-        GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
-        GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
-
-        // TODO: Need event types for the ones below, see ./types/events directory
-        PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
-        PLAYER_COMBAT_STAR: 'playerCombatStar',
-        PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
-        PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
-        PLAYER_TECHNOLOGY_RECEIVED: 'playerTechnologyReceived',
-        PLAYER_TECHNOLOGY_SENT: 'playerTechnologySent',
-        PLAYER_CREDITS_RECEIVED: 'playerCreditsReceived',
-        PLAYER_CREDITS_SENT: 'playerCreditsSent',
-        PLAYER_CREDITS_SPECIALISTS_RECEIVED: 'playerCreditsSpecialistsReceived',
-        PLAYER_CREDITS_SPECIALISTS_SENT: 'playerCreditsSpecialistsSent',
-        PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
-        PLAYER_RENOWN_SENT: 'playerRenownSent',
-        PLAYER_GIFT_RECEIVED: 'playerGiftReceived',
-        PLAYER_GIFT_SENT: 'playerGiftSent',
-        PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
-        PLAYER_STAR_DIED: 'playerStarDied',
-        PLAYER_STAR_REIGNITED: 'playerStarReignited',
-        PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
-        PLAYER_DEBT_SETTLED: 'playerDebtSettled',
-        PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
-        PLAYER_STAR_SPECIALIST_HIRED: 'playerStarSpecialistHired',
-        PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
-        PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
-        PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
-        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
-        PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
-    }
-    
     eventModel;
     eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     broadcastService: BroadcastService;
@@ -358,7 +315,7 @@ export default class EventService {
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_PLAYER_JOINED, data);
     }
 
     async createPlayerQuitEvent(args: InternalGamePlayerQuitEvent) {
@@ -367,7 +324,7 @@ export default class EventService {
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_PLAYER_QUIT, data);
     }
 
     async createPlayerDefeatedEvent(args: InternalGamePlayerDefeatedEvent) {
@@ -377,7 +334,7 @@ export default class EventService {
             openSlot: args.openSlot
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
     }
 
     async createPlayerAfkEvent(args: InternalGamePlayerAFKEvent) {
@@ -386,13 +343,13 @@ export default class EventService {
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_PLAYER_AFK, data);
     }
 
     async createGameStartedEvent(args: InternalGameEvent) {
         let data = {};
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_STARTED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_STARTED, data);
     }
 
     async createGameEndedEvent(args: InternalGameEndedEvent) {
@@ -400,13 +357,13 @@ export default class EventService {
             rankingResult: args.rankingResult
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_ENDED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_ENDED, data);
     }
 
     /* PLAYER EVENTS */
 
     async createPlayerGalacticCycleCompleteEvent(data: InternalPlayerGalacticCycleCompletedEvent) {
-        return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
+        return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
     }
 
     async createPlayerCombatStarEvent(gameId: DBObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: StarCaptureResult) {
@@ -422,13 +379,13 @@ export default class EventService {
         for (let defender of defenders) {
             let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
 
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
+            await this.createPlayerEvent(gameId, gameTick, defender._id, EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
             let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
         }
     }
 
@@ -442,13 +399,13 @@ export default class EventService {
         for (let defender of defenders) {
             let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
             
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
+            await this.createPlayerEvent(gameId, gameTick, defender._id, EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
             let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
+            await this.createPlayerEvent(gameId, gameTick, attacker._id, EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
         }
     }
 
@@ -460,7 +417,7 @@ export default class EventService {
             technologyLevelNext
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
+        return await this.createPlayerEvent(gameId, gameTick, playerId, EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
     }
 
     async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
@@ -469,7 +426,7 @@ export default class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
     }
 
     async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
@@ -478,7 +435,7 @@ export default class EventService {
             technology
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data, true);
     }
 
     async createCreditsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
@@ -487,7 +444,7 @@ export default class EventService {
             credits
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
     }
 
     async createCreditsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
@@ -496,7 +453,7 @@ export default class EventService {
             credits
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, EVENT_TYPES.PLAYER_CREDITS_SENT, data, true);
     }
 
     async createCreditsSpecialistsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
@@ -505,7 +462,7 @@ export default class EventService {
             creditsSpecialists
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED, data);
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED, data);
     }
 
     async createCreditsSpecialistsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
@@ -514,7 +471,7 @@ export default class EventService {
             creditsSpecialists
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data, true);
     }
 
     async createRenownReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
@@ -523,7 +480,7 @@ export default class EventService {
             renown
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
     }
 
     async createRenownSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
@@ -532,7 +489,7 @@ export default class EventService {
             renown
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
     }
 
     async createGiftReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
@@ -545,7 +502,7 @@ export default class EventService {
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
+        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
     }
 
     async createGiftSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
@@ -558,7 +515,7 @@ export default class EventService {
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
     }
 
     async createStarAbandonedEvent(gameId: DBObjectId, gameTick: number, player: Player, star: Star) {
@@ -567,7 +524,7 @@ export default class EventService {
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
     }
 
     async createStarDiedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
@@ -576,7 +533,7 @@ export default class EventService {
             starName
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_DIED, data);
+        await this.createPlayerEvent(gameId, gameTick, playerId, EVENT_TYPES.PLAYER_STAR_DIED, data);
     }
 
     async createStarReignitedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
@@ -585,7 +542,7 @@ export default class EventService {
             starName
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_REIGNITED, data);
+        await this.createPlayerEvent(gameId, gameTick, playerId, EVENT_TYPES.PLAYER_STAR_REIGNITED, data);
     }
 
     async createInfrastructureBulkUpgraded(gameId: DBObjectId, gameTick: number, player: Player, upgradeReport: BulkUpgradeReport) {
@@ -593,7 +550,7 @@ export default class EventService {
             upgradeReport
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
+        return await this.createPlayerEvent(gameId, gameTick, player._id, EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
     }
 
     async createDebtAddedEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
@@ -611,8 +568,8 @@ export default class EventService {
             ledgerType
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, true);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, false);
+        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, EVENT_TYPES.PLAYER_DEBT_SETTLED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, EVENT_TYPES.PLAYER_DEBT_SETTLED, data, false);
 
         this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
@@ -625,8 +582,8 @@ export default class EventService {
             ledgerType
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, false);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, true);
+        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, false);
+        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, true);
 
         this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
@@ -641,7 +598,7 @@ export default class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, player._id, EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data, true);
     }
 
     async createPlayerCarrierSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, carrier: Carrier, specialist: Specialist) {
@@ -654,7 +611,7 @@ export default class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, player._id, EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data, true);
     }
 
     async createPlayerConversationCreated(gameId: DBObjectId, gameTick: number, convo: Conversation) {
@@ -665,7 +622,7 @@ export default class EventService {
             participants: convo.participants
         };
 
-        await this.createPlayerEvent(gameId, gameTick, convo.createdBy!, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
+        await this.createPlayerEvent(gameId, gameTick, convo.createdBy!, EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
     }
 
     async createPlayerConversationInvited(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
@@ -675,7 +632,7 @@ export default class EventService {
             playerId
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_INVITED, data);
+        await this.createPlayerEvent(gameId, gameTick, playerId, EVENT_TYPES.PLAYER_CONVERSATION_INVITED, data);
     }
 
     async createPlayerConversationLeft(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
@@ -685,7 +642,7 @@ export default class EventService {
             playerId
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
+        await this.createPlayerEvent(gameId, gameTick, playerId, EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
     }
 
     async createGamePlayerBadgePurchased(args: InternalGamePlayerBadgePurchasedEvent) {
@@ -698,7 +655,7 @@ export default class EventService {
             badgeName: args.badgeName
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
     }
 
     async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
@@ -707,8 +664,8 @@ export default class EventService {
             tick: gameTick,
             type: {
                 $in: [
-                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
-                    this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
+                    EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
                 ]
             },
             $or: [
@@ -727,20 +684,20 @@ export default class EventService {
     async createGameDiplomacyPeaceDeclared(args: InternalGameDiplomacyPeaceDeclaredEvent) {
         let data = args.status;
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
     }
 
     async createGameDiplomacyWarDeclared(args: InternalGameDiplomacyWarDeclaredEvent) {
         let data = args.status;
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
+        return await this.createGameEvent(args.gameId, args.gameTick, EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
     }
 
     async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
         const data = status;
 
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
     }
 
 };

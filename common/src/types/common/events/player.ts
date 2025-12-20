@@ -1,18 +1,13 @@
 import type { StarCaptureResult } from "../star";
 import type { CombatResult } from "../combat";
 import type {BulkUpgradeReport} from "../infrastructureUpgrade";
+import type {BaseGameEvent} from "./game";
 
-export interface BaseGameEvent<ID> {
-    _id: ID;
-    gameId: ID;
-    playerId: ID | null;
-    tick: number;
-    type: string;
-    read: boolean;
-    date?: Date;
-};
+export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
+    playerId: ID;
+}
 
-export interface PlayerCombatStarEvent<ID> extends BaseGameEvent<ID> {
+export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerCombatStar';
     data: {
         playerIdOwner: ID;
@@ -25,10 +20,9 @@ export interface PlayerCombatStarEvent<ID> extends BaseGameEvent<ID> {
     };
 }
 
-export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BaseGameEvent<ID> {
+export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerBulkInfrastructureUpgraded',
     data: {
         upgradeReport: BulkUpgradeReport<ID>,
     }
 }
-

@@ -24,7 +24,7 @@ import { TechnologyService } from 'solaris-common';
 import UserService from "./user";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
-import { GameRankingResult } from "./types/Rating";
+import { GameRankingResult } from "../../common/src/types/common/rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
@@ -891,7 +891,7 @@ export default class GameTickService extends EventEmitter {
             }
 
             if (!isTutorialGame) {
-                let rankingResult: GameRankingResult | null = null;
+                let rankingResult: GameRankingResult<DBObjectId> | null = null;
 
                 if (this.gameTypeService.isRankedGame(game)) {
                     rankingResult = this._awardEndGameRank(game, gameUsers, true);
@@ -930,7 +930,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
-        let rankingResult: GameRankingResult | null = null;
+        let rankingResult: GameRankingResult<DBObjectId> | null = null;
     
         // There must have been at least X production ticks in order for
         // rankings to be added to players. This is to slow down players

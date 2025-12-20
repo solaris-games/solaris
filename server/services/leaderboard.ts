@@ -1,7 +1,7 @@
 import {Game, Team} from "./types/Game";
 import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam, PlayerStatistics} from "./types/Leaderboard";
 import { Player } from "./types/Player";
-import {EloRatingChangeResult, GameRanking, GameRankingResult} from "./types/Rating";
+import {EloRatingChangeResult, GameRanking, GameRankingResult} from "solaris-common";
 import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
@@ -12,7 +12,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import {maxBy, reverseSort, sorterByProperty} from "solaris-common";
+import { reverseSort, sorterByProperty} from "solaris-common";
 import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
 import {isSpecialGameMode} from "./officialGames";
@@ -277,7 +277,7 @@ export default class LeaderboardService {
         };
     }
 
-    addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult {
+    addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult<DBObjectId> {
         // Get first team that is not defeated
         const leadingTeam = leaderboard.find(team => {
             return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
@@ -303,7 +303,7 @@ export default class LeaderboardService {
         const rankToAward = game.settings.general.playerLimit * 2;
         const rankPerPlayer = Math.floor(rankToAward / nonAfkInLeadingTeam.length);
 
-        const ranks: GameRanking[] = [];
+        const ranks: GameRanking<DBObjectId>[] = [];
 
         for (let player of nonAfkInLeadingTeam) {
             const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
@@ -332,10 +332,10 @@ export default class LeaderboardService {
         };
     }
 
-    addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult {
-        let result: GameRankingResult = {
+    addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult<DBObjectId> {
+        let result: GameRankingResult<DBObjectId> = {
             ranks: [],
-            eloRating: null
+            eloRating: null,
         };
 
         let leaderboardPlayers = leaderboard.map(x => x.player);
@@ -415,7 +415,7 @@ export default class LeaderboardService {
     }
 
     incrementGameWinnerAchievements(game: Game, gameUsers: User[], winner: Player, awardCredits: boolean) {
-        let user = gameUsers.find(u => winner.userId && u._id.toString() === winner.userId.toString());
+        const user = gameUsers.find(u => winner.userId && u._id.toString() === winner.userId.toString());
 
         // Double check user isn't deleted.
         if (!user) {
@@ -439,7 +439,7 @@ export default class LeaderboardService {
         }
     }
 
-    addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult | null {
+    addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult<DBObjectId> | null {
         if (!this.gameTypeService.is1v1Game(game)) {
             return null;
         }
