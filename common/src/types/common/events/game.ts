@@ -1,14 +1,24 @@
 import type {GameRankingResult} from "../rating";
 import type {DiplomaticStatus} from "../diplomacy";
 
-export interface BaseGameEvent<ID> {
-    _id: ID;
-    gameId: ID;
-    tick: number;
-    type: string;
-    read: boolean;
-    date?: Date;
+export type BaseGameEvent<ID> = {
+    _id: ID,
+    gameId: ID,
+    tick: number,
+    type: string,
+    read: boolean,
+    date?: Date,
 }
+
+export type GameEvent<ID> = 
+    | GamePlayerJoinedEvent<ID>
+    | GamePlayerQuitEvent<ID>
+    | GamePlayerDefeatedEvent<ID>
+    | GamePlayerAfkEvent<ID>
+    | GameStartedEvent<ID>
+    | GameEndedEvent<ID>
+    | GameDiplomacyPeaceDeclaredEvent<ID>
+    | GameDiplomacyWarDeclaredEvent<ID>
 
 export interface GamePlayerJoinedEvent<ID> extends BaseGameEvent<ID> {
     type: 'gamePlayerJoined',
@@ -55,12 +65,12 @@ export interface GameEndedEvent<ID> extends BaseGameEvent<ID> {
     }
 }
 
-export interface GameDiplomacyPeaceDeclared<ID> extends BaseGameEvent<ID> {
+export interface GameDiplomacyPeaceDeclaredEvent<ID> extends BaseGameEvent<ID> {
     type: 'gameDiplomacyPeaceDeclared',
     data: DiplomaticStatus<ID>,
 }
 
-export interface GameDiplomacyWarDeclared<ID> extends BaseGameEvent<ID> {
+export interface GameDiplomacyWarDeclaredEvent<ID> extends BaseGameEvent<ID> {
     type: 'gameDiplomacyWarDeclared',
     data: DiplomaticStatus<ID>,
 }
