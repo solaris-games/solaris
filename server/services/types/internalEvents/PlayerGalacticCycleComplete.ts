@@ -1,6 +1,8 @@
 import { InternalGameEvent } from "./InternalGameEvent";
+import {DBObjectId} from "../DBObjectId";
 
 export default interface InternalPlayerGalacticCycleCompleteEvent extends InternalGameEvent {
+    playerId: DBObjectId;
     creditsEconomy: number;
     creditsBanking: number;
     creditsSpecialists: number;

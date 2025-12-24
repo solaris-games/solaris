@@ -19,6 +19,7 @@ export type GameEvent<ID> =
     | GameEndedEvent<ID>
     | GameDiplomacyPeaceDeclaredEvent<ID>
     | GameDiplomacyWarDeclaredEvent<ID>
+    | GamePlayerBadgePurchasedEvent<ID>
 
 export interface GamePlayerJoinedEvent<ID> extends BaseGameEvent<ID> {
     type: 'gamePlayerJoined',
@@ -73,4 +74,16 @@ export interface GameDiplomacyPeaceDeclaredEvent<ID> extends BaseGameEvent<ID> {
 export interface GameDiplomacyWarDeclaredEvent<ID> extends BaseGameEvent<ID> {
     type: 'gameDiplomacyWarDeclared',
     data: DiplomaticStatus<ID>,
+}
+
+export interface GamePlayerBadgePurchasedEvent<ID> extends BaseGameEvent<ID> {
+    type: 'gamePlayerBadgePurchased',
+    data: {
+        purchasedByPlayerId: ID,
+        purchasedByPlayerAlias: string,
+        purchasedForPlayerId: ID,
+        purchasedForPlayerAlias: string,
+        badgeKey: string,
+        badgeName: string,
+    }
 }

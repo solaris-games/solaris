@@ -11,6 +11,7 @@ export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
 
 export type PlayerEvent<ID> =
     | PlayerCombatStarEvent<ID>
+    | PlayerCombatCarrierEvent<ID>
     | PlayerBulkInfrastructureUpgradedEvent<ID>
     | PlayerCreditsReceivedEvent<ID>
     | PlayerCreditsSentEvent<ID>
@@ -266,6 +267,15 @@ export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
         captureResult: StarCaptureResult<ID>;
         combatResult: CombatResult<ID>;
     };
+}
+
+export interface PlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
+    type: 'playerCombatCarrier',
+    data: {
+        playerIdDefenders: ID[];
+        playerIdAttackers: ID[];
+        combatResult: CombatResult<ID>;
+    }
 }
 
 export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BasePlayerEvent<ID> {
