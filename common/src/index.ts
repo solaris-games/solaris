@@ -52,6 +52,7 @@ export * from "./api/controllers/colour";
 export * from "./api/controllers/diplomacy";
 export * from "./api/controllers/conversation";
 export * from "./api/controllers/research";
+export * from "./api/controllers/event";
 export * from "./events/index";
 export * from "./events/handler";
 export * from "./events/emitter";
