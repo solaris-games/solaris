@@ -3,7 +3,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import EventController from '../controllers/event';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createEventRoutes} from "@solaris-common";
+import {createEventRoutes} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 
