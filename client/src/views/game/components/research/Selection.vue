@@ -54,7 +54,7 @@ import AudioService from '../../../../game/audio'
 import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
-import {updateResearchNow, updateResearchNext} from "@/services/typedapi/resesarch";
+import {updateResearchNow, updateResearchNext} from "@/services/typedapi/research";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
