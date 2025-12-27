@@ -9,7 +9,7 @@
     <div class="mb-2 row pt-2 pb-2 mb-0 " v-if="!player.defeated && optionsNow.length">
       <label class="col-5 col-form-label">Researching:</label>
       <div class="col-7">
-        <select class="form-control" v-model="player.researchingNow" v-on:change="updateResearchNow" v-if="!loadingNow"
+        <select class="form-control" v-model="player.researchingNow" v-on:change="doUpdateResearchNow" v-if="!loadingNow"
                 :disabled="isHistoricalMode || isGameFinished">
           <option v-for="option in optionsNow" v-bind:value="option.value" v-bind:key="option.value">
             {{ option.text }}
@@ -28,7 +28,7 @@
     <div class="mb-2 row pt-2 pb-2 mb-0  mt-1" v-if="!player.defeated && optionsNext.length > 1">
       <label class="col-5 col-form-label">Next:</label>
       <div class="col-7">
-        <select class="form-control" v-model="player.researchingNext" v-on:change="updateResearchNext"
+        <select class="form-control" v-model="player.researchingNext" v-on:change="doUpdateResearchNext"
                 v-if="!loadingNext" :disabled="isHistoricalMode || isGameFinished">
           <option v-for="option in optionsNext" v-bind:value="option.value" v-bind:key="option.value">
             {{ option.text }}
@@ -54,7 +54,7 @@ import AudioService from '../../../../game/audio'
 import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
-import {updateResesarchNow} from "@/services/typedapi/resesarch";
+import {updateResearchNow, updateResearchNext} from "@/services/typedapi/resesarch";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
@@ -109,10 +109,10 @@ const loadTechnologies = () => {
   optionsNext.value.push({text: 'Random', value: 'random'});
 };
 
-const updateResearchNow = async () => {
+const doUpdateResearchNow = async () => {
   loadingNow.value = true;
 
-  const response = await updateResesarchNow(httpClient)(game.value._id, player.value.researchingNow);
+  const response = await updateResearchNow(httpClient)(game.value._id, player.value.researchingNow);
   if (isOk(response)) {
     AudioService.join();
     player.value.currentResearchTicksEta = response.data.ticksEta;
@@ -127,10 +127,10 @@ const updateResearchNow = async () => {
   loadingNow.value = false;
 };
 
-const updateResearchNext = async () => {
+const doUpdateResearchNext = async () => {
   loadingNext.value = true;
 
-  const response = await updateResesarchNow(httpClient)(game.value._id, player.value.researchingNow);
+  const response = await updateResearchNext(httpClient)(game.value._id, player.value.researchingNow);
   if (isOk(response)) {
     AudioService.join();
     player.value.currentResearchTicksEta = response.data.ticksEta;
