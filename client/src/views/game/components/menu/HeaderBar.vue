@@ -71,7 +71,6 @@ import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import ServerConnectionStatus from './ServerConnectionStatus.vue'
 import ResearchProgress from './ResearchProgress.vue'
-import EventApiService from '../../../../services/api/event'
 import HamburgerMenu from './HamburgerMenu.vue'
 import TickSelector from './TickSelector.vue'
 import ReadyStatusButton from './ReadyStatusButton.vue'
@@ -88,6 +87,7 @@ import {toastInjectionKey} from "@/util/keys";
 import type {TradeEventTechnology} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
+import {unreadCount} from "@/services/typedapi/event";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -312,15 +312,11 @@ const checkForUnreadEvents = async () => {
     return;
   }
 
-  // sadly, this must stay until the events are typed
-  try {
-    const response = await EventApiService.getUnreadCount(game.value._id);
-
-    if (response.status === 200) {
-      unreadEvents.value = response.data.unread;
-    }
-  } catch (err) {
-    console.error(err);
+  const response = await unreadCount(httpClient)(game.value._id);
+  if (isOk(response)) {
+    unreadEvents.value = response.data.unread;
+  } else {
+    console.error(formatError(response));
   }
 };
 
