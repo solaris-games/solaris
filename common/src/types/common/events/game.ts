@@ -10,17 +10,6 @@ export type BaseGameEvent<ID> = {
     date?: Date,
 }
 
-export type GameEvent<ID> = 
-    | GamePlayerJoinedEvent<ID>
-    | GamePlayerQuitEvent<ID>
-    | GamePlayerDefeatedEvent<ID>
-    | GamePlayerAfkEvent<ID>
-    | GameStartedEvent<ID>
-    | GameEndedEvent<ID>
-    | GameDiplomacyPeaceDeclaredEvent<ID>
-    | GameDiplomacyWarDeclaredEvent<ID>
-    | GamePlayerBadgePurchasedEvent<ID>
-
 export interface GamePlayerJoinedEvent<ID> extends BaseGameEvent<ID> {
     type: 'gamePlayerJoined',
     data: {

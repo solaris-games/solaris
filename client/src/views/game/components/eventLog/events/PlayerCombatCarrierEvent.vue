@@ -10,14 +10,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type {PlayerCombatStarEvent} from "@solaris-common";
+import type {PlayerCombatCarrierEvent} from "@solaris-common";
 import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '../../../../../store';
-import {createCarrierDefenderSide, createCarrierAttackerSide} from '../../../../../types/combat';
+import type { State } from '@/store';
+import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/types/combat';
 
 const props = defineProps<{
-  event: PlayerCombatStarEvent<string>
+  event: PlayerCombatCarrierEvent<string>
 }>();
 
 const emit = defineEmits<{

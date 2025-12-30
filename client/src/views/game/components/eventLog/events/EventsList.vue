@@ -24,9 +24,6 @@
     </div>
 
     <div class="row mt-2">
-      <div class="col-auto">
-        <!-- <p class="mb-0"><small>Click on an event to mark it as read.</small></p> -->
-      </div>
       <div class="col">
         <nav aria-label="Events pagination">
           <ul class="pagination justify-content-end mb-0">
@@ -72,102 +69,92 @@
 </div>
 </template>
 
-<script>
-import EventApiService from '../../../../../services/api/event'
-import LoadingSpinnerVue from '../../../../components/LoadingSpinner.vue'
-import EventsListItemVue from './EventsListItem.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../../../../components/LoadingSpinner.vue';
+import EventsListItem from './EventsListItem.vue';
+import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import type {BaseGameEvent, GameEvent} from "@solaris-common";
+import { useStore } from 'vuex';
+import type {Game} from "@/types/game";
+import {listEvents, markAllAsRead} from "@/services/typedapi/event";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'events-list-item': EventsListItemVue
-  },
-  data: function () {
-    return {
-      events: null,
-      count: 0,
-      page: 0,
-      pageSize: 30,
-      pageMax: 0,
-      pageCurrent: 0,
-      selectedFilter: 'all'
-    }
-  },
-  mounted () {
-    this.loadEvents()
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.$emit('onOpenCarrierDetailRequested', e)
-    },
-    loadPage (pageNumber) {
-      if (pageNumber >= 0 && pageNumber <= this.pageMax) {
-        this.page = pageNumber
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenStarDetailRequested: [starId: string],
+  onOpenCarrierDetailRequested: [carrierId: string],
+}>();
 
-        this.loadEvents()
-      }
-    },
-    async loadEvents () {
-      this.events = null
+const httpClient = inject(httpInjectionKey)!;
 
-      let game = this.$store.state.game
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-      try {
-        let response = await EventApiService.getEvents(game._id, this.page, this.pageSize, this.selectedFilter)
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 
-        if (response.status === 200) {
-          this.count = response.data.count
-          this.events = response.data.events
+const onOpenStarDetailRequested = (starId: string) => emit('onOpenStarDetailRequested', starId);
 
-          this.pageMax = Math.floor(this.count / this.pageSize)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async markAllRead () {
-      try {
-        let response = await EventApiService.markAllEventsAsRead(this.$store.state.game._id)
+const onOpenCarrierDetailRequested = (carrierId: string) => emit('onOpenCarrierDetailRequested', carrierId);
 
-        if (response.status === 200) {
-          for (let e of this.events) {
-            if (e.read === false) {
-              e.read = true
-            }
-          }
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  },
-  computed: {
-    pageNumbers () {
-      const pages = []
-      const depth = 2
+const events = ref<GameEvent<string>[]>([]);
+const count = ref(0);
+const page = ref(0);
+const pageSize = ref(30);
+const pageMax = ref(0);
+const selectedFilter = ref('all');
 
-      for (let i = this.page - depth; i < this.page; i++) {
-        if (i >= 0 && i <= this.pageMax) {
-          pages.push(i)
-        }
-      }
+const pageNumbers = computed(() => {
+  const pages: number[] = [];
+  const depth = 2;
 
-      for (let i = this.page; i < this.page + depth; i++) {
-        if (i <= this.pageMax) {
-          pages.push(i)
-        }
-      }
-
-      return pages
+  for (let i = page.value - depth; i < page.value; i++) {
+    if (i >= 0 && i <= pageMax.value) {
+      pages.push(i);
     }
   }
+
+  for (let i = page.value; i < page.value + depth; i++) {
+    if (i <= pageMax.value) {
+      pages.push(i);
+    }
+  }
+
+  return pages;
+})
+
+const loadEvents = async () => {
+  const response = await listEvents(httpClient)(game.value._id, page.value, pageSize.value, selectedFilter.value);
+
+  if (isOk(response)) {
+    count.value = response.data.count;
+    events.value = response.data.events as GameEvent<string>[]; // we assume that this covers all possible events
+
+    pageMax.value = Math.floor(count.value / pageSize.value);
+  } else {
+    console.error(formatError(response));
+  }
+};
+
+const loadPage = (pageNumber: number) => {
+  if (pageNumber >= 0 && pageNumber <= pageMax.value) {
+    page.value = pageNumber;
+
+    loadEvents();
+  }
+};
+
+const markAllRead = async () => {
+  const response = await markAllAsRead(httpClient)(game.value._id);
+  if (isOk(response)) {
+    events.value.forEach(ev => {
+      ev.read = true;
+    });
+  }
 }
+
+onMounted(() => {
+  loadEvents();
+});
 </script>
 
 <style scoped>

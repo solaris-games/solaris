@@ -9,34 +9,6 @@ export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
     playerId: ID;
 }
 
-export type PlayerEvent<ID> =
-    | PlayerCombatStarEvent<ID>
-    | PlayerCombatCarrierEvent<ID>
-    | PlayerBulkInfrastructureUpgradedEvent<ID>
-    | PlayerCreditsReceivedEvent<ID>
-    | PlayerCreditsSentEvent<ID>
-    | PlayerSpecialistTokensReceivedEvent<ID>
-    | PlayerSpecialistTokensSentEvent<ID>
-    | PlayerDebtForgivenEvent<ID>
-    | PlayerDebtSettledEvent<ID>
-    | PlayerGiftReceivedEvent<ID>
-    | PlayerGiftSentEvent<ID>
-    | PlayerCarrierSpecialistHiredEvent<ID>
-    | PlayerConversationCreatedEvent<ID>
-    | PlayerConversationInvitedEvent<ID>
-    | PlayerConversationLeftEvent<ID>
-    | PlayerDiplomacyStatusChangedEvent<ID>
-    | PlayerGalacticCycleCompleteEvent<ID>
-    | PlayerStarSpecialistHiredEvent<ID>
-    | PlayerRenownReceivedEvent<ID>
-    | PlayerRenownSentEvent<ID>
-    | PlayerResearchCompleteEvent<ID>
-    | PlayerStarAbandonedEvent<ID>
-    | PlayerStarDiedEvent<ID>
-    | PlayerStarReignitedEvent<ID>
-    | PlayerTechnologyReceivedEvent<ID>
-    | PlayerTechnologySentEvent<ID>
-
 export interface PlayerCreditsReceivedEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerCreditsReceived',
     data: {
@@ -256,26 +228,29 @@ export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
     },
 }
 
+export interface CombatEventData<ID> {
+    playerIdDefenders: ID[];
+    playerIdAttackers: ID[];
+    combatResult: CombatResult<ID>;
+}
+
+export interface BaseCombatEvent<ID> extends BasePlayerEvent<ID> {
+    data: CombatEventData<ID>,
+}
+
 export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerCombatStar';
-    data: {
+    data: CombatEventData<ID> & {
         playerIdOwner: ID;
-        playerIdDefenders: ID[];
-        playerIdAttackers: ID[];
         starId: ID;
         starName: string;
         captureResult: StarCaptureResult<ID>;
-        combatResult: CombatResult<ID>;
     };
 }
 
 export interface PlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerCombatCarrier',
-    data: {
-        playerIdDefenders: ID[];
-        playerIdAttackers: ID[];
-        combatResult: CombatResult<ID>;
-    }
+    data: CombatEventData<ID>,
 }
 
 export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BasePlayerEvent<ID> {

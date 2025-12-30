@@ -1,4 +1,4 @@
-import type { CombatCarrier, CombatStar, PlayerCombatStarEvent, Specialist } from "@solaris-common"
+import type {BaseCombatEvent, CombatCarrier, CombatStar, PlayerCombatStarEvent, Specialist} from "@solaris-common"
 import type { Player, Carrier, Star, Game } from "./game"
 import gameHelper from "../services/gameHelper"
 
@@ -115,7 +115,7 @@ export const resultToNumber = (result: CombatParticipantResult) => {
   return typeof result === 'number' ? result : 0;
 }
 
-const createCarrierSide = (game: Game, event: PlayerCombatStarEvent<string>, sidePlayers: Player[], weaponsLevel: number) => {
+const createCarrierSide = (game: Game, event: BaseCombatEvent<string>, sidePlayers: Player[], weaponsLevel: number) => {
   const relevantCarriers = event.data.combatResult.carriers.filter(c => sidePlayers.find(d => d._id === c.ownedByPlayerId));
 
   const participantsGroups = new Map<string, CombatActor[]>();
@@ -135,13 +135,13 @@ export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<
   return createCarrierSide(game, event, attackers, event.data.combatResult.weapons.attacker);
 };
 
-export const createCarrierDefenderSide = (game: Game, event: PlayerCombatStarEvent<string>) => {
+export const createCarrierDefenderSide = (game: Game, event: BaseCombatEvent<string>) => {
   const defenders = event.data.playerIdDefenders.map(id => gameHelper.getPlayerById(game, id)!);
 
   return createCarrierSide(game, event, defenders, event.data.combatResult.weapons.defender);
 }
 
-export const createCarrierAttackerSide = (game: Game, event: PlayerCombatStarEvent<string>) => {
+export const createCarrierAttackerSide = (game: Game, event: BaseCombatEvent<string>) => {
   const attackers = event.data.playerIdAttackers.map(id => gameHelper.getPlayerById(game, id)!);
 
   return createCarrierSide(game, event, attackers, event.data.combatResult.weapons.attacker);

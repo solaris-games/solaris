@@ -7,7 +7,7 @@ export type ListEventsResponse<ID> = {
 }
 
 export const createEventRoutes = <ID>() => ({
-    listEvents: new GetRoute<{ gameId: ID }, {}, ListEventsResponse<ID>>("/api/game/:gameId/events"),
+    listEvents: new GetRoute<{ gameId: ID }, { page: number, pageSize: number, category: string }, ListEventsResponse<ID>>("/api/game/:gameId/events"),
     markAllAsRead: new PatchRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/events/markAsRead"),
     markAsRead: new PatchRoute<{ gameId: ID, eventId: ID }, {}, {}, {}>("/api/game/:gameId/events/:eventId/markAsRead"),
     unreadCount: new GetRoute<{ gameId: ID }, {}, { unread: number }>("/api/game/:gameId/events/unread"),

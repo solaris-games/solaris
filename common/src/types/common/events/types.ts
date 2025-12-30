@@ -1,3 +1,32 @@
+import type {
+    PlayerBulkInfrastructureUpgradedEvent,
+    PlayerCarrierSpecialistHiredEvent,
+    PlayerCombatCarrierEvent,
+    PlayerCombatStarEvent,
+    PlayerConversationCreatedEvent,
+    PlayerConversationInvitedEvent,
+    PlayerConversationLeftEvent,
+    PlayerCreditsReceivedEvent,
+    PlayerCreditsSentEvent,
+    PlayerDebtForgivenEvent,
+    PlayerDebtSettledEvent,
+    PlayerDiplomacyStatusChangedEvent, PlayerGalacticCycleCompleteEvent,
+    PlayerGiftReceivedEvent,
+    PlayerGiftSentEvent, PlayerRenownReceivedEvent, PlayerRenownSentEvent, PlayerResearchCompleteEvent,
+    PlayerSpecialistTokensReceivedEvent,
+    PlayerSpecialistTokensSentEvent, PlayerStarAbandonedEvent, PlayerStarDiedEvent,
+    PlayerStarReignitedEvent, PlayerStarSpecialistHiredEvent, PlayerTechnologyReceivedEvent, PlayerTechnologySentEvent
+} from "./player";
+import type {
+    GameDiplomacyPeaceDeclaredEvent, GameDiplomacyWarDeclaredEvent,
+    GameEndedEvent,
+    GamePlayerAfkEvent, GamePlayerBadgePurchasedEvent,
+    GamePlayerDefeatedEvent,
+    GamePlayerJoinedEvent,
+    GamePlayerQuitEvent,
+    GameStartedEvent
+} from "./game";
+
 export const EVENT_TYPES = {
     GAME_PLAYER_JOINED: 'gamePlayerJoined',
     GAME_PLAYER_QUIT: 'gamePlayerQuit',
@@ -35,3 +64,68 @@ export const EVENT_TYPES = {
     PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
     PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
 }
+
+export type GameEvent<ID> =
+    | GamePlayerJoinedEvent<ID>
+    | GamePlayerQuitEvent<ID>
+    | GamePlayerDefeatedEvent<ID>
+    | GamePlayerAfkEvent<ID>
+    | GameStartedEvent<ID>
+    | GameEndedEvent<ID>
+    | GameDiplomacyPeaceDeclaredEvent<ID>
+    | GameDiplomacyWarDeclaredEvent<ID>
+    | GamePlayerBadgePurchasedEvent<ID>
+    | PlayerCombatStarEvent<ID>
+    | PlayerCombatCarrierEvent<ID>
+    | PlayerBulkInfrastructureUpgradedEvent<ID>
+    | PlayerCreditsReceivedEvent<ID>
+    | PlayerCreditsSentEvent<ID>
+    | PlayerSpecialistTokensReceivedEvent<ID>
+    | PlayerSpecialistTokensSentEvent<ID>
+    | PlayerDebtForgivenEvent<ID>
+    | PlayerDebtSettledEvent<ID>
+    | PlayerGiftReceivedEvent<ID>
+    | PlayerGiftSentEvent<ID>
+    | PlayerCarrierSpecialistHiredEvent<ID>
+    | PlayerConversationCreatedEvent<ID>
+    | PlayerConversationInvitedEvent<ID>
+    | PlayerConversationLeftEvent<ID>
+    | PlayerDiplomacyStatusChangedEvent<ID>
+    | PlayerGalacticCycleCompleteEvent<ID>
+    | PlayerStarSpecialistHiredEvent<ID>
+    | PlayerRenownReceivedEvent<ID>
+    | PlayerRenownSentEvent<ID>
+    | PlayerResearchCompleteEvent<ID>
+    | PlayerStarAbandonedEvent<ID>
+    | PlayerStarDiedEvent<ID>
+    | PlayerStarReignitedEvent<ID>
+    | PlayerTechnologyReceivedEvent<ID>
+    | PlayerTechnologySentEvent<ID>
+
+export type PlayerEvent<ID> =
+    | PlayerCombatStarEvent<ID>
+    | PlayerCombatCarrierEvent<ID>
+    | PlayerBulkInfrastructureUpgradedEvent<ID>
+    | PlayerCreditsReceivedEvent<ID>
+    | PlayerCreditsSentEvent<ID>
+    | PlayerSpecialistTokensReceivedEvent<ID>
+    | PlayerSpecialistTokensSentEvent<ID>
+    | PlayerDebtForgivenEvent<ID>
+    | PlayerDebtSettledEvent<ID>
+    | PlayerGiftReceivedEvent<ID>
+    | PlayerGiftSentEvent<ID>
+    | PlayerCarrierSpecialistHiredEvent<ID>
+    | PlayerConversationCreatedEvent<ID>
+    | PlayerConversationInvitedEvent<ID>
+    | PlayerConversationLeftEvent<ID>
+    | PlayerDiplomacyStatusChangedEvent<ID>
+    | PlayerGalacticCycleCompleteEvent<ID>
+    | PlayerStarSpecialistHiredEvent<ID>
+    | PlayerRenownReceivedEvent<ID>
+    | PlayerRenownSentEvent<ID>
+    | PlayerResearchCompleteEvent<ID>
+    | PlayerStarAbandonedEvent<ID>
+    | PlayerStarDiedEvent<ID>
+    | PlayerStarReignitedEvent<ID>
+    | PlayerTechnologyReceivedEvent<ID>
+    | PlayerTechnologySentEvent<ID>
