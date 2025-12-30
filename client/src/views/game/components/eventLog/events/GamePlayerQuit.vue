@@ -6,17 +6,18 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    event: Object
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.event.data.playerId)
-    }
-  }
-}
+<script setup lang="ts">
+import type {GamePlayerQuitEvent} from "@solaris-common";
+
+const props = defineProps<{
+  event: GamePlayerQuitEvent<string>,
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
+
+const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.event.data.playerId);
 </script>
 
 <style scoped>
