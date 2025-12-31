@@ -14,7 +14,7 @@ import type {PlayerCombatCarrierEvent} from "@solaris-common";
 import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
 import type { State } from '@/store';
-import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/types/combat';
+import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
 
 const props = defineProps<{
   event: PlayerCombatCarrierEvent<string>

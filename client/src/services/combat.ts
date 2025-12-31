@@ -1,6 +1,6 @@
 import type {BaseCombatEvent, CombatCarrier, CombatStar, PlayerCombatStarEvent, Specialist} from "@solaris-common"
-import type { Player, Carrier, Star, Game } from "./game"
-import gameHelper from "../services/gameHelper"
+import type { Player, Carrier, Star, Game } from "../types/game"
+import gameHelper from "./gameHelper"
 
 export type CombatParticipantResult = number | '???';
 

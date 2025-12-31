@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import { useStore } from 'vuex';
-import { type CombatSide, resultToNumber } from '../../../../../types/combat';
+import { type CombatSide, resultToNumber } from '../../../../../services/combat';
 import type { Store } from 'vuex/types/index.js';
 import type { State } from '../../../../../store';
 import CombatActorDescription from './CombatActorDescription.vue';

@@ -20,9 +20,9 @@
   </p>
 
   <p v-if="event.data.experimentLevelUp">
-    The <span class="text-warning">{{event.data.experimentAmount}} points</span> of research discovered by your experimental scientists caused a <span class="text-warning">breakthrough</span> in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology)}}</span>!
+    The <span class="text-warning">{{event.data.experimentAmount}} points</span> of research discovered by your experimental scientists caused a <span class="text-warning">breakthrough</span> in the field of <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentTechnology!)}}</span>!
   </p>
-  
+
   <p v-if="event.data.experimentResearchingNext">
     Your scientists are now researching <span class="text-info">{{getTechnologyFriendlyName(event.data.experimentResearchingNext)}}</span>.
   </p>
@@ -39,22 +39,15 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import TechnologyHelper from '../../../../../services/technologyHelper'
+import type {PlayerGalacticCycleCompleteEvent, ResearchType} from "@solaris-common";
 
-export default {
-  components: {
+const props = defineProps<{
+  event: PlayerGalacticCycleCompleteEvent<string>,
+}>();
 
-  },
-  props: {
-    event: Object
-  },
-  methods: {
-    getTechnologyFriendlyName (key) {
-      return TechnologyHelper.getFriendlyName(key)
-    }
-  }
-}
+const getTechnologyFriendlyName = (key: string) => TechnologyHelper.getFriendlyName(key as ResearchType);
 </script>
 
 <style scoped>

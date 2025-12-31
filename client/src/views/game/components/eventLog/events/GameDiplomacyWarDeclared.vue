@@ -6,17 +6,18 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    event: Object
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    }
-  }
-}
+<script setup lang="ts">
+import type {GameDiplomacyWarDeclaredEvent} from "@solaris-common";
+
+const props = defineProps<{
+  event: GameDiplomacyWarDeclaredEvent<string>,
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
+
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 </script>
 
 <style scoped>
