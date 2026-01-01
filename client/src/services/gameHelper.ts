@@ -1,7 +1,7 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
-import type {GameStateDetail, Location, MapObject, Team} from '@solaris-common';
+import {type BasePlayerDebtEvent, type GameStateDetail, type Location, type MapObject, type Team} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 
 class GameHelper {
@@ -1252,7 +1252,7 @@ class GameHelper {
     return game.settings.general.featured === true
   }
 
-  getLedgerGameEventPlayerSummary(game, gameEvent) {
+  getLedgerGameEventPlayerSummary(game: Game, gameEvent: BasePlayerDebtEvent<string>) {
     const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
     const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)
     const isCreditor = this.getUserPlayer(game) == creditor

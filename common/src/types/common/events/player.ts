@@ -4,6 +4,7 @@ import type {BulkUpgradeReport} from "../infrastructureUpgrade";
 import type {BaseGameEvent} from "./game";
 import type {LedgerType} from "../ledger";
 import type {DiplomaticStatus} from "../diplomacy";
+import type {TradeEventTechnology} from "../trade";
 
 export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
     playerId: ID;
@@ -41,8 +42,7 @@ export interface PlayerSpecialistTokensSentEvent<ID> extends BasePlayerEvent<ID>
     }
 }
 
-export interface PlayerDebtForgivenEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerDebtForgiven',
+export interface BasePlayerDebtEvent<ID> extends BasePlayerEvent<ID> {
     data: {
         debtorPlayerId: ID,
         creditorPlayerId: ID,
@@ -51,14 +51,12 @@ export interface PlayerDebtForgivenEvent<ID> extends BasePlayerEvent<ID> {
     }
 }
 
-export interface PlayerDebtSettledEvent<ID> extends BasePlayerEvent<ID> {
+export interface PlayerDebtForgivenEvent<ID> extends BasePlayerDebtEvent<ID> {
+    type: 'playerDebtForgiven',
+}
+
+export interface PlayerDebtSettledEvent<ID> extends BasePlayerDebtEvent<ID> {
     type: 'playerDebtSettled',
-    data: {
-        debtorPlayerId: ID,
-        creditorPlayerId: ID,
-        amount: number,
-        ledgerType: LedgerType,
-    }
 }
 
 export interface PlayerGiftReceivedEvent<ID> extends BasePlayerEvent<ID> {
@@ -216,7 +214,7 @@ export interface PlayerTechnologyReceivedEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerTechnologyReceived',
     data: {
         fromPlayerId: ID,
-        technology: string,
+        technology: TradeEventTechnology,
     },
 }
 
@@ -224,7 +222,7 @@ export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerTechnologySent',
     data: {
         toPlayerId: ID,
-        technology: string,
+        technology: TradeEventTechnology,
     },
 }
 

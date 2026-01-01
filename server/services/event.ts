@@ -27,7 +27,7 @@ import {
     PlayerStarDiedEvent,
     PlayerStarReignitedEvent, PlayerStarSpecialistHiredEvent,
     PlayerTechnologyReceivedEvent,
-    PlayerTechnologySentEvent
+    PlayerTechnologySentEvent, TradeEventTechnology
 } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
@@ -449,7 +449,7 @@ export default class EventService {
         return await this.createPlayerEvent<PlayerResearchCompleteEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerResearchComplete', data);
     }
 
-    async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
+    async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: TradeEventTechnology) {
         const data = {
             fromPlayerId: fromPlayer._id,
             technology
@@ -458,7 +458,7 @@ export default class EventService {
         return await this.createPlayerEvent<PlayerTechnologyReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerTechnologyReceived', data);
     }
 
-    async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
+    async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: TradeEventTechnology) {
         const data = {
             toPlayerId: toPlayer._id,
             technology

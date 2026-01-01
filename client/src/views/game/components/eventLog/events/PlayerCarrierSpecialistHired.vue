@@ -9,17 +9,13 @@
 </div>
 </template>
 
-<script>
-import CarrierLabelVue from '../../carrier/CarrierLabel.vue'
+<script setup lang="ts">
+import CarrierLabel from '../../carrier/CarrierLabel.vue'
+import type {PlayerCarrierSpecialistHiredEvent} from "@solaris-common";
 
-export default {
-  components: {
-    'carrier-label': CarrierLabelVue
-  },
-  props: {
-    event: Object
-  }
-}
+const props = defineProps<{
+  event: PlayerCarrierSpecialistHiredEvent<string>,
+}>();
 </script>
 
 <style scoped>
