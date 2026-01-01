@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import {inject, computed} from 'vuex';
+import {inject, computed} from 'vue';
 import GameEnded from './GameEnded.vue'
 import GamePlayerAfk from './GamePlayerAFK.vue'
 import GamePlayerDefeated from './GamePlayerDefeated.vue'
