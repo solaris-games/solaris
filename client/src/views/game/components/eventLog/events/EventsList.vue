@@ -1,15 +1,13 @@
 <template>
 <div>
-  <loading-spinner :loading="!events"/>
-
-  <div class="container" v-if="events">
+  <div class="container">
     <div class="row">
       <div class="col">
-        <button class="btn btn-sm btn-outline-primary" @click="loadEvents"><i class="fas fa-sync"></i><span class="d-none d-sm-inline-block ms-1">Refresh</span></button>
-        <button class="btn btn-sm btn-success ms-1" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
+        <button :disabled="isLoading" class="btn btn-sm btn-outline-primary" @click="loadEvents"><i class="fas fa-sync"></i><span class="d-none d-sm-inline-block ms-1">Refresh</span></button>
+        <button :disabled="isLoading" class="btn btn-sm btn-success ms-1" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
       </div>
       <div class="col-auto">
-        <select class="form-control form-control-sm" v-model="selectedFilter" @change="loadPage(0)">
+        <select :disabled="isLoading" class="form-control form-control-sm" v-model="selectedFilter" @change="loadPage(0)">
           <option value="all">All Events</option>
           <option value="gameEvents">Game Events</option>
           <option value="galacticCycles">Galactic Cycles</option>
@@ -23,8 +21,8 @@
       </div>
     </div>
 
-    <div class="row mt-2">
-      <div class="col">
+    <div class="row mt-2" v-if="events">
+      <div class="col-auto">
         <nav aria-label="Events pagination">
           <ul class="pagination justify-content-end mb-0">
             <li class="page-item" :class="{'disabled': page <= 0}">
@@ -56,6 +54,8 @@
     </div>
   </div>
 
+  <loading-spinner :loading="isLoading"/>
+
   <div class="mt-2 events-container container" v-if="events && events.length">
       <events-list-item v-for="event in events" :key="event._id" :event="event"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
@@ -63,7 +63,7 @@
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
   </div>
 
-  <div class="text-center pt-3 pb-3" v-if="events && !events.length">
+  <div class="text-center pt-3 pb-3" v-if="!isLoading && events && !events.length">
       No Events.
   </div>
 </div>
@@ -97,6 +97,7 @@ const onOpenStarDetailRequested = (starId: string) => emit('onOpenStarDetailRequ
 const onOpenCarrierDetailRequested = (carrierId: string) => emit('onOpenCarrierDetailRequested', carrierId);
 
 const events = ref<GameEvent<string>[]>([]);
+const isLoading = ref(false);
 const count = ref(0);
 const page = ref(0);
 const pageSize = ref(30);
@@ -123,6 +124,8 @@ const pageNumbers = computed(() => {
 })
 
 const loadEvents = async () => {
+  isLoading.value = true;
+
   const response = await listEvents(httpClient)(game.value._id, page.value, pageSize.value, selectedFilter.value);
 
   if (isOk(response)) {
@@ -133,6 +136,8 @@ const loadEvents = async () => {
   } else {
     console.error(formatError(response));
   }
+
+  isLoading.value = false;
 };
 
 const loadPage = (pageNumber: number) => {
