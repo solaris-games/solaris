@@ -1,15 +1,14 @@
 <template>
 <div class="menu-page">
   <div class="container">
-    <menu-title title="Event Log" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Event Log" @onCloseRequested="onCloseRequested">
+      <button :disabled="isLoading" class="btn btn-sm btn-success" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
+      <button :disabled="isLoading" class="btn btn-sm btn-outline-primary ms-1" @click="loadEvents"><i class="fas fa-sync"></i><span class="d-none d-sm-inline-block ms-1">Refresh</span></button>
+    </menu-title>
   </div>
 
   <div class="container">
     <div class="row">
-      <div class="col">
-        <button :disabled="isLoading" class="btn btn-sm btn-outline-primary" @click="loadEvents"><i class="fas fa-sync"></i><span class="d-none d-sm-inline-block ms-1">Refresh</span></button>
-        <button :disabled="isLoading" class="btn btn-sm btn-success ms-1" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
-      </div>
       <div class="col-auto">
         <select :disabled="isLoading" class="form-control form-control-sm" v-model="selectedFilter" @change="loadPage(0)">
           <option value="all">All Events</option>
