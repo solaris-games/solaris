@@ -546,10 +546,15 @@
       <form-error-list v-bind:errors="errors" />
 
       <div class="row mt-2">
-        <div class="col"></div>
+        <div class="col">
+          <button type="button" class="btn btn-warning" :disabled="isSavingSettings" @click="resetToDefaults">
+            <i class="fas fa-arrow-rotate-left"></i> Reset to defaults
+          </button>
+        </div>
         <div class="col-auto">
-          <button type="submit" class="btn btn-success" :disabled="isSavingSettings"><i class="fas fa-save"></i> Save
-            Settings</button>
+          <button type="submit" class="btn btn-success" :disabled="isSavingSettings">
+            <i class="fas fa-save"></i> Save Settings
+          </button>
         </div>
       </div>
     </form>
@@ -563,7 +568,7 @@ import { inject, onMounted, ref, type Ref } from 'vue';
 import { eventBusInjectionKey } from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi';
-import type { UserGameSettings } from '@solaris-common';
+import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris-common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
 import { toastInjectionKey } from '@/util/keys';
 import { useStore, type Store } from 'vuex';
@@ -621,14 +626,18 @@ const handleSubmit = async (e: Event) => {
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.state.game, settings: store.state.settings });
     }
 
-    onOptionsSaved()
+    onOptionsSaved();
   } else {
     console.error(response.cause);
     errors.value = extractErrors(response) || [];
   }
 
   isSavingSettings.value = false
-}
+};
+
+const resetToDefaults = () => {
+  settings.value = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+};
 
 onMounted(async () => {
   settings.value = null

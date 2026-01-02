@@ -21,7 +21,7 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         carrierPathWidth: 1,
         carrierPathDashLength: 6,
         territoryStyle: 'marching-square',
-        territoryOpacity: 0.333,
+        territoryOpacity: 0.3,
         marchingSquareGridSize: 6,
         marchingSquareTerritorySize: 5,
         marchingSquareBorderWidth: 2,
