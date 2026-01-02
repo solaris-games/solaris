@@ -2,14 +2,14 @@ import type {UserGameSettings} from "../types/common/settings";
 
 export const DEFAULT_SETTINGS: UserGameSettings = {
     interface: {
-        audio: 'disabled',
+        audio: 'enabled',
         galaxyScreenUpgrades: 'disabled',
         uiStyle: 'standard',
-        suggestMentions: 'disabled',
+        suggestMentions: 'enabled',
         shiftKeyMentions: 'disabled',
     },
     guild: {
-        displayGuildTag: 'hidden',
+        displayGuildTag: 'visible',
     },
     technical: {
         performanceMonitor: 'disabled',
