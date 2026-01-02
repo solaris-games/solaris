@@ -7,7 +7,7 @@
        "password":null,
        "playerLimit":8,
        "playerType":"establishedPlayers",
-       "anonymity":"normal",
+       "anonymity":"revealAtEnd",
        "playerOnlineStatus":"hidden",
        "playerIPWarning": "enabled",
        "timeMachine":"disabled",
