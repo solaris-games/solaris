@@ -40,8 +40,12 @@ export class GameTypeService {
         return game.settings.general.mode === 'kingOfTheHill';
     }
 
-    isAnonymousGame<ID>(game: Game<ID>) {
+    isAnonymousAfterEnd<ID>(game: Game<ID>) {
         return game.settings.general.anonymity === 'extra';
+    }
+
+    isAnonymousGameDuringGame<ID>(game: Game<ID>) {
+        return game.settings.general.anonymity === 'extra' || game.settings.general.anonymity === 'revealAtEnd';
     }
 
     isForEstablishedPlayersOnly<ID>(game: Game<ID>) {

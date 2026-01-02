@@ -901,7 +901,7 @@ export default class GameTickService extends EventEmitter {
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
 
-                let e: InternalGameEndedEvent = {
+                const e: InternalGameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult
@@ -952,7 +952,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // If the game is anonymous, then ranking results should be omitted from the game ended event.
-        if (this.gameTypeService.isAnonymousGame(game)) {
+        if (this.gameTypeService.isAnonymousAfterEnd(game)) {
             rankingResult = null;
         }
         

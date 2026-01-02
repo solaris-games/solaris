@@ -51,6 +51,7 @@ import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {join} from "@/services/typedapi/game";
 import PlayerLeaderboard from "@/views/game/components/leaderboard/PlayerLeaderboard.vue";
+import {useGameServices} from "@/util/gameServices";
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -65,9 +66,11 @@ const avatar = ref<number | null>(null);
 const alias = ref('');
 const password = ref('');
 
-const store = useStore();
+const serviceProvider = useGameServices();
+
+const store = useStore()
 const game = computed(() => store.state.game as Game);
-const isAnonymousGame = computed(() => gameHelper.isExtraAnonymity(game.value));
+const isAnonymousGame = computed(() => serviceProvider.gameTypeService.isAnonymousGameDuringGame(game.value));
 const isPasswordRequired = computed(() => game.value.settings.general.passwordRequired);
 const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot === 'enabled');
 

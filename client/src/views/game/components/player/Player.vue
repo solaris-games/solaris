@@ -60,6 +60,8 @@ import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import { getPlayerUser } from '@/services/typedapi/game'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import {useGameServices} from "@/util/gameServices";
+import type {Game} from "@/types/game";
 
 const props = defineProps<{
   playerId: string,
@@ -87,7 +89,12 @@ const userPlayer: Ref<Player<string> | null> = ref(null);
 const leaderboard: Ref<Player<string>[] | null> = ref(null);
 const playerIndex = ref(0);
 
-const game = computed(() => store.state.game!);
+const game = computed<Game>(() => store.state.game!);
+
+const serviceProvider = useGameServices();
+
+const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
+const playersAreAnonymous = computed(() => isGameFinished.value ? serviceProvider.gameTypeService.isAnonymousAfterEnd(game.value) : serviceProvider.gameTypeService.isAnonymousGameDuringGame(game.value));
 
 onMounted(async () => {
   isLoading.value = true;
@@ -99,7 +106,7 @@ onMounted(async () => {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (store.state.userId && !player.value!.isOpenSlot && GameHelper.isNormalAnonymity(store.state.game)) {
+    if (store.state.userId && !player.value!.isOpenSlot && !playersAreAnonymous.value) {
       const response = await getPlayerUser(httpClient)(store.state.game._id, player.value!._id);
 
       if (isOk(response)) {

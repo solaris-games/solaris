@@ -89,7 +89,7 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`The player slot has not been filled by a user.`);
         }
 
-        if (this.gameTypeService.isAnonymousGame(game) && !this.gameStateService.isFinished(game)) {
+        if (this.gameTypeService.isAnonymousGameDuringGame(game) && !this.gameStateService.isFinished(game)) {
             throw new ValidationError(`Cannot purchase a badge in an anonymous game before it finishes.`);
         }
 

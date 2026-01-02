@@ -408,11 +408,13 @@ export default class GameService extends EventEmitter {
     }
 
     async getPlayerUser(game: Game, playerId: DBObjectId) {
-        if (this.gameTypeService.isAnonymousGame(game)) {
+        const isAnonymousNow = this.gameStateService.isFinished(game) ? this.gameTypeService.isAnonymousAfterEnd(game) : this.gameTypeService.isAnonymousGameDuringGame(game);
+
+        if (isAnonymousNow) {
             return null;
         }
         
-        let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+        const player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         if (!player.userId) {
             return null;
