@@ -5,11 +5,15 @@
       <button :disabled="isLoading" class="btn btn-sm btn-success" @click="markAllRead"><i class="fas fa-check"></i> Read All</button>
       <button :disabled="isLoading" class="btn btn-sm btn-outline-primary ms-1" @click="loadEvents"><i class="fas fa-sync"></i><span class="d-none d-sm-inline-block ms-1">Refresh</span></button>
     </menu-title>
-  </div>
 
-  <div class="container">
-    <div class="row">
-      <div class="col-auto">
+    <div class="row pt-2 pb-2">
+      <div class="col">
+        <input class="form-check-input me-1" type="checkbox" v-model="showUnread" id="showUnread">
+        <label class="form-check-label" for="showUnread">
+          Unread only
+        </label>
+      </div>
+      <div class="col">
         <select :disabled="isLoading" class="form-control form-control-sm" v-model="selectedFilter" @change="loadPage(0)">
           <option value="all">All Events</option>
           <option value="gameEvents">Game Events</option>
@@ -25,7 +29,7 @@
     </div>
 
     <div class="row mt-2" v-if="events">
-      <div class="col-auto">
+      <div class="col-auto pagination-col">
         <nav aria-label="Events pagination">
           <ul class="pagination justify-content-end mb-0">
             <li class="page-item" :class="{'disabled': page <= 0}">
@@ -60,7 +64,7 @@
   <loading-spinner :loading="isLoading"/>
 
   <div class="mt-2 events-container container" v-if="events && events.length">
-    <events-list-item v-for="event in events" :key="event._id" :event="event"
+    <events-list-item v-for="event in displayedEvents" :key="event._id" :event="event"
                       @onOpenStarDetailRequested="onOpenStarDetailRequested"
                       @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
                       @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
@@ -110,6 +114,15 @@ const page = ref(0);
 const pageSize = ref(30);
 const pageMax = ref(0);
 const selectedFilter = ref('all');
+const showUnread = ref(false);
+
+const displayedEvents = computed(() => {
+  if (showUnread.value) {
+    return events.value.filter(ev => ev.read === false); // null/undefined is global event
+  } else {
+    return events.value;
+  }
+})
 
 const pageNumbers = computed(() => {
   const pages: number[] = [];
@@ -170,6 +183,12 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.pagination-col {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+}
+
 .events-container {
   max-height: 600px;
   overflow: auto;
