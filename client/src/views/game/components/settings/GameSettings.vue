@@ -649,6 +649,7 @@ const getFriendlyText = (option: string) => {
     'current_research': 'Current Research',
     'largestCarrier': "Largest carrier",
     'anyCarrier': "Any carrier",
+    'revealAtEnd': "Anonymous, revealed at end",
   }[option]
 
   return text || option
