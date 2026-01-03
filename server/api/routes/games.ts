@@ -375,6 +375,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.game.loadGame({
                 lean: true,
                 settings: true,
+                state: true,
                 'galaxy.players': true
             }),
             controller.getPlayerUser

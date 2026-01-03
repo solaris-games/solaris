@@ -459,7 +459,7 @@ export default (container: DependencyContainer) => {
         },
         getPlayerUser: async (req, res, next) => {
             try {
-                let user = await container.gameService.getPlayerUser(
+                const user = await container.gameService.getPlayerUser(
                     req.game,
                     req.params.playerId
                 );
