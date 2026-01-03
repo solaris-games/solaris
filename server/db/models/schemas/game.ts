@@ -54,7 +54,7 @@ const schema = new Schema({
 			passwordRequired: { type: Types.Boolean, required: false, default: false },
 			playerLimit: { type: Types.Number, required: true, default: 8, min: 2, max: 64 },
 			playerType: { type: Types.String, required: true, enum: ['all', 'establishedPlayers'], default: 'all' },
-			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra'], default: 'normal' },
+			anonymity: { type: Types.String, required: true, enum: ['normal', 'extra', 'revealAtEnd'], default: 'normal' },
 			playerOnlineStatus: { type: Types.String, required: true, enum: ['hidden', 'visible'], default: 'hidden' },
 			playerIPWarning: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'enabled' },
 			timeMachine: { type: Types.String, required: true, enum: ['disabled', 'enabled'], default: 'disabled' },
