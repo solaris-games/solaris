@@ -931,12 +931,12 @@ export default class GameTickService extends EventEmitter {
 
     _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
         let rankingResult: GameRankingResult<DBObjectId> | null = null;
-    
+
         // There must have been at least X production ticks in order for
         // rankings to be added to players. This is to slow down players
         // should they wish to cheat the system.
-        let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
-        let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
+        const productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+        const canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
             if (this.gameTypeService.isTeamConquestGame(game)) {

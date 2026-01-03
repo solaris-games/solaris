@@ -71,8 +71,8 @@ const store = useStore();
 const game = computed<Game>(() => store.state.game);
 
 const isTeamGame = computed(() => GameHelper.isTeamConquest(game.value));
-const hasRankResults = computed(() => props.event?.data?.rankingResult?.ranks?.length);
-const hasEloRatingResult = computed(() => props.event?.data?.rankingResult?.eloRating);
+const hasRankResults = computed(() => Boolean(props.event?.data?.rankingResult?.ranks?.length));
+const hasEloRatingResult = computed(() => Boolean(props.event?.data?.rankingResult?.eloRating));
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerRating = computed(() => {
