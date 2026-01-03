@@ -28,17 +28,17 @@
         </div>
     </div>
     <div class="row bg-dark mt-0">
-        <div class="col-12" v-if="hasLastMessage && lastMessageSender">
+        <div class="col-12" v-if="hasLastMessage">
           <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
-            <player-icon v-if="lastMessage!.fromPlayerId" :playerId="lastMessageSender._id" />
+            <player-icon v-if="lastMessageSender && lastMessage!.fromPlayerId" :playerId="lastMessageSender._id" />
             <span class="lastMessage">{{lastMessageText}}</span>
           </p>
         </div>
         <div class="col-12" v-if="hasLastMessage && lastMessage">
-            <small class="float-end mb-2"><i>{{GameHelper.getDateString(lastMessage.sentDate)}}</i></small>
+          <small class="float-end mb-2"><i>{{GameHelper.getDateString(lastMessage.sentDate)}}</i></small>
         </div>
         <div class="col-12" v-if="!hasLastMessage">
-            <p class="mt-2 mb-2">No messages.</p>
+          <p class="mt-2 mb-2">No messages.</p>
         </div>
     </div>
 </div>
