@@ -370,6 +370,8 @@ export default class LeaderboardService {
                     if (i < topN || i >= leaderboard.length - topN) {
                         rankIncrease = Math.round(leaderboard.length / 2 - i);
                     }
+                } else if (game.settings.general.awardRankTo === 'noRankLoss') {
+                    rankIncrease = Math.abs(Math.round(leaderboard.length / 2 - i));
                 }
             }
 

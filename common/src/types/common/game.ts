@@ -50,7 +50,8 @@ export const GAME_AWARD_RANK_TO = [
     'all',
     'winner',
     'top_n',
-    'teams'
+    'teams',
+    'noRankLoss',
 ] as const;
 
 export type GameAwardRankTo = typeof GAME_AWARD_RANK_TO[number];
