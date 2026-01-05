@@ -650,6 +650,7 @@ const getFriendlyText = (option: string) => {
     'largestCarrier': "Largest carrier",
     'anyCarrier': "Any carrier",
     'revealAtEnd': "Anonymous, revealed at end",
+    'noRankLoss': 'All players, no rank loss',
   }[option]
 
   return text || option

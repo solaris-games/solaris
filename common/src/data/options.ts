@@ -253,6 +253,10 @@ export const GAME_CREATION_OPTIONS = {
             {
                 "value": "top_n",
                 "text": "Top N"
+            },
+            {
+                "value": "noRankLoss",
+                "text": "All players, no rank loss"
             }
         ]
     },
