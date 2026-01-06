@@ -371,7 +371,7 @@ export default class LeaderboardService {
                         rankIncrease = Math.round(leaderboard.length / 2 - i);
                     }
                 } else if (game.settings.general.awardRankTo === 'noRankLoss') {
-                    rankIncrease = Math.abs(Math.round(leaderboard.length / 2 - i));
+                    rankIncrease = Math.max(0, Math.round(leaderboard.length / 2 - i));
                 }
             }
 
