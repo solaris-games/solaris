@@ -162,6 +162,12 @@ const schema = new Schema({
                 enum: ['enabled', 'disabled'],
                 default: 'enabled'
             },
+            confirmShipDistribution: {
+                type: Types.String,
+                required: false,
+                enum: ['enabled', 'disabled'],
+                default: 'disabled'
+            },
         },
         technical: {
             performanceMonitor: {

@@ -72,5 +72,6 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         confirmBuildIndustry: 'disabled',
         confirmBuildScience: 'disabled',
         confirmBuildWarpGate: 'enabled',
+        confirmShipDistribution: 'disabled',
     },
 }

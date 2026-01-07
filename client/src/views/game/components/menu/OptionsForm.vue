@@ -522,6 +522,17 @@
         </div>
       </div>
 
+      <div class="row pt-1 pb-1">
+        <label for="confirmShipDistribution" class="col-12 col-sm-6 col-form-label">Confirm Ship Distribution</label>
+        <div class="col-12 col-sm-6">
+          <select class="form-control" id="confirmShipDistribution" v-model="settings.star.confirmShipDistribution"
+                  :disabled="isSavingSettings">
+            <option value="disabled">Disabled</option>
+            <option value="enabled">Enabled</option>
+          </select>
+        </div>
+      </div>
+
       <h5 class="pt-2">Technical</h5>
 
       <div class="row pt-1 pb-1">
