@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { ValidationError } from "solaris-common";
+import {UserGameSettings, ValidationError} from "solaris-common";
 import PasswordService from './password';
 import Repository from './repository';
 import SessionService from './session';
@@ -422,7 +422,7 @@ export default class UserService extends EventEmitter {
         return user!.gameSettings;
     }
 
-    async saveGameSettings(userId: DBObjectId, settings) {
+    async saveGameSettings(userId: DBObjectId, settings: UserGameSettings) {
         if (+settings.carrier.defaultAmount < 0) {
             throw new ValidationError(`Carrier default amount must be greater than 0.`);
         }

@@ -91,7 +91,7 @@
           <label for="territory-size" class="col-12 col-sm-6 col-form-label">Territory Size</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="2" max="32" class="form-control" id="territory-size"
-              v-model="settings.map.marchingSquareTerritorySize" :disabled="isSavingSettings">
+              v-model.number="settings.map.marchingSquareTerritorySize" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -99,7 +99,7 @@
           <label for="grid-size" class="col-12 col-sm-6 col-form-label">Grid Size</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="2" max="32" class="form-control" id="grid-size"
-              v-model="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
+              v-model.number="settings.map.marchingSquareGridSize" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -107,7 +107,7 @@
           <label for="border-width" class="col-12 col-sm-6 col-form-label">Border Width</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="0" max="8" class="form-control" id="border-width"
-              v-model="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
+              v-model.number="settings.map.marchingSquareBorderWidth" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -123,7 +123,7 @@
           <label for="grid-size" class="col-12 col-sm-6 col-form-label">Territory Border Width</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="0" max="8" class="form-control" id="grid-size"
-              v-model="settings.map.voronoiTerritoryBorderWidth" :disabled="isSavingSettings">
+              v-model.number="settings.map.voronoiTerritoryBorderWidth" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -131,7 +131,7 @@
           <label for="territory-opacity" class="col col-form-label">Territory Opacity</label>
           <div class="col">
             <input type="number" max="1" min="0" step="0.05" class="form-control" id="territory-opacity"
-              v-model="settings.map.territoryOpacity" :disabled="isSavingSettings">
+              v-model.number="settings.map.territoryOpacity" :disabled="isSavingSettings">
           </div>
         </div>
       </div>
@@ -164,14 +164,14 @@
           <label for="minimum-scale" class="col-12 col-sm-6 col-form-label">Minimum Scale</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="0" max="32" class="form-control" id="minimum-scale"
-              v-model="settings.map.objectsMinimumScale" :disabled="isSavingSettings">
+              v-model.number="settings.map.objectsMinimumScale" :disabled="isSavingSettings">
           </div>
         </div>
         <div v-if="settings.map.objectsScaling == 'clamped'" class="row pt-1 pb-1 ms-1">
           <label for="maximum-scale" class="col-12 col-sm-6 col-form-label">Maximum Scale</label>
           <div class="col-12 col-sm-6">
             <input type="number" min="12" max="128" class="form-control" id="maximum-scale"
-              v-model="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
+              v-model.number="settings.map.objectsMaximumScale" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -187,7 +187,7 @@
           <label for="carrier-path-width" class="col col-form-label">Path Width</label>
           <div class="col">
             <input type="number" min="1" max="8" class="form-control" id="carrier-path-width"
-              v-model="settings.map.carrierPathWidth" :disabled="isSavingSettings">
+              v-model.number="settings.map.carrierPathWidth" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -206,7 +206,7 @@
           <label for="carrier-path-length" class="col col-form-label">Dash Length</label>
           <div class="col">
             <input type="number" min="4" max="16" class="form-control" id="carrier-path-length"
-              v-model="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
+              v-model.number="settings.map.carrierPathDashLength" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -331,7 +331,7 @@
           <label for="territories-zoom" class="col col-form-label">Territories</label>
           <div class="col">
             <input type="number" class="form-control" id="territories-zoom"
-              v-model="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.territories" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -339,7 +339,7 @@
           <label for="player-names-zoom" class="col col-form-label">Player Names</label>
           <div class="col">
             <input type="number" class="form-control" id="player-names-zoom"
-              v-model="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.playerNames" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -351,7 +351,7 @@
           <label for="nebulas-zoom" class="col col-form-label">Nebulas</label>
           <div class="col">
             <input type="number" class="form-control" id="nebulas-zoom"
-              v-model="settings.map.zoomLevels.background.nebulas" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.background.nebulas" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -359,7 +359,7 @@
           <label for="background-stars-zoom" class="col col-form-label">Background Stars</label>
           <div class="col">
             <input type="number" class="form-control" id="background-stars-zoom"
-              v-model="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.background.stars" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -367,7 +367,7 @@
           <label for="carriers-ship-zoom" class="col col-form-label">Carrier Ships</label>
           <div class="col">
             <input type="number" class="form-control" id="carriers-ship-zoom"
-              v-model="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.carrierShips" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -375,14 +375,14 @@
           <label for="star-ship-zoom" class="col col-form-label">Star Ships</label>
           <div class="col">
             <input type="number" class="form-control" id="star-ship-zoom"
-              v-model="settings.map.zoomLevels.star.shipCount" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.star.shipCount" :disabled="isSavingSettings">
           </div>
         </div>
 
         <div class="row pt-1 pb-1 ms-1">
           <label for="star-name-zoom" class="col col-form-label">Star Name</label>
           <div class="col">
-            <input type="number" class="form-control" id="star-name-zoom" v-model="settings.map.zoomLevels.star.name"
+            <input type="number" class="form-control" id="star-name-zoom" v-model.number="settings.map.zoomLevels.star.name"
               :disabled="isSavingSettings">
           </div>
         </div>
@@ -391,7 +391,7 @@
           <label for="star-resources-zoom" class="col col-form-label">Star Natural Resources</label>
           <div class="col">
             <input type="number" class="form-control" id="star-resources-zoom"
-              v-model="settings.map.zoomLevels.star.naturalResources" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.star.naturalResources" :disabled="isSavingSettings">
           </div>
         </div>
 
@@ -399,7 +399,7 @@
           <label for="star-infrastructure-zoom" class="col col-form-label">Star Infrastructure</label>
           <div class="col">
             <input type="number" class="form-control" id="star-infrastructure-zoom"
-              v-model="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
+              v-model.number="settings.map.zoomLevels.star.infrastructure" :disabled="isSavingSettings">
           </div>
         </div>
       </div>
@@ -421,7 +421,7 @@
         <label for="natural-resources-ring-opacity" class="col col-form-label">Natural Resources Ring Opacity</label>
         <div class="col">
           <input type="number" max="1" min="0" step="0.05" class="form-control" id="natural-resources-ring-opacity"
-            v-model="settings.map.naturalResourcesRingOpacity" :disabled="isSavingSettings">
+            v-model.number="settings.map.naturalResourcesRingOpacity" :disabled="isSavingSettings">
         </div>
       </div>
 
@@ -460,7 +460,7 @@
       <div class="row pt-1 pb-1">
         <label for="carrierDefaultAmount" class="col-12 col-sm-6 col-form-label">Default Amount</label>
         <div class="col-12 col-sm-6">
-          <input type="number" class="form-control" id="carrierDefaultAmount" v-model="settings.carrier.defaultAmount"
+          <input type="number" class="form-control" id="carrierDefaultAmount" v-model.number="settings.carrier.defaultAmount"
             :disabled="isSavingSettings">
         </div>
       </div>
@@ -550,7 +550,7 @@
         <label for="fpsLimit" class="col-12 col-sm-6 col-form-label">FPS Limit</label>
         <div class="col-12 col-sm-6">
           <input class="form-control" min="0" max="240" type="number" id="fpsLimit"
-            v-model="settings.technical.fpsLimit" :disabled="isSavingSettings">
+            v-model.number="settings.technical.fpsLimit" :disabled="isSavingSettings">
         </div>
       </div>
 
