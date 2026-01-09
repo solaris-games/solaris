@@ -51,7 +51,7 @@ import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
-import {DEFAULT_SETTINGS} from "@solaris-common";
+import type {Game} from "@/types/game";
 
 const store: Store<State> = useStore();
 
@@ -71,13 +71,15 @@ const polling: Ref<number | null> = ref(null);
 const ticking = ref(false);
 const colourOverride: Ref<{ playerId: string } | null> = ref(null);
 
-const gameId = computed(() => store.state.game._id);
+const game = computed<Game>(() => store.state.game);
 
-const hasGame = computed(() => Boolean(store.state.game));
+const gameId = computed(() => game.value._id);
+
+const hasGame = computed(() => Boolean(game.value));
 
 const isLoggedIn = computed(() => Boolean(store.state.userId));
 
-const isHistorical = computed(() => store.state.tick !== store.state.game.state.tick);
+const isHistorical = computed(() => store.state.tick !== game.value.state.tick);
 
 const gameServices = createGameServices(store);
 provide(gameServicesKey, gameServices);
@@ -199,7 +201,7 @@ const reloadGame = async () => {
 
 const reloadGameCheck = async () => {
   if (!isLoggedIn.value || ticking.value) {
-    return
+    return;
   }
 
   // Check if the next tick date has passed, if so check if the server has finished the game tick.
@@ -212,7 +214,9 @@ const reloadGameCheck = async () => {
     const response = await detailState(httpClient)(store.state.game._id);
 
     if (isOk(response)) {
-      if (store.state.tick < response.data.state.tick) {
+      const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
+
+      if (store.state.tick < response.data.state.tick || hasEnded) {
         // If the user is currently using the time machine then only set the state variables.
         // Otherwise reload the current game tick.
         if (isHistorical.value) {
@@ -224,7 +228,11 @@ const reloadGameCheck = async () => {
 
         eventBus.emit(GameEventBusEventNames.OnGameTick);
 
-        toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
+        if (hasEnded) {
+          toast.success(`The game has ended!`);
+        } else {
+          toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
+        }
 
         AudioService.download();
       }

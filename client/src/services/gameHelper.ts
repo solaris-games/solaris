@@ -1033,7 +1033,7 @@ class GameHelper {
   }
 
   isAllUndefeatedPlayersReady(game) {
-    let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
+    const undefeatedPlayers = this.listAllUndefeatedPlayers(game)
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length
   }
@@ -1054,13 +1054,10 @@ class GameHelper {
 
   canTick(game: Game) {
     if (this.isGameFinished(game)) {
-      console.log('canTick: isGameFinished true, returning false');
       return false;
     }
 
     if (this.isAllUndefeatedPlayersReadyToQuit(game)) {
-      console.log('canTick: isAllUndefeatedPlayersReadyToQuit true, returning true');
-
       return true;
     }
 
@@ -1071,12 +1068,10 @@ class GameHelper {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
       nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
-      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
-
-      console.log(`canTick: isTurnBasedGame(game): true, isAllPlayersReady: ${isAllPlayersReady}`);
+      const isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
 
       if (isAllPlayersReady) {
-        return true
+        return true;
       }
 
       nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
