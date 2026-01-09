@@ -47,6 +47,12 @@ export default class BroadcastService {
         });
     }
 
+    gamePlayerConcededDefeat(game: Game, player: Player) {
+        this.playerServerSocketEmitter.emitGamePlayerConcededDefeat(game._id.toString(), {
+            playerId: player._id.toString(),
+        });
+    }
+
     gamePlayerReady(game: Game, player: Player) {
         this.playerServerSocketEmitter.emitGamePlayerReady(game._id.toString(), {
             playerId: player._id.toString()

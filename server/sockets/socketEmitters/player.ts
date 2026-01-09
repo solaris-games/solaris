@@ -18,6 +18,10 @@ export class PlayerServerSocketEmitter extends ServerSocketEmitter<PlayerSocketE
         this.emit(room, PlayerSocketEventNames.GamePlayerQuit, data);
     }
 
+    public emitGamePlayerConcededDefeat(room: string | string[], data: { playerId: string }) {
+        this.emit(room, PlayerSocketEventNames.GamePlayerConcededDefeat, data);
+    }
+
     public emitGamePlayerReady(room: string | string[], data: { playerId: string }) {
         this.emit(room, PlayerSocketEventNames.GamePlayerReady, data);
     }

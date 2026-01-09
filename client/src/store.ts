@@ -312,7 +312,13 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     [PlayerMutationNames.GamePlayerReady] (state: State, data) {
       let player = GameHelper.getPlayerById(state.game!, data.playerId)!
 
-      player.ready = true
+      player.ready = true;
+    },
+
+    [PlayerMutationNames.GamePlayerConcededDefeat] (state: State, data) {
+      const player = GameHelper.getPlayerById(state.game!, data.playerId)!
+
+      player.defeated = true;
     },
 
     [PlayerMutationNames.GamePlayerNotReady] (state: State, data) {

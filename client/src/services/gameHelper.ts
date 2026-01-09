@@ -1052,13 +1052,16 @@ class GameHelper {
     return game.galaxy.players.filter(p => p.isOpenSlot).length > 0
   }
 
-  canTick(game) {
+  canTick(game: Game) {
     if (this.isGameFinished(game)) {
-      return false
+      console.log('canTick: isGameFinished true, returning false');
+      return false;
     }
 
     if (this.isAllUndefeatedPlayersReadyToQuit(game)) {
-      return true
+      console.log('canTick: isAllUndefeatedPlayersReadyToQuit true, returning true');
+
+      return true;
     }
 
     let lastTick = moment(game.state.lastTickDate).utc();
@@ -1068,7 +1071,9 @@ class GameHelper {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
       nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
-      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
+      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
+
+      console.log(`canTick: isTurnBasedGame(game): true, isAllPlayersReady: ${isAllPlayersReady}`);
 
       if (isAllPlayersReady) {
         return true

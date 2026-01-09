@@ -284,6 +284,9 @@ export default (container: DependencyContainer) => {
                     reqObj.openSlot);
                     
                 res.sendStatus(200);
+
+                container.broadcastService.gamePlayerConcededDefeat(req.game, req.player);
+
                 return next();
             } catch (err) {
                 return next(err);
