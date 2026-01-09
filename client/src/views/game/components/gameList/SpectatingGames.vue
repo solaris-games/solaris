@@ -27,7 +27,7 @@
               Starting Soon
             </span>
             <span v-if="GameHelper.isGameInProgress(game)">
-              <countdown-timer :endDate="getNextCycleDate(game)" :active="true"
+              <countdown-timer :endDate="getNextCycleDate(game)?.toDate()" :active="true"
                 afterEndText="Pending..."></countdown-timer>
             </span>
           </td>
@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import CountdownTimer from '../CountdownTimer.vue';
+import CountdownTimer from '../time/CountdownTimer.vue';
 import { type Ref, ref, onMounted, inject } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listSpectating } from '@/services/typedapi/game';

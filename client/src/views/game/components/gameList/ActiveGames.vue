@@ -50,7 +50,7 @@
                           Starting Soon
                         </span>
                         <span v-if="isGameInProgress(game)">
-                          <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                          <countdown-timer :endDate="getNextCycleDate(game)?.toDate()" :active="true" afterEndText="Pending..."></countdown-timer>
                         </span>
                       </small>
                     </div>
@@ -63,7 +63,7 @@
                       Starting Soon
                     </span>
                     <span v-if="isGameInProgress(game)">
-                      <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                      <countdown-timer :endDate="getNextCycleDate(game)?.toDate()" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
                   </td>
                   <td class="col-1 col-md-6 text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
@@ -90,7 +90,7 @@
 <script setup lang="ts">
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import GameHelper from '../../../../services/gameHelper';
-import CountdownTimer from '../CountdownTimer.vue';
+import CountdownTimer from '../time/CountdownTimer.vue';
 import { loadLocalPreference, storeLocalPreference } from '@/util/localPreference';
 import type { UserActiveListGame } from '@solaris-common';
 import { ref, computed, type Ref, inject, onMounted, watch } from 'vue';
