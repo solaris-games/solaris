@@ -75,6 +75,10 @@ export function notNull<T>(val: T | null): val is T {
     return val !== null;
 }
 
+export const notUndefined = <T>(val: T | undefined): val is T => {
+    return val !== undefined;
+}
+
 export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
     return (a, b) => {
         if (a[prop] < b[prop]) {
