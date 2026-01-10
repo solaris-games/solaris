@@ -1,30 +1,10 @@
 <template>
-  <details v-if="star.ownedByPlayerId && compact">
+  <details v-if="star.ownedByPlayerId">
     <summary>
-    <span title="Weapons">
-     Weapons: {{ weaponsDetail.total }} <i class="fas fa-gun ms-1"></i>
-    </span>
-    </summary>
-
-    <p title="Weapons technology">
-      <span>{{ weaponsDetail.weaponsLevel }}</span>
-      <i class="fas fa-gun ms-2"></i>
-    </p>
-
-    <p title="Defender Bonus">
-      <span>{{ weaponsDetail.defenderBonus }}</span>
-      <i class="fas fa-shield-alt ms-2"></i>
-    </p>
-
-    <p title="Weapons modified" v-for="buff of weaponsDetail.appliedBuffs">
-      <span v-if="buff.kind === 'star'">Star Specialist {{ buff.amount }}</span>
-      <span v-if="buff.kind === 'carrier'">Carrier Specialist {{ buff.amount }}</span>
-      <i class="fas fa-user-astronaut ms-2"></i>
-    </p>
-  </details>
-  <details v-if="star.ownedByPlayerId && !compact">
-    <summary>
-      <span title="Weapons">
+      <span title="Weapons" v-if="compact">
+        {{ weaponsDetail.total }} <i class="fas fa-gun ms-1"></i>
+      </span>
+      <span title="Weapons" v-else>
         Weapons {{ weaponsDetail.total }}
         <i class="fas fa-gun ms-2"></i>
       </span>
@@ -41,8 +21,8 @@
     </p>
 
     <p title="Weapons modified" v-for="buff of weaponsDetail.appliedBuffs">
-      <span v-if="buff.kind === 'star'">{{ buff.amount }} <i class="fas fa-star"></i></span>
-      <span v-if="buff.kind === 'carrier'">{{ buff.amount }} <i class="fas fa-rocket"></i></span>
+      <span v-if="buff.kind === 'star'">Star Specialist {{ buff.amount }}</span>
+      <span v-if="buff.kind === 'carrier'">Carrier Specialist {{ buff.amount }}</span>
       <i class="fas fa-user-astronaut ms-2"></i>
     </p>
   </details>

@@ -5,7 +5,7 @@ import type {CombatResolutionMalusStrategy, Game} from "../types/common/game";
 import type {Star} from "../types/common/star";
 import type {Id} from "../types/id";
 import type {Carrier} from "../types/common/carrier";
-import {maxBy} from "../utilities/utils";
+import {maxBy, maxOf, minOf} from "../utilities/utils";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -308,20 +308,20 @@ export class TechnologyService {
     }
 
     _calculateActualWeaponsBuff(weapons: number, buffs: Buff[], additionalBuff: number): WeaponsDetail {
-        const highestBuff = buffs.sort((a, b) => b.amount - a.amount)[0];
-        const lowestBuff = buffs.sort((a, b) => b.amount - a.amount)[0];
+        const highestBuff = maxOf((b) => b.amount, buffs);
+        const lowestBuff = minOf((b) => b.amount, buffs);
 
-        const buff = Math.max(0, highestBuff.amount);
-        const debuff = lowestBuff.amount;
+        const buff = Math.max(0, highestBuff?.amount || 0);
+        const debuff = lowestBuff?.amount || 0;
 
         const appliedBuffs: Buff[] = [];
 
         if (buff > 0) {
-            appliedBuffs.push(highestBuff);
+            appliedBuffs.push(highestBuff!);
         }
 
         if (debuff < 0) {
-            appliedBuffs.push(lowestBuff);
+            appliedBuffs.push(lowestBuff!);
         }
 
         const buffsTotal = appliedBuffs.reduce((acc, curr) => acc + curr.amount, 0);
