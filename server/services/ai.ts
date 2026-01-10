@@ -947,7 +947,7 @@ export default class AIService {
 
         const defender = {
             ships: Math.ceil(shipsAtArrival),
-            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
+            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers).total,
         };
 
         const attacker = {

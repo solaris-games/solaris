@@ -23,6 +23,21 @@ interface ISpecialistService {
     getByIdCarrier(id: number): Specialist | null;
 }
 
+type Buff = {
+    kind: 'star' | 'carrier',
+    amount: number,
+}
+
+type WeaponsDetail = {
+    total: number,
+    appliedBuffs: Buff[],
+    weaponsLevel: number,
+}
+
+type StarWeaponsDetail = WeaponsDetail & {
+    defenderBonus: number,
+}
+
 export class TechnologyService {
     specialistService: ISpecialistService;
     gameTypeService: GameTypeService;
@@ -240,46 +255,84 @@ export class TechnologyService {
         return deduction || 0;
     }
 
-    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]) {
-        let weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
-        let defenderBonus = this.getDefenderBonus(game, star);
+    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
+        const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+        const defenderBonus = this.getDefenderBonus(game, star);
 
-        let buffs: number[] = [];
+        let buffs: Buff[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false));
+            buffs = carriersInOrbit.map(c => ({
+                kind: 'carrier',
+                amount: this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false)
+            }));
         }
 
-        buffs.push(this.getStarWeaponsBuff(star));
+        buffs.push({
+            kind: 'star',
+            amount: this.getStarWeaponsBuff(star),
+        });
 
-        return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
+        const detail = this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
+
+        return {
+            ...detail,
+            defenderBonus,
+        }
     }
 
-    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy) {
+    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy): WeaponsDetail {
         const weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
 
         if (!carriers.length) {
-            return weapons;
+            return {
+                total: weapons,
+                appliedBuffs: [],
+                weaponsLevel: weapons,
+            };
         }
 
         const largestCarrierShips = maxBy(c => c.ships || 0, carriers);
 
-        const buffs = carriers.map(c => {
+        const buffs: Buff[] = carriers.map(c => {
             const isLargest = (c.ships || 0) === (largestCarrierShips || 0);
 
-            return this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest)
+            const amount = this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest);
+            return {
+                kind: 'carrier',
+                amount,
+            }
         });
 
         return this._calculateActualWeaponsBuff(weapons, buffs, 0);
     }
 
-    _calculateActualWeaponsBuff(weapons: number, buffs: number[], additionalBuff: number) {
-        let buff = Math.max(0, buffs.sort((a, b) => b - a)[0]);
-        let debuff = buffs.sort((a, b) => a - b)[0];
+    _calculateActualWeaponsBuff(weapons: number, buffs: Buff[], additionalBuff: number): WeaponsDetail {
+        const highestBuff = buffs.sort((a, b) => b.amount - a.amount)[0];
+        const lowestBuff = buffs.sort((a, b) => b.amount - a.amount)[0];
 
-        let actualBuff = debuff < 0 ? debuff + buff : buff;
+        const buff = Math.max(0, highestBuff.amount);
+        const debuff = lowestBuff.amount;
 
-        return Math.max(1, weapons + actualBuff + additionalBuff);
+        const appliedBuffs: Buff[] = [];
+
+        if (buff > 0) {
+            appliedBuffs.push(highestBuff);
+        }
+
+        if (debuff < 0) {
+            appliedBuffs.push(lowestBuff);
+        }
+
+        const buffsTotal = appliedBuffs.reduce((acc, curr) => acc + curr.amount, 0);
+
+        const total = Math.max(1, weapons + buffsTotal + additionalBuff);
+
+        return {
+            weaponsLevel: weapons,
+            total,
+            appliedBuffs,
+        }
     }   
 
     getDefenderBonus<ID>(game: Game<ID>, star: Star<ID>) {
