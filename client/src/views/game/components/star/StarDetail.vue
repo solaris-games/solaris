@@ -149,16 +149,7 @@
             <span v-if="!star.specialist">No Specialist</span>
           </span>
         </div>
-        <div class="col-auto">
-          <span title="Weapons (not including carriers in orbit)" v-if="star.ownedByPlayerId">
-            {{effectiveWeapons}} <i class="fas fa-gun ms-1"></i>
-          </span>
-        </div>
-        <div class="col-auto">
-          <span title="Defender Bonus" v-if="star.ownedByPlayerId">
-            {{defenderBonus}} <i class="fas fa-shield-alt ms-1"></i>
-          </span>
-        </div>
+        <star-weapons-level :star="star" :compact="true"></star-weapons-level>
         <div class="col-auto">
           <span v-if="star.ownedByPlayerId && !isDeadStar" title="Manufacturing">
             {{star.effectiveTechs!.manufacturing}} <i class="fas fa-industry ms-1"></i>
@@ -238,23 +229,7 @@
       </div>
 
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
-          <div class="col">
-              Weapons (not including carriers in orbit)
-          </div>
-          <div class="col text-end" title="Weapons (not including carriers in orbit)">
-            <span>{{effectiveWeapons}}</span>
-            <i class="fas fa-gun ms-2"></i>
-          </div>
-      </div>
-
-      <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
-        <div class="col">
-          Defender Bonus
-        </div>
-        <div class="col text-end" title="Defender Bonus">
-          <span>{{defenderBonus}}</span>
-          <i class="fas fa-shield-alt ms-2"></i>
-        </div>
+        <star-weapons-level :star="star" :compact="false"></star-weapons-level>
       </div>
 
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1 bg-dark">
@@ -462,7 +437,7 @@ import {abandon} from "@/services/typedapi/star";
 import {makeWarpgateActions} from "@/views/game/components/star/upgrade";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {useGameServices} from "@/util/gameServices";
+import StarWeaponsLevel from "@/views/game/components/star/StarWeaponsLevel.vue";
 
 const props = defineProps<{
   starId: string,
@@ -486,8 +461,6 @@ const store: Store<State> = useStore();
 const game = computed<Game>(() => store.state.game);
 
 const isHistoricalMode = useIsHistoricalMode(store);
-
-const gameServices = useGameServices();
 
 const star = computed(() => GameHelper.getStarById(game.value, props.starId)!);
 const starOwningPlayer = computed<Player | undefined>(() => star.value.ownedByPlayerId && GameHelper.getPlayerById(game.value, star.value.ownedByPlayerId) || undefined);
@@ -535,16 +508,6 @@ const onOpenCarrierDetailRequested = (carrier: Carrier) => emit('onOpenCarrierDe
 const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsRequested', carrierId);
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
 const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: e });
-
-const defenderBonus = computed(() => gameServices.technologyService.getDefenderBonus(game.value, star.value));
-
-const effectiveWeapons = computed(() => {
-  if (!starOwningPlayer.value) {
-    return '0';
-  }
-
-  return gameServices.technologyService.getStarEffectiveWeaponsLevel(game.value, [starOwningPlayer.value], star.value, []);
-});
 
 const confirmAbandonStar = async (e) => {
   const response = await abandon(httpClient)(game.value._id, star.value._id);
