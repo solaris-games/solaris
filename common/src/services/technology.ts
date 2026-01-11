@@ -5,7 +5,7 @@ import type {CombatResolutionMalusStrategy, Game} from "../types/common/game";
 import type {Star} from "../types/common/star";
 import type {Id} from "../types/id";
 import type {Carrier} from "../types/common/carrier";
-import {maxBy} from "../utilities/utils";
+import {maxBy, maxOf, minOf, notUndefined} from "../utilities/utils";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -21,6 +21,22 @@ const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
     getByIdCarrier(id: number): Specialist | null;
+}
+
+type Buff = {
+    kind: 'star' | 'carrier',
+    amount: number,
+    specialistId: number,
+}
+
+type WeaponsDetail = {
+    total: number,
+    appliedBuffs: Buff[],
+    weaponsLevel: number,
+}
+
+type StarWeaponsDetail = WeaponsDetail & {
+    defenderBonus: number,
 }
 
 export class TechnologyService {
@@ -155,64 +171,75 @@ export class TechnologyService {
         return techs;
     }
 
-    getStarWeaponsBuff<ID>(star: Star<ID>) {
+    getStarWeaponsBuff<ID>(star: Star<ID>): Buff | undefined {
         if (star.specialistId) {
-            let specialist = this.specialistService.getByIdStar(star.specialistId);
+            const specialist = this.specialistService.getByIdStar(star.specialistId);
 
             if (specialist && specialist.modifiers.local != null) {
-                return specialist.modifiers.local.weapons || 0;
+                return {
+                    amount: specialist.modifiers.local.weapons || 0,
+                    specialistId: specialist.id,
+                    kind: 'star',
+                }
             }
         }
 
-        return 0;
+        return undefined;
     }
 
-    getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean) {
+    getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean): Buff | undefined {
+        if (!carrier.specialistId) {
+            return undefined;
+        }
+
         const buffs: number[] = [];
+        const specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
 
-        if (carrier.specialistId) {
-            let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        if (!specialist) {
+            return undefined;
+        }
 
-            if (!specialist) {
-                return 0;
+        if (specialist.modifiers.local) {
+            if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat) {
+                if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.weapons) {
+                    buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                }
+
+                if (!isAttacker && specialist.modifiers.local.carrierToStarCombat.defender?.weapons) {
+                    buffs.push(specialist.modifiers.local.carrierToStarCombat.defender.weapons);
+                }
+
+                if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.perAlly) {
+                    const adjustedAllyCount = Math.min(allyCount, specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.maxAllies);
+                    buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.weapons * adjustedAllyCount);
+                }
             }
-            
-            if (specialist.modifiers.local) {
-                if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat) {
-                    if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.weapons) {
-                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
-                    }
 
-                    if (!isAttacker && specialist.modifiers.local.carrierToStarCombat.defender?.weapons) {
-                        buffs.push(specialist.modifiers.local.carrierToStarCombat.defender.weapons);
-                    }
+            if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat?.weapons) {
+                buffs.push(specialist.modifiers.local.carrierToCarrierCombat.weapons);
+            }
 
-                    if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.perAlly) {
-                        const adjustedAllyCount = Math.min(allyCount, specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.maxAllies);
-                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.weapons * adjustedAllyCount);
-                    }
-                }
+            if (specialist.modifiers.local.weapons) {
+                const isDebuff = specialist.modifiers.local.weapons < 0;
+                const isMalusCarrier = (strategy === 'anyCarrier') || (strategy === 'largestCarrier' && isLargestCarrier);
 
-                if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat?.weapons) {
-                    buffs.push(specialist.modifiers.local.carrierToCarrierCombat.weapons);
-                }
-                
-                if (specialist.modifiers.local.weapons) {
-                    const isDebuff = specialist.modifiers.local.weapons < 0;
-                    const isMalusCarrier = (strategy === 'anyCarrier') || (strategy === 'largestCarrier' && isLargestCarrier);
-
-                    if (!isDebuff || isMalusCarrier) {
-                        buffs.push(specialist.modifiers.local.weapons);
-                    }
+                if (!isDebuff || isMalusCarrier) {
+                    buffs.push(specialist.modifiers.local.weapons);
                 }
             }
         }
 
         if (!buffs.length) {
-            return 0;
+            return undefined;
         }
 
-        return buffs.sort((a, b) => b - a)[0];
+        const relevantBuff = maxBy((a) => a, buffs);
+
+        return {
+            kind: 'carrier',
+            specialistId: carrier.specialistId,
+            amount: relevantBuff,
+        }
     }
 
     getCarriersWeaponsDebuff<ID>(carriersToCheck: Carrier<ID>[]) {
@@ -240,46 +267,78 @@ export class TechnologyService {
         return deduction || 0;
     }
 
-    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]) {
-        let weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
-        let defenderBonus = this.getDefenderBonus(game, star);
+    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
+        const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+        const defenderBonus = this.getDefenderBonus(game, star);
 
-        let buffs: number[] = [];
+        let buffs: Buff[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false));
+            buffs = carriersInOrbit.map(c => (this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false))).filter(notUndefined);
         }
 
-        buffs.push(this.getStarWeaponsBuff(star));
+        const starBuff = this.getStarWeaponsBuff(star);
 
-        return this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
+        if (starBuff) {
+            buffs.push(starBuff);
+        }
+
+        const detail = this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
+
+        return {
+            ...detail,
+            defenderBonus,
+        }
     }
 
-    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy) {
+    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy): WeaponsDetail {
         const weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
 
         if (!carriers.length) {
-            return weapons;
+            return {
+                total: weapons,
+                appliedBuffs: [],
+                weaponsLevel: weapons,
+            };
         }
 
         const largestCarrierShips = maxBy(c => c.ships || 0, carriers);
 
-        const buffs = carriers.map(c => {
+        const buffs: Buff[] = carriers.map(c => {
             const isLargest = (c.ships || 0) === (largestCarrierShips || 0);
 
-            return this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest)
-        });
+            return this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest);
+        }).filter(notUndefined);
 
         return this._calculateActualWeaponsBuff(weapons, buffs, 0);
     }
 
-    _calculateActualWeaponsBuff(weapons: number, buffs: number[], additionalBuff: number) {
-        let buff = Math.max(0, buffs.sort((a, b) => b - a)[0]);
-        let debuff = buffs.sort((a, b) => a - b)[0];
+    _calculateActualWeaponsBuff(weapons: number, buffs: Buff[], additionalBuff: number): WeaponsDetail {
+        const highestBuff = maxOf((b) => b.amount, buffs);
+        const lowestBuff = minOf((b) => b.amount, buffs);
 
-        let actualBuff = debuff < 0 ? debuff + buff : buff;
+        const buff = Math.max(0, highestBuff?.amount || 0);
+        const debuff = lowestBuff?.amount || 0;
 
-        return Math.max(1, weapons + actualBuff + additionalBuff);
+        const appliedBuffs: Buff[] = [];
+
+        if (buff > 0) {
+            appliedBuffs.push(highestBuff!);
+        }
+
+        if (debuff < 0) {
+            appliedBuffs.push(lowestBuff!);
+        }
+
+        const buffsTotal = appliedBuffs.reduce((acc, curr) => acc + curr.amount, 0);
+
+        const total = Math.max(1, weapons + buffsTotal + additionalBuff);
+
+        return {
+            weaponsLevel: weapons,
+            total,
+            appliedBuffs,
+        }
     }   
 
     getDefenderBonus<ID>(game: Game<ID>, star: Star<ID>) {
