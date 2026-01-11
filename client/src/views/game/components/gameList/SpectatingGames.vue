@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import CountdownTimer from '../time/CountdownTimer.vue';
+import CountdownTimer from '../time/CountdownDateTimer.vue';
 import { type Ref, ref, onMounted, inject } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listSpectating } from '@/services/typedapi/game';
