@@ -1,5 +1,39 @@
 <template>
-  <details v-if="star.ownedByPlayerId">
+  <details v-if="star.ownedByPlayerId && compact">
+    <summary class="row pb-2">
+      <span class="col-auto">
+        <span class="weapons-header"></span>
+        <i class="fas fa-gun ms-1"></i>
+        {{ weaponsDetail.total }}
+      </span>
+    </summary>
+
+    <div class="row pb-2">
+      <div class="col-auto" title="Weapons technology">
+        Weapons technology
+        {{ weaponsDetail.weaponsLevel }}
+        <i class="fas fa-gun ms-1"></i>
+      </div>
+    </div>
+
+    <div class="row pb-2">
+      <div class="col-auto" title="Defender Bonus">
+        Defender Bonus
+        {{ weaponsDetail.defenderBonus }}
+        <i class="fas fa-shield-alt ms-1"></i>
+      </div>
+    </div>
+
+    <div class="row pb-2" title="Weapons modifier" v-for="buff of weaponsDetail.appliedBuffs">
+      <div class="col-auto" title="Weapons technology">
+        <span v-if="buff.kind === 'star'">{{getSpecialistName(buff.specialistId, 'star')}}</span>
+        <span v-if="buff.kind === 'carrier'">{{getSpecialistName(buff.specialistId, 'carrier')}}</span>
+        {{ buff.amount }}
+        <i class="fas fa-user-astronaut ms-1"></i>
+      </div>
+    </div>
+  </details>
+  <details v-if="star.ownedByPlayerId && !compact">
     <summary class="row pt-1 pb-1">
       <span class="col" title="Weapons">
         <span class="weapons-header"></span>
