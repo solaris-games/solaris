@@ -13,12 +13,11 @@ import {Player} from "./types/Player";
 import {Star, StarCaptureResult} from "./types/Star";
 import {User} from "./types/User";
 import DiplomacyService from "./diplomacy";
-import { GameTypeService } from 'solaris-common'
+import {GameTypeService, TechnologyService} from 'solaris-common'
 import PlayerService from "./player";
 import ReputationService from "./reputation";
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import { TechnologyService } from 'solaris-common';
 import StarCaptureService from "./starCapture";
 import StatisticsService from "./statistics";
 
@@ -148,31 +147,27 @@ export default class CombatService extends EventEmitter {
     }
 
     calculateStar(game: Game, star: Star, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[], calculateNeeded: boolean = false) {
-        let combatWeapons = this._calculateEffectiveWeaponsLevels(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatWeapons = this._calculateEffectiveWeaponsLevels(game, star, defenders, attackers, defenderCarriers, attackerCarriers);
 
-        let combatResult = this.calculate({
+        return this.calculate({
             weaponsLevel: combatWeapons.defenderWeaponsTechLevel,
             ships: combatWeapons.totalDefenders
         }, {
             weaponsLevel: combatWeapons.attackerWeaponsTechLevel,
             ships: combatWeapons.totalAttackers
         }, true, calculateNeeded);
-
-        return combatResult;
     }
 
     calculateCarrier(game: Game, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
-        let combatWeapons = this._calculateEffectiveWeaponsLevels(game, null, defenders, attackers, defenderCarriers, attackerCarriers);
+        const combatWeapons = this._calculateEffectiveWeaponsLevels(game, null, defenders, attackers, defenderCarriers, attackerCarriers);
 
-        let combatResult = this.calculate({
+        return this.calculate({
             weaponsLevel: combatWeapons.defenderWeaponsTechLevel,
             ships: combatWeapons.totalDefenders
         }, {
             weaponsLevel: combatWeapons.attackerWeaponsTechLevel,
             ships: combatWeapons.totalAttackers
         }, false);
-
-        return combatResult;
     }
 
     _calculateEffectiveWeaponsLevels(game: Game, star: Star | null, defenders: Player[], attackers: Player[], defenderCarriers: Carrier[], attackerCarriers: Carrier[]) {
@@ -192,14 +187,14 @@ export default class CombatService extends EventEmitter {
         let defenderWeaponsTechLevel: number;
 
         if (isCarrierToStarCombat) {
-            defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star!, defenderCarriers);
+            defenderWeaponsTechLevel = this.technologyService.getStarEffectiveWeaponsLevel(game, defenders, star!, defenderCarriers).total;
         } else {
-            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat, false, 'anyCarrier');
+            defenderWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, defenders, defenderCarriers, isCarrierToStarCombat, false, 'anyCarrier').total;
         }
 
         const attackerMalusStrategy = isCarrierToStarCombat ? game.settings.specialGalaxy.combatResolutionMalusStrategy : 'anyCarrier';
         // Calculate the weapons tech level for the attacker
-        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true, attackerMalusStrategy);
+        let attackerWeaponsTechLevel = this.technologyService.getCarriersEffectiveWeaponsLevel(game, attackers, attackerCarriers, isCarrierToStarCombat, true, attackerMalusStrategy).total;
 
         // Check for deductions to weapons to either side
         const defenderWeaponsDeduction = this.technologyService.getCarriersWeaponsDebuff(attackerCarriers);
