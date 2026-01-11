@@ -1,27 +1,49 @@
 <template>
   <details v-if="star.ownedByPlayerId">
-    <summary class="pb-2">
-      <span title="Weapons" v-if="compact">
-        {{ weaponsDetail.total }} <i class="fas fa-gun ms-1"></i>
+    <summary class="row pt-1 pb-1">
+      <span class="col" title="Weapons">
+        <span class="weapons-header"></span>
+        Weapons
       </span>
-      <span title="Weapons" v-else>
-        <i class="fas fa-gun pe-2"></i>Weapons {{ weaponsDetail.total }}
+      <span class="col text-end">
+        {{ weaponsDetail.total }}
+        <i class="fas fa-gun"></i>
       </span>
     </summary>
 
-    <p title="Weapons technology">
-      <i class="fas fa-gun pe-2"></i>Weapons technology {{ weaponsDetail.weaponsLevel }}
-    </p>
+    <div class="row pt-1 pb-1">
+      <div class="col" title="Weapons technology">
+        Weapons technology
+      </div>
 
-    <p title="Defender Bonus">
-      <i class="fas fa-shield-alt pe-2"></i>Defender Bonus {{ weaponsDetail.defenderBonus }}
-    </p>
+      <div class="col text-end">
+        {{ weaponsDetail.weaponsLevel }}
+        <i class="fas fa-gun"></i>
+      </div>
+    </div>
 
-    <p title="Weapons modified" v-for="buff of weaponsDetail.appliedBuffs">
-      <i class="fas fa-user-astronaut pe-2"></i>
-      <span v-if="buff.kind === 'star'">{{getSpecialistName(buff.specialistId, 'star')}} {{ buff.amount }}</span>
-      <span v-if="buff.kind === 'carrier'">{{getSpecialistName(buff.specialistId, 'carrier')}} {{ buff.amount }}</span>
-    </p>
+    <div class="row pt-1 pb-1">
+      <div class="col" title="Defender Bonus">
+        Defender Bonus
+      </div>
+
+      <div class="col text-end">
+        {{ weaponsDetail.defenderBonus }}
+        <i class="fas fa-shield-alt"></i>
+      </div>
+    </div>
+
+    <div class="row pt-1 pb-1" title="Weapons modifier" v-for="buff of weaponsDetail.appliedBuffs">
+      <div class="col" title="Weapons technology">
+        <span v-if="buff.kind === 'star'">{{getSpecialistName(buff.specialistId, 'star')}}</span>
+        <span v-if="buff.kind === 'carrier'">{{getSpecialistName(buff.specialistId, 'carrier')}}</span>
+      </div>
+
+      <div class="col text-end">
+        {{ buff.amount }}
+        <i class="fas fa-user-astronaut"></i>
+      </div>
+    </div>
   </details>
 </template>
 
@@ -64,5 +86,7 @@ const weaponsDetail = computed(() => gameServices.technologyService.getStarEffec
 </script>
 
 <style scoped>
-
+.weapons-header {
+  display: inline flow list-item;
+}
 </style>
