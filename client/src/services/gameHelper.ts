@@ -3,6 +3,7 @@ import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
 import {type BasePlayerDebtEvent, type GameStateDetail, type Location, type MapObject, type Team} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
+import {addTicksToTime, getCountdownTimeStringByTicks} from "@/util/time";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -272,118 +273,19 @@ class GameHelper {
   }
 
   getTicksToProduction(game: Game, currentTick, currentProductionTick) {
-    let productionTicks = game.settings.galaxy.productionTicks
+    const productionTicks = game.settings.galaxy.productionTicks
 
     return ((currentProductionTick + 1) * productionTicks) - currentTick
   }
 
-  getCountdownTime(game: Game, date) {
-    if (date == null) {
-      return 'Unknown'
+  getCountdownTimeForProductionCycle(game: Game) {
+    if (!game.state.lastTickDate) {
+      return `N/A`;
     }
 
-    let relativeTo = moment().utc()
-    // Deduct the future date from now.
-    return moment(date).utc().clone().diff(relativeTo)
-  }
-
-  getCountdownTimeString(game: Game, date, largestUnitOnly = false) {
-    if (date == null) {
-      return 'Unknown'
-    }
-
-    if (this.isGameFinished(game)) {
-      return 'N/A'
-    }
-
-    let t = this.getCountdownTime(game, date)
-
-    return this.getDateToString(t, largestUnitOnly)
-  }
-
-  getCountdownTimeStringByTicksWithTickETA(game: Game, ticks: number, useNowDate = false, largestUnitOnly = false) {
-    const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
-
-    if (game.settings.gameTime.gameType === 'realTime') {
-      return `${str} - Tick ${game.state.tick + ticks}`
-    }
-
-    return str
-  }
-
-  getCountdownTimeStringByTicks(game, ticks, useNowDate = false, largestUnitOnly = false) {
-    if (game == null) {
-      return ''
-    }
-
-    if (game.settings.gameTime.gameType === 'realTime' && !this.isGameFinished(game)) {
-      const date = useNowDate ? moment().utc() : game.state.lastTickDate
-
-      const timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
-
-      return this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
-    }
-
-    return `${ticks} ticks`
-  }
-
-  getDateToString(date, largestUnitOnly = false) {
-    let days = Math.floor(date / (1000 * 60 * 60 * 24))
-    let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
-    let secs = Math.floor((date % (1000 * 60)) / 1000)
-
-    if (secs < 0) {
-      return 'Pending...'
-    }
-
-    let str = ''
-    let showDays = false
-    let showHours = false
-
-    if (days > 0) {
-      str += `${days}d `
-      showDays = true
-
-      if (largestUnitOnly && hours === 0 && mins === 0 && secs === 0) {
-        return str
-      }
-    }
-
-    if (showDays || hours > 0) {
-      str += `${hours}h `
-      showHours = true
-
-      if (largestUnitOnly && mins === 0 && secs === 0) {
-        return str
-      }
-    }
-
-    if (showHours || mins > 0) {
-      str += `${mins}m `
-
-      if (largestUnitOnly && secs === 0) {
-        return str
-      }
-    }
-
-    str += `${secs}s`
-
-    return str
-  }
-
-  getCountdownTimeForProductionCycle(game) {
     const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
 
-    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
-  }
-
-  getCountdownTimeForTurnTimeout(game) {
-    return moment(game.state.lastTickDate).utc().add('minutes', game.settings.gameTime.maxTurnWait)
-  }
-
-  getCountdownTimeStringForTurnTimeout(game) {
-    return this.getCountdownTimeString(game, this.getCountdownTimeForTurnTimeout(game))
+    return addTicksToTime(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
   // TODO: This has all been copy/pasted from the API services
@@ -448,16 +350,6 @@ class GameHelper {
     }
 
     return totalTicks
-  }
-
-  calculateTimeByTicks(ticks, speedInSeconds, relativeTo: Moment | null = null) {
-    if (relativeTo == null) {
-      relativeTo = moment().utc()
-    } else {
-      relativeTo = moment(relativeTo).utc()
-    }
-
-    return relativeTo.add(ticks * speedInSeconds, 'seconds')
   }
 
   canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star | null, destinationStar: Star | null) {
