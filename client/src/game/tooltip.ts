@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
 import type { Game } from '../types/game';
 import type { DrawingContext } from './container';
+import {getCountdownTimeStringByTicks} from "@/util/time";
 
 export default class {
 
@@ -109,7 +110,7 @@ export default class {
       const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game, carrier)
 
       const detail = [
-        `⏱️ ` + GameHelper.getCountdownTimeStringByTicks(this.game, carrier.ticksEta)
+        `⏱️ ` + getCountdownTimeStringByTicks(this.game, carrier.ticksEta)
       ]
 
       if (isOwnedByUserPlayer) {

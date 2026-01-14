@@ -1,5 +1,5 @@
 import { add } from 'date-fns';
-import type {Game} from "@/types/game";
+import type {Carrier, Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {between, type Duration, formatDuration as formatRealDuration, toSeconds} from "@/util/duration";
 
@@ -46,6 +46,16 @@ export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string
 
   return `${ticks} T`;
 };
+
+export const getCountdownTimeForProductionCycle = (game: Game) => {
+  if (!game.state.lastTickDate) {
+    return `N/A`;
+  }
+
+  const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
+
+  return addTicksToTime(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
+}
 
 export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {
   return `${getCountdownTimeStringByTicks(game, ticks)} - ETA: ${game.state.tick + ticks}`;

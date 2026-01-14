@@ -7,6 +7,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
+import {getCountdownTimeStringByTicks} from "@/util/time";
 
 const props = defineProps<{
   ticks: number;
@@ -18,7 +19,7 @@ const game = computed<Game>(() => store.state.game);
 const timeString = ref('');
 
 const recalculateTime = () => {
-
+  timeString.value = getCountdownTimeStringByTicks(game.value, props.ticks);
 };
 
 onMounted(() => {

@@ -3,7 +3,7 @@ import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
 import {type BasePlayerDebtEvent, type GameStateDetail, type Location, type MapObject, type Team} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
-import {addTicksToTime, getCountdownTimeStringByTicks} from "@/util/time";
+import {addTicksToTime} from "@/util/time";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -276,16 +276,6 @@ class GameHelper {
     const productionTicks = game.settings.galaxy.productionTicks
 
     return ((currentProductionTick + 1) * productionTicks) - currentTick
-  }
-
-  getCountdownTimeForProductionCycle(game: Game) {
-    if (!game.state.lastTickDate) {
-      return `N/A`;
-    }
-
-    const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
-
-    return addTicksToTime(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
   }
 
   // TODO: This has all been copy/pasted from the API services
