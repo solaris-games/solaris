@@ -100,6 +100,8 @@ import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {useGameServices} from "@/util/gameServices";
 import type {Game} from "@/types/game";
+import {getCountdownTimeStringByTicks, ticksToDuration} from "@/util/time";
+import {formatDuration} from "@/util/duration";
 
 const props = defineProps<{
   carrierId: string,
@@ -216,13 +218,12 @@ const recalculateWaypointEta = () => {
     totalTicks += wp.ticks!;
   }
 
-  waypointEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicks);
+  waypointEta.value = getCountdownTimeStringByTicks(game.value, totalTicks);
 };
 
 const recalculateWaypointDuration = () => {
   if (currentWaypoint.value) {
-    const timeRemainingEtaDate = GameHelper.calculateTimeByTicks((currentWaypoint.value.ticks || 0) + currentWaypoint.value.delayTicks, game.value.settings.gameTime.speed, null);
-    waypointDuration.value = GameHelper.getCountdownTimeString(game.value, timeRemainingEtaDate, true);
+    waypointDuration.value = formatDuration(ticksToDuration(game.value, (currentWaypoint.value.ticks || 0) + currentWaypoint.value.delayTicks));
   }
 
   recalculateWaypointEta();

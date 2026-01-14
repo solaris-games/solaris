@@ -1,7 +1,7 @@
 import { add } from 'date-fns';
 import type {Carrier, Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import {between, type Duration, formatDuration as formatRealDuration, toSeconds} from "@/util/duration";
+import {between, type Duration, formatDuration as formatRealDuration, normalize, toSeconds} from "@/util/duration";
 
 export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo: Date): Date => {
   return add(relativeTo, { seconds: ticks * speedInSeconds });
@@ -55,6 +55,12 @@ export const getCountdownTimeForProductionCycle = (game: Game) => {
   const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
 
   return addTicksToTime(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
+}
+
+export const ticksToDuration = (game: Game, ticks: number): Duration => {
+  const seconds = ticks * game.settings.gameTime.speed;
+
+  return normalize({ seconds });
 }
 
 export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {

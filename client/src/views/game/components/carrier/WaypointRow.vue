@@ -2,7 +2,9 @@
     <tr>
         <td v-if="userPlayerOwnsCarrier"><span v-if="!(isFirstWaypoint(waypoint) && isInTransit)">{{waypoint.delayTicks}}</span></td>
         <td><a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(waypoint.destination)}}</a></td>
-        <td v-if="!showAction">{{timeRemainingEta}}</td>
+        <td v-if="!showAction && props.waypoint.ticksEta !== null && props.waypoint.ticksEta !== undefined">
+          <timer :ticks="props.waypoint.ticksEta" />
+        </td>
         <td v-if="showAction">
             <span>{{formatAction(waypoint, waypoint.action)}}</span>
         </td>
@@ -16,10 +18,11 @@
 import GameHelper from '../../../../services/gameHelper';
 import type {Carrier, Game} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris-common";
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from "vuex";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {formatAction} from "@/util/waypoint";
+import Timer from "@/views/game/components/time/Timer.vue";
 
 const props = defineProps<{
   carrier: Carrier,
@@ -36,8 +39,6 @@ const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 const game = computed<Game>(() => store.state.game);
 
-const timeRemainingEta = ref<string | null>(null);
-
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
 const canEditWaypoints = computed(() => !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
@@ -52,24 +53,6 @@ const editWaypoint = () => emit('onEditWaypointRequested', props.waypoint);
 const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
   return props.carrier.waypoints.indexOf(waypoint) === 0;
 };
-
-const recalculateTimeRemaining = () => {
-  timeRemainingEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, props.waypoint.ticksEta);
-};
-
-onMounted(() => {
-  recalculateTimeRemaining();
-
-  let handle;
-
-  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
-    handle = setInterval(recalculateTimeRemaining, 250);
-  }
-
-  onUnmounted(() => {
-    handle && clearInterval(handle);
-  });
-});
 </script>
 
 <style scoped>

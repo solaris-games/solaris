@@ -96,6 +96,7 @@ import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {saveWaypoints} from "@/services/typedapi/carrier";
 import type {TempWaypoint} from "@/types/waypoint";
 import {gameServicesKey, useGameServices} from "@/util/gameServices";
+import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
 
 const props = defineProps<{
   carrierId: string,
@@ -157,11 +158,7 @@ const recalculateTotalEta = () => {
   const totalTicksEta = gameServices.waypointService.calculateWaypointTicksEta(game.value, carrier.value,
     carrier.value.waypoints[carrier.value.waypoints.length - 1]);
 
-  const relativeTime = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicksEta);
-
-  const absoluteTick = game.value.state.tick + totalTicksEta;
-
-  totalEtaTimeString.value = `${relativeTime} - ETA: Tick ${absoluteTick}`;
+  totalEtaTimeString.value = getCountdownTimeStringWithETA(game.value, totalTicksEta);
 };
 
 const removeLastWaypoint = () => {
