@@ -1,7 +1,14 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
-import {type BasePlayerDebtEvent, type GameStateDetail, type Location, type MapObject, type Team} from '@solaris-common';
+import {
+  type BasePlayerDebtEvent, type GameInfoState,
+  type GameSettings, type GameSettingsGalaxyBase,
+  type GameStateDetail,
+  type Location,
+  type MapObject,
+  type Team
+} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 import {addTicksToTime} from "@/util/time";
 
@@ -272,10 +279,10 @@ class GameHelper {
     return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
   }
 
-  getTicksToProduction(game: Game, currentTick, currentProductionTick) {
-    const productionTicks = game.settings.galaxy.productionTicks
+  getTicksToProduction(game: { settings: { galaxy: GameSettingsGalaxyBase } }, currentTick: number, currentProductionTick: number) {
+    const productionTicks = game.settings.galaxy.productionTicks;
 
-    return ((currentProductionTick + 1) * productionTicks) - currentTick
+    return ((currentProductionTick + 1) * productionTicks) - currentTick;
   }
 
   // TODO: This has all been copy/pasted from the API services
@@ -477,7 +484,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
-  isGameFinished(game: GameStateDetail<string>) {
+  isGameFinished(game: { state: GameInfoState<string> }) {
     return game.state.endDate != null;
   }
 

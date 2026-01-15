@@ -127,7 +127,7 @@ export default class GameListService {
             'settings.gametime.speed': 1,
             'settings.gametime.gameType': 1,
             'settings.gameTime': 1,
-            'settings.galaxy.productionTicks': 1,
+            'settings.galaxy': 1,
             'galaxy.players._id': 1,
             'galaxy.players.userId': 1,
             'galaxy.players.ready': 1,

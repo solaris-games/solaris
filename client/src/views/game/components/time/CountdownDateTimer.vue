@@ -2,8 +2,8 @@
     <span>{{currentText}}</span>
 </template>
 <script setup lang="ts">
-import GameHelper from '../../../../services/gameHelper';
 import { ref, onMounted, onUnmounted } from 'vue';
+import {between, formatDuration, toSeconds} from "@/util/duration";
 
 const props = defineProps<{
   endDate?: Date,
@@ -19,13 +19,13 @@ const recalculateTime = () => {
     return;
   }
 
-  const current = Date.now()
-  const delta = props.endDate.getTime() - current;
+  const current = new Date();
+  const delta = between(current, props.endDate);
 
-  if (delta < 0) {
+  if (toSeconds(delta) <= 0)  {
     currentText.value = props.afterEndText || '';
   } else {
-    currentText.value = GameHelper.getDateToString(delta);
+    currentText.value = formatDuration(delta);
   }
 };
 

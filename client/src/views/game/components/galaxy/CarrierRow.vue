@@ -27,6 +27,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import type {Carrier} from "@/types/game";
 import Timer from "@/views/game/components/time/Timer.vue";
+import type {MapObject} from "@solaris-common";
 
 const props = defineProps<{
   carrier: Carrier,
@@ -43,7 +44,7 @@ const clickCarrier = () => {
 };
 
 const goToCarrier = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: props.carrier });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: props.carrier as MapObject<string> });
 };
 </script>
 

@@ -142,7 +142,7 @@
             <td>
               <span>
                 <i class="fas" :class="{'fa-star':point.type=='star','fa-rocket':point.type=='carrier'}"></i>
-                {{point.object.name}}
+                {{(point.object as Star).name}}
               </span>
             </td>
             <td>
@@ -151,7 +151,7 @@
             <td>
               <span v-if="getNextPoint(point)">
                 <i class="fas" :class="{'fa-star':getNextPoint(point).type=='star','fa-rocket':getNextPoint(point).type=='carrier'}"></i>
-                {{getNextPoint(point).object.name}}
+                {{(getNextPoint(point).object as Star).name}}
               </span>
             </td>
             <td>
@@ -231,7 +231,7 @@ const speeds = computed(() => {
 
   const speedSpecialists = carrierSpecialists.value.filter(i => i.modifiers && i.modifiers.local && i.modifiers.local.speed);
 
-  return [...new Set(speedSpecialists.map(s => s.modifiers!.local!.speed))].sort()
+  return [...new Set(speedSpecialists.map(s => s.modifiers!.local!.speed))].sort();
 });
 
 const onCloseRequested = () => {
@@ -267,7 +267,7 @@ const recalculateHyperspaceScanningLevel = () => {
     distances.push(GameHelper.getDistanceBetweenLocations(point.location, nextPoint.location))
   }
 
-  const longestWaypoint = Math.max(...distances)
+  const longestWaypoint = Math.max(...distances);
 
   // Calculate the hyperspace range required for it.
   hyperspaceLevel.value = Math.max(GameHelper.getHyperspaceLevelByDistance(game.value, longestWaypoint), 1)

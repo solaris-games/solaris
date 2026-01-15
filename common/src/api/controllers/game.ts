@@ -1,7 +1,9 @@
 import {DeleteRoute, GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
 import type {Statistics} from "../../types/common/stats";
 import { type Flux } from "../../types/common/flux";
-import type {GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
+import type {
+    GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase,
+    GameSettingsGameTime, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
     GameUserNotification,
@@ -48,7 +50,14 @@ export type ListGame<ID> = {
     state: GameInfoState<ID>,
 }
 
-export type UserActiveListGame<ID> = ListGame<ID> & {
+export type UserActiveListGame<ID> = {
+    _id: ID,
+    settings: {
+        general: ListGameSettingsGeneral<ID>,
+        gameTime: GameSettingsGameTime,
+        galaxy: GameSettingsGalaxyBase,
+    },
+    state: GameInfoState<ID>,
     userNotifications: GameUserNotification,
 };
 

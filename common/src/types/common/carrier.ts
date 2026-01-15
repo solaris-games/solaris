@@ -5,6 +5,7 @@ import type { Specialist } from "./specialist";
 import type { PlayerTechnologyLevels } from "./player";
 
 export interface Carrier<ID> extends MapObject<ID> {
+    name: string;
     orbiting: ID | null;
     waypointsLooped: boolean;
     ships: number | null;

@@ -29,6 +29,7 @@ export interface IgnoreBulkUpgrade {
 };
 
 export interface Star<ID> extends MapObject<ID> {
+    name: string;
     naturalResources: NaturalResources;
     terraformedResources?: TerraformedResources;
     ships: number | null;

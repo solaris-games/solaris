@@ -1,7 +1,11 @@
 import { add } from 'date-fns';
-import type {Carrier, Game} from "@/types/game";
+import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {between, type Duration, formatDuration as formatRealDuration, normalize, toSeconds} from "@/util/duration";
+import {
+  type GameInfoState,
+  type GameSettingsGalaxyBase, type GameSettingsGameTime, type ListGameSettingsGeneral
+} from "@solaris-common";
 
 export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo: Date): Date => {
   return add(relativeTo, { seconds: ticks * speedInSeconds });
@@ -51,9 +55,18 @@ export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string
   return `${ticks} T`;
 };
 
-export const getCountdownTimeForProductionCycle = (game: Game) => {
+type TGame = {
+  settings: {
+    general: ListGameSettingsGeneral<string>,
+    gameTime: GameSettingsGameTime,
+    galaxy: GameSettingsGalaxyBase,
+  },
+  state: GameInfoState<string>,
+}
+
+export const getCountdownTimeForProductionCycle = (game: TGame): Date | null => {
   if (!game.state.lastTickDate) {
-    return `N/A`;
+    return null;
   }
 
   const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
@@ -65,13 +78,21 @@ export const ticksToDuration = (game: Game, ticks: number): Duration => {
   const seconds = ticks * game.settings.gameTime.speed;
 
   return normalize({ seconds });
-}
+};
 
 export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {
   return `${getCountdownTimeStringByTicks(game, ticks)} - ETA: ${game.state.tick + ticks}`;
 };
 
-export const getCountdownTimeStringForTurnTimeout = (game: Game): string => {
+export const getCountdownTimeForTurnTimeout = (game: TGame): Date | null => {
+  if (game.settings.gameTime.gameType === 'realTime' && game.state.lastTickDate && !GameHelper.isGameFinished(game)) {
+    return add(game.state.lastTickDate, { minutes: game.settings.gameTime.maxTurnWait });
+  }
+
+  return null;
+};
+
+export const getCountdownTimeStringForTurnTimeout = (game: TGame): string => {
   if (game.settings.gameTime.gameType === 'realTime' && !GameHelper.isGameFinished(game)) {
     const endTime = add(new Date(), { seconds: game.settings.gameTime.maxTurnWait });
 
