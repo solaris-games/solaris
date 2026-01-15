@@ -50,7 +50,7 @@ export type ListGame<ID> = {
     state: GameInfoState<ID>,
 }
 
-export type UserActiveListGame<ID> = {
+export type UserListGame<ID> = {
     _id: ID,
     settings: {
         general: ListGameSettingsGeneral<ID>,
@@ -58,6 +58,9 @@ export type UserActiveListGame<ID> = {
         galaxy: GameSettingsGalaxyBase,
     },
     state: GameInfoState<ID>,
+}
+
+export type UserActiveListGame<ID> = UserListGame<ID> & {
     userNotifications: GameUserNotification,
 };
 
@@ -116,7 +119,7 @@ export const createGameRoutes = <ID>() => ({
     listMyCompleted: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/completed/user"),
     listActive: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/active"),
     listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
-    listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
+    listSpectating: new GetRoute<{}, {}, UserListGame<ID>[]>("/api/game/list/spectating"),
     getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>[]>("/api/game/:gameId/intel"),
     join: new PutRoute<{ gameId: ID }, {}, GameJoinGameRequest<ID>, {}>("/api/game/:gameId/join"),
     quit: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/quit"), 

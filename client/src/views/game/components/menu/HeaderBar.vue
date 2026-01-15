@@ -246,7 +246,7 @@ const recalculateTimeRemaining = () => {
   }
 
   if (gameIsPendingStart.value) {
-    timeRemaining.value = getCountdownTimeString(game.value, game.value.state.startDate);
+    timeRemaining.value = getCountdownTimeString(game.value.state.startDate!);
   } else {
     const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.state.tick, store.state.productionTick);
     timeRemaining.value = getCountdownTimeStringByTicks(game.value, ticksToProduction);
