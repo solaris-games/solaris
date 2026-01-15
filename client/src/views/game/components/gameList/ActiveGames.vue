@@ -98,7 +98,7 @@ import { listActive } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import {
   getCountdownTimeForProductionCycle,
-  getCountdownTimeForTurnTimeout,
+  getTurnTimeoutTime,
   getCountdownTimeStringForTurnTimeout
 } from "@/util/time";
 
@@ -130,7 +130,7 @@ const getNextCycleDate = (game: UserActiveListGame<string>): Date | null => {
   if (GameHelper.isRealTimeGame(game)) {
     return getCountdownTimeForProductionCycle(game);
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return getCountdownTimeForTurnTimeout(game);
+    return getTurnTimeoutTime(game);
   }
 
   return null;

@@ -51,7 +51,7 @@ import { listSpectating } from '@/services/typedapi/game';
 import { type UserListGame } from '@solaris-common';
 import {
   getCountdownTimeForProductionCycle,
-  getCountdownTimeForTurnTimeout,
+  getTurnTimeoutTime,
 } from "@/util/time";
 
 const httpClient = inject(httpInjectionKey)!;
@@ -62,7 +62,7 @@ const getNextCycleDate = (game: UserListGame<string>): Date | null => {
   if (GameHelper.isRealTimeGame(game)) {
     return getCountdownTimeForProductionCycle(game);
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return getCountdownTimeForTurnTimeout(game);
+    return getTurnTimeoutTime(game);
   }
 
   return null;

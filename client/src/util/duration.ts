@@ -24,10 +24,11 @@ export const toSeconds = (duration: Duration) => {
 
 export const normalize = (duration: Duration): Duration => {
   let seconds = toSeconds(duration);
+
   const norm = {} as Duration;
 
   norm.weeks = Math.floor(seconds / WEEK_SECONDS);
-  seconds -= seconds % WEEK_SECONDS;
+  seconds -= norm.weeks * WEEK_SECONDS;
 
   norm.days = Math.floor(seconds / DAY_SECONDS);
   seconds -= norm.days * DAY_SECONDS;
@@ -38,16 +39,12 @@ export const normalize = (duration: Duration): Duration => {
   norm.minutes = Math.floor(seconds / MINUTE_SECONDS);
   seconds -= norm.minutes * MINUTE_SECONDS;
 
-  norm.seconds = seconds;
+  norm.seconds = Math.floor(seconds);
 
   return norm;
 };
 
 export const between = (date1: Date, date2: Date): Duration => {
-  if (compareDesc(date1, date2) !== 1) {
-    return { seconds: 0 };
-  }
-
   return normalize({
     seconds: (date2.getTime() - date1.getTime()) / 1000,
   });
