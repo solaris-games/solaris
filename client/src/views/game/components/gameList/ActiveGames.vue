@@ -96,6 +96,7 @@ import type { UserActiveListGame } from '@solaris-common';
 import { ref, computed, type Ref, inject, onMounted, watch } from 'vue';
 import { listActive } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import {getCountdownTimeForProductionCycle, getCountdownTimeStringForTurnTimeout} from "@/util/time";
 
 const INCLUDE_DEFEATED_PREF_KEY = 'activeGamesIncludeDefeated';
 
@@ -125,9 +126,9 @@ const isGameInProgress = (game: UserActiveListGame<string>) => GameHelper.isGame
 
 const getNextCycleDate = (game: UserActiveListGame<string>) => {
   if (GameHelper.isRealTimeGame(game)) {
-    return GameHelper.getCountdownTimeForProductionCycle(game);
+    return getCountdownTimeForProductionCycle(game);
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return GameHelper.getCountdownTimeForTurnTimeout(game);
+    return getCountdownTimeStringForTurnTimeout(game);
   }
 };
 

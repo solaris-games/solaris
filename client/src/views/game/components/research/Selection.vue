@@ -22,7 +22,9 @@
     <div class="mb-2 row mb-0 bg-dark" v-if="!player.defeated && optionsNow.length">
       <label class="col col-form-label" title="Current research ETA">ETA:</label>
       <div class="col text-end">
-        <label class="col-form-label">{{ timeRemainingEta }}</label>
+        <label class="col-form-label">
+          <timer :ticks="player.value.currentResearchTicksEta || 0" />
+        </label>
       </div>
     </div>
     <div class="mb-2 row pt-2 pb-2 mb-0  mt-1" v-if="!player.defeated && optionsNext.length > 1">
@@ -41,6 +43,8 @@
     <div class="mb-2 row mb-2 bg-dark" v-if="!player.defeated && optionsNext.length > 1 && timeNextRemainingEta">
       <label class="col col-form-label" title="Next research ETA">ETA:</label>
       <div class="col text-end">
+        <timer :ticks="player.value.nextResearchTicksEta || 0" />
+
         <label class="col-form-label">{{ timeNextRemainingEta }}</label>
       </div>
     </div>
@@ -51,7 +55,7 @@
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
 import AudioService from '../../../../game/audio'
-import { ref, computed, onMounted, onUnmounted, inject } from 'vue';
+import { ref, computed, onMounted, inject } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {updateResearchNow, updateResearchNext} from "@/services/typedapi/research";
@@ -59,6 +63,7 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {ResearchType} from "@solaris-common";
+import Timer from "@/views/game/components/time/Timer.vue";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
@@ -75,19 +80,6 @@ const loadingNow = ref(false);
 const loadingNext = ref(false);
 const optionsNow = ref<Option[]>([]);
 const optionsNext = ref<Option[]>([]);
-
-const timeRemainingEta = ref<string | null>(null);
-const timeNextRemainingEta = ref<string | null>(null);
-
-const recalculateTimeRemaining = () => {
-  timeRemainingEta.value = GameHelper.getCountdownTimeStringByTicksWithTickETA(game.value, player.value.currentResearchTicksEta || 0);
-
-  if (player.value.nextResearchTicksEta == null) {
-    timeNextRemainingEta.value = null;
-  } else {
-    timeNextRemainingEta.value = GameHelper.getCountdownTimeStringByTicksWithTickETA(game.value, player.value.nextResearchTicksEta);
-  }
-};
 
 const loadTechnologies = () => {
   const options: Option[] = [
@@ -117,7 +109,6 @@ const doUpdateResearchNow = async () => {
     AudioService.join();
     player.value.currentResearchTicksEta = response.data.ticksEta;
     player.value.nextResearchTicksEta = response.data.ticksNextEta;
-    recalculateTimeRemaining();
     toast.default("Current research updated.");
   } else {
     console.error(formatError(response));
@@ -135,7 +126,6 @@ const doUpdateResearchNext = async () => {
     AudioService.join();
     player.value.currentResearchTicksEta = response.data.ticksEta;
     player.value.nextResearchTicksEta = response.data.ticksNextEta;
-    recalculateTimeRemaining();
     toast.default("Current research updated.");
   } else {
     console.error(formatError(response));
@@ -147,18 +137,6 @@ const doUpdateResearchNext = async () => {
 
 onMounted(() => {
   loadTechnologies();
-
-  recalculateTimeRemaining();
-
-  let intervalFunction = 0;
-
-  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
-    intervalFunction = setInterval(recalculateTimeRemaining, 1000);
-  }
-
-  onUnmounted(() => {
-    intervalFunction && clearInterval(intervalFunction);
-  })
 });
 </script>
 

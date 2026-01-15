@@ -88,6 +88,7 @@ import type {TradeEventTechnology} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
 import {unreadCount} from "@/services/typedapi/event";
+import {getCountdownTimeString, getCountdownTimeStringByTicks} from "@/util/time";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -245,11 +246,10 @@ const recalculateTimeRemaining = () => {
   }
 
   if (gameIsPendingStart.value) {
-    timeRemaining.value = GameHelper.getCountdownTimeString(game.value, game.value.state.startDate);
+    timeRemaining.value = getCountdownTimeString(game.value, game.value.state.startDate);
   } else {
     const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.state.tick, store.state.productionTick);
-
-    timeRemaining.value = GameHelper.getCountdownTimeStringByTicks(game.value, ticksToProduction);
+    timeRemaining.value = getCountdownTimeStringByTicks(game.value, ticksToProduction);
   }
 };
 

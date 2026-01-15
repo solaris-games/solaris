@@ -25,7 +25,11 @@ const formatDuration = (duration: Duration): string => {
   }
 
   return formatRealDuration(duration);
-}
+};
+
+export const getCountdownTimeString = (date: Date): string => {
+  return formatDuration(between(new Date(), date));
+};
 
 export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string => {
   if (game.settings.gameTime.gameType === 'realTime' && !GameHelper.isGameFinished(game)) {

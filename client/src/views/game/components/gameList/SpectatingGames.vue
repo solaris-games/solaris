@@ -49,6 +49,7 @@ import { type Ref, ref, onMounted, inject } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listSpectating } from '@/services/typedapi/game';
 import type { ListGame } from '@solaris-common';
+import {getCountdownTimeForProductionCycle, getCountdownTimeStringForTurnTimeout} from "@/util/time";
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -56,9 +57,9 @@ const games: Ref<ListGame<string>[]> = ref([]);
 
 const getNextCycleDate = (game: ListGame<string>) => {
   if (GameHelper.isRealTimeGame(game)) {
-    return GameHelper.getCountdownTimeForProductionCycle(game)
+    return getCountdownTimeForProductionCycle(game)
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return GameHelper.getCountdownTimeForTurnTimeout(game)
+    return getCountdownTimeStringForTurnTimeout(game)
   }
 };
 
