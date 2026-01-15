@@ -184,7 +184,7 @@ class GameHelper {
     return false;
   }
 
-  getTickDistance(game: Game, carrier: Carrier, tickDistanceModifier = 1) {
+  getTickDistance(game: Game, carrier: Carrier | null, tickDistanceModifier = 1) {
     let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
@@ -219,7 +219,7 @@ class GameHelper {
     return `${speedLy}LY/tick`;
   }
 
-  getTicksBetweenLocations(game: Game, carrier: Carrier, locs: RulerPoint[], tickDistanceModifier = 1) {
+  getTicksBetweenLocations(game: Game, carrier: Carrier | null, locs: RulerPoint[], tickDistanceModifier = 1) {
     let totalTicks = 0
     const tickDistance = this.getTickDistance(game, carrier, tickDistanceModifier);
 
