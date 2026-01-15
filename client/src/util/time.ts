@@ -85,7 +85,7 @@ export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string
 };
 
 export const getCountdownTimeForTurnTimeout = (game: TGame): Date | null => {
-  if (game.settings.gameTime.gameType === 'realTime' && game.state.lastTickDate && !GameHelper.isGameFinished(game)) {
+  if (game.settings.gameTime.gameType === 'turnBased' && game.state.lastTickDate && !GameHelper.isGameFinished(game)) {
     return add(game.state.lastTickDate, { minutes: game.settings.gameTime.maxTurnWait });
   }
 
