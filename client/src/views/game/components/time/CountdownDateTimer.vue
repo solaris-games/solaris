@@ -20,15 +20,7 @@ const recalculateTime = () => {
   }
 
   const current = new Date();
-
-  console.warn({
-    current,
-    endDate: props.endDate,
-  })
-
   const delta = between(current, props.endDate);
-
-  console.warn(delta);
 
   if (toSeconds(delta) <= 0)  {
     currentText.value = props.afterEndText || '';

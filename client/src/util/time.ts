@@ -35,12 +35,16 @@ export const getCountdownTimeString = (date: Date): string => {
   return formatDuration(between(new Date(), date));
 };
 
+const formatTick = (ticks: number): string => {
+  return ticks === 1 ?  `1 tick` : `${ticks} ticks`;
+};
+
 export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string => {
   if (game.settings.gameTime.gameType === 'realTime' && !GameHelper.isGameFinished(game)) {
     const time = addTicksToLastTick(game, ticks);
 
     if (!time) {
-      return `${ticks} T`;
+      return formatTick(ticks);
     }
 
     const duration = between(new Date(), time);
@@ -49,10 +53,10 @@ export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string
       return `Pending...`;
     }
 
-    return `${formatDuration(duration)} (${ticks} T)`;
+    return `${formatDuration(duration)} (${formatTick(ticks)})`;
   }
 
-  return `${ticks} T`;
+  return formatTick(ticks);
 };
 
 type TGame = {
@@ -81,7 +85,7 @@ export const ticksToDuration = (game: Game, ticks: number): Duration => {
 };
 
 export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {
-  return `${getCountdownTimeStringByTicks(game, ticks)} - ETA: ${game.state.tick + ticks}`;
+  return `${getCountdownTimeStringByTicks(game, ticks)} - ETA: Tick ${game.state.tick + ticks}`;
 };
 
 export const getTurnTimeoutTime = (game: TGame): Date | null => {
