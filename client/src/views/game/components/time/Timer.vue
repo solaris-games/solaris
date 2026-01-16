@@ -7,10 +7,11 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import {getCountdownTimeStringByTicks} from "@/util/time";
+import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
 
 const props = defineProps<{
   ticks: number;
+  showETA?: boolean;
 }>();
 
 const store = useStore();
@@ -19,7 +20,11 @@ const game = computed<Game>(() => store.state.game);
 const timeString = ref('');
 
 const recalculateTime = () => {
-  timeString.value = getCountdownTimeStringByTicks(game.value, props.ticks);
+  if (props.showETA) {
+    timeString.value = getCountdownTimeStringWithETA(game.value, props.ticks);
+  } else {
+    timeString.value = getCountdownTimeStringByTicks(game.value, props.ticks);
+  }
 };
 
 onMounted(() => {

@@ -42,7 +42,10 @@
           <!--Yes, that key-property depending on the current date is there for a reason. Otherwise, under certain circumstances, the text is not updated on screen on iOS Safari.-->
           <!-- https://stackoverflow.com/questions/55008261/my-react-component-does-not-update-in-the-safari-browser -->
           <!-- Seriously, what is wrong with you, Safari? -->
-		  		<p class="mb-0" :key="(new Date()).getTime().toString()" v-if="totalEtaTimeString && carrier.waypoints.length">{{totalEtaTimeString}}<orbital-mechanics-e-t-a-warning /></p>
+		  		<p class="mb-0" :key="(new Date()).getTime().toString()" v-if="totalTicksEta !== null && totalTicksEta !== undefined && carrier.waypoints.length">
+            <timer :ticks="totalTicksEta" :show-e-t-a="true" />
+            <orbital-mechanics-e-t-a-warning />
+          </p>
 		  	</div>
       </div>
 
@@ -97,6 +100,7 @@ import {saveWaypoints} from "@/services/typedapi/carrier";
 import type {TempWaypoint} from "@/types/waypoint";
 import {gameServicesKey, useGameServices} from "@/util/gameServices";
 import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
+import Timer from "@/views/game/components/time/Timer.vue";
 
 const props = defineProps<{
   carrierId: string,
@@ -131,7 +135,7 @@ const waypointAsList = computed<string>(() => carrier.value.waypoints.map(w => g
 const isSavingWaypoints = ref(false);
 const oldWaypoints = ref<CarrierWaypoint<string>[]>([]);
 const oldWaypointsLooped = ref(false);
-const totalEtaTimeString = ref<string | null>(null); // todo: use waypoint logic
+const totalTicksEta = ref<number | null>(null);
 const errors = ref<string[]>([]);
 const display = ref(true);
 
@@ -155,10 +159,8 @@ const recalculateLooped = () => {
 };
 
 const recalculateTotalEta = () => {
-  const totalTicksEta = gameServices.waypointService.calculateWaypointTicksEta(game.value, carrier.value,
+  totalTicksEta.value = gameServices.waypointService.calculateWaypointTicksEta(game.value, carrier.value,
     carrier.value.waypoints[carrier.value.waypoints.length - 1]);
-
-  totalEtaTimeString.value = getCountdownTimeStringWithETA(game.value, totalTicksEta);
 };
 
 const removeLastWaypoint = () => {
@@ -173,7 +175,7 @@ const removeLastWaypoint = () => {
   }
 
   if (!carrier.value.waypoints.length) {
-    totalEtaTimeString.value = null;
+    totalTicksEta.value = null;
   }
 
   AudioService.backspace();
@@ -229,7 +231,7 @@ const removeAllWaypoints = () => {
 
   eventBus.emit(MapCommandEventBusEventNames.MapCommandUpdateWaypoints, {});
 
-  totalEtaTimeString.value = null;
+  totalTicksEta.value = null;
 
   AudioService.backspace();
 
