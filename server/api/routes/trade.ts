@@ -3,11 +3,15 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import TradeController from '../controllers/trade';
 import { MiddlewareContainer } from "../middleware";
 import { SingleRouter} from "../singleRoute";
+import { createTradeRoutes } from "solaris-common";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = TradeController(container);
+    const routes = createTradeRoutes();
+    const answer = createRoutes(router, mw);
 
-    router.put('/api/game/:gameId/trade/credits',
+    answer(routes.sendCredits,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -27,7 +31,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/trade/creditsSpecialists',
+    answer(routes.sendCreditsSpecialists,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -47,7 +51,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/trade/renown',
+    answer(routes.sendRenown,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -66,7 +70,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/trade/tech',
+    answer(routes.sendTechnology,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -86,7 +90,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/trade/tech/:toPlayerId',
+    answer(routes.listTradeableTechnologies,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -106,7 +110,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/trade/:toPlayerId/events',
+    answer(routes.listTradeEvents,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
