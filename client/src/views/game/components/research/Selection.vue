@@ -43,7 +43,9 @@
     <div class="mb-2 row mb-2 bg-dark" v-if="!player.defeated && optionsNext.length > 1">
       <label class="col col-form-label" title="Next research ETA">ETA:</label>
       <div class="col text-end">
-        <timer :ticks="player.nextResearchTicksEta || 0" />
+        <label class="col-form-label">
+          <timer :ticks="player.nextResearchTicksEta || 0" />
+        </label>
       </div>
     </div>
   </form>
