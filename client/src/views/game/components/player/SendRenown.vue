@@ -17,48 +17,54 @@
 </div>
 </template>
 
-<script>
-import tradeService from '../../../../services/api/trade'
+<script setup lang="ts">
+import { inject, ref, computed } from 'vue';
+import { useStore } from 'vuex';
 import FormErrorList from '../../../components/FormErrorList.vue'
+import type {Game, Player} from "@/types/game";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {sendRenown} from "@/services/typedapi/trade";
 
-export default {
-  components: {
-    'form-error-list': FormErrorList
-  },
-  props: {
-    player: Object,
-    userPlayer: Object
-  },
-  data () {
-    return {
-      errors: [],
-      isAwardingRenown: false,
-      amount: 1
-    }
-  },
-  methods: {
-    async confirmAwardRenown () {
-      this.errors = []
-      this.isAwardingRenown = true
+const props = defineProps<{
+  player: Player,
+  userPlayer: Player,
+}>();
 
-      try {
-        let response = await tradeService.sendRenown(this.$store.state.game._id, this.player._id, this.amount)
+const emit = defineEmits<{
+  onRenownSent: [amount: number],
+}>();
 
-        if (response.status === 200) {
-          this.$toast.default(`Sent ${this.amount} renown to ${this.player.alias}.`)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-          this.userPlayer.renownToGive -= this.amount
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const isHistoricalMode = useIsHistoricalMode(store);
 
-          this.$emit('onRenownSent', this.amount)
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
+const errors = ref<string[]>([]);
+const isAwardingRenown = ref(false);
 
-      this.isAwardingRenown = false
-    }
+const confirmAwardRenown = async () => {
+  errors.value = [];
+  isAwardingRenown.value = true;
+
+  const response = await sendRenown(httpClient)(game.value._id, props.player._id, 1);
+  if (isOk(response)) {
+    toast.default(`Sent ${1} renown to ${props.player.alias}.`);
+
+    props.userPlayer.renownToGive -= 1;
+
+    emit('onRenownSent', 1);
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
   }
-}
+
+  isAwardingRenown.value = false;
+};
+
 </script>
 
 <style scoped>
