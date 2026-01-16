@@ -136,7 +136,8 @@ export type Player<ID> = {
     currentResearchTicksEta?: number | null;
     nextResearchTicksEta?: number | null;
     hasPerspective?: boolean;
-    colourMapping?: Map<String, PlayerColour>
+    colourMapping?: Map<String, PlayerColour>;
+    reputation?: PlayerReputation<ID>;
 };
 
 export type PlayerColourShapeCombination = {

@@ -16,7 +16,7 @@
       </div>
       <div class="col-5">
         <div class="d-grid gap-2">
-          <modalButton modalName="sendCreditsModal" classText="btn btn-success" :disabled="$isHistoricalMode() || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
+          <modalButton modalName="sendCreditsModal" classText="btn btn-success" :disabled="isHistoricalMode || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
         </div>
       </div>
     </form>
@@ -28,55 +28,57 @@
 </div>
 </template>
 
-<script>
-import tradeService from '../../../../services/api/trade'
+<script setup lang="ts">
+import { ref, inject, computed } from 'vue';
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
+import type {Game, Player} from "@/types/game";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {sendCredits} from "@/services/typedapi/trade";
+import { useStore } from 'vuex';
+import {toastInjectionKey} from "@/util/keys";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  props: {
-    player: Object,
-    userPlayer: Object
-  },
-  components: {
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'form-error-list': FormErrorList
-  },
-  data () {
-    return {
-      errors: [],
-      isSendingCredits: false,
-      amount: 0
-    }
-  },
-  methods: {
-    async confirmSendCredits () {
-      this.errors = []
-      this.isSendingCredits = true
-      this.amount = Math.floor(this.amount)
+const props = defineProps<{
+  player: Player,
+  userPlayer: Player,
+}>();
 
-      try {
-        let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
+const emit = defineEmits<{
+  onCreditsSent: [amount: number],
+}>();
 
-        if (response.status === 200) {
-          this.$emit('onCreditsSent', this.amount)
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-          this.$toast.default(`Sent ${this.amount} credits to ${this.player.alias}.`)
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const isHistoricalMode = useIsHistoricalMode(store);
 
-          this.userPlayer.credits -= this.amount
-          this.amount = 0
+const errors = ref<string[]>([]);
+const isSendingCredits = ref(false);
+const amount = ref(0);
 
-          this.player.reputation = response.data.reputation
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
+const confirmSendCredits = async () => {
+  errors.value = [];
+  isSendingCredits.value = true;
+  amount.value = Math.floor(amount.value);
 
-      this.isSendingCredits = false
-    }
+  const response = await sendCredits(httpClient)(game.value._id, props.player._id, amount.value);
+  if (isOk(response)) {
+    emit("onCreditsSent", amount.value);
+    toast.default(`Sent ${amount.value} credits to ${props.player.alias}.`);
+
+    props.userPlayer.credits -= amount.value;
+    amount.value = 0;
+    props.player.reputation = response.data.reputation;
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
   }
+
+  isSendingCredits.value = false;
 }
 </script>
 
