@@ -11,7 +11,7 @@ import { Conversation } from "./types/Conversation";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { TradeEventTechnology } from "./types/Trade";
+import { TradeEventTechnology } from "solaris-common";
 import {UserServerSocketEmitter} from "../sockets/socketEmitters/user";
 
 

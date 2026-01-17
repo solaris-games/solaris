@@ -15,7 +15,7 @@ import ReputationService from './reputation';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { Player, PlayerReputation } from './types/Player';
-import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
+import { TradeEvent, TradeEventTechnology, TradeTechnology } from 'solaris-common';
 import { User } from './types/User';
 import UserService from './user';
 import StatisticsService from './statistics';
@@ -490,7 +490,7 @@ export default class TradeService extends EventEmitter {
         }
     }
 
-    async listTradeEventsBetweenPlayers(game: Game, playerId: DBObjectId, playerIds: DBObjectId[]): Promise<TradeEvent[]> {
+    async listTradeEventsBetweenPlayers(game: Game, playerId: DBObjectId, playerIds: DBObjectId[]): Promise<TradeEvent<DBObjectId>[]> {
         let events = await this.eventRepo.find({
             gameId: game._id,
             playerId: playerId,
@@ -526,15 +526,12 @@ export default class TradeService extends EventEmitter {
         .map(e => {
             const ev = e as BasePlayerEvent<DBObjectId>;
 
-            return {
-                playerId: ev.playerId!,
-                type: ev.type,
-                // TODO
-                // @ts-ignore
-                data: ev.data,
+            const event: TradeEvent<DBObjectId> = {
+                ...ev,
                 sentDate: moment(ev._id.getTimestamp()).toDate(),
-                sentTick: ev.tick
-            }
+            };
+
+            return event;
         });
     }
 

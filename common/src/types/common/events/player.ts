@@ -42,13 +42,15 @@ export interface PlayerSpecialistTokensSentEvent<ID> extends BasePlayerEvent<ID>
     }
 }
 
+export interface PlayerDebtEventData<ID> {
+    debtorPlayerId: ID,
+    creditorPlayerId: ID,
+    amount: number,
+    ledgerType: LedgerType,
+}
+
 export interface BasePlayerDebtEvent<ID> extends BasePlayerEvent<ID> {
-    data: {
-        debtorPlayerId: ID,
-        creditorPlayerId: ID,
-        amount: number,
-        ledgerType: LedgerType,
-    }
+    data: PlayerDebtEventData<ID>,
 }
 
 export interface PlayerDebtForgivenEvent<ID> extends BasePlayerDebtEvent<ID> {

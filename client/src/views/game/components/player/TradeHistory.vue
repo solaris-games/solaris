@@ -68,75 +68,69 @@
   </div>
 </template>
 
-<script>
-import TradeApiService from '../../../../services/api/trade'
-import GameHelper from '../../../../services/gameHelper'
-import TechnologyHelper from '../../../../services/technologyHelper'
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import moment from 'moment'
+<script setup lang="ts">
+import { ref, computed, inject, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
+import TechnologyHelper from '../../../../services/technologyHelper';
+import LoadingSpinner from '../../../components/LoadingSpinner.vue';
+import { compareAsc } from 'date-fns';
+import type {Game} from "@/types/game";
+import type {ResearchTypeNotRandom, TradeEvent} from "@solaris-common";
+import {listTradeEvents} from "@/services/typedapi/trade";
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinner,
-  },
-  props: {
-    toPlayerId: String
-  },
-  data() {
-    return {
-      isLoading: false,
-      userPlayer: null,
-      tradeEvents: []
-    }
-  },
-  async mounted() {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
+const props = defineProps<{
+  toPlayerId: string,
+}>();
 
-    await this.loadTradeEvents()
-  },
-  methods: {
-    async loadTradeEvents() {
-      this.isLoading = true
+const httpClient = inject(httpInjectionKey)!;
 
-      try {
-        let response = await TradeApiService.listTradeEventsBetweenPlayers(this.$store.state.game._id, this.toPlayerId)
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 
-        if (response.status === 200) {
-          this.tradeEvents = response.data.sort((a, b) => moment(b.sentDate).utc().toDate() - moment(a.sentDate).utc().toDate())
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const isLoading = ref(false);
+const tradeEvents = ref<TradeEvent<string>[]>([]);
 
-      this.isLoading = false
-    },
-    isTradeFromUserPlayer(tradeEvent) {
-      return tradeEvent.data.toPlayerId
-    },
-    getTechnologyFriendlyName(key) {
-      return TechnologyHelper.getFriendlyName(key)
-    },
-    getDateString(date) {
-      return GameHelper.getDateString(date)
-    },
-    isUserPlayerLedgerEventCreditor(event) {
-      if (event.type !== 'playerDebtSettled' && event.type !== 'playerDebtForgiven') {
-        return false
-      }
-
-      const summary = GameHelper.getLedgerGameEventPlayerSummary(this.$store.state.game, event)
-
-      return summary.isCreditor
-    },
-    getCreditsType(event) {
-      if (event.data.ledgerType === 'credits') {
-        return 'credits'
-      } else if (event.data.ledgerType === 'creditsSpecialists') {
-        return 'specialist tokens'
-      }
-    }
+const isUserPlayerLedgerEventCreditor = (event: TradeEvent<string>) => {
+  if (event.type !== 'playerDebtSettled' && event.type !== 'playerDebtForgiven') {
+    return false
   }
-}
+
+  const summary = GameHelper.getLedgerGameEventPlayerSummary(game.value, event)
+
+  return summary.isCreditor
+};
+
+const getTechnologyFriendlyName = (key: ResearchTypeNotRandom) => TechnologyHelper.getFriendlyName(key);
+
+const getDateString = (date: Date) => GameHelper.getDateString(date);
+
+const getCreditsType = (event: TradeEvent<string>) => {
+  if (event.data.ledgerType === 'credits') {
+    return 'credits';
+  } else if (event.data.ledgerType === 'creditsSpecialists') {
+    return 'specialist tokens';
+  }
+};
+
+const loadTradeEvents = async () => {
+  isLoading.value = true;
+
+  const response = await listTradeEvents(httpClient)(game.value._id, props.toPlayerId);
+  if (isOk(response)) {
+    tradeEvents.value = response.data.sort((a, b) => compareAsc(a.sentDate, b.sentDate));
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+onMounted(async () => {
+  await loadTradeEvents();
+});
 </script>
 
 <style scoped>
