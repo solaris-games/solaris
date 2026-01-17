@@ -524,7 +524,7 @@ export default class TradeService extends EventEmitter {
 
         return events
         .map(e => {
-            const ev = e as BasePlayerEvent<DBObjectId>;
+            const ev = e as BasePlayerEvent<DBObjectId> & { data: TradeEvent<DBObjectId>['data'] };
 
             const event: TradeEvent<DBObjectId> = {
                 ...ev,

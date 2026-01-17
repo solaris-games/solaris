@@ -1,5 +1,5 @@
 import { Carrier } from "./Carrier";
-import { Conversation } from "./Conversation";
+import { Conversation } from "solaris-common";
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
 import { Player } from "./Player";
@@ -39,7 +39,7 @@ export interface Game {
 		linkedStars: DBObjectId[][],
 		teams?: Team[],
 	},
-	conversations: Conversation[]
+	conversations: Conversation<DBObjectId>[]
 	state: {
 		readyToQuitCount: number | undefined;
 		locked: boolean;

@@ -9,7 +9,7 @@ import {ReportCreateReportRequest} from "../api/requests/report";
 import UserService from "./user";
 import GameListService from "./gameList";
 import GameService from "./game";
-import {Conversation} from "./types/Conversation";
+import {Conversation} from "solaris-common";
 
 export default class ReportService {
     reportModel;
@@ -77,7 +77,7 @@ export default class ReportService {
             userGameIds.includes(report.gameId.toString());
     }
 
-    async conversationForReport(reportId: DBObjectId, userId: DBObjectId): Promise<Conversation> {
+    async conversationForReport(reportId: DBObjectId, userId: DBObjectId): Promise<Conversation<DBObjectId>> {
         const report = await this.reportRepo.findOne({
             _id: reportId
         }, {});

@@ -27,7 +27,8 @@ import {
     PlayerStarDiedEvent,
     PlayerStarReignitedEvent, PlayerStarSpecialistHiredEvent,
     PlayerTechnologyReceivedEvent,
-    PlayerTechnologySentEvent, TradeEventTechnology
+    PlayerTechnologySentEvent, TradeEventTechnology,
+    Conversation
 } from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
@@ -48,7 +49,6 @@ import StarUpgradeService, { StarUpgradeServiceEvents } from "./starUpgrade";
 import TradeService, { TradeServiceEvents } from "./trade";
 import { Carrier } from "./types/Carrier";
 import { CombatResult } from "./types/Combat";
-import { Conversation } from "./types/Conversation";
 import { DBObjectId } from "./types/DBObjectId";
 import { DiplomaticStatus } from "solaris-common";
 import { Game } from "./types/Game";
@@ -643,7 +643,7 @@ export default class EventService {
         await this.createPlayerEvent<PlayerCarrierSpecialistHiredEvent<DBObjectId>>(gameId, gameTick, player._id, 'playerCarrierSpecialistHired', data, true);
     }
 
-    async createPlayerConversationCreated(gameId: DBObjectId, gameTick: number, convo: Conversation) {
+    async createPlayerConversationCreated(gameId: DBObjectId, gameTick: number, convo: Conversation<DBObjectId>) {
         const data = {
             conversationId: convo._id,
             createdBy: convo.createdBy!,
@@ -654,7 +654,7 @@ export default class EventService {
         await this.createPlayerEvent<PlayerConversationCreatedEvent<DBObjectId>>(gameId, gameTick, convo.createdBy!, 'playerConversationCreated', data, true);
     }
 
-    async createPlayerConversationInvited(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
+    async createPlayerConversationInvited(gameId: DBObjectId, gameTick: number, convo: Conversation<DBObjectId>, playerId: DBObjectId) {
         const data = {
             conversationId: convo._id,
             name: convo.name,
@@ -664,7 +664,7 @@ export default class EventService {
         await this.createPlayerEvent<PlayerConversationInvitedEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerConversationInvited', data);
     }
 
-    async createPlayerConversationLeft(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
+    async createPlayerConversationLeft(gameId: DBObjectId, gameTick: number, convo: Conversation<DBObjectId>, playerId: DBObjectId) {
         const data = {
             conversationId: convo._id,
             name: convo.name,

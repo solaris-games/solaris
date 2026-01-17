@@ -7,7 +7,7 @@ import { GameServerSocketEmitter } from '../sockets/socketEmitters/game';
 import { PlayerServerSocketEmitter } from '../sockets/socketEmitters/player';
 import AvatarService from "./avatar";
 import { Avatar } from './types/Avatar';
-import { Conversation } from "./types/Conversation";
+import { Conversation } from "solaris-common";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
@@ -88,28 +88,28 @@ export default class BroadcastService {
         toUserIds.forEach(u => this.userServerSocketEmitter.emitGameMessageSent(u.toString(), this.mapConversationMessageSentResultObjectIds(message)));
     }
 
-    gameConversationRead(game: Game, conversation: Conversation, readByPlayerId: DBObjectId) {
+    gameConversationRead(game: Game, conversation: Conversation<DBObjectId>, readByPlayerId: DBObjectId) {
         this.playerServerSocketEmitter.emitGameConversationRead(readByPlayerId.toString(), {
             conversationId: conversation._id.toString(),
             readByPlayerId: readByPlayerId.toString()
         });
     }
 
-    gameConversationLeft(game: Game, conversation: Conversation, playerId: DBObjectId) {
+    gameConversationLeft(game: Game, conversation: Conversation<DBObjectId>, playerId: DBObjectId) {
         conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationLeft(p.toString(), {
             conversationId: conversation._id.toString(),
             playerId: playerId.toString()
         }));
     }
 
-    gameConversationMessagePinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
+    gameConversationMessagePinned(game: Game, conversation: Conversation<DBObjectId>, messageId: DBObjectId) {
         conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationMessagePinned(p.toString(), {
             conversationId: conversation._id.toString(),
             messageId: messageId.toString()
         }));
     }
 
-    gameConversationMessageUnpinned(game: Game, conversation: Conversation, messageId: DBObjectId) {
+    gameConversationMessageUnpinned(game: Game, conversation: Conversation<DBObjectId>, messageId: DBObjectId) {
         conversation.participants.forEach(p => this.playerServerSocketEmitter.emitGameConversationMessageUnpinned(p.toString(), {
             conversationId: conversation._id.toString(),
             messageId: messageId.toString()

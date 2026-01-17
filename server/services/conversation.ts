@@ -4,8 +4,7 @@ import moment from "moment";
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "solaris-common";
 import Repository from './repository';
-import { Conversation } from './types/Conversation';
-import { ConversationMessage, ConversationMessageSentResult } from './types/ConversationMessage';
+import { Conversation, ConversationMessage, ConversationMessageSentResult } from 'solaris-common';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import TradeService from './trade';
@@ -29,7 +28,7 @@ function arrayIsEqual(a, b): boolean {
     return true;
 }
 
-function getNewConversation(game: Game, playerId: DBObjectId | null, name: string, participantIds: DBObjectId[]): Conversation {
+function getNewConversation(game: Game, playerId: DBObjectId | null, name: string, participantIds: DBObjectId[]): Conversation<DBObjectId> {
     if (name == null || !name.length || name.length > 100) {
         throw new ValidationError(`Name is required and must not exceed 100 characters.`);
     }
@@ -54,9 +53,9 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
         throw new ValidationError(`A conversation already exists with the same participants and name.`);
     }
 
-    let convoId = new mongoose.Types.ObjectId();
+    const convoId = new mongoose.Types.ObjectId();
 
-    let newConvo: Conversation = {
+    const newConvo: Conversation<DBObjectId> = {
         _id: convoId,
         name,
         createdBy: playerId,
@@ -95,7 +94,7 @@ export default class ConversationService extends EventEmitter {
         this.broadcastService = broadcastService;
     }
 
-    async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation> {
+    async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation<DBObjectId>> {
         let newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
@@ -127,12 +126,12 @@ export default class ConversationService extends EventEmitter {
     }
 
     createConversationAllPlayers(game: Game): void {
-        let name = game.settings.general.name;
-        let participantIds: DBObjectId[] = game.galaxy.players.map(p => p._id);
+        const name = game.settings.general.name;
+        const participantIds: DBObjectId[] = game.galaxy.players.map(p => p._id);
 
-        let newConvo = getNewConversation(game, null, name, participantIds);
+        const newConvo = getNewConversation(game, null, name, participantIds);
         
-        let newMessage: ConversationMessage = {
+        const newMessage: ConversationMessage<DBObjectId> = {
             fromPlayerId: null,
             fromPlayerAlias: "Solaris",
             message: "Welcome to " + name + "!\n\nThis is the global chat. Any messages sent here will be delivered to all players in the game!\nPlease take a moment to familiarise yourself with our community guidelines.\n\nGood Luck, Commanders!",
@@ -147,7 +146,7 @@ export default class ConversationService extends EventEmitter {
 
     }
 
-    getGeneralConversation(game: Game): Conversation | undefined {
+    getGeneralConversation(game: Game): Conversation<DBObjectId> | undefined {
         return game.conversations.find(c => c.createdBy == null);
     }
 
@@ -158,7 +157,7 @@ export default class ConversationService extends EventEmitter {
         let convos = game.conversations.filter(c => c.participants.find(p => p.toString() === playerId.toString()));
 
         return convos.map(c => {
-            const msgs: ConversationMessage[] = c.messages as ConversationMessage[];
+            const msgs: ConversationMessage<DBObjectId>[] = c.messages as ConversationMessage<DBObjectId>[];
 
             // Only return the last message
             const lastMessage = msgs.slice(-1)[0] || null;
@@ -207,7 +206,7 @@ export default class ConversationService extends EventEmitter {
         }
 
         convo.messages.forEach(cm => {
-            cm = <ConversationMessage>cm;
+            cm = <ConversationMessage<DBObjectId>>cm;
             cm.readBy = cm.readBy.filter(pid => pid.toString() === playerId.toString());
         })
 
@@ -251,10 +250,10 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async sendSystemMessage(game: Game, conversation: Conversation, message: string): Promise<ConversationMessageSentResult> {
+    async sendSystemMessage(game: Game, conversation: Conversation<DBObjectId>, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {
         message = message.trim()
 
-        const newMessage: ConversationMessage = {
+        const newMessage: ConversationMessage<DBObjectId> = {
             fromPlayerId: null,
             fromPlayerAlias: "Solaris",
             message: message,
@@ -269,7 +268,7 @@ export default class ConversationService extends EventEmitter {
         return await this._pushMessage(game, conversation, toPlayerIds, newMessage);
     }
 
-    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult> {
+    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {
         message = message.trim()
 
         if (message === '') {
@@ -287,7 +286,7 @@ export default class ConversationService extends EventEmitter {
             throw new ValidationError(`You are not participating in this conversation.`);
         }
 
-        let newMessage: ConversationMessage = {
+        const newMessage: ConversationMessage<DBObjectId> = {
             _id: new mongoose.Types.ObjectId(),
             fromPlayerId: player._id,
             fromPlayerAlias: player.alias!,
@@ -307,7 +306,7 @@ export default class ConversationService extends EventEmitter {
         return await this._pushMessage(game, convo, toPlayerIds, newMessage);
     }
 
-    async _pushMessage(game: Game, conversation: Conversation, toPlayerIds: DBObjectId[], newMessage: ConversationMessage) {
+    async _pushMessage(game: Game, conversation: Conversation<DBObjectId>, toPlayerIds: DBObjectId[], newMessage: ConversationMessage<DBObjectId>) {
         // Push a new message into the conversation messages array.
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -319,7 +318,7 @@ export default class ConversationService extends EventEmitter {
         });
 
 
-        const sentMessageResult: ConversationMessageSentResult = {
+        const sentMessageResult: ConversationMessageSentResult<DBObjectId> = {
             ...newMessage,
             conversationId: conversation._id,
             type: 'message',
@@ -328,7 +327,7 @@ export default class ConversationService extends EventEmitter {
             gameName: game.settings.general.name,
         }
 
-        let e: InternalConversationMessageSentEvent = {
+        const e: InternalConversationMessageSentEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             conversation,
@@ -347,7 +346,7 @@ export default class ConversationService extends EventEmitter {
 
         // Note: This is the best way as it may save a DB call
         // if there are no unread messages.
-        let unreadMessages = (convo.messages as ConversationMessage[])
+        let unreadMessages = (convo.messages as ConversationMessage<DBObjectId>[])
             .filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null)
             .map(m => m._id);
 
@@ -412,7 +411,7 @@ export default class ConversationService extends EventEmitter {
         return (game.conversations || [])
             .filter(c => c.participants.find(p => p.toString() === playerId.toString()))
             .reduce((sum, c) => {
-                return sum + (c.messages as ConversationMessage[]).filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null).length
+                return sum + (c.messages as ConversationMessage<DBObjectId>[]).filter(m => m.readBy.find(r => r.toString() === playerId.toString()) == null).length
             }, 0);
     }
 
