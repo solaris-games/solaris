@@ -15,8 +15,8 @@ export interface TradeTechnology {
     cost: number;
 };
 
-export type TradeEvent<ID> = { sentDate: Date } &
-    (PlayerDebtForgivenEvent<ID>
+export type BaseTradeEvent<ID> =
+    | PlayerDebtForgivenEvent<ID>
     | PlayerDebtSettledEvent<ID>
     | PlayerCreditsReceivedEvent<ID>
     | PlayerCreditsSentEvent<ID>
@@ -27,7 +27,9 @@ export type TradeEvent<ID> = { sentDate: Date } &
     | PlayerTechnologySentEvent<ID>
     | PlayerTechnologyReceivedEvent<ID>
     | PlayerGiftReceivedEvent<ID>
-    | PlayerGiftSentEvent<ID>);
+    | PlayerGiftSentEvent<ID>;
+
+export type TradeEvent<ID> = { sentDate: Date } & BaseTradeEvent<ID>;
 
 export interface TradeEventTechnology {
     name: string;

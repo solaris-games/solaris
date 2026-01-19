@@ -8,7 +8,7 @@ export interface Conversation<ID> {
     createdBy: ID | null;
     name: string;
     mutedBy?: ID[];
-    messages: (ConversationMessage<ID> | TradeEvent<ID> | DiplomacyEvent<string>)[];
+    messages: (ConversationMessage<ID> | TradeEvent<ID> | DiplomacyEvent<ID>)[];
     lastMessage?: ConversationMessage<ID>;
     unreadCount?: number;
     isMuted?: boolean;

@@ -1,10 +1,17 @@
 import EventEmitter from "events";
 import moment from "moment";
-import {BaseGameEvent, BasePlayerEvent, LedgerType} from 'solaris-common';
-import { ValidationError } from "solaris-common";
+import {
+    BaseGameEvent,
+    GameTypeService,
+    LedgerType,
+    ResearchTypeNotRandom,
+    TradeEvent,
+    TradeEventTechnology,
+    TradeTechnology,
+    ValidationError
+} from 'solaris-common';
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
-import { GameTypeService, ResearchTypeNotRandom } from 'solaris-common'
 import LedgerService from './ledger';
 import PlayerService from './player';
 import PlayerAfkService from './playerAfk';
@@ -12,11 +19,10 @@ import PlayerCreditsService from './playerCredits';
 import RandomService from './random';
 import Repository from './repository';
 import ReputationService from './reputation';
-import { DBObjectId } from './types/DBObjectId';
-import { Game } from './types/Game';
-import { Player, PlayerReputation } from './types/Player';
-import { TradeEvent, TradeEventTechnology, TradeTechnology } from 'solaris-common';
-import { User } from './types/User';
+import {DBObjectId} from './types/DBObjectId';
+import {Game} from './types/Game';
+import {Player, PlayerReputation} from './types/Player';
+import {User} from './types/User';
 import UserService from './user';
 import StatisticsService from './statistics';
 
@@ -491,7 +497,7 @@ export default class TradeService extends EventEmitter {
     }
 
     async listTradeEventsBetweenPlayers(game: Game, playerId: DBObjectId, playerIds: DBObjectId[]): Promise<TradeEvent<DBObjectId>[]> {
-        let events = await this.eventRepo.find({
+        const events = await this.eventRepo.find({
             gameId: game._id,
             playerId: playerId,
             type: {
@@ -523,15 +529,11 @@ export default class TradeService extends EventEmitter {
         });
 
         return events
-        .map(e => {
-            const ev = e as BasePlayerEvent<DBObjectId> & { data: TradeEvent<DBObjectId>['data'] };
-
-            const event: TradeEvent<DBObjectId> = {
+        .map(ev => {
+            return {
                 ...ev,
                 sentDate: moment(ev._id.getTimestamp()).toDate(),
-            };
-
-            return event;
+            } as TradeEvent<DBObjectId>;
         });
     }
 
