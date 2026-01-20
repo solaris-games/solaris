@@ -961,7 +961,10 @@ const canAllTradingBeEnabled = computed(() => {
 
 const loadSettingsFromTemplate = async (templateName: string) => {
   const template = await import(`../../config/gamesettings/${templateName}.json`);
-  settings.value = JSON.parse(JSON.stringify(template)); // deep clone
+
+  const copy = JSON.parse(JSON.stringify(template)); // deep copy
+  delete copy.default; // remove default property added by ES module
+  settings.value = copy;
 };
 
 const validateTeamSettings = () => {
