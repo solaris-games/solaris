@@ -169,7 +169,7 @@
       <div class="row pt-2 pb-2" v-if="hasWaypoints">
         <div class="col" v-if="carrier.ticksEta !== null && carrier.ticksEta !== undefined">
           <span>ETA<orbital-mechanics-e-t-a-warning />: <timer :ticks="carrier.ticksEta" />
-            <span v-if="carrier.waypoints.length > 1 && carrier.ticksEtaTotal !== null && carrier.ticksEtaTotal !== undefined">(Total: <timer :ticks="carrier.ticksEtaTotal" />)</span>
+            <span v-if="carrier.waypoints.length > 1 && carrier.ticksEtaTotal !== null && carrier.ticksEtaTotal !== undefined"> (Total: <timer :ticks="carrier.ticksEtaTotal" />)</span>
           </span>
         </div>
         <div class="col">
