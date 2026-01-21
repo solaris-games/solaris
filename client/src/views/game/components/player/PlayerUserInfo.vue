@@ -24,6 +24,7 @@ import { computed } from 'vue';
 import type {Player, InGameUser} from '@solaris-common';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
+import {useGameServices} from "@/util/gameServices";
 
 const props = defineProps<{
   game: Game,
@@ -36,15 +37,17 @@ const emit = defineEmits<{
   onOpenPurchasePlayerBadgeRequested: [playerId: string],
 }>();
 
+const serviceProvider = useGameServices();
+
 const isGameFinished = computed(() => GameHelper.isGameFinished(props.game));
 const isGameStarted = computed(() => GameHelper.isGameStarted(props.game));
-const isAnonymousGame = computed(() => props.game.settings.general.anonymity === 'extra');
+const playersAreAnonymous = computed(() => isGameFinished.value ? serviceProvider.gameTypeService.isAnonymousAfterEnd(props.game) : serviceProvider.gameTypeService.isAnonymousGameDuringGame(props.game));
 
 const canViewAchievements = computed(() => Boolean(props.player && props.player.isRealUser && props.user?.achievements));
 const playerIsUser = computed(() => Boolean(props.player && props.userPlayer && props.userPlayer._id === props.player._id));
 
-const canSendRenown = computed(() => Boolean(props.player && isGameStarted.value && props.player.isRealUser && props.userPlayer && !(playerIsUser.value) && (!isAnonymousGame.value || isGameFinished.value)));
-const canAwardBadge = computed(() => Boolean(props.player && props.player.isRealUser && props.userPlayer && !(playerIsUser.value) && (!isAnonymousGame.value || isGameFinished.value)));
+const canSendRenown = computed(() => Boolean(props.player && isGameStarted.value && props.player.isRealUser && props.userPlayer && !(playerIsUser.value) && (!playersAreAnonymous.value || isGameFinished.value)));
+const canAwardBadge = computed(() => Boolean(props.player && props.player.isRealUser && props.userPlayer && !(playerIsUser.value) && (!playersAreAnonymous.value || isGameFinished.value)));
 
 const onOpenPurchasePlayerBadgeRequested = () => emit('onOpenPurchasePlayerBadgeRequested', props.player._id);
 

@@ -3,7 +3,7 @@ import {Player} from "./types/Player";
 import {KnownAttack} from "./types/Ai";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
-import { DistanceService } from 'solaris-common';
+import {DistanceService, PathfindingService} from 'solaris-common';
 import PlayerService from "./player";
 import ShipTransferService from "./shipTransfer";
 import StarService from "./star";
@@ -20,7 +20,6 @@ import {DBObjectId} from "./types/DBObjectId";
 import BasicAIService from "./basicAi";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
-import PathfindingService from "./pathfinding";
 import {logger} from "../utils/logging";
 import mongoose from 'mongoose';
 import SaveWaypointsService from "./saveWaypoints";
@@ -149,7 +148,7 @@ export default class AIService {
     playerStatisticsService: PlayerStatisticsService;
     shipService: ShipService;
     basicAIService: BasicAIService;
-    pathfindingService: PathfindingService;
+    pathfindingService: PathfindingService<DBObjectId>;
     saveWaypointService: SaveWaypointsService;
     starDataService: StarDataService;
 
@@ -169,7 +168,7 @@ export default class AIService {
         shipService: ShipService,
         playerStatisticsService: PlayerStatisticsService,
         basicAIService: BasicAIService,
-        pathfindingService: PathfindingService,
+        pathfindingService: PathfindingService<DBObjectId>,
         saveWaypointService: SaveWaypointsService,
         starDataService: StarDataService,
     ) {
@@ -948,7 +947,7 @@ export default class AIService {
 
         const defender = {
             ships: Math.ceil(shipsAtArrival),
-            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers)
+            weaponsLevel: this.technologyService.getStarEffectiveWeaponsLevel(game, [defendingPlayer], starToInvade, defendingCarriers).total,
         };
 
         const attacker = {

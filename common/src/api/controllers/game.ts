@@ -1,7 +1,9 @@
 import {DeleteRoute, GetRoute, PatchRoute, PostRoute, PutRoute, SimpleGetRoute} from "./index";
 import type {Statistics} from "../../types/common/stats";
 import { type Flux } from "../../types/common/flux";
-import type {GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
+import type {
+    GameConstants, GameGalaxy, GameSettings, GameSettingsGalaxyBase,
+    GameSettingsGameTime, GameSettingsGeneral, GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase,
     GameState,
     GameUserNotification,
@@ -48,7 +50,17 @@ export type ListGame<ID> = {
     state: GameInfoState<ID>,
 }
 
-export type UserActiveListGame<ID> = ListGame<ID> & {
+export type UserListGame<ID> = {
+    _id: ID,
+    settings: {
+        general: ListGameSettingsGeneral<ID>,
+        gameTime: GameSettingsGameTime,
+        galaxy: GameSettingsGalaxyBase,
+    },
+    state: GameInfoState<ID>,
+}
+
+export type UserActiveListGame<ID> = UserListGame<ID> & {
     userNotifications: GameUserNotification,
 };
 
@@ -107,7 +119,7 @@ export const createGameRoutes = <ID>() => ({
     listMyCompleted: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/completed/user"),
     listActive: new GetRoute<{}, {}, UserActiveListGame<ID>[]>("/api/game/list/active"),
     listMyOpen: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/open"),
-    listSpectating: new GetRoute<{}, {}, ListGame<ID>[]>("/api/game/list/spectating"),
+    listSpectating: new GetRoute<{}, {}, UserListGame<ID>[]>("/api/game/list/spectating"),
     getIntel: new GetRoute<{ gameId: ID }, {}, Intel<ID>[]>("/api/game/:gameId/intel"),
     join: new PutRoute<{ gameId: ID }, {}, GameJoinGameRequest<ID>, {}>("/api/game/:gameId/join"),
     quit: new PutRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/quit"), 

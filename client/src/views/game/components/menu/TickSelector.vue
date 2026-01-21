@@ -66,6 +66,7 @@ import type {State} from "@/store";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {detailGalaxy} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import type {Game} from "@/types/game";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -80,24 +81,20 @@ const display = ref(false);
 const tick = ref(0);
 const inputTick = ref(0);
 
-const stateTick = computed(() => {
-  return store.state.tick
-});
+const game = computed<Game>(() => store.state.game);
 
-const gameTick = computed(() => {
-  return store.state.game.state.tick
-});
+const stateTick = computed(() => store.state.tick);
 
-const minimumTick = computed(() => {
-  return store.state.game.state.timeMachineMinimumTick ?? 1;
-});
+const gameTick = computed(() => game.value.state.tick);
 
-const turnTicks = computed(() => {
-  return (store.state.game.settings.gameTime.gameType === 'turnBased' ? store.state.game.settings.gameTime.turnJumps : 6);
-});
+const minimumTick = computed(() => store.state.game.state.timeMachineMinimumTick ?? 1);
+
+const turnTicks = computed(() => store.state.game.settings.gameTime.gameType === 'turnBased' ? store.state.game.settings.gameTime.turnJumps : 6);
 
 const onGameTick = () => {
-  if (tick.value === gameTick.value - 1) {
+  const oneIncrement = game.value.settings.gameTime.gameType === 'turnBased' ? game.value.settings.gameTime.turnJumps : 1;
+
+  if (tick.value === gameTick.value - oneIncrement) {
     tick.value = gameTick.value;
   }
 };

@@ -9,17 +9,13 @@
 </div>
 </template>
 
-<script>
-import StarLabelVue from '../../star/StarLabel.vue'
+<script setup lang="ts">
+import StarLabel from '../../star/StarLabel.vue'
+import type {PlayerStarSpecialistHiredEvent} from "@solaris-common";
 
-export default {
-  components: {
-    'star-label': StarLabelVue
-  },
-  props: {
-    event: Object
-  }
-}
+const props = defineProps<{
+  event: PlayerStarSpecialistHiredEvent<string>,
+}>()
 </script>
 
 <style scoped>

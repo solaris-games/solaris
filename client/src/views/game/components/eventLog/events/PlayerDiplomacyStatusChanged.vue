@@ -15,26 +15,26 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    event: Object
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    getDiplomaticStatusClass (status) {
-      switch (status) {
-        case 'enemies': return 'text-danger'
-        case 'allies': return 'text-success'
-        case 'neutral': return 'text-info'
-      }
+<script setup lang="ts">
+import {type DiplomaticState, type PlayerDiplomacyStatusChangedEvent} from "@solaris-common";
 
-      return ''
-    }
+const props = defineProps<{
+  event: PlayerDiplomacyStatusChangedEvent<string>,
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
+
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+
+const getDiplomaticStatusClass = (status: DiplomaticState) => {
+  switch (status) {
+    case 'enemies': return 'text-danger';
+    case 'allies': return 'text-success';
+    case 'neutral': return 'text-info';
   }
-}
+};
 </script>
 
 <style scoped>

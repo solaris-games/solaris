@@ -67,7 +67,7 @@ import {
     ReadyToQuitVisibility,
     GameJoinGameRequest,
 } from "solaris-common";
-import type {GameSettingsReq} from "../../services/gameCreate";
+import {GameSettingsGalaxyReq, GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
 
 const enabledDisabled = stringEnumeration<GameSettingEnabledDisabled, GameSettingEnabledDisabled[]>(['enabled', 'disabled']);
@@ -91,7 +91,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
         integer: true,
     }),
     playerType: stringEnumeration<GamePlayerType, GamePlayerType[]>(['all', 'establishedPlayers']),
-    anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra']),
+    anonymity: stringEnumeration<GamePlayerAnonymity, GamePlayerAnonymity[]>(['normal', 'extra', 'revealAtEnd']),
     playerOnlineStatus: stringEnumeration<GamePlayerOnlineStatus, GamePlayerOnlineStatus[]>(['hidden', 'visible']),
     playerIPWarning: enabledDisabled,
     awardRankTo: withDefault('all', stringEnumeration<GameAwardRankTo, GameAwardRankTo[]>(GAME_AWARD_RANK_TO)),
@@ -112,7 +112,7 @@ const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     joinRandomSlot: withDefault('disabled', enabledDisabled),
 });
 
-const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({
+const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyReq> = object({
     galaxyType: stringEnumeration<GameGalaxyType, GameGalaxyType[]>(GAME_GALAXY_TYPE),
     starsPerPlayer: numberAdv({
         integer: true,
@@ -130,6 +130,7 @@ const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyBase> = object({
     }),
     advancedCustomGalaxyEnabled: maybeUndefined(enabledDisabled),
     customGalaxy: maybeUndefined(str => customGalaxyValidator(JSON.parse(str))),
+    customSeed: maybeUndefined(string),
 });
 
 const specialStarNumber = numberAdv({

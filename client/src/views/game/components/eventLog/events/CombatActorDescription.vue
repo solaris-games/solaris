@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { type CombatActor } from '../../../../../types/combat';
+import { type CombatActor } from '../../../../../services/combat';
 import SpecialistIcon from "../../specialist/SpecialistIcon.vue";
 import type {Specialist} from "@solaris-common";
 

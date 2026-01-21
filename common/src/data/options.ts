@@ -99,8 +99,12 @@ export const GAME_CREATION_OPTIONS = {
                 "text": "Normal"
             },
             {
+                "value": "revealAtEnd",
+                "text": "Anonymous"
+            },
+            {
                 "value": "extra",
-                "text": "Extra"
+                "text": "Anonymous (no revealing)"
             }
         ],
         "playerOnlineStatus": [
@@ -249,6 +253,10 @@ export const GAME_CREATION_OPTIONS = {
             {
                 "value": "top_n",
                 "text": "Top N"
+            },
+            {
+                "value": "noRankLoss",
+                "text": "All players, no rank loss"
             }
         ]
     },

@@ -13,6 +13,7 @@ export class PlayerSocketEventNames {
 
     public static readonly GamePlayerJoined: PlayerSocketEventName<{ playerId: string, alias: string, avatar: string }> = toEventName('gamePlayerJoined');
     public static readonly GamePlayerQuit: PlayerSocketEventName<{ playerId: string }> = toEventName('gamePlayerQuit');
+    public static readonly GamePlayerConcededDefeat: PlayerSocketEventName<{ playerId: string }> = toEventName('onPlayerDefeated');
 
     public static readonly GameRoomJoined: PlayerSocketEventName<{ gameId: string, playerId?: string }> = toEventName('gameRoomJoined');
     public static readonly GameRoomLeft: PlayerSocketEventName<{ gameId: string, playerId?: string }> = toEventName('gameRoomLeft');

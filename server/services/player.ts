@@ -1,5 +1,3 @@
-import DiplomacyService from "./diplomacy";
-
 import mongoose from 'mongoose';
 import moment from "moment";
 import EventEmitter from "events";
@@ -7,9 +5,9 @@ import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
 import {Game, Team} from './types/Game';
 import { Location } from './types/Location';
-import { Player, PlayerColour, PlayerColourShapeCombination, PlayerShape, ResearchTypeNotRandom } from './types/Player';
+import { Player, PlayerColour, PlayerShape } from './types/Player';
 import CarrierService from './carrier';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService, ResearchTypeNotRandom } from 'solaris-common';
 import MapService from './map';
 import PlayerReadyService from './playerReady';
 import RandomService from './random';

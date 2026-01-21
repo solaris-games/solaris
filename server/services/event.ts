@@ -1,4 +1,34 @@
-import { LedgerType } from 'solaris-common';
+import {
+    BaseGameEvent,
+    EVENT_TYPES, GameDiplomacyPeaceDeclaredEvent, GameDiplomacyWarDeclaredEvent,
+    GameEndedEvent,
+    GameEvent,
+    GamePlayerAfkEvent, GamePlayerBadgePurchasedEvent,
+    GamePlayerDefeatedEvent,
+    GamePlayerJoinedEvent,
+    GamePlayerQuitEvent,
+    GameStartedEvent,
+    LedgerType,
+    PlayerBulkInfrastructureUpgradedEvent, PlayerCarrierSpecialistHiredEvent,
+    PlayerCombatCarrierEvent,
+    PlayerCombatStarEvent, PlayerConversationCreatedEvent, PlayerConversationInvitedEvent, PlayerConversationLeftEvent,
+    PlayerCreditsReceivedEvent,
+    PlayerCreditsSentEvent, PlayerDebtForgivenEvent, PlayerDebtSettledEvent, PlayerDiplomacyStatusChangedEvent,
+    PlayerEvent,
+    PlayerGalacticCycleCompleteEvent,
+    PlayerGiftReceivedEvent,
+    PlayerGiftSentEvent,
+    PlayerRenownReceivedEvent,
+    PlayerRenownSentEvent,
+    PlayerResearchCompleteEvent,
+    PlayerSpecialistTokensReceivedEvent,
+    PlayerSpecialistTokensSentEvent,
+    PlayerStarAbandonedEvent,
+    PlayerStarDiedEvent,
+    PlayerStarReignitedEvent, PlayerStarSpecialistHiredEvent,
+    PlayerTechnologyReceivedEvent,
+    PlayerTechnologySentEvent, TradeEventTechnology
+} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
@@ -20,70 +50,27 @@ import { Carrier } from "./types/Carrier";
 import { CombatResult } from "./types/Combat";
 import { Conversation } from "./types/Conversation";
 import { DBObjectId } from "./types/DBObjectId";
-import { DiplomaticStatus } from "./types/Diplomacy";
+import { DiplomaticStatus } from "solaris-common";
 import { Game } from "./types/Game";
-import { GameEvent } from "./types/GameEvent";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
 import { Specialist } from 'solaris-common';
 import { Star, StarCaptureResult } from "./types/Star";
-import { BaseGameEvent } from "./types/events/BaseGameEvent";
-import GameDiplomacyPeaceDeclaredEvent from "./types/events/GameDiplomacyPeaceDeclared";
-import GameDiplomacyWarDeclaredEvent from "./types/events/GameDiplomacyWarDeclared";
-import GameEndedEvent from "./types/events/GameEnded";
-import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
-import GamePlayerBadgePurchasedEvent from "./types/events/GamePlayerBadgePurchased";
-import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
-import GamePlayerJoinedEvent from "./types/events/GamePlayerJoined";
-import GamePlayerQuitEvent from "./types/events/GamePlayerQuit";
-import PlayerGalacticCycleCompletedEvent from './types/events/PlayerGalacticCycleComplete';
-
-import moment from "moment";
+import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
+import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";
+import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
+import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
+import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
+import InternalGamePlayerBadgePurchasedEvent from "./types/internalEvents/GamePlayerBadgePurchased";
+import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDefeated";
+import InternalGamePlayerJoinedEvent from "./types/internalEvents/GamePlayerJoined";
+import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
+import InternalPlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
+import { Model } from "mongoose";
 
 export default class EventService {
-
-    EVENT_TYPES = {
-        GAME_PLAYER_JOINED: 'gamePlayerJoined',
-        GAME_PLAYER_QUIT: 'gamePlayerQuit',
-        GAME_PLAYER_DEFEATED: 'gamePlayerDefeated',
-        GAME_PLAYER_AFK: 'gamePlayerAFK',
-        GAME_STARTED: 'gameStarted',
-        GAME_ENDED: 'gameEnded',
-        GAME_PLAYER_BADGE_PURCHASED: 'gamePlayerBadgePurchased',
-        GAME_DIPLOMACY_PEACE_DECLARED: 'gameDiplomacyPeaceDeclared',
-        GAME_DIPLOMACY_WAR_DECLARED: 'gameDiplomacyWarDeclared',
-
-        // TODO: Need event types for the ones below, see ./types/events directory
-        PLAYER_GALACTIC_CYCLE_COMPLETE: 'playerGalacticCycleComplete',
-        PLAYER_COMBAT_STAR: 'playerCombatStar',
-        PLAYER_COMBAT_CARRIER: 'playerCombatCarrier',
-        PLAYER_RESEARCH_COMPLETE: 'playerResearchComplete',
-        PLAYER_TECHNOLOGY_RECEIVED: 'playerTechnologyReceived',
-        PLAYER_TECHNOLOGY_SENT: 'playerTechnologySent',
-        PLAYER_CREDITS_RECEIVED: 'playerCreditsReceived',
-        PLAYER_CREDITS_SENT: 'playerCreditsSent',
-        PLAYER_CREDITS_SPECIALISTS_RECEIVED: 'playerCreditsSpecialistsReceived',
-        PLAYER_CREDITS_SPECIALISTS_SENT: 'playerCreditsSpecialistsSent',
-        PLAYER_RENOWN_RECEIVED: 'playerRenownReceived',
-        PLAYER_RENOWN_SENT: 'playerRenownSent',
-        PLAYER_GIFT_RECEIVED: 'playerGiftReceived',
-        PLAYER_GIFT_SENT: 'playerGiftSent',
-        PLAYER_STAR_ABANDONED: 'playerStarAbandoned',
-        PLAYER_STAR_DIED: 'playerStarDied',
-        PLAYER_STAR_REIGNITED: 'playerStarReignited',
-        PLAYER_BULK_INFRASTRUCTURE_UPGRADED: 'playerBulkInfrastructureUpgraded',
-        PLAYER_DEBT_SETTLED: 'playerDebtSettled',
-        PLAYER_DEBT_FORGIVEN: 'playerDebtForgiven',
-        PLAYER_STAR_SPECIALIST_HIRED: 'playerStarSpecialistHired',
-        PLAYER_CARRIER_SPECIALIST_HIRED: 'playerCarrierSpecialistHired',
-        PLAYER_CONVERSATION_CREATED: 'playerConversationCreated',
-        PLAYER_CONVERSATION_INVITED: 'playerConversationInvited',
-        PLAYER_CONVERSATION_LEFT: 'playerConversationLeft',
-        PLAYER_DIPLOMACY_STATUS_CHANGED: 'playerDiplomacyStatusChanged',
-    }
-    
-    eventModel;
-    eventRepo: Repository<GameEvent>;
+    eventModel: Model<GameEvent<DBObjectId>>;
+    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     broadcastService: BroadcastService;
     gameService: GameService;
     gameJoinService: GameJoinService;
@@ -102,7 +89,7 @@ export default class EventService {
 
     constructor(
         eventModel,
-        eventRepo: Repository<GameEvent>,
+        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         broadcastService: BroadcastService,
         gameService: GameService,
         gameJoinService: GameJoinService,
@@ -191,12 +178,12 @@ export default class EventService {
 
     async deleteByGameId(gameId: DBObjectId) {
         await this.eventRepo.deleteMany({
-            gameId
+            gameId,
         });
     }
 
-    async createGameEvent(gameId: DBObjectId, gameTick: number, type: string, data) {
-        let event = new this.eventModel({
+    async createGameEvent<Ev extends GameEvent<DBObjectId>>(gameId: DBObjectId, gameTick: number, type: Ev['type'], data: Ev['data']) {
+        const event = new this.eventModel({
             gameId,
             playerId: null,
             tick: gameTick,
@@ -208,8 +195,8 @@ export default class EventService {
         await event.save();
     }
 
-    async createPlayerEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, type: string, data, isRead: boolean = false) {
-        let event = new this.eventModel({
+    async createPlayerEvent<Ev extends PlayerEvent<DBObjectId>>(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, type: Ev['type'], data: Ev['data'], isRead: boolean = false) {
+        const event = new this.eventModel({
             gameId,
             playerId,
             tick: gameTick,
@@ -221,7 +208,7 @@ export default class EventService {
         await event.save();
     }
 
-    async getPlayerEvents(gameId: DBObjectId, player: Player, page: number, pageSize: number, category: string | null) {
+    async getPlayerEvents(gameId: DBObjectId, player: Player, page: number, pageSize: number, category: string | null): Promise<{ count: number, events: BaseGameEvent<DBObjectId>[] }> {
         const query = {
             gameId: gameId,
             playerId: {
@@ -353,65 +340,63 @@ export default class EventService {
 
     /* GLOBAL EVENTS */
 
-    async createPlayerJoinedEvent(args: GamePlayerJoinedEvent) {
-        let data = {
+    async createPlayerJoinedEvent(args: InternalGamePlayerJoinedEvent) {
+        const data = {
             playerId: args.playerId,
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_JOINED, data);
+        return await this.createGameEvent<GamePlayerJoinedEvent<DBObjectId>>(args.gameId, args.gameTick, 'gamePlayerJoined', data);
     }
 
-    async createPlayerQuitEvent(args: GamePlayerQuitEvent) {
-        let data = {
+    async createPlayerQuitEvent(args: InternalGamePlayerQuitEvent) {
+        const data = {
             playerId: args.playerId,
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_QUIT, data);
+        return await this.createGameEvent<GamePlayerQuitEvent<DBObjectId>>(args.gameId, args.gameTick, 'gamePlayerQuit', data);
     }
 
-    async createPlayerDefeatedEvent(args: GamePlayerDefeatedEvent) {
-        let data = {
+    async createPlayerDefeatedEvent(args: InternalGamePlayerDefeatedEvent) {
+        const data = {
             playerId: args.playerId,
             alias: args.playerAlias,
             openSlot: args.openSlot
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_DEFEATED, data);
+        return await this.createGameEvent<GamePlayerDefeatedEvent<DBObjectId>>(args.gameId, args.gameTick, 'gamePlayerDefeated', data);
     }
 
-    async createPlayerAfkEvent(args: GamePlayerAFKEvent) {
-        let data = {
+    async createPlayerAfkEvent(args: InternalGamePlayerAFKEvent) {
+        const data = {
             playerId: args.playerId,
             alias: args.playerAlias
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_AFK, data);
+        return await this.createGameEvent<GamePlayerAfkEvent<DBObjectId>>(args.gameId, args.gameTick, 'gamePlayerAFK', data);
     }
 
-    async createGameStartedEvent(args: BaseGameEvent) {
-        let data = {};
-
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_STARTED, data);
+    async createGameStartedEvent(args: InternalGameEvent) {
+        return await this.createGameEvent<GameStartedEvent<DBObjectId>>(args.gameId, args.gameTick, 'gameStarted', {});
     }
 
-    async createGameEndedEvent(args: GameEndedEvent) {
-        let data = {
+    async createGameEndedEvent(args: InternalGameEndedEvent) {
+        const data = {
             rankingResult: args.rankingResult
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_ENDED, data);
+        return await this.createGameEvent<GameEndedEvent<DBObjectId>>(args.gameId, args.gameTick, 'gameEnded', data);
     }
 
     /* PLAYER EVENTS */
 
-    async createPlayerGalacticCycleCompleteEvent(data: PlayerGalacticCycleCompletedEvent) {
-        return await this.createPlayerEvent(data.gameId, data.gameTick, data.playerId!, this.EVENT_TYPES.PLAYER_GALACTIC_CYCLE_COMPLETE, data);
+    async createPlayerGalacticCycleCompleteEvent(data: InternalPlayerGalacticCycleCompletedEvent) {
+        return await this.createPlayerEvent<PlayerGalacticCycleCompleteEvent<DBObjectId>>(data.gameId, data.gameTick, data.playerId, 'playerGalacticCycleComplete', data);
     }
 
     async createPlayerCombatStarEvent(gameId: DBObjectId, gameTick: number, owner: Player, defenders: Player[], attackers: Player[], star: Star, combatResult: CombatResult, captureResult: StarCaptureResult) {
-        let data = {
+        const data = {
             playerIdOwner: owner._id,
             playerIdDefenders: defenders.map(p => p._id),
             playerIdAttackers: attackers.map(p => p._id),
@@ -421,180 +406,180 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            const defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
 
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: defenderCombatResult });
+            await this.createPlayerEvent<PlayerCombatStarEvent<DBObjectId>>(gameId, gameTick, defender._id, 'playerCombatStar', { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
+            const attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_STAR, { ...data, combatResult: attackerCombatResult });
+            await this.createPlayerEvent<PlayerCombatStarEvent<DBObjectId>>(gameId, gameTick, attacker._id, 'playerCombatStar', { ...data, combatResult: attackerCombatResult });
         }
     }
 
     async createPlayerCombatCarrierEvent(gameId: DBObjectId, gameTick: number, defenders: Player[], attackers: Player[], combatResult: CombatResult) {
-        let data = {
+        const data = {
             playerIdDefenders: defenders.map(p => p._id),
             playerIdAttackers: attackers.map(p => p._id),
             combatResult
         };
 
         for (let defender of defenders) {
-            let defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            const defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
             
-            await this.createPlayerEvent(gameId, gameTick, defender._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: defenderCombatResult });
+            await this.createPlayerEvent<PlayerCombatCarrierEvent<DBObjectId>>(gameId, gameTick, defender._id, 'playerCombatCarrier', { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            let attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
+            const attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
 
-            await this.createPlayerEvent(gameId, gameTick, attacker._id, this.EVENT_TYPES.PLAYER_COMBAT_CARRIER, { ...data, combatResult: attackerCombatResult });
+            await this.createPlayerEvent<PlayerCombatCarrierEvent<DBObjectId>>(gameId, gameTick, attacker._id, 'playerCombatCarrier', { ...data, combatResult: attackerCombatResult });
         }
     }
 
     async createResearchCompleteEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
-        let data = {
+        const data = {
             technologyKey,
             technologyLevel,
             technologyKeyNext,
             technologyLevelNext
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_RESEARCH_COMPLETE, data);
+        return await this.createPlayerEvent<PlayerResearchCompleteEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerResearchComplete', data);
     }
 
-    async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
-        let data = {
+    async createTechnologyReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: TradeEventTechnology) {
+        const data = {
             fromPlayerId: fromPlayer._id,
             technology
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_RECEIVED, data);
+        return await this.createPlayerEvent<PlayerTechnologyReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerTechnologyReceived', data);
     }
 
-    async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: string) {
-        let data = {
+    async createTechnologySentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, technology: TradeEventTechnology) {
+        const data = {
             toPlayerId: toPlayer._id,
             technology
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_TECHNOLOGY_SENT, data, true);
+        return await this.createPlayerEvent<PlayerTechnologySentEvent<DBObjectId>>(gameId, gameTick, fromPlayer._id, 'playerTechnologySent', data, true);
     }
 
     async createCreditsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
-        let data = {
+        const data = {
             fromPlayerId: fromPlayer._id,
             credits
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_RECEIVED, data);
+        return await this.createPlayerEvent<PlayerCreditsReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerCreditsReceived', data);
     }
 
     async createCreditsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, credits: number) {
-        let data = {
+        const data = {
             toPlayerId: toPlayer._id,
             credits
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SENT, data, true);
+        return await this.createPlayerEvent<PlayerCreditsSentEvent<DBObjectId>>(gameId, gameTick, fromPlayer._id, 'playerCreditsSent', data, true);
     }
 
     async createCreditsSpecialistsReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
-        let data = {
+        const data = {
             fromPlayerId: fromPlayer._id,
             creditsSpecialists
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_RECEIVED, data);
+        return await this.createPlayerEvent<PlayerSpecialistTokensReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerCreditsSpecialistsReceived', data);
     }
 
     async createCreditsSpecialistsSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, creditsSpecialists: number) {
-        let data = {
+        const data = {
             toPlayerId: toPlayer._id,
             creditsSpecialists
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_CREDITS_SPECIALISTS_SENT, data, true);
+        return await this.createPlayerEvent<PlayerSpecialistTokensSentEvent<DBObjectId>>(gameId, gameTick, fromPlayer._id, 'playerCreditsSpecialistsSent', data, true);
     }
 
     async createRenownReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
-        let data = {
+        const data = {
             fromPlayerId: fromPlayer._id,
             renown
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_RECEIVED, data);
+        return await this.createPlayerEvent<PlayerRenownReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerRenownReceived', data);
     }
 
     async createRenownSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, renown: number) {
-        let data = {
+        const data = {
             toPlayerId: toPlayer._id,
             renown
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_RENOWN_SENT, data, true);
+        return await this.createPlayerEvent<PlayerRenownSentEvent<DBObjectId>>(gameId, gameTick, fromPlayer._id, 'playerRenownSent', data, true);
     }
 
     async createGiftReceivedEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
-        let data = {
+        const data = {
             fromPlayerId: fromPlayer._id,
             carrierId: carrier._id,
             carrierName: carrier.name,
-            carrierShips: carrier.ships,
+            carrierShips: carrier.ships || 0,
             starId: star._id,
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, toPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_RECEIVED, data);
+        return await this.createPlayerEvent<PlayerGiftReceivedEvent<DBObjectId>>(gameId, gameTick, toPlayer._id, 'playerGiftReceived', data);
     }
 
     async createGiftSentEvent(gameId: DBObjectId, gameTick: number, fromPlayer: Player, toPlayer: Player, carrier: Carrier, star: Star) {
-        let data = {
+        const data = {
             toPlayerId: toPlayer._id,
             carrierId: carrier._id,
             carrierName: carrier.name,
-            carrierShips: carrier.ships,
+            carrierShips: carrier.ships || 0,
             starId: star._id,
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, fromPlayer._id, this.EVENT_TYPES.PLAYER_GIFT_SENT, data, true);
+        return await this.createPlayerEvent<PlayerGiftSentEvent<DBObjectId>>(gameId, gameTick, fromPlayer._id, 'playerGiftSent', data, true);
     }
 
     async createStarAbandonedEvent(gameId: DBObjectId, gameTick: number, player: Player, star: Star) {
-        let data = {
+        const data = {
             starId: star._id,
             starName: star.name
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_ABANDONED, data, true);
+        return await this.createPlayerEvent<PlayerStarAbandonedEvent<DBObjectId>>(gameId, gameTick, player._id, 'playerStarAbandoned', data, true);
     }
 
     async createStarDiedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
-        let data = {
+        const data = {
             starId,
             starName
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_DIED, data);
+        await this.createPlayerEvent<PlayerStarDiedEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerStarDied', data);
     }
 
     async createStarReignitedEvent(gameId: DBObjectId, gameTick: number, playerId: DBObjectId, starId: DBObjectId, starName: string) {
-        let data = {
+        const data = {
             starId,
             starName
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_STAR_REIGNITED, data);
+        await this.createPlayerEvent<PlayerStarReignitedEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerStarReignited', data);
     }
 
     async createInfrastructureBulkUpgraded(gameId: DBObjectId, gameTick: number, player: Player, upgradeReport: BulkUpgradeReport) {
-        let data = {
+        const data = {
             upgradeReport
         };
 
-        return await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_BULK_INFRASTRUCTURE_UPGRADED, data, true);
+        return await this.createPlayerEvent<PlayerBulkInfrastructureUpgradedEvent<DBObjectId>>(gameId, gameTick, player._id, 'playerBulkInfrastructureUpgraded', data, true);
     }
 
     async createDebtAddedEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
@@ -605,35 +590,35 @@ export default class EventService {
     }
 
     async createDebtSettledEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
-        let data = {
+        const data = {
             debtorPlayerId,
             creditorPlayerId,
             amount,
             ledgerType
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, true);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_SETTLED, data, false);
+        await this.createPlayerEvent<PlayerDebtSettledEvent<DBObjectId>>(gameId, gameTick, debtorPlayerId, 'playerDebtSettled', data, true);
+        await this.createPlayerEvent<PlayerDebtSettledEvent<DBObjectId>>(gameId, gameTick, creditorPlayerId, 'playerDebtSettled', data, false);
 
         this.broadcastService.gamePlayerDebtSettled(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
 
     async createDebtForgivenEvent(gameId: DBObjectId, gameTick: number, debtorPlayerId: DBObjectId, creditorPlayerId: DBObjectId, amount: number, ledgerType: LedgerType) {
-        let data = {
+        const data = {
             debtorPlayerId,
             creditorPlayerId,
             amount,
             ledgerType
         };
 
-        await this.createPlayerEvent(gameId, gameTick, debtorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, false);
-        await this.createPlayerEvent(gameId, gameTick, creditorPlayerId, this.EVENT_TYPES.PLAYER_DEBT_FORGIVEN, data, true);
+        await this.createPlayerEvent<PlayerDebtForgivenEvent<DBObjectId>>(gameId, gameTick, debtorPlayerId, 'playerDebtForgiven', data, false);
+        await this.createPlayerEvent<PlayerDebtForgivenEvent<DBObjectId>>(gameId, gameTick, creditorPlayerId, 'playerDebtForgiven', data, true);
 
         this.broadcastService.gamePlayerDebtForgiven(debtorPlayerId, creditorPlayerId, amount, ledgerType);
     }
 
     async createPlayerStarSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, star: Star, specialist: Specialist) {
-        let data = {
+        const data = {
             starId: star._id,
             starName: star.name,
             specialistId: specialist.id,
@@ -642,11 +627,11 @@ export default class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_STAR_SPECIALIST_HIRED, data, true);
+        await this.createPlayerEvent<PlayerStarSpecialistHiredEvent<DBObjectId>>(gameId, gameTick, player._id, 'playerStarSpecialistHired', data, true);
     }
 
     async createPlayerCarrierSpecialistHired(gameId: DBObjectId, gameTick: number, player: Player, carrier: Carrier, specialist: Specialist) {
-        let data = {
+        const data = {
             carrierId: carrier._id,
             carrierName: carrier.name, // Carriers may be destroyed so we need to keep track of the name separately
             specialistId: specialist.id,
@@ -655,42 +640,42 @@ export default class EventService {
             specialistDescription: specialist.description
         }
 
-        await this.createPlayerEvent(gameId, gameTick, player._id, this.EVENT_TYPES.PLAYER_CARRIER_SPECIALIST_HIRED, data, true);
+        await this.createPlayerEvent<PlayerCarrierSpecialistHiredEvent<DBObjectId>>(gameId, gameTick, player._id, 'playerCarrierSpecialistHired', data, true);
     }
 
     async createPlayerConversationCreated(gameId: DBObjectId, gameTick: number, convo: Conversation) {
-        let data = {
+        const data = {
             conversationId: convo._id,
-            createdBy: convo.createdBy,
+            createdBy: convo.createdBy!,
             name: convo.name,
             participants: convo.participants
         };
 
-        await this.createPlayerEvent(gameId, gameTick, convo.createdBy!, this.EVENT_TYPES.PLAYER_CONVERSATION_CREATED, data, true);
+        await this.createPlayerEvent<PlayerConversationCreatedEvent<DBObjectId>>(gameId, gameTick, convo.createdBy!, 'playerConversationCreated', data, true);
     }
 
     async createPlayerConversationInvited(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
-        let data = {
+        const data = {
             conversationId: convo._id,
             name: convo.name,
             playerId
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_INVITED, data);
+        await this.createPlayerEvent<PlayerConversationInvitedEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerConversationInvited', data);
     }
 
     async createPlayerConversationLeft(gameId: DBObjectId, gameTick: number, convo: Conversation, playerId: DBObjectId) {
-        let data = {
+        const data = {
             conversationId: convo._id,
             name: convo.name,
             playerId
         };
 
-        await this.createPlayerEvent(gameId, gameTick, playerId, this.EVENT_TYPES.PLAYER_CONVERSATION_LEFT, data, true);
+        await this.createPlayerEvent<PlayerConversationLeftEvent<DBObjectId>>(gameId, gameTick, playerId, 'playerConversationLeft', data, true);
     }
 
-    async createGamePlayerBadgePurchased(args: GamePlayerBadgePurchasedEvent) {
-        let data = {
+    async createGamePlayerBadgePurchased(args: InternalGamePlayerBadgePurchasedEvent) {
+        const data = {
             purchasedByPlayerId: args.purchasedByPlayerId,
             purchasedByPlayerAlias: args.purchasedByPlayerAlias,
             purchasedForPlayerId: args.purchasedForPlayerId,
@@ -699,17 +684,17 @@ export default class EventService {
             badgeName: args.badgeName
         };
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_PLAYER_BADGE_PURCHASED, data);
+        return await this.createGameEvent<GamePlayerBadgePurchasedEvent<DBObjectId>>(args.gameId, args.gameTick, 'gamePlayerBadgePurchased', data);
     }
 
-    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
+    async _deleteGameDiplomacyDeclarationsInTick(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
         await this.eventRepo.deleteMany({
             gameId,
             tick: gameTick,
             type: {
                 $in: [
-                    this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
-                    this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
+                    EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, 
+                    EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED
                 ]
             },
             $or: [
@@ -725,23 +710,22 @@ export default class EventService {
         });
     }
 
-    async createGameDiplomacyPeaceDeclared(args: GameDiplomacyPeaceDeclaredEvent) {
-        let data = args.status;
+    async createGameDiplomacyPeaceDeclared(args: InternalGameDiplomacyPeaceDeclaredEvent) {
+        const data = args.status;
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_PEACE_DECLARED, data);
+        return await this.createGameEvent<GameDiplomacyPeaceDeclaredEvent<DBObjectId>>(args.gameId, args.gameTick, 'gameDiplomacyPeaceDeclared', data);
     }
 
-    async createGameDiplomacyWarDeclared(args: GameDiplomacyWarDeclaredEvent) {
-        let data = args.status;
+    async createGameDiplomacyWarDeclared(args: InternalGameDiplomacyWarDeclaredEvent) {
+        const data = args.status;
 
-        return await this.createGameEvent(args.gameId, args.gameTick, this.EVENT_TYPES.GAME_DIPLOMACY_WAR_DECLARED, data);
+        return await this.createGameEvent<GameDiplomacyWarDeclaredEvent<DBObjectId>>(args.gameId, args.gameTick, 'gameDiplomacyWarDeclared', data);
     }
 
-    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus) {
-        let data = status;
+    async createPlayerDiplomacyStatusChanged(gameId: DBObjectId, gameTick: number, status: DiplomaticStatus<DBObjectId>) {
+        const data = status;
 
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdFrom, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
-        await this.createPlayerEvent(gameId, gameTick, status.playerIdTo, this.EVENT_TYPES.PLAYER_DIPLOMACY_STATUS_CHANGED, data);
+        await this.createPlayerEvent<PlayerDiplomacyStatusChangedEvent<DBObjectId>>(gameId, gameTick, status.playerIdFrom, 'playerDiplomacyStatusChanged', data);
+        await this.createPlayerEvent<PlayerDiplomacyStatusChangedEvent<DBObjectId>>(gameId, gameTick, status.playerIdTo, 'playerDiplomacyStatusChanged', data);
     }
-
 };

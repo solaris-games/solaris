@@ -3,6 +3,7 @@ export default class PlayerMutationNames {
 
   public static readonly GamePlayerJoined: string = 'gamePlayerJoined';
   public static readonly GamePlayerQuit: string = 'gamePlayerQuit';
+  public static readonly GamePlayerConcededDefeat: string = 'gamePlayerConcededDefeat';
 
   public static readonly GamePlayerReady: string = 'gamePlayerReady';
   public static readonly GamePlayerNotReady: string = 'gamePlayerNotReady';

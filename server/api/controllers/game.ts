@@ -284,6 +284,9 @@ export default (container: DependencyContainer) => {
                     reqObj.openSlot);
                     
                 res.sendStatus(200);
+
+                container.broadcastService.gamePlayerConcededDefeat(req.game, req.player);
+
                 return next();
             } catch (err) {
                 return next(err);
@@ -459,7 +462,7 @@ export default (container: DependencyContainer) => {
         },
         getPlayerUser: async (req, res, next) => {
             try {
-                let user = await container.gameService.getPlayerUser(
+                const user = await container.gameService.getPlayerUser(
                     req.game,
                     req.params.playerId
                 );

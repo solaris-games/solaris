@@ -27,7 +27,7 @@
               Starting Soon
             </span>
             <span v-if="GameHelper.isGameInProgress(game)">
-              <countdown-timer :endDate="getNextCycleDate(game)" :active="true"
+              <countdown-timer :endDate="getNextCycleDate(game) || undefined" :active="true"
                 afterEndText="Pending..."></countdown-timer>
             </span>
           </td>
@@ -44,22 +44,28 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import CountdownTimer from '../CountdownTimer.vue';
+import CountdownTimer from '../time/CountdownDateTimer.vue';
 import { type Ref, ref, onMounted, inject } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listSpectating } from '@/services/typedapi/game';
-import type { ListGame } from '@solaris-common';
+import { type UserListGame } from '@solaris-common';
+import {
+  getCountdownTimeForProductionCycle,
+  getTurnTimeoutTime,
+} from "@/util/time";
 
 const httpClient = inject(httpInjectionKey)!;
 
-const games: Ref<ListGame<string>[]> = ref([]);
+const games: Ref<UserListGame<string>[]> = ref([]);
 
-const getNextCycleDate = (game: ListGame<string>) => {
+const getNextCycleDate = (game: UserListGame<string>): Date | null => {
   if (GameHelper.isRealTimeGame(game)) {
-    return GameHelper.getCountdownTimeForProductionCycle(game)
+    return getCountdownTimeForProductionCycle(game);
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return GameHelper.getCountdownTimeForTurnTimeout(game)
+    return getTurnTimeoutTime(game);
   }
+
+  return null;
 };
 
 onMounted(async () => {

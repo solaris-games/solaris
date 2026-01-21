@@ -10,31 +10,21 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
-import OptionsFormVue from './OptionsForm.vue'
+import OptionsForm from './OptionsForm.vue'
 import ErrorLog from "./ErrorLog.vue";
 
-export default {
-  components: {
-    ErrorLog,
-    'options-form': OptionsFormVue,
-    'menu-title': MenuTitle
-  },
-  data () {
-    return {
-      showErrorsCounter: 0,
-    }
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onTitleClicked (e) {
-      this.showErrorsCounter += 1;
-    }
-  }
-}
+const emit = defineEmits<{
+  onCloseRequested: [],
+}>();
+
+const onCloseRequested = () => emit('onCloseRequested');
+
+const showErrorsCounter = ref(0);
+
+const onTitleClicked = () => showErrorsCounter.value += 1;
 </script>
 
 <style scoped>

@@ -4,24 +4,21 @@
 </span>
 </template>
 
-<script>
-export default {
-  props: {
-    'statusFrom': String,
-    'statusTo': String,
-    'actualStatus': String
-  },
-  methods: {
-    getStatusIcon (status) {
-      switch (status) {
-        case 'allies':
-          return 'fas fa-handshake text-success'
-        case 'neutral':
-          return 'fas fa-dove text-info'
-        case 'enemies':
-          return 'fas fa-crosshairs text-danger'
-      }
-    }
+<script setup lang="ts">
+const props = defineProps<{
+  statusFrom: string,
+  statusTo: string,
+  actualStatus: string,
+}>();
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case 'allies':
+      return 'fas fa-handshake text-success'
+    case 'neutral':
+      return 'fas fa-dove text-info'
+    case 'enemies':
+      return 'fas fa-crosshairs text-danger'
   }
 }
 </script>

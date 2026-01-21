@@ -1,7 +1,7 @@
 import {
   CarrierTravelService,
   DistanceService,
-  type Game, GameTypeService, type Specialist,
+  type Game, GameTypeService, PathfindingService, type Specialist,
   type Star, StarDataService,
   StarDistanceService,
   TechnologyService,
@@ -16,6 +16,7 @@ export type ServiceProvider = {
   technologyService: TechnologyService;
   starDataService: StarDataService;
   carrierTravelService: CarrierTravelService<string>;
+  pathfindingService: PathfindingService<string>;
 }
 
 interface IStarService {
@@ -42,6 +43,8 @@ export const initialize = (starService: IStarService, specialistService: ISpecia
 
   const waypointService = new WaypointService(starService, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService);
 
+  const pathfindingService = new PathfindingService(distanceService, waypointService, starDataService);
+
   return {
     starDataService,
     carrierTravelService,
@@ -50,5 +53,6 @@ export const initialize = (starService: IStarService, specialistService: ISpecia
     waypointService,
     gameTypeService,
     technologyService,
+    pathfindingService,
   }
 }

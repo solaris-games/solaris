@@ -1,13 +1,8 @@
-import { ValidationError } from "solaris-common";
+import {ConversationCreateConversationRequest, ConversationSendMessageRequest, ValidationError} from "solaris-common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasArrayValue, keyHasStringValue } from "./helpers";
 
-export interface ConversationCreateConversationRequest {
-    name: string;
-    participants: DBObjectId[];
-};
-
-export const mapToConversationCreateConversationRequest = (body: any): ConversationCreateConversationRequest => {
+export const mapToConversationCreateConversationRequest = (body: any): ConversationCreateConversationRequest<DBObjectId> => {
     let errors: string[] = [];
 
     if (!keyHasStringValue(body, 'name')) {
@@ -30,10 +25,6 @@ export const mapToConversationCreateConversationRequest = (body: any): Conversat
         name: body.name,
         participants: body.participants
     }
-};
-
-export interface ConversationSendMessageRequest {
-    message: string;
 };
 
 export const mapToConversationSendMessageRequest = (body: any): ConversationSendMessageRequest => {

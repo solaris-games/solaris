@@ -1,8 +1,16 @@
 import moment, {type Moment} from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
-import type {Location, MapObject, Team} from '@solaris-common';
+import {
+  type BasePlayerDebtEvent, type GameInfoState,
+  type GameSettings, type GameSettingsGalaxyBase,
+  type GameStateDetail,
+  type Location,
+  type MapObject,
+  type Team
+} from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
+import {addTicksToTime} from "@/util/time";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -183,7 +191,7 @@ class GameHelper {
     return false;
   }
 
-  getTickDistance(game: Game, carrier: Carrier, tickDistanceModifier = 1) {
+  getTickDistance(game: Game, carrier: Carrier | null, tickDistanceModifier = 1) {
     let tickDistance = game.settings.specialGalaxy.carrierSpeed * tickDistanceModifier
 
     // Factor in any local speed modifers
@@ -218,7 +226,7 @@ class GameHelper {
     return `${speedLy}LY/tick`;
   }
 
-  getTicksBetweenLocations(game: Game, carrier: Carrier, locs: RulerPoint[], tickDistanceModifier = 1) {
+  getTicksBetweenLocations(game: Game, carrier: Carrier | null, locs: RulerPoint[], tickDistanceModifier = 1) {
     let totalTicks = 0
     const tickDistance = this.getTickDistance(game, carrier, tickDistanceModifier);
 
@@ -271,119 +279,10 @@ class GameHelper {
     return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
   }
 
-  getTicksToProduction(game: Game, currentTick, currentProductionTick) {
-    let productionTicks = game.settings.galaxy.productionTicks
+  getTicksToProduction(game: { settings: { galaxy: GameSettingsGalaxyBase } }, currentTick: number, currentProductionTick: number) {
+    const productionTicks = game.settings.galaxy.productionTicks;
 
-    return ((currentProductionTick + 1) * productionTicks) - currentTick
-  }
-
-  getCountdownTime(game: Game, date) {
-    if (date == null) {
-      return 'Unknown'
-    }
-
-    let relativeTo = moment().utc()
-    // Deduct the future date from now.
-    return moment(date).utc().clone().diff(relativeTo)
-  }
-
-  getCountdownTimeString(game: Game, date, largestUnitOnly = false) {
-    if (date == null) {
-      return 'Unknown'
-    }
-
-    if (this.isGameFinished(game)) {
-      return 'N/A'
-    }
-
-    let t = this.getCountdownTime(game, date)
-
-    return this.getDateToString(t, largestUnitOnly)
-  }
-
-  getCountdownTimeStringByTicksWithTickETA(game: Game, ticks: number, useNowDate = false, largestUnitOnly = false) {
-    const str = this.getCountdownTimeStringByTicks(game, ticks, useNowDate, largestUnitOnly);
-
-    if (game.settings.gameTime.gameType === 'realTime') {
-      return `${str} - Tick ${game.state.tick + ticks}`
-    }
-
-    return str
-  }
-
-  getCountdownTimeStringByTicks(game, ticks, useNowDate = false, largestUnitOnly = false) {
-    if (game == null) {
-      return ''
-    }
-
-    if (game.settings.gameTime.gameType === 'realTime' && !this.isGameFinished(game)) {
-      const date = useNowDate ? moment().utc() : game.state.lastTickDate
-
-      const timeRemainingEtaDate = this.calculateTimeByTicks(ticks, game.settings.gameTime.speed, date)
-
-      return this.getCountdownTimeString(game, timeRemainingEtaDate, largestUnitOnly)
-    }
-
-    return `${ticks} ticks`
-  }
-
-  getDateToString(date, largestUnitOnly = false) {
-    let days = Math.floor(date / (1000 * 60 * 60 * 24))
-    let hours = Math.floor((date % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    let mins = Math.floor((date % (1000 * 60 * 60)) / (1000 * 60))
-    let secs = Math.floor((date % (1000 * 60)) / 1000)
-
-    if (secs < 0) {
-      return 'Pending...'
-    }
-
-    let str = ''
-    let showDays = false
-    let showHours = false
-
-    if (days > 0) {
-      str += `${days}d `
-      showDays = true
-
-      if (largestUnitOnly && hours === 0 && mins === 0 && secs === 0) {
-        return str
-      }
-    }
-
-    if (showDays || hours > 0) {
-      str += `${hours}h `
-      showHours = true
-
-      if (largestUnitOnly && mins === 0 && secs === 0) {
-        return str
-      }
-    }
-
-    if (showHours || mins > 0) {
-      str += `${mins}m `
-
-      if (largestUnitOnly && secs === 0) {
-        return str
-      }
-    }
-
-    str += `${secs}s`
-
-    return str
-  }
-
-  getCountdownTimeForProductionCycle(game) {
-    const ticksToProduction = this.getTicksToProduction(game, game.state.tick, game.state.productionTick);
-
-    return this.calculateTimeByTicks(ticksToProduction, game.settings.gameTime.speed, game.state.lastTickDate);
-  }
-
-  getCountdownTimeForTurnTimeout(game) {
-    return moment(game.state.lastTickDate).utc().add('minutes', game.settings.gameTime.maxTurnWait)
-  }
-
-  getCountdownTimeStringForTurnTimeout(game) {
-    return this.getCountdownTimeString(game, this.getCountdownTimeForTurnTimeout(game))
+    return ((currentProductionTick + 1) * productionTicks) - currentTick;
   }
 
   // TODO: This has all been copy/pasted from the API services
@@ -450,16 +349,6 @@ class GameHelper {
     return totalTicks
   }
 
-  calculateTimeByTicks(ticks, speedInSeconds, relativeTo: Moment | null = null) {
-    if (relativeTo == null) {
-      relativeTo = moment().utc()
-    } else {
-      relativeTo = moment(relativeTo).utc()
-    }
-
-    return relativeTo.add(ticks * speedInSeconds, 'seconds')
-  }
-
   canTravelAtWarpSpeed(game: Game, player: Player, carrier: Carrier, sourceStar: Star | null, destinationStar: Star | null) {
     // Double check for destroyed stars.
     if (sourceStar == null || destinationStar == null) {
@@ -469,8 +358,8 @@ class GameHelper {
     // If both stars have warp gates and they are both owned by players...
     if (sourceStar.warpGate && destinationStar.warpGate && sourceStar.ownedByPlayerId && destinationStar.ownedByPlayerId) {
       // If both stars are owned by the player or by allies then carriers can always move at warp.
-      let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
-      let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId]))
+      let sourceAllied = sourceStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, sourceStar.ownedByPlayerId, [carrier.ownedByPlayerId!]))
+      let desinationAllied = destinationStar.ownedByPlayerId === carrier.ownedByPlayerId || (DiplomacyHelper.isFormalAlliancesEnabled(game) && DiplomacyHelper.isDiplomaticStatusToPlayersAllied(game, destinationStar.ownedByPlayerId, [carrier.ownedByPlayerId!]))
 
       // If both stars are owned by the player then carriers can always move at warp.
       if (sourceAllied && desinationAllied) {
@@ -595,8 +484,8 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
   }
 
-  isGameFinished(game) {
-    return game.state.endDate != null
+  isGameFinished(game: { state: GameInfoState<string> }) {
+    return game.state.endDate != null;
   }
 
   isDarkModeExtra(game) {
@@ -1033,7 +922,7 @@ class GameHelper {
   }
 
   isAllUndefeatedPlayersReady(game) {
-    let undefeatedPlayers = this.listAllUndefeatedPlayers(game)
+    const undefeatedPlayers = this.listAllUndefeatedPlayers(game)
 
     return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length
   }
@@ -1052,13 +941,13 @@ class GameHelper {
     return game.galaxy.players.filter(p => p.isOpenSlot).length > 0
   }
 
-  canTick(game) {
+  canTick(game: Game) {
     if (this.isGameFinished(game)) {
-      return false
+      return false;
     }
 
     if (this.isAllUndefeatedPlayersReadyToQuit(game)) {
-      return true
+      return true;
     }
 
     let lastTick = moment(game.state.lastTickDate).utc();
@@ -1068,10 +957,10 @@ class GameHelper {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
       nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
     } else if (this.isTurnBasedGame(game)) {
-      let isAllPlayersReady = this.isAllUndefeatedPlayersReady(game)
+      const isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
 
       if (isAllPlayersReady) {
-        return true
+        return true;
       }
 
       nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
@@ -1252,7 +1141,7 @@ class GameHelper {
     return game.settings.general.featured === true
   }
 
-  getLedgerGameEventPlayerSummary(game, gameEvent) {
+  getLedgerGameEventPlayerSummary(game: Game, gameEvent: BasePlayerDebtEvent<string>) {
     const debtor = this.getPlayerById(game, gameEvent.data.debtorPlayerId)
     const creditor = this.getPlayerById(game, gameEvent.data.creditorPlayerId)
     const isCreditor = this.getUserPlayer(game) == creditor
@@ -1316,14 +1205,14 @@ class GameHelper {
 
     const partialManufacturing: number = manufacturing - Math.floor(manufacturing);
     const next: number =  Math.floor(shipsActual) + 1;
-  
+
     let count: number = 0;
-  
+
     while (shipsActual < next) {
       count++;
       shipsActual += partialManufacturing;
     }
-  
+
     return count;
   }
 }

@@ -77,6 +77,7 @@ export type UserGameSettings = {
         confirmBuildIndustry: SettingEnabledDisabled;
         confirmBuildScience: SettingEnabledDisabled;
         confirmBuildWarpGate: SettingEnabledDisabled;
+        confirmShipDistribution: SettingEnabledDisabled;
     },
     technical: {
         performanceMonitor: SettingEnabledDisabled;

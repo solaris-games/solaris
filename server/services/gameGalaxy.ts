@@ -577,9 +577,11 @@ export default class GameGalaxyService {
         // Get the list of all guilds associated to players, we'll need this later.
         let guildUsers: GuildUserWithTag[] = [];
 
-        if (!this.gameTypeService.isAnonymousGame(doc)) {
-            let userIds: DBObjectId[] = doc.galaxy.players.filter(x => x.userId).map(x => x.userId!);
-            guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds)
+        const isAnonymousNow = this.gameStateService.isFinished(doc) ? this.gameTypeService.isAnonymousAfterEnd(doc) : this.gameTypeService.isAnonymousGameDuringGame(doc);
+
+        if (!isAnonymousNow) {
+            const userIds: DBObjectId[] = doc.galaxy.players.filter(x => x.userId).map(x => x.userId!);
+            guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
         }
 
         // Calculate which players are in scanning range.
@@ -600,7 +602,7 @@ export default class GameGalaxyService {
             }
         }
 
-        let displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
+        const displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
 
         this._populatePlayerHasDuplicateIPs(doc);
 

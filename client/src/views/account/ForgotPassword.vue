@@ -1,5 +1,5 @@
 <template>
-  <view-container>
+  <view-container :is-auth-page="false">
     <view-title title="Forgot Password" navigation="home" />
 
     <form-error-list v-bind:errors="errors" />
@@ -7,7 +7,7 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="email">Email Address</label>
-        <input type="email" required="required" class="form-control" name="email" v-model="email" :disabled="isLoading">
+        <input type="email" :required="false" class="form-control" name="email" v-model="email" :disabled="isLoading">
       </div>
 
       <div>
@@ -23,66 +23,52 @@
   </view-container>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import { inject } from 'vue'
+import { inject, ref } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {requestPasswordReset} from "@/services/typedapi/user";
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'form-error-list': FormErrorList
-  },
-  setup() {
-    return {
-      httpClient: inject(httpInjectionKey),
-    };
-  },
-  data() {
-    return {
-      isLoading: false,
-      errors: [],
-      email: null
-    }
-  },
-  methods: {
-    async handleSubmit(e) {
-      this.errors = []
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (!this.email) {
-        this.errors.push('Email required.')
-      }
+const isLoading = ref(false);
+const errors = ref<string[]>([]);
+const email = ref('');
 
-      e.preventDefault()
+const handleSubmit = async (e: Event) => {
+  errors.value = [];
 
-      if (this.errors.length) {
-        return;
-      }
-
-      this.isLoading = true
-
-      const response = await requestPasswordReset(this.httpClient)(this.email);
-
-      if (isOk(response)) {
-        this.$toast.success(`A password reset email has been sent to the email address, please check your email inbox.`)
-      } else {
-        console.error(formatError(response));
-        this.errors = extractErrors(response);
-        this.$toast.error(`There was a problem resetting your password, please check that you entered your email address correctly.`)
-      }
-
-      router.push({ name: 'home' })
-
-      this.isLoading = false
-    }
+  if (!email.value) {
+    errors.value.push('Email required.')
   }
+
+  e.preventDefault();
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await requestPasswordReset(httpClient)(email.value);
+
+  if (isOk(response)) {
+    toast.success(`A password reset email has been sent to the email address, please check your email inbox.`);
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+    toast.error(`There was a problem resetting your password, please check that you entered your email address correctly.`);
+  }
+
+  router.push({ name: 'home' });
+
+  isLoading.value = false;
 }
 </script>
 

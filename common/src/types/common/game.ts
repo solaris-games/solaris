@@ -42,7 +42,7 @@ export const GAME_MODES = [
 
 export type GameMode = typeof GAME_MODES[number];
 export type GamePlayerType = 'all'|'establishedPlayers';
-export type GamePlayerAnonymity = 'normal'|'extra';
+export type GamePlayerAnonymity = 'normal'|'extra'|'revealAtEnd';
 export type GamePlayerOnlineStatus = 'hidden'|'visible';
 export type GameSettingEnabledDisabled = 'disabled'|'enabled';
 
@@ -50,7 +50,8 @@ export const GAME_AWARD_RANK_TO = [
     'all',
     'winner',
     'top_n',
-    'teams'
+    'teams',
+    'noRankLoss',
 ] as const;
 
 export type GameAwardRankTo = typeof GAME_AWARD_RANK_TO[number];

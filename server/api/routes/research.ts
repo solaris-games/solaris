@@ -3,11 +3,16 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ResearchController from '../controllers/research';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createResearchRoutes} from "solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = ResearchController(container);
+    const routes = createResearchRoutes<DBObjectId>();
+    const answer = createRoutes(router, mw);
 
-    router.put('/api/game/:gameId/research/now',
+    answer(routes.updateNow,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -27,7 +32,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.put('/api/game/:gameId/research/next',
+    answer(routes.updateNext,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({

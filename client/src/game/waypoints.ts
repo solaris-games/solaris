@@ -1,13 +1,13 @@
 import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
-import WaypointHelper from '../services/waypointHelper'
 import {EventEmitter} from "./eventEmitter";
-import type {Game, Carrier as CarrierData} from '../types/game';
+import type {Game, Carrier as CarrierData, Star as StarData} from '../types/game';
 import type { DrawingContext } from './container';
-import type { TempWaypoint } from '../types/waypoint';
+import type { TempWaypoint } from '@/types/waypoint';
 import { createStarHighlight } from './highlight';
 import type {Location, UserGameSettings} from "@solaris-common";
 import { v7 as generateV7Uuid } from 'uuid';
+import type {ServiceProvider} from "@/services/services";
 
 type Events = {
   onWaypointCreated: TempWaypoint,
@@ -21,10 +21,12 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   lightYearDistance: number | undefined;
   carrier: CarrierData | undefined;
   settings: UserGameSettings | undefined;
+  serviceProvider: ServiceProvider;
 
-  constructor () {
-    super()
+  constructor (serviceProvider: ServiceProvider) {
+    super();
 
+    this.serviceProvider = serviceProvider;
     this.container = new PIXI.Container()
   }
 
@@ -39,19 +41,22 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     this.container.removeChildren();
   }
 
-  draw (carrier: CarrierData, plotting=true) {
+  drawPath(carrier: CarrierData) {
     this.clear()
-
-    this.carrier = carrier
-    if (plotting) {
-      this.drawHyperspaceRange()
-      this.drawLastWaypoint()
-      this.drawNextWaypoints()
-    }
-    this.drawPaths()
+    this.carrier = carrier;
+    this._drawPaths()
   }
 
-  drawLastWaypoint () {
+  drawWaypointMode (carrier: CarrierData) {
+    this.clear();
+    this.carrier = carrier;
+    this._drawHyperspaceRange();
+    this._drawLastWaypoint();
+    this._drawNextWaypoints();
+    this._drawPaths();
+  }
+
+  _drawLastWaypoint () {
     // If there are no waypoints at all
     // then deem the current location as the waypoint.
     const lastLocation = this._getLastLocation();
@@ -64,10 +69,10 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     this._highlightLocation(lastLocation, 0.8)
   }
 
-  drawNextWaypoints () {
+  _drawNextWaypoints () {
     // Draw all of the available waypoints that the last waypoint can reach.
-    let lastLocation = this._getLastLocation()
-    let userPlayer = this.game!.galaxy.players.find(p => p.userId)
+    const lastLocation = this._getLastLocation()
+    const userPlayer = this.game!.galaxy.players.find(p => p.userId)!;
 
     // Calculate which stars are in reach and draw highlights around them
     const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
@@ -85,7 +90,7 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     }
   }
 
-  drawPaths () {
+  _drawPaths () {
     if (!this.carrier!.waypoints.length) {
       return
     }
@@ -116,16 +121,16 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
       alpha: 0.8
     });
 
-    this.container.addChild(graphics)
+    this.container.addChild(graphics);
   }
 
-  drawHyperspaceRange () {
-    let graphics = new PIXI.Graphics()
+  _drawHyperspaceRange () {
+    const graphics = new PIXI.Graphics()
     // TODO: This is causing errors when a star is revealed in dark mode.
-    let lastLocationStar = this._getLastLocationStar()
-    let player = this.game!.galaxy.players.find(p => p.userId)
+    const lastLocationStar = this._getLastLocationStar()
+    const player = this.game!.galaxy.players.find(p => p.userId)
 
-    let radius = ((this.carrier!.effectiveTechs!.hyperspace || 1) + 1.5) * this.lightYearDistance!
+    const radius = ((this.carrier!.effectiveTechs!.hyperspace || 1) + 1.5) * this.lightYearDistance!
 
     const playerColour = this.context!.getPlayerColour(player!._id)
 
@@ -150,9 +155,9 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     this.container.addChild(graphics);
   }
 
-  onStarClicked (e) {
+  onStarClicked (e: StarData) {
     if (!this.carrier) {
-      return
+      return;
     }
 
     // If the selected star is inside of hyperspace range then
@@ -210,19 +215,19 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
       ...newWaypoint,
     });
 
-    this.draw(this.carrier!);
+    this.drawWaypointMode(this.carrier!);
 
     this.emit('onWaypointCreated', newWaypoint);
   }
 
   _createWaypointRoute (sourceStarId: string, destinStarId: string) {
-    const route = WaypointHelper.calculateShortestRoute(this.game, this.carrier, sourceStarId, destinStarId)
+    const route = this.serviceProvider.pathfindingService.calculateShortestRoute(this.game!, GameHelper.getUserPlayer(this.game!)!, this.carrier!, sourceStarId, destinStarId)
 
     if (route.length > 1) {
       for (let i = 1; i < route.length; i++) {
-        let waypointStar = route[i]
+        const waypointStar = route[i];
 
-        this._createWaypoint(waypointStar._id)
+        this._createWaypoint(waypointStar.id)
       }
     } else {
       this.emit('onWaypointOutOfRange', null)

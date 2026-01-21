@@ -23,136 +23,137 @@
 </tr>
 </template>
 
-<script>
-import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
-import DiplomacyApiService from '../../../../services/api/diplomacy'
-import gameHelper from '../../../../services/gameHelper'
-import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import DiplomacyIconsVue from './DiplomacyIcons.vue'
+<script setup lang="ts">
+import PlayerAvatar from '../menu/PlayerAvatar.vue';
+import gameHelper from '../../../../services/gameHelper';
+import DiplomacyHelper from '../../../../services/diplomacyHelper';
+import DiplomacyIcons from './DiplomacyIcons.vue';
+import { inject, computed } from 'vue';
+import { useStore } from 'vuex';
+import type {DiplomaticStatus} from "@solaris-common";
+import {makeConfirm} from "@/util/confirm";
+import type {Game} from "@/types/game";
+import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {toastInjectionKey} from "@/util/keys";
+import {ally, enemy, neutral} from "@/services/typedapi/diplomacy";
 
-export default {
-  components: {
-    'player-avatar': PlayerAvatarVue,
-    'diplomacy-icons': DiplomacyIconsVue
-  },
-  props: {
-    'diplomaticStatus': Object
-  },
-  methods: {
-    getPlayer (playerId) {
-      return gameHelper.getPlayerById(this.$store.state.game, playerId)
-    },
-    getPlayerAlias (playerId) {
-      return this.getPlayer(playerId).alias
-    },
-    getFriendlyColour (playerId) {
-      return this.$store.getters.getColourForPlayer(playerId).value
-    },
-    onOpenPlayerDetailRequested(playerId) {
-      this.$emit('onOpenPlayerDetailRequested', playerId)
-    },
-    async declareAlly (diplomaticStatus) {
-      const userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
-      let allianceFee = 0
-      let cycleCredits = gameHelper.calculateIncome(this.$store.state.game, userPlayer);
+const props = defineProps<{
+  diplomaticStatus: DiplomaticStatus<string>,
+}>();
 
-      if (DiplomacyHelper.isAllianceUpkeepEnabled(this.$store.state.game)) {
-        allianceFee = DiplomacyHelper.getAllianceUpkeepCost(this.$store.state.game, userPlayer, cycleCredits, 1)
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+  onApiRequestSuccess: [],
+  onApiRequestError: [errors: string[]],
+}>();
 
-        if (!await this.$confirm('Alliance Fee', `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`)) {
-          return
-        }
-      }
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (this.$store.state.game.settings.diplomacy.lockedAlliances === 'enabled') {
-        if (!await this.$confirm('Permanent Alliance', 'If you form an alliance in this game, you will not be able to cancel it.')) {
-          return
-        }
-      }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const confirm = makeConfirm(store);
 
-      if (await this.$confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
-        try {
-          let response = await DiplomacyApiService.declareAlly(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+const isGameFinished = computed(() => gameHelper.isGameFinished(game.value));
+const userPlayer = computed(() => gameHelper.getUserPlayer(game.value)!);
 
-          if (response.status === 200) {
-            if (response.data.statusTo == 'allies') {
-              this.$toast.success(`Your diplomatic status to ${playerAlias} is now allied.`)
-            } else {
-              this.$toast.error(`You can not ally ${playerAlias}. Check the maximum alliance limits.`)
-            }
+const getPlayer = (playerId: string) => gameHelper.getPlayerById(game.value, playerId)!;
 
-            diplomaticStatus.statusFrom = response.data.statusFrom
-            diplomaticStatus.statusTo = response.data.statusTo
-            diplomaticStatus.actualStatus = response.data.actualStatus
+const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-            userPlayer.credits -= allianceFee
+const getFriendlyColour = (playerId: string) => store.getters.getColourForPlayer(playerId).value;
 
-            this.$emit('onApiRequestSuccess')
-          } else {
-            this.$emit('onApiRequestError', response.data)
-          }
-        } catch (err) {
-          console.error(err)
-          this.$emit('onApiRequestError', err.response.data)
-        }
-      }
-    },
-    async declareEnemy (diplomaticStatus) {
-      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
+const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 
-      if (await this.$confirm('Declare Enemy', `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`)) {
-        try {
-          let response = await DiplomacyApiService.declareEnemy(this.$store.state.game._id, diplomaticStatus.playerIdTo)
+const declareAlly = async (diplomaticStatus: DiplomaticStatus<string>) => {
+  const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
 
-          if (response.status === 200) {
-            this.$toast.success(`Your diplomatic status to ${playerAlias} is now enemies.`)
+  let allianceFee = 0
+  let cycleCredits = gameHelper.calculateIncome(game.value, userPlayer.value);
 
-            diplomaticStatus.statusFrom = response.data.statusFrom
-            diplomaticStatus.statusTo = response.data.statusTo
-            diplomaticStatus.actualStatus = response.data.actualStatus
+  if (DiplomacyHelper.isAllianceUpkeepEnabled(game.value)) {
+    allianceFee = DiplomacyHelper.getAllianceUpkeepCost(game.value, userPlayer.value, cycleCredits, 1);
 
-            this.$emit('onApiRequestSuccess')
-          } else {
-            this.$emit('onApiRequestError', response.data)
-          }
-        } catch (err) {
-          console.error(err)
-          this.$emit('onApiRequestError', err.response.data)
-        }
-      }
-    },
-    async declareNeutral (diplomaticStatus) {
-      let playerAlias = this.getPlayerAlias(diplomaticStatus.playerIdTo)
-
-      if (await this.$confirm('Declare Neutral', `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`)) {
-        try {
-          let response = await DiplomacyApiService.declareNeutral(this.$store.state.game._id, diplomaticStatus.playerIdTo)
-
-          if (response.status === 200) {
-            this.$toast.success(`Your diplomatic status to ${playerAlias} is now neutral.`)
-
-            diplomaticStatus.statusFrom = response.data.statusFrom
-            diplomaticStatus.statusTo = response.data.statusTo
-            diplomaticStatus.actualStatus = response.data.actualStatus
-
-            this.$emit('onApiRequestSuccess')
-          } else {
-            this.$emit('onApiRequestError', response.data)
-          }
-        } catch (err) {
-          console.error(err)
-          this.$emit('onApiRequestError', err.response.data)
-        }
-      }
-    }
-  },
-  computed: {
-    isGameFinished: function () {
-      return gameHelper.isGameFinished(this.$store.state.game)
+    if (!await confirm('Alliance Fee', `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`)) {
+      return;
     }
   }
-}
+
+  if (game.value.settings.diplomacy.lockedAlliances === 'enabled') {
+    if (!await confirm('Permanent Alliance', 'If you form an alliance in this game, you will not be able to cancel it.')) {
+      return;
+    }
+  }
+
+  if (!await confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
+    return;
+  }
+
+  const response = await ally(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+  if (isOk(response)) {
+    if (response.data.statusTo === 'allies') {
+      toast.success(`Your diplomatic status to ${playerAlias} is now allied.`);
+    } else {
+      toast.error(`You can not ally ${playerAlias}. Check the maximum alliance limits.`);
+    }
+
+    diplomaticStatus.statusFrom = response.data.statusFrom;
+    diplomaticStatus.statusTo = response.data.statusTo;
+    diplomaticStatus.actualStatus = response.data.actualStatus;
+
+    userPlayer.value.credits -= allianceFee;
+
+    emit('onApiRequestSuccess')
+  } else {
+    console.error(formatError(response));
+    emit('onApiRequestError', extractErrors(response));
+  }
+};
+
+const declareEnemy = async (diplomaticStatus: DiplomaticStatus<string>) => {
+  const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
+
+  if (!await confirm('Declare Enemy', `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`)) {
+    return;
+  }
+
+  const response = await enemy(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+
+  if (isOk(response)) {
+    toast.success(`Your diplomatic status to ${playerAlias} is now enemies.`);
+
+    diplomaticStatus.statusFrom = response.data.statusFrom;
+    diplomaticStatus.statusTo = response.data.statusTo;
+    diplomaticStatus.actualStatus = response.data.actualStatus;
+
+    emit('onApiRequestSuccess');
+  } else {
+    console.error(formatError(response));
+    emit('onApiRequestError', extractErrors(response));
+  }
+};
+
+const declareNeutral = async (diplomaticStatus: DiplomaticStatus<string>) => {
+  const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
+
+  if (!await confirm('Declare Neutral', `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`)) {
+    return;
+  }
+
+  const response = await neutral(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+  if (isOk(response)) {
+    toast.success(`Your diplomatic status to ${playerAlias} is now neutral.`);
+
+    diplomaticStatus.statusFrom = response.data.statusFrom;
+    diplomaticStatus.statusTo = response.data.statusTo;
+    diplomaticStatus.actualStatus = response.data.actualStatus;
+
+    emit('onApiRequestSuccess');
+  } else {
+    console.error(formatError(response));
+    emit('onApiRequestError', extractErrors(response));
+  }
+};
 </script>
 
 <style scoped>

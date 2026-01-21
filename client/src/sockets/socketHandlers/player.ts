@@ -20,6 +20,7 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
 
     this.on(PlayerSocketEventNames.GamePlayerJoined, (e: { playerId: string, alias: string, avatar: string }) => store.commit(PlayerMutationNames.GamePlayerJoined, e));
     this.on(PlayerSocketEventNames.GamePlayerQuit, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerQuit, e));
+    this.on(PlayerSocketEventNames.GamePlayerConcededDefeat, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerConcededDefeat, e));
 
     // Only the server handles these.
     //socket.on(PlayerSocketEventNames.GameRoomJoined, (e: { playerId: string, alias: string, avatar: string }) => store.commit(PlayerMutationNames.GameRoomJoined, e));

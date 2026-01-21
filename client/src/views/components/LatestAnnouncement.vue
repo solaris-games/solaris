@@ -6,7 +6,7 @@
     <details>
       <summary>More...</summary>
 
-      <announcement-panel :announcement="announcement" />
+      <announcement-panel :announcement="announcement" :highlighted="false" />
     </details>
   </div>
 </template>

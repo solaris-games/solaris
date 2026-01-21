@@ -8,7 +8,7 @@
       <h4>Announcements</h4>
 
       <div class="announcement-list" v-for="announcement in announcements" :key="announcement._id">
-        <announcement-tile :announcement="announcement">
+        <announcement-tile :announcement="announcement" :highlighted="false">
           <template v-slot:context-actions>
             <button class="btn btn-outline-danger btn-sm" @click="removeAnnouncement(announcement)">Delete</button>
           </template>

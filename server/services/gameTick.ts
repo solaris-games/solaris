@@ -24,17 +24,17 @@ import { TechnologyService } from 'solaris-common';
 import UserService from "./user";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
-import { GameRankingResult } from "./types/Rating";
+import { GameRankingResult } from "../../common/src/types/common/rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
-import PlayerGalacticCycleCompletedEvent from "./types/events/PlayerGalacticCycleComplete"
-import GamePlayerDefeatedEvent from "./types/events/GamePlayerDefeated";
-import GamePlayerAFKEvent from "./types/events/GamePlayerAFK";
-import GameEndedEvent from "./types/events/GameEnded";
+import PlayerGalacticCycleCompletedEvent from "./types/internalEvents/PlayerGalacticCycleComplete"
+import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDefeated";
+import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
+import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import ScheduleBuyService from "./scheduleBuy";
@@ -814,7 +814,7 @@ export default class GameTickService extends EventEmitter {
                         this.playerAfkService.incrementAfkCount(user);
                     }
 
-                    let e: GamePlayerAFKEvent = {
+                    let e: InternalGamePlayerAFKEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
@@ -832,7 +832,7 @@ export default class GameTickService extends EventEmitter {
                         }
                     }
 
-                    let e: GamePlayerDefeatedEvent = {
+                    let e: InternalGamePlayerDefeatedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
@@ -891,7 +891,7 @@ export default class GameTickService extends EventEmitter {
             }
 
             if (!isTutorialGame) {
-                let rankingResult: GameRankingResult | null = null;
+                let rankingResult: GameRankingResult<DBObjectId> | null = null;
 
                 if (this.gameTypeService.isRankedGame(game)) {
                     rankingResult = this._awardEndGameRank(game, gameUsers, true);
@@ -901,14 +901,14 @@ export default class GameTickService extends EventEmitter {
                 this.leaderboardService.markNonAFKPlayersAsEstablishedPlayers(game, gameUsers);
                 this.leaderboardService.incrementPlayersCompletedAchievement(game, gameUsers);
 
-                let e: GameEndedEvent = {
+                const e: InternalGameEndedEvent = {
                     gameId: game._id,
                     gameTick: game.state.tick,
                     rankingResult
                 };
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
-            } else if (winner.kind === 'player') {
+            } else if (winner.kind === 'player') { // game is tutorial
                 const userId = winner.player.userId
                 const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());
                 const tutorialKey = game.settings.general.createdFromTemplate;
@@ -930,13 +930,13 @@ export default class GameTickService extends EventEmitter {
     }
 
     _awardEndGameRank(game: Game, gameUsers: User[], awardCredits: boolean) {
-        let rankingResult: GameRankingResult | null = null;
-    
+        let rankingResult: GameRankingResult<DBObjectId> | null = null;
+
         // There must have been at least X production ticks in order for
         // rankings to be added to players. This is to slow down players
         // should they wish to cheat the system.
-        let productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
-        let canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
+        const productionTickCap = this.gameTypeService.is1v1Game(game) ? 1 : 2;
+        const canAwardRank = this.gameTypeService.isRankedGame(game) && game.state.productionTick > productionTickCap;
 
         if (canAwardRank) {
             if (this.gameTypeService.isTeamConquestGame(game)) {
@@ -952,7 +952,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // If the game is anonymous, then ranking results should be omitted from the game ended event.
-        if (this.gameTypeService.isAnonymousGame(game)) {
+        if (this.gameTypeService.isAnonymousAfterEnd(game)) {
             rankingResult = null;
         }
         

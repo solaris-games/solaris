@@ -15,7 +15,7 @@
                     [&nbsp;<span class="link-active">ETA</span>&nbsp;|&nbsp;Action&nbsp;]
                   </a>
                 </td>
-                <td class="text-end" v-if="!$isHistoricalMode() && canEditWaypoints">
+                <td class="text-end" v-if="!isHistoricalMode && canEditWaypoints">
                   <a href="javascript:;" @click="onEditWaypointsRequested">
                     Edit
                   </a>
@@ -33,49 +33,42 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
+import type {Carrier, Game} from "@/types/game";
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import type {CarrierWaypoint} from "@solaris-common";
+import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
-export default {
-  components: {
-    'waypointRow': WaypointRow
-  },
-  props: {
-    carrier: Object
-  },
-  data () {
-    return {
-      showAction: true
-    }
-  },
-  methods: {
-    toggleShowAction (e) {
-      this.showAction = !this.showAction
-    },
-    onEditWaypointRequested (e) {
-      this.$emit('onEditWaypointRequested', e)
-    },
-    onEditWaypointsRequested (e) {
-      this.$emit('onEditWaypointsRequested', e)
-    },
-    onOpenStarDetailRequested (e) {
-      this.$emit('onOpenStarDetailRequested', e)
-    }
-  },
-  computed: {
-    userPlayer() {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    userPlayerOwnsCarrier: function () {
-      return this.userPlayer &&
-        GameHelper.getCarrierOwningPlayer(this.$store.state.game, this.carrier)._id === this.userPlayer._id
-    },
-    canEditWaypoints: function () {
-      return !GameHelper.isGameFinished(this.$store.state.game) && this.userPlayerOwnsCarrier && !this.carrier.isGift
-    }
-  }
-}
+const props = defineProps<{
+  carrier: Carrier,
+}>();
+
+const emit = defineEmits<{
+  onEditWaypointRequested: [waypoint: CarrierWaypoint<string>],
+  onEditWaypointsRequested: [],
+  onOpenStarDetailRequested: [starId: string],
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const isHistoricalMode = useIsHistoricalMode(store);
+
+const showAction = ref(true);
+
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
+const canEditWaypoints = computed(() => !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
+
+const toggleShowAction = () => showAction.value = !showAction.value;
+
+const onEditWaypointRequested = (wp: CarrierWaypoint<string>) => emit('onEditWaypointRequested', wp);
+
+const onEditWaypointsRequested = () => emit('onEditWaypointsRequested');
+
+const onOpenStarDetailRequested = (starId: string) => emit('onOpenStarDetailRequested', starId);
 </script>
 
 <style scoped>

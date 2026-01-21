@@ -2,14 +2,14 @@ import type {UserGameSettings} from "../types/common/settings";
 
 export const DEFAULT_SETTINGS: UserGameSettings = {
     interface: {
-        audio: 'disabled',
+        audio: 'enabled',
         galaxyScreenUpgrades: 'disabled',
         uiStyle: 'standard',
-        suggestMentions: 'disabled',
+        suggestMentions: 'enabled',
         shiftKeyMentions: 'disabled',
     },
     guild: {
-        displayGuildTag: 'hidden',
+        displayGuildTag: 'visible',
     },
     technical: {
         performanceMonitor: 'disabled',
@@ -21,7 +21,7 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         carrierPathWidth: 1,
         carrierPathDashLength: 6,
         territoryStyle: 'marching-square',
-        territoryOpacity: 0.333,
+        territoryOpacity: 0.3,
         marchingSquareGridSize: 6,
         marchingSquareTerritorySize: 5,
         marchingSquareBorderWidth: 2,
@@ -72,5 +72,6 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         confirmBuildIndustry: 'disabled',
         confirmBuildScience: 'disabled',
         confirmBuildWarpGate: 'enabled',
+        confirmShipDistribution: 'disabled',
     },
 }

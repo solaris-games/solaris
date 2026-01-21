@@ -16,13 +16,14 @@ import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../ty
 import type {Location, MapObject, UserGameSettings} from "@solaris-common";
 import { Chunks } from './chunks'
 import Carrier, {type CarrierClickEvent} from "./carrier";
-import type { EventBus } from '../eventBus'
+import type { EventBus } from '@/eventBus'
 import MapEventBusEventNames from '../eventBusEventNames/map'
 import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
 import type {TempWaypoint} from "@/types/waypoint";
 import type {RulerPoint} from "@/types/ruler";
+import type {ServiceProvider} from "@/services/services";
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -90,14 +91,16 @@ export class Map {
   chunks: Chunks;
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
+  serviceProvider: ServiceProvider;
 
-  constructor (app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
-    this.app = app
-    this.context = context
+  constructor (serviceProvider: ServiceProvider, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+    this.app = app;
+    this.context = context;
     this.viewport = viewport;
-    this.container = new PIXI.Container()
-    this.container.sortableChildren = true
+    this.container = new PIXI.Container();
+    this.container.sortableChildren = true;
     this.eventBus = eventBus;
+    this.serviceProvider = serviceProvider;
 
     this.stars = []
 
@@ -107,7 +110,6 @@ export class Map {
 
     this.zoomPercent = 100
     this.lastZoomPercent = 100
-
 
     this.userSettings = userSettings
     this.game = game
@@ -155,12 +157,12 @@ export class Map {
 
     // Add carriers
     for (let i = 0; i < game.galaxy.carriers.length; i++) {
-      this.setupCarrier(game, userSettings, game.galaxy.carriers[i])
+      this.setupCarrier(game, userSettings, game.galaxy.carriers[i]);
     }
 
     this.chunks = new Chunks(game, this.stars, this.carriers);
 
-    this.waypoints = new Waypoints();
+    this.waypoints = new Waypoints(serviceProvider);
     this.waypoints.setup(game, this.context, userSettings);
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
@@ -464,6 +466,8 @@ export class Map {
     this.background.draw();
 
     this.waypoints.setup(game, this.context, userSettings);
+    this.waypoints.clear();
+
     this.tooltipLayer.setup(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
@@ -577,7 +581,7 @@ export class Map {
 
   drawWaypoints () {
     if (this.mode.mode === ModeKind.Waypoints) {
-      this.waypoints.draw(this.mode.carrier);
+      this.waypoints.drawWaypointMode(this.mode.carrier);
     }
 
     for (let i = 0; i < this.carriers.length; i++) {
@@ -862,9 +866,8 @@ export class Map {
 
       //highlight carrier path if selected
       if (selectedCarrier?.isSelected) {
-        this.waypoints!.draw(selectedCarrier!.data!, false);
-      }
-      else {
+        this.waypoints!.drawPath(selectedCarrier!.data!);
+      } else {
         this.waypoints!.clear();
       }
 

@@ -6,69 +6,46 @@
     <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
     <td class="text-end">{{carrier.ships == null ? '???' : carrier.ships}}</td>
     <td class="text-end" :class="{'text-warning':carrier.waypointsLooped}" :title="carrier.waypointsLooped?'Looped':'Unlooped'">{{carrier.waypoints.length}}</td>
-    <!-- <td><i class="fas fa-sync" v-if="carrier.waypointsLooped"></i></td> -->
     <td class="text-end">
-      <span class="text-small" v-if="carrier.waypoints.length" :title="timeRemainingEtaActual">{{timeRemainingEta}}</span>
+      <span class="text-small" v-if="carrier.waypoints.length && carrier.ticksEta !== null && carrier.ticksEta !== undefined">
+        <timer :ticks="carrier.ticksEta" />
+      </span>
     </td>
     <td class="text-end text-muted">
-      <span v-if="carrier.waypoints.length" class="text-small" :title="timeRemainingEtaTotalActual">{{timeRemainingEtaTotal}}</span>
+      <span v-if="carrier.waypoints.length && carrier.ticksEtaTotal !== null && carrier.ticksEtaTotal !== undefined" class="text-small">
+        <timer :ticks="carrier.ticksEtaTotal" />
+      </span>
     </td>
 </tr>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon.vue'
+<script setup lang="ts">
+import PlayerIcon from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
+import type {Carrier} from "@/types/game";
+import Timer from "@/views/game/components/time/Timer.vue";
+import type {MapObject} from "@solaris-common";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue,
-    'specialist-icon': SpecialistIcon
-  },
-  props: {
-    carrier: Object
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      timeRemainingEta: null,
-      timeRemainingEtaTotal: null,
-      timeRemainingEtaActual: null,
-      timeRemainingEtaTotalActual: null,
-      intervalFunction: null
-    }
-  },
-  mounted () {
-    this.recalculateTimeRemaining()
+const props = defineProps<{
+  carrier: Carrier,
+}>();
 
-    if (GameHelper.isGameInProgress(this.$store.state.game) || GameHelper.isGamePendingStart(this.$store.state.game)) {
-      this.intervalFunction = setInterval(this.recalculateTimeRemaining, 250)
-      this.recalculateTimeRemaining()
-    }
-  },
-  methods: {
-    clickCarrier (e) {
-      this.$emit('onOpenCarrierDetailRequested', this.carrier._id)
-    },
-    goToCarrier (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: this.carrier });
-    },
-    recalculateTimeRemaining () {
-      this.timeRemainingEta = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, true)
-      this.timeRemainingEtaActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEta, false, false)
-      this.timeRemainingEtaTotal = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, true)
-      this.timeRemainingEtaTotalActual = GameHelper.getCountdownTimeStringByTicks(this.$store.state.game, this.carrier.ticksEtaTotal, false, false)
-    }
-  }
-}
+const emit = defineEmits<{
+  onOpenCarrierDetailRequested: [carrierId: string],
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+
+const clickCarrier = () => {
+  emit('onOpenCarrierDetailRequested', props.carrier._id);
+};
+
+const goToCarrier = () => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: props.carrier as MapObject<string> });
+};
 </script>
 
 <style scoped>

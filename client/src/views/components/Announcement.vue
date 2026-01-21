@@ -14,24 +14,18 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { renderMarkdown } from "../../util/markdown";
+import type {Announcement} from "@solaris-common";
+import { computed } from "vue";
 
-export default {
-  name: "Announcement",
-  props: {
-    announcement: Object,
-    highlighted: Boolean
-  },
-  computed: {
-    date () {
-      return new Date(this.announcement.date).toLocaleString()
-    },
-    content () {
-      return renderMarkdown(this.announcement.content);
-    }
-  }
-}
+const props = defineProps<{
+  announcement: Announcement<string>,
+  highlighted: boolean,
+}>();
+
+const date = computed(() => props.announcement.date.toLocaleString());
+const content = computed(() => renderMarkdown(props.announcement.content));
 </script>
 
 <style scoped>

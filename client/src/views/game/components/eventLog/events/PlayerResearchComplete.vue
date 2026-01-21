@@ -9,22 +9,15 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import TechnologyHelper from '../../../../../services/technologyHelper'
+import type {PlayerResearchCompleteEvent, ResearchType} from "@solaris-common";
 
-export default {
-  components: {
+const props = defineProps<{
+  event: PlayerResearchCompleteEvent<string>,
+}>();
 
-  },
-  props: {
-    event: Object
-  },
-  methods: {
-    getTechnologyFriendlyName (key) {
-      return TechnologyHelper.getFriendlyName(key)
-    }
-  }
-}
+const getTechnologyFriendlyName = (key: string) => TechnologyHelper.getFriendlyName(key as ResearchType);
 </script>
 
 <style scoped>

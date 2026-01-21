@@ -27,80 +27,61 @@
           </small>
         </div>
     </div>
-    <!-- <div class="row mt-1" :style="{'background-color': colour}" style="height:6px;"></div> -->
     <div class="row bg-dark mt-0">
         <div class="col-12" v-if="hasLastMessage">
           <p class="mt-2 mb-2" :class="{'truncate':isTruncated}">
-            <player-icon v-if="lastMessage.fromPlayerId" :playerId="lastMessageSender._id" />
-            {{lastMessage}}
+            <player-icon v-if="lastMessageSender && lastMessage!.fromPlayerId" :playerId="lastMessageSender._id" />
+            <span class="lastMessage">{{lastMessageText}}</span>
           </p>
         </div>
-        <div class="col-12" v-if="hasLastMessage">
-            <small class="float-end mb-2"><i>{{getDateString(conversation.lastMessage.sentDate)}}</i></small>
+        <div class="col-12" v-if="hasLastMessage && lastMessage">
+          <small class="float-end mb-2"><i>{{GameHelper.getDateString(lastMessage.sentDate)}}</i></small>
         </div>
         <div class="col-12" v-if="!hasLastMessage">
-            <p class="mt-2 mb-2">No messages.</p>
+          <p class="mt-2 mb-2">No messages.</p>
         </div>
     </div>
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
-import PlayerIconVue from '../../player/PlayerIcon.vue'
+import PlayerIcon from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
-import { inject } from 'vue'
+import { inject, computed } from 'vue'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+import type {ConversationOverview} from "@solaris-common";
+import { useStore } from 'vuex';
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    conversation: Object,
-    isTruncated: Boolean,
-    isFullWidth: Boolean
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  methods: {
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    getDateString (date) {
-      return GameHelper.getDateString(date)
-    },
-    getFriendlyColour (colour) {
-      return GameHelper.getFriendlyColour(colour)
-    },
-    openConversation () {
-      this.eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-        conversationId: this.conversation._id
-      });
-    }
-  },
-  computed: {
-    hasLastMessage: function () {
-      return this.conversation.lastMessage != null
-    },
-    hasReadLastMessage: function () {
-      return this.hasLastMessage && this.conversation.lastMessage.readBy.find(r => r === this.getUserPlayer()._id)
-    },
-    lastMessageSender: function () {
-      return GameHelper.getPlayerById(this.$store.state.game, this.conversation.lastMessage.fromPlayerId)
-    },
-    isAllPlayersConversation: function () {
-      return this.conversation.participants.length === this.$store.state.game.settings.general.playerLimit
-    },
-    lastMessage () {
-      return mentionHelper.replaceMentionsWithNames(this.conversation.lastMessage.message)
-    }
-  }
-}
+const props = defineProps<{
+  conversation: ConversationOverview<string>,
+  isTruncated: boolean,
+  isFullWidth: boolean,
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const hasLastMessage = computed(() => props.conversation.lastMessage != null);
+const lastMessage = computed(() => props.conversation.lastMessage);
+const hasReadLastMessage = computed(() => hasLastMessage.value && props.conversation.lastMessage!.readBy.find(r => r === userPlayer.value._id));
+const lastMessageSender = computed(() => props.conversation.lastMessage?.fromPlayerId && GameHelper.getPlayerById(game.value, props.conversation.lastMessage.fromPlayerId));
+const isAllPlayersConversation = computed(() => props.conversation.participants.length === game.value.settings.general.playerLimit);
+
+const lastMessageText = computed(() => lastMessage.value && mentionHelper.replaceMentionsWithNames(lastMessage.value.message));
+
+const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);
+
+const openConversation = () => {
+  eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
+    conversationId: props.conversation._id,
+  });
+};
 </script>
 
 <style scoped>
@@ -117,5 +98,9 @@ export default {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+}
+
+.lastMessage {
+  margin-left: 12px;
 }
 </style>

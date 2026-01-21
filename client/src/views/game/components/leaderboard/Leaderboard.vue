@@ -111,6 +111,7 @@ import Winner from "@/views/game/components/leaderboard/Winner.vue";
 import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
 import { notReadyToQuit, quit, readyToQuit } from '@/services/typedapi/game'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
+import {getCountdownTimeStringByTicks, getCountdownTimeStringForTurnTimeout} from "@/util/time";
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -144,9 +145,9 @@ const isUserPlayer = (player: Player<string>) => userPlayer.value?._id === playe
 
 const recalculateTimeRemaining = () => {
   if (GameHelper.isRealTimeGame(game.value)) {
-    timeRemaining.value = `Next tick: ${GameHelper.getCountdownTimeStringByTicks(game.value, 1)}`;
+    timeRemaining.value = `Next tick: ${getCountdownTimeStringByTicks(game.value, 1)}`;
   } else if (GameHelper.isTurnBasedGame(game.value)) {
-    timeRemaining.value = `Next turn: ${GameHelper.getCountdownTimeStringForTurnTimeout(game.value)}`;
+    timeRemaining.value = `Next turn: ${getCountdownTimeStringForTurnTimeout(game.value)}`;
   }
 };
 

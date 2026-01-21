@@ -9,7 +9,7 @@ import { ConversationMessage, ConversationMessageSentResult } from './types/Conv
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import TradeService from './trade';
-import ConversationMessageSentEvent from './types/events/ConversationMessageSent';
+import InternalConversationMessageSentEvent from './types/internalEvents/ConversationMessageSent';
 import DiplomacyService from './diplomacy';
 import mongoose from 'mongoose';
 import EventEmitter from "events";
@@ -328,7 +328,7 @@ export default class ConversationService extends EventEmitter {
             gameName: game.settings.general.name,
         }
 
-        let e: ConversationMessageSentEvent = {
+        let e: InternalConversationMessageSentEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             conversation,

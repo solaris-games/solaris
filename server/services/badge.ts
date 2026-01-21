@@ -6,7 +6,7 @@ import { Game } from './types/Game';
 import {AwardedBadge, User} from './types/User';
 import PlayerService from './player';
 import UserService from './user';
-import GamePlayerBadgePurchasedEvent from './types/events/GamePlayerBadgePurchased';
+import InternalGamePlayerBadgePurchasedEvent from './types/internalEvents/GamePlayerBadgePurchased';
 import { GameTypeService } from 'solaris-common'
 import GameStateService from "./gameState";
 import EventEmitter from "events";
@@ -89,7 +89,7 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`The player slot has not been filled by a user.`);
         }
 
-        if (this.gameTypeService.isAnonymousGame(game) && !this.gameStateService.isFinished(game)) {
+        if (this.gameTypeService.isAnonymousGameDuringGame(game) && !this.gameStateService.isFinished(game)) {
             throw new ValidationError(`Cannot purchase a badge in an anonymous game before it finishes.`);
         }
 
@@ -139,7 +139,7 @@ export default class BadgeService extends EventEmitter {
             }
         });
 
-        let e: GamePlayerBadgePurchasedEvent = {
+        let e: InternalGamePlayerBadgePurchasedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             purchasedByPlayerId: buyer._id,

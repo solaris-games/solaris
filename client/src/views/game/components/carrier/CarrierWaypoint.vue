@@ -83,22 +83,25 @@
 </template>
 
 <script setup lang="ts">
-import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
+import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import gameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
-import {eventBusInjectionKey} from "../../../../eventBus";
+import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
-import type {CarrierWaypoint, CarrierWaypointActionType, MapObject} from "@solaris-common"
+import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris-common"
 import {useStore} from 'vuex';
 import {saveWaypoints} from "@/services/typedapi/carrier";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {useGameServices} from "@/util/gameServices";
+import type {Game} from "@/types/game";
+import {getCountdownTimeStringByTicks, ticksToDuration} from "@/util/time";
+import {formatDuration} from "@/util/duration";
 
 const props = defineProps<{
   carrierId: string,
@@ -119,7 +122,8 @@ const isHistoricalMode = useIsHistoricalMode(store);
 
 const gameServices = useGameServices();
 
-const game = computed(() => store.state.game);
+const settings = computed<UserGameSettings>(() => store.state.settings);
+const game = computed<Game>(() => store.state.game);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isInTransit = computed(() => !carrier.value.orbiting);
@@ -214,13 +218,12 @@ const recalculateWaypointEta = () => {
     totalTicks += wp.ticks!;
   }
 
-  waypointEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, totalTicks);
+  waypointEta.value = getCountdownTimeStringByTicks(game.value, totalTicks);
 };
 
 const recalculateWaypointDuration = () => {
   if (currentWaypoint.value) {
-    const timeRemainingEtaDate = GameHelper.calculateTimeByTicks((currentWaypoint.value.ticks || 0) + currentWaypoint.value.delayTicks, game.value.settings.gameTime.speed, null);
-    waypointDuration.value = GameHelper.getCountdownTimeString(game.value, timeRemainingEtaDate, true);
+    waypointDuration.value = formatDuration(ticksToDuration(game.value, (currentWaypoint.value.ticks || 0) + currentWaypoint.value.delayTicks));
   }
 
   recalculateWaypointEta();
@@ -286,6 +289,14 @@ const doSaveWaypoints = async (saveAndEdit = false) => {
 
   isSavingWaypoints.value = false;
 };
+
+watch(() => currentWaypoint.value.action, (newV, oldV) => {
+  if (!isActionRequiresShips(oldV) && isActionRequiresShips(newV)) {
+    currentWaypoint.value.actionShips = settings.value.carrier.defaultAmount;
+  } else if (!isActionRequiresShips(newV)) {
+    currentWaypoint.value.actionShips = 0;
+  }
+})
 
 onMounted(() => {
   recalculateWaypointDuration();

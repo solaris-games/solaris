@@ -6,15 +6,12 @@
 </div>
 </template>
 
-<script>
-export default {
-  components: {
+<script setup lang="ts">
+import type {PlayerConversationInvitedEvent} from "@solaris-common";
 
-  },
-  props: {
-    event: Object
-  }
-}
+const props = defineProps<{
+  event: PlayerConversationInvitedEvent<string>,
+}>();
 </script>
 
 <style scoped>

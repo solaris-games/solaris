@@ -40,10 +40,10 @@ import StarLabel from '../../star/StarLabel.vue'
 import type {PlayerCombatStarEvent} from "@solaris-common";
 import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '../../../../../store';
-import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '../../../../../types/combat';
+import type { State } from '@/store';
+import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '@/services/combat';
 import gameHelper from '../../../../../services/gameHelper';
-import type {Game} from "../../../../../types/game";
+import type {Game} from "@/types/game";
 
 const props = defineProps<{
   event: PlayerCombatStarEvent<string>
@@ -66,7 +66,6 @@ const originalOwnerId = computed(() => props.event.data.combatResult.star?.owned
 const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);
 };
-
 </script>
 
 <style scoped>

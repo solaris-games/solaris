@@ -1,11 +1,11 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToResearchUpdateNextRequest, mapToResearchUpdateNowRequest } from '../requests/research';
+import { parseUpdateResearchNextRequest, parseUpdateResearchNowRequest } from '../requests/research';
 
 export default (container: DependencyContainer) => {
     return {
         updateNow: async (req, res, next) => {
             try {
-                const reqObj = mapToResearchUpdateNowRequest(req.body);
+                const reqObj = parseUpdateResearchNowRequest(req.body);
 
                 let eta = await container.researchService.updateResearchNow(req.game, req.player, reqObj.preference);
                 
@@ -17,7 +17,7 @@ export default (container: DependencyContainer) => {
         },
         updateNext: async (req, res, next) => {
             try {
-                const reqObj = mapToResearchUpdateNextRequest(req.body);
+                const reqObj = parseUpdateResearchNextRequest(req.body);
                 
                 let eta = await container.researchService.updateResearchNext(req.game, req.player, reqObj.preference);
     

@@ -8,7 +8,7 @@ import {
     parseUserUpdateEmailRequest,
     parseUserUpdatePasswordRequest,
     parseUserUpdateUserNameRequest,
-    parseCreateUserRequest
+    parseCreateUserRequest, parseUpdateSettingsRequest
 } from '../requests/user';
 import {logger} from "../../utils/logging";
 
@@ -69,7 +69,9 @@ export default (container: DependencyContainer) => {
         },
         saveSettings: async (req, res, next) => {
             try {
-                await container.userService.saveGameSettings(req.session.userId, req.body);
+                const settings = parseUpdateSettingsRequest(req.body);
+
+                await container.userService.saveGameSettings(req.session.userId, settings);
     
                 res.sendStatus(200);
                 return next();

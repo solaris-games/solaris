@@ -1,7 +1,8 @@
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
-import { PlayerResearch, ResearchType, ResearchTypeNotRandom } from "./Player";
+import { PlayerResearch } from "./Player";
 import { IgnoreBulkUpgrade, Infrastructure, NaturalResources } from "./Star";
+import { ResearchType, ResearchTypeNotRandom } from "solaris-common";
 
 export interface GameHistoryPlayer {
     userId: DBObjectId | null;

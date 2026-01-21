@@ -50,7 +50,7 @@
                           Starting Soon
                         </span>
                         <span v-if="isGameInProgress(game)">
-                          <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                          <countdown-timer :endDate="getNextCycleDate(game) || undefined" :active="true" afterEndText="Pending..."></countdown-timer>
                         </span>
                       </small>
                     </div>
@@ -63,7 +63,7 @@
                       Starting Soon
                     </span>
                     <span v-if="isGameInProgress(game)">
-                      <countdown-timer :endDate="getNextCycleDate(game)" :active="true" afterEndText="Pending..."></countdown-timer>
+                      <countdown-timer :endDate="getNextCycleDate(game) || undefined" :active="true" afterEndText="Pending..."></countdown-timer>
                     </span>
                   </td>
                   <td class="col-1 col-md-6 text-center">{{game.state.players}}/{{game.settings.general.playerLimit}}</td>
@@ -90,12 +90,17 @@
 <script setup lang="ts">
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import GameHelper from '../../../../services/gameHelper';
-import CountdownTimer from '../CountdownTimer.vue';
+import CountdownTimer from '../time/CountdownDateTimer.vue';
 import { loadLocalPreference, storeLocalPreference } from '@/util/localPreference';
 import type { UserActiveListGame } from '@solaris-common';
 import { ref, computed, type Ref, inject, onMounted, watch } from 'vue';
 import { listActive } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import {
+  getCountdownTimeForProductionCycle,
+  getTurnTimeoutTime,
+  getCountdownTimeStringForTurnTimeout
+} from "@/util/time";
 
 const INCLUDE_DEFEATED_PREF_KEY = 'activeGamesIncludeDefeated';
 
@@ -115,20 +120,20 @@ const filteredActiveGames = computed(() => {
   return activeGames.value.filter(g => !g.userNotifications.defeated);
 });
 
-const isRealTimeGame = (game: UserActiveListGame<string>) => GameHelper.isRealTimeGame(game);
-
 const isGameWaitingForPlayers = (game: UserActiveListGame<string>) => GameHelper.isGameWaitingForPlayers(game);
 
 const isGamePendingStart = (game: UserActiveListGame<string>) => GameHelper.isGamePendingStart(game);
 
 const isGameInProgress = (game: UserActiveListGame<string>) => GameHelper.isGameInProgress(game);
 
-const getNextCycleDate = (game: UserActiveListGame<string>) => {
+const getNextCycleDate = (game: UserActiveListGame<string>): Date | null => {
   if (GameHelper.isRealTimeGame(game)) {
-    return GameHelper.getCountdownTimeForProductionCycle(game);
+    return getCountdownTimeForProductionCycle(game);
   } else if (GameHelper.isTurnBasedGame(game)) {
-    return GameHelper.getCountdownTimeForTurnTimeout(game);
+    return getTurnTimeoutTime(game);
   }
+
+  return null;
 };
 
 const getGameTypeFriendlyText = (game: UserActiveListGame<string>) => GameHelper.getGameTypeFriendlyText(game);

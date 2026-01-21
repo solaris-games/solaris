@@ -167,8 +167,10 @@
       </div>
 
       <div class="row pt-2 pb-2" v-if="hasWaypoints">
-        <div class="col">
-          <span>ETA<orbital-mechanics-e-t-a-warning />: {{timeRemainingEta}} <span v-if="carrier.waypoints.length > 1">({{timeRemainingEtaTotal}})</span></span>
+        <div class="col" v-if="carrier.ticksEta !== null && carrier.ticksEta !== undefined">
+          <span>ETA<orbital-mechanics-e-t-a-warning />: <timer :ticks="carrier.ticksEta" />
+            <span v-if="carrier.waypoints.length > 1 && carrier.ticksEtaTotal !== null && carrier.ticksEtaTotal !== undefined"> (Total: <timer :ticks="carrier.ticksEtaTotal" />)</span>
+          </span>
         </div>
         <div class="col">
           <span>Speed: {{carrierSpeed}}</span>
@@ -239,6 +241,7 @@ import { useStore } from 'vuex';
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {makeConfirm} from "@/util/confirm";
+import Timer from "@/views/game/components/time/Timer.vue";
 
 const props = defineProps<{
   carrierId: string,
@@ -358,11 +361,6 @@ const canHireSpecialist = computed(() => {
 const isStandardUIStyle = computed(() => settings.value.interface.uiStyle === 'standard');
 const isCompactUIStyle = computed(() => settings.value.interface.uiStyle === 'compact');
 
-const timeRemainingEta = ref('');
-const timeRemainingEtaTotal = ref('');
-
-const intervalFunction = ref(0);
-
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const onOpenPlayerDetailRequested = (e: Event) => {
@@ -381,16 +379,6 @@ const onViewCombatCalculatorRequested = () => {
 const onShipTransferRequested = (e: Event) => {
   e.preventDefault();
   emit('onShipTransferRequested', carrier.value._id);
-};
-
-const recalculateTimeRemaining = () => {
-  if (carrier.value.ticksEta) {
-    timeRemainingEta.value = GameHelper.getCountdownTimeStringByTicks(game.value, carrier.value.ticksEta);
-  }
-
-  if (carrier.value.ticksEtaTotal) {
-    timeRemainingEtaTotal.value = GameHelper.getCountdownTimeStringByTicks(game.value, carrier.value.ticksEtaTotal);
-  }
 };
 
 const onCloseRequested = (e: Event) => {
@@ -509,17 +497,6 @@ const onConfirmGiftCarrier = async () => {
 
   isGiftingCarrier.value = false;
 };
-
-onMounted(() => {
-  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
-    intervalFunction.value = setInterval(recalculateTimeRemaining, 250)
-    recalculateTimeRemaining();
-  }
-
-  onUnmounted(() => {
-    clearInterval(intervalFunction.value);
-  });
-});
 </script>
 
 <style scoped>

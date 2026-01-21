@@ -14,35 +14,30 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    title: String,
-    startsOpened: {
-      default: false,
-      type: Boolean
-    }
-  },
-  data() {
-    return {
-      isCollapsed: true
-    }
-  },
-  mounted () {
-    this.isCollapsed = !this.startsOpened || false
-  },
-  methods: {
-    toggle () {
-      this.isCollapsed = !this.isCollapsed;
-      this.$emit('onToggle', this.isCollapsed);
-    }
-  },
-  computed: {
-    collapseText () {
-      return this.isCollapsed ? 'expand' : 'collapse'
-    }
-  }
-}
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+
+const props = defineProps<{
+  title: string,
+  startsOpened: boolean,
+}>();
+
+const emit = defineEmits<{
+  onToggle: [v: boolean];
+}>();
+
+const isCollapsed = ref(true);
+
+const collapseText = computed(() => isCollapsed.value ? 'expand' : 'collapse');
+
+const toggle = () => {
+  isCollapsed.value = !isCollapsed.value;
+  emit('onToggle', isCollapsed.value);
+};
+
+onMounted(() => {
+  isCollapsed.value = !props.startsOpened || false;
+});
 </script>
 
 <style scoped>

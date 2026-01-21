@@ -17,8 +17,8 @@ import StarService from './star';
 import UserService from './user';
 import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
-import GamePlayerQuitEvent from './types/events/GamePlayerQuit';
-import GamePlayerDefeatedEvent from './types/events/GamePlayerDefeated';
+import InternalGamePlayerQuitEvent from './types/internalEvents/GamePlayerQuit';
+import InternalGamePlayerDefeatedEvent from './types/internalEvents/GamePlayerDefeated';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
@@ -192,7 +192,7 @@ export default class GameService extends EventEmitter {
         
         await game.save();
 
-        let e: GamePlayerQuitEvent = {
+        let e: InternalGamePlayerQuitEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
@@ -248,7 +248,7 @@ export default class GameService extends EventEmitter {
 
         await game.save();
 
-        let e: GamePlayerDefeatedEvent = {
+        let e: InternalGamePlayerDefeatedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
@@ -408,11 +408,13 @@ export default class GameService extends EventEmitter {
     }
 
     async getPlayerUser(game: Game, playerId: DBObjectId) {
-        if (this.gameTypeService.isAnonymousGame(game)) {
+        const isAnonymousNow = this.gameStateService.isFinished(game) ? this.gameTypeService.isAnonymousAfterEnd(game) : this.gameTypeService.isAnonymousGameDuringGame(game);
+
+        if (isAnonymousNow) {
             return null;
         }
         
-        let player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+        const player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
 
         if (!player.userId) {
             return null;

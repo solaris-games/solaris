@@ -3,11 +3,16 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ConversationController from '../controllers/conversation';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
+import {createConversationRoutes} from "solaris-common";
+import {DBObjectId} from "../../services/types/DBObjectId";
+import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
     const controller = ConversationController(container);
+    const routes = createConversationRoutes<DBObjectId>();
+    const answer = createRoutes(router, mw);
 
-    router.get('/api/game/:gameId/conversations',
+    answer(routes.list,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -21,7 +26,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/conversations/private/:withPlayerId',
+    answer(routes.listPrivate,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -35,7 +40,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/conversations/unread',
+    answer(routes.getUnreadCount,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -49,7 +54,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.get('/api/game/:gameId/conversations/:conversationId',
+    answer(routes.detail,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -63,7 +68,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.post('/api/game/:gameId/conversations',
+    answer(routes.create,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -80,7 +85,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/send',
+    answer(routes.sendMessage,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -98,7 +103,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/markAsRead',
+    answer(routes.markAsRead,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -115,7 +120,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/mute',
+    answer(routes.mute,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -132,7 +137,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/unmute',
+    answer(routes.unmute,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -149,7 +154,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/leave',
+    answer(routes.leave,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -166,7 +171,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/pin/:messageId',
+    answer(routes.pinMessage,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({
@@ -183,7 +188,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             mw.playerMutex.release()
     );
 
-    router.patch('/api/game/:gameId/conversations/:conversationId/unpin/:messageId',
+    answer(routes.unpinMessage,
             mw.auth.authenticate(),
             mw.playerMutex.wait(),
             mw.game.loadGame({

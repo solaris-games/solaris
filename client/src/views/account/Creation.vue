@@ -1,6 +1,6 @@
 <template>
   <div class="full-container">
-    <view-container :hideTopBar="true">
+    <view-container :hideTopBar="true" :is-auth-page="false">
       <view-title title="Create Account" navigation="home" />
 
       <div class="row">
@@ -34,30 +34,30 @@
           <form @submit="handleSubmit">
             <div class="mb-2">
               <label for="email">Email Address</label>
-              <input type="email" required="required" class="form-control" name="email" v-model="email"
+              <input type="email" :required="true" class="form-control" name="email" v-model="email"
                 :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="username">Username</label>
-              <input type="text" required="required" class="form-control" name="username" minlength="3" maxlength="24"
+              <input type="text" :required="true" class="form-control" name="username" minlength="3" maxlength="24"
                 v-model="username" :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="password">Password</label>
-              <input type="password" required="required" class="form-control" name="password" v-model="password"
+              <input type="password" :required="true" class="form-control" name="password" v-model="password"
                 :disabled="isLoading">
             </div>
 
             <div class="mb-2">
               <label for="passwordConfirm">Re-enter Password</label>
-              <input type="password" required="required" class="form-control" name="passwordConfirm"
+              <input type="password" :required="true" class="form-control" name="passwordConfirm"
                 v-model="passwordConfirm" :disabled="isLoading">
             </div>
 
             <div class="checkbox mb-2">
-              <input id="privacyPolicy" type="checkbox" required="required" name="privacyPolicy"
+              <input id="privacyPolicy" type="checkbox" :required="true" name="privacyPolicy"
                 v-model="privacyPolicyAccepted" :disabled="isLoading" class="me-2">
               <label for="privacyPolicy">Accept
                 <router-link :to="{ name: 'privacy-policy' }" class="me-2" title="Privacy Policy">
@@ -89,95 +89,81 @@
         </div>
       </div>
     </view-container>
-
     <parallax />
   </div>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../components/LoadingSpinner.vue'
+<script setup lang="ts">
+import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import router from '../../router'
 import ViewTitle from '../components/ViewTitle.vue'
 import FormErrorList from '../components/FormErrorList.vue'
-import ParallaxVue from '../components/Parallax.vue'
-import { inject } from 'vue';
+import Parallax from '../components/Parallax.vue'
+import { inject, ref } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createUser } from '@/services/typedapi/user';
+import {toastInjectionKey} from "@/util/keys";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'form-error-list': FormErrorList,
-    'parallax': ParallaxVue
-  },
-  setup() {
-    return {
-      httpClient: inject(httpInjectionKey),
-    };
-  },
-  data() {
-    return {
-      isLoading: false,
-      errors: [],
-      email: null,
-      username: null,
-      password: null,
-      passwordConfirm: null,
-      privacyPolicyAccepted: false
-    }
-  },
-  methods: {
-    async handleSubmit(e) {
-      this.errors = []
+const httpClient = inject(httpInjectionKey)!;
+const toast = inject(toastInjectionKey)!;
 
-      if (!this.email) {
-        this.errors.push('Email required.')
-      }
+const isLoading = ref(false);
+const errors = ref<string[]>([]);
+const email = ref('');
+const username = ref('');
+const password = ref('');
+const passwordConfirm = ref('');
+const privacyPolicyAccepted = ref(false);
 
-      if (!this.username) {
-        this.errors.push('Username required.')
-      }
+const handleSubmit = async (e: Event) => {
+  errors.value = [];
 
-      if (!this.password) {
-        this.errors.push('Password required.')
-      }
-
-      if (!this.passwordConfirm) {
-        this.errors.push('Password confirmation required.')
-      }
-
-      if (this.password !== this.passwordConfirm) {
-        this.errors.push('Passwords must match.')
-      }
-
-      if (!this.privacyPolicyAccepted) {
-        this.errors.push('Privacy policy must be accepted.')
-      }
-
-      e.preventDefault()
-
-      if (this.errors.length) return
-
-      this.isLoading = true
-
-      // Call the account create API endpoint
-      const response = await createUser(this.httpClient)(this.email, this.username, this.password);
-
-      if (isOk(response)) {
-        this.$toast.success(`Welcome ${this.username}! You can now log in and play Solaris.`)
-
-        router.push({ name: 'home' })
-      } else {
-        console.error(formatError(response));
-        this.errors = extractErrors(response);
-      }
-
-      this.isLoading = false
-    }
+  if (!email.value) {
+    errors.value.push('Email required.');
   }
+
+  if (!username.value) {
+    errors.value.push('Username required.');
+  }
+
+  if (!password.value) {
+    errors.value.push('Password required.');
+  }
+
+  if (!passwordConfirm.value) {
+    errors.value.push('Password confirmation required.');
+  }
+
+  if (password.value !== passwordConfirm.value) {
+    errors.value.push('Passwords must match.');
+  }
+
+  if (!privacyPolicyAccepted.value) {
+    errors.value.push('Privacy policy must be accepted.');
+  }
+
+  e.preventDefault();
+
+  if (errors.value.length) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  // Call the account create API endpoint
+  const response = await createUser(httpClient)(email.value, username.value, password.value);
+
+  if (isOk(response)) {
+    toast.success(`Welcome ${username.value}! You can now log in and play Solaris.`);
+
+    router.push({ name: 'home' });
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+  }
+
+  isLoading.value = false;
 }
 </script>
 

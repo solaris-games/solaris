@@ -1,10 +1,10 @@
 import EventEmitter from "events";
 import moment from "moment";
-import { LedgerType } from 'solaris-common';
+import {BaseGameEvent, BasePlayerEvent, LedgerType} from 'solaris-common';
 import { ValidationError } from "solaris-common";
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService, ResearchTypeNotRandom } from 'solaris-common'
 import LedgerService from './ledger';
 import PlayerService from './player';
 import PlayerAfkService from './playerAfk';
@@ -14,8 +14,7 @@ import Repository from './repository';
 import ReputationService from './reputation';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
-import { GameEvent } from './types/GameEvent';
-import { Player, PlayerReputation, ResearchTypeNotRandom } from './types/Player';
+import { Player, PlayerReputation } from './types/Player';
 import { TradeEvent, TradeEventTechnology, TradeTechnology } from './types/Trade';
 import { User } from './types/User';
 import UserService from './user';
@@ -34,7 +33,7 @@ export const TradeServiceEvents = {
 
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
-    eventRepo: Repository<GameEvent>;
+    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     userService: UserService;
     playerService: PlayerService;
     diplomacyService: DiplomacyService;
@@ -49,7 +48,7 @@ export default class TradeService extends EventEmitter {
 
     constructor(
         gameRepo: Repository<Game>,
-        eventRepo: Repository<GameEvent>,
+        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         userService: UserService,
         playerService: PlayerService,
         diplomacyService: DiplomacyService,
@@ -525,12 +524,16 @@ export default class TradeService extends EventEmitter {
 
         return events
         .map(e => {
+            const ev = e as BasePlayerEvent<DBObjectId>;
+
             return {
-                playerId: e.playerId!,
-                type: e.type,
-                data: e.data,
-                sentDate: moment(e._id.getTimestamp()).toDate(),
-                sentTick: e.tick
+                playerId: ev.playerId!,
+                type: ev.type,
+                // TODO
+                // @ts-ignore
+                data: ev.data,
+                sentDate: moment(ev._id.getTimestamp()).toDate(),
+                sentTick: ev.tick
             }
         });
     }

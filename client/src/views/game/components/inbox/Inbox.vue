@@ -8,61 +8,53 @@
 </div>
 </template>
 
-<script>
-import MenuTitle from '../MenuTitle.vue'
-import ConversationListVue from './conversations/ConversationList.vue'
-import ConversationApiService from '../../../../services/api/conversation'
-import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
-import { inject } from 'vue'
-import { eventBusInjectionKey } from '../../../../eventBus'
+<script setup lang="ts">
+import MenuTitle from '../MenuTitle.vue';
+import ConversationList from './conversations/ConversationList.vue';
+import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';
+import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
+import { eventBusInjectionKey } from '../../../../eventBus';
 import UserEventBusEventNames from "@/eventBusEventNames/user";
+import { useStore } from 'vuex';
+import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import type {Game} from "@/types/game";
+import {getUnreadCount} from "@/services/typedapi/conversation";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'conversation-list': ConversationListVue
-  },
-  data () {
-    return {
-      unreadMessages: 0
-    }
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    };
-  },
-  async mounted() {
-    await this.checkForUnreadMessages();
-    // TODO: This is duplicated on the menu header, is it possible to share this logic
-    // to save API calls?
-    this.eventBus.on(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
-    this.eventBus.on(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
-  },
-  unmounted () {
-    this.eventBus.off(UserEventBusEventNames.GameMessageSent, this.checkForUnreadMessages);
-    this.eventBus.off(PlayerEventBusEventNames.GameConversationRead, this.checkForUnreadMessages);
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    async checkForUnreadMessages () {
-      try {
-        let response = await ConversationApiService.getUnreadCount(this.$store.state.game._id)
+const emit = defineEmits<{
+  onCloseRequested: [],
+}>();
 
-        if (response.status === 200) {
-          this.unreadMessages = response.data.unread
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const unreadMessages = ref(0);
+
+const httpClient = inject(httpInjectionKey)!;
+const eventBus = inject(eventBusInjectionKey)!;
+
+const onCloseRequested = () => emit('onCloseRequested');
+
+const checkForUnreadMessages = async () => {
+  const response = await getUnreadCount(httpClient)(game.value._id);
+
+  if (isOk(response)) {
+    unreadMessages.value = response.data.unread;
+  } else {
+    console.error(formatError(response));
   }
-}
+};
+
+onMounted(async () => {
+  eventBus.on(UserEventBusEventNames.GameMessageSent, checkForUnreadMessages);
+  eventBus.on(PlayerEventBusEventNames.GameConversationRead, checkForUnreadMessages);
+
+  onUnmounted(() => {
+    eventBus.off(UserEventBusEventNames.GameMessageSent, checkForUnreadMessages);
+    eventBus.off(PlayerEventBusEventNames.GameConversationRead, checkForUnreadMessages);
+  });
+
+  await checkForUnreadMessages();
+});
 </script>
 
 <style scoped>

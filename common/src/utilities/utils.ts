@@ -37,7 +37,7 @@ export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
     return lastScore;
 }
 
-export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
+export const maxOf = <T>(max: (arg0: T) => number, list: T[]): T | undefined => {
     let lastScore = Number.MIN_SAFE_INTEGER;
     let largest: T | undefined = undefined;
 
@@ -52,6 +52,20 @@ export function maxOf<T>(max: (arg0: T) => number, list: T[]): T | undefined {
     return largest;
 }
 
+export const minOf = <T>(min: (arg0: T) => number, list: T[]): T | undefined => {
+    let lastScore = Number.MAX_SAFE_INTEGER;
+    let smallest: T | undefined = undefined;
+
+    for (let el of list) {
+        const elScore = min(el);
+        if (elScore < lastScore) {
+            lastScore = elScore;
+            smallest = el;
+        }
+    }
+
+    return smallest;
+}
 
 export function reverseSort<A>(sorter: (a: A, b: A) => number): (a: A, b: A) => number {
     return (a, b) => sorter(b, a);
@@ -59,6 +73,10 @@ export function reverseSort<A>(sorter: (a: A, b: A) => number): (a: A, b: A) => 
 
 export function notNull<T>(val: T | null): val is T {
     return val !== null;
+}
+
+export const notUndefined = <T>(val: T | undefined): val is T => {
+    return val !== undefined;
 }
 
 export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
