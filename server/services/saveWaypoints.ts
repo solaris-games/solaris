@@ -80,6 +80,22 @@ export default class SaveWaypointsService {
             const sourceStar = this.starService.getById(game, waypoint.source);
             const destinationStar = this.starService.getById(game, waypoint.destination);
 
+            if (i === 0) {
+                if (!destinationStar) {
+                    throw new ValidationError("Destination does not exist.");
+                }
+            } else {
+                if (!destinationStar || !sourceStar) {
+                    throw new ValidationError("Source or destination does not exist.");
+                }
+
+                const previous = waypoints[i - 1];
+
+                if (previous.destination.toString() !== waypoint.source.toString()) {
+                    throw new ValidationError(`The waypoint source star does not match the previous waypoint destination star.`);
+                }
+            }
+
             const sourceStarName = sourceStar == null ? 'Unknown' : sourceStar.name; // Could be travelling from a destroyed star.
 
             // Make sure the user isn't being a dumbass.
