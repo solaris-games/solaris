@@ -381,7 +381,7 @@ export default class GameCreateService {
 
             if (awardRankTo === 'top_n' && (!awardRankToTopN || awardRankToTopN < 1 || awardRankToTopN > Math.floor(settings.general.playerLimit / 2))) {
                 throw new ValidationError('Invalid top N value for awarding rank.');
-            } else if (!['all', 'winner', 'top_n'].includes(awardRankTo)) {
+            } else if (!['all', 'winner', 'top_n', 'noRankLoss'].includes(awardRankTo)) {
                 throw new ValidationError('Invalid award rank to setting.');
             }
         }
