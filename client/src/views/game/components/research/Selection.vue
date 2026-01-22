@@ -121,12 +121,12 @@ const doUpdateResearchNow = async () => {
 const doUpdateResearchNext = async () => {
   loadingNext.value = true;
 
-  const response = await updateResearchNext(httpClient)(game.value._id, player.value.researchingNow);
+  const response = await updateResearchNext(httpClient)(game.value._id, player.value.researchingNext);
   if (isOk(response)) {
     AudioService.join();
     player.value.currentResearchTicksEta = response.data.ticksEta;
     player.value.nextResearchTicksEta = response.data.ticksNextEta;
-    toast.default("Current research updated.");
+    toast.default("Next research updated.");
   } else {
     console.error(formatError(response));
     toast.error("Failed to update research.")
