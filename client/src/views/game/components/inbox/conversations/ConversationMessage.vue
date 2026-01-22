@@ -73,7 +73,7 @@ const dateText = computed(() => {
   let tick = '';
 
   if (props.message.sentTick || props.message.sentTick === 0) {
-    tick = ` (tick ${props.message.sentTick})`;
+    tick = ` (Tick ${props.message.sentTick})`;
   }
 
   return date + tick;
