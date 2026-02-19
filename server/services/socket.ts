@@ -28,10 +28,10 @@ export default class SocketService {
             const cookieString = socket.request.headers.cookie;
 
             if (cookieString) {
-                const cookieParsed = cookie.parse(cookieString);
-                const sid: string = cookieParsed['connect.sid'];
+                const cookieParsed = cookie.parseCookie(cookieString);
+                const sid: string | undefined = cookieParsed['connect.sid'];
 
-                if (sid != null && this.config.sessionSecret != null) {
+                if (sid != undefined && this.config.sessionSecret != null) {
                     const sidParsed = cookieParser.signedCookie(sid, this.config.sessionSecret);
 
                     if (sidParsed) {
