@@ -37,6 +37,8 @@ import { Star } from './types/Star';
 import { WaypointService, Guild, GuildUserWithTag } from 'solaris-common';
 import { StarDataService } from "solaris-common";
 import mongoose from 'mongoose';
+import {logger} from "../utils/logging";
+const { performance } = require('perf_hooks');
 
 enum ViewpointKind {
     Basic,
@@ -49,6 +51,8 @@ type Viewpoint =
     | { kind: ViewpointKind.Finished }
     | { kind: ViewpointKind.Perspectives, perspectives: Player[] };
 
+
+const log = logger("GameGalaxyService");
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -205,6 +209,8 @@ export default class GameGalaxyService {
 
         this._setReadyToQuitCount(game);
 
+        const timeVPStart = performance.now();
+
         // We always need to filter the player data so that it's basic info only.
         await this._setPlayerInfoBasic(game, userPlayer, viewpoint);
 
@@ -245,6 +251,10 @@ export default class GameGalaxyService {
         if (isHistorical && cached) {
             this.cacheService.put(cached.cacheKey!, game, 1200000); // 20 minutes.
         }
+
+        const timeVPEnd = performance.now();
+
+        log.info("(Normal) Time for viewport calculation: " + (timeVPEnd - timeVPStart) + "ms");
 
         return game;
     }
