@@ -40,6 +40,8 @@ import { StarDataService } from "solaris-common";
 import ScanningService from "./scanning";
 import mongoose from 'mongoose';
 import { KDTree } from "../utils/kdTree";
+import {logger} from "../utils/logging";
+const { performance } = require('perf_hooks');
 
 enum ViewpointKind {
     Basic,
@@ -52,6 +54,8 @@ type Viewpoint =
     | { kind: ViewpointKind.Finished }
     | { kind: ViewpointKind.Perspectives, perspectives: Player[] };
 
+
+const log = logger("GameGalaxyService");
 
 export default class GameGalaxyService {
     cacheService: CacheService;
@@ -211,8 +215,14 @@ export default class GameGalaxyService {
 
         this._setReadyToQuitCount(game);
 
+        const timeKDStart = performance.now();
+
         // TODO: Calculate during tick processing and load stored tree
         const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+        const timeKDEnd = performance.now();
+
+        const timeVPStart = performance.now();
 
         let scannedStarSet = new Set<Star>();
         // Will only need to calculate for the user if they are playing.
@@ -262,6 +272,12 @@ export default class GameGalaxyService {
         if (isHistorical && cached) {
             this.cacheService.put(cached.cacheKey!, game, 1200000); // 20 minutes.
         }
+
+        const timeVPEnd = performance.now();
+
+        log.info("Time for KD tree construction: " + (timeKDEnd - timeKDStart) + "ms");
+
+        log.info("Time for viewpoint calculation: " + (timeVPEnd - timeVPStart) + "ms");
 
         return game;
     }
