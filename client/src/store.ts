@@ -106,10 +106,11 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.menuState = null
       state.menuArguments = null
 
+      // TODO: Refactor menu handling
       eventBus.emit(MenuEventBusEventNames.OnMenuRequested, {
         menuState: null,
-        menuArguments: null as unknown
-      })
+        menuArguments: null,
+      } as any)
     },
 
     setMenuStateChat (state: State, menuState) {
