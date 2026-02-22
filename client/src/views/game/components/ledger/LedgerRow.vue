@@ -23,7 +23,7 @@ import {useStore} from 'vuex';
 import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
 import type {LedgerType, PlayerLedgerDebt} from "@solaris-common";
-import type { Game } from "../../../../types/game";
+import type { Game } from "@/types/game";
 import {makeConfirm} from "@/util/confirm";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";

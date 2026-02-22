@@ -6,11 +6,7 @@
   </div>
 </template>
 
-<script>
-
-export default {
-  name: "CommunityGuidelinesBar",
-}
+<script setup lang="ts">
 </script>
 
 <style scoped>

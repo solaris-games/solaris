@@ -7,20 +7,20 @@
     </div>
 </template>
 
-<script>
-export default {
-    props: {
-        game: Object
-    },
-  computed: {
-    userCanJoinGame () {
-        return this.userIsEstablishedPlayer || this.game.settings.general.playerType === 'all'
-    },
-    userIsEstablishedPlayer () {
-        return this.$store.state.userIsEstablishedPlayer == null ? true : this.$store.state.userIsEstablishedPlayer
-    }
-  }
-}
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import type {ListGame} from "@solaris-common";
+
+const props = defineProps<{
+  game: ListGame<string>,
+}>();
+
+const store = useStore();
+
+const userIsEstablishedPlayer = computed(() => Boolean(store.state.userIsEstablishedPlayer))
+
+const userCanJoinGame = computed(() => userIsEstablishedPlayer.value && props.game.settings.general.playerType === 'all');
 </script>
 
 <style scoped>

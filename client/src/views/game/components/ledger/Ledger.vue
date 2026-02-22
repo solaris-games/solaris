@@ -17,43 +17,33 @@
 
     <div class="tab-content pt-2">
       <div class="tab-pane" :class="selectedTab === 'credits' ? 'active show' : null" id="credits">
-        <ledger-table :ledgerType="'credits'" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+        <ledger-table :ledgerType="LedgerType.Credits" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
       </div>
       <div class="tab-pane" :class="selectedTab === 'tokens' ? 'active show' : null" id="tokens">
-        <ledger-table :ledgerType="'creditsSpecialists'" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+        <ledger-table :ledgerType="LedgerType.CreditsSpecialists" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
       </div>
     </div>
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import {ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue'
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import LedgerTableVue from './LedgerTable.vue'
+import LedgerTable from './LedgerTable.vue'
+import {LedgerType} from "@solaris-common";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'loading-spinner': LoadingSpinner,
-    'ledger-table': LedgerTableVue
-  },
-  data () {
-    return {
-      selectedTab: 'credits'
-    }
-  },
-  methods: {
-    select(tab) {
-      this.selectedTab = tab
-    },
-    onOpenPlayerDetailRequested(playerId) {
-      this.$emit('onOpenPlayerDetailRequested', playerId)
-    },
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    }
-  }
-}
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+  onCloseRequested: [],
+}>();
+
+const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
+
+const onCloseRequested = () => emit('onCloseRequested');
+
+const selectedTab = ref<'credits' | 'tokens'>('credits');
+
+const select = (tab: 'credits' | 'tokens') => selectedTab.value = tab;
 </script>
 
 <style scoped>
