@@ -7,7 +7,7 @@ import PlayerMutationNames from './mutationNames/playerMutationNames';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, PlayerColour, Specialist, UserGameSettings, UserRoles} from "@solaris-common";
+import type {Badge, PlayerColour, Specialist, UserGameSettings, UserPrivate, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -25,7 +25,7 @@ export type MentionCallbacks = {
 
 export type State = {
   userId: string | null;
-  user: any;
+  user: UserPrivate<string>;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;

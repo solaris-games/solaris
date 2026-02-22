@@ -18,9 +18,9 @@ const props = defineProps<{
 
 const store = useStore();
 
-const userIsEstablishedPlayer = computed(() => Boolean(store.state.userIsEstablishedPlayer))
+const userIsEstablishedPlayer = computed(() => Boolean(store.state.user?.isEstablishedPlayer))
 
-const userCanJoinGame = computed(() => userIsEstablishedPlayer.value && props.game.settings.general.playerType === 'all');
+const userCanJoinGame = computed(() => userIsEstablishedPlayer.value || props.game.settings.general.playerType === 'all');
 </script>
 
 <style scoped>
