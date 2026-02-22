@@ -1,5 +1,5 @@
 import { MongoDBStore } from 'connect-mongodb-session';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 import cookieParser from 'cookie-parser';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import { Config } from "../config/types/Config";
