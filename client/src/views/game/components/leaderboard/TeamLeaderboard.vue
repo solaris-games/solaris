@@ -34,44 +34,38 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '@/services/gameHelper';
 import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.vue';
 import { inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import type {Game} from "@/types/game";
+import { useStore } from 'vuex';
+import { computed } from 'vue';
+import type {Team} from "@solaris-common";
+import type {TeamLeaderboardData} from "@/types/leaderboard.ts";
 
-export default {
-  components: {
-    'leaderboard-row': LeaderboardRow
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    },
-    isPlayerTeam (team) {
-      const userPlayer = GameHelper.getUserPlayer(this.$store.state.game);
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-      return userPlayer && team.players.some(p => p._id.toString() === userPlayer._id.toString())
-    },
-  },
-  computed: {
-    sortedTeams() {
-      return GameHelper.getSortedLeaderboardTeamList(this.$store.state.game)
-    },
-    isHomeStarsWinCondition () {
-      return GameHelper.isWinConditionHomeStars(this.$store.state.game)
-    },
-    isStarCountWinCondition () {
-      return GameHelper.isWinConditionStarCount(this.$store.state.game)
-    }
-  }
-}
+const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
+
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+
+const sortedTeams = computed(() => GameHelper.getSortedLeaderboardTeamList(game.value));
+const isHomeStarsWinCondition = computed(() => GameHelper.isWinConditionHomeStars(game.value));
+const isStarCountWinCondition = computed(() => GameHelper.isWinConditionStarCount(game.value));
+
+const isPlayerTeam = (team: TeamLeaderboardData) => {
+  const userPlayer = GameHelper.getUserPlayer(game.value);
+
+  return userPlayer && team.players.some(p => p._id.toString() === userPlayer._id.toString())
+};
 </script>
 
 <style scoped>
