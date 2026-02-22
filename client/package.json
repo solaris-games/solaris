@@ -36,11 +36,11 @@
   },
   "devDependencies": {
     "@types/random-seed": "^0.3.5",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "@vue/tsconfig": "^0.5.1",
-    "less": "^3.13.1",
-    "vite": "^5.4.8",
-    "vue-tsc": "^2.1.10"
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/tsconfig": "^0.8.1",
+    "less": "^4.5.1",
+    "vite": "7.3.1",
+    "vue-tsc": "^3.2.5"
   },
   "optionalDependencies": {
     "@rollup/rollup-win32-x64-msvc": "^4.29.1",
