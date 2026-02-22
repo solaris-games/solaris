@@ -96,33 +96,9 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject, ref, computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
-import type {Intel, IntelPlayer} from "@solaris-common";
-
-type DataSet = {
-  label: string;
-  borderColor: string;
-  fill: boolean;
-  pointRadius: number;
-  borderWidth: number;
-  pointHitRadius: number;
-  data: number[];
-}
-
-type DataCollection = {
-  labels: string[];
-  datasets: DataSet[];
-}
-
-type PlayerFilter = {
-  enabled: boolean,
-  playerId: string,
-  alias: string,
-  shape: string,
-  defeated: boolean,
-  colour: string
-};
-
-type IntelType = keyof IntelPlayer<string>['statistics'] | keyof IntelPlayer<string>['research'];
+import type {Intel} from "@solaris-common";
+import type {PlayerFilter, IntelType, DataCollection, DataSet} from "@/views/game/components/intel/types";
+import type { ChartOptions } from "chart.js"
 
 const props = defineProps<{
   compareWithPlayerId?: string
@@ -158,15 +134,12 @@ const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isSpecialistsEnabled = computed(() => GameHelper.isSpecialistsEnabled(game.value));
 const isSpecialistsTechnologyEnabled = computed(() => GameHelper.isSpecialistsTechnologyEnabled(game.value));
 
-const dataoptions = {
+const dataoptions: ChartOptions<"line"> = {
   aspectRatio: 1,
   plugins: {
     legend: {
       display: false,
     }
-  },
-  bezierCurve: false,
-  scales: {
   },
   elements: {
     line: {
@@ -192,7 +165,7 @@ const fillData = () => {
   newDataCollection.labels = filteredHistory.map(h => h.tick.toString());
 
   for (let i = 0; i < game.value.galaxy.players.length; i++) {
-    const player = game.value.galaxy.players[i];
+    const player = game.value.galaxy.players[i]!;
     const playerFilter = playerFilters.value.find(f => f.playerId === player._id)!;
 
     if (!playerFilter.enabled) {
@@ -213,7 +186,7 @@ const fillData = () => {
 
     // Get all data points for the selected intel type.
     for (let e = 0; e < filteredHistory.length; e++) {
-      const thisHistory = filteredHistory[e];
+      const thisHistory = filteredHistory[e]!;
       const historyPlayer = thisHistory.players.find(p => p.playerId === player._id)!;
 
       switch (intelType.value) {
@@ -270,7 +243,7 @@ const calculateStartTicks = () => {
     value: 0
   })
 
-  startTick.value = startTickOptions.value[startTickOptions.value.length - 2].value
+  startTick.value = startTickOptions.value![startTickOptions.value.length - 2]!.value
 };
 
 const togglePlayerFilter = (playerFilter: PlayerFilter) => {
