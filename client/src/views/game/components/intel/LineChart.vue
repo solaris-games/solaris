@@ -2,7 +2,7 @@
   <Line :data="chartData" :options="options" />
 </template>
 
-<script>
+<script setup lang="ts">
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -13,24 +13,18 @@ import {
   CategoryScale,
   LinearScale,
   LineController,
-  PointElement, LineElement
+  PointElement,
+  LineElement,
+  type ChartOptions,
 } from 'chart.js'
+import type {DataCollection} from "@/views/game/components/intel/types.ts";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, LineController, PointElement, LineElement)
 
-export default {
-  name: "LineChart",
-  components: {
-    Line,
-  },
-  props: {
-    options: Object,
-    chartData: Object,
-  },
-  mounted() {
-    console.warn(this.chartData);
-  }
-}
+const props = defineProps<{
+  options: ChartOptions<"line">,
+  chartData: DataCollection,
+}>();
 </script>
 
 <style scoped>
