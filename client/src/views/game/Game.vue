@@ -154,10 +154,10 @@ const onPlayerSelected = (playerId: string) => {
   emit('onPlayerSelected', playerId);
 };
 
-const onOpenReportPlayerRequested = (playerId: string) => {
+const onOpenReportPlayerRequested = (e: { playerId: string }) => {
   store.commit('setMenuState', {
     state: MENU_STATES.REPORT_PLAYER,
-    args: playerId,
+    args: e,
   });
 };
 

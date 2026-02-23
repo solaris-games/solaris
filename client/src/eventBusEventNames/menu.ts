@@ -1,5 +1,5 @@
 import { makeCastFunc } from "@solaris-common";
-import MENU_STATES from '../services/data/menuStates.js';
+import MENU_STATES from '../services/data/menuStates';
 import type { EventBusEventName } from "./eventBusEventName";
 
 export type MenuEventBusEventType = { menuEventBusEventType: 'menuEventBusEventType' };
@@ -10,7 +10,7 @@ const toEventName: <TData>(value: string) => MenuEventBusEventName<TData> = make
 export default class MenuEventBusEventNames {
   private constructor() { };
 
-  public static readonly OnMenuRequested: MenuEventBusEventName<{ menuState: MENU_STATES | null, menuArguments: unknown | null }> = toEventName('onMenuRequested');
+  public static readonly OnMenuRequested: MenuEventBusEventName<{ menuState: string | null, menuArguments: unknown | null }> = toEventName('onMenuRequested');
 
   public static readonly OnMenuChatSidebarRequested: MenuEventBusEventName<void> = toEventName('onMenuChatSidebarRequested');
 

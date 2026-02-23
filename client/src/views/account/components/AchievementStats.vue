@@ -4,6 +4,7 @@ import PieChart from '../../game/components/intel/PieChart.vue'
 import PolarAreaChart from '../../game/components/intel/PolarAreaChart.vue'
 import {computed, onMounted, ref, type Ref} from 'vue';
 import type {AchievementsUser} from "@solaris-common";
+import { type ChartOptions, type TooltipItem } from 'chart.js';
 
 const props = defineProps<{
   user: AchievementsUser<string>,
@@ -12,45 +13,31 @@ const props = defineProps<{
 const user = computed(() => props.user);
 const levelSrc = computed(() => new URL(`../../../assets/levels/${user.value.achievements.level}.png`, import.meta.url).href);
 
-const pieChartOptions = {
-  legend: {
-    display: false
-  }
+const pieChartOptions: ChartOptions<"pie"> = {
 };
 
-const militaryChartOptions = {
-  legend: {
-    display: false
-  },
-  tooltips: {
-    callbacks: {
-      title: function (tooltipItems, data) {
-        return data.datasets[tooltipItems[0].datasetIndex].label
-      },
-      label: function (tooltipItem, data) {
-        // If the star dataset, use the label "Captured"
-        // instead of "Kills"
-        let label = data.labels[tooltipItem.index]
+const polarChartOptions: ChartOptions<"polarArea"> = {
+};
 
-        if (tooltipItem.datasetIndex === 2) {
-          label = tooltipItem.index ? 'Losses' : 'Captured'
+const militaryChartOptions: ChartOptions<"pie"> = {
+  plugins: {
+    tooltip: {
+      callbacks: {
+        title: function (tooltipItems) {
+          return tooltipItems[0].dataset.label
         }
-
-        return label + ': ' +
-          data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
       }
     }
   }
 };
 
-const tradeChartOptions = {
-  legend: {
-    display: false
-  },
-  tooltips: {
-    callbacks: {
-      title: function (tooltipItems, data) {
-        return data.datasets[tooltipItems[0].datasetIndex].label
+const tradeChartOptions: ChartOptions<"pie"> = {
+  plugins: {
+    tooltip: {
+      callbacks: {
+        title: (t: TooltipItem<"pie">[]) => {
+          return t[0].dataset[t[0].datasetIndex].label;
+        }
       }
     }
   }
@@ -340,7 +327,7 @@ onMounted(async () => {
       </table>
     </div>
     <div class="d-none d-md-block col-4">
-      <polar-area-chart v-if="gamesChartData" :chart-data="gamesChartData" :options="pieChartOptions"/>
+      <polar-area-chart v-if="gamesChartData" :chart-data="gamesChartData" :options="polarChartOptions"/>
     </div>
   </div>
 
