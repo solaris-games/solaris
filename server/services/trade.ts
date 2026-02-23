@@ -490,6 +490,14 @@ export default class TradeService extends EventEmitter {
 
     _canPlayersTradeInRange(game: Game, fromPlayer: Player, toPlayer: Player) {
         if (game.settings.player.tradeScanning === 'scanned') {
+            return this.scanningService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
+        }
+
+        return true;
+    }
+
+    _tradeScanningCheck(game: Game, fromPlayer: Player, toPlayer: Player) {
+        if (game.settings.player.tradeScanning === 'scanned') {
             const before = performance.now();
 
             let isInRange;
@@ -502,15 +510,6 @@ export default class TradeService extends EventEmitter {
             const duration = after - before;
             console.log(`KDTree: Trade scanning check took ${duration} milliseconds.`);
 
-            return isInRange;
-        }
-
-        return true;
-    }
-
-    _tradeScanningCheck(game: Game, fromPlayer: Player, toPlayer: Player) {
-        if (game.settings.player.tradeScanning === 'scanned') {
-            let isInRange = this.scanningService.isInScanningRangeOfPlayer(game, fromPlayer, toPlayer);
 
             if (!isInRange) {
                 throw new ValidationError(`You cannot trade with this player, they are not within scanning range.`);
