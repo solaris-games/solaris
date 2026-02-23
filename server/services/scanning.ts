@@ -139,7 +139,7 @@ export default class ScanningService {
             let isInRange = false;
 
             for (let s of otherPlayerStars) {
-                if (this.isStarWithinScanningRangeOfStars(game, s, scannedStarSet)) {
+                if (this.isStarWithinScanningRangeOfStarsByViewpoint(game, s, scannedStarSet)) {
                     isInRange = true;
                     break;
                 }
@@ -153,14 +153,7 @@ export default class ScanningService {
         return inRange;
     }
 
-    isInScanningRangeOfPlayer(game: Game, sourcePlayer: Player, targetPlayer: Player, kdTree: KDTree) {
-        const scannedStarSet = this.getStarSetByScanningRange(game, [sourcePlayer], kdTree);
-
-        return this.getPlayersWithinScanningRangeOfStars(game, [targetPlayer], scannedStarSet)
-            .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
-    }
-
-    isStarWithinScanningRangeOfStars(game: Game, star: Star, scannedStarSet: Set<Star>) {
+    isStarWithinScanningRangeOfStarsByViewpoint(game: Game, star: Star, scannedStarSet: Set<Star>) {
         // Pulsars are considered to be always in scanning range.
         // Note: They are not visible until the game starts to prevent pre-teaming.
         if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
@@ -188,5 +181,82 @@ export default class ScanningService {
         }
 
         return scanningMap;
+    }
+
+    isObjectWithinScanningRangeOfStars(object: MapObject, starTreesWithRadius: [number, KDTree][]) {
+        for (const starTreeWithRadius of starTreesWithRadius) {
+            if (starTreeWithRadius[1].isWithinRadiusOfAny(object.location, starTreeWithRadius[0])) return true;
+        }
+        return false;
+    }
+
+    isStarWithinScanningRangeOfStars(game: Game, star: Star, starTreesWithRadius: [number, KDTree][]) {
+        // Pulsars are considered to be always in scanning range.
+        // Note: They are not visible until the game starts to prevent pre-teaming.
+        if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
+            return true;
+        }
+
+        if (this.isObjectWithinScanningRangeOfStars(star, starTreesWithRadius)) return true;
+
+        return false;
+    }
+
+    isInScanningRangeOfPlayer(game: Game, sourcePlayer: Player, targetPlayer: Player) {
+        const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [sourcePlayer._id]);
+        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
+
+        const targetPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, targetPlayer._id);
+
+        // If the source player is very small relative to the target player, it is generally faster to compute their viewpoint.
+        if (targetPlayerStars.length > starsWithScanning.length * 5) {
+            return this._isInScanningRangeOfPlayerByViewpoint(game, sourcePlayer, targetPlayer);
+        }
+
+        // Group stars by their scanning range, since we need to build a tree for each group.
+        const treesWithRadius = this.getScanningStarTrees(game, starsWithScanning);
+
+        for (const targetStar of targetPlayerStars) {
+            for (const tree of treesWithRadius) {
+                if (tree[1].isWithinRadiusOfAny(targetStar.location, tree[0])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    _isInScanningRangeOfPlayerByViewpoint(game: Game, sourcePlayer: Player, targetPlayer: Player) {
+        // TODO: Calculate during tick processing and load stored tree
+        const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+        const scannedStarSet = this.getStarSetByScanningRange(game, [sourcePlayer], kdTree);
+
+        return this.getPlayersWithinScanningRangeOfStars(game, [targetPlayer], scannedStarSet)
+            .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
+    }
+
+    getScanningStarTrees(game: Game, starsWithScanning: Star[]) {
+        const starGroups = new Map<number, Star[]>();
+        for (const star of starsWithScanning) {
+            const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
+            const scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
+
+            let group = starGroups.get(scanningRangeDistance);
+            if (group) {
+                group.push(star);
+            } else {
+                starGroups.set(scanningRangeDistance, [star]);
+            }
+        }
+
+        const treesWithRadius: [number, KDTree][] = [];
+        for (const group of starGroups.entries()) {
+            treesWithRadius.push([group[0], new KDTree(this.distanceService, group[1])]);
+        }
+        treesWithRadius.sort((a, b) => b[0] - a[0]);
+
+        return treesWithRadius;
     }
 }

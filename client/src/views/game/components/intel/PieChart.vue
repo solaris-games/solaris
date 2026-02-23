@@ -2,7 +2,7 @@
   <pie :data="chartData" :options="options" />
 </template>
 
-<script>
+<script setup lang="ts">
 import { Pie } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -12,21 +12,18 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-  RadialLinearScale, ArcElement
+  RadialLinearScale, ArcElement,
+  type ChartOptions,
 } from 'chart.js'
+import type {DataCollection} from "@/views/game/components/intel/types.ts";
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, RadialLinearScale, ArcElement)
 
-export default {
-  name: "PieChart",
-  components: {
-    Pie,
-  },
-  props: {
-    options: Object,
-    chartData: Object,
-  }
-}
+
+const props = defineProps<{
+  options: ChartOptions<"pie">,
+  chartData: DataCollection,
+}>();
 </script>
 
 <style scoped>

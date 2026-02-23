@@ -494,7 +494,7 @@ export default class GameGalaxyService {
                     delete s.shipsActual;
                 }
 
-                s.isInScanningRange = (isFinished || this.scanningService.isStarWithinScanningRangeOfStars(doc, s, scannedStarSet));
+                s.isInScanningRange = (isFinished || this.scanningService.isStarWithinScanningRangeOfStarsByViewpoint(doc, s, scannedStarSet));
 
                 // If it's in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.

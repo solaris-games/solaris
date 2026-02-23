@@ -44,21 +44,40 @@ export default class CullWaypointsService {
     }
 
     sanitiseAllCarrierWaypointsByScanningRange(game: Game) {
-        // TODO: Calculate during tick processing and load stored tree
-        const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
         const players = this._getPlayersWithOwnedOrInOrbitStars(game);
 
-        const starScanningMap = new Map<Player, Set<Star>>();
+        const playerCarrierMap = new Map<Player, Carrier[]>();
+        let remaining = game.galaxy.carriers;
+
         for (const player of players.values()) {
-            starScanningMap.set(player.player, this.scanningService.getStarSetByScanningRange(game, [player.player], kdTree));
+            const playerCarriers: Carrier[] = [];
+            const otherCarriers: Carrier[] = [];
+
+            remaining.forEach(c => {
+                if (c.ownedByPlayerId === player.player._id) {
+                    playerCarriers.push(c);
+                } else otherCarriers.push(c);
+            });
+            remaining = otherCarriers;
+
+            playerCarrierMap.set(player.player, playerCarriers);
         }
 
-        game.galaxy.carriers
-            .filter(c => c.waypoints.length && c.ownedByPlayerId)
-            .forEach(c => {
-                const player = players.get(c.ownedByPlayerId!.toString())!;
-                this._checkCarrierRoute(game, c, player, starScanningMap.get(player.player)!);
-            });
+        let kdTree: KDTree | undefined = undefined;
+
+        for (const player of players.values()) {
+            // If the source point set is very small relative to the target point set, it is generally faster to compute the viewpoint.
+            if (playerCarrierMap.get(player.player)!.length > player.stars.length * 5) {
+                // TODO: Calculate during tick processing and load stored tree
+                if (!kdTree) kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+                const scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [player.player], kdTree);
+                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRouteByViewpoint(game, c, player, scannedStarSet));
+            } else {
+                const treesWithRadius = this.scanningService.getScanningStarTrees(game, player.stars);
+                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRoute(game, c, player, treesWithRadius));
+            }
+        }
     }
 
     async cullWaypointsByHyperspaceRangeDB(game: Game, carrier: Carrier) {
@@ -134,14 +153,36 @@ export default class CullWaypointsService {
         }
     }
 
-    _checkCarrierRoute(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: string[] }, scannedStarSet: Set<Star>) {
+    _checkCarrierRouteByViewpoint(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: Set<string> }, scannedStarSet: Set<Star>) {
         let startIndex = this.carrierTravelService.isInTransit(carrier) ? 1 : 0;
         for (let index = startIndex; index < carrier.waypoints.length; index++) {
             const waypoint = carrier.waypoints[index];
-            if (waypoint.destination.toString() in player.inRange) continue;
+            if (player.inRange.has(waypoint.destination.toString())) continue;
             const waypointStar = this.starService.getById(game, waypoint.destination);
-            if (this.scanningService.isStarWithinScanningRangeOfStars(game, waypointStar, scannedStarSet)) {
-                player.inRange.push(waypoint.destination.toString());
+            if (this.scanningService.isStarWithinScanningRangeOfStarsByViewpoint(game, waypointStar, scannedStarSet)) {
+                player.inRange.add(waypoint.destination.toString());
+            } else {
+                carrier.waypoints.splice(index);
+
+                if (carrier.waypointsLooped) {
+                    carrier.waypointsLooped = this.waypointService.canLoop(game, carrier);
+                }
+
+                break;
+            }
+        }
+    }
+
+    _checkCarrierRoute(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: Set<string> }, treesWithRadius: [number, KDTree][]) {
+        let startIndex = this.carrierTravelService.isInTransit(carrier) ? 1 : 0;
+        for (let index = startIndex; index < carrier.waypoints.length; index++) {
+            const waypoint = carrier.waypoints[index];
+            if (player.inRange.has(waypoint.destination.toString())) continue;
+            const waypointStar = this.starService.getById(game, waypoint.destination);
+
+            let inScan = this.scanningService.isStarWithinScanningRangeOfStars(game, waypointStar, treesWithRadius);
+            if (inScan) {
+                player.inRange.add(waypoint.destination.toString());
             } else {
                 carrier.waypoints.splice(index);
 
@@ -155,7 +196,7 @@ export default class CullWaypointsService {
     }
 
     _getPlayersWithOwnedOrInOrbitStars(game: Game) {
-        const results = new Map<string, { player: Player, stars: Star[], inRange: string[] }>();
+        const results = new Map<string, { player: Player, stars: Star[], inRange: Set<string> }>();
         game.galaxy.players
             .forEach(p => {
                 const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
@@ -167,7 +208,7 @@ export default class CullWaypointsService {
                 results.set(p._id.toString(), {
                     player: p,
                     stars: starsWithScanning,
-                    inRange: starsOwnedOrInOrbit.map(s => s._id.toString())
+                    inRange: new Set<string>(starsOwnedOrInOrbit.map(s => s._id.toString()))
                 });
             });
         return results;

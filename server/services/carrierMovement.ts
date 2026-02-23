@@ -157,10 +157,7 @@ export default class CarrierMovementService {
             }
 
             if (!this.carrierTravelService.isWithinHyperspaceRange(game, carrierInTransit, sourceStar, destinationStar)) {
-                log.warn(`Carrier ${carrierInTransit._id} is trying to launch to a star that is out of hyperspace range.`, {
-                    gameId: game._id.toString(),
-                    carrierId: carrierInTransit._id.toString(),
-                });
+                log.warn(`Carrier ${carrierInTransit._id} is trying to launch to a star that is out of hyperspace range. GAME: ${game._id.toString()}`);
 
                 carrierInTransit.waypoints = [];
                 return null;

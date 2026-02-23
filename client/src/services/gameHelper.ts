@@ -9,6 +9,7 @@ import {
   type Team
 } from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
+import type {TeamLeaderboardData} from "@/types/leaderboard";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -637,15 +638,15 @@ class GameHelper {
     return 'Unknown'
   }
 
-  getSortedLeaderboardTeamList(game) {
+  getSortedLeaderboardTeamList(game: Game): TeamLeaderboardData[] {
     const sortingKey = game.settings.conquest.victoryCondition === 'starPercentage' ? 'totalStars' : 'totalHomeStars';
 
-    const teamsWithData = game.galaxy.teams.map(team => {
-      const players = team.players.map(playerId => this.getPlayerById(game, playerId))
+    const teamsWithData = game.galaxy.teams!.map(team => {
+      const players = team.players.map(playerId => this.getPlayerById(game, playerId)!);
 
       players.sort((a, b) => {
-        const aStars = a.stats && a.stats[sortingKey];
-        const bStars = b.stats && b.stats[sortingKey];
+        const aStars = a.stats && a.stats[sortingKey] || 0;
+        const bStars = b.stats && b.stats[sortingKey] || 0;
 
         if (aStars > bStars) return -1;
         if (aStars < bStars) return 1;
@@ -682,7 +683,7 @@ class GameHelper {
     return teamsWithData;
   }
 
-  getSortedLeaderboardPlayerList(game: Game) {
+  getSortedLeaderboardPlayerList(game: Game): Player[] {
     // Sort by total number of stars, then by total ships, then by total carriers.
     // Note that this sorting is different from the server side sorting as
     // on the UI we want to preserve defeated player positions relative to how many

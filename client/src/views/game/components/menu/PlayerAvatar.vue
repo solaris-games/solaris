@@ -13,60 +13,41 @@
   </div>
 </template>
 
-<script>
-import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon.vue'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import PlayerIcon from '../player/PlayerIcon.vue'
+import type {Game, Player} from "@/types/game";
+import GameHelper from "../../../../services/gameHelper";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    player: Object
-  },
-  data () {
-    return {
-      leaderboard: null,
-      showMedals: false
-    }
-  },
-  mounted () {
-    this.leaderboard = gameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-    this.showMedals = gameHelper.isGameInProgress(this.$store.state.game) || gameHelper.isGameFinished(this.$store.state.game)
-  },
-  methods: {
-    isFirstPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const props = defineProps<{
+  player: Player,
+}>();
 
-      return position === 0
-    },
-    isSecondPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const emit = defineEmits<{
+  onClick: [],
+}>();
 
-      return position === 1
-    },
-    isThirdPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const onClick = () => emit('onClick');
 
-      return position === 2
-    },
-    hasPerspective () {
-      if (gameHelper.getUserPlayer(this.$store.state.game)) {
-        return false
-      }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const leaderboard = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
+const showMedals = computed(() => GameHelper.isGameInProgress(game.value) || GameHelper.isGameFinished(game.value));
 
-      return this.player.hasPerspective || false
-    },
-    onClick () {
-      this.$emit('onClick')
-    }
-  },
-  computed: {
-    avatarSrc () {
-      return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href;
-    }
+const avatarSrc = computed(() => new URL(`../../../../assets/avatars/${props.player.avatar}`, import.meta.url).href);
+
+const isFirstPlace = () => leaderboard.value.indexOf(props.player) === 0;
+const isSecondPlace = () => leaderboard.value.indexOf(props.player) === 1;
+const isThirdPlace = () => leaderboard.value.indexOf(props.player) === 2;
+
+const hasPerspective = () => {
+  if (GameHelper.getUserPlayer(game.value)) {
+    return false;
   }
-}
+
+  return props.player.hasPerspective || false;
+};
 </script>
 
 <style scoped>

@@ -107,4 +107,43 @@ export class KDTree {
 
         return this.withinRadius;
     }
+
+    firstValidNeighbourSearch(query: Location, begin: number, end: number, radius: number, key: keyof Location) {
+        if (end <= begin) return;
+        if (this.withinRadius.length > 0) return;
+
+        const n = begin + Math.floor((end - begin) / 2);
+        const current = this.nodes[n];
+
+        const sqDistance = this.distanceService.getDistanceSquaredBetweenLocations(query, this.mapObjects[current.objectIndex].location);
+        if (sqDistance <= Math.pow(radius, 2)) {
+            this.withinRadius.push(current.objectIndex);
+            return;
+        }
+
+        const goLeft = query[key] < this.mapObjects[current.objectIndex].location[key];
+
+        if (goLeft) {
+            this.firstValidNeighbourSearch(query, begin, n, radius, key === 'x' ? 'y' : 'x');
+        } else {
+            this.firstValidNeighbourSearch(query, n + 1, end, radius, key === 'x' ? 'y' : 'x');
+        }
+
+        const delta = Math.abs(query[key] - this.mapObjects[current.objectIndex].location[key]);
+        if (delta < radius) {
+            if (goLeft) { // Invert previous decision
+                this.firstValidNeighbourSearch(query, n + 1, end, radius, key === 'x' ? 'y' : 'x');
+            } else {
+                this.firstValidNeighbourSearch(query, begin, n, radius, key === 'x' ? 'y' : 'x');
+            }
+        }
+    }
+
+    isWithinRadiusOfAny(target: Location, radius: number) {
+        this.withinRadius = [];
+
+        this.firstValidNeighbourSearch(target, 0, this.nodes.length, radius, 'x');
+
+        return this.withinRadius.length > 0;
+    }
 }

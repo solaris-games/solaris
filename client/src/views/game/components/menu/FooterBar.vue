@@ -33,70 +33,43 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
 import MENU_STATES from '../../../../services/data/menuStates'
 import HamburgerMenuVue from './HamburgerMenu.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
+import { useStore } from 'vuex';
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'hamburger-menu': HamburgerMenuVue
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      MENU_STATES: MENU_STATES
-    }
-  },
-  methods: {
-    setMenuState (state, args) {
-      this.$store.commit('setMenuState', {
-        state,
-        args
-      })
-    },
-    panToHomeStar () {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-      if (this.userPlayer) {
-        this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)
-      }
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    gameIsInProgress () {
-      return GameHelper.isGameInProgress(this.$store.state.game)
-    },
-    gameIsFinished () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    gameIsJoinable () {
-      return !this.gameIsInProgress && !this.gameIsFinished
-    },
-    userPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    isLoggedIn () {
-      return this.$store.state.userId != null
-    },
-    isDarkModeExtra () {
-      return GameHelper.isDarkModeExtra(this.$store.state.game)
-    },
-    isDataCleaned () {
-      return this.$store.state.game.state.cleaned
-    }
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const isLoggedIn = computed(() => store.state.userId != null);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
+const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
+const gameIsJoinable = computed(() => !gameIsInProgress.value && !gameIsFinished.value);
+const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
+const isDataCleaned = computed(() => game.value.state.cleaned);
+
+const setMenuState = (state: string, args = undefined) => {
+  store.commit('setMenuState', { state, args });
+};
+
+const panToHomeStar = () => {
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
+
+  if (userPlayer.value) {
+    emit('onOpenPlayerDetailRequested', userPlayer.value._id);
   }
-}
+};
 </script>
 
 <style scoped>
