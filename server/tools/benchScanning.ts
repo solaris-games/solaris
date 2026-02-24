@@ -7,7 +7,7 @@ import {
     Player,
     StarDataService,
     TechnologyService,
-    DistanceService
+    DistanceService, StarDistanceService
 } from "@solaris-common";
 import {KDTree} from "../utils/kdTree";
 import SpecialistService from "../services/specialist";
@@ -35,8 +35,9 @@ const starDataService = new StarDataService();
 const gameTypeService = new GameTypeService();
 const technologyService = new TechnologyService(new SpecialistService(gameTypeService), gameTypeService);
 const distanceService = new DistanceService();
+const starDistanceService = new StarDistanceService(distanceService);
 
-const benchTradeCheckMiniTrees = () => {
+const createTradeCheckMiniTrees = () => {
     const getScanningStarTrees = (game: Game<string>, starsWithScanning: Star<string>[]) => {
         const starGroups = new Map<number, Star<string>[]>();
         for (const star of starsWithScanning) {
@@ -80,9 +81,32 @@ const benchTradeCheckMiniTrees = () => {
 
         return false;
     }
+
+    return isInScanningRangeOfPlayer;
 }
 
-const benchTradeCheckNormal = () => {
+const createTradeCheckNormal = () => {
+    const isStarWithinScanningRangeOfStars = (game: Game<string>, star: Star<string>, stars: Star<string>[]) => {
+        // Go through all of the stars one by one and calculate
+        // whether any one of them is within scanning range.
+        for (let otherStar of stars) {
+            if (otherStar.ownedByPlayerId == null) {
+                continue;
+            }
+
+            // Use the effective scanning range of the other star to check if it can "see" the given star.
+            let effectiveTechs = technologyService.getStarEffectiveTechnologyLevels(game, otherStar);
+            let scanningRangeDistance = distanceService.getScanningDistance(game, effectiveTechs.scanning);
+            let distance = starDistanceService.getDistanceBetweenStars(star, otherStar);
+
+            if (distance <= scanningRangeDistance) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     const getPlayersWithinScanningRangeOfPlayer = (game: Game<string>, players: Player<string>[], player: Player<string>) {
         let inRange = [player];
         let playerStars = listStarsOwnedByPlayer(game, player._id);
@@ -97,7 +121,7 @@ const benchTradeCheckNormal = () => {
             let isInRange = false;
 
             for (let s of otherPlayerStars) {
-                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
+                if (isStarWithinScanningRangeOfStars(game, s, playerStars)) {
                     isInRange = true;
                     break;
                 }
@@ -115,6 +139,8 @@ const benchTradeCheckNormal = () => {
         return getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
             .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
+
+    return isInScanningRangeOfPlayer;
 }
 
 
