@@ -83,7 +83,38 @@ const benchTradeCheckMiniTrees = () => {
 }
 
 const benchTradeCheckNormal = () => {
+    const getPlayersWithinScanningRangeOfPlayer = (game: Game<string>, players: Player<string>[], player: Player<string>) {
+        let inRange = [player];
+        let playerStars = listStarsOwnedByPlayer(game, player._id);
 
+        for (let otherPlayer of players) {
+            if (inRange.indexOf(otherPlayer) > -1) {
+                continue;
+            }
+
+            let otherPlayerStars = listStarsOwnedByPlayer(game, otherPlayer._id);
+
+            let isInRange = false;
+
+            for (let s of otherPlayerStars) {
+                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
+                    isInRange = true;
+                    break;
+                }
+            }
+
+            if (isInRange) {
+                inRange.push(otherPlayer);
+            }
+        }
+
+        return inRange;
+    }
+
+    const isInScanningRangeOfPlayer = (game: Game<string>, sourcePlayer: Player<string>, targetPlayer: Player<string>) => {
+        return getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
+            .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
+    }
 }
 
 
