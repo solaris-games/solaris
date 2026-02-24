@@ -16,6 +16,7 @@
     "start-db-recalc-stats:prod": "node dist/server/tools/recalculateStats.js",
     "start-db-sync-indices:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/syncIndices.ts",
     "start-db-sync-indices:prod": "node dist/server/tools/syncIndices.js",
+    "bench-scanning": "node dist/server/tools/benchScanning.js",
     "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
