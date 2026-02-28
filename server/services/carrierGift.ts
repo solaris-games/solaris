@@ -44,6 +44,10 @@ export default class CarrierGiftService extends EventEmitter {
             throw new ValidationError(`Cannot convert carrier into a gift, you do not own this carrier.`);
         }
 
+        if (carrier.isScuttled) {
+            throw new ValidationError(`Cannot gift a scuttled carrier`);
+        }
+
         if (carrier.isGift) {
             throw new ValidationError(`The carrier has already been converted into a gift.`);
         }
