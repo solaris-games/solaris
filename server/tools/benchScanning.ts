@@ -1,5 +1,3 @@
-import ScanningService from "../services/scanning";
-import StarService from "../services/star";
 import {
     Game,
     Star,
@@ -8,27 +6,21 @@ import {
     StarDataService,
     TechnologyService,
     DistanceService, StarDistanceService
-} from "@solaris-common";
+} from "solaris-common";
 import {KDTree} from "../utils/kdTree";
 import SpecialistService from "../services/specialist";
+import {logger} from "../utils/logging";
+import mongooseLoader from "../db";
+import config from "../config";
+import containerLoader from "../services";
+import {serverStub} from "../sockets/serverStub";
+import {DBObjectId, objectIdFromString} from "../services/types/DBObjectId";
+import {DependencyContainer} from "../services/types/DependencyContainer";
 
 const { performance } = require('perf_hooks');
 
-/*
-                const scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [player.player], kdTree);
-                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRouteByViewpoint(game, c, player, scannedStarSet));
-            } else {
-                const treesWithRadius = this.scanningService.getScanningStarTrees(game, player.stars);
-                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRoute(game, c, player, treesWithRadius));
-            }
- */
-
-/*
-
- */
-
-const listStarsOwnedByPlayer = (game: Game<string>, playerId: string) => {
-    return game.galaxy.stars.filter((s) => playerId === s.ownedByPlayerId);
+const listStarsOwnedByPlayer = (game: Game<DBObjectId>, playerId: DBObjectId) => {
+    return game.galaxy.stars.filter((s) => playerId.toString() === s.ownedByPlayerId?.toString());
 }
 
 const starDataService = new StarDataService();
@@ -37,9 +29,11 @@ const technologyService = new TechnologyService(new SpecialistService(gameTypeSe
 const distanceService = new DistanceService();
 const starDistanceService = new StarDistanceService(distanceService);
 
-const createTradeCheckMiniTrees = () => {
-    const getScanningStarTrees = (game: Game<string>, starsWithScanning: Star<string>[]) => {
-        const starGroups = new Map<number, Star<string>[]>();
+type ScanningFunc = (game: Game<DBObjectId>, sourcePlayer: Player<DBObjectId>, targetPlayer: Player<DBObjectId>) => boolean;
+
+const createTradeCheckMiniTrees = (): ScanningFunc => {
+    const getScanningStarTrees = (game: Game<DBObjectId>, starsWithScanning: Star<DBObjectId>[]) => {
+        const starGroups = new Map<number, Star<DBObjectId>[]>();
         for (const star of starsWithScanning) {
             const effectiveTechs = technologyService.getStarEffectiveTechnologyLevels(game, star);
             const scanningRangeDistance = distanceService.getScanningDistance(game, effectiveTechs.scanning);
@@ -62,7 +56,7 @@ const createTradeCheckMiniTrees = () => {
         return treesWithRadius;
     }
 
-    const isInScanningRangeOfPlayer = (game: Game<string>, sourcePlayer: Player<string>, targetPlayer: Player<string>) => {
+    const isInScanningRangeOfPlayer = (game: Game<DBObjectId>, sourcePlayer: Player<DBObjectId>, targetPlayer: Player<DBObjectId>) => {
         const starsOwnedOrInOrbit = listStarsOwnedByPlayer(game, sourcePlayer._id);
         const starsWithScanning = starsOwnedOrInOrbit.filter(s => !starDataService.isDeadStar(s));
 
@@ -85,8 +79,8 @@ const createTradeCheckMiniTrees = () => {
     return isInScanningRangeOfPlayer;
 }
 
-const createTradeCheckNormal = () => {
-    const isStarWithinScanningRangeOfStars = (game: Game<string>, star: Star<string>, stars: Star<string>[]) => {
+const createTradeCheckNormal = (): ScanningFunc => {
+    const isStarWithinScanningRangeOfStars = (game: Game<DBObjectId>, star: Star<DBObjectId>, stars: Star<DBObjectId>[]) => {
         // Go through all of the stars one by one and calculate
         // whether any one of them is within scanning range.
         for (let otherStar of stars) {
@@ -107,7 +101,7 @@ const createTradeCheckNormal = () => {
         return false;
     }
 
-    const getPlayersWithinScanningRangeOfPlayer = (game: Game<string>, players: Player<string>[], player: Player<string>) {
+    const getPlayersWithinScanningRangeOfPlayer = (game: Game<DBObjectId>, players: Player<DBObjectId>[], player: Player<DBObjectId>)=> {
         let inRange = [player];
         let playerStars = listStarsOwnedByPlayer(game, player._id);
 
@@ -135,7 +129,7 @@ const createTradeCheckNormal = () => {
         return inRange;
     }
 
-    const isInScanningRangeOfPlayer = (game: Game<string>, sourcePlayer: Player<string>, targetPlayer: Player<string>) => {
+    const isInScanningRangeOfPlayer = (game: Game<DBObjectId>, sourcePlayer: Player<DBObjectId>, targetPlayer: Player<DBObjectId>) => {
         return getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
             .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
     }
@@ -143,4 +137,62 @@ const createTradeCheckNormal = () => {
     return isInScanningRangeOfPlayer;
 }
 
+const ITERATIONS = 10;
 
+const runOne = (game: Game<DBObjectId>, func: ScanningFunc, name: string) => {
+    let total = 0;
+
+    console.log(`Running benchmark for ${name}. Game has ${game.galaxy.players.length} players and ${game.galaxy.stars.length} stars.`);
+
+    for (let i = 0; i < ITERATIONS; i++) {
+        for (const player1 of game.galaxy.players) {
+            for (const player2 of game.galaxy.players) {
+                if (player1._id.toString() === player2._id.toString()) {
+                    continue;
+                }
+
+                const start = performance.now();
+                const result = func(game, player1, player2);
+                const end = performance.now();
+                const delta = end - start;
+                total += delta;
+
+                //console.log(`${name}: Iteration ${i}, ${player1.alias} -> ${player2.alias}: ${result}, time: ${delta} ms`);
+            }
+        }
+    }
+
+    console.log(`${name}: Total time: ${total} ms`);
+}
+
+const runBenchmark = async (container: DependencyContainer, gameId: DBObjectId) => {
+    const game = await container.gameService.getByIdAll(gameId);
+
+    if (!game) {
+        throw new Error("Game not found");
+    }
+
+    runOne(game, createTradeCheckMiniTrees(), "Mini trees");
+    runOne(game, createTradeCheckNormal(), "Normal");
+}
+
+const GAME_IDS = [
+    objectIdFromString("69725b6faac371b026899402"),
+];
+
+const benchmark = async () => {
+    const log = logger("Benchmark");
+
+    const mongo = await mongooseLoader(config, {
+        syncIndexes: true,
+        poolSize: 1,
+    });
+
+    const container = containerLoader(config, serverStub, log);
+
+    for (const gameId of GAME_IDS) {
+        await runBenchmark(container, gameId);
+    }
+}
+
+benchmark();
