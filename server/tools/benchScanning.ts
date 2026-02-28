@@ -5,7 +5,7 @@ import {
     Player,
     StarDataService,
     TechnologyService,
-    DistanceService, StarDistanceService
+    DistanceService, StarDistanceService, object
 } from "solaris-common";
 import {KDTree} from "../utils/kdTree";
 import SpecialistService from "../services/specialist";
@@ -142,11 +142,11 @@ const ITERATIONS = 10;
 const runOne = (game: Game<DBObjectId>, func: ScanningFunc, name: string) => {
     let total = 0;
 
-    console.log(`Running benchmark for ${name}. Game has ${game.galaxy.players.length} players and ${game.galaxy.stars.length} stars.`);
+    console.log(`Running benchmark for ${name}. Game ${game._id} has ${game.galaxy.players.length} players and ${game.galaxy.stars.length} stars.`);
 
     for (let i = 0; i < ITERATIONS; i++) {
-        for (const player1 of game.galaxy.players) {
-            for (const player2 of game.galaxy.players) {
+        for (const player1 of game.galaxy.players.filter(p => !p.defeated)) {
+            for (const player2 of game.galaxy.players.filter(p => !p.defeated)) {
                 if (player1._id.toString() === player2._id.toString()) {
                     continue;
                 }
@@ -177,7 +177,12 @@ const runBenchmark = async (container: DependencyContainer, gameId: DBObjectId) 
 }
 
 const GAME_IDS = [
-    objectIdFromString("69725b6faac371b026899402"),
+    objectIdFromString("69725b6faac371b026899402"), // THE 64 player game
+    objectIdFromString("69a34120c7f2c399758c6c5c"), // 64 player game, very early, low scanning
+    objectIdFromString("692467a30034b675f44010de"), // 1v1 late stage
+    objectIdFromString("698f7966011a8a58a7e4a280"), // 1v1 early stage
+    objectIdFromString("697ce9fa53ffda392441dd6c"), // 10 player early stage
+    objectIdFromString("68bd433f096363f09c666758"), // 32 player lage stage
 ];
 
 const benchmark = async () => {
