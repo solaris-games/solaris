@@ -22,6 +22,12 @@
       </div>
     </div>
 
+    <div class="row bg-danger" v-if="carrier.isScuttled">
+      <div class="col text-center pt-2">
+        <p class="mb-0">This carrier and all its ships will be scuttled.</p>
+      </div>
+    </div>
+
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">

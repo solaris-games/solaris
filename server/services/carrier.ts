@@ -343,8 +343,6 @@ export default class CarrierService extends EventEmitter {
                 'galaxy.carriers.$.isScuttled': true,
             },
         });
-
-        // TODO: Event?
     }
 
     canPlayersSeeCarrierShips(game: Game, players: Player[], carrier: Carrier) {
