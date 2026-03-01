@@ -445,6 +445,8 @@ const confirmScuttleCarrier = async () => {
 
     carrier.value.isScuttled = true;
 
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
+
     AudioService.leave();
 
     onCloseRequested(new Event('scuttle'));

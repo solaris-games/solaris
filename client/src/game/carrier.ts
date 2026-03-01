@@ -24,6 +24,8 @@ type Events = {
   onCarrierClicked: CarrierClickEvent,
 }
 
+const SCUTTLE_CROSS_SIZE = 3;
+
 export class Carrier extends EventEmitter<keyof Events, Events> implements MapObject {
   static zoomLevel = 140
 
@@ -31,6 +33,7 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
   graphics_colour: Sprite | null;
   graphics_selected: Graphics;
   graphics_ship: Sprite;
+  graphics_scuttled: Graphics;
   text_ships: BitmapText | null = null;
   pathManager: PathManager;
   sharedPathsIDs: Array<string>;
@@ -65,13 +68,15 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
     this.container.interactiveChildren = false
     this.container.cursor = 'pointer'
 
-    this.graphics_colour = new Sprite()
-    this.graphics_selected = new Graphics()
-    this.graphics_ship = new Sprite()
+    this.graphics_colour = new Sprite();
+    this.graphics_selected = new Graphics();
+    this.graphics_ship = new Sprite();
+    this.graphics_scuttled = new Graphics();
 
-    this.container.addChild(this.graphics_colour)
-    this.container.addChild(this.graphics_selected)
-    this.container.addChild(this.graphics_ship)
+    this.container.addChild(this.graphics_colour);
+    this.container.addChild(this.graphics_selected);
+    this.container.addChild(this.graphics_ship);
+    this.container.addChild(this.graphics_scuttled);
 
     this.container.on('pointerup', this.onClicked.bind(this))
     this.container.on('mouseover', this.onMouseOver.bind(this))
@@ -121,12 +126,31 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
 
   draw() {
     this.drawColour();
+    this.drawScuttled();
     this.drawSelectedCircle();
     this.drawCarrier();
     this.drawShips();
     this.drawSpecialist();
     this.drawCarrierWaypoints();
     this.drawDepth();
+  }
+
+  drawScuttled () {
+    this.graphics_scuttled.clear()
+
+    if (this.data.isScuttled) {
+      this.graphics_scuttled.moveTo(SCUTTLE_CROSS_SIZE, -SCUTTLE_CROSS_SIZE);
+      this.graphics_scuttled.lineTo(-SCUTTLE_CROSS_SIZE, SCUTTLE_CROSS_SIZE);
+      this.graphics_scuttled.moveTo(-SCUTTLE_CROSS_SIZE, -SCUTTLE_CROSS_SIZE);
+      this.graphics_scuttled.lineTo(SCUTTLE_CROSS_SIZE, SCUTTLE_CROSS_SIZE);
+      this.graphics_scuttled.closePath();
+      this.graphics_scuttled.stroke({
+        width: 2,
+        color: 0xFF0000,
+      });
+
+      this.graphics_scuttled.visible = !this.data.orbiting;
+    }
   }
 
   drawShape() {
@@ -387,8 +411,17 @@ export class Carrier extends EventEmitter<keyof Events, Events> implements MapOb
   }
 
   updateVisibility() {
-    if (this.graphics_ship) this.graphics_ship.visible = !this.data!.orbiting && !this.hasSpecialist()
-    if (this.text_ships) this.text_ships.visible = !this.data!.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    if (this.graphics_selected) {
+      this.graphics_selected.visible = !this.data.orbiting;
+    }
+
+    if (this.graphics_ship) {
+      this.graphics_ship.visible = !this.data!.orbiting && !this.hasSpecialist()
+    }
+
+    if (this.text_ships) {
+      this.text_ships.visible = !this.data!.orbiting && (this.zoomPercent >= Carrier.zoomLevel || (this.isSelected && this.zoomPercent > Carrier.zoomLevel) || (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel))
+    }
   }
 
   deselectAllText() {
