@@ -29,7 +29,13 @@ export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo
 
 // for non-started or paused games we want the current time as base
 const getLastTickDate = (game: TGame) => {
-  if (GameHelper.isGameInProgress(game)) {
+  if (!game.state.lastTickDate) {
+    return null;
+  }
+
+  const isBehind = game.state.lastTickDate.getTime() + (game.settings.gameTime.speed * 1000) < Date.now();
+
+  if (GameHelper.isGameInProgress(game) && !isBehind) {
     return game.state.lastTickDate;
   }
 
@@ -47,8 +53,6 @@ export const addTicksToLastTick = (game: Game, ticks: number): Date | null => {
 };
 
 const formatDuration = (duration: Duration): string => {
-  console.warn(duration);
-
   if (toSeconds(duration) <= 0) {
     return `Pending...`;
   }
@@ -103,7 +107,9 @@ export const ticksToDuration = (game: Game, ticks: number): Duration => {
 };
 
 export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {
-  return `${getCountdownTimeStringByTicks(game, ticks)} - ETA: Tick ${game.state.tick + ticks}`;
+  const relative = getCountdownTimeStringByTicks(game, ticks);
+
+  return `${relative} - ETA: Tick ${game.state.tick + ticks}`;
 };
 
 export const getTurnTimeoutTime = (game: TGame): Date | null => {
