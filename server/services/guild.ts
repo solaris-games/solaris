@@ -127,24 +127,37 @@ export default class GuildService {
             'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.victories': 1,
-            'achievements.renown': 1
+            'achievements.renown': 1,
+            isAnonymous: 1
         };
 
         let usersInGuild = await this.userService.listUsersInGuild(guildId, userSelectObject);
+
+        const stripAnonymousData = (user) => {
+            if (user.isAnonymous) {
+                user.achievements.rank = 0;
+                user.achievements.victories = 0;
+            }
+
+            const { isAnonymous, ...rest } = user;
+            return rest;
+        };
         
-        guildWithUsers.leader = usersInGuild.find(x => x._id.toString() === guild!.leader.toString())!;
-        guildWithUsers.officers = usersInGuild.filter(x => this._isOfficer(guild!, x._id));
-        guildWithUsers.members = usersInGuild.filter(x => this._isMember(guild!, x._id));
+        guildWithUsers.leader = stripAnonymousData(usersInGuild.find(x => x._id.toString() === guild!.leader.toString())!);
+        guildWithUsers.officers = usersInGuild.filter(x => this._isOfficer(guild!, x._id)).map(stripAnonymousData);
+        guildWithUsers.members = usersInGuild.filter(x => this._isMember(guild!, x._id)).map(stripAnonymousData);
 
         if (withInvitationsAndApplications) {
-            guildWithUsers.invitees = await this.userService.listUsers(guild.invitees, userSelectObject);
-            guildWithUsers.applicants = await this.userService.listUsers(guild.applicants, userSelectObject);
+            let invitees = await this.userService.listUsers(guild.invitees, userSelectObject);
+            let applicants = await this.userService.listUsers(guild.applicants, userSelectObject);
+            guildWithUsers.invitees = invitees.map(stripAnonymousData);
+            guildWithUsers.applicants = applicants.map(stripAnonymousData);
         } else {
             delete guildWithUsers.invitees;
             delete guildWithUsers.applicants;
         }
 
-        guildWithUsers.totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+        guildWithUsers.totalRank = usersInGuild.filter(x => !x.isAnonymous).reduce((sum, i) => sum + i.achievements.rank, 0);
 
         return guildWithUsers;
     }
