@@ -14,7 +14,7 @@ export default (container: DependencyContainer) => {
         },
         listForUser: async (req, res, next) => {
             try {
-                const result = await container.badgeService.listBadgesByUser(req.params.userId);
+                const result = await container.badgeService.listBadgesByUser(req.params.userId, req.session.userId);
                 
                 res.status(200).json(result);
                 return next();
