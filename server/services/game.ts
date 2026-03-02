@@ -387,7 +387,7 @@ export default class GameService extends EventEmitter {
 
         // If the game hasn't started yet, re-adjust user achievements of players
         // who joined the game.
-        if (game.state.startDate == null && !this.gameTypeService.isTutorialGame(game)) {
+        if (!this.gameTypeService.isTutorialGame(game) && game.state.startDate == null) {
             // Deduct "joined" count for all players who already joined the game.
             for (let player of game.galaxy.players) {
                 if (player.userId) {
