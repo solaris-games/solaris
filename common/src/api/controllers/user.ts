@@ -41,6 +41,7 @@ export const createUserRoutes = <ID>() => ({
     listMyAvatars: new SimpleGetRoute<{ avatars: UserAvatar[] }>("/api/user/avatars"),
     purchaseAvatar: new PostRoute<{ avatarId: number }, {}, {}, {}>("/api/user/avatars/:avatarId/purchase"),
     getAchievements: new GetRoute<{ id: string }, {}, AchievementsUser<ID>>("/api/user/achievements/:id"),
+    updateIsAnonymous: new SimplePutRoute<{ enabled: boolean }, {}>("/api/user/changeIsAnonymous"),
     updateEmailPreference: new SimplePutRoute<{ enabled: boolean }, {}>("/api/user/changeEmailPreference"),
     updateEmailOtherPreference: new SimplePutRoute<{ enabled: boolean }, {}>("/api/user/changeEmailOtherPreference"),
     updateUsername: new SimplePutRoute<{ username: string }, {}>("/api/user/changeUsername"),

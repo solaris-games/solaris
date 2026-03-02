@@ -99,6 +99,7 @@ export default class UserService extends EventEmitter {
             lastSeenIP: 0,
             oauth: 0,
             tutorialsCompleted: 0,
+            isAnonymous: 0,
         });
     }
 
@@ -118,6 +119,7 @@ export default class UserService extends EventEmitter {
             lastSeenIP: 0,
             oauth: 0,
             tutorialsCompleted: 0,
+            isAnonymous: 0,
         };
 
         return await this.userRepo.findById(id, select);
@@ -295,6 +297,14 @@ export default class UserService extends EventEmitter {
             _id: id
         }, {
             emailOtherEnabled: preference
+        });
+    }
+
+    async updateIsAnonymous(id: DBObjectId, isAnonymous: boolean) {
+        await this.userRepo.updateOne({
+            _id: id
+        }, {
+            isAnonymous
         });
     }
 

@@ -185,6 +185,18 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
+        updateIsAnonymous: async (req, res, next) => {
+            try {
+                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+    
+                await container.userService.updateIsAnonymous(req.session.userId, reqObj.enabled);
+    
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
         updateUsername: async (req, res, next) => {
             try {
                 const reqObj = parseUserUpdateUserNameRequest(req.body);
