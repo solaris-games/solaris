@@ -420,14 +420,26 @@ export default class GameService extends EventEmitter {
             return null;
         }
 
-        return await this.userService.getInfoByIdLean(player.userId!, {
+        const user = await this.userService.getInfoByIdLean(player.userId!, {
             'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.renown': 1,
             'achievements.victories': 1,
             'achievements.eloRating': 1,
-            roles: 1
+            roles: 1,
+            isAnonymous: 1
         });
+
+        if (user?.isAnonymous) {
+            return null;
+        }
+
+        if (user) {
+            const { isAnonymous, ...userWithoutAnonymous } = user;
+            return userWithoutAnonymous;
+        }
+
+        return user;
     }
 
     async getPlayersLean(gameId: DBObjectId): Promise<{ _id: DBObjectId, userId: DBObjectId | null }[] | undefined> {
