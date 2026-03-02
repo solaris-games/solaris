@@ -707,7 +707,8 @@ export default class GuildService {
             guildId: { $ne: null }
         }, {
             guildId: 1,
-            'achievements.rank': 1
+            'achievements.rank': 1,
+            isAnonymous: 1
         });
     }
 
@@ -729,7 +730,7 @@ export default class GuildService {
         let guildsWithRank: GuildLeaderboard[] = guilds.map(guild => {
             let usersInGuild = users.filter(x => x.guildId!.toString() === guild._id.toString());
 
-            let totalRank = usersInGuild.reduce((sum, i) => sum + i.achievements.rank, 0);
+            let totalRank = usersInGuild.filter(x => !x.isAnonymous).reduce((sum, i) => sum + i.achievements.rank, 0);
             let memberCount = usersInGuild.length;
 
             return {
