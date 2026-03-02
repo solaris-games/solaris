@@ -264,8 +264,10 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
       this.graphics_star.tint = 0xa0a0a0
     }
 
-    if (gameHelper.isRedCapital(this.game, this.data)) {
+    if (gameHelper.isCapitalEliminationCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFF0000
+    } else if (gameHelper.isCapitalCaptureCapital(this.game, this.data)) {
+      this.graphics_star.tint = 0xFFA500
     }
 
     this.graphics_star.anchor.set(0.5)
@@ -417,8 +419,10 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
 
-    if (gameHelper.isRedCapital(this.game, this.data)) {
-      this.specialistSprite.tint = 0xFF0000
+    if (gameHelper.isCapitalEliminationCapital(this.game, this.data)) {
+      this.specialistSprite.tint = 0xFF0000;
+    } else if (gameHelper.isCapitalCaptureCapital(this.game, this.data)) {
+      this.graphics_star.tint = 0xFFA500;
     }
 
     this.container.addChild(this.specialistSprite)
