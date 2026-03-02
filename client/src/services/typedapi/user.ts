@@ -65,6 +65,10 @@ export const updateEmailOtherPreference = (axios: Axios) => async (enabled: bool
   return doPut(axios)(routes.updateEmailOtherPreference, {}, {}, { enabled }, { withCredentials: true });
 }
 
+export const updateIsAnonymous = (axios: Axios) => async (enabled: boolean): Promise<ResponseResult<{}>> => {
+  return doPut(axios)(routes.updateIsAnonymous, {}, {}, { enabled }, { withCredentials: true });
+}
+
 export const updateUsername = (axios: Axios) => async (username: string): Promise<ResponseResult<{}>> => {
   return doPut(axios)(routes.updateUsername, {}, {}, { username }, { withCredentials: true });
 }

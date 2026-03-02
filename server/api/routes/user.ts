@@ -39,6 +39,8 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
 
     answer(routes.updateEmailOtherPreference, mw.auth.authenticate(), controller.updateEmailOtherPreference);
 
+    answer(routes.updateIsAnonymous, mw.auth.authenticate(), controller.updateIsAnonymous);
+
     answer(routes.updateUsername, mw.auth.authenticate(), controller.updateUsername);
 
     answer(routes.updateEmailAddress, mw.auth.authenticate(), controller.updateEmailAddress);

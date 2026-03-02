@@ -50,6 +50,12 @@ export const between = (date1: Date, date2: Date): Duration => {
   });
 };
 
+export const betweenAbs = (date1: Date, date2: Date): Duration => {
+  return normalize({
+    seconds: Math.abs((date2.getTime() - date1.getTime()) / 1000),
+  });
+};
+
 export const formatDuration = (duration: Duration): string => {
   const val2 = (v: number | undefined) => (v || 0).toString().padStart(2, '0');
 

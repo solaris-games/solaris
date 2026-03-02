@@ -73,6 +73,7 @@ export type UserPrivate<ID> = UserPublic<ID> & {
     lastSeenIP: string | null;
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
+    isAnonymous: boolean;
     warnings: UserWarning[];
     lastReadAnnouncement: ID | null;
     gameSettings: UserGameSettings,

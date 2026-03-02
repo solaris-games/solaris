@@ -153,7 +153,7 @@ export default (container: DependencyContainer) => {
         },
         getAchievements: async (req, res, next) => {
             try {
-                let achievements = await container.userAchievementService.getAchievements(req.params.id);
+                let achievements = await container.userAchievementService.getAchievements(req.params.id, req.session.userId);
     
                 res.status(200).json(achievements);
                 return next();
@@ -178,6 +178,18 @@ export default (container: DependencyContainer) => {
                 const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
     
                 await container.userService.updateEmailOtherPreference(req.session.userId, reqObj.enabled);
+    
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        updateIsAnonymous: async (req, res, next) => {
+            try {
+                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+    
+                await container.userService.updateIsAnonymous(req.session.userId, reqObj.enabled);
     
                 res.sendStatus(200);
                 return next();

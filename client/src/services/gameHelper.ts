@@ -577,13 +577,17 @@ class GameHelper {
     return game.galaxy.players.find(player => player.homeStarId == star._id);
   }
 
-  isRedCapital(game, star) {
+  isCapitalCaptureCapital(game: Game, star: Star) {
     if (!star.homeStar || !star.ownedByPlayerId) {
       return false;
     }
 
-    if (this.isConquestHomeStars(game)) {
-      return true;
+    return this.isConquestHomeStars(game);
+  }
+
+  isCapitalEliminationCapital(game: Game, star: Star) {
+    if (!star.homeStar || !star.ownedByPlayerId) {
+      return false;
     }
 
     const player = this.getPlayerById(game, star.ownedByPlayerId)!
