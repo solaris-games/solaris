@@ -12,7 +12,7 @@
     }">{{roleName}}</td>
     <td align="right" :class="getColumnClass('rank')">
       {{player.achievements.rank}}
-      <img class="user-level-icon" :src="levelSrc">
+      <img v-if="player.achievements.level" class="user-level-icon" :src="levelSrc">
     </td>
     <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
