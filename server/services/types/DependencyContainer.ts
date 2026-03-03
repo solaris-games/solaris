@@ -62,6 +62,7 @@ import RatingService from "../rating";
 import ReportService from "../report";
 import ReputationService from "../reputation";
 import ResearchService from "../research";
+import ScanningService from "../scanning";
 import ScheduleBuyService from "../scheduleBuy";
 import SessionService from "../session";
 import ShipService from "../ship";
@@ -196,4 +197,5 @@ export interface DependencyContainer {
     cullWaypointsService: CullWaypointsService,
     carrierTravelService: CarrierTravelService<DBObjectId>,
     starDataService: StarDataService,
+    scanningService: ScanningService,
 };

@@ -153,67 +153,6 @@ export default class CarrierService extends EventEmitter {
         return name;
     }
 
-    getCarriersWithinScanningRangeOfStarByCarrierIds(game: Game, star: Star, carriers: MapObject[]): MapObject[] {
-        // If the star isn't owned then it cannot have a scanning range
-        if (star.ownedByPlayerId == null) {
-            return [];
-        }
-
-        // Calculate the scanning distance of the given star.
-        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star);
-        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-
-        // Go through all carriers and the ones that are within the star's scanning range.
-        let carriersInRange = carriers.filter(c => {
-            return this.distanceService.getDistanceBetweenLocations(c.location, star.location) <= scanningRangeDistance;
-        });
-
-        return carriersInRange;
-    }
-
-    filterCarriersByScanningRange(game: Game, playerIds: DBObjectId[]) {
-        const ids = playerIds.map(p => p.toString());
-
-        // Stars may have different scanning ranges independently so we need to check
-        // each star to check what is within its scanning range.
-        let playerStars = this.starService.listStarsWithScanningRangeByPlayers(game, playerIds);
-
-        // Start with all of the carriers that the player owns as
-        // the player can always see those carriers.
-        let carriersInRange: DBObjectId[] = game.galaxy.carriers
-            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
-            .map(c => c._id);
-
-        // We need to check all carriers NOT owned by the player.
-        let carriersToCheck = game.galaxy.carriers
-            .filter(c => !ids.includes(c.ownedByPlayerId!.toString()))
-            .map(c => {
-                return {
-                    _id: c._id,
-                    ownedByPlayerId: c.ownedByPlayerId,
-                    location: c.location
-                };
-            });
-
-        for (let star of playerStars) {
-            let carrierIds = this.getCarriersWithinScanningRangeOfStarByCarrierIds(game, star, carriersToCheck);
-
-            for (let carrierId of carrierIds) {
-                if (carriersInRange.indexOf(carrierId._id) === -1) {
-                    carriersInRange.push(carrierId._id);
-                    carriersToCheck.splice(carriersToCheck.indexOf(carrierId), 1);
-                }
-            }
-
-            // If we've checked all carriers then no need to continue.
-            if (!carriersToCheck.length) {
-                break;
-            }
-        }
-
-        return carriersInRange.map(c => this.getById(game, c));
-    }
-
     sanitizeCarriersByPlayers(game: Game, playerIds: DBObjectId[]) {
         const ids = playerIds.map(p => p.toString());
 

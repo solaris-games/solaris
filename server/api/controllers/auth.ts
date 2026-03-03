@@ -1,6 +1,6 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {logger} from "../../utils/logging";
-import axios from "axios";
+import { default as axios, AxiosError } from "axios";
 
 const log = logger("Auth Controller");
 
@@ -95,7 +95,14 @@ export default (container: DependencyContainer) => {
                 } catch (error) {
                     // NOTE: An unauthorized token will not throw an error;
                     // it will return a 401 Unauthorized response in the try block above
-                    log.error(error);
+                    if ((error as Error).name === "AxiosError") {
+                        log.error({
+                            error,
+                            response: (error as AxiosError).response?.data,
+                        });
+                    } else {
+                        log.error(error);
+                    }
                 }
             }
     

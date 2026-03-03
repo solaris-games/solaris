@@ -86,39 +86,6 @@ export default class PlayerService extends EventEmitter {
         return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString())?._id;
     }
 
-    getPlayersWithinScanningRangeOfPlayer(game: Game, players: Player[], player: Player) {
-        let inRange = [player];
-        let playerStars = this.starService.listStarsWithScanningRangeByPlayer(game, player._id);
-
-        for (let otherPlayer of players) {
-            if (inRange.indexOf(otherPlayer) > -1) {
-                continue;
-            }
-
-            let otherPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, otherPlayer._id);
-
-            let isInRange = false;
-
-            for (let s of otherPlayerStars) {
-                if (this.starService.isStarWithinScanningRangeOfStars(game, s, playerStars)) {
-                    isInRange = true;
-                    break;
-                }
-            }
-
-            if (isInRange) {
-                inRange.push(otherPlayer);
-            }
-        }
-
-        return inRange;
-    }
-
-    isInScanningRangeOfPlayer(game: Game, sourcePlayer: Player, targetPlayer: Player) {
-        return this.getPlayersWithinScanningRangeOfPlayer(game, [targetPlayer], sourcePlayer)
-            .find(p => p._id.toString() === targetPlayer._id.toString()) != null;
-    }
-
     createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
         const defaultTech = this.technologyService.getDefaultTechnology(game);
         const researchingNow: ResearchTypeNotRandom = defaultTech;

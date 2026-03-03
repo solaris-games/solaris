@@ -1,4 +1,4 @@
-import {CarrierWaypointBase, ValidationError} from "solaris-common";
+import { CarrierWaypointBase, ValidationError } from "solaris-common";
 import AvatarService from './avatar';
 import BattleRoyaleService from './battleRoyale';
 import CacheService from './cache';
@@ -31,12 +31,15 @@ import { Carrier } from './types/Carrier';
 import { CarrierWaypoint } from 'solaris-common';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
-import {GameHistoryCarrier, GameHistoryCarrierWaypoint} from "./types/GameHistory";
+import { GameHistoryCarrier, GameHistoryCarrierWaypoint } from "./types/GameHistory";
+import { Guild, GuildUserWithTag } from 'solaris-common';
 import { Player, PlayerDiplomaticState, PlayerReputation, PlayerResearch } from './types/Player';
 import { Star } from './types/Star';
-import { WaypointService, Guild, GuildUserWithTag } from 'solaris-common';
+import { WaypointService } from 'solaris-common';
 import { StarDataService } from "solaris-common";
+import ScanningService from "./scanning";
 import mongoose from 'mongoose';
+import { KDTree } from "../utils/kdTree";
 
 enum ViewpointKind {
     Basic,
@@ -81,6 +84,7 @@ export default class GameGalaxyService {
     spectatorService: SpectatorService;
     gameMaskingService: GameMaskingService;
     starDataService: StarDataService;
+    scanningService: ScanningService;
 
     constructor(
         cacheService: CacheService,
@@ -91,10 +95,10 @@ export default class GameGalaxyService {
         playerAfkService: PlayerAfkService,
         starService: StarService,
         shipService: ShipService,
-        distanceService: DistanceService, 
+        distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
-        carrierService: CarrierService, 
+        carrierService: CarrierService,
         waypointService: WaypointService<DBObjectId>,
         researchService: ResearchService,
         specialistService: SpecialistService,
@@ -113,6 +117,7 @@ export default class GameGalaxyService {
         spectatorService: SpectatorService,
         gameMaskingService: GameMaskingService,
         starDataService: StarDataService,
+        scanningService: ScanningService,
     ) {
         this.cacheService = cacheService;
         this.socketService = socketService;
@@ -144,6 +149,7 @@ export default class GameGalaxyService {
         this.spectatorService = spectatorService;
         this.gameMaskingService = gameMaskingService;
         this.starDataService = starDataService;
+        this.scanningService = scanningService;
     }
 
     async getGalaxy(gameId: DBObjectId, userId: DBObjectId | null, tick: number | null) {
@@ -205,8 +211,19 @@ export default class GameGalaxyService {
 
         this._setReadyToQuitCount(game);
 
+        // TODO: Calculate during tick processing and load stored tree
+        const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+        let scannedStarSet = new Set<Star>();
+        // Will only need to calculate for the user if they are playing.
+        if (userPlayer != null) {
+            scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [userPlayer], kdTree);
+        } else if (viewpoint.kind === ViewpointKind.Perspectives) {
+            scannedStarSet = this.scanningService.getStarSetByScanningRange(game, viewpoint.perspectives, kdTree);
+        }
+
         // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer, viewpoint);
+        await this._setPlayerInfoBasic(game, userPlayer, viewpoint, scannedStarSet);
 
         // if the user isn't playing this game or spectating, then only return
         // basic data about the stars, exclude any important info like ships.
@@ -215,8 +232,8 @@ export default class GameGalaxyService {
             this._setStarInfoBasic(game);
             this._clearPlayerCarriers(game);
         } else {
-            this._setCarrierInfoDetailed(game, viewpoint);
-            this._setStarInfoDetailed(game, userPlayer, viewpoint);
+            this._setCarrierInfoDetailed(game, viewpoint, new KDTree(this.distanceService, game.galaxy.carriers));
+            this._setStarInfoDetailed(game, userPlayer, viewpoint, scannedStarSet);
         }
 
         this._filterPlayerHomeStars(game);
@@ -348,32 +365,32 @@ export default class GameGalaxyService {
         }
 
         doc.galaxy.stars = doc.galaxy.stars
-        .map(s => {
-            let star = {
-                _id: s._id,
-                name: s.name,
-                ownedByPlayerId: s.ownedByPlayerId,
-                location: s.location,
-                warpGate: false,
-                isNebula: false,
-                isAsteroidField: false,
-                isBinaryStar: false,
-                isBlackHole: false,
-                isPulsar: false,
-                wormHoleToStarId: null
-            } as Star;
+            .map(s => {
+                let star = {
+                    _id: s._id,
+                    name: s.name,
+                    ownedByPlayerId: s.ownedByPlayerId,
+                    location: s.location,
+                    warpGate: false,
+                    isNebula: false,
+                    isAsteroidField: false,
+                    isBinaryStar: false,
+                    isBlackHole: false,
+                    isPulsar: false,
+                    wormHoleToStarId: null
+                } as Star;
 
-            star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, star);
+                star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(doc, star);
 
-            if (isKingOfTheHillMode) {
-                star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
-            }
+                if (isKingOfTheHillMode) {
+                    star.isKingOfTheHillStar = kingOfTheHillStar != null && kingOfTheHillStar._id.toString() === s._id.toString();
+                }
 
-            return star;
-        });
+                return star;
+            });
     }
 
-    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint) {
+    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedStarSet: Set<Star>) {
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
@@ -387,26 +404,23 @@ export default class GameGalaxyService {
             kingOfTheHillStar = this.starService.getKingOfTheHillStar(doc);
         }
 
-        // If dark start and game hasn't started yet OR is dark mode, then filter out
-        // any stars the player cannot see in scanning range.
-        if (viewpoint.kind === ViewpointKind.Perspectives && (isDarkMode || (isDarkStart && !doc.state.startDate))) {
-            if (isDarkMode) {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRangeAndWaypointDestinations(doc, viewpoint.perspectives);
-            } else {
-                doc.galaxy.stars = this.starService.filterStarsByScanningRange(doc, viewpoint.perspectives);
-            }
-        }
-
         // Get all of the player's stars.
         let playerStars: Star[] = [];
-        let playerScanningStars: Star[] = [];
-        let playerCarriersInOrbit: Carrier[] = [];
 
         if (viewpoint.kind === ViewpointKind.Perspectives) {
             const perspectivePlayerIds = viewpoint.perspectives.map(p => p._id);
             playerStars = this.starService.listStarsOwnedByPlayers(doc.galaxy.stars, perspectivePlayerIds);
-            playerScanningStars = this.starService.listStarsWithScanningRangeByPlayers(doc, perspectivePlayerIds);
-            playerCarriersInOrbit = this.carrierService.listCarriersOwnedByPlayersInOrbit(doc.galaxy.carriers, perspectivePlayerIds);
+
+            // If dark start and game hasn't started yet OR is dark mode, then filter out
+            // any stars the player cannot see in scanning range.
+            if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
+                const scannedStarList = this.scanningService.starSetToSortedList(scannedStarSet);
+                if (isDarkMode) {
+                    doc.galaxy.stars = this.scanningService.addWaypointDestinations(doc, viewpoint.perspectives, scannedStarList);
+                } else {
+                    doc.galaxy.stars = scannedStarList;
+                }
+            }
         }
 
         // Work out which ones are not in scanning range and clear their data.
@@ -454,7 +468,7 @@ export default class GameGalaxyService {
                     } else {
                         delete s.ignoreBulkUpgrade;
                     }
-                    
+
                     s.isInScanningRange = true;
 
                     return s;
@@ -464,11 +478,9 @@ export default class GameGalaxyService {
                     delete s.shipsActual;
                 }
 
-                s.isInScanningRange = isFinished ||                                                         // The game is finished
-                    this.starService.isStarWithinScanningRangeOfStars(doc, s, playerScanningStars) ||       // The star is within scanning range
-                    playerCarriersInOrbit.find(c => c.orbiting!.toString() === s._id.toString()) != null;   // The star has a friendly carrier in orbit
+                s.isInScanningRange = (isFinished || this.scanningService.isStarWithinScanningRangeOfStarsByViewpoint(doc, s, scannedStarSet));
 
-                // If its in range then its all good, send the star back as is.
+                // If it's in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.
                 if (s.isInScanningRange) {
                     if (s.specialistId) {
@@ -520,25 +532,25 @@ export default class GameGalaxyService {
                     if (isDarkFogged && !s.isInScanningRange) {
                         mappedStar.ownedByPlayerId = null;
                     }
-                    
+
                     return mappedStar;
                 };
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint) {
+    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint, kdTree: KDTree) {
         const isFinished = this.gameStateService.isFinished(doc)
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
         // If the game hasn't finished we need to filter and sanitize carriers.
         if (viewpoint.kind !== ViewpointKind.Finished) {
-            const perspectivePlayerIds = viewpoint.kind === ViewpointKind.Perspectives ? viewpoint.perspectives.map(p => p._id) : [];
+            const perspectivePlayers = viewpoint.kind === ViewpointKind.Perspectives ? viewpoint.perspectives : [];
 
-            doc.galaxy.carriers = this.carrierService.filterCarriersByScanningRange(doc, perspectivePlayerIds);
+            doc.galaxy.carriers = Array.from(this.scanningService.getCarrierSetByScanningRange(doc, perspectivePlayers, kdTree));
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
-            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayers(doc, perspectivePlayerIds) as any;
+            doc.galaxy.carriers = this.carrierService.sanitizeCarriersByPlayers(doc, perspectivePlayers.map(p => p._id)) as any;
         }
 
         // Populate the number of ticks it will take for all waypoints.
@@ -565,7 +577,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedStarSet: Set<Star>) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -586,19 +598,8 @@ export default class GameGalaxyService {
         // Calculate which players are in scanning range.
         let playersInRange: Player[] = [];
 
-        if (userPlayer) {
-            playersInRange = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, userPlayer);
-        } else if (viewpoint.kind === ViewpointKind.Perspectives) {
-            playersInRange = viewpoint.perspectives;
-
-            const visited = new Set<string>();
-            viewpoint.perspectives.forEach(p => visited.add(p._id.toString()))
-
-            for (const player of viewpoint.perspectives) {
-                const inRangeOfPlayer = this.playerService.getPlayersWithinScanningRangeOfPlayer(doc, doc.galaxy.players, player).filter(x => !visited.has(x._id.toString()));
-                inRangeOfPlayer.forEach(p => visited.add(p._id.toString()));
-                playersInRange = playersInRange.concat(inRangeOfPlayer);
-            }
+        if (userPlayer || viewpoint.kind === ViewpointKind.Perspectives) {
+            playersInRange = this.scanningService.getPlayersWithinScanningRangeOfStars(doc, doc.galaxy.players, scannedStarSet);
         }
 
         const displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -646,7 +647,7 @@ export default class GameGalaxyService {
                 delete p.lastSeenIP; // Super sensitive data.
 
                 p.isRealUser = true;
-                
+
                 return p;
             }
 
@@ -667,28 +668,28 @@ export default class GameGalaxyService {
             }
 
             let research: PlayerResearch | null = {
-                scanning: { 
+                scanning: {
                     level: p.research.scanning.level
                 },
-                hyperspace: { 
+                hyperspace: {
                     level: p.research.hyperspace.level
                 },
-                terraforming: { 
+                terraforming: {
                     level: p.research.terraforming.level
                 },
-                experimentation: { 
+                experimentation: {
                     level: p.research.experimentation.level
                 },
-                weapons: { 
+                weapons: {
                     level: p.research.weapons.level
                 },
-                banking: { 
+                banking: {
                     level: p.research.banking.level
                 },
-                manufacturing: { 
+                manufacturing: {
                     level: p.research.manufacturing.level
                 },
-                specialists: { 
+                specialists: {
                     level: p.research.specialists.level
                 }
             };
@@ -921,7 +922,7 @@ export default class GameGalaxyService {
         if (isHistorical) {
             for (let historyCarrier of history.carriers) {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
-                
+
                 if (!gameCarrier) {
                     game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
@@ -935,7 +936,7 @@ export default class GameGalaxyService {
 
             for (let historyCarrier of carrierInOrbitToAdd) {
                 let gameCarrier = game.galaxy.carriers.find(x => x._id.toString() === historyCarrier.carrierId.toString());
-                
+
                 if (!gameCarrier) {
                     game.galaxy.carriers.push(this._fromHistoryCarrier(historyCarrier));
                 }
