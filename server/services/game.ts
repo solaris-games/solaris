@@ -387,7 +387,7 @@ export default class GameService extends EventEmitter {
 
         // If the game hasn't started yet, re-adjust user achievements of players
         // who joined the game.
-        if (game.state.startDate == null && !this.gameTypeService.isTutorialGame(game)) {
+        if (!this.gameTypeService.isTutorialGame(game) && game.state.startDate == null) {
             // Deduct "joined" count for all players who already joined the game.
             for (let player of game.galaxy.players) {
                 if (player.userId) {
@@ -420,14 +420,26 @@ export default class GameService extends EventEmitter {
             return null;
         }
 
-        return await this.userService.getInfoByIdLean(player.userId!, {
+        const user = await this.userService.getInfoByIdLean(player.userId!, {
             'achievements.level': 1,
             'achievements.rank': 1,
             'achievements.renown': 1,
             'achievements.victories': 1,
             'achievements.eloRating': 1,
-            roles: 1
+            roles: 1,
+            isAnonymous: 1
         });
+
+        if (user?.isAnonymous) {
+            return null;
+        }
+
+        if (user) {
+            const { isAnonymous, ...userWithoutAnonymous } = user;
+            return userWithoutAnonymous;
+        }
+
+        return user;
     }
 
     async getPlayersLean(gameId: DBObjectId): Promise<{ _id: DBObjectId, userId: DBObjectId | null }[] | undefined> {

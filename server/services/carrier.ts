@@ -100,6 +100,7 @@ export default class CarrierService extends EventEmitter {
             specialistExpireTick: null,
             specialist: null,
             isGift: false,
+            isScuttled: false,
             locationNext: null,
             toObject(): Carrier {
                 return this
@@ -265,21 +266,22 @@ export default class CarrierService extends EventEmitter {
             throw new ValidationError(`Cannot scuttle carrier, you are not its owner.`);
         }
 
+        if (carrier.isScuttled) {
+            throw new ValidationError(`Cannot scuttle carrier that is already scuttled.`);
+        }
+
         if (carrier.isGift) {
             throw new ValidationError(`Cannot scuttle a gift.`);
         }
 
         await this.gameRepo.updateOne({
-            _id: game._id
+            _id: game._id,
+            'galaxy.carriers._id': carrierId
         }, {
-            $pull: {
-                'galaxy.carriers': {
-                    _id: carrierId
-                }
-            }
+            $set: {
+                'galaxy.carriers.$.isScuttled': true,
+            },
         });
-
-        // TODO: Event?
     }
 
     canPlayersSeeCarrierShips(game: Game, players: Player[], carrier: Carrier) {

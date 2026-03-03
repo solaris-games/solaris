@@ -2,9 +2,14 @@
   <view-container :is-auth-page="false">
     <view-title :title="user ? user.username : 'Achievements'" />
 
+    <div v-if="loadError" class="text-center pt-3">
+      <p>This user could not be found.</p>
+      <router-link to="/" class="btn btn-primary">Return Home</router-link>
+    </div>
+
     <roles v-if="user" :user="user" :displayText="true" />
 
-    <loading-spinner :loading="!user" />
+    <loading-spinner :loading="!user && !loadError" />
 
     <user-guild-info v-if="user" :user="user" />
 
@@ -38,13 +43,17 @@ const route = useRoute();
 const userId = computed(() => route.params.userId as string);
 
 const user: Ref<AchievementsUser<string> | null> = ref(null);
+const loadError = ref(false);
 
 const loadAchievements = async () => {
+  loadError.value = false;
+  user.value = null;
   const response = await getAchievements(httpClient)(userId.value);
 
   if (isOk(response)) {
     user.value = response.data
   } else {
+    loadError.value = true;
     console.error(formatError(response));
   }
 };

@@ -46,12 +46,23 @@ export default class BadgeService extends EventEmitter {
         return this.listBadges().filter(b => b.price);
     }
 
-    async listBadgesByUser(userId: DBObjectId): Promise<AwardedBadge[]> {
+    async listBadgesByUser(userId: DBObjectId, requestingUserId?: DBObjectId): Promise<AwardedBadge[]> {
         const user = await this.userService.getById(userId, {
-            'achievements.badges': 1
+            'achievements.badges': 1,
+            isAnonymous: 1
         });
 
-        if (!user?.achievements?.badges) {
+        if (!user) {
+            throw new ValidationError('User not found.', 404);
+        }
+
+        const isSelf = requestingUserId && requestingUserId.toString() === user._id.toString();
+
+        if (user.isAnonymous && !isSelf) {
+            throw new ValidationError('User not found.', 404);
+        }
+
+        if (!user.achievements?.badges) {
             return [];
         }
 

@@ -253,6 +253,8 @@ export default class GameTickService extends EventEmitter {
 
             logTime(`Tick ${game.state.tick}`);
 
+            await this._scuttleCarriers(game);
+
             await this._captureAbandonedStars(game, gameUsers);
             logTime('Capture abandoned stars');
 
@@ -1006,6 +1008,14 @@ export default class GameTickService extends EventEmitter {
             this.emit(GameTickServiceEvents.onGameTurnEnded, {
                 gameId: game._id
             });
+        }
+    }
+
+    private async _scuttleCarriers(game: Game) {
+        const carriersMarkedForScuttle = game.galaxy.carriers.filter(c => c.isScuttled);
+
+        for (let carrier of carriersMarkedForScuttle) {
+            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
         }
     }
 }
