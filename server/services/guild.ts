@@ -137,6 +137,8 @@ export default class GuildService {
             if (user.isAnonymous) {
                 user.achievements.rank = 0;
                 user.achievements.victories = 0;
+                user.achievements.renown = 0;
+                user.achievements.level = 0;
             }
 
             const { isAnonymous, ...rest } = user;
