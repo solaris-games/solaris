@@ -75,6 +75,7 @@ export interface User {
     lastSeenIP: string | null;
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
+    isAnonymous: boolean;
     roles: UserRoles,
     level?: UserLevel,
     warnings: UserWarning[];

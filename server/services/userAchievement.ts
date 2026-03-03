@@ -1,3 +1,4 @@
+import { ValidationError } from "solaris-common";
 import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { User } from "./types/User";
@@ -15,30 +16,43 @@ export default class UserAchievementService {
         this.userLevelService = userLevelService;
     }
 
-    async getAchievements(id: DBObjectId) {
+    async getAchievements(id: DBObjectId, requestingUserId?: DBObjectId) {
         const user = await this.userRepo.findById(id, {
             // Remove fields we don't want to send back.
             achievements: 1,
             guildId: 1,
             username: 1,
+            isAnonymous: 1,
             'roles.contributor': 1,
             'roles.developer': 1,
             'roles.communityManager': 1,
             'roles.gameMaster': 1
         });
 
-        if (user) {
-            user.level = this.userLevelService.getByRankPoints(user.achievements.rank);
+        if (!user) {
+            throw new ValidationError('User not found.', 404);
         }
 
-        if (user && user.guildId) {
+        // If the user is anonymous and the requester is not the user themselves, return 404.
+        const isSelf = requestingUserId && requestingUserId.toString() === user._id.toString();
+
+        if (user.isAnonymous && !isSelf) {
+            throw new ValidationError('User not found.', 404);
+        }
+
+        user.level = this.userLevelService.getByRankPoints(user.achievements.rank);
+
+        // Strip isAnonymous from the response.
+        const { isAnonymous, ...userWithoutAnonymous } = user;
+
+        if (userWithoutAnonymous.guildId) {
             return {
-                ...user,
-                guild: await this.guildService.getInfoById(user.guildId)
+                ...userWithoutAnonymous,
+                guild: await this.guildService.getInfoById(userWithoutAnonymous.guildId)
             }
         }
 
-        return user;
+        return userWithoutAnonymous;
     }
 
     async _incrementAchievement(userId: DBObjectId, achievement: string, amount: number = 1) {
