@@ -14,62 +14,63 @@
     </td>
   </tr>
 </template>
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper";
+import type {Game, Player} from "@/types/game";
+import type {ResearchTypeNotRandom} from "@solaris-common";
 
-export default {
-  props: {
-    player: Object,
-    userPlayer: Object,
-    research: String,
-    title: String,
-    iconClass: String,
-  },
-  computed: {
-    playerResearchLevel () {
-      return this.player.research[this.research].level;
-    },
-    userPlayerResearchLevel () {
-      return this.userPlayer.research[this.research].level;
-    },
-    playerStyle () {
-      if ((this.userPlayer && this.userPlayer == this.player) || !this.userPlayer) {
-        return {
-          "text-success": this.hasHighestTechLevel,
-          "text-danger": this.hasLowestTechLevel,
-        };
-      } else {
-        return {};
-      }
-    },
-    userPlayerStyle () {
-      if (this.userPlayer) {
-        return {
-          "text-success":
-            this.playerResearchLevel < this.userPlayerResearchLevel,
-          "text-danger":
-            this.playerResearchLevel > this.userPlayerResearchLevel,
-        };
-      } else {
-        return {};
-      }
-    },
-    hasHighestTechLevel () {
-      return gameHelper.playerHasHighestTechLevel(
-        this.$store.state.game,
-        this.research,
-        this.player
-      );
-    },
-    hasLowestTechLevel () {
-      return gameHelper.playerHasLowestTechLevel(
-        this.$store.state.game,
-        this.research,
-        this.player
-      );
-    }
+const props = defineProps<{
+  player: Player,
+  userPlayer: Player,
+  research: ResearchTypeNotRandom,
+  title: string,
+  iconClass: string,
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const playerResearchLevel = computed(() => props.player.research[props.research].level);
+
+const userPlayerResearchLevel = computed(() => props.userPlayer.research[props.research].level);
+
+const hasHighestTechLevel = computed(() => gameHelper.playerHasHighestTechLevel(
+  game.value,
+  props.research,
+  props.player
+));
+
+const hasLowestTechLevel = computed(() => gameHelper.playerHasLowestTechLevel(
+  game.value,
+  props.research,
+  props.player
+));
+
+const playerStyle = computed(() => {
+  if ((props.userPlayer && props.userPlayer == props.player) || !props.userPlayer) {
+    return {
+      "text-success": hasHighestTechLevel.value,
+      "text-danger": hasLowestTechLevel.value,
+    };
+  } else {
+    return {};
   }
-};
+});
+
+const userPlayerStyle = computed(() => {
+  if (props.userPlayer) {
+    return {
+      "text-success":
+        playerResearchLevel.value <  userPlayerResearchLevel.value,
+      "text-danger":
+        playerResearchLevel.value > userPlayerResearchLevel.value,
+    };
+  } else {
+    return {};
+  }
+});
 </script>
 <style scoped>
 .row-icon {
