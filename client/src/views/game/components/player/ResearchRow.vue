@@ -23,7 +23,7 @@ import type {ResearchTypeNotRandom} from "@solaris-common";
 
 const props = defineProps<{
   player: Player,
-  userPlayer: Player,
+  userPlayer: Player | undefined,
   research: ResearchTypeNotRandom,
   title: string,
   iconClass: string,
@@ -34,7 +34,7 @@ const game = computed<Game>(() => store.state.game);
 
 const playerResearchLevel = computed(() => props.player.research[props.research].level);
 
-const userPlayerResearchLevel = computed(() => props.userPlayer.research[props.research].level);
+const userPlayerResearchLevel = computed(() => props.userPlayer?.research[props.research].level);
 
 const hasHighestTechLevel = computed(() => gameHelper.playerHasHighestTechLevel(
   game.value,
@@ -63,9 +63,9 @@ const userPlayerStyle = computed(() => {
   if (props.userPlayer) {
     return {
       "text-success":
-        playerResearchLevel.value <  userPlayerResearchLevel.value,
+        playerResearchLevel.value <  userPlayerResearchLevel.value!,
       "text-danger":
-        playerResearchLevel.value > userPlayerResearchLevel.value,
+        playerResearchLevel.value > userPlayerResearchLevel.value!,
     };
   } else {
     return {};

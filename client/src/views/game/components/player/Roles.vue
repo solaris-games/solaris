@@ -39,6 +39,6 @@ import type {UserPublic} from "@solaris-common";
 
 const props = defineProps<{
   user: UserPublic<string>,
-  displayText: boolean,
+  displayText?: boolean,
 }>();
 </script>
