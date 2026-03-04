@@ -758,19 +758,14 @@ class GameHelper {
     return game.settings.general.playerOnlineStatus === 'hidden'
   }
 
-  isPlayerOnline(player) {
+  isPlayerOnline(player: Player) {
     if (player.isOnline == null) {
       return false;
     }
-    else if (player.isOnline) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    else return player.isOnline;
   }
 
-  getOnlineStatus(player) {
+  getOnlineStatus(player: Player) {
     if (player.isOnline == null || player.lastSeen == null) {
       return ''
     }

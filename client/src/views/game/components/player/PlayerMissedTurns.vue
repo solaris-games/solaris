@@ -8,12 +8,12 @@
 </div>
 </template>
 
-<script>
-export default {
-  props: {
-    player: Object
-  }
-}
+<script setup lang="ts">
+import type {Player} from "@/types/game";
+
+const props = defineProps<{
+  player: Player
+}>();
 </script>
 
 <style scoped>
