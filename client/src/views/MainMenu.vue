@@ -49,7 +49,7 @@
       </div>
     </div>
 
-    <div class="row pb-0 pt-3">
+    <div class="row pb-0 pt-0">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="home1" alt="View my games">

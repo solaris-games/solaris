@@ -25,6 +25,16 @@
       </div>
     </div>
 
+    <div class="row bg-primary">
+      <div class="col text-center">
+        <p class="mb-2 mt-2">
+          <a class="text-white" href="https://command.solaris.games" target="_blank">
+            Play Solaris:Command, the new, hex-based strategy and tactics game!
+          </a>
+        </p>
+      </div>
+    </div>
+
     <latest-announcement />
   </view-container>
 
