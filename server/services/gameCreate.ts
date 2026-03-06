@@ -232,7 +232,12 @@ export default class GameCreateService {
 
         await this.teamService.setDiplomacyStates(game);
 
-        const gameObject = await game.save();
+        let gameObject;
+        try {
+            gameObject = await game.save();
+        } catch (err) {
+            throw new ValidationError("Failed to create game: " + (err as Error).message);
+        }
 
         await this.initialGameStateService.storeStateFor(gameObject);
         await this.historyService.log(gameObject);
