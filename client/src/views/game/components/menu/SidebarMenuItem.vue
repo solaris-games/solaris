@@ -6,27 +6,28 @@
   </a>
 </template>
 
-<script>
-export default {
-  props: {
-    menuState: String,
-    tooltip: String,
-    iconClass: String
-  },
-  methods: {
-    setMenuState () {
-      this.$store.commit('setMenuState', {
-        state: this.menuState,
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const props = defineProps<{
+    menuState?: string;
+    tooltip?: string;
+    iconClass?: string;
+}>();
+
+const store = useStore();
+
+const isActive = computed(() => {
+    return props.menuState === store.state.menuState;
+});
+
+const setMenuState = () => {
+    store.commit('setMenuState', {
+        state: props.menuState,
         args: null
-      })
-    }
-  },
-  computed: {
-    isActive () {
-      return this.menuState === this.$store.state.menuState
-    }
-  }
-}
+    });
+};
 </script>
 
 <style scoped>

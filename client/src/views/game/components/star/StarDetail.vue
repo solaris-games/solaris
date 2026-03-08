@@ -569,7 +569,7 @@ const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsReq
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
 const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {object: e});
 
-const confirmAbandonStar = async (e) => {
+const confirmAbandonStar = async () => {
   const response = await abandon(httpClient)(game.value._id, star.value._id);
 
   if (isOk(response)) {
