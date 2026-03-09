@@ -181,8 +181,10 @@ export default class ResearchService extends EventEmitter {
         const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
         const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
 
-        if (game.settings.technology.researchCostProgression.progression === "exponential") {
-            const growthFactor = game.constants.research.exponentialGrowthFactors[game.settings.technology.researchCostProgression.growthFactor];
+        const progression = game.settings.technology.researchCostProgressions[technologyKey];
+
+        if (progression.progression === "exponential") {
+            const growthFactor = game.constants.research.exponentialGrowthFactors[progression.growthFactor];
             return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel - 1));
         } else {
             return technologyLevel * progressMultiplierConfig;

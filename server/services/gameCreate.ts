@@ -338,26 +338,6 @@ export default class GameCreateService {
             settings.technology.startingTechnologyLevel.specialists = 0;
         }
 
-        // Validate research costs
-        if (settings.technology.researchCostProgression?.progression === 'standard') {
-            settings.technology.researchCostProgression = {
-                progression: 'standard',
-            };
-        } else if (settings.technology.researchCostProgression?.progression === 'exponential') {
-            const growthFactor = settings.technology.researchCostProgression.growthFactor;
-
-            if (growthFactor && growthFactor === 'soft' || growthFactor === 'medium' || growthFactor === 'hard') {
-                settings.technology.researchCostProgression = {
-                    progression: 'exponential',
-                    growthFactor: growthFactor
-                };
-            } else {
-                throw new ValidationError('Invalid growth factor for research cost progression.');
-            }
-        } else {
-            throw new ValidationError('Invalid research cost progression.');
-        }
-
         if (settings.general.readyToQuit === "enabled") {
             settings.general.readyToQuitFraction = settings.general.readyToQuitFraction || 1.0;
             settings.general.readyToQuitTimerCycles = settings.general.readyToQuitTimerCycles || 0;

@@ -407,7 +407,16 @@ export type GameSettingsTechnology = {
         weapons: GameResearchCost;
         specialists: GameResearchCost;
     },
-    researchCostProgression: GameResearchProgression;
+    researchCostProgressions: {
+        terraforming: GameResearchProgression,
+        experimentation: GameResearchProgression,
+        scanning: GameResearchProgression,
+        hyperspace: GameResearchProgression,
+        manufacturing: GameResearchProgression,
+        banking: GameResearchProgression,
+        weapons: GameResearchProgression,
+        specialists: GameResearchProgression,
+    }
     bankingReward: GameBankingReward;
     experimentationDistribution: GameExperimentationDistribution;
     experimentationReward: GameExperimentationReward;
