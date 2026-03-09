@@ -27,28 +27,6 @@
       <poll></poll>
     </div>
 
-    <div class="row pb-0 pt-3">
-      <div class="col-sm-12 col-md-12 col-lg-12">
-        <a class="card bg-dark text-white p-1" href="https://command.solaris.games/">
-          <img class="card-img" alt="Solaris:Command" :src="solarisCommandImg">
-          <div class="card-img-overlay">
-            <h5 class="card-title">
-              Solaris:Command
-            </h5>
-            <p class="card-text bg-dark p-2">
-              Solaris:Command, the new, hex-based strategy and tactics game, is live!
-            </p>
-            <div class="card-arrow">
-              <div class="card-arrow-top-left"></div>
-              <div class="card-arrow-top-right"></div>
-              <div class="card-arrow-bottom-left"></div>
-              <div class="card-arrow-bottom-right"></div>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-
     <div class="row pb-0 pt-0">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
@@ -134,6 +112,28 @@
             <div class="card-arrow-bottom-right"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="row pb-0">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <a class="card bg-dark text-white p-1" href="https://command.solaris.games/">
+          <img class="card-img" alt="Solaris:Command" :src="solarisCommandImg">
+          <div class="card-img-overlay">
+            <h5 class="card-title">
+              Solaris:Command
+            </h5>
+            <p class="card-text bg-dark p-2">
+              Solaris:Command, the new, hex-based strategy and tactics game, is live!
+            </p>
+            <div class="card-arrow">
+              <div class="card-arrow-top-left"></div>
+              <div class="card-arrow-top-right"></div>
+              <div class="card-arrow-bottom-left"></div>
+              <div class="card-arrow-bottom-right"></div>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
 
