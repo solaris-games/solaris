@@ -266,12 +266,12 @@ const parseGameSettingsPlayer: Validator<GameSettingsPlayer> = object({
 
 const researchCosts: Validator<GameResearchCost> = stringEnumeration<GameResearchCost, GameResearchCost[]>(GAME_RESEARCH_COSTS);
 
-const researchCostProgression: Validator<GameResearchProgression> = or(object({
+const researchCostProgression: Validator<GameResearchProgression> = withDefault({ progression: 'standard' }, or(object({
     progression: just('standard'),
 }), object({
     progression: just('exponential'),
     growthFactor: stringEnumeration<'soft'|'medium'|'hard', ('soft'|'medium'|'hard')[]>(['soft', 'medium', 'hard']),
-}));
+})));
 
 const parseGameSettingsTechnology: Validator<GameSettingsTechnology> = object({
     startingTechnologyLevel: object({
