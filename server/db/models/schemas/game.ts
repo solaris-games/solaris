@@ -201,7 +201,7 @@ const schema = new Schema({
                     progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
                 },
-                specialist: {
+                specialists: {
                     progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
                 },
