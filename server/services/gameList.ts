@@ -416,7 +416,8 @@ export default class GameListService {
             'settings.general.type': 'tutorial',
             'state.endDate': { $ne: null }
         }, {
-            _id: 1
+            _id: 1,
+            'settings': 1,
         });
         
         return games.filter(g => {
