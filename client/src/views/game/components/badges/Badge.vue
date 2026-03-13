@@ -41,8 +41,9 @@ const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge
 
 .badge-label {
   font-size: 14px;
-  padding: 4px;
   color: white;
+  font-weight: bold;
+  padding: 4px;
   background-color: #333333;
   border-radius: 4px;
 }
