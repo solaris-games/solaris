@@ -11,7 +11,7 @@
           recipientPlayer.alias }}</a>
           a <strong>Badge of Honor<i class="fas fa-medal ms-1"></i></strong></p>
 
-        <p v-if="userCredits"><small>You have <span class="text-warning"><strong>{{ userCredits }}</strong> Galactic
+        <p v-if="userCredits !== null && userCredits !== undefined"><small>You have <span class="text-warning"><strong>{{ userCredits }}</strong> Galactic
               Credits</span>.</small>
         </p>
       </div>
@@ -19,7 +19,7 @@
 
     <loading-spinner :loading="isLoading" />
 
-    <div class="pt-3 pb-3" v-if="!isLoading && userCredits && recipientPlayer">
+    <div class="pt-3 pb-3" v-if="!isLoading && userCredits !== null && userCredits !== undefined && recipientPlayer">
       <badge-shop-list :badges="badges" :userCredits="userCredits" :recipientName="recipientPlayer.alias"
         @onPurchaseBadgeConfirmed="onPurchaseBadgeConfirmed" />
     </div>

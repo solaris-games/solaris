@@ -733,7 +733,7 @@ export default class GameTickService extends EventEmitter {
                 let creditsResult = this.playerCycleRewardsService.givePlayerCreditsEndOfCycleRewards(game, player);
                 let experimentResult = this.researchService.conductExperiments(game, player);
                 let carrierUpkeepResult = this.playerService.deductCarrierUpkeepCost(game, player);
-                let allianceUpkeepResult: any | null = null; // TODO: Type
+                let allianceUpkeepResult: { allianceCount: number, totalCost: number } | null = null;
 
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
                     let allianceCount = this.diplomacyService.getAlliesOfPlayer(game, player).length;
@@ -766,6 +766,11 @@ export default class GameTickService extends EventEmitter {
             // Destroy stars for battle royale mode.
             if (game.settings.general.mode === 'battleRoyale') {
                 this.battleRoyaleService.performBattleRoyaleTick(game);
+            }
+
+            // Stars can be looted once per cycle, so reset that
+            for (const star of game.galaxy.stars) {
+                star.canBeLooted = true;
             }
 
             this.emit(GameTickServiceEvents.onGameCycleEnded, {

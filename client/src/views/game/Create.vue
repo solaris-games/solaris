@@ -848,23 +848,14 @@
           </select>
         </div>
 
-        <div class="mb-2">
-          <label for="researchProgression" class="col-form-label">Research Cost Progression <help-tooltip tooltip="Determines the growth of research points needed for the next level of technology"/></label>
-          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.progression" :disabled="isCreatingGame">
-            <option v-for="opt in options.technology.researchCostProgression" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-2" v-if="settings.technology.researchCostProgression && settings.technology.researchCostProgression.progression === 'exponential'">
-          <label for="researchProgression" class="col-form-label">Exponential growth factor <help-tooltip tooltip="Determines the speed of exponential growth"/></label>
-          <select class="form-control" id="researchProgression" v-model="settings.technology.researchCostProgression.growthFactor" :disabled="isCreatingGame">
-            <option v-for="opt in options.technology.researchCostProgressionGrowthFactor" v-bind:key="opt.value" v-bind:value="opt.value">
-              {{ opt.text }}
-            </option>
-          </select>
-        </div>
+        <research-cost-progression :is-creating-game="isCreatingGame" name="terraforming" v-model="settings.technology.researchCostProgressions.terraforming" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="experimentation" v-model="settings.technology.researchCostProgressions.experimentation" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="scanning" v-model="settings.technology.researchCostProgressions.scanning" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="hyperspace" v-model="settings.technology.researchCostProgressions.hyperspace" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="manufacturing" v-model="settings.technology.researchCostProgressions.manufacturing" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="banking" v-model="settings.technology.researchCostProgressions.banking" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="weapons" v-model="settings.technology.researchCostProgressions.weapons" />
+        <research-cost-progression :is-creating-game="isCreatingGame" name="specialists" v-model="settings.technology.researchCostProgressions.specialists" />
 
         <div class="mb-2">
           <label for="bankingReward" class="col-form-label">Banking Reward <help-tooltip tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"/></label>
@@ -936,6 +927,7 @@ import {createGame, getDefaultSettings} from "@/services/typedapi/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
+import ResearchCostProgression from "@/views/game/gameCreation/ResearchCostProgression.vue";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
