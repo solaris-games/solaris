@@ -61,25 +61,26 @@
   </td>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
+import type {NaturalResources} from "@solaris-common";
 
-export default {
-    props: {
-        resources: Object,
-        compareResources: Object,
-        iconAlignLeft: Boolean,
-        displayIcon: {
-            type: Boolean,
-            default: true
-        }
-    },
-    computed: {
-        isSplitResources () {
-            return GameHelper.isSplitResources(this.$store.state.game)
-        }
-    }
-}
+const props = withDefaults(defineProps<{
+    resources?: NaturalResources | null;
+    compareResources?: NaturalResources | null;
+    iconAlignLeft?: boolean;
+    displayIcon?: boolean;
+}>(), {
+    displayIcon: true
+});
+
+const store = useStore();
+
+const isSplitResources = computed(() => {
+    return GameHelper.isSplitResources(store.state.game);
+});
 </script>
 
 <style scoped>

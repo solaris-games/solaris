@@ -10,16 +10,9 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
-
-export default {
-  components: {
-    'view-container': ViewContainer,
-    'view-title': ViewTitle
-  }
-}
 </script>
 
 <style scoped>

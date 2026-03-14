@@ -57,7 +57,7 @@ export default (container: DependencyContainer) => {
                 }
     
                 res.status(201).json({
-                    gameId: game._id,
+                    gameId: game?._id,
                 });
                 return next();
             } catch (err) {

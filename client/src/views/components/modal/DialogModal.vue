@@ -22,25 +22,28 @@
     </div>
 </template>
 
-<script>
-export default {
-  props: {
-    modalName: String,
-    titleText: String,
-    cancelText: String,
-    confirmText: String,
-    hideCancelButton: Boolean,
-    cover: Boolean
-  },
-  methods: {
-    onCancel () {
-      this.$emit('onCancel')
-    },
-    onConfirm () {
-      this.$emit('onConfirm')
-    }
-  }
-}
+<script setup lang="ts">
+defineProps<{
+    modalName?: string;
+    titleText?: string;
+    cancelText?: string;
+    confirmText?: string;
+    hideCancelButton?: boolean;
+    cover?: boolean;
+}>();
+
+const emit = defineEmits<{
+    onCancel: [];
+    onConfirm: [];
+}>();
+
+const onCancel = () => {
+    emit('onCancel');
+};
+
+const onConfirm = () => {
+    emit('onConfirm');
+};
 </script>
 
 <style scoped>

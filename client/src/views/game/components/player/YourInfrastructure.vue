@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row" v-if="comparePlayer?.stats && userPlayer?.stats">
     <div class="col pt-2 pb-2">
         <span>Yours</span>
         <span class="float-end">
@@ -27,22 +27,24 @@
   </div>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
 
-export default {
-  props: {
-    comparePlayerId: String
-  },
-  computed: {
-    userPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    comparePlayer () {
-      return GameHelper.getPlayerById(this.$store.state.game, this.comparePlayerId)
-    }
-  }
-}
+const props = defineProps<{
+    comparePlayerId: string;
+}>();
+
+const store = useStore();
+
+const userPlayer = computed(() => {
+    return GameHelper.getUserPlayer(store.state.game);
+});
+
+const comparePlayer = computed(() => {
+    return GameHelper.getPlayerById(store.state.game, props.comparePlayerId);
+});
 </script>
 
 <style scoped>

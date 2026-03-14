@@ -8,21 +8,20 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
+import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStore } from 'vuex'
 
-export default {
-  components: {
-    'view-container': ViewContainer,
-    'view-title': ViewTitle
-  },
-  mounted () {
-    let credits = +this.$route.query.credits
+const route = useRoute()
+const store = useStore()
 
-    this.$store.commit('setUserCredits', this.$store.state.userCredits + credits)
-  }
-}
+onMounted(() => {
+    let credits = +route.query.credits!
+    store.commit('setUserCredits', store.state.userCredits + credits)
+})
 </script>
 
 <style scoped>

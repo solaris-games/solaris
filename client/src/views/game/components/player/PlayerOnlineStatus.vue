@@ -8,37 +8,32 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
+import type {Player} from "@/types/game";
 
-export default {
-  props: {
-    player: Object
-  },
-  data () {
-    return {
-      isOnline: false,
-      onlineStatus: '',
-      intervalFunction: null
-    }
-  },
-  mounted () {
-    let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
+const props = defineProps<{
+  player: Player
+}>();
 
-    this.recalculateOnlineStatus()
-    
-    if (!isHiddenPlayerOnlineStatus) {
-      this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
-      this.recalculateOnlineStatus()
-    }
-  },
-  methods: {
-    recalculateOnlineStatus () {
-      this.isOnline = GameHelper.isPlayerOnline(this.player)
-      this.onlineStatus = GameHelper.getOnlineStatus(this.player)
-    }
-  }
-}
+const isOnline = ref(false);
+const onlineStatus = ref('');
+
+const recalculateOnlineStatus = () => {
+  isOnline.value = GameHelper.isPlayerOnline(props.player);
+  onlineStatus.value = GameHelper.getOnlineStatus(props.player);
+};
+
+onMounted(() => {
+  const intervalHandle = setInterval(recalculateOnlineStatus, 1000);
+  recalculateOnlineStatus();
+
+  onUnmounted(() => {
+    clearInterval(intervalHandle);
+  });
+});
 </script>
 
 <style scoped>

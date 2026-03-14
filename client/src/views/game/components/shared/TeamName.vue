@@ -2,21 +2,23 @@
   <p class="team-name" v-if="team">({{team.name}})</p>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import type { Game } from '@/types/game'
 
-export default {
-  props: {
-    playerId: String
-  },
-  computed: {
-    team () {
-      const player = GameHelper.getPlayerById(this.$store.state.game, this.playerId);
-      return GameHelper.getTeamByPlayer(this.$store.state.game, player);
-    }
-  }
-}
+const props = defineProps<{
+    playerId: string
+}>()
 
+const store = useStore()
+
+const team = computed(() => {
+    const game = store.state.game as Game;
+    const player = GameHelper.getPlayerById(game, props.playerId);
+    return GameHelper.getTeamByPlayer(game, player);
+})
 </script>
 
 <style scoped>
