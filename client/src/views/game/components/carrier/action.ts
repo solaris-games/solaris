@@ -9,32 +9,37 @@ import {toastInjectionKey} from "@/util/keys";
 import {eventBusInjectionKey} from "@/eventBus";
 import {useGameServices} from "@/util/gameServices";
 
-export const saveWaypoints = (game: Ref<Game>, isSavingWaypoints: Ref<boolean>) => async (carrier: Carrier, waypoints: CarrierWaypoint<string>[]) => {
-  isSavingWaypoints.value = true;
+export const saveWaypoints = (game: Ref<Game>, isSavingWaypoints: Ref<boolean>) => {
   const toast = inject(toastInjectionKey)!;
   const eventBus = inject(eventBusInjectionKey)!;
   const httpClient = inject(httpInjectionKey)!;
   const gameServices = useGameServices();
 
-  const response = await saveWaypointsReq(httpClient)(game.value._id, carrier._id, waypoints, carrier.waypointsLooped);
+  return async (carrier: Carrier, waypoints: CarrierWaypoint<string>[]) => {
+    isSavingWaypoints.value = true;
 
-  if (isOk(response)) {
-    AudioService.join();
+    const response = await saveWaypointsReq(httpClient)(game.value._id, carrier._id, waypoints, carrier.waypointsLooped);
 
-    carrier.waypoints = response.data.waypoints;
+    if (isOk(response)) {
+      AudioService.join();
 
-    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier);
+      carrier.waypoints = response.data.waypoints;
 
-    toast.default(`${carrier.name} waypoints updated.`)
+      gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier);
 
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier});
+      toast.default(`${carrier.name} waypoints updated.`)
 
-    return true;
-  } else {
-    toast.error(`Failed to update ${carrier.name} waypoints.`)
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier});
 
-    return false;
+      isSavingWaypoints.value = false;
+
+      return true;
+    } else {
+      toast.error(`Failed to update ${carrier.name} waypoints.`)
+
+      isSavingWaypoints.value = false;
+
+      return false;
+    }
   }
-
-  isSavingWaypoints.value = false;
 };
