@@ -1,25 +1,25 @@
 <template>
-<div class="table-responsive p-0">
+<div class="p-0">
     <table class="table table-striped table-hover mb-1">
         <thead class="table-dark">
             <tr>
-                <td v-if="userPlayerOwnsCarrier">Delay</td>
-                <td>Destination</td>
-                <td v-if="!showAction" title="Show actions">
+                <th class="col-2" v-if="userPlayerOwnsCarrier">Delay</th>
+                <th class="col-2">Destination</th>
+                <th class="col-6" v-if="!isEditMode && !showAction" title="Show actions">
                   <a class="link-inactive" href="javascript:;" @click="toggleShowAction">
                     [&nbsp;ETA&nbsp;|&nbsp;<span class="link-active">Action</span>&nbsp;]
                   </a>
-                </td>
-                <td v-if="showAction" title="Show ETAs">
+                </th>
+                <th class="col-6" v-if="!isEditMode && showAction" title="Show ETAs">
                   <a class="link-inactive" href="javascript:;" @click="toggleShowAction">
                     [&nbsp;<span class="link-active">ETA</span>&nbsp;|&nbsp;Action&nbsp;]
                   </a>
-                </td>
-                <td class="text-end" v-if="!isHistoricalMode && canEditWaypoints">
-                  <a href="javascript:;" @click="onEditWaypointsRequested">
-                    Edit
-                  </a>
-                </td>
+                </th>
+                <th class="col-6" v-if="isEditMode">Action</th>
+                <th class="col-2" v-if="isEditMode">Ships</th>
+                <th class="col-2 text-end" v-if="!isEditMode && canEditWaypoints">
+                  Edit
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +30,13 @@
                         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
         </tbody>
     </table>
+
+  <div class="col text-end" v-if="canEditWaypoints">
+    <input class="me-1" type="checkbox" v-model="isEditMode" id="chkEditWaypoints">
+    <label for="chkEditWaypoints">
+      Edit Waypoints
+    </label>
+  </div>
 </div>
 </template>
 
@@ -48,7 +55,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   onEditWaypointRequested: [waypoint: CarrierWaypoint<string>],
-  onEditWaypointsRequested: [],
   onOpenStarDetailRequested: [starId: string],
 }>();
 
@@ -57,16 +63,15 @@ const game = computed<Game>(() => store.state.game);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const showAction = ref(true);
+const isEditMode = ref(false);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
-const canEditWaypoints = computed(() => !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
+const canEditWaypoints = computed(() => !isHistoricalMode.value && !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
 
 const toggleShowAction = () => showAction.value = !showAction.value;
 
 const onEditWaypointRequested = (wp: CarrierWaypoint<string>) => emit('onEditWaypointRequested', wp);
-
-const onEditWaypointsRequested = () => emit('onEditWaypointsRequested');
 
 const onOpenStarDetailRequested = (starId: string) => emit('onOpenStarDetailRequested', starId);
 </script>
