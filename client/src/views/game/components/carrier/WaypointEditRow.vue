@@ -1,33 +1,37 @@
 <template>
-  <div class="row g-0 mb-2" v-if="waypoint">
-    <div class="col-2 text-center">
-      <input type="number" class="form-control form-control-sm" v-if="!(isFirstWaypoint(allWaypoints, waypoint) && isInTransit)" v-model="waypoint.delayTicks" @change="onChanged">
-    </div>
-    <div class="col-3 text-center pt-1">
-      <span>{{getStarName(waypoint.destination)}}</span>
-    </div>
-    <div class="col-5 text-center">
+  <tr v-if="waypoint">
+    <td class="waypoint-element">
+      <input type="number" class="form-control form-control-sm"
+             v-if="!(isFirstWaypoint(allWaypoints, waypoint) && isInTransit)" v-model="waypoint.delayTicks"
+             @change="onChanged">
+    </td>
+    <td class="waypoint-element pt-2">
+      <span>{{ getStarName(waypoint.destination) }}</span>
+    </td>
+    <td class="waypoint-element">
       <select class="form-control form-control-sm" v-model="waypoint.action" @change="onChanged">
-        <option key="nothing" value="nothing">{{formatAction(waypoint, 'nothing')}}</option>
-        <option key="collectAll" value="collectAll">{{formatAction(waypoint, 'collectAll')}}</option>
-        <option key="dropAll" value="dropAll">{{formatAction(waypoint, 'dropAll')}}</option>
-        <option key="collect" value="collect">{{formatAction(waypoint, 'collect')}}</option>
-        <option key="drop" value="drop">{{formatAction(waypoint, 'drop')}}</option>
-        <option key="collectAllBut" value="collectAllBut">{{formatAction(waypoint, 'collectAllBut')}}</option>
-        <option key="dropAllBut" value="dropAllBut">{{formatAction(waypoint, 'dropAllBut')}}</option>
-        <option key="garrison" value="garrison">{{formatAction(waypoint, 'garrison')}}</option>
-        <option key="collectPercentage" value="collectPercentage">{{formatAction(waypoint, 'collectPercentage')}}</option>
-        <option key="dropPercentage" value="dropPercentage">{{formatAction(waypoint, 'dropPercentage')}}</option>
+        <option key="nothing" value="nothing">{{ formatAction(waypoint, 'nothing') }}</option>
+        <option key="collectAll" value="collectAll">{{ formatAction(waypoint, 'collectAll') }}</option>
+        <option key="dropAll" value="dropAll">{{ formatAction(waypoint, 'dropAll') }}</option>
+        <option key="collect" value="collect">{{ formatAction(waypoint, 'collect') }}</option>
+        <option key="drop" value="drop">{{ formatAction(waypoint, 'drop') }}</option>
+        <option key="collectAllBut" value="collectAllBut">{{ formatAction(waypoint, 'collectAllBut') }}</option>
+        <option key="dropAllBut" value="dropAllBut">{{ formatAction(waypoint, 'dropAllBut') }}</option>
+        <option key="garrison" value="garrison">{{ formatAction(waypoint, 'garrison') }}</option>
+        <option key="collectPercentage" value="collectPercentage">{{ formatAction(waypoint, 'collectPercentage') }}
+        </option>
+        <option key="dropPercentage" value="dropPercentage">{{ formatAction(waypoint, 'dropPercentage') }}</option>
       </select>
-    </div>
-    <div class="col-2 text-center">
-      <input v-if="isActionRequiresShips(waypoint.action)" class="form-control form-control-sm" type="number" v-model="waypoint.actionShips"/>
-    </div>
-  </div>
+    </td>
+    <td class="waypoint-element">
+      <input v-if="isActionRequiresShips(waypoint.action)" class="form-control form-control-sm" type="number"
+             v-model="waypoint.actionShips"/>
+    </td>
+  </tr>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useStore } from "vuex";
+import {computed} from 'vue';
+import {useStore} from "vuex";
 import type {CarrierWaypoint} from "@solaris-common";
 import {formatAction, isActionRequiresShips, isFirstWaypoint} from "@/util/waypoint";
 import GameHelper from "@/services/gameHelper";
@@ -54,5 +58,7 @@ const getStarName = (starId: string) => {
 };
 </script>
 <style scoped>
-
+.waypoint-element {
+  text-align: center;
+}
 </style>
