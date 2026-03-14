@@ -76,23 +76,19 @@ import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import gameHelper from '../../../../services/gameHelper';
-import AudioService from '../../../../game/audio';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris-common"
 import {useStore} from 'vuex';
-import {saveWaypoints} from "@/services/typedapi/carrier";
-import {httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
+import {httpInjectionKey} from "@/services/typedapi";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {useGameServices} from "@/util/gameServices";
 import type {Game} from "@/types/game";
 import {getCountdownTimeStringByTicks, ticksToDuration} from "@/util/time";
 import {formatDuration} from "@/util/duration";
 import {isActionRequiresShips} from "@/util/waypoint";
 import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
+import {saveWaypoints} from "@/views/game/components/carrier/action";
 
 const props = defineProps<{
   carrierId: string,
@@ -106,12 +102,9 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-
-const gameServices = useGameServices();
 
 const settings = computed<UserGameSettings>(() => store.state.settings);
 const game = computed<Game>(() => store.state.game);
@@ -131,11 +124,6 @@ const intervalFunction = ref<number | null>(null);
 
 const onCloseRequested = () => {
   emit('onCloseRequested');
-};
-
-const getStarName = (starId: string) => {
-  const star = GameHelper.getStarById(game.value, starId);
-  return star ? star.name : 'Unknown Star';
 };
 
 const panToWaypoint = () => {
@@ -210,29 +198,18 @@ const toggleLooped = () => {
   carrier.value.waypointsLooped = !carrier.value.waypointsLooped;
 };
 
+const waypointsSaveAction = saveWaypoints(game, isSavingWaypoints);
+
 const doSaveWaypoints = async (saveAndEdit = false) => {
-  isSavingWaypoints.value = true
-  const response = await saveWaypoints(httpClient)(game.value._id, carrier.value._id, waypoints.value, carrier.value.waypointsLooped)
+  const res = await waypointsSaveAction(carrier.value, waypoints.value);
 
-  if (isOk(response)) {
-    AudioService.join()
-
-    carrier.value.waypoints = response.data.waypoints;
-
-    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
-
-    toast.default(`${carrier.value.name} waypoints updated.`)
-
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier.value});
-
+  if (res) {
     if (saveAndEdit) {
       emit('onOpenCarrierDetailRequested', carrier.value._id);
     } else {
       onCloseRequested();
     }
   }
-
-  isSavingWaypoints.value = false;
 };
 
 watch(() => currentWaypoint.value.action, (newV, oldV) => {

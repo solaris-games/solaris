@@ -22,7 +22,14 @@
                 </th>
             </tr>
         </thead>
-        <tbody>
+        <tbody v-if="isEditMode">
+          <waypoint-edit-row v-for="waypoint in carrier.waypoints"
+                             :is-in-transit="!carrier.orbiting"
+                             :waypoint="waypoint"
+                             :all-waypoints="carrier.waypoints"
+                             @onWaypointUpdated="onWaypointChanged" />
+        </tbody>
+        <tbody v-if="!isEditMode">
             <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
                         :carrier="carrier"
                         :waypoint="waypoint" :showAction="showAction"
@@ -48,6 +55,8 @@ import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
+import {saveWaypoints} from "@/views/game/components/carrier/action";
 
 const props = defineProps<{
   carrier: Carrier,
@@ -64,10 +73,17 @@ const isHistoricalMode = useIsHistoricalMode(store);
 
 const showAction = ref(true);
 const isEditMode = ref(false);
+const isSavingWaypoints = ref(false);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
 const canEditWaypoints = computed(() => !isHistoricalMode.value && !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
+
+const waypointsSaveAction = saveWaypoints(game, isSavingWaypoints);
+
+const onWaypointChanged = async (waypoint: CarrierWaypoint<string>) => {
+  await waypointsSaveAction(props.carrier, props.carrier.waypoints);
+};
 
 const toggleShowAction = () => showAction.value = !showAction.value;
 
