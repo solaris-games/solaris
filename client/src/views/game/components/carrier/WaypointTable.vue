@@ -23,14 +23,13 @@
             </tr>
         </thead>
         <tbody v-if="isEditMode">
-          <waypoint-edit-row v-for="waypoint in carrier.waypoints"
+          <waypoint-edit-row v-for="waypoint in waypoints"
                              :is-in-transit="!carrier.orbiting"
                              :waypoint="waypoint"
-                             :all-waypoints="carrier.waypoints"
-                             @onWaypointUpdated="onWaypointChanged" />
+                             :all-waypoints="waypoints" />
         </tbody>
         <tbody v-if="!isEditMode">
-            <waypointRow v-for="waypoint in carrier.waypoints" v-bind:key="waypoint._id"
+            <waypointRow v-for="waypoint in waypoints" v-bind:key="waypoint._id"
                         :carrier="carrier"
                         :waypoint="waypoint" :showAction="showAction"
                         @onEditWaypointRequested="onEditWaypointRequested"
@@ -38,11 +37,10 @@
         </tbody>
     </table>
 
-  <div class="col text-end" v-if="canEditWaypoints">
-    <input class="me-1" type="checkbox" v-model="isEditMode" id="chkEditWaypoints">
-    <label for="chkEditWaypoints">
-      Edit Waypoints
-    </label>
+  <div class="col p-1" v-if="canEditWaypoints">
+    <button v-if="!isEditMode" @click="isEditMode = true" class="ms-1 btn btn-sm btn-success">Edit</button>
+    <button v-if="isEditMode" @click="onWaypointsSave" class="ms-1 btn btn-sm btn-success">Save</button>
+    <button v-if="isEditMode" @click="cancelEdit" class="ms-1 btn btn-sm btn-danger">Cancel</button>
   </div>
 </div>
 </template>
@@ -51,7 +49,7 @@
 import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import type {Carrier, Game} from "@/types/game";
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
@@ -75,14 +73,31 @@ const showAction = ref(true);
 const isEditMode = ref(false);
 const isSavingWaypoints = ref(false);
 
+const waypoints = ref<CarrierWaypoint<string>[]>([]);
+
+const resetWaypoints = () => {
+  waypoints.value = JSON.parse(JSON.stringify(props.carrier.waypoints));
+};
+
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);
 const canEditWaypoints = computed(() => !isHistoricalMode.value && !GameHelper.isGameFinished(game.value) && userPlayerOwnsCarrier.value && !props.carrier.isGift);
 
 const waypointsSaveAction = saveWaypoints(game, isSavingWaypoints);
 
-const onWaypointChanged = async (waypoint: CarrierWaypoint<string>) => {
-  await waypointsSaveAction(props.carrier, props.carrier.waypoints);
+const cancelEdit = () => {
+  isEditMode.value = false;
+  resetWaypoints();
+}
+
+const onWaypointsSave = async () => {
+  const res = await waypointsSaveAction(props.carrier, waypoints.value);
+
+  if (res) {
+    resetWaypoints();
+  }
+
+  isEditMode.value = false;
 };
 
 const toggleShowAction = () => showAction.value = !showAction.value;
@@ -90,6 +105,10 @@ const toggleShowAction = () => showAction.value = !showAction.value;
 const onEditWaypointRequested = (wp: CarrierWaypoint<string>) => emit('onEditWaypointRequested', wp);
 
 const onOpenStarDetailRequested = (starId: string) => emit('onOpenStarDetailRequested', starId);
+
+onMounted(() => {
+  resetWaypoints();
+});
 </script>
 
 <style scoped>
