@@ -18,32 +18,7 @@
             </div>
         </div>
 
-        <div class="row g-0 mb-2" v-if="currentWaypoint">
-            <div class="col-2 text-center">
-              <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
-            </div>
-            <div class="col-3 text-center pt-1">
-                <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
-                <span>{{getStarName(currentWaypoint.destination)}}</span>
-            </div>
-            <div class="col-5 text-center">
-                <select class="form-control input-sm" id="waypointAction" v-model="currentWaypoint.action">
-                    <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(currentWaypoint, 'nothing')}}</option>
-                    <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAll')}}</option>
-                    <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAll')}}</option>
-                    <option key="collect" value="collect">{{getWaypointActionFriendlyText(currentWaypoint, 'collect')}}</option>
-                    <option key="drop" value="drop">{{getWaypointActionFriendlyText(currentWaypoint, 'drop')}}</option>
-                    <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAllBut')}}</option>
-                    <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAllBut')}}</option>
-                    <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(currentWaypoint, 'garrison')}}</option>
-                    <option key="collectPercentage" value="collectPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'collectPercentage')}}</option>
-                    <option key="dropPercentage" value="dropPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'dropPercentage')}}</option>
-                </select>
-            </div>
-            <div class="col-2 text-center">
-                <input v-if="isActionRequiresShips(currentWaypoint.action)" class="form-control input-sm" type="number" v-model="currentWaypoint.actionShips"/>
-            </div>
-        </div>
+        <waypoint-edit-row :isInTransit="isInTransit" :waypoint="currentWaypoint" :allWaypoints="waypoints" @change="recalculateWaypointDuration" />
 
         <div class="row pt-2 pb-0 mb-0">
           <div class="col">
@@ -102,6 +77,8 @@ import {useGameServices} from "@/util/gameServices";
 import type {Game} from "@/types/game";
 import {getCountdownTimeStringByTicks, ticksToDuration} from "@/util/time";
 import {formatDuration} from "@/util/duration";
+import {isActionRequiresShips} from "@/util/waypoint";
+import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
 
 const props = defineProps<{
   carrierId: string,
@@ -160,50 +137,8 @@ const panToWaypoint = () => {
   eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, { location: star!.location });
 };
 
-const isActionRequiresShips = (action: CarrierWaypointActionType) => {
-  switch (action) {
-    case 'collect':
-    case 'drop':
-    case 'collectAllBut':
-    case 'dropAllBut':
-    case 'collectPercentage':
-    case 'dropPercentage':
-    case 'garrison':
-      return true;
-  }
-
-  return false;
-};
-
 const isActionRequiresPercentage = (action: CarrierWaypointActionType) => {
   return action === 'dropPercentage' || action === 'collectPercentage';
-};
-
-const getWaypointActionFriendlyText = (waypoint: CarrierWaypoint<string>, action: CarrierWaypointActionType) => {
-  action = action || waypoint.action;
-
-  switch (action) {
-    case 'nothing':
-      return 'Do Nothing'
-    case 'collectAll':
-      return 'Collect All'
-    case 'dropAll':
-      return 'Drop All'
-    case 'collect':
-      return `Collect ${waypoint.actionShips}`
-    case 'drop':
-      return `Drop ${waypoint.actionShips}`
-    case 'collectAllBut':
-      return `Collect All But ${waypoint.actionShips}`
-    case 'dropAllBut':
-      return `Drop All But ${waypoint.actionShips}`
-    case 'garrison':
-      return `Garrison ${waypoint.actionShips}`
-    case 'dropPercentage':
-      return `Drop ${waypoint.actionShips}%`
-    case 'collectPercentage':
-      return `Collect ${waypoint.actionShips}%`
-  }
 };
 
 const recalculateWaypointEta = () => {
@@ -260,10 +195,6 @@ const previousWaypoint = () => {
 const toggleLooped = () => {
   carrier.value.waypointsLooped = !carrier.value.waypointsLooped;
 };
-
-const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
-  return waypoints.value.indexOf(waypoint) === 0;
-}
 
 const doSaveWaypoints = async (saveAndEdit = false) => {
   isSavingWaypoints.value = true
