@@ -201,26 +201,54 @@ const runScanningOne = (game: Game<DBObjectId>, func: ScanningFunc, name: string
     console.log(`${name}: Total time: ${total} ms`);
 }
 
-const createSanitizeKD = (): SanitizeFunc => {
-    const _getPlayersWithOwnedOrInOrbitStars = (game: Game<DBObjectId>) => {
-        const results = new Map<string, { player: Player<DBObjectId>, stars: Star<DBObjectId>[], inRange: Set<string> }>();
-        game.galaxy.players
-            .forEach(p => {
-                const starsOwnedOrInOrbit = listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
-                const starsWithScanning = starsOwnedOrInOrbit.filter(s => !starDataService.isDeadStar(s));
-                let wormHoleStars = starsOwnedOrInOrbit.filter(s => s.wormHoleToStarId)
-                wormHoleStars.forEach(s => {
-                    starsOwnedOrInOrbit.push(s, getById(game, s.wormHoleToStarId!))
-                });
-                results.set(p._id.toString(), {
-                    player: p,
-                    stars: starsWithScanning,
-                    inRange: new Set<string>(starsOwnedOrInOrbit.map(s => s._id.toString()))
-                });
+const _getPlayersWithOwnedOrInOrbitStars = (game: Game<DBObjectId>) => {
+    const results = new Map<string, { player: Player<DBObjectId>, stars: Star<DBObjectId>[], inRange: Set<string> }>();
+    game.galaxy.players
+        .forEach(p => {
+            const starsOwnedOrInOrbit = listStarsOwnedOrInOrbitByPlayers(game, [p._id]);
+            const starsWithScanning = starsOwnedOrInOrbit.filter(s => !starDataService.isDeadStar(s));
+            let wormHoleStars = starsOwnedOrInOrbit.filter(s => s.wormHoleToStarId)
+            wormHoleStars.forEach(s => {
+                starsOwnedOrInOrbit.push(s, getById(game, s.wormHoleToStarId!))
             });
-        return results;
+            results.set(p._id.toString(), {
+                player: p,
+                stars: starsWithScanning,
+                inRange: new Set<string>(starsOwnedOrInOrbit.map(s => s._id.toString()))
+            });
+        });
+    return results;
+}
+
+const canLoop = (game: Game<DBObjectId>, carrier: Carrier<DBObjectId>) => {
+    if (carrier.waypoints.length < 2 || carrier.isGift) {
+        return false;
     }
 
+    const effectiveTechs = technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+
+    // Check whether the last waypoint is in range of the first waypoint.
+    const firstWaypoint = carrier.waypoints[0];
+    const lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+
+    const firstWaypointStar = getById(game, firstWaypoint.destination);
+    const lastWaypointStar = getById(game, lastWaypoint.destination);
+
+    if (firstWaypointStar == null || lastWaypointStar == null) {
+        return false;
+    }
+
+    if (starDataService.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
+        return true;
+    }
+
+    const distanceBetweenStars = starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
+    const hyperspaceDistance = distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+
+    return distanceBetweenStars <= hyperspaceDistance
+}
+
+const createSanitizeKD = (): SanitizeFunc => {
     const isStarAlwaysVisible = (star: Star<DBObjectId>) => {
         return star.isPulsar || star.specialistId === 10 // Trade port
     }
@@ -235,34 +263,6 @@ const createSanitizeKD = (): SanitizeFunc => {
         if (scannedStarSet.has(star)) return true;
 
         return false;
-    }
-
-    const canLoop = (game: Game<DBObjectId>, carrier: Carrier<DBObjectId>) => {
-        if (carrier.waypoints.length < 2 || carrier.isGift) {
-            return false;
-        }
-
-        const effectiveTechs = technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
-
-        // Check whether the last waypoint is in range of the first waypoint.
-        const firstWaypoint = carrier.waypoints[0];
-        const lastWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
-
-        const firstWaypointStar = getById(game, firstWaypoint.destination);
-        const lastWaypointStar = getById(game, lastWaypoint.destination);
-
-        if (firstWaypointStar == null || lastWaypointStar == null) {
-            return false;
-        }
-
-        if (starDataService.isStarPairWormHole(firstWaypointStar, lastWaypointStar)) {
-            return true;
-        }
-
-        const distanceBetweenStars = starDistanceService.getDistanceBetweenStars(firstWaypointStar, lastWaypointStar);
-        const hyperspaceDistance = distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
-
-        return distanceBetweenStars <= hyperspaceDistance
     }
 
     const _checkCarrierRouteByViewpoint = (game: Game<DBObjectId>, carrier: Carrier<DBObjectId>, player: { player: Player<DBObjectId>, stars: Star<DBObjectId>[], inRange: Set<string> }, scannedStarSet: Set<Star<DBObjectId>>) => {
@@ -411,6 +411,66 @@ const createSanitizeKD = (): SanitizeFunc => {
     return sanitiseAllCarrierWaypointsByScanningRange;
 }
 
+const createSanitizeNormal = (): SanitizeFunc => {
+    const getStarsWithinScanningRangeOfStarByStarIds = (game: Game<DBObjectId>, star: Star<DBObjectId>, stars: MapObjectWithVisibility[]) => {
+        // If the star isn't owned then it cannot have a scanning range
+        if (star.ownedByPlayerId == null) {
+            return [];
+        }
+
+        // Calculate the scanning distance of the given star.
+        let effectiveTechs = technologyService.getStarEffectiveTechnologyLevels(game, star, true);
+        let scanningRangeDistance = distanceService.getScanningDistance(game, effectiveTechs.scanning);
+
+        // Go through all stars and find each star that is in scanning range.
+        return stars.filter(s => {
+            return s.isAlwaysVisible || starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
+        });
+    }
+
+
+    const _checkWaypointStarInRange = (game: Game<DBObjectId>, waypoint: Star<DBObjectId>, player: { player: Player<DBObjectId>, stars: Star<DBObjectId>[], inRange: string[] }) => {
+        for (let index = 0; index < player.stars.length; index++) {
+            const star = player.stars[index];
+            if (getStarsWithinScanningRangeOfStarByStarIds(game, star, [waypoint]).length) return true;
+        }
+        return false;
+    }
+
+    const _checkCarrierRoute = (game: Game<DBObjectId>, carrier: Carrier<DBObjectId>, player: { player: Player<DBObjectId>, stars: Star<DBObjectId>[], inRange: string[] }) => {
+        let startIndex = carrier.orbiting ? 0 : 1;
+        for (let index = startIndex; index < carrier.waypoints.length; index++) {
+            const waypoint = carrier.waypoints[index];
+            if (waypoint.destination.toString() in player.inRange) continue;
+            const waypointStar = getById(game, waypoint.destination);
+            if (_checkWaypointStarInRange(game, waypointStar, player)) {
+                player.inRange.push(waypoint.destination.toString());
+            } else {
+                carrier.waypoints.splice(index);
+
+                if (carrier.waypointsLooped) {
+                    carrier.waypointsLooped = canLoop(game, carrier);
+                }
+
+                break;
+            }
+        }
+    }
+
+    const sanitiseAllCarrierWaypointsByScanningRange = (game: Game<DBObjectId>) => {
+        const players = _getPlayersWithOwnedOrInOrbitStars(game);
+
+        game.galaxy.carriers
+            .filter(c => c.waypoints.length && c.ownedByPlayerId)
+            .forEach(c => {
+                const v = players.get(c.ownedByPlayerId!.toString())!;
+                _checkCarrierRoute(game, c, { player: v.player, stars: v.stars, inRange: Array.from(v.inRange) });
+            });
+    }
+
+    return sanitiseAllCarrierWaypointsByScanningRange;
+}
+
 const runScanningBenchmark = async (container: DependencyContainer, gameId: DBObjectId) => {
     const game = await container.gameService.getByIdAll(gameId);
 
@@ -446,6 +506,7 @@ const runSanitizeBenchmark = async (container: DependencyContainer, gameId: DBOb
     }
 
     runSanitizeOne(game, createSanitizeKD(), "Sanitize KD Tree");
+    runSanitizeOne(game, createSanitizeNormal(), "Sanitize Normal");
 }
 
 const GAME_IDS = [
