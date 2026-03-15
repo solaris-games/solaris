@@ -135,4 +135,28 @@ export class CarrierTravelService<ID extends Id> {
     isLaunching(carrier: Carrier<ID>) {
         return carrier.orbiting && carrier.waypoints.length && carrier.waypoints[0].delayTicks === 0;
     }
+
+    getSpeedOfCarrier(game: Game<ID>, carrier: Carrier<ID>) {
+        let waypoint = carrier.waypoints[0];
+        let sourceStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.source.toString())!;
+        let destinationStar = game.galaxy.stars.find(s => s._id.toString() === waypoint.destination.toString())!;
+        let carrierOwner = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
+
+        let warpSpeed = false;
+        let instantSpeed: boolean | null = false;
+
+        if (sourceStar) {
+            warpSpeed = this.canTravelAtWarpSpeed(game, carrierOwner, carrier, sourceStar, destinationStar);
+            instantSpeed = this.starDataService.isStarPairWormHole(sourceStar, destinationStar);
+        }
+
+        if (instantSpeed) {
+            let distanceToDestination = this.distanceService.getDistanceBetweenLocations(carrier.location, destinationStar.location);
+            return distanceToDestination;
+        } else {
+            // Here "!" is added to fix typing. The value null is only taken if instantSpeed is true.
+            // This is not the case, but typing still does not allow it otherwise
+            return this.getCarrierDistancePerTick(game, carrier, warpSpeed, instantSpeed)!;
+        }
+    }
 }

@@ -128,6 +128,7 @@ import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import SaveWaypointsService from "./saveWaypoints";
 import { CarrierTravelService, type Guild, StarDataService, type StatsSlice } from 'solaris-common';
+import CarrierCombatService from "./carrierCombat";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -250,7 +251,8 @@ export default (config: Config,
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, cullWaypointsService);
     const gameGalaxyService = new GameGalaxyService(cacheService, socketService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService, starDataService);
     const scheduleBuyService = new ScheduleBuyService(gameRepository, starUpgradeService);
-    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService, waypointActionService, cullWaypointsService, carrierTravelService);
+    const carrierCombatService = new CarrierCombatService(carrierTravelService, carrierMovementService, combatService, diplomacyService, distanceService, playerService, specialistService, starService);
+    const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService, waypointActionService, cullWaypointsService, carrierTravelService, carrierCombatService);
     const emailService = new EmailService(config, gameService, gameJoinService, userService, leaderboardService, playerService, playerReadyService, gameTypeService, gameStateService, gameTickService);
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameJoinService, gameTickService, researchService, starService, starUpgradeService, tradeService,
         ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);

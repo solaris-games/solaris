@@ -117,6 +117,10 @@ export default class SpecialistService {
         return result;
     }
 
+    getAvoidCombatCarrierToCarrier(carrier: Carrier) {
+        return this._getCarrierSpecialValue(carrier, 'avoidCombatCarrierToCarrier', false);
+    }
+
     _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue) {
         if (!carrier.specialistId) {
             return defaultValue;
