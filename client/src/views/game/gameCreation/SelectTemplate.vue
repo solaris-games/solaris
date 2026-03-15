@@ -23,6 +23,7 @@
       <option value="special_orbital">Special Orbital Rotation</option>
       <option value="special_tinyGalaxy">Special Tiny Galaxy</option>
       <option value="special_ultraDark">Special Ultra Dark</option>
+      <option value="fast_newPlayer">Fast New Player</option>
     </select>
     <button class="btn btn-default mt-2" @click="load">Load settings</button>
   </div>

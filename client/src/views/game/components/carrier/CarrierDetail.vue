@@ -162,7 +162,6 @@
       <div v-if="(hasWaypoints && isStandardUIStyle) || (hasWaypoints && isUserPlayerCarrier)" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier"
           @onEditWaypointRequested="onEditWaypointRequested"
-          @onEditWaypointsRequested="editWaypoints"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
@@ -190,7 +189,7 @@
         </div>
         <div class="col-auto">
           <button class="btn btn-sm btn-success" @click="editWaypoints()">
-            Edit Waypoints
+            Waypoints
             <i class="fas fa-map-marker-alt"></i>
           </button>
         </div>

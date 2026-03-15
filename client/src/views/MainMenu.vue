@@ -27,7 +27,7 @@
       <poll></poll>
     </div>
 
-    <div class="row pb-0 pt-3">
+    <div class="row pb-0 pt-0">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
           <img class="card-img" :src="home1" alt="View my games">
@@ -115,6 +115,28 @@
       </div>
     </div>
 
+    <div class="row pb-0">
+      <div class="col-sm-12 col-md-12 col-lg-12">
+        <a class="card bg-dark text-white p-1" href="https://command.solaris.games/">
+          <img class="card-img" alt="Solaris:Command" :src="solarisCommandImg">
+          <div class="card-img-overlay">
+            <h5 class="card-title">
+              Solaris:Command
+            </h5>
+            <p class="card-text bg-dark p-2">
+              Solaris:Command, the new, hex-based strategy and tactics game, is live!
+            </p>
+            <div class="card-arrow">
+              <div class="card-arrow-top-left"></div>
+              <div class="card-arrow-top-right"></div>
+              <div class="card-arrow-bottom-left"></div>
+              <div class="card-arrow-bottom-right"></div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <hr />
 
     <community />
@@ -129,6 +151,7 @@ import home2 from '../assets/screenshots/tiles/home-2.jpg'
 import home3 from '../assets/screenshots/tiles/home-3.jpg'
 import home4 from '../assets/screenshots/tiles/home-4.jpg'
 import home5 from '../assets/screenshots/tiles/home-5.jpg'
+import solarisCommandImg from '../assets/screenshots/solaris_command_1.jpg';
 import { ref, onMounted, type Ref, inject } from 'vue';
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import router from '../router'

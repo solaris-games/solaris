@@ -871,7 +871,7 @@ class GameHelper {
     return this.isSpecialistsEnabled(game) && game.settings.specialGalaxy.specialistsCurrency === 'creditsSpecialists'
   }
 
-  getDateString(date) {
+  getDateString(date: Date | string) {
     date = moment(date).utc().toDate()
 
     let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']

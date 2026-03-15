@@ -533,18 +533,16 @@
               :valueText="getFriendlyText(game.settings.technology.experimentationDistribution)"
               :value="game.settings.technology.experimentationDistribution"
               :compareValue="compareSettings.technology.experimentationDistribution" />
-            <game-setting-value v-if="game.settings.technology.researchCostProgression"
-              title="Research Cost Progression"
-              tooltip="Determines the growth of research points needed for the next level of technology"
-              :valueText="getFriendlyText(game.settings.technology.researchCostProgression.progression)"
-              :value="game.settings.technology.researchCostProgression.progression"
-              :compareValue="compareSettings.technology.researchCostProgression.progression" />
-            <game-setting-value
-              v-if="game.settings.technology.researchCostProgression && game.settings.technology.researchCostProgression.progression === 'exponential'"
-              title="Exponential growth factor" tooltip="Determines the speed of exponential growth"
-              :valueText="getFriendlyText(game.settings.technology.researchCostProgression.growthFactor)"
-              :value="game.settings.technology.researchCostProgression.growthFactor"
-              compareValue="medium" />
+
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.terraforming" name="Terraforming" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.banking" name="Banking" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.experimentation" name="Experimentation" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.hyperspace" name="Hyperspace Range" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.manufacturing" name="Manufacturing" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.scanning" name="Scanning" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.weapons" name="Weapons" />
+            <research-cost-progression-setting :progression="game.settings.technology.researchCostProgressions.specialists" name="Specialists" />
+
             <game-setting-value title="Experimentation Reward"
               tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
               :valueText="getFriendlyText(game.settings.technology.experimentationReward)"
@@ -576,6 +574,7 @@ import type { GameInfoDetail, GameSettingsSpec } from '@solaris-common';
 import { ref, inject, type Ref, onMounted } from 'vue';
 import { getDefaultSettings } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import ResearchCostProgressionSetting from "@/views/game/components/settings/ResearchCostProgressionSetting.vue";
 
 const props = defineProps<{
   game: GameInfoDetail<string>,

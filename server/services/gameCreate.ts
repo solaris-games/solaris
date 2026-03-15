@@ -232,7 +232,12 @@ export default class GameCreateService {
 
         await this.teamService.setDiplomacyStates(game);
 
-        const gameObject = await game.save();
+        let gameObject;
+        try {
+            gameObject = await game.save();
+        } catch (err) {
+            throw new ValidationError("Failed to create game: " + (err as Error).message);
+        }
 
         await this.initialGameStateService.storeStateFor(gameObject);
         await this.historyService.log(gameObject);
@@ -331,26 +336,6 @@ export default class GameCreateService {
             };
             settings.technology.researchCosts.specialists = 'none';
             settings.technology.startingTechnologyLevel.specialists = 0;
-        }
-
-        // Validate research costs
-        if (settings.technology.researchCostProgression?.progression === 'standard') {
-            settings.technology.researchCostProgression = {
-                progression: 'standard',
-            };
-        } else if (settings.technology.researchCostProgression?.progression === 'exponential') {
-            const growthFactor = settings.technology.researchCostProgression.growthFactor;
-
-            if (growthFactor && growthFactor === 'soft' || growthFactor === 'medium' || growthFactor === 'hard') {
-                settings.technology.researchCostProgression = {
-                    progression: 'exponential',
-                    growthFactor: growthFactor
-                };
-            } else {
-                throw new ValidationError('Invalid growth factor for research cost progression.');
-            }
-        } else {
-            throw new ValidationError('Invalid research cost progression.');
         }
 
         if (settings.general.readyToQuit === "enabled") {

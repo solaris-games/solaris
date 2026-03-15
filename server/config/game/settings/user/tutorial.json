@@ -119,8 +119,31 @@
         "experimentationDistribution": "random",
         "experimentationReward": "standard",
         "specialistTokenReward": "standard",
-        "researchCostProgression": {
-            "progression": "standard"
+        "researchCostProgressions": {
+            "terraforming": {
+                "progression": "standard"
+            },
+            "experimentation": {
+                "progression": "standard"
+            },
+            "scanning": {
+                "progression": "standard"
+            },
+            "hyperspace": {
+                "progression": "standard"
+            },
+            "manufacturing": {
+                "progression": "standard"
+            },
+            "banking": {
+                "progression": "standard"
+            },
+            "weapons": {
+                "progression": "standard"
+            },
+            "specialists": {
+                "progression": "standard"
+            }
         }
     },
     "gameTime": {
