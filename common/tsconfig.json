@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "nodenext",
-        "target": "es2019",
+        "target": "es2024",
         "declaration": true,
         "outDir": "./dist",
         "strict": true
