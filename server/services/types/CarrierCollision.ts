@@ -5,3 +5,9 @@ export interface CarrierCollision {
     location: number,
     carriers: Carrier[]
 }
+
+export interface DualCarrierCollision {
+    time: number;
+    location: number;
+    carriers: [Carrier, Carrier];
+}

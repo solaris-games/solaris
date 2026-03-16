@@ -8,7 +8,7 @@ import DiplomacyService from "./diplomacy";
 import PlayerService from "./player";
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import { CarrierCollision } from "./types/CarrierCollision";
+import {CarrierCollision, DualCarrierCollision} from "./types/CarrierCollision";
 import {CarrierTravelService, DistanceService} from "@solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 
@@ -52,20 +52,20 @@ export default class CarrierCombatService {
                 && !this.specialistService.getAvoidCombatCarrierToCarrier(x)    // Check if the carrier is eligable for c2cc.
             )
             .map(c => {
-                let waypoint = c.waypoints[0];
-                let locationNext = this.carrierMovementService.getNextLocationToWaypoint(game, c);
+                const waypoint = c.waypoints[0];
+                const locationNext = this.carrierMovementService.getNextLocationToWaypoint(game, c);
 
-                let sourceStar = this.starService.getById(game, waypoint.source);
-                let destinationStar = this.starService.getById(game, waypoint.destination);
+                const sourceStar = this.starService.getById(game, waypoint.source);
+                const destinationStar = this.starService.getById(game, waypoint.destination);
 
                 // Note: There should never be a scenario where a carrier is travelling to a
                 // destroyed star.
-                let distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
-                let distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
-                let speed = this.carrierTravelService.getSpeedOfCarrier(game, c);
+                const distanceToDestinationCurrent = this.distanceService.getDistanceBetweenLocations(c.location, destinationStar.location);
+                const distanceToDestinationNext = this.distanceService.getDistanceBetweenLocations(locationNext.location, destinationStar.location);
+                const speed = this.carrierTravelService.getSpeedOfCarrier(game, c);
 
-                let distanceToSourceCurrent,
-                    distanceToSourceNext;
+                let distanceToSourceCurrent: number;
+                let distanceToSourceNext: number;
 
                 // TODO: BUG: Its possible that a carrier is travelling from a star that has been destroyed
                 // and is no longer in the game, this will cause carrier to carrier combat to be actioned.
@@ -96,17 +96,20 @@ export default class CarrierCombatService {
         const positionGraph = this._getCarrierPositionGraph(carrierPositions);
 
         for (let carrierPath in positionGraph) {
-            let positions: CarrierPosition[] = positionGraph[carrierPath];
+            const positions: CarrierPosition[] = positionGraph.get(carrierPath)!;
 
             if (positions.length <= 1) {
                 continue;
             }
 
-            let collisions: CarrierCollision[] = this._getDualCollisionsInPath(positions);
+            const collisions: DualCarrierCollision[] = this._getDualCollisionsInPath(positions);
+
+            // TODO: Rewrite merging logic, until here everything looks good
+
             this._mergeCollisionsinPath(collisions);
 
             // A collision will at this point be cleaned up to a list of carriers
-            for(let collision of collisions) {
+            for( let collision of collisions) {
                 // It could very well be that in a previous collision, carriers were destroyed/reduced to 0 ships.
                 collision.carriers.filter(c => c.ships! > 0)
 
@@ -127,7 +130,7 @@ export default class CarrierCombatService {
     }
 
     _getCarrierPositionGraph(carrierPositions: CarrierPosition[]) {
-        const graph = {};
+        const graph: Map<string, CarrierPosition[]> = new Map();
 
         for (let carrierPosition of carrierPositions) {
             const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
@@ -139,7 +142,7 @@ export default class CarrierCombatService {
             }
 
             // If the key already exists, we want to add this carrier to it, otherwise we create a new one.
-            const graphObj = graph[graphKeyA] || graph[graphKeyB];
+            const graphObj = graph.get(graphKeyA) || graph.get(graphKeyB);
 
             if (graphObj) {
                 graphObj.push(carrierPosition);
@@ -151,8 +154,8 @@ export default class CarrierCombatService {
         return graph;
     }
 
-    _getDualCollisionsInPath(positions: CarrierPosition[]) : CarrierCollision[] {
-        let collisionList: CarrierCollision[] = [];
+    _getDualCollisionsInPath(positions: CarrierPosition[]) : DualCarrierCollision[] {
+        let collisionList: DualCarrierCollision[] = [];
 
         // In order to be able to check if carriers intersect at the same place, we need the distance to a fixed star, which must exist.
         // As the source star can be destroyed we need a destination for that. Now the distance to that star can be used to check if carriers are in the same place.
