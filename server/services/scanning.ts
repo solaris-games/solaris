@@ -2,7 +2,7 @@ import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import StarService from "./star";
 import { StarDataService, TechnologyService } from 'solaris-common';
-import { MapObject, MapObjectWithVisibility } from "./types/Map";
+import { MapObject } from "./types/Map";
 import { KDTree } from "../utils/kdTree";
 import { DistanceService, StarDistanceService } from 'solaris-common';
 import { Star } from "./types/Star";
@@ -12,6 +12,8 @@ import CarrierService from "./carrier";
 import { DBObjectId } from "./types/DBObjectId";
 
 export default class ScanningService {
+    static SINGLE_TREE_COST_FACTOR = 5.0;
+
     starService: StarService;
     starDataService: StarDataService;
     distanceService: DistanceService;
@@ -53,7 +55,7 @@ export default class ScanningService {
         let starsInRange = new Set<Star>();
 
         for (const star of starsWithScanning) {
-            this.getStarsWithinScanningRangeOfStar(game, star, kdTree).forEach(s => starsInRange.add(this.starService.getById(game, s._id)));
+            this.getStarsWithinScanningRangeOfStar(game, star, kdTree).forEach(s => starsInRange.add(s));
         }
         kdTree.resetMarked();
 
@@ -81,18 +83,20 @@ export default class ScanningService {
         let carriersInRange = new Set<Carrier>();
 
         for (const star of starsWithScanning) {
-            this.getCarriersWithinScanningRangeOfStar(game, star, kdTree).forEach(c => carriersInRange.add(this.carrierService.getById(game, c._id)));
+            this.getCarriersWithinScanningRangeOfStar(game, star, kdTree).forEach(c => carriersInRange.add(c));
         }
         kdTree.resetMarked();
 
         return carriersInRange;
     }
 
-    getStarsWithinScanningRangeOfStar(game: Game, star: Star, kdTree: KDTree): MapObjectWithVisibility[] {
+    // Requires manually calling resetMarked() after
+    getStarsWithinScanningRangeOfStar(game: Game, star: Star, kdTree: KDTree): Star[] {
         return this._getObjectsWithinScanningRangeOfStar(game, star, kdTree).map(i => game.galaxy.stars[i]);
     }
 
-    getCarriersWithinScanningRangeOfStar(game: Game, star: Star, kdTree: KDTree): MapObject[] {
+    // Requires manually calling resetMarked() after
+    getCarriersWithinScanningRangeOfStar(game: Game, star: Star, kdTree: KDTree): Carrier[] {
         return this._getObjectsWithinScanningRangeOfStar(game, star, kdTree).map(i => game.galaxy.carriers[i]);
     }
 
@@ -139,7 +143,7 @@ export default class ScanningService {
             let isInRange = false;
 
             for (let s of otherPlayerStars) {
-                if (this.isStarWithinScanningRangeOfStarsByViewpoint(game, s, scannedStarSet)) {
+                if (this.isStarWithinScanningRangeOfStarsBySingleTree(game, s, scannedStarSet)) {
                     isInRange = true;
                     break;
                 }
@@ -153,7 +157,7 @@ export default class ScanningService {
         return inRange;
     }
 
-    isStarWithinScanningRangeOfStarsByViewpoint(game: Game, star: Star, scannedStarSet: Set<Star>) {
+    isStarWithinScanningRangeOfStarsBySingleTree(game: Game, star: Star, scannedStarSet: Set<Star>) {
         // Pulsars are considered to be always in scanning range.
         // Note: They are not visible until the game starts to prevent pre-teaming.
         if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
@@ -209,8 +213,8 @@ export default class ScanningService {
         const targetPlayerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, targetPlayer._id);
 
         // If the source player is very small relative to the target player, it is generally faster to compute their viewpoint.
-        if (targetPlayerStars.length > starsWithScanning.length * 5) {
-            return this._isInScanningRangeOfPlayerByViewpoint(game, sourcePlayer, targetPlayer);
+        if (targetPlayerStars.length > starsWithScanning.length * ScanningService.SINGLE_TREE_COST_FACTOR) {
+            return this._isInScanningRangeOfPlayerBySingleTree(game, sourcePlayer, targetPlayer);
         }
 
         // Group stars by their scanning range, since we need to build a tree for each group.
@@ -227,7 +231,7 @@ export default class ScanningService {
         return false;
     }
 
-    _isInScanningRangeOfPlayerByViewpoint(game: Game, sourcePlayer: Player, targetPlayer: Player) {
+    _isInScanningRangeOfPlayerBySingleTree(game: Game, sourcePlayer: Player, targetPlayer: Player) {
         // TODO: Calculate during tick processing and load stored tree
         const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
 
@@ -258,5 +262,107 @@ export default class ScanningService {
         treesWithRadius.sort((a, b) => b[0] - a[0]);
 
         return treesWithRadius;
+    }
+
+    calculateViewpointScanning(game: Game, players: Player[]) {
+        const scannedStarSet = new Set<Star>();
+        const scannedPlayerIdSet = new Set<DBObjectId>();
+        const scannedCarrierSet = new Set<Carrier>();
+        const unscannedWormholeSet = new Set<Star>();
+
+        const starsOwnedOrInOrbit = this.starService.listStarsOwnedOrInOrbitByPlayers(game, players.map(p => p._id));
+        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
+
+        starsWithScanning.forEach(e => scannedStarSet.add(e));
+
+        let treesWithRadius: [number, KDTree][] | undefined = undefined;
+
+        if (game.galaxy.stars.length > starsWithScanning.length * ScanningService.SINGLE_TREE_COST_FACTOR) {
+            // TODO: Calculate during tick processing and load stored tree
+            const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+            for (const star of starsWithScanning) {
+                const starsInRange = this.getStarsWithinScanningRangeOfStar(game, star, kdTree);
+
+                for (const scannedStar of starsInRange) {
+                    scannedStarSet.add(scannedStar);
+
+                    if (star.ownedByPlayerId != null) {
+                        scannedPlayerIdSet.add(star.ownedByPlayerId);
+                    }
+                }
+            }
+            kdTree.resetMarked();
+        } else {
+            if (!treesWithRadius) treesWithRadius = this.getScanningStarTrees(game, starsWithScanning);
+
+            for (const star of game.galaxy.stars) {
+                if (scannedStarSet.has(star)) continue;
+
+                for (const tree of treesWithRadius) {
+                    if (tree[1].isWithinRadiusOfAny(star.location, tree[0])) {
+                        scannedStarSet.add(star);
+
+                        if (star.ownedByPlayerId != null) {
+                            scannedPlayerIdSet.add(star.ownedByPlayerId);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        // If worm holes are present, then ensure that any owned star OR star in orbit
+        // also has its paired star visible.
+        starsOwnedOrInOrbit
+            .filter(s => s.wormHoleToStarId)
+            .map(s => {
+                return {
+                    source: s,
+                    destination: this.starService.getById(game, s.wormHoleToStarId!)
+                };
+            })
+            .forEach(s => {
+                if (!scannedStarSet.has(s.destination)) {
+                    unscannedWormholeSet.add(s.destination);
+                    scannedStarSet.add(s.destination);
+                }
+            });
+
+
+        if (game.galaxy.carriers.length > starsWithScanning.length * ScanningService.SINGLE_TREE_COST_FACTOR) {
+            // TODO: Calculate during tick processing and load stored tree
+            const kdTree = new KDTree(this.distanceService, game.galaxy.carriers);
+
+            for (const star of starsWithScanning) {
+                const carriersInRange = this.getCarriersWithinScanningRangeOfStar(game, star, kdTree);
+
+                for (const scannedCarrier of carriersInRange) {
+                    scannedCarrierSet.add(scannedCarrier);
+                }
+            }
+            kdTree.resetMarked();
+        } else {
+            if (!treesWithRadius) treesWithRadius = this.getScanningStarTrees(game, starsWithScanning);
+
+            for (const carrier of game.galaxy.carriers) {
+                if (scannedCarrierSet.has(carrier)) continue;
+
+                for (const tree of treesWithRadius) {
+                    if (tree[1].isWithinRadiusOfAny(carrier.location, tree[0])) {
+                        scannedCarrierSet.add(carrier);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return {
+            stars: scannedStarSet,
+            playerIds: scannedPlayerIdSet,
+            carriers: scannedCarrierSet,
+            unscannedWormHoles: unscannedWormholeSet
+        }
     }
 }

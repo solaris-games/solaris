@@ -67,12 +67,12 @@ export default class CullWaypointsService {
 
         for (const player of players.values()) {
             // If the source point set is very small relative to the target point set, it is generally faster to compute the viewpoint.
-            if (playerCarrierMap.get(player.player)!.length > player.stars.length * 5) {
+            if (playerCarrierMap.get(player.player)!.length > player.stars.length * ScanningService.SINGLE_TREE_COST_FACTOR) {
                 // TODO: Calculate during tick processing and load stored tree
                 if (!kdTree) kdTree = new KDTree(this.distanceService, game.galaxy.stars);
 
                 const scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [player.player], kdTree);
-                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRouteByViewpoint(game, c, player, scannedStarSet));
+                playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRouteBySingleTree(game, c, player, scannedStarSet));
             } else {
                 const treesWithRadius = this.scanningService.getScanningStarTrees(game, player.stars);
                 playerCarrierMap.get(player.player)!.forEach(c => this._checkCarrierRoute(game, c, player, treesWithRadius));
@@ -153,13 +153,13 @@ export default class CullWaypointsService {
         }
     }
 
-    _checkCarrierRouteByViewpoint(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: Set<string> }, scannedStarSet: Set<Star>) {
+    _checkCarrierRouteBySingleTree(game: Game, carrier: Carrier, player: { player: Player, stars: Star[], inRange: Set<string> }, scannedStarSet: Set<Star>) {
         let startIndex = this.carrierTravelService.isInTransit(carrier) ? 1 : 0;
         for (let index = startIndex; index < carrier.waypoints.length; index++) {
             const waypoint = carrier.waypoints[index];
             if (player.inRange.has(waypoint.destination.toString())) continue;
             const waypointStar = this.starService.getById(game, waypoint.destination);
-            if (this.scanningService.isStarWithinScanningRangeOfStarsByViewpoint(game, waypointStar, scannedStarSet)) {
+            if (this.scanningService.isStarWithinScanningRangeOfStarsBySingleTree(game, waypointStar, scannedStarSet)) {
                 player.inRange.add(waypoint.destination.toString());
             } else {
                 carrier.waypoints.splice(index);
