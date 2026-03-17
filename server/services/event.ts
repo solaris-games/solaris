@@ -67,6 +67,7 @@ import InternalGamePlayerJoinedEvent from "./types/internalEvents/GamePlayerJoin
 import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
 import InternalPlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
 import { Model } from "mongoose";
+import {CombatMaskingService} from "./combatMasking";
 
 export default class EventService {
     eventModel: Model<GameEvent<DBObjectId>>;
@@ -86,6 +87,7 @@ export default class EventService {
     badgeService: BadgeService;
     carrierGiftService: CarrierGiftService;
     diplomacyService: DiplomacyService;
+    combatMaskingService: CombatMaskingService;
 
     constructor(
         eventModel,
@@ -104,7 +106,8 @@ export default class EventService {
         specialistService: SpecialistService,
         badgeService: BadgeService,
         carrierGiftService: CarrierGiftService,
-        diplomacyService: DiplomacyService
+        diplomacyService: DiplomacyService,
+        combatMaskingService: CombatMaskingService,
     ) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
@@ -123,6 +126,7 @@ export default class EventService {
         this.badgeService = badgeService;
         this.carrierGiftService = carrierGiftService;
         this.diplomacyService = diplomacyService;
+        this.combatMaskingService = combatMaskingService;
 
         this.gameJoinService.on(GameJoinServiceEvents.onPlayerJoined, (args) => this.createPlayerJoinedEvent(args));
         this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.createGameStartedEvent(args));
@@ -406,13 +410,13 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            const defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            const defenderCombatResult: CombatResult = this.combatMaskingService.maskCombatResult(combatResult, defender);
 
             await this.createPlayerEvent<PlayerCombatStarEvent<DBObjectId>>(gameId, gameTick, defender._id, 'playerCombatStar', { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            const attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
+            const attackerCombatResult: CombatResult = this.combatMaskingService.maskCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent<PlayerCombatStarEvent<DBObjectId>>(gameId, gameTick, attacker._id, 'playerCombatStar', { ...data, combatResult: attackerCombatResult });
         }
@@ -426,13 +430,13 @@ export default class EventService {
         };
 
         for (let defender of defenders) {
-            const defenderCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, defender);
+            const defenderCombatResult: CombatResult = this.combatMaskingService.maskCombatResult(combatResult, defender);
             
             await this.createPlayerEvent<PlayerCombatCarrierEvent<DBObjectId>>(gameId, gameTick, defender._id, 'playerCombatCarrier', { ...data, combatResult: defenderCombatResult });
         }
 
         for (let attacker of attackers) {
-            const attackerCombatResult: CombatResult = this.combatService.sanitiseCombatResult(combatResult, attacker);
+            const attackerCombatResult: CombatResult = this.combatMaskingService.maskCombatResult(combatResult, attacker);
 
             await this.createPlayerEvent<PlayerCombatCarrierEvent<DBObjectId>>(gameId, gameTick, attacker._id, 'playerCombatCarrier', { ...data, combatResult: attackerCombatResult });
         }

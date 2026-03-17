@@ -1,7 +1,7 @@
 import { type Carrier } from '../types/common/carrier';
 import { type Game } from '../types/common/game';
 import { type Player } from '../types/common/player';
-import {Id} from "../types/id";
+import type {Id} from "../types/id";
 
 type CombatGroupResult<ID> = {
     groups: Player<ID>[][],

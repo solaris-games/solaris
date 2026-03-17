@@ -129,6 +129,7 @@ import CullWaypointsService from "./cullWaypoints";
 import SaveWaypointsService from "./saveWaypoints";
 import { CarrierTravelService, type Guild, StarDataService, type StatsSlice } from 'solaris-common';
 import CarrierCombatService from "./carrierCombat";
+import {CombatMaskingService} from "./combatMasking";
 
 const gameNames = require('../config/game/gameNames');
 const starNames = require('../config/game/starNames');
@@ -254,8 +255,9 @@ export default (config: Config,
     const carrierCombatService = new CarrierCombatService(carrierTravelService, carrierMovementService, combatService, diplomacyService, distanceService, playerService, specialistService, starService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService, waypointActionService, cullWaypointsService, carrierTravelService, carrierCombatService);
     const emailService = new EmailService(config, gameService, gameJoinService, userService, leaderboardService, playerService, playerReadyService, gameTypeService, gameStateService, gameTickService);
+    const combatMaskingService = new CombatMaskingService();
     const eventService = new EventService(EventModel, eventRepository, broadcastService, gameService, gameJoinService, gameTickService, researchService, starService, starUpgradeService, tradeService,
-        ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService);
+        ledgerService, conversationService, combatService, specialistService, badgeService, carrierGiftService, diplomacyService, combatMaskingService);
 
     const gameListService = new GameListService(gameRepository, gameService, conversationService, eventService, gameTypeService, leaderboardService);
     const customGalaxyService = new CustomGalaxyService(nameService, specialistService, playerService, playerColourService, teamService, carrierService);
