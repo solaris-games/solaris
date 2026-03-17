@@ -10,38 +10,22 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import LeaderboardRow from './LeaderboardRow.vue';
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'leaderboard-row': LeaderboardRow
-  },
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-  data () {
-    return {
-      players: []
-    }
-  },
-  mounted () {
-    this.players = this.$store.state.game.galaxy.players
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    }
-  },
+const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    sortedPlayers () {
-      return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-    }
-  }
-}
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const sortedPlayers = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
 </script>
 
 <style scoped>

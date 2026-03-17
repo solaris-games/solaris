@@ -48,6 +48,10 @@ export default class SaveWaypointsService {
             throw new ValidationError('Cannot plot more than 30 waypoints.');
         }
 
+        if (carrier.isScuttled) {
+            throw new ValidationError(`Cannot alter waypoints for a scuttled carrier`);
+        }
+
         if (carrier.isGift) {
             throw new ValidationError('Cannot alter waypoints for a gifted carrier.');
         }

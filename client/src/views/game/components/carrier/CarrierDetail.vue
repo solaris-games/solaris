@@ -22,6 +22,12 @@
       </div>
     </div>
 
+    <div class="row bg-danger" v-if="carrier.isScuttled">
+      <div class="col text-center p-2">
+        <p class="mb-0">This carrier and all its ships will be scuttled.</p>
+      </div>
+    </div>
+
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">
@@ -437,9 +443,9 @@ const confirmScuttleCarrier = async () => {
   if (isOk(response)) {
     toast.default(`${carrier.value.name} has been scuttled. All ships will be destroyed.`);
 
-    store.commit('gameCarrierScuttled', {
-      carrierId: carrier.value._id
-    });
+    carrier.value.isScuttled = true;
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
 
     AudioService.leave();
 

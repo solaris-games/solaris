@@ -378,6 +378,7 @@ export default class PlayerService extends EventEmitter {
                 specialistId: savedCarrier.specialistId,
                 specialistExpireTick: savedCarrier.specialistExpireTick,
                 isGift: savedCarrier.isGift,
+                isScuttled: false,
                 location: savedCarrier.location,
                 waypoints: savedCarrier.waypoints,
                 waypointsLooped: false,

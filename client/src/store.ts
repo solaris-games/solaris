@@ -7,7 +7,7 @@ import PlayerMutationNames from './mutationNames/playerMutationNames';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, PlayerColour, Specialist, UserGameSettings, UserRoles} from "@solaris-common";
+import type {Badge, PlayerColour, Specialist, UserGameSettings, UserPrivate, UserRoles} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
 import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -25,7 +25,7 @@ export type MentionCallbacks = {
 
 export type State = {
   userId: string | null;
-  user: any;
+  user: UserPrivate<string>;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
@@ -106,10 +106,11 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.menuState = null
       state.menuArguments = null
 
+      // TODO: Refactor menu handling
       eventBus.emit(MenuEventBusEventNames.OnMenuRequested, {
         menuState: null,
-        menuArguments: null as unknown
-      })
+        menuArguments: null,
+      } as any)
     },
 
     setMenuStateChat (state: State, menuState) {
@@ -479,25 +480,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
 
       // Redraw the star
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    },
-    gameCarrierScuttled (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
-      let star = GameHelper.getStarById(state.game!, carrier.orbiting!)!
-      let player = GameHelper.getPlayerById(state.game!, carrier.ownedByPlayerId!)!
-
-      player.stats!.totalCarriers--
-
-      if (carrier.specialistId) {
-        player.stats!.totalSpecialists--
-      }
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, { carrier });
-
-      state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(carrier), 1)
-
-      if (star) {
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-      }
     },
     [PlayerMutationNames.PlayerDebtSettled] (state: State, data) {
       let player = GameHelper.getUserPlayer(state.game!)!

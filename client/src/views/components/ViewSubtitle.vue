@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
-
 const { title, level = 'h4' } = defineProps<{
   title: string,
   level?: 'h4' | 'h5' | 'h6',

@@ -228,6 +228,7 @@ export class GameContainer {
 
   _reloadCarrier (carrier: Carrier) {
     const carrierObject = this.map.setupCarrier(this.game, this.userSettings, carrier);
+    carrierObject.updateVisibility();
     this.map.drawCarrier(carrierObject);
   }
 
