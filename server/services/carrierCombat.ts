@@ -12,6 +12,8 @@ import {CarrierCollision, DualCarrierCollision} from "./types/CarrierCollision";
 import {CarrierTravelService, DistanceService} from "@solaris-common";
 import {DBObjectId} from "./types/DBObjectId";
 
+const EPSILON = 10**-10;
+
 export default class CarrierCombatService {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierMovementService: CarrierMovementService;
@@ -102,11 +104,11 @@ export default class CarrierCombatService {
                 continue;
             }
 
-            const collisions: DualCarrierCollision[] = this._getDualCollisionsInPath(positions);
+            const dualCollisions: DualCarrierCollision[] = this._getDualCollisionsInPath(positions);
 
             // TODO: Rewrite merging logic, until here everything looks good
 
-            this._mergeCollisionsinPath(collisions);
+            const collisions = this._mergeCollisionsinPath(dualCollisions);
 
             // A collision will at this point be cleaned up to a list of carriers
             for( let collision of collisions) {
@@ -207,41 +209,40 @@ export default class CarrierCombatService {
         return collisionList;
     }
 
-    _mergeCollisionsinPath(collisionList) {
-        // If there is just 1 or fewer collisions, we still need to merge, as the format changes.
-        let newCollisionList: any[] = []
+    _mergeCollisionsinPath(collisionList: DualCarrierCollision[]): CarrierCollision[] {
+        const collisions: CarrierCollision[] = [];
 
         // As long as there are still ungrouped dual collisions, we continue to group.
         while(collisionList.length > 0) {
-            // Everything that happens at the same time and place should be merged.
-            let toMergeCollision = collisionList.filter(c => (Math.abs(collisionList[0].time - c.time) < 10**-10) && (Math.abs(collisionList[0].location - c.location) < 10**-10));
-            let newCollision = this._mergeCollisions(toMergeCollision);
-            newCollisionList.push(newCollision);
+            const coll = collisionList.pop()!;
+            const toMerge = new Array<DualCarrierCollision>();
+            toMerge.push(coll);
 
-            // Continue with all elements that do not fall under the previous collision, repeat untill all collisions have been checked and removed.
-            collisionList = collisionList.filter(c => !((Math.abs(collisionList[0].time - c.time) < 10**-10) && (Math.abs(collisionList[0].location - c.location) < 10**-10)));
+            for (let i = 0; i < collisionList.length; i++) {
+                const c = collisionList[i];
+
+                if ((Math.abs(coll.time - c.time) < EPSILON) && (Math.abs(coll.location - c.location) < EPSILON)) {
+                    toMerge.push(c);
+                    collisionList.splice(i, 1);
+                    i--;
+                }
+            }
+
+            collisions.push(this._mergeCollisions(toMerge));
         }
 
         // Make sure that the combat that should happen first is first in the list.
-        collisionList = newCollisionList.sort((a, b) => a.time - b.time);
+        collisions.sort((a, b) => a.time - b.time);
+
+        return collisions;
     }
 
-    _mergeCollisions(collisionList) {
-        // Here we merge the carriers that will for sure all be at the same time and place together.
-        // We cannot simply paste the carrier arrays after one another. This as some carriers can occur in multiple collisions.
-        let carrierList: Carrier[] = []
-        collisionList.forEach(c => {
-            // If no carrier is yet in the list with this id, we still have to add it. This prevents doubles in the collisionlist.
-            if(!carrierList.find(c.carrier._id.toString())) {
-                carrierList.push(c.carrier)
-            }
-        });
-
+    _mergeCollisions(collisionList: DualCarrierCollision[]): CarrierCollision {
         return {
             time: collisionList[0].time,
             location: collisionList[0].location,
-            carriers: carrierList
-        }
+            carriers: Array.from(new Set(collisionList.flatMap(c => c.carriers))),
+        };
     }
 
     _collisionThisTick(cPosA: CarrierPosition, cPosB: CarrierPosition) {
