@@ -197,7 +197,7 @@ const doSaveWaypoints = async (saveAndEdit = false) => {
         waypoint: carrier.value.waypoints[0],
       });
     } else {
-      onCloseRequested();
+      emit('onOpenCarrierDetailRequested', carrier.value._id);
     }
   }
 };
