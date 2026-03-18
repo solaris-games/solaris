@@ -3,58 +3,48 @@
     <player-icon-shape :filled="iconFilled" :iconColour="iconColour" :shape="player.shape" />
   </span>
 </template>
-<script>
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconShape from './PlayerIconShape.vue'
+import type {Game} from "@/types/game";
 
-export default {
-  components: { PlayerIconShape },
-  props: {
-    playerId: String,
-    hideOnlineStatus: Boolean,
-    solidGlyphOnly: Boolean,
-    colour: String
-  },
-  data () {
-    return {
-      onlineStatus: '',
-      isOnline: false,
-      intervalFunction: null
-    }
-  },
-    mounted() {
-      let isHiddenPlayerOnlineStatus = GameHelper.isHiddenPlayerOnlineStatus(this.$store.state.game)
+const props = defineProps<{
+  playerId: string,
+  hideOnlineStatus?: boolean,
+  solidGlyphOnly?: boolean,
+  colour?: string,
+}>();
 
-      if (!this.hideOnlineStatus && !isHiddenPlayerOnlineStatus) {
-        this.intervalFunction = setInterval(this.recalculateOnlineStatus, 1000)
-        this.recalculateOnlineStatus()
-      }
-  },
-  unmounted () {
-    clearInterval(this.intervalFunction)
-  },
-  methods: {
-    recalculateOnlineStatus () {
-      this.isOnline = GameHelper.isPlayerOnline(this.player)
-      this.onlineStatus = GameHelper.getOnlineStatus(this.player)
-    }
-  },
-  computed: {
-    iconColour () {
-      return !this.colour ? GameHelper.getFriendlyColour(this.playerColour) : this.colour
-    },
-    iconFilled () {
-      const unknownStatus = this.player.isOnline == null;
-      return unknownStatus || this.isOnline || this.solidGlyphOnly;
-    },
-    player() {
-      return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    },
-    playerColour() {
-      return this.$store.getters.getColourForPlayer(this.playerId).value
-    }
-  }
-}
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const isOnline = ref(false);
+const onlineStatus = ref('');
+
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+
+const playerColour = computed(() => store.getters.getColourForPlayer(props.playerId).value);
+const iconColour = computed(() => !props.colour ? GameHelper.getFriendlyColour(playerColour.value) : props.colour);
+const iconFilled = computed(() => {
+  const unknownStatus = player.value.isOnline == null;
+  return unknownStatus || isOnline.value || props.solidGlyphOnly;
+});
+
+const recalculateOnlineStatus = () => {
+  isOnline.value = GameHelper.isPlayerOnline(player.value);
+  onlineStatus.value = GameHelper.getOnlineStatus(player.value);
+};
+
+onMounted(() => {
+  const intervalHandle = setInterval(recalculateOnlineStatus, 1000);
+  recalculateOnlineStatus();
+
+  onUnmounted(() => {
+    clearInterval(intervalHandle);
+  });
+});
 </script>
 
 <style scoped>

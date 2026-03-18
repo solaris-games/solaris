@@ -150,6 +150,15 @@
           </span>
         </div>
 
+        <div v-if="game.settings.specialGalaxy.starCaptureReward === 'enabled'" class="compact-element">
+          <span v-if="star.canBeLooted" title="This star can be looted">
+            <i class="fas fa-coins text-white ms-1"></i>
+          </span>
+          <span v-if="!star.canBeLooted" title="This star cannot be looted">
+            <i class="fas fa-coins text-danger ms-1"></i>
+          </span>
+        </div>
+
         <div class="compact-element">
           <span title="Scanning range" v-if="star.ownedByPlayerId">
             <i class="fas fa-binoculars ms-1"></i>
@@ -277,6 +286,15 @@
           </table>
         </div>
       </div>
+
+      <div v-if="game.settings.specialGalaxy.starCaptureReward === 'enabled'" class="row pt-1">
+        <div class="col text-center">
+          <span v-if="star.canBeLooted" class="text-white">This star can be looted</span>
+          <span v-if="!star.canBeLooted" class="text-danger">This star can not be looted</span>
+        </div>
+      </div>
+
+      <hr />
 
       <div v-if="star.ownedByPlayerId" class="row pt-1 pb-1">
         <star-weapons-level :star="star" :compact="false"></star-weapons-level>
@@ -569,7 +587,7 @@ const onEditWaypointsRequested = (carrierId: string) => emit('onEditWaypointsReq
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', star.value._id);
 const viewOnMap = (e: MapObject<string>) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {object: e});
 
-const confirmAbandonStar = async (e) => {
+const confirmAbandonStar = async () => {
   const response = await abandon(httpClient)(game.value._id, star.value._id);
 
   if (isOk(response)) {

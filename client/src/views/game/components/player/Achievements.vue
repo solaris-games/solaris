@@ -44,25 +44,19 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    level: Number,
-    victories: Number,
-    rank: Number,
-    renown: Number
-  },
-  methods: {
-  },
-  computed: {
-    levelSrc () {
-      return new URL(`../../../../assets/levels/${this.level}.png`, import.meta.url).href
-    },
-    isSmallHeaders () {
-      return this.victories >= 100 || this.rank >= 100 || this.renown >= 100
-    }
-  }
-}
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const props = defineProps<{
+  level: number,
+  victories: number,
+  rank: number,
+  renown: number,
+}>();
+
+const isSmallHeaders = computed(() => props.victories >= 100 || props.rank >= 100 || props.renown >= 100);
+
+const levelSrc = computed(() => new URL(`../../../../assets/levels/${props.level}.png`, import.meta.url).href);
 </script>
 
 <style scoped>

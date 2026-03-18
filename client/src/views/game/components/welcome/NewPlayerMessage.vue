@@ -4,19 +4,21 @@
   </p>
 </template>
 
-<script>
+<script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import type { Game } from '@/types/game'
 
-export default {
-  computed: {
-    isGameNotStarted () {
-      return GameHelper.isGameNotStarted(this.$store.state.game)
-    },
-    isNewPlayerGame () {
-      return GameHelper.isNewPlayerGame(this.$store.state.game)
-    }
-  }
-}
+const store = useStore()
+
+const isGameNotStarted = computed(() => {
+    return GameHelper.isGameNotStarted(store.state.game as Game)
+})
+
+const isNewPlayerGame = computed(() => {
+    return GameHelper.isNewPlayerGame(store.state.game as Game)
+})
 </script>
 
 <style scoped>

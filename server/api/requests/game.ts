@@ -266,12 +266,12 @@ const parseGameSettingsPlayer: Validator<GameSettingsPlayer> = object({
 
 const researchCosts: Validator<GameResearchCost> = stringEnumeration<GameResearchCost, GameResearchCost[]>(GAME_RESEARCH_COSTS);
 
-const researchCostProgression: Validator<GameResearchProgression> = or(object({
+const researchCostProgression: Validator<GameResearchProgression> = withDefault({ progression: 'standard' }, or(object({
     progression: just('standard'),
 }), object({
     progression: just('exponential'),
     growthFactor: stringEnumeration<'soft'|'medium'|'hard', ('soft'|'medium'|'hard')[]>(['soft', 'medium', 'hard']),
-}));
+})));
 
 const parseGameSettingsTechnology: Validator<GameSettingsTechnology> = object({
     startingTechnologyLevel: object({
@@ -342,7 +342,16 @@ const parseGameSettingsTechnology: Validator<GameSettingsTechnology> = object({
         weapons: researchCosts,
         specialists: researchCosts,
     }),
-    researchCostProgression: researchCostProgression,
+    researchCostProgressions: object({
+        terraforming: researchCostProgression,
+        experimentation: researchCostProgression,
+        scanning: researchCostProgression,
+        hyperspace: researchCostProgression,
+        manufacturing: researchCostProgression,
+        banking: researchCostProgression,
+        weapons: researchCostProgression,
+        specialists: researchCostProgression,
+    }),
     bankingReward: stringEnumeration<GameBankingReward, GameBankingReward[]>(GAME_BANKING_REWARDS),
     experimentationDistribution: stringEnumeration<GameExperimentationDistribution, GameExperimentationDistribution[]>(GAME_EXPERIMENTATION_DISTRIBUTIONS),
     experimentationReward: stringEnumeration<GameExperimentationReward, GameExperimentationReward[]>(GAME_EXPERIMENTATION_REWARDS),

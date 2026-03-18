@@ -122,10 +122,32 @@
           "weapons":"standard",
           "specialists":"standard"
        },
-       "researchCostProgression": {
-          "progression": "standard",
-          "growthFactor": "medium"
-       },
+        "researchCostProgressions": {
+            "terraforming": {
+                "progression": "standard"
+            },
+            "experimentation": {
+                "progression": "standard"
+            },
+            "scanning": {
+                "progression": "standard"
+            },
+            "hyperspace": {
+                "progression": "standard"
+            },
+            "manufacturing": {
+                "progression": "standard"
+            },
+            "banking": {
+                "progression": "standard"
+            },
+            "weapons": {
+                "progression": "standard"
+            },
+            "specialists": {
+                "progression": "standard"
+            }
+        },
        "experimentationDistribution": "random",
        "bankingReward":"standard",
        "experimentationReward": "standard",

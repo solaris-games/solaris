@@ -4,17 +4,15 @@
   </div>
 </template>
 
-<script>
-export default {
-  computed: {
-    displayPoll () {
-      const now = new Date();
-      const endsAt = new Date('2024-05-15T00:00:00Z');
+<script setup lang="ts">
+import { computed } from 'vue'
 
-      return now < endsAt;
-    }
-  }
-}
+const displayPoll = computed(() => {
+    const now = new Date();
+    const endsAt = new Date('2024-05-15T00:00:00Z');
+
+    return now < endsAt;
+})
 </script>
 
 <style scoped>

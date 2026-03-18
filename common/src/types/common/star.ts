@@ -43,6 +43,7 @@ export interface Star<ID> extends MapObject<ID> {
     isBinaryStar: boolean;
     isBlackHole: boolean;
     isPulsar: boolean;
+    canBeLooted: boolean;
     wormHoleToStarId: ID | null;
     ignoreBulkUpgrade?: IgnoreBulkUpgrade;
     infrastructure: Infrastructure;

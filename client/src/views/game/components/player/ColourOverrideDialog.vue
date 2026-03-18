@@ -10,9 +10,9 @@
           <div class="colour-override-controls form-group">
             <label for="colour">Colour</label>
             <select v-model="currentColour">
-              <option v-for="colour in $store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
+              <option v-for="colour in store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
             </select>
-            <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour) }" />
+            <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour!) }" />
             <button class="btn btn-default btn-sm" v-on:click="setToDefault">Use default</button>
           </div>
         </div>
@@ -29,81 +29,87 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { ref, inject, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper";
+import type {Game} from "@/types/game";
+import {toastInjectionKey} from "@/util/keys.ts";
 
-export default {
-  name: "ColourOverrideDialog.vue",
-  props: {
-    playerId: String,
-  },
-  data () {
-    return {
-      currentColour: null,
-      player: null,
-      modal: null,
-    }
-  },
-  mounted () {
-    const modalEl = document.getElementById("colourOverride");
+const props = defineProps<{
+  playerId: string,
+}>();
 
-    modalEl.addEventListener('hidden.bs.modal', () => {
-      this.$emit('onColourOverrideCancelled');
+const emit = defineEmits<{
+  onColourOverrideCancelled: [],
+  onColourOverrideConfirmed: [],
+}>();
+
+const toast = inject(toastInjectionKey)!;
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const currentColour = ref<string | null>(null);
+const modal = ref(null);
+
+const player = computed(() => gameHelper.getPlayerById(game.value, props.playerId)!);
+const title = computed(() => `Custom colour for ${player.value.alias}`)
+
+const onCancel = () => emit('onColourOverrideCancelled');
+
+const toColourValue = (alias: string) => store.state.coloursConfig.find(colour => colour.alias === alias)?.value;
+
+const setToDefault = () => {
+  currentColour.value = ensureExists(player.value.colour.alias);
+}
+
+const onConfirm = async () => {
+  try {
+    await store.dispatch('addColourMapping', {
+      playerId: player.value._id,
+      colour: {
+        alias: currentColour.value,
+        value: toColourValue(currentColour.value!),
+      }
     });
 
-    this.modal = new bootstrap.Modal(modalEl);
-    this.modal.show();
-    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId);
-    this.currentColour = this.ensureExists(this.$store.getters.getColourForPlayer(this.playerId).alias);
-  },
-  methods: {
-    ensureExists (alias) {
-      const existsA = this.$store.state.coloursConfig.find(colour => colour.alias === alias);
-
-      if (existsA) {
-        return alias;
-      }
-
-      const existsV = this.$store.state.coloursConfig.find(colour => colour.value === gameHelper.getFriendlyColour(this.player.colour.value))?.alias;
-
-      if (existsV) {
-        return existsV;
-      }
-
-      return this.$store.state.coloursConfig[0].alias;
-    },
-    onCancel () {
-      this.$emit('onColourOverrideCancelled');
-    },
-    async onConfirm () {
-      try {
-        await this.$store.dispatch('addColourMapping', {
-          playerId: this.player._id,
-          colour: {
-            alias: this.currentColour,
-            value: this.toColourValue(this.currentColour)
-          }
-        });
-
-        this.$emit('onColourOverrideConfirmed');
-      } catch (e) {
-        console.error(e);
-        this.$toast.error(`There was a problem saving the custom colour`)
-      }
-    },
-    toColourValue (alias) {
-      return this.$store.state.coloursConfig.find(colour => colour.alias === alias)?.value
-    },
-    setToDefault () {
-      this.currentColour = this.ensureExists(this.player.colour.alias);
-    }
-  },
-  computed: {
-    title () {
-      return `Custom colour for ${this.player.alias}`
-    }
+    emit('onColourOverrideConfirmed');
+  } catch (e) {
+    console.error(e);
+    toast.error(`There was a problem saving the custom colour`);
   }
 }
+
+const ensureExists = (alias: string) => {
+  const existsA = store.state.coloursConfig.find(colour => colour.alias === alias);
+
+  if (existsA) {
+    return alias;
+  }
+
+  const existsV = store.state.coloursConfig.find(colour => colour.value === gameHelper.getFriendlyColour(player.value.colour.value))?.alias;
+
+  if (existsV) {
+    return existsV;
+  }
+
+  return store.state.coloursConfig[0].alias;
+}
+
+onMounted(() => {
+  const modalEl = document.getElementById("colourOverride")!;
+
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    emit('onColourOverrideCancelled');
+  });
+
+  //@ts-ignore
+  modal.value = new bootstrap.Modal(modalEl);
+  //@ts-ignore
+  modal.value.show();
+  currentColour.value = ensureExists(store.getters.getColourForPlayer(props.playerId).alias);
+});
 </script>
 
 <style scoped>

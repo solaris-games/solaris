@@ -1,5 +1,5 @@
 <template>
-  <view-container :hideTopBar="true">
+  <view-container :hideTopBar="true" :is-auth-page="false">
     <view-title
       title="Community Guidelines"
       :showSocialLinks="false"
@@ -35,16 +35,9 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from "./components/ViewContainer.vue"
 import ViewTitle from "./components/ViewTitle.vue"
-
-export default {
-  components: {
-    "view-container": ViewContainer,
-    "view-title": ViewTitle,
-  }
-}
 </script>
 
 <style scoped>

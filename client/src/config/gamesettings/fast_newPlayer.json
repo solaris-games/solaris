@@ -1,80 +1,113 @@
 {
     "general": {
-        "name": "[[[RANDOM]]]",
-        "description": "Go head to head against a single opponent, this game will be down to pure skill.",
-        "type": "1v1_tb",
+        "name": "Ultra fast New player",
+        "description": "Ultra fast new player game to teach the basics of Solaris",
+        "type": "custom",
         "mode": "conquest",
-        "password": null,
-        "playerLimit": 2,
+        "featured": false,
+        "playerLimit": 3,
         "playerType": "all",
         "anonymity": "normal",
         "playerOnlineStatus": "hidden",
         "playerIPWarning": "enabled",
-        "timeMachine": "enabled",
+        "timeMachine": "disabled",
+        "awardRankTo": "all",
+        "awardRankToTopN": null,
         "fluxEnabled": "disabled",
-        "advancedAI": "disabled",
+        "advancedAI": "enabled",
         "spectators": "enabled",
         "afkSlotsOpen": "enabled",
         "readyToQuit": "enabled",
-        "awardRankTo": "all"
+        "readyToQuitFraction": 1,
+        "readyToQuitTimerCycles": 0,
+        "readyToQuitVisibility": "visible",
+        "joinRandomSlot": "disabled"
     },
     "galaxy": {
-        "galaxyType": "circular-balanced",
-        "starsPerPlayer": 40,
-        "productionTicks": 20
+        "galaxyType": "doughnut",
+        "starsPerPlayer": 10,
+        "productionTicks": 10,
+        "advancedCustomGalaxyEnabled": "disabled"
     },
     "specialGalaxy": {
-        "carrierCost": "standard",
+        "carrierCost": "cheap",
         "carrierUpkeepCost": "none",
-        "warpgateCost": "standard",
+        "warpgateCost": "cheap",
         "specialistCost": "standard",
         "specialistsCurrency": "creditsSpecialists",
-        "randomWarpGates": 0,
+        "randomWarpGates": 20,
         "randomWormHoles": 0,
-        "randomNebulas": 0,
-        "randomAsteroidFields": 0,
+        "randomNebulas": 20,
+        "randomAsteroidFields": 20,
         "randomBinaryStars": 0,
         "randomBlackHoles": 0,
-        "randomPulsars": 0,
-        "darkGalaxy": "fog",
+        "randomPulsars": 20,
+        "darkGalaxy": "disabled",
         "giftCarriers": "disabled",
         "defenderBonus": "enabled",
         "carrierToCarrierCombat": "enabled",
         "splitResources": "disabled",
         "resourceDistribution": "random",
-        "playerDistribution": "circular",
-        "carrierSpeed": 10,
+        "playerDistribution": "circularSequential",
+        "carrierSpeed": 25,
         "starCaptureReward": "enabled",
+        "combatResolutionMalusStrategy": "largestCarrier",
         "specialistBans": {
             "star": [
                 16,
-                17
+                17,
+                5,
+                6,
+                7,
+                8,
+                10,
+                9,
+                12,
+                15,
+                18
             ],
-            "carrier": []
+            "carrier": [
+                1,
+                7,
+                8,
+                10,
+                12,
+                13,
+                15,
+                16,
+                17,
+                19,
+                20,
+                21
+            ]
         }
     },
     "conquest": {
         "victoryCondition": "starPercentage",
         "victoryPercentage": 66,
-        "capitalStarElimination": "enabled"
+        "capitalStarElimination": "enabled",
+        "teamsCount": null
+    },
+    "kingOfTheHill": {
+        "productionCycles": 10
     },
     "orbitalMechanics": {
         "enabled": "disabled",
         "orbitSpeed": 3
     },
     "player": {
-        "startingStars": 6,
-        "startingCredits": 1000,
-        "startingCreditsSpecialists": 5,
-        "startingShips": 10,
+        "startingStars": 9,
+        "startingCredits": 500,
+        "startingCreditsSpecialists": 2,
+        "startingShips": 2,
         "startingInfrastructure": {
-            "economy": 5,
-            "industry": 5,
-            "science": 2
+            "economy": 10,
+            "industry": 3,
+            "science": 3
         },
         "developmentCost": {
-            "economy": "standard",
-            "industry": "standard",
+            "economy": "cheap",
+            "industry": "cheap",
             "science": "cheap"
         },
         "tradeCredits": false,
@@ -89,36 +122,33 @@
     },
     "diplomacy": {
         "enabled": "disabled",
-        "upkeepCost": "none",
-        "maxAlliances": 1,
         "tradeRestricted": "disabled",
+        "lockedAlliances": "disabled",
+        "maxAlliances": 2,
+        "upkeepCost": "none",
         "globalEvents": "disabled"
     },
     "technology": {
         "startingTechnologyLevel": {
             "terraforming": 1,
             "experimentation": 0,
-            "scanning": 2,
-            "hyperspace": 1,
+            "scanning": 3,
+            "hyperspace": 3,
             "manufacturing": 1,
             "banking": 1,
             "weapons": 5,
-            "specialists": 3
+            "specialists": 2
         },
         "researchCosts": {
             "terraforming": "standard",
             "experimentation": "none",
-            "scanning": "standard",
-            "hyperspace": "standard",
-            "manufacturing": "expensive",
-            "banking": "cheap",
+            "scanning": "none",
+            "hyperspace": "none",
+            "manufacturing": "standard",
+            "banking": "standard",
             "weapons": "none",
             "specialists": "standard"
         },
-        "experimentationDistribution": "random",
-        "bankingReward": "standard",
-        "experimentationReward": "standard",
-        "specialistTokenReward": "standard",
         "researchCostProgressions": {
             "terraforming": {
                 "progression": "standard"
@@ -144,18 +174,22 @@
             "specialists": {
                 "progression": "standard"
             }
-        }
+        },
+        "bankingReward": "standard",
+        "experimentationDistribution": "random",
+        "experimentationReward": "standard",
+        "specialistTokenReward": "standard"
     },
     "gameTime": {
-        "speed": 3600,
-        "isTickLimited": "enabled",
-        "tickLimit": 400,
-        "startDelay": 240,
-        "gameType": "turnBased",
+        "gameType": "realTime",
+        "speed": 30,
+        "startDelay": 5,
         "turnJumps": 4,
         "maxTurnWait": 1440,
+        "isTickLimited": "enabled",
+        "tickLimit": 400,
         "afk": {
-            "lastSeenTimeout": 2,
+            "lastSeenTimeout": 1,
             "cycleTimeout": 3,
             "turnTimeout": 3
         }

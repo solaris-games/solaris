@@ -46,7 +46,7 @@ export default class StarCaptureService {
     captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]): StarCaptureResult {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
-        let specialist = this.specialistService.getByIdStar(star.specialistId);
+        const specialist = this.specialistService.getByIdStar(star.specialistId);
 
         // If the star had a specialist that destroys infrastructure then perform demolition.
         if (specialist && specialist.modifiers.special && specialist.modifiers.special.destroyInfrastructureOnLoss) {
@@ -59,7 +59,7 @@ export default class StarCaptureService {
 
         // If multiple players are capturing the star, then the player who owns the carrier with the most
         // ships will capture it, otherwise the closest carrier gets it.
-        let capturePlayerId = attackerCarriers.sort((a, b) => {
+        const capturePlayerId = attackerCarriers.sort((a, b) => {
             // Sort by ship count (highest ships first)
             if (a.ships! > b.ships!) return -1;
             if (a.ships! < b.ships!) return 1;
@@ -89,6 +89,8 @@ export default class StarCaptureService {
 
         if (captureReward !== null) {
             star.infrastructure.economy = 0;
+
+            star.canBeLooted = false;
 
             if (captureReward > 0) {
                 newStarPlayer.credits += captureReward;
@@ -168,7 +170,7 @@ export default class StarCaptureService {
         // If star capture reward is enabled, destroy the economic infrastructure
         // and add the capture amount to the attacker
 
-        if (game.settings.specialGalaxy.starCaptureReward === 'enabled') {
+        if (game.settings.specialGalaxy.starCaptureReward === 'enabled' && star.canBeLooted) {
             const starEconomy = star.infrastructure.economy || 0;
             const baseReward = starEconomy * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
 

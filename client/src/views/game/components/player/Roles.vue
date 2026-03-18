@@ -34,11 +34,11 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    user: Object,
-    displayText: Boolean
-  }
-}
+<script setup lang="ts">
+import type {UserPublic} from "@solaris-common";
+
+const props = defineProps<{
+  user: UserPublic<string>,
+  displayText?: boolean,
+}>();
 </script>

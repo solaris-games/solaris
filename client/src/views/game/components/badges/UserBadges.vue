@@ -3,7 +3,7 @@
     <loading-spinner :loading="isLoading"/>
 
     <div class="pt-3 pb-3 badges" v-if="!isLoading && badges.length">
-      <badge v-for="badge in badges" :key="badge.badge" :badge="badge" :allBadges="allBadges" />
+      <badge-with-history v-for="badge in badges" :key="badge.badge" :badge="badge" :allBadges="allBadges" />
     </div>
   </div>
 </template>
@@ -12,13 +12,13 @@
 import {ref, onMounted, type Ref, inject, watch} from 'vue';
 import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import Badge from './Badge.vue'
 import type {State} from "../../../../store";
 import {useStore} from 'vuex';
 import type {Store} from 'vuex/types/index.js';
 import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
 import {getBadgesForUser} from "../../../../services/typedapi/badge";
-import {httpInjectionKey, isError, isOk} from "../../../../services/typedapi";
+import {httpInjectionKey, isOk} from "../../../../services/typedapi";
+import BadgeWithHistory from "@/views/game/components/badges/BadgeWithHistory.vue";
 
 const props = defineProps<{ userId: string }>();
 

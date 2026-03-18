@@ -10,7 +10,7 @@
         <div class="col">
             <form @submit.prevent>
                 <div class="mb-2 mt-3">
-                    <input class="form-control" required="required" placeholder="Password" type="password" v-model="password" @change="onPasswordChanged">
+                    <input class="form-control" :required="true" placeholder="Password" type="password" v-model="password" @change="onPasswordChanged">
                 </div>
             </form>
         </div>
@@ -18,19 +18,18 @@
 </div>
 </template>
 
-<script>
-export default {
-  data () {
-    return {
-      password: null
-    }
-  },
-  methods: {
-    onPasswordChanged (e) {
-      this.$emit('onPasswordChanged', this.password)
-    }
-  }
-}
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const password = ref<string | null>(null);
+
+const emit = defineEmits<{
+    onPasswordChanged: [password: string];
+}>();
+
+const onPasswordChanged = () => {
+    emit('onPasswordChanged', password.value || '');
+};
 </script>
 
 <style scoped>

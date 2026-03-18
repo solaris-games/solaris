@@ -1,85 +1,74 @@
 <template>
-	<div class="menu-page container" v-if="carrier">
-    	<menu-title title="Edit Fleet Order" @onCloseRequested="onCloseRequested"/>
+  <div class="menu-page container" v-if="carrier">
+    <menu-title title="Edit Fleet Order" @onCloseRequested="onCloseRequested"/>
 
-        <div class="row g-0 mb-1">
-            <div class="col-2 text-center">
-                <span>Delay</span>
-            </div>
-            <div class="col-3 text-center">
-                <span>Destination</span>
-            </div>
-            <div class="col-5 text-center">
-                <span>Action</span>
-            </div>
-            <div class="col-2 text-center">
-                <span v-if="!currentWaypoint || !currentWaypoint.action || !isActionRequiresPercentage(currentWaypoint.action)">Ships</span>
-                <span v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
-            </div>
-        </div>
+    <div class="row g-0">
+      <table class="table table-borderless">
+        <thead>
+        <tr>
+          <th scope="col" class="waypoint-table-head col-2">Delay</th>
+          <th scope="col" class="waypoint-table-head col-2">Destination</th>
+          <th scope="col" class="waypoint-table-head col-6">Action</th>
+          <th scope="col" class="waypoint-table-head col-2">
+            <span
+              v-if="!currentWaypoint || !currentWaypoint.action || !isActionRequiresPercentage(currentWaypoint.action)">Ships</span>
+            <span
+              v-if="currentWaypoint && currentWaypoint.action && isActionRequiresPercentage(currentWaypoint.action)">%</span>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <waypoint-edit-row :isInTransit="isInTransit" :waypoint="currentWaypoint" :allWaypoints="waypoints"
+                           @change="recalculateWaypointDuration"/>
+        </tbody>
+      </table>
+    </div>
 
-        <div class="row g-0 mb-2" v-if="currentWaypoint">
-            <div class="col-2 text-center">
-              <input type="number" class="form-control input-sm" v-if="!(isFirstWaypoint(currentWaypoint) && isInTransit)" v-model="currentWaypoint.delayTicks" @change="recalculateWaypointDuration">
-            </div>
-            <div class="col-3 text-center pt-1">
-                <!-- <a href="javascript:;" @click="onOpenStarDetailRequested">{{getStarName(currentWaypoint.destination)}}</a> -->
-                <span>{{getStarName(currentWaypoint.destination)}}</span>
-            </div>
-            <div class="col-5 text-center">
-                <select class="form-control input-sm" id="waypointAction" v-model="currentWaypoint.action">
-                    <option key="nothing" value="nothing">{{getWaypointActionFriendlyText(currentWaypoint, 'nothing')}}</option>
-                    <option key="collectAll" value="collectAll">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAll')}}</option>
-                    <option key="dropAll" value="dropAll">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAll')}}</option>
-                    <option key="collect" value="collect">{{getWaypointActionFriendlyText(currentWaypoint, 'collect')}}</option>
-                    <option key="drop" value="drop">{{getWaypointActionFriendlyText(currentWaypoint, 'drop')}}</option>
-                    <option key="collectAllBut" value="collectAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'collectAllBut')}}</option>
-                    <option key="dropAllBut" value="dropAllBut">{{getWaypointActionFriendlyText(currentWaypoint, 'dropAllBut')}}</option>
-                    <option key="garrison" value="garrison">{{getWaypointActionFriendlyText(currentWaypoint, 'garrison')}}</option>
-                    <option key="collectPercentage" value="collectPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'collectPercentage')}}</option>
-                    <option key="dropPercentage" value="dropPercentage">{{getWaypointActionFriendlyText(currentWaypoint, 'dropPercentage')}}</option>
-                </select>
-            </div>
-            <div class="col-2 text-center">
-                <input v-if="isActionRequiresShips(currentWaypoint.action)" class="form-control input-sm" type="number" v-model="currentWaypoint.actionShips"/>
-            </div>
-        </div>
 
-        <div class="row pt-2 pb-0 mb-0">
-          <div class="col">
-            <p class="mb-2">ETA<orbital-mechanics-e-t-a-warning />: {{waypointEta}}</p>
-          </div>
-          <div class="col-auto" v-if="isRealTimeGame">
-            <p class="mb-2">Duration<orbital-mechanics-e-t-a-warning />: {{waypointDuration}}</p>
-          </div>
-        </div>
+    <div class="row pt-1 pb-0 mb-0">
+      <div class="col">
+        <p class="mb-2">ETA
+          <orbital-mechanics-e-t-a-warning/>
+          : {{ waypointEta }}
+        </p>
+      </div>
+      <div class="col-auto" v-if="isRealTimeGame">
+        <p class="mb-2">Duration
+          <orbital-mechanics-e-t-a-warning/>
+          : {{ waypointDuration }}
+        </p>
+      </div>
+    </div>
 
-		<div class="row bg-dark pt-2 pb-2">
-			<div class="col pe-0">
-				<button class="btn btn-sm btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints">
+    <div class="row bg-dark pt-2 pb-2">
+      <div class="col pe-0">
+        <button class="btn btn-sm btn-primary" @click="previousWaypoint()" :disabled="isSavingWaypoints">
           <i class="fas fa-chevron-left"></i>
           <span class="ms-1">Prev</span>
         </button>
-				<button class="btn btn-sm btn-primary ms-1" @click="nextWaypoint()" :disabled="isSavingWaypoints">
+        <button class="btn btn-sm btn-primary ms-1" @click="nextWaypoint()" :disabled="isSavingWaypoints">
           <span class="me-1">Next</span>
           <i class="fas fa-chevron-right"></i>
         </button>
-				<button class="btn btn-sm ms-1" :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}" @click="toggleLooped()" :disabled="isHistoricalMode || !canLoop" title="Loop/Unloop the carrier's waypoints">
+        <button class="btn btn-sm ms-1"
+                :class="{'btn-success':carrier.waypointsLooped,'btn-outline-primary':!carrier.waypointsLooped}"
+                @click="toggleLooped()" :disabled="isHistoricalMode || !canLoop"
+                title="Loop/Unloop the carrier's waypoints">
           <i class="fas fa-sync"></i>
         </button>
-			</div>
-			<div class="col-auto" v-if="!isHistoricalMode">
-				<button class="btn btn-sm btn-outline-success" @click="doSaveWaypoints()" :disabled="isSavingWaypoints">
+      </div>
+      <div class="col-auto" v-if="!isHistoricalMode">
+        <button class="btn btn-sm btn-outline-success" @click="doSaveWaypoints()" :disabled="isSavingWaypoints">
           <i class="fas fa-save"></i>
           <span class="ms-1">Save</span>
         </button>
-				<button class="btn btn-sm btn-success ms-1" @click="doSaveWaypoints(true)" :disabled="isSavingWaypoints">
+        <button class="btn btn-sm btn-success ms-1" @click="doSaveWaypoints(true)" :disabled="isSavingWaypoints">
           <i class="fas fa-check"></i>
           <span class="ms-1 d-none d-sm-inline-block">Save &amp; Edit</span>
         </button>
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,21 +76,19 @@ import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import gameHelper from '../../../../services/gameHelper';
-import AudioService from '../../../../game/audio';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris-common"
 import {useStore} from 'vuex';
-import {saveWaypoints} from "@/services/typedapi/carrier";
-import {httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
+import {httpInjectionKey} from "@/services/typedapi";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {useGameServices} from "@/util/gameServices";
 import type {Game} from "@/types/game";
 import {getCountdownTimeStringByTicks, ticksToDuration} from "@/util/time";
 import {formatDuration} from "@/util/duration";
+import {isActionRequiresShips} from "@/util/waypoint";
+import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
+import {saveWaypoints} from "@/views/game/components/carrier/action";
 
 const props = defineProps<{
   carrierId: string,
@@ -115,12 +102,9 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-
-const gameServices = useGameServices();
 
 const settings = computed<UserGameSettings>(() => store.state.settings);
 const game = computed<Game>(() => store.state.game);
@@ -142,11 +126,6 @@ const onCloseRequested = () => {
   emit('onCloseRequested');
 };
 
-const getStarName = (starId: string) => {
-  const star = GameHelper.getStarById(game.value, starId);
-  return star ? star.name : 'Unknown Star';
-};
-
 const panToWaypoint = () => {
   eventBus.emit(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, {});
 
@@ -156,54 +135,12 @@ const panToWaypoint = () => {
 
   const star = gameHelper.getStarById(game.value, currentWaypoint.value!.destination);
 
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star as MapObject<string> });
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, { location: star!.location });
-};
-
-const isActionRequiresShips = (action: CarrierWaypointActionType) => {
-  switch (action) {
-    case 'collect':
-    case 'drop':
-    case 'collectAllBut':
-    case 'dropAllBut':
-    case 'collectPercentage':
-    case 'dropPercentage':
-    case 'garrison':
-      return true;
-  }
-
-  return false;
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {object: star as MapObject<string>});
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandHighlightLocation, {location: star!.location});
 };
 
 const isActionRequiresPercentage = (action: CarrierWaypointActionType) => {
   return action === 'dropPercentage' || action === 'collectPercentage';
-};
-
-const getWaypointActionFriendlyText = (waypoint: CarrierWaypoint<string>, action: CarrierWaypointActionType) => {
-  action = action || waypoint.action;
-
-  switch (action) {
-    case 'nothing':
-      return 'Do Nothing'
-    case 'collectAll':
-      return 'Collect All'
-    case 'dropAll':
-      return 'Drop All'
-    case 'collect':
-      return `Collect ${waypoint.actionShips}`
-    case 'drop':
-      return `Drop ${waypoint.actionShips}`
-    case 'collectAllBut':
-      return `Collect All But ${waypoint.actionShips}`
-    case 'dropAllBut':
-      return `Drop All But ${waypoint.actionShips}`
-    case 'garrison':
-      return `Garrison ${waypoint.actionShips}`
-    case 'dropPercentage':
-      return `Drop ${waypoint.actionShips}%`
-    case 'collectPercentage':
-      return `Collect ${waypoint.actionShips}%`
-  }
 };
 
 const recalculateWaypointEta = () => {
@@ -261,33 +198,18 @@ const toggleLooped = () => {
   carrier.value.waypointsLooped = !carrier.value.waypointsLooped;
 };
 
-const isFirstWaypoint = (waypoint: CarrierWaypoint<string>) => {
-  return waypoints.value.indexOf(waypoint) === 0;
-}
+const waypointsSaveAction = saveWaypoints(game, isSavingWaypoints);
 
 const doSaveWaypoints = async (saveAndEdit = false) => {
-  isSavingWaypoints.value = true
-  const response = await saveWaypoints(httpClient)(game.value._id, carrier.value._id, waypoints.value, carrier.value.waypointsLooped)
+  const res = await waypointsSaveAction(carrier.value, waypoints.value);
 
-  if (isOk(response)) {
-    AudioService.join()
-
-    carrier.value.waypoints = response.data.waypoints;
-
-    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
-
-    toast.default(`${carrier.value.name} waypoints updated.`)
-
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier.value});
-
+  if (res) {
     if (saveAndEdit) {
       emit('onOpenCarrierDetailRequested', carrier.value._id);
     } else {
       onCloseRequested();
     }
   }
-
-  isSavingWaypoints.value = false;
 };
 
 watch(() => currentWaypoint.value.action, (newV, oldV) => {
@@ -319,4 +241,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.waypoint-table-head {
+  padding: 1px;
+  text-align: center;
+}
 </style>

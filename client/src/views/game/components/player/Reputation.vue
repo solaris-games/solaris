@@ -34,40 +34,30 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
+import type {Game} from "@/types/game";
 
-export default {
-  props: {
-    playerId: String
-  },
-  data () {
-    return {
-      player: null
-    }
-  },
-  mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-  },
-  computed: {
-    creditsRequired () {
-      return this.player.stats.totalEconomy * 10 / 2
-    },
-    creditsSpecialistsRequired () {
-      return Math.round(this.player.research.specialists.level / 2)
-    },
-    isSpecialistsCurrencyCreditsSpecialists () {
-      return GameHelper.isSpecialistsCurrencyCreditsSpecialists(this.$store.state.game)
-    },
-    isFormalAlliancesEnabled () {
-      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
-    },
-    isExtraDark () {
-      return this.$store.state.game.settings.specialGalaxy.darkGalaxy === 'extra'
-    }
-  }
-}
+const props = defineProps<{
+  playerId: string,
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+
+const isExtraDark = computed(() => GameHelper.isDarkModeExtra(game.value));
+
+const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
+
+const isSpecialistsCurrencyCreditsSpecialists = computed(() => GameHelper.isSpecialistsCurrencyCreditsSpecialists(game.value));
+
+const creditsSpecialistsRequired = computed(() => Math.round(player.value.research.specialists.level / 2));
+
+const creditsRequired = computed(() => player.value.stats!.totalEconomy * 10 / 2);
 </script>
 
 <style scoped>

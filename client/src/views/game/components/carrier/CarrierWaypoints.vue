@@ -87,7 +87,6 @@ import AudioService from '../../../../game/audio'
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {type Mode, ModeKind} from "@/game/map";
 import {toastInjectionKey} from "@/util/keys";
@@ -96,11 +95,10 @@ import {useStore} from 'vuex';
 import type {Carrier, Game, Player} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {saveWaypoints} from "@/services/typedapi/carrier";
 import type {TempWaypoint} from "@/types/waypoint";
-import {gameServicesKey, useGameServices} from "@/util/gameServices";
-import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
+import {useGameServices} from "@/util/gameServices";
 import Timer from "@/views/game/components/time/Timer.vue";
+import {saveWaypoints} from "@/views/game/components/carrier/action";
 
 const props = defineProps<{
   carrierId: string,
@@ -184,45 +182,24 @@ const removeLastWaypoint = () => {
   recalculateLooped();
 };
 
+const waypointsSaveAction = saveWaypoints(game, isSavingWaypoints);
+
 const doSaveWaypoints = async (saveAndEdit = false) => {
-  isSavingWaypoints.value = true
-  const response = await saveWaypoints(httpClient)(game.value._id, carrier.value._id, carrier.value.waypoints, carrier.value.waypointsLooped)
+  const res = await waypointsSaveAction(carrier.value, carrier.value.waypoints);
 
-  if (isOk(response)) {
-    AudioService.join();
-
-    carrier.value.waypoints = response.data.waypoints;
-
-    gameServices.waypointService.populateCarrierWaypointEta(game.value, carrier.value);
-
+  if (res) {
     oldWaypoints.value = carrier.value.waypoints.slice(0);
     oldWaypointsLooped.value = carrier.value.waypointsLooped;
 
-    toast.default(`${carrier.value.name} waypoints updated.`)
-
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {carrier: carrier.value});
-
     if (saveAndEdit) {
+      emit('onEditWaypointRequested', {
+        carrierId: carrier.value._id,
+        waypoint: carrier.value.waypoints[0],
+      });
+    } else {
       emit('onOpenCarrierDetailRequested', carrier.value._id);
-    } else {
-      onCloseRequested();
     }
-
-    if (saveAndEdit) {
-      if (carrier.value.waypoints.length) {
-        emit('onEditWaypointRequested', {
-          carrierId: carrier.value._id,
-          waypoint: carrier.value.waypoints[0],
-        })
-      } else {
-        emit('onOpenCarrierDetailRequested', carrier.value._id);
-      }
-    } else {
-      onCloseRequested();
-    }
-  };
-
-  isSavingWaypoints.value = false;
+  }
 };
 
 const removeAllWaypoints = () => {
