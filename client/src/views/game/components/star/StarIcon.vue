@@ -1,61 +1,48 @@
 <template>
-  <!--<div>
-    ${iconSource}
-  </div>-->
-  <!--<img style="fill: red" :src="iconSource" width="24" height="24" title="Star">-->
-  <!--Use CSS property (ie variable)-->
-  <!--<svg viewBox="0 0 512 512" class="whatever" title="Star">
-    <use href="../../../../assets/map-objects/128x128_star_scannable_binary.svg#128x128_star_scannable_binary" width="512" height="512" stroke="red" />
-  </svg>-->
   <!--TODO: Combo-stars, ie stars with more than one type.-->
-  <svg-wrapper v-if="isBinaryStar" :href="iconSource" class="star-svg binaryStarIcon"></svg-wrapper>
-  <!--<i v-else-if="isNebula" class="fas fa-eye-slash"></i>-->
+  <svg-wrapper v-if="isBinaryStar" :icon-name="iconSource" class="star-svg binaryStarIcon"></svg-wrapper>
   <div v-else-if="isNebula" class="imageMask nebulaIcon" :style="iconSource" />
   <i v-else-if="isBlackHole" class="far fa-circle"></i>
   <i v-else-if="isAsteroidField" class="fas fa-meteor"></i>
-  <!--<div v-else-if="isAsteroidField" class="imageMask asteroidIcon" :style="iconSource" />-->
-  <svg-wrapper v-else-if="isPulsar" :href="iconSource" class="star-svg"></svg-wrapper>
+  <svg-wrapper v-else-if="isPulsar" :icon-name="iconSource" class="star-svg"></svg-wrapper>
   <div v-else-if="isWormHole" class="imageMask wormHoleIcon" :style="iconSource" />
 </template>
 
-<script>
-import SvgWrapperVue from '../../../components/SvgWrapper.vue'
-export default {
-  components: {
-    'svg-wrapper': SvgWrapperVue
-  },
-  props: {
-    isAsteroidField: false,
-    isBinaryStar: false,
-    isNebula: false,
-    isBlackHole: false,
-    isPulsar: false,
-    isWormHole: false
-  },
-  computed: {
-    iconSource() {
-      // TODO: Combos?
-     if (this.isBinaryStar) {
-        return new URL(`../../../../assets/map-objects-symbols/128x128_star_scannable_binary.svg`, import.meta.url).href;
-      }
-      else if (this.isNebula) {
-       return `mask-image: url(${new URL(`../../../../assets/map-objects-symbols/neb0-starless-bright.png`, import.meta.url)}); -webkit-mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)});`;
-      }
-      else if (this.isBlackHole) {
-        return new URL(`../../../../assets/map-objects-symbols/128x128_star_black_hole.svg`, import.meta.url).href;
-      }
-      else if (this.isPulsar) {
-        return new URL(`../../../../assets/map-objects-symbols/128x128_star_pulsar.svg`, import.meta.url).href;
-      }
-      else if (this.isWormHole) {
-       return `mask-image: url(${new URL(`../../../../assets/map-objects-symbols/vortex.png`, import.meta.url).href}); -webkit-mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href});`;
-      }
-      else {
-        return new URL(`../../../../assets/map-objects-symbols/128x128_star_scannable.svg`, import.meta.url).href;
-      }
-    }
+<script setup lang="ts">
+import { computed } from 'vue';
+import SvgWrapper from '../../../components/SvgWrapper.vue';
+
+const props = defineProps<{
+  isAsteroidField?: boolean,
+  isBinaryStar?: boolean,
+  isNebula?: boolean,
+  isBlackHole?: boolean,
+  isPulsar?: boolean,
+  isWormHole?: boolean,
+}>();
+
+const iconSource = computed(() => {
+  // TODO: Combos?
+  if (props.isBinaryStar) {
+    return "128x128_star_scannable_binary";
   }
-}
+  else if (props.isNebula) {
+    return `mask-image: url(${new URL(`../../../../assets/map-objects-symbols/neb0-starless-bright.png`, import.meta.url)}); -webkit-mask-image: url(${new URL(`../../../../assets/nebula/neb0-starless-bright.png`, import.meta.url)});`;
+  }
+  else if (props.isBlackHole) {
+    return "128x128_star_black_hole";
+  }
+  else if (props.isPulsar) {
+    return "128x128_star_pulsar";
+  }
+  else if (props.isWormHole) {
+    return `mask-image: url(${new URL(`../../../../assets/map-objects-symbols/vortex.png`, import.meta.url).href}); -webkit-mask-image: url(${new URL(`../../../../assets/stars/vortex.png`, import.meta.url).href});`;
+  }
+  else {
+    return "128x128_star_scannable";
+  }
+});
+
 </script>
 
 <style>
