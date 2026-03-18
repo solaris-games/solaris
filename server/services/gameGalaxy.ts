@@ -215,25 +215,21 @@ export default class GameGalaxyService {
 
         this._setReadyToQuitCount(game);
 
-        const timeKDStart = performance.now();
-
-        // TODO: Calculate during tick processing and load stored tree
-        const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
-
-        const timeKDEnd = performance.now();
-
         const timeVPStart = performance.now();
 
-        let scannedStarSet = new Set<Star>();
-        // Will only need to calculate for the user if they are playing.
-        if (userPlayer != null) {
-            scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [userPlayer], kdTree);
-        } else if (viewpoint.kind === ViewpointKind.Perspectives) {
-            scannedStarSet = this.scanningService.getStarSetByScanningRange(game, viewpoint.perspectives, kdTree);
+        let scanned: {
+            stars: Set<Star>;
+            playerIds: Set<DBObjectId>;
+            carriers: Set<Carrier>;
+            unscannedWormHoles: Set<Star>;
+        } | undefined;
+
+        if (viewpoint.kind === ViewpointKind.Perspectives) {
+            scanned = this.scanningService.calculateViewpointScanning(game, viewpoint.perspectives);
         }
 
         // We always need to filter the player data so that it's basic info only.
-        await this._setPlayerInfoBasic(game, userPlayer, viewpoint, scannedStarSet);
+        await this._setPlayerInfoBasic(game, userPlayer, viewpoint, scanned?.playerIds);
 
         // if the user isn't playing this game or spectating, then only return
         // basic data about the stars, exclude any important info like ships.
@@ -242,8 +238,8 @@ export default class GameGalaxyService {
             this._setStarInfoBasic(game);
             this._clearPlayerCarriers(game);
         } else {
-            this._setCarrierInfoDetailed(game, viewpoint, new KDTree(this.distanceService, game.galaxy.carriers));
-            this._setStarInfoDetailed(game, userPlayer, viewpoint, scannedStarSet);
+            this._setCarrierInfoDetailed(game, viewpoint, scanned?.carriers);
+            this._setStarInfoDetailed(game, userPlayer, viewpoint, scanned?.stars, scanned?.unscannedWormHoles);
         }
 
         this._filterPlayerHomeStars(game);
@@ -274,8 +270,6 @@ export default class GameGalaxyService {
         }
 
         const timeVPEnd = performance.now();
-
-        log.info("Time for KD tree construction: " + (timeKDEnd - timeKDStart) + "ms");
 
         log.info("Time for viewpoint calculation: " + (timeVPEnd - timeVPStart) + "ms");
 
@@ -406,7 +400,7 @@ export default class GameGalaxyService {
             });
     }
 
-    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedStarSet: Set<Star>) {
+    _setStarInfoDetailed(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, visibleStarSet?: Set<Star>, unscannedWormHoles?: Set<Star>) {
         const isFinished = this.gameStateService.isFinished(doc);
         const isDarkStart = this.gameTypeService.isDarkStart(doc);
         const isDarkMode = this.gameTypeService.isDarkMode(doc);
@@ -430,7 +424,7 @@ export default class GameGalaxyService {
             // If dark start and game hasn't started yet OR is dark mode, then filter out
             // any stars the player cannot see in scanning range.
             if (isDarkMode || (isDarkStart && !doc.state.startDate)) {
-                const scannedStarList = this.scanningService.starSetToSortedList(scannedStarSet);
+                const scannedStarList = this.scanningService.starSetToSortedList(visibleStarSet!);
                 if (isDarkMode) {
                     doc.galaxy.stars = this.scanningService.addWaypointDestinations(doc, viewpoint.perspectives, scannedStarList);
                 } else {
@@ -494,7 +488,8 @@ export default class GameGalaxyService {
                     delete s.shipsActual;
                 }
 
-                s.isInScanningRange = (isFinished || this.scanningService.isStarWithinScanningRangeOfStarsByViewpoint(doc, s, scannedStarSet));
+                // visibleStarSet may include connected wormholes, which aren't actually in scanning range, so we need to check for that too.
+                s.isInScanningRange = (isFinished || Boolean(visibleStarSet?.has(s) && !unscannedWormHoles?.has(s._id)));
 
                 // If it's in range then its all good, send the star back as is.
                 // Otherwise only return a subset of the data.
@@ -554,7 +549,7 @@ export default class GameGalaxyService {
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint, kdTree: KDTree) {
+    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint, scannedCarrierIdSet?: Set<Carrier>) {
         const isFinished = this.gameStateService.isFinished(doc)
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
@@ -562,7 +557,7 @@ export default class GameGalaxyService {
         if (viewpoint.kind !== ViewpointKind.Finished) {
             const perspectivePlayers = viewpoint.kind === ViewpointKind.Perspectives ? viewpoint.perspectives : [];
 
-            doc.galaxy.carriers = Array.from(this.scanningService.getCarrierSetByScanningRange(doc, perspectivePlayers, kdTree));
+            doc.galaxy.carriers = Array.from(scannedCarrierIdSet!);
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
@@ -593,7 +588,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedStarSet: Set<Star>) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedPlayerIdSet?: Set<DBObjectId>) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -609,13 +604,6 @@ export default class GameGalaxyService {
         if (!isAnonymousNow) {
             const userIds: DBObjectId[] = doc.galaxy.players.filter(x => x.userId).map(x => x.userId!);
             guildUsers = await this.guildUserService.listUsersWithGuildTags(userIds);
-        }
-
-        // Calculate which players are in scanning range.
-        let playersInRange: Player[] = [];
-
-        if (userPlayer || viewpoint.kind === ViewpointKind.Perspectives) {
-            playersInRange = this.scanningService.getPlayersWithinScanningRangeOfStars(doc, doc.galaxy.players, scannedStarSet);
         }
 
         const displayOnlineStatus = doc.settings.general.playerOnlineStatus === 'visible';
@@ -649,7 +637,7 @@ export default class GameGalaxyService {
             // then do not include psuedo afk. We only want to check that for other players.
             p.isAIControlled = this.playerAfkService.isAIControlled(doc, p, !isCurrentUserPlayer);
 
-            p.isInScanningRange = playersInRange.find(x => x._id.toString() === p._id.toString()) != null;
+            p.isInScanningRange = Boolean(scannedPlayerIdSet?.has(p._id)); // Return false if not scanned or scannedPlayerIds is undefined
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
             p.avatar = p.avatar ? avatars.find(a => a.id.toString() === p.avatar!.toString())!.file : null; // TODO: We should made the ID a number and not a string as it is an ID.
 

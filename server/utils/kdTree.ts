@@ -6,6 +6,7 @@ import { DistanceService } from '@solaris-common';
 interface KDTreeNode {
     objectIndex: number;
     marked?: boolean;
+    inRange?: boolean;
 }
 
 export class KDTree {
@@ -64,13 +65,19 @@ export class KDTree {
 
         if (current.marked) return;
 
-        const sqDistance = this.distanceService.getDistanceSquaredBetweenLocations(query, this.mapObjects[current.objectIndex].location);
+        if (!current.inRange) {
+            const sqDistance = this.distanceService.getDistanceSquaredBetweenLocations(query, this.mapObjects[current.objectIndex].location);
 
-        if (sqDistance <= Math.pow(radius, 2)) {
-            this.withinRadius.push(current.objectIndex);
+            if (sqDistance <= Math.pow(radius, 2)) {
+                this.withinRadius.push(current.objectIndex);
+                current.inRange = true;
+            }
+        }
 
+        if (current.inRange) {
             const left = begin + Math.floor((n - begin) / 2);
             const right = n + 1 + Math.floor((end - (n + 1)) / 2);
+
             if ((n <= begin || this.nodes[left].marked) && (end <= n + 1 || this.nodes[right].marked)) {
                 current.marked = true;
                 return;
@@ -96,7 +103,10 @@ export class KDTree {
     }
 
     resetMarked() {
-        this.nodes.forEach(n => n.marked = undefined);
+        this.nodes.forEach(n => {
+            n.marked = undefined;
+            n.inRange = undefined;
+        });
     }
 
     getWithinRadius(target: Star, radius: number, resetMarked: boolean = false) {

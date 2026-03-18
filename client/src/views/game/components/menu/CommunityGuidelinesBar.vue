@@ -1,5 +1,5 @@
 <template>
-  <div class="row bg-primary mb-4 p-1" title="Community Guidelines">
+  <div class="row bg-primary mb-0 p-1" title="Community Guidelines">
     <p class="guidelines-text">
       By playing Solaris, you agree to the <router-link class="guidelines-link" :to="{ name: 'guidelines' }">Community Guidelines</router-link>
     </p>
