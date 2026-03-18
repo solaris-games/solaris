@@ -123,9 +123,39 @@
         "bankingReward": "standard",
         "experimentationReward": "experimental",
         "specialistTokenReward": "experimental",
-        "researchCostProgression": {
-            "progression": "exponential",
-            "growthFactor": "medium"
+        "researchCostProgressions": {
+            "terraforming": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "experimentation": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "scanning": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "hyperspace": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "manufacturing": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "banking": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "weapons": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            },
+            "specialists": {
+                "progression": "exponential",
+                "growthFactor": "medium"
+            }
         }
     },
     "gameTime": {

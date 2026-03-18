@@ -1,6 +1,7 @@
-import type {ResearchType} from "@solaris-common";
+import type {GameResearchCost, ResearchType} from "@solaris-common";
 import type {Game} from "@/types/game";
 
+// TODO: Deduplicate with common library
 class TechnologyHelper {
   FRIENDLY_NAMES = {
     scanning: 'Scanning',
@@ -26,12 +27,14 @@ class TechnologyHelper {
   }
 
   getRequiredResearchProgress(game: Game, technologyKey: ResearchType, technologyLevel: number) {
-    const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
-    const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
+    const researchCostConfig: GameResearchCost = game.settings.technology.researchCosts[technologyKey];
+    const expenseCostConfig: number = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
     const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
 
-    if (game.settings.technology.researchCostProgression.progression === 'exponential') {
-      const growthFactor = game.constants.research.exponentialGrowthFactors[game.settings.technology.researchCostProgression.growthFactor];
+    const progression = game.settings.technology.researchCostProgressions[technologyKey];
+
+    if (progression.progression === "exponential") {
+      const growthFactor = game.constants.research.exponentialGrowthFactors[progression.growthFactor];
       return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel - 1));
     } else {
       return technologyLevel * progressMultiplierConfig;

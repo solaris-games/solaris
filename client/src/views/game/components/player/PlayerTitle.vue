@@ -13,7 +13,7 @@
           <player-diplomatic-status-icon v-if="isFormalAlliancesEnabled" :toPlayerId="player._id" class="ms-2"/>
           <i v-if="player.hasFilledAfkSlot && !player.afk" class="fas fa-user-friends ms-2" title="This player has filled an AFK slot and will be awarded 1.5x additional rank points (minimum 1) when the game ends"></i>
           <i class="fas fa-robot ms-2" v-if="player.isAIControlled" title="This player is AI Controlled"></i>
-          <span v-if="player.defeated" :title="getPlayerStatus(player)">
+          <span v-if="player.defeated" :title="getPlayerStatus()">
             <i v-if="!player.afk" class="fas fa-skull-crossbones ms-2" title="This player has been defeated"></i>
             <i v-if="player.afk" class="fas fa-user-clock ms-2" title="This player is AFK"></i>
           </span>
@@ -29,44 +29,31 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import PlayerIconVue from '../player/PlayerIcon.vue'
-import PlayerOpenSlotStatusVue from './PlayerOpenSlotStatus.vue'
-import PlayerOnlineStatusVue from './PlayerOnlineStatus.vue'
-import PlayerMissedTurnsVue from './PlayerMissedTurns.vue'
+import PlayerIcon from '../player/PlayerIcon.vue'
+import PlayerOpenSlotStatus from './PlayerOpenSlotStatus.vue'
+import PlayerOnlineStatus from './PlayerOnlineStatus.vue'
+import PlayerMissedTurns from './PlayerMissedTurns.vue'
 import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon.vue'
 import TeamName from '../shared/TeamName.vue';
+import type {Game, Player} from "@/types/game";
 
-export default {
-  components: {
-    'team-name': TeamName,
-    'player-icon': PlayerIconVue,
-    'player-open-slot-status': PlayerOpenSlotStatusVue,
-    'player-online-status': PlayerOnlineStatusVue,
-    'player-missed-turns': PlayerMissedTurnsVue,
-    'player-diplomatic-status-icon': PlayerDiplomaticStatusIcon
-  },
-  props: {
-    player: Object
-  },
-  methods: {
-    getPlayerStatus () {
-      return GameHelper.getPlayerStatus(this.player)
-    }
-  },
-  computed: {
-    isFormalAlliancesEnabled () {
-      return DiplomacyHelper.isFormalAlliancesEnabled(this.$store.state.game)
-    },
-    colour () {
-      return GameHelper.getFriendlyColour(
-        this.$store.getters.getColourForPlayer(this.player._id).value
-      )
-    }
-  }
-}
+const props = defineProps<{
+  player: Player,
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+
+const getPlayerStatus = () => GameHelper.getPlayerStatus(props.player);
+
+const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
+
+const colour = computed(() => GameHelper.getFriendlyColour(store.getters.getColourForPlayer(props.player._id).value));
 </script>
 
 <style scoped>

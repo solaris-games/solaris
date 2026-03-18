@@ -13,19 +13,20 @@
 </div>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
 
-export default {
-    computed: {
-        isSpectating () {
-            return GameHelper.isUserSpectatingGame(this.$store.state.game)
-        },
-        isSpectatingDarkMode () {
-            return (GameHelper.isDarkMode(this.$store.state.game) || GameHelper.isDarkFogged(this.$store.state.game)) && !this.$store.state.game.galaxy.stars.length
-        }
-    }
-}
+const store = useStore();
+
+const isSpectating = computed(() => {
+    return GameHelper.isUserSpectatingGame(store.state.game);
+});
+
+const isSpectatingDarkMode = computed(() => {
+    return (GameHelper.isDarkMode(store.state.game) || GameHelper.isDarkFogged(store.state.game)) && !store.state.game.galaxy.stars.length;
+});
 </script>
 
 <style scoped>

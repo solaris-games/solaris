@@ -358,7 +358,7 @@ export class TechnologyService {
 
         if (star.homeStar) {
             if (this.gameTypeService.isCapitalStarEliminationMode(game)) {
-                bonus *= 2;
+                bonus += 1;
             } else {
                 bonus *= game.constants.star.homeStarDefenderBonusMultiplier;
             }

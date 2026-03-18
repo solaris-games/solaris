@@ -29,9 +29,9 @@ const props = defineProps<{
   }
 }>();
 
-const onConfirm = (e) => props.dialogSettings.onConfirm();
+const onConfirm = () => props.dialogSettings.onConfirm();
 
-const onCancel = (e) => props.dialogSettings.onCancel();
+const onCancel = () => props.dialogSettings.onCancel();
 </script>
 
 <style>

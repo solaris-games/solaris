@@ -1,0 +1,197 @@
+{
+    "general": {
+        "name": "Ultra fast New player",
+        "description": "Ultra fast new player game to teach the basics of Solaris",
+        "type": "custom",
+        "mode": "conquest",
+        "featured": false,
+        "playerLimit": 3,
+        "playerType": "all",
+        "anonymity": "normal",
+        "playerOnlineStatus": "hidden",
+        "playerIPWarning": "enabled",
+        "timeMachine": "disabled",
+        "awardRankTo": "all",
+        "awardRankToTopN": null,
+        "fluxEnabled": "disabled",
+        "advancedAI": "enabled",
+        "spectators": "enabled",
+        "afkSlotsOpen": "enabled",
+        "readyToQuit": "enabled",
+        "readyToQuitFraction": 1,
+        "readyToQuitTimerCycles": 0,
+        "readyToQuitVisibility": "visible",
+        "joinRandomSlot": "disabled"
+    },
+    "galaxy": {
+        "galaxyType": "doughnut",
+        "starsPerPlayer": 10,
+        "productionTicks": 10,
+        "advancedCustomGalaxyEnabled": "disabled"
+    },
+    "specialGalaxy": {
+        "carrierCost": "cheap",
+        "carrierUpkeepCost": "none",
+        "warpgateCost": "cheap",
+        "specialistCost": "standard",
+        "specialistsCurrency": "creditsSpecialists",
+        "randomWarpGates": 20,
+        "randomWormHoles": 0,
+        "randomNebulas": 20,
+        "randomAsteroidFields": 20,
+        "randomBinaryStars": 0,
+        "randomBlackHoles": 0,
+        "randomPulsars": 20,
+        "darkGalaxy": "disabled",
+        "giftCarriers": "disabled",
+        "defenderBonus": "enabled",
+        "carrierToCarrierCombat": "enabled",
+        "splitResources": "disabled",
+        "resourceDistribution": "random",
+        "playerDistribution": "circularSequential",
+        "carrierSpeed": 25,
+        "starCaptureReward": "enabled",
+        "combatResolutionMalusStrategy": "largestCarrier",
+        "specialistBans": {
+            "star": [
+                16,
+                17,
+                5,
+                6,
+                7,
+                8,
+                10,
+                9,
+                12,
+                15,
+                18
+            ],
+            "carrier": [
+                1,
+                7,
+                8,
+                10,
+                12,
+                13,
+                15,
+                16,
+                17,
+                19,
+                20,
+                21
+            ]
+        }
+    },
+    "conquest": {
+        "victoryCondition": "starPercentage",
+        "victoryPercentage": 66,
+        "capitalStarElimination": "enabled",
+        "teamsCount": null
+    },
+    "kingOfTheHill": {
+        "productionCycles": 10
+    },
+    "orbitalMechanics": {
+        "enabled": "disabled",
+        "orbitSpeed": 3
+    },
+    "player": {
+        "startingStars": 9,
+        "startingCredits": 500,
+        "startingCreditsSpecialists": 2,
+        "startingShips": 2,
+        "startingInfrastructure": {
+            "economy": 10,
+            "industry": 3,
+            "science": 3
+        },
+        "developmentCost": {
+            "economy": "cheap",
+            "industry": "cheap",
+            "science": "cheap"
+        },
+        "tradeCredits": false,
+        "tradeCreditsSpecialists": false,
+        "tradeCost": 0,
+        "tradeScanning": "all",
+        "populationCap": {
+            "enabled": "disabled",
+            "shipsPerStar": 100
+        },
+        "allowAbandonStars": "disabled"
+    },
+    "diplomacy": {
+        "enabled": "disabled",
+        "tradeRestricted": "disabled",
+        "lockedAlliances": "disabled",
+        "maxAlliances": 2,
+        "upkeepCost": "none",
+        "globalEvents": "disabled"
+    },
+    "technology": {
+        "startingTechnologyLevel": {
+            "terraforming": 1,
+            "experimentation": 0,
+            "scanning": 3,
+            "hyperspace": 3,
+            "manufacturing": 1,
+            "banking": 1,
+            "weapons": 5,
+            "specialists": 2
+        },
+        "researchCosts": {
+            "terraforming": "standard",
+            "experimentation": "none",
+            "scanning": "none",
+            "hyperspace": "none",
+            "manufacturing": "standard",
+            "banking": "standard",
+            "weapons": "none",
+            "specialists": "standard"
+        },
+        "researchCostProgressions": {
+            "terraforming": {
+                "progression": "standard"
+            },
+            "experimentation": {
+                "progression": "standard"
+            },
+            "scanning": {
+                "progression": "standard"
+            },
+            "hyperspace": {
+                "progression": "standard"
+            },
+            "manufacturing": {
+                "progression": "standard"
+            },
+            "banking": {
+                "progression": "standard"
+            },
+            "weapons": {
+                "progression": "standard"
+            },
+            "specialists": {
+                "progression": "standard"
+            }
+        },
+        "bankingReward": "standard",
+        "experimentationDistribution": "random",
+        "experimentationReward": "standard",
+        "specialistTokenReward": "standard"
+    },
+    "gameTime": {
+        "gameType": "realTime",
+        "speed": 30,
+        "startDelay": 5,
+        "turnJumps": 4,
+        "maxTurnWait": 1440,
+        "isTickLimited": "enabled",
+        "tickLimit": 400,
+        "afk": {
+            "lastSeenTimeout": 1,
+            "cycleTimeout": 3,
+            "turnTimeout": 3
+        }
+    }
+}

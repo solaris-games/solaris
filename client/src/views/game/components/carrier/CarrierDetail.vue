@@ -22,6 +22,12 @@
       </div>
     </div>
 
+    <div class="row bg-danger" v-if="carrier.isScuttled">
+      <div class="col text-center p-2">
+        <p class="mb-0">This carrier and all its ships will be scuttled.</p>
+      </div>
+    </div>
+
     <div v-if="isCompactUIStyle">
       <div class="row mt-2">
         <div class="col">
@@ -162,7 +168,6 @@
       <div v-if="(hasWaypoints && isStandardUIStyle) || (hasWaypoints && isUserPlayerCarrier)" class="row pt-0 pb-0 mb-0">
         <waypointTable :carrier="carrier"
           @onEditWaypointRequested="onEditWaypointRequested"
-          @onEditWaypointsRequested="editWaypoints"
           @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
       </div>
 
@@ -190,7 +195,7 @@
         </div>
         <div class="col-auto">
           <button class="btn btn-sm btn-success" @click="editWaypoints()">
-            Edit Waypoints
+            Waypoints
             <i class="fas fa-map-marker-alt"></i>
           </button>
         </div>
@@ -437,9 +442,9 @@ const confirmScuttleCarrier = async () => {
   if (isOk(response)) {
     toast.default(`${carrier.value.name} has been scuttled. All ships will be destroyed.`);
 
-    store.commit('gameCarrierScuttled', {
-      carrierId: carrier.value._id
-    });
+    carrier.value.isScuttled = true;
+
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: carrier.value });
 
     AudioService.leave();
 

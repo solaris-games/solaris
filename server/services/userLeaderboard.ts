@@ -479,9 +479,14 @@ export default class UserLeaderboardService {
     async getUserLeaderboard(limit: number | null, sortingKey: string, skip: number = 0) {
         const sorter = UserLeaderboardService.GLOBALSORTERS[sortingKey] || UserLeaderboardService.GLOBALSORTERS['rank'];
 
+        const query = {
+            ...sorter.query || {},
+            isAnonymous: { $ne: true }
+        };
+
         const leaderboard = await this.userRepo
             .find(
-                sorter.query || {},
+                query,
                 sorter.select,
                 sorter.sort,
                 limit,

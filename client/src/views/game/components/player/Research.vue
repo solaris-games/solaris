@@ -83,35 +83,26 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper"
 import TechnologyHelper from "../../../../services/technologyHelper"
 import ResearchRow from "./ResearchRow.vue"
+import type {Game} from "@/types/game.ts";
+import GameHelper from "@/services/gameHelper.ts";
+import type {ResearchTypeNotRandom} from "@solaris-common";
 
-export default {
-  components: {
-    "research-row": ResearchRow,
-  },
-  props: {
-    playerId: String,
-  },
-  methods: {
-    isTechnologyEnabled (technologyKey) {
-      return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)
-    },
-    isTechnologyResearchable (technologyKey) {
-      return TechnologyHelper.isTechnologyResearchable(this.$store.state.game, technologyKey)
-    }
-  },
-  computed: {
-    player() {
-      return gameHelper.getPlayerById(this.$store.state.game, this.playerId);
-    },
-    userPlayer() {
-      return gameHelper.getUserPlayer(this.$store.state.game);
-    },
-  },
-};
+const props = defineProps<{
+  playerId: string,
+}>();
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+
+const isTechnologyEnabled = (technologyKey: ResearchTypeNotRandom) => TechnologyHelper.isTechnologyEnabled(game.value, technologyKey);
 </script>
 
 <style scoped>

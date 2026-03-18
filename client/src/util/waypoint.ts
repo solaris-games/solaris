@@ -24,3 +24,23 @@ export const formatAction = (waypoint: CarrierWaypoint<string>, action: CarrierW
       return `Drop ${waypoint.actionShips}% Of Ships`
   }
 };
+
+export const isActionRequiresShips = (action: CarrierWaypointActionType) => {
+  switch (action) {
+    case 'collect':
+    case 'drop':
+    case 'collectAllBut':
+    case 'dropAllBut':
+    case 'collectPercentage':
+    case 'dropPercentage':
+    case 'garrison':
+      return true;
+  }
+
+  return false;
+};
+
+export const isFirstWaypoint = (allWaypoints: CarrierWaypoint<string>[], waypoint: CarrierWaypoint<string>) => {
+  return allWaypoints.indexOf(waypoint) === 0;
+}
+

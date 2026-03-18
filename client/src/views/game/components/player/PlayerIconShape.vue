@@ -7,23 +7,22 @@
   </svg>
 </template>
 
-<script>
-export default {
-  props: {
-    filled: Boolean,
-    iconColour: String,
-    shape: String
-  },
-  computed: {
-    iconStyle () {
-      if (this.filled) {
-        return { 'fill': this.iconColour, 'stroke': 'none' }
-      } else {
-        return {'stroke-width':64, 'fill': 'none', 'stroke': this.iconColour}
-      }
-    }
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const props = defineProps<{
+  filled: boolean,
+  iconColour: string,
+  shape: string,
+}>();
+
+const iconStyle = computed(() => {
+  if (props.filled) {
+    return { 'fill': props.iconColour, 'stroke': 'none' }
+  } else {
+    return {'stroke-width':64, 'fill': 'none', 'stroke': props.iconColour}
   }
-}
+});
 </script>
 
 <style>

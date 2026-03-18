@@ -5,19 +5,14 @@
     </div>
   </div>
 </template>
-<script>
+<script setup lang="ts">
 import GameHelper from "../../services/gameHelper";
 
-export default {
-  props: {
-    warnings: Array
-  },
-  methods: {
-    formatDate(date) {
-      return GameHelper.getDateString(date)
-    }
-  }
-}
+defineProps<{
+    warnings: { date: Date, text: string }[]
+}>();
+
+const formatDate = (date: Date) => GameHelper.getDateString(date);
 </script>
 <style scoped>
 .warningDescription {

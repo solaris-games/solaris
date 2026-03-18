@@ -481,25 +481,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       // Redraw the star
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
-    gameCarrierScuttled (state: State, data) {
-      let carrier = GameHelper.getCarrierById(state.game!, data.carrierId)!
-      let star = GameHelper.getStarById(state.game!, carrier.orbiting!)!
-      let player = GameHelper.getPlayerById(state.game!, carrier.ownedByPlayerId!)!
-
-      player.stats!.totalCarriers--
-
-      if (carrier.specialistId) {
-        player.stats!.totalSpecialists--
-      }
-
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, { carrier });
-
-      state.game!.galaxy.carriers.splice(state.game!.galaxy.carriers.indexOf(carrier), 1)
-
-      if (star) {
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-      }
-    },
     [PlayerMutationNames.PlayerDebtSettled] (state: State, data) {
       let player = GameHelper.getUserPlayer(state.game!)!
 

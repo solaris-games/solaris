@@ -48,6 +48,25 @@
         </div>
       </div>
 
+      <div class="row pt-2 pb-2">
+        <div class="col">
+          <p>Anonymous Mode</p>
+          <p><small>Hides your identity. Achivements page will not be visible and you will not appear on the leaderboard.</small></p>
+        </div>
+        <div class="col text-end">
+          <button v-if="info.isAnonymous" :disabled="isChangingAnonymous"
+            @click="toggleAnonymous(false)" class="btn btn-success">
+            Enabled
+            <i class="fas fa-check"></i>
+          </button>
+          <button v-if="!info.isAnonymous" :disabled="isChangingAnonymous"
+            @click="toggleAnonymous(true)" class="btn btn-danger">
+            Disabled
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
       <div class="mt-3 text-end">
         <button :disabled="isClosingAccount" class="btn btn-outline-danger" @click="closeAccount"><i
             class="fas fa-trash"></i> Delete Account</button>
@@ -157,7 +176,7 @@ import Roles from '../game/components/player/Roles.vue'
 import Notifications from "./components/Notifications.vue";
 import { inject, onMounted, ref, computed, type Ref } from 'vue'
 import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
-import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference } from '@/services/typedapi/user'
+import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference, updateIsAnonymous } from '@/services/typedapi/user'
 import type { UserPrivate } from '@solaris-common'
 import { toastInjectionKey } from '@/util/keys'
 import type { State } from "@/store";
@@ -177,6 +196,7 @@ const confirm = makeConfirm(store);
 
 const info: Ref<UserPrivate<string> | null> = ref(null);
 const isChangingEmailNotifications = ref(false);
+const isChangingAnonymous = ref(false);
 const isClosingAccount = ref(false);
 
 const discordOauthURL = config.appDiscordOAuthUrl;
@@ -218,6 +238,25 @@ const toggleEmailOtherNotifications = async (enabled: boolean) => {
   }
 
   isChangingEmailNotifications.value = false
+};
+
+const toggleAnonymous = async (enabled: boolean) => {
+  if (!info.value) {
+    return;
+  }
+
+  info.value.isAnonymous = enabled
+
+  try {
+    isChangingAnonymous.value = true
+
+    unwrapOk(await updateIsAnonymous(httpClient)(info.value.isAnonymous));
+  } catch (err) {
+    toast.error("An error occured");
+    console.error(err)
+  }
+
+  isChangingAnonymous.value = false
 };
 
 const closeAccount = async () => {

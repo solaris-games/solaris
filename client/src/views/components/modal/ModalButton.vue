@@ -4,13 +4,11 @@
     </button>
 </template>
 
-<script>
-export default {
-  props: {
-    modalName: String,
-    classText: String
-  }
-}
+<script setup lang="ts">
+defineProps<{
+    modalName: string;
+    classText: string;
+}>();
 </script>
 
 <style scoped>

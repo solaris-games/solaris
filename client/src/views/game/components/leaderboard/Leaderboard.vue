@@ -62,7 +62,7 @@
     <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!" />
 
     <div class="row" v-if="userPlayer != null && !game.state.endDate">
-      <div class="col text-end pe-2">
+      <div class="col text-start m-2">
         <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal"
           classText="btn btn-sm btn-danger">
           <i class="fas fa-sign-out-alt"></i> Quit Game
