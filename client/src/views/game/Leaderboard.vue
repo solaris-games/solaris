@@ -23,24 +23,12 @@
   </view-container>
 </template>
 
-<script>
+<script setup lang="ts">
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
-import LoadingSpinner from '../components/LoadingSpinner.vue'
 import LeaderboardUserTable from './components/menu/LeaderboardUserTable.vue'
 import LeaderboardUserEloTable from './components/menu/LeaderboardUserEloTable.vue'
 import LeaderboardGuildTable from './components/menu/LeaderboardGuildTable.vue'
-
-export default {
-  components: {
-    'view-container': ViewContainer,
-    'view-title': ViewTitle,
-    'loading-spinner': LoadingSpinner,
-    'leaderboard-user-table': LeaderboardUserTable,
-    'leaderboard-user-elo-table': LeaderboardUserEloTable,
-    'leaderboard-guild-table': LeaderboardGuildTable
-  }
-}
 </script>
 
 <style scoped>

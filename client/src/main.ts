@@ -82,6 +82,14 @@ const init = (config: FrontendConfig) => {
 
   const store: Store<State> = createSolarisStore(eventBus, httpClient, userClientSocketEmitter);
 
+  socket.on("connect", () => {
+    store.commit('setSocketConnected', true);
+  });
+
+  socket.on("disconnect", () => {
+    store.commit('setSocketConnected', false);
+  });
+
   app.use(store);
 
   app.use(ToastPlugin);

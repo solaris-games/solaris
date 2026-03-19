@@ -52,6 +52,7 @@ export type State = {
   productionTick: number | null;
   unreadMessages: number | null;
   badges: Badge[];
+  socketConnected: boolean;
 }
 
 export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Store<State> {
@@ -84,6 +85,7 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     productionTick: null,
     unreadMessages: null,
     badges: [],
+    socketConnected: false,
   },
   mutations: {
     // Menu
@@ -125,6 +127,10 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
       state.menuArgumentsChat = null
     },
     // -------
+
+    setSocketConnected(state: State, connected: boolean) {
+      state.socketConnected = connected;
+    },
 
     // TUTORIAL
     setTutorialPage (state: State, page) {
