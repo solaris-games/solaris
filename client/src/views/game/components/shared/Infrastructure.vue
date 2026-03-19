@@ -36,43 +36,26 @@
   </div>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from '../../../../services/gameHelper';
+import type {Game} from "@/types/game.ts";
 
-export default {
-  props: {
-    playerId: String,
-    starId: String
-  },
-  computed: {
-    isSmallHeaders () {
-      return this.economy >= 100 || this.industry >= 100 || this.science >= 100
-    },
-    economy () {
-      return this.player ? this.player.stats.totalEconomy : this.star.infrastructure.economy
-    },
-    industry () {
-      return this.player ? this.player.stats.totalIndustry : this.star.infrastructure.industry
-    },
-    science () {
-      return this.player ? this.player.stats.totalScience : this.star.infrastructure.science
-    },
-    player () {
-      if (!this.playerId) {
-        return null
-      }
+const props = defineProps<{
+  playerId?: string,
+  starId?: string,
+}>();
 
-      return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    },
-    star () {
-      if (!this.starId) {
-        return null
-      }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 
-      return GameHelper.getStarById(this.$store.state.game, this.starId)
-    }
-  }
-}
+const player = computed(() => props.playerId ? GameHelper.getPlayerById(game.value, props.playerId) : null);
+const star = computed(() => props.starId ? GameHelper.getStarById(game.value, props.starId) : null);
+const economy = computed(() => player.value ? player.value.stats!.totalEconomy : star.value!.infrastructure.economy || 0);
+const industry = computed(() => player.value ? player.value.stats!.totalIndustry : star.value!.infrastructure.industry || 0);
+const science = computed(() => player.value ? player.value.stats!.totalScience : star.value!.infrastructure.science || 0);
+const isSmallHeaders = computed(() => economy.value >= 100 || industry.value >= 100 || science.value >= 100);
 </script>
 
 <style scoped>

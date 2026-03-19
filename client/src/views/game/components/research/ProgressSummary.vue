@@ -171,35 +171,23 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
+import type {ResearchTypeNotRandom} from "@solaris-common";
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'help-tooltip': HelpTooltip
-  },
-  methods: {
-    getRequiredTotal (technologyKey) {
-      return TechnologyHelper.getRequiredResearchProgress(this.$store.state.game, technologyKey, this.research[technologyKey].level)
-    },
-    isTechnologyEnabled (technologyKey) {
-      return TechnologyHelper.isTechnologyEnabled(this.$store.state.game, technologyKey)
-    },
-    isTechnologyResearchable (technologyKey) {
-      return TechnologyHelper.isTechnologyResearchable(this.$store.state.game, technologyKey)
-    },
-    getIcon (technologyKey) {
-      return 'fas fa-' + TechnologyHelper.getIcon(technologyKey)
-    }
-  },
-  computed: {
-    research: function () {
-      return GameHelper.getUserPlayer(this.$store.state.game).research
-    }
-  }
-}
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const research = computed(() => GameHelper.getUserPlayer(game.value)!.research);
+
+const getRequiredTotal = (key: ResearchTypeNotRandom) => TechnologyHelper.getRequiredResearchProgress(game.value, key, research.value[key].level);
+const isTechnologyEnabled = (key: ResearchTypeNotRandom) => TechnologyHelper.isTechnologyEnabled(game.value, key);
+const isTechnologyResearchable = (key: ResearchTypeNotRandom) => TechnologyHelper.isTechnologyResearchable(game.value, key);
+const getIcon = (key: ResearchTypeNotRandom) => `fas fa-${TechnologyHelper.getIcon(key)}`;
 </script>
 
 <style scoped>
