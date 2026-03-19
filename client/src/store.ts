@@ -41,7 +41,7 @@ export type State = {
   colourMapping: Record<string, any>;
   menuState: string | null;
   menuArguments: any;
-  tutorialPage: number;
+  tutorialPage: number | string;
   menuStateChat: string | null;
   menuArgumentsChat: any;
   username: string | null;

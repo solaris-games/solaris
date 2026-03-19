@@ -7,8 +7,8 @@
             {{star.specialist.name}}
           </h5>
         </div>
-        <div v-if="!$isHistoricalMode() && canHireSpecialist && !isGameFinished" class="col-auto">
-            <button class="btn btn-sm btn-success" @click="onViewHireStarSpecialistRequested"><i class="fas fa-user-astronaut"></i> Hire Specialist</button>
+        <div v-if="!isHistoricalMode && canHireSpecialist && !isGameFinished" class="col-auto">
+          <button class="btn btn-sm btn-success" @click="onViewHireStarSpecialistRequested"><i class="fas fa-user-astronaut"></i> Hire Specialist</button>
         </div>
         <div class="col-12 mt-2">
             <p v-if="star.specialist">{{star.specialist.description}}</p>
@@ -21,44 +21,35 @@
     </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
-import SpecialistIconVue from '../specialist/SpecialistIcon.vue'
+import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import type {Game} from "@/types/game";
+import {useIsHistoricalMode} from "@/util/reactiveHooks.ts";
 
-export default {
-  components: {
-    'specialist-icon': SpecialistIconVue
-  },
-  props: {
-    starId: String
-  },
-  data () {
-    return {
-      userPlayer: null,
-      star: null,
-      canHireSpecialist: false
-    }
-  },
-  mounted () {
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.star = GameHelper.getStarById(this.$store.state.game, this.starId)
+const props = defineProps<{
+  starId: string,
+}>();
 
-    this.canHireSpecialist = this.userPlayer 
-      && this.$store.state.game.settings.specialGalaxy.specialistCost !== 'none'
-      && this.userPlayer._id === this.star.ownedByPlayerId
-      && (!this.star.specialistId || !this.star.specialist.oneShot)
-  },
-  methods: {
-    onViewHireStarSpecialistRequested() {
-        this.$emit('onViewHireStarSpecialistRequested', this.starId)
-    }
-  },
-  computed: {
-    isGameFinished: function () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    }
-  }
-}
+const emit = defineEmits<{
+  onViewHireStarSpecialistRequested: [starId: string],
+}>();
+
+const onViewHireStarSpecialistRequested = () => emit('onViewHireStarSpecialistRequested', props.starId);
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const isHistoricalMode = useIsHistoricalMode(store);
+const star = computed(() => GameHelper.getStarById(game.value, props.starId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
+const canHireSpecialist = computed(() => userPlayer.value &&
+  game.value.settings.specialGalaxy.specialistCost !== 'none' &&
+  userPlayer.value._id === star.value.ownedByPlayerId &&
+  (!star.value.specialistId || !star.value.specialist!.oneShot)
+);
 </script>
 
 <style scoped>
