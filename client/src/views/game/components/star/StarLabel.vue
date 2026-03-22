@@ -2,46 +2,42 @@
   <a href="javascript:;" @click="pan">{{actualStarName}}<i class="fas fa-eye ms-1"></i></a>
 </template>
 
-<script>
+<script setup lang="ts">
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
+import { useStore } from 'vuex';
+import GameHelper from "../../../../services/gameHelper";
+import type {MapObject} from "@solaris-common";
 
-export default {
-  props: {
-    starId: String,
-    starName: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      actualStarName: null
-    }
-  },
-  mounted () {
-    if (this.starName != null) {
-      this.actualStarName = this.starName
-    } else {
-      const star = gameHelper.getStarById(this.$store.state.game, this.starId)
+const props = defineProps<{
+  starId: string,
+  starName?: string | null | undefined,
+}>();
 
-      this.actualStarName = star ? star.name : 'Unknown'
-    }
-  },
-  methods: {
-    pan (e) {
-      const star = gameHelper.getStarById(this.$store.state.game, this.starId)
+const eventBus = inject(eventBusInjectionKey)!;
 
-      if (star) {
-        this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
-          object: star
-        });
-      }
-    }
+const store = useStore();
+const game = computed(() => store.state.game);
+
+const actualStarName = computed(() => {
+  if (props.starName) {
+    return props.starName;
+  } else {
+    const star = GameHelper.getStarById(game.value, props.starId);
+
+    return star ? star.name : 'Unknown';
+  }
+});
+
+const pan = () => {
+  const star = gameHelper.getStarById(game.value, props.starId);
+
+  if (star) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
+      object: star as MapObject<string>,
+    });
   }
 }
 </script>

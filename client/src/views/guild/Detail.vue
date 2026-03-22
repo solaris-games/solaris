@@ -39,6 +39,8 @@ import { useRoute } from 'vue-router';
 import {detailGuild} from "@/services/typedapi/guild";
 import type {GuildWithUsers} from "@solaris-common";
 
+type SortingKey = 'rank' | 'victories' | 'renown' | 'role';
+
 const httpClient = inject(httpInjectionKey)!;
 
 const route = useRoute();
@@ -71,7 +73,7 @@ const getRoleName = (role: string) => {
   return role.charAt(0).toUpperCase() + role.slice(1);
 };
 
-const getRoleClass = (role: string, getColumnClass: (col: string) => Record<string, string>) => {
+const getRoleClass = (role: string, getColumnClass: (col: SortingKey) => Record<string, boolean>) => {
   return {
     'text-warning': role === 'leader',
     'text-info': role === 'officer',

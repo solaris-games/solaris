@@ -4,49 +4,49 @@
       <thead class="table-dark">
           <tr>
               <th></th>
-              <th v-if="!isUserPlayer()"></th>
-              <th v-if="userIsInGame()" class="text-end">You</th>
+              <th v-if="!isUserPlayer"></th>
+              <th v-if="userIsInGame" class="text-end">You</th>
           </tr>
       </thead>
       <tbody>
           <statistic-row :playerId="playerId"
                          header="Stars"
                          scanningRangeTooltip="This figure is based on the stars in your scanning range."
-                         :playerStat="player.stats.totalStars"
-                         :userPlayerStat="userPlayer?.stats.totalStars">
+                         :playerStat="player.stats!.totalStars"
+                         :userPlayerStat="userPlayer?.stats?.totalStars">
           </statistic-row>
           <statistic-row v-if="isConquestHomeStars"
                          :playerId="playerId"
                          header="Capitals"
                          scanningRangeTooltip="This figure is based on the capitals in your scanning range."
-                         :playerStat="player.stats.totalHomeStars"
-                         :userPlayerStat="userPlayer?.stats.totalHomeStars">
+                         :playerStat="player.stats!.totalHomeStars"
+                         :userPlayerStat="userPlayer?.stats?.totalHomeStars">
           </statistic-row>
           <statistic-row :playerId="playerId"
                          header="Carriers"
                          scanningRangeTooltip="This figure is based on the carriers in your scanning range."
-                         :playerStat="player.stats.totalCarriers"
-                         :userPlayerStat="userPlayer?.stats.totalCarriers">
+                         :playerStat="player.stats!.totalCarriers"
+                         :userPlayerStat="userPlayer?.stats?.totalCarriers">
           </statistic-row>
           <statistic-row  v-if="isSpecialistsEnabled"
                          :playerId="playerId"
                          header="Specialists"
                          scanningRangeTooltip="This figure is based on the specialists in your scanning range."
-                         :playerStat="player.stats.totalSpecialists"
-                         :userPlayerStat="userPlayer?.stats.totalSpecialists">
+                         :playerStat="player.stats!.totalSpecialists"
+                         :userPlayerStat="userPlayer?.stats?.totalSpecialists">
           </statistic-row>
           <statistic-row :playerId="playerId"
                          header="Ships"
                          scanningRangeTooltip="This figure is based on the ships in your scanning range."
-                         :playerStat="player.stats.totalShips"
-                         :userPlayerStat="userPlayer?.stats.totalShips"
+                         :playerStat="player.stats!.totalShips"
+                         :userPlayerStat="userPlayer?.stats?.totalShips"
                          :formatFunction="formatTotalShipsValue">
           </statistic-row>
           <statistic-row :playerId="playerId"
                          header="New Ships"
                          scanningRangeTooltip="This figure is based on the stars in your scanning range."
-                         :playerStat="player.stats.newShips"
-                         :userPlayerStat="userPlayer?.stats.newShips">
+                         :playerStat="player.stats!.newShips"
+                         :userPlayerStat="userPlayer?.stats?.newShips">
           </statistic-row>
           <statistic-row :playerId="playerId"
                          header="Cycle Income"
@@ -67,75 +67,44 @@
       </tbody>
   </table>
 
-  <p class="text-warning text-center mb-2" v-if="isDarkModeExtra && userIsInGame() && !isUserPlayer()"><small>Based on your scanning range.</small></p>
+  <p class="text-warning text-center mb-2" v-if="isDarkModeExtra && userIsInGame && isUserPlayer"><small>Based on your scanning range.</small></p>
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import StatisticRow from './StatisticRow.vue'
+import type {Player} from "@/types/game.ts";
 
-export default {
-  components: {
-    'statistic-row': StatisticRow,
-  },
-  props: {
-    playerId: String
-  },
-  methods: {
-    isUserPlayer () {
-      return this.userPlayer && this.userPlayer._id === this.player._id
-    },
-    getUserPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    userIsInGame () {
-      return this.userPlayer != null
-    },
-    formatCreditsValue: function (player, value) {
-      return `$${value}`;
-    },
-    formatTotalShipsValue: function (player, value) {
-      if (player.stats.totalShipsMax != null) {
-        return `${value}/${player.stats.totalShipsMax}`
-      }
+const props = defineProps<{
+  playerId: string,
+}>();
 
-      return value;
-    }
-  },
-  computed: {
-    player () {
-        return GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    },
-    userPlayer () {
-        return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    isSpecialistsEnabled () {
-      return GameHelper.isSpecialistsEnabled(this.$store.state.game)
-    },
-    isDarkModeExtra () {
-      return GameHelper.isDarkModeExtra(this.$store.state.game)
-    },
-    isConquestHomeStars () {
-      return GameHelper.isConquestHomeStars(this.$store.state.game)
-    },
-    playerIncome () {
-      return GameHelper.calculateIncome(this.$store.state.game, this.player)
-    },
-    userPlayerIncome () {
-      return this.userPlayer != null ? GameHelper.calculateIncome(this.$store.state.game, this.userPlayer) : null
-    },
-    playerTickIncome() {
-      return GameHelper.calculateTickIncome(this.$store.state.game, this.player)
-    },
-    userPlayerTickIncome() {
-      return this.userPlayer != null ? GameHelper.calculateTickIncome(this.$store.state.game, this.userPlayer) : null;
-    },
-    isDarkModeExtra() {
-      return GameHelper.isDarkModeExtra(this.$store.state.game);
-    }
+const store = useStore();
+const game = computed(() => store.state.game);
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const isUserPlayer = computed(() => userPlayer.value && player.value._id === userPlayer.value._id);
+const userIsInGame = computed(() => Boolean(userPlayer.value));
+const isSpecialistsEnabled = computed(() => GameHelper.isSpecialistsEnabled(game.value));
+const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
+const isConquestHomeStars = computed(() => GameHelper.isConquestHomeStars(game.value));
+const playerIncome = computed(() => GameHelper.calculateIncome(game.value, player.value));
+const userPlayerIncome = computed(() => GameHelper.calculateIncome(game.value, userPlayer.value));
+const playerTickIncome = computed(() => GameHelper.calculateTickIncome(game.value, player.value));
+const userPlayerTickIncome = computed(() => GameHelper.calculateTickIncome(game.value, userPlayer.value));
+
+const formatCreditsValue = (player: Player, value: number) => `$${value}`;
+
+const formatTotalShipsValue = (player: Player, value: number) => {
+  if (player.stats!.totalShipsMax != null) {
+    return `${value}/${player.stats!.totalShipsMax}`
   }
-}
+
+  return value.toString();
+};
 </script>
 
 <style scoped>

@@ -49,7 +49,7 @@
             </td>
             <td align="right" :class="getColumnClass('rank')">
               {{ player.achievements.rank }}
-              <img class="user-level-icon" :src="getLevelSrc(player)" :alt="player.achievements.level">
+              <img class="user-level-icon" :src="getLevelSrc(player)" :alt="player.achievements.level.toString()">
             </td>
             <td align="right" :class="getColumnClass('victories')">{{ player.achievements.victories }}</td>
             <td align="right" :class="getColumnClass('renown')">{{ player.achievements.renown }}</td>
@@ -68,6 +68,7 @@ import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
 import { useStore, type Store } from 'vuex';
 import type { State } from '../../../../store';
+import type {LeaderboardUser, UserLeaderboard} from "@solaris-common";
 
 const httpClient = inject(httpInjectionKey)!;
 const store: Store<State> = useStore();
@@ -78,7 +79,7 @@ const props = defineProps<{
 
 const isLoading = ref(false);
 const sortingKey = ref('rank');
-const leaderboards = ref({});
+const leaderboards = ref<Record<string, LeaderboardUser<string>[]>>({});
 const totalPlayers = ref(0);
 
 const leaderboard = computed(() => leaderboards.value[sortingKey.value]);

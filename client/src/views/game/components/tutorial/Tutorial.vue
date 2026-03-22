@@ -16,82 +16,54 @@
 </div>
 </template>
 
-<script>
-import MenuTitle from '../MenuTitle.vue'
-import TutorialOriginal from './TutorialOriginal.vue'
-import TutorialStarsAndCarriers from './TutorialStarsAndCarriers.vue'
-import TutorialInfrastructureAndExpansion from './TutorialInfrastructureAndExpansion.vue'
-import TutorialScienceAndResearch from './TutorialScienceAndResearch.vue'
-import TutorialCombatBasics from './TutorialCombatBasics.vue'
-import TutorialSpecialStarTypes from './TutorialSpecialStarTypes.vue'
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import MenuTitle from '../MenuTitle.vue';
+import type {Game} from "@/types/game";
 
-import TutorialFleetMovement from './TutorialFleetMovement.vue'
+const defaultTutorialKey = "original";
 
-const defaultTutorialKey = "original"
+const emit = defineEmits<{
+  onCloseRequested: [],
+}>();
 
-export default {
-    components: {
-        'menu-title': MenuTitle,
+const onCloseRequested = () => emit('onCloseRequested');
 
-        // these component names correspondent to the tutorials in server/config/game/tutorials.json
-        // and the createdFromTemplate value in the game settings JSON under server/config/game/settings/user
-        'tutorial-original': TutorialOriginal,
-        'tutorial-fleet-movement': TutorialFleetMovement,
-        'tutorial-stars-and-carriers': TutorialStarsAndCarriers,
-        'tutorial-infrastructure-and-expansion': TutorialInfrastructureAndExpansion,
-        'tutorial-science-and-research': TutorialScienceAndResearch,
-        'tutorial-combat-basics': TutorialCombatBasics,
-        'tutorial-special-star-types': TutorialSpecialStarTypes,
-    },
-    data() {
-        return {
-            title: "Tutorial",
-            tutorialKey: '',
-            page: 0,
-            maxPage: 0
-        }
-    },
-    created() {
-        this.tutorialKey = this.$store.state.game.settings.general.createdFromTemplate || defaultTutorialKey
-    },
-    mounted() {
-        this.page = this.$store.state.tutorialPage || 0
-        if (typeof this.page === 'string') {
-            if (this.page.split('|')[0] !== this.tutorialKey) {
-                this.page = 0
-            } else {
-                this.page = parseInt(this.page.split('|')[1])
-            }
-        }
-    },
-    methods: {
-        onCloseRequested(e) {
-            this.$emit('onCloseRequested', e)
-        },
-        nextPage() {
-            this.page++
-            this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
-        },
-        prevPage() {
-            this.page = Math.max(this.page - 1, 0)
-            this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
-        },
-        setTutorialCompleted() {
-            this.page = -1
-            this.$store.commit('setTutorialPage', this.tutorialKey + '|' + this.page)
-            // TODO check why this doesn't always work
-            // this.onOpenTutorialRequested()
-        }
-    },
-    computed: {
-        currentTutorialComponent() {
-            return 'tutorial-' + this.$store.state.game.settings.general.createdFromTemplate || defaultTutorialKey
-        },
-        isTutorialCompleted() {
-            return this.page === -1
-        }
-    }
-}
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const title = ref("Tutorial");
+const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defaultTutorialKey);
+const page = ref(0);
+const maxPage = ref(0);
+
+const nextPage = () => {
+  page.value = page.value + 1;
+  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+};
+
+const prevPage = () => {
+  page.value = Math.max(0, page.value - 1);
+  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+};
+
+const setTutorialCompleted = () => {
+  page.value = -1;
+  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+};
+
+const isTutorialCompleted = computed(() => page.value === -1);
+const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
+
+onMounted(() => {
+  // TODO
+  const tutPage: string | number = store.state.tutorialPage || 0;
+  if (typeof tutPage === 'string') {
+    page.value = Number.parseInt(tutPage.split("|")[1]);
+  } else {
+    page.value = tutPage;
+  }
+});
 </script>
 
 <style scoped>

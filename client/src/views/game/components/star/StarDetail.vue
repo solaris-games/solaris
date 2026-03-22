@@ -39,7 +39,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isNebula">
           <hr/>
           <p class="mb-0">This star is hidden inside a <span class="text-warning">Nebula <star-icon
-            isNebula="true"></star-icon></span>.
+            :isNebula="true"></star-icon></span>.
           </p>
           <p class="mb-2 text-info"><small><i>Nebulas conceal the infrastructure and ship counts at the star from all
             other players.</i></small></p>
@@ -48,7 +48,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isAsteroidField">
           <hr/>
           <p class="mb-0" v-if="star.isAsteroidField">This star is surrounded by an <span class="text-warning">Asteroid Field <star-icon
-            isAsteroidField="true"></star-icon></span>.
+            :isAsteroidField="true"></star-icon></span>.
           </p>
           <p class="mb-2 text-info" v-if="star.isAsteroidField"><small><i>Asteroid Fields have +1 Defender Bonus (net +2
             Weapons) in combat.</i></small></p>
@@ -57,7 +57,7 @@
         <div v-if="(!isCompactUIStyle || !star.ownedByPlayerId) && star.isBinaryStar">
           <hr/>
           <p class="mb-0" v-if="star.isBinaryStar">This is a <span class="text-warning">Binary Star <star-icon
-            isBinaryStar="true"></star-icon></span> system.
+            :isBinaryStar="true"></star-icon></span> system.
           </p>
           <p class="mb-2 text-info" v-if="star.isBinaryStar"><small><i>Binary Stars start with additional natural
             resources.</i></small></p>

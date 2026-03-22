@@ -19,88 +19,73 @@
 </div>
 </template>
 
-<script>
-import LoadingSpinnerVue from '../../../components/LoadingSpinner.vue'
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue'
-import PlayerTitleVue from './PlayerTitle.vue'
+import PlayerTitle from './PlayerTitle.vue'
 import Research from './Research.vue'
-import PlayerTradeVue from './PlayerTrade.vue'
-import TradeHistoryVue from './TradeHistory.vue'
+import PlayerTrade from './PlayerTrade.vue'
+import TradeHistory from './TradeHistory.vue'
 import GameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import type {Game, Player} from "@/types/game";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinnerVue,
-    'menu-title': MenuTitle,
-    'player-title': PlayerTitleVue,
-    'research': Research,
-    'player-trade': PlayerTradeVue,
-    'trade-history': TradeHistoryVue
-  },
-  props: {
-    playerId: String
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      player: null,
-      userPlayer: null,
-      playerIndex: 0,
-      isLoadingLedger: false
-    }
-  },
-  async mounted () {
-    this.player = GameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    this.userPlayer = GameHelper.getUserPlayer(this.$store.state.game)
-    this.playerIndex = this.$store.state.game.galaxy.players.indexOf(this.player)
-    this.leaderboard = GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    },
-    panToPlayer (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.player });
-    },
-    onOpenPrevPlayerDetailRequested (e) {
-      let prevLeaderboardIndex = this.leaderboard.indexOf(this.player) - 1;
+const props = defineProps<{
+  playerId: string,
+}>();
 
-      if (prevLeaderboardIndex < 0) {
-        prevLeaderboardIndex = this.leaderboard.length - 1;
-      }
+const emit = defineEmits<{
+  onCloseRequested: [],
+  onOpenTradeRequested: [playerId: string],
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-      const prevPlayer = this.leaderboard[prevLeaderboardIndex];
+const onCloseRequested = () => emit('onCloseRequested');
 
-      this.onOpenTradeRequested(prevPlayer);
-    },
-    onOpenNextPlayerDetailRequested (e) {
-      let nextLeaderboardIndex = this.leaderboard.indexOf(this.player) + 1;
+const eventBus = inject(eventBusInjectionKey)!;
 
-      if (nextLeaderboardIndex > this.leaderboard.length - 1) {
-        nextLeaderboardIndex = 0;
-      }
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
+const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+const playerIndex = computed(() => game.value.galaxy.players.indexOf(player.value));
+const leaderboard = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
 
-      let nextPlayer = this.leaderboard[nextLeaderboardIndex];
+const panToPlayer = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player.value });
 
-      this.onOpenTradeRequested(nextPlayer);
-    },
-    onOpenTradeRequested (player) {
-      this.$emit('onOpenTradeRequested', player._id)
-    },
-    onOpenPlayerDetailRequested (e) {
-      let player = this.$store.state.game.galaxy.players[this.playerIndex]
+const onOpenTradeRequested = (player: Player) => emit('onOpenTradeRequested', player._id);
 
-      this.$emit('onOpenPlayerDetailRequested', player._id)
-    }
+const onOpenPlayerDetailRequested = () => {
+  const player = game.value.galaxy.players[playerIndex.value];
+
+  emit('onOpenPlayerDetailRequested', player._id);
+};
+
+const onOpenPrevPlayerDetailRequested = () => {
+  let prevLeaderboardIndex = leaderboard.value.indexOf(player.value) - 1;
+
+  if (prevLeaderboardIndex < 0) {
+    prevLeaderboardIndex = leaderboard.value.length - 1;
   }
-}
+
+  const prevPlayer = leaderboard.value[prevLeaderboardIndex];
+
+  onOpenTradeRequested(prevPlayer);
+};
+
+const onOpenNextPlayerDetailRequested = () => {
+  let nextLeaderboardIndex = leaderboard.value.indexOf(player.value) + 1;
+
+  if (nextLeaderboardIndex > leaderboard.value.length - 1) {
+    nextLeaderboardIndex = 0;
+  }
+
+  const nextPlayer = leaderboard.value[nextLeaderboardIndex];
+
+  onOpenTradeRequested(nextPlayer);
+};
 </script>
 
 <style scoped>

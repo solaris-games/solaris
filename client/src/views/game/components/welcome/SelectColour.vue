@@ -33,7 +33,7 @@
                     </td>
                     <td class="fit ps-2 pt-2 pb-2 pe-2">
                         <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-success ms-1" @click="onJoinRequested(player)" v-if="!$isHistoricalMode() && player.isOpenSlot">Join</button>
+                        <button class="btn btn-success ms-1" @click="onJoinRequested(player)" v-if="!isHistoricalMode && player.isOpenSlot">Join</button>
                     </td>
                 </tr>
             </tbody>
@@ -43,55 +43,47 @@
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import gameHelper from '../../../../services/gameHelper'
-import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
+import PlayerAvatar from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+import { inject, computed } from 'vue';
+import { useStore } from 'vuex';
+import type {Game, Player} from "@/types/game";
+import GameHelper from "../../../../services/gameHelper";
+import {makeConfirm} from "@/util/confirm.ts";
+import {useIsHistoricalMode} from "@/util/reactiveHooks.ts";
 
-export default {
-  components: {
-    'team-name': TeamName,
-    'player-avatar': PlayerAvatarVue
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      players: []
-    }
-  },
-  mounted () {
-    this.players = this.$store.state.game.galaxy.players
-  },
+const emit = defineEmits<{
+  onJoinRequested: [playerId: string],
+  onOpenPlayerDetailRequested: [playerId: string],
+}>();
 
-  methods: {
-    getFriendlyColour (colour) {
-      return gameHelper.getFriendlyColour(colour)
-    },
-    async onJoinRequested (player) {
-      if (gameHelper.isNewPlayerGame(this.$store.state.game)) {
-        await this.$confirm('Join Game', 'You are about to join a new player game, it will start when 2 players have joined the game. Good luck and have fun!', 'OK', 'Cancel', true)
-      }
+const eventBus = inject(eventBusInjectionKey)!;
 
-      this.$emit('onJoinRequested', player._id)
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e._id)
-    },
-    panToPlayer (player) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
-    },
-    getPlayerStatus (player) {
-      return gameHelper.getPlayerStatus(player)
-    }
+const store = useStore();
+const confirm = makeConfirm(store);
+const isHistoricalMode = useIsHistoricalMode(store);
+const game = computed<Game>(() => store.state.game);
+const players = computed(() => game.value.galaxy.players);
+
+const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);
+
+const panToPlayer = (player: Player) => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
+
+const getPlayerStatus = (player: Player) => GameHelper.getPlayerStatus(player);
+
+const onOpenPlayerDetailRequested = (player: Player) => emit('onOpenPlayerDetailRequested', player._id);
+
+const onJoinRequested = async (player: Player) => {
+  if (gameHelper.isNewPlayerGame(game.value)) {
+    await confirm('Join Game', 'You are about to join a new player game, it will start when 2 players have joined the game. Good luck and have fun!', 'OK', 'Cancel', true)
   }
-}
+
+  emit('onJoinRequested', player._id);
+};
 </script>
 
 <style scoped>

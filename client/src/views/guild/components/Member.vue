@@ -62,11 +62,13 @@ import {
   uninviteGuild
 } from "@/services/typedapi/guild";
 
+type SortingKey = 'role' | 'rank' | 'victories' | 'renown';
+
 const props = defineProps<{
   guild: GuildWithUsers<string>,
   role: GuildRole,
   user: GuildUser<string>,
-  getColumnClass: (col: string) => Record<string, string>,
+  getColumnClass: (col: SortingKey) => Record<SortingKey, boolean>,
 }>();
 
 const emit = defineEmits<{

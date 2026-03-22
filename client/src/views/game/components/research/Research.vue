@@ -9,33 +9,25 @@
     <h4 class="mt-2">Research Progress</h4>
 
     <progress-summary/>
-
-    <!-- TODO: Explanations of each research type -->
 </div>
 </template>
 
-<script>
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue'
 import Selection from './Selection.vue'
 import ProgressSummary from './ProgressSummary.vue'
+import type {Game} from "@/types/game";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'selection': Selection,
-    'progress-summary': ProgressSummary
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    }
-  }
-}
+const emit = defineEmits<{
+  onCloseRequested: [],
+}>();
+
+const onCloseRequested = () => emit('onCloseRequested');
+
+const store = useStore();
+const game = computed<Game>(() => store.state.game);
 </script>
 
 <style scoped>

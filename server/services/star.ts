@@ -6,7 +6,6 @@ import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { Game } from './types/Game';
 import { Location } from './types/Location';
-import { MapObjectWithVisibility } from './types/Map';
 import { Player } from './types/Player';
 import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import { User } from './types/User';
@@ -21,7 +20,7 @@ import { TechnologyService } from 'solaris-common';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
-import {GameSettings} from "solaris-common";
+import { GameSettings } from "solaris-common";
 import EventEmitter from "events";
 import { StarDataService } from "solaris-common";
 
@@ -203,34 +202,6 @@ export default class StarService extends EventEmitter {
             .map(c => c.orbiting!.toString());
     }
 
-    listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
-
-        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
-            starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
-        }
-
-        starIds = [...new Set(starIds)];
-
-        return starIds
-            .map(id => this.getById(game, id))
-            .filter(s => !this.starDataService.isDeadStar(s));
-    }
-
-    listStarsWithScanningRangeByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
-
-        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
-            starIds = starIds.concat(this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds));
-        }
-
-        starIds = [...new Set(starIds)];
-
-        return starIds
-            .map(id => this.getById(game, id))
-            .filter(s => !this.starDataService.isDeadStar(s));
-    }
-
     listStarsOwnedOrInOrbitByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
         let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
 
@@ -247,151 +218,6 @@ export default class StarService extends EventEmitter {
     listStarsOwnedByPlayerBulkIgnored(stars: Star[], playerId: DBObjectId, infrastructureType: InfrastructureType) {
         return this.listStarsOwnedByPlayer(stars, playerId)
             .filter(s => s.ignoreBulkUpgrade![infrastructureType]);
-    }
-
-    isStarAlwaysVisible(star: Star) {
-        return star.isPulsar || star.specialistId === 10 // Trade port
-    }
-
-    isStarWithinScanningRangeOfStars(game: Game, star: Star, stars: Star[]) {
-        // Pulsars are considered to be always in scanning range.
-        // Note: They are not visible until the game starts to prevent pre-teaming.
-        if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
-            return true;
-        }
-
-        // Go through all of the stars one by one and calculate
-        // whether any one of them is within scanning range.
-        for (let otherStar of stars) {
-            if (otherStar.ownedByPlayerId == null) {
-                continue;
-            }
-
-            // Use the effective scanning range of the other star to check if it can "see" the given star.
-            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, otherStar);
-            let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-            let distance = this.starDistanceService.getDistanceBetweenStars(star, otherStar);
-
-            if (distance <= scanningRangeDistance) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    _insertIntoSortedMapObjectsArray(mapObjects: MapObjectWithVisibility[], mapObject: MapObjectWithVisibility) {
-        let index = this._binarySearchIndex(mapObjects, mapObject._id.toString());
-        mapObjects.splice(index, 0, mapObject);
-    }
-
-    filterStarsByScanningRange(game: Game, players: Player[]) {
-        // Stars may have different scanning ranges independently so we need to check
-        // each star to check what is within its scanning range.
-        const starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, players.map(p => p._id));
-        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
-
-        // Seed the stars that are in range to be the stars owned or are in orbit of.
-        let starsInRange: MapObjectWithVisibility[] = starsOwnedOrInOrbit.map(s => {
-            return {
-                _id: s._id,
-                location: s.location,
-                ownedByPlayerId: s.ownedByPlayerId,
-            }
-        })
-            .sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1);
-
-        // Calculate which stars need to be checked excluding the ones that the player can definitely see.
-        let starsToCheck: MapObjectWithVisibility[] = game.galaxy.stars
-            .filter(s => starsInRange.find(r => r._id.toString() === s._id.toString()) == null)
-            .map(s => {
-                return {
-                    _id: s._id,
-                    location: s.location,
-                    ownedByPlayerId: s.ownedByPlayerId,
-                    isAlwaysVisible: this.isStarAlwaysVisible(s)
-                }
-            });
-
-        for (let star of starsWithScanning) {
-            let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
-
-            for (let starId of starIds) {
-                if (this.binarySearchStars(starsInRange, starId._id) == null) {
-                    this._insertIntoSortedMapObjectsArray(starsInRange, starId);
-                    starsToCheck.splice(starsToCheck.indexOf(starId), 1);
-                }
-            }
-
-            // If we've checked all stars then no need to continue.
-            if (!starsToCheck.length) {
-                break;
-            }
-        }
-
-        // If worm holes are present, then ensure that any owned star OR star in orbit
-        // also has its paired star visible.
-        //if (game.settings.specialGalaxy.randomWormHoles) {
-        let wormHoleStars = starsOwnedOrInOrbit
-            .filter(s => s.wormHoleToStarId)
-            .map(s => {
-                return {
-                    source: s,
-                    destination: this.getById(game, s.wormHoleToStarId!)
-                };
-            });
-
-        for (let wormHoleStar of wormHoleStars) {
-            if (this.binarySearchStars(starsInRange, wormHoleStar.destination._id) == null) {
-                this._insertIntoSortedMapObjectsArray(starsInRange, {
-                    _id: wormHoleStar.destination._id,
-                    location: wormHoleStar.destination.location,
-                    ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
-                });
-            }
-        }
-        //}
-        return starsInRange.map(s => this.getById(game, s._id));
-    }
-
-    filterStarsByScanningRangeAndWaypointDestinations(game: Game, players: Player[]) {
-        const playerIds = players.map(p => p._id);
-        // Get all stars within the player's normal scanning vision.
-        let starsInScanningRange = this.filterStarsByScanningRange(game, players);
-
-        const ids = playerIds.map(p => p.toString());
-
-        // If in dark mode then we need to also include any stars that are 
-        // being travelled to by carriers in transit for the current player.
-        const inTransitStars = game.galaxy.carriers
-            .filter(c => !c.orbiting)
-            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
-            .map(c => c.waypoints[0].destination)
-            .map(d => this.getById(game, d));
-
-        for (let transitStar of inTransitStars) {
-            if (starsInScanningRange.indexOf(transitStar) < 0) {
-                starsInScanningRange.push(transitStar);
-            }
-        }
-
-        return starsInScanningRange;
-    }
-
-    getStarsWithinScanningRangeOfStarByStarIds(game: Game, star: Star, stars: MapObjectWithVisibility[]) {
-        // If the star isn't owned then it cannot have a scanning range
-        if (star.ownedByPlayerId == null) {
-            return [];
-        }
-
-        // Calculate the scanning distance of the given star.
-        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star, true);
-        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-
-        // Go through all stars and find each star that is in scanning range.
-        return stars.filter(s => {
-            return s.isAlwaysVisible || this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
-        });
     }
 
     calculateActualNaturalResources(star: Star): NaturalResources {

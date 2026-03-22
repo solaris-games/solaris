@@ -128,6 +128,7 @@ import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import SaveWaypointsService from "./saveWaypoints";
 import { CarrierTravelService, type Guild, StarDataService, type StatsSlice } from 'solaris-common';
+import ScanningService from "./scanning";
 import CarrierCombatService from "./carrierCombat";
 import {CombatMaskingService} from "./combatMasking";
 
@@ -226,7 +227,8 @@ export default (config: Config,
     const badgeService = new BadgeService(userRepository, userService, playerService, gameTypeService, gameStateService);
     const ledgerService = new LedgerService(gameRepository, playerService, playerCreditsService);
     const reputationService = new ReputationService(gameRepository, playerStatisticsService, diplomacyService, playerAfkService);
-    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, userAchievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService, statisticsService);
+    const scanningService = new ScanningService(starService, starDataService, distanceService, technologyService, gameStateService, starDistanceService, carrierService);
+    const tradeService = new TradeService(gameRepository, eventRepository, userService, playerService, diplomacyService, ledgerService, userAchievementService, reputationService, gameTypeService, randomService, playerCreditsService, playerAfkService, statisticsService, scanningService, distanceService);
     const conversationService = new ConversationService(gameRepository, tradeService, diplomacyService, broadcastService);
     const gameAuthService = new GameAuthService(userService);
     const gameJoinService = new GameJoinService(userService, starService, playerService, passwordService, userAchievementService, avatarService, gameTypeService, gameStateService, conversationService, randomService, spectatorService);
@@ -240,7 +242,7 @@ export default (config: Config,
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointActionService = new WaypointActionService();
     const waypointService = new WaypointService<DBObjectId>(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
-    const cullWaypointsService = new CullWaypointsService(gameRepository, starService, playerService, waypointService, carrierTravelService, starDataService);
+    const cullWaypointsService = new CullWaypointsService(gameRepository, starService, playerService, waypointService, carrierTravelService, starDataService, scanningService, distanceService);
     const saveWaypointsService = new SaveWaypointsService(gameRepository, carrierMovementService, starService, waypointService, carrierService, starDataService);
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, cullWaypointsService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService, statisticsService, starDataService);
@@ -250,7 +252,7 @@ export default (config: Config,
     const aiService = new AIService(starUpgradeService, carrierService, starService, distanceService, waypointService, combatService, shipTransferService, technologyService, playerService, playerAfkService, reputationService, diplomacyService, shipService, playerStatisticsService, basicAIService, pathfindingService, saveWaypointsService, starDataService);
     const battleRoyaleService = new BattleRoyaleService(starService, carrierService, mapService, starDistanceService, cullWaypointsService, carrierMovementService);
     const starMovementService = new StarMovementService(mapService, starDistanceService, specialistService, cullWaypointsService);
-    const gameGalaxyService = new GameGalaxyService(cacheService, socketService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService, starDataService);
+    const gameGalaxyService = new GameGalaxyService(cacheService, socketService, gameService, mapService, playerService, playerAfkService, starService, shipService, distanceService, starDistanceService, starUpgradeService, carrierService, waypointService, researchService, specialistService, technologyService, reputationService, guildUserService, historyService, battleRoyaleService, starMovementService, gameTypeService, gameStateService, diplomacyService, avatarService, playerStatisticsService, gameFluxService, spectatorService, gameMaskingService, starDataService, scanningService);
     const scheduleBuyService = new ScheduleBuyService(gameRepository, starUpgradeService);
     const carrierCombatService = new CarrierCombatService(carrierTravelService, carrierMovementService, combatService, diplomacyService, distanceService, playerService, specialistService, starService);
     const gameTickService = new GameTickService(distanceService, starService, carrierService, researchService, playerService, playerAfkService, historyService, combatService, leaderboardService, userService, gameService, technologyService, specialistService, starUpgradeService, reputationService, aiService, battleRoyaleService, starMovementService, diplomacyService, gameTypeService, gameStateService, playerCycleRewardsService, diplomacyUpkeepService, carrierMovementService, carrierGiftService, starContestedService, playerReadyService, shipService, scheduleBuyService, gameLockService, statisticsService, waypointActionService, cullWaypointsService, carrierTravelService, carrierCombatService);
@@ -373,5 +375,6 @@ export default (config: Config,
         saveWaypointsService,
         carrierTravelService,
         starDataService,
+        scanningService,
     };
 };

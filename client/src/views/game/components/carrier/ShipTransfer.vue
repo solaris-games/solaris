@@ -8,7 +8,7 @@
       </div>
     </div>
 
-    <div class="row mb-0 pt-2 pb-2 bg-dark" v-if="carrier && carrier.waypoints && carrier.waypoints.length">
+    <div class="row mb-0 pt-2 pb-2 bg-dark" v-if="carrier?.waypoints?.length && carrierWaypointDestination">
       <div class="col">
         <p class="mb-0"><i class="fas fa-map-marker-alt me-2"></i><strong>{{carrier.name}}</strong>'s next waypoint is to <star-label :starId="carrierWaypointDestination"/>.</p>
       </div>

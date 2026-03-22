@@ -1,76 +1,60 @@
-<script>
-  import { defineAsyncComponent, h, normalizeClass, normalizeStyle, Suspense } from 'vue'
+<template>
+  <Suspense>
+    <svgInner/>
+  </Suspense>
+</template>
+<script setup lang="ts">
+import {defineAsyncComponent, h, normalizeClass, normalizeStyle, Suspense, useAttrs} from 'vue'
 
-  let svgCacheMap = new Map();
+defineOptions({
+  inheritAttrs: false,
+});
 
-  export default {
-    inheritAttrs: false,
-    props: {
-      href: null
-    },
-    render() {
-      const svgInner = defineAsyncComponent(this.renderInternal);
+const props = defineProps<{
+  iconName: string,
+}>();
 
-      return h(Suspense, null, {
-        default: h(svgInner)
-      });
-    },
-    methods: {
-      async renderInternal() {
-        console.log(normalizeClass);
+const attributes = useAttrs();
 
-        let svgText = null;
+const horribleSvgGetBBox = (svg: SVGGraphicsElement) => {
+  // This abomination is needed because getBBox() returns all zeroes if the SVG isn't currently "visible".
+  // Based on the answers from here: https://stackoverflow.com/questions/28282295/getbbox-of-svg-when-hidden
+  const svgClone = svg.cloneNode(true) as SVGGraphicsElement;
+  const div = document.createElement('div', {});
+  div.setAttribute('style', 'position: absolute; visibility: hidden; width: 0; height: 0');
+  div.appendChild(svgClone);
 
-        if (svgCacheMap.has(this.href)) {
-          svgText = svgCacheMap.get(this.href);
-        }
-        else {
-          let svgResponse = await fetch(this.href);
+  document.body.appendChild(div);
 
-          if (svgResponse.ok) {
-            svgText = await svgResponse.text();
-            svgCacheMap.set(this.href, svgText);
-          }
-        }
+  const bbBox = svgClone.getBBox();
 
-        if (svgText != null) {
-          let range = document.createRange();
-          let svgFragment = range.createContextualFragment(svgText);
+  document.body.removeChild(div);
 
-          // Trim the space around the actual icon!
-          let svgBoundingBox = this.horribleSvgGetBBox(svgFragment.firstChild);
-          svgFragment.firstChild.setAttribute('viewBox', `${svgBoundingBox.x} ${svgBoundingBox.y} ${svgBoundingBox.width} ${svgBoundingBox.height}`);
+  return bbBox;
+};
 
-          let attributes = this.$attrs;
-          let svgAttributes = Object.fromEntries(Array.from(svgFragment.firstChild.attributes).map(v => [v.name, v.value]))
+const svgInner = defineAsyncComponent(async () => {
+  const svgText = await import(`../../assets/map-objects-symbols/${props.iconName}.svg`)
 
-          let cssClass = normalizeClass([attributes.class, svgAttributes.class]);
-          let style = normalizeStyle([attributes.style, svgAttributes.style]);
+  if (svgText != null) {
+    const range = document.createRange();
+    const svgFragment = range.createContextualFragment(svgText);
 
-          return h('svg', {...attributes, ...svgAttributes, class: cssClass, style: style, innerHTML: svgFragment.firstChild.innerHTML });
-        }
-        else {
-          return h('span');
-        }
-      },
-      horribleSvgGetBBox(svg) {
-        // This abomination is needed because getBBox() returns all zeroes if the SVG isn't currently "visible".
-        // Based on the answers from here: https://stackoverflow.com/questions/28282295/getbbox-of-svg-when-hidden
-        let svgClone = svg.cloneNode(true);
-        let div = document.createElement('div', {});
-        div.setAttribute('style', 'position: absolute; visibility: hidden; width: 0; height: 0');
-        div.appendChild(svgClone);
+    // Trim the space around the actual icon!
+    const firstEl = svgFragment.firstChild! as Element;
+    const svgBoundingBox = horribleSvgGetBBox(firstEl as SVGGraphicsElement);
+    firstEl.setAttribute('viewBox', `${svgBoundingBox.x} ${svgBoundingBox.y} ${svgBoundingBox.width} ${svgBoundingBox.height}`);
 
-        document.body.appendChild(div);
+    const svgAttributes = Object.fromEntries(Array.from(firstEl.attributes).map(v => [v.name, v.value]))
 
-        let bbBox = svgClone.getBBox();
+    const cssClass = normalizeClass([attributes.class, svgAttributes.class]);
+    const style = normalizeStyle([attributes.style, svgAttributes.style]);
 
-        document.body.removeChild(div);
-
-        return bbBox;
-      }
-    }
+    return h('svg', {...attributes, ...svgAttributes, class: cssClass, style: style, innerHTML: firstEl.innerHTML});
+  } else {
+    return h('span');
   }
+});
 </script>
 
 <style scoped>
