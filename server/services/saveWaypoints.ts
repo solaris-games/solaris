@@ -1,15 +1,19 @@
-import {Game} from "./types/Game";
-import {Carrier} from "./types/Carrier";
-import {Player} from "./types/Player";
-import {DBObjectId} from "./types/DBObjectId";
-import {CarrierWaypointBase, ValidationError} from "solaris-common";
+import { Game } from "./types/Game";
+import { Carrier } from "./types/Carrier";
+import { Player } from "./types/Player";
+import { DBObjectId } from "./types/DBObjectId";
+import { CarrierWaypointBase, ValidationError } from "solaris-common";
 import CarrierMovementService from "./carrierMovement";
 import StarService from "./star";
 import Repository from "./repository";
 import { WaypointService } from 'solaris-common';
 import mongoose from 'mongoose';
 import CarrierService from "./carrier";
-import { StarDataService } from "solaris-common";
+import { StarDataService } from 'solaris-common';
+import { KDTree } from "../utils/kdTree";
+import ScanningService from "./scanning";
+import { DistanceService, GameTypeService } from 'solaris-common';
+import { Star } from "./types/Star";
 
 export default class SaveWaypointsService {
     gameRepo: Repository<Game>;
@@ -18,6 +22,9 @@ export default class SaveWaypointsService {
     waypointService: WaypointService<DBObjectId>;
     carrierService: CarrierService;
     starDataService: StarDataService;
+    scanningService: ScanningService;
+    distanceService: DistanceService;
+    gameTypeService: GameTypeService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -26,6 +33,9 @@ export default class SaveWaypointsService {
         waypointService: WaypointService<DBObjectId>,
         carrierService: CarrierService,
         starDataService: StarDataService,
+        scanningService: ScanningService,
+        distanceService: DistanceService,
+        gameTypeService: GameTypeService,
     ) {
         this.gameRepo = gameRepo;
         this.carrierMovementService = carrierMovementService;
@@ -33,6 +43,9 @@ export default class SaveWaypointsService {
         this.waypointService = waypointService;
         this.carrierService = carrierService;
         this.starDataService = starDataService;
+        this.scanningService = scanningService;
+        this.distanceService = distanceService;
+        this.gameTypeService = gameTypeService;
     }
 
     async saveWaypointsForCarrier(game: Game, player: Player, carrier: Carrier, waypoints: CarrierWaypointBase<DBObjectId>[], looped: boolean | null, writeToDB: boolean = true) {
@@ -74,6 +87,25 @@ export default class SaveWaypointsService {
         } else if (waypoints?.length > 0) {
             if (carrier.orbiting.toString() !== waypoints[0].source.toString()) {
                 throw new ValidationError('The source star does not match the carrier location.');
+            }
+        }
+
+        let scannedStarSet: Set<Star> | undefined = undefined;
+        let treesWithRadius: [number, KDTree][] | undefined = undefined;
+        let scanningCheck: 'singleTree' | 'multiTree' | 'none' = 'none';
+
+        // No need to calculate scanning for non-dark games.
+        if (this.gameTypeService.isDarkMode(game)) {
+            const playerStars = this.starService.listStarsOwnedOrInOrbitByPlayers(game, [player._id]);
+            if (waypoints.length > playerStars.length * ScanningService.SINGLE_TREE_COST_FACTOR) {
+                // TODO: Calculate during tick processing and load stored tree
+                const kdTree = new KDTree(this.distanceService, game.galaxy.stars);
+
+                scannedStarSet = this.scanningService.getStarSetByScanningRange(game, [player], kdTree);
+                scanningCheck = 'singleTree';
+            } else {
+                treesWithRadius = this.scanningService.getScanningStarTrees(game, playerStars);
+                scanningCheck = 'multiTree';
             }
         }
 
@@ -135,12 +167,28 @@ export default class SaveWaypointsService {
                 waypoint.delayTicks = 0;
             }
 
-            // Validate waypoint hyperspace range if:
+            // Validate waypoint hyperspace range and scanning if:
             // The waypoint is not the first waypoint in the array.
             // The carrier isn't in transit to the first waypoint.
             if (i > 0 || (i === 0 && Boolean(carrier.orbiting))) { // Is one of the next waypoints OR is the first waypoint and isn't in transit
                 if (sourceStar && (!this._waypointRouteIsBetweenWormHoles(game, waypoint) && !this.waypointService.starRouteIsWithinHyperspaceRange(game, carrier, sourceStar, destinationStar))) {// Validation of whether the waypoint is within hyperspace range
                     throw new ValidationError(`The waypoint ${sourceStarName} -> ${destinationStar.name} exceeds hyperspace range.`);
+                }
+
+                // Validate scanning if needed.
+                switch (scanningCheck) {
+                    case 'singleTree':
+                        if (!this.scanningService.isStarWithinScanningRangeOfStarsBySingleTree(game, destinationStar, scannedStarSet!)) {
+                            throw new ValidationError(`The waypoint destination ${destinationStar.name} is not within scanning range.`);
+                        }
+                        break;
+                    case 'multiTree':
+                        if (!this.scanningService.isStarWithinScanningRangeOfStars(game, destinationStar, treesWithRadius!)) {
+                            throw new ValidationError(`The waypoint destination ${destinationStar.name} is not within scanning range.`);
+                        }
+                        break;
+                    case 'none':
+                        break;
                 }
             }
         }
