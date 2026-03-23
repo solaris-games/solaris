@@ -26,14 +26,12 @@
     </div>
 </template>
 
-<script>
-import tutorialMixin from './tutorialMixin';
-export default {
-    mixins: [tutorialMixin],
-    mounted: function () {
-        this.setTutorial("Tutorial - Combat Basics", 2)
-    },
-}
+<script setup lang="ts">
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+
+const props = defineProps<TutorialProps>();
+
+props.setTutorial("Tutorial - Combat Basics", 2);
 </script>
 
 <style scoped>

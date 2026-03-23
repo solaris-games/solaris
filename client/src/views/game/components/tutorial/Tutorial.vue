@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <component v-bind:is="currentTutorialComponent"></component>
+    <component v-bind:is="currentTutorialComponent" v-bind="tutorialProps"></component>
 
 </div>
 </template>
@@ -21,6 +21,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
 
 const defaultTutorialKey = "original";
 
@@ -37,6 +38,24 @@ const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defau
 const page = ref(0);
 const maxPage = ref(0);
 
+const isTutorialCompleted = computed(() => page.value === -1);
+const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
+
+const setTutorialCompleted = () => {
+  page.value = -1;
+  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+};
+
+const tutorialProps = computed<TutorialProps>(() => ({
+  page: page.value,
+  game: game.value,
+  setTutorial: (t, mp) => {
+    title.value = t;
+    maxPage.value = mp;
+  },
+  setTutorialCompleted,
+}));
+
 const nextPage = () => {
   page.value = page.value + 1;
   store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
@@ -46,14 +65,6 @@ const prevPage = () => {
   page.value = Math.max(0, page.value - 1);
   store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
 };
-
-const setTutorialCompleted = () => {
-  page.value = -1;
-  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
-};
-
-const isTutorialCompleted = computed(() => page.value === -1);
-const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
 
 onMounted(() => {
   // TODO
