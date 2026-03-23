@@ -49,14 +49,12 @@
     </div>
 </template>
 
-<script>
-import tutorialMixin from './tutorialMixin';
-export default {
-    mixins: [tutorialMixin],
-    mounted: function () {
-        this.setTutorial("Tutorial - Science and Research", 3)
-    },
-}
+<script setup lang="ts">
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+
+const props = defineProps<TutorialProps>();
+
+props.setTutorial("Tutorial - Science and Research", 3);
 </script>
 
 <style scoped>
