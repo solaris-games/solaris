@@ -22,11 +22,13 @@ import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";
 import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+import GameHelper from "@/services/gameHelper.ts";
 
 const defaultTutorialKey = "original";
 
 const emit = defineEmits<{
   onCloseRequested: [],
+  onOpenStarDetailRequested: [starId: string],
 }>();
 
 const onCloseRequested = () => emit('onCloseRequested');
@@ -46,15 +48,26 @@ const setTutorialCompleted = () => {
   store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
 };
 
-const tutorialProps = computed<TutorialProps>(() => ({
-  page: page.value,
-  game: game.value,
-  setTutorial: (t, mp) => {
-    title.value = t;
-    maxPage.value = mp;
-  },
-  setTutorialCompleted,
-}));
+const tutorialProps = computed<TutorialProps>(() => {
+  const player = GameHelper.getUserPlayer(game.value)!;
+
+  return ({
+    page: page.value,
+    player,
+    game: game.value,
+    setTutorial: (t, mp) => {
+      title.value = t;
+      maxPage.value = mp;
+    },
+    setTutorialCompleted,
+    isTutorialCompleted: isTutorialCompleted.value,
+    onOpenStarDetailRequested: (starId) => emit('onOpenStarDetailRequested', starId),
+    startingStars: game.value.settings.player.startingStars,
+    playerHomeStar: GameHelper.getPlayerHomeStar(player, game.value.galaxy.stars)!,
+    playerStars: game.value.galaxy.stars.filter((st) => st.ownedByPlayerId === player._id),
+    starsForVictory: game.value.state.starsForVictory,
+  });
+});
 
 const nextPage = () => {
   page.value = page.value + 1;
