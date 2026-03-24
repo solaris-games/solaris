@@ -3,10 +3,18 @@
     <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
     <div class="badge-details text-center">
       <span class="badge-name" :title="badgeName">{{badgeName}}</span>
-      <p v-if="hasMoreInfo" class="text-info">Awarded by {{badge.awardedByName}} in
+
+      <p v-if="hasFullPlayerInfo" class="text-info">Awarded by {{badge.awardedByName}} in
         <router-link :to="{ path: '/game', query: { id: badge.awardedInGame } }">
           {{badge.awardedInGameName}}
-        </router-link> on the {{awardedDate}}</p>
+        </router-link> on the {{awardedDate}}
+      </p>
+      <p v-else-if="hasFullGameInfo">
+        Awarded in
+        <router-link :to="{ path: '/game', query: { id: badge.awardedInGame } }">
+          {{badge.awardedInGameName}}
+        </router-link> on the {{awardedDate}}
+      </p>
       <p v-else-if="awardedDate" class="text-info">Awarded on the {{awardedDate}}</p>
     </div>
   </div>
@@ -25,7 +33,8 @@ const badgeName = computed(() => props.allBadges.find(b => b.key === props.badge
 
 const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.png`, import.meta.url).href)
 
-const hasMoreInfo = computed(() => Boolean(props.badge.playerAwarded && props.badge.awardedByName && props.badge.awardedInGameName && props.badge.time));
+const hasFullPlayerInfo = computed(() => Boolean(props.badge.playerAwarded && props.badge.awardedByName && props.badge.awardedInGameName && props.badge.time));
+const hasFullGameInfo = computed(() => Boolean(props.badge.awardedInGameName && props.badge.time));
 
 const awardedDate = computed(() => props.badge.time && format(props.badge.time, "P"));
 </script>
