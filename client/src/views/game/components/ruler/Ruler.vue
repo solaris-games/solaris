@@ -241,13 +241,13 @@ const onCloseRequested = () => {
 };
 
 const recalculateETAs = () => {
-  const totalDistance = serviceProvider.distanceService.getDistanceAlongLocationList(points.value.map(p => p.location));
+  const locations = points.value.map(p => p.location);
 
   const tickDistance = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, false);
   const tickDistanceWarp = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, true);
 
-  const totalTicks = serviceProvider.carrierTravelService.getTicksToTravel(totalDistance, tickDistance);
-  const totalTicksWarp = serviceProvider.carrierTravelService.getTicksToTravel(totalDistance, tickDistanceWarp);
+  const totalTicks = serviceProvider.carrierTravelService.getTicksToTravel(locations, tickDistance) || 0;
+  const totalTicksWarp = serviceProvider.carrierTravelService.getTicksToTravel(locations, tickDistanceWarp) || 0;
 
   totalEta.value = getCountdownTimeStringByTicks(game.value, totalTicks)
   totalEtaWarp.value = getCountdownTimeStringByTicks(game.value, totalTicksWarp)
@@ -293,7 +293,7 @@ const recalculateDistanceLightYears = () => {
   for (let i = 0; i < points.value.length - 1; i++) {
     dist += GameHelper.getDistanceBetweenLocations(points.value[i].location, points.value[i + 1].location)
   }
-  
+
   distanceLightYears.value = Math.round(dist / game.value.constants.distances.lightYear * 100.0) / 100.0
 };
 

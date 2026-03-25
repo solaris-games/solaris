@@ -8,6 +8,7 @@ import type {StarDataService} from "./starData";
 import type {Carrier} from "../types/common/carrier";
 import type {Player} from "../types/common/player";
 import type {Star} from "../types/common/star";
+import type {Location} from "../types/common/location";
 
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
@@ -54,21 +55,37 @@ export class CarrierTravelService<ID extends Id> {
         return this.getDistancePerTick(game, distanceModifier, warpSpeed)
     }
 
-    getTicksToTravel(distance: number, distancePerTick: number) {
+    getTicksToTravel(locations: Location[], distancePerTick: number): null | number {
         // this needs to be iterative for precision reasons
-        let totalTicks = 0;
-        let remainingDistance = distance;
+        // we actually need to do all the angle/position nonsense too for precision
 
-        while (true) {
-            if (remainingDistance <= 0) {
-                break;
-            }
-
-            remainingDistance -= distancePerTick;
-            totalTicks++;
+        if (locations.length < 2) {
+            return null;
         }
 
-        return totalTicks;
+        let currentPosition = locations[0];
+        let ticks = 0;
+
+        for (let i = 1; i < locations.length; i++) {
+            const location = locations[i];
+
+            while (true) {
+                const distanceToDestination = this.distanceService.getDistanceBetweenLocations(currentPosition, location);
+
+                if (distanceToDestination === 0) {
+                    break;
+                } else if (distanceToDestination <= distancePerTick) {
+                    currentPosition = location;
+                    ticks++;
+                    break;
+                } else {
+                    currentPosition = this.distanceService.getNextLocationTowardsLocation(currentPosition, location, distancePerTick);
+                    ticks++;
+                }
+            }
+        }
+
+        return ticks;
     }
 
     getDistancePerTick(game: Game<ID>, tickDistanceModifier: number, warpSpeed: boolean) {
