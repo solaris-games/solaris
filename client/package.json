@@ -22,6 +22,7 @@
     "marked": "^13.0.2",
     "mitt": "^3.0.1",
     "moment": "^2.29.1",
+    "pinia": "^3.0.4",
     "pixi-viewport": "6.0.3",
     "pixi.js": "8.16.0",
     "random-seed": "^0.3.0",
