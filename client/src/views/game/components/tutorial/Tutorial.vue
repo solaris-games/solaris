@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <component v-bind:is="currentTutorialComponent"></component>
+    <component v-bind:is="currentTutorialComponent" v-bind="tutorialProps"></component>
 
 </div>
 </template>
@@ -21,11 +21,14 @@ import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+import GameHelper from "@/services/gameHelper.ts";
 
 const defaultTutorialKey = "original";
 
 const emit = defineEmits<{
   onCloseRequested: [],
+  onOpenStarDetailRequested: [starId: string],
 }>();
 
 const onCloseRequested = () => emit('onCloseRequested');
@@ -37,6 +40,35 @@ const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defau
 const page = ref(0);
 const maxPage = ref(0);
 
+const isTutorialCompleted = computed(() => page.value === -1);
+const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
+
+const setTutorialCompleted = () => {
+  page.value = -1;
+  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+};
+
+const tutorialProps = computed<TutorialProps>(() => {
+  const player = GameHelper.getUserPlayer(game.value)!;
+
+  return ({
+    page: page.value,
+    player,
+    game: game.value,
+    setTutorial: (t, mp) => {
+      title.value = t;
+      maxPage.value = mp;
+    },
+    setTutorialCompleted,
+    isTutorialCompleted: isTutorialCompleted.value,
+    onOpenStarDetailRequested: (starId) => emit('onOpenStarDetailRequested', starId),
+    startingStars: game.value.settings.player.startingStars,
+    playerHomeStar: GameHelper.getPlayerHomeStar(player, game.value.galaxy.stars)!,
+    playerStars: game.value.galaxy.stars.filter((st) => st.ownedByPlayerId === player._id),
+    starsForVictory: game.value.state.starsForVictory,
+  });
+});
+
 const nextPage = () => {
   page.value = page.value + 1;
   store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
@@ -46,14 +78,6 @@ const prevPage = () => {
   page.value = Math.max(0, page.value - 1);
   store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
 };
-
-const setTutorialCompleted = () => {
-  page.value = -1;
-  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
-};
-
-const isTutorialCompleted = computed(() => page.value === -1);
-const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
 
 onMounted(() => {
   // TODO

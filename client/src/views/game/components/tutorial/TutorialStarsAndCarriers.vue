@@ -84,26 +84,12 @@
     </div>
 </template>
 
-<script>
-import tutorialMixin from './tutorialMixin';
-export default {
-    mixins: [tutorialMixin],
-    mounted: function () {
-        this.setTutorial("Tutorial - Stars and Carriers", 3)
-        // if (this.gameIsFinished) {
-        //     console.log("FINISHED")
-        //     this.setTutorialCompleted()
-        // }
-    },
-    // watch: {
-    //     game (newGame, _oldGame) {
-    //         console.log("GAME UPDATE", newGame)
-    //         if (this.gameIsFinished) {
-    //             this.setTutorialCompleted()
-    //         }
-    //     }
-    // }
-}
+<script setup lang="ts">
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+
+const props = defineProps<TutorialProps>();
+
+props.setTutorial("Tutorial - Stars and Carriers", 3);
 </script>
 
 <style scoped>
