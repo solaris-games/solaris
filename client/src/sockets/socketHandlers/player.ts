@@ -1,4 +1,3 @@
-import moment from "moment";
 import type { Socket } from "socket.io-client";
 import type { Player } from "@solaris-common";
 import type { LedgerType } from "@solaris-common";
@@ -32,14 +31,14 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
     this.on(PlayerSocketEventNames.GamePlayerRoomJoined, (e: { playerId: string }) => {
       let player: Player<string> = gameHelper.getPlayerById(store.state.game!, e.playerId)!;
 
-      player.lastSeen = moment().utc().toDate();
+      player.lastSeen = new Date();
       player.isOnline = true;
     });
 
     this.on(PlayerSocketEventNames.GamePlayerRoomLeft, (e: { playerId: string }) => {
       let player: Player<string> = gameHelper.getPlayerById(store.state.game!, e.playerId)!;
 
-      player.lastSeen = moment().utc().toDate();
+      player.lastSeen = new Date();
       player.isOnline = false;
     });
 

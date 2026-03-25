@@ -71,7 +71,6 @@ import {makeConfirm} from "@/util/confirm";
 import { useStore, type Store } from 'vuex';
 import { inject, computed } from 'vue';
 import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris-common";
-import moment from "moment/moment";
 import {
   ban,
   impersonate,
@@ -81,6 +80,7 @@ import {
   setRoleDeveloper, setRoleGameMaster, unban
 } from "@/services/typedapi/admin";
 import router from "@/router";
+import { formatDistanceToNow } from "date-fns";
 
 const props = defineProps<{
   user: ListUser<string>,
@@ -102,7 +102,7 @@ const getLastSeenString = (lastSeen: Date) => {
     return ''
   }
 
-  return moment(lastSeen).utc().fromNow();
+  formatDistanceToNow(lastSeen, { addSuffix: true });
 };
 
 const onWarningAdded = (warning: string) => {

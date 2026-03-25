@@ -515,7 +515,6 @@ import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
 import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
-import moment from 'moment'
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 import { type ListGame, type Tutorial } from "@solaris-common";
 import { ref, computed, inject, onMounted, type Ref } from 'vue';
@@ -523,6 +522,7 @@ import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/game';
 import { useStore } from 'vuex';
 import gameHelper from '@/services/gameHelper';
+import { formatDistanceToNow } from "date-fns";
 
 type Games = {
   featured: ListGame<string> | undefined,
@@ -592,7 +592,7 @@ const getSpecialGame = () => {
 };
 
 const getFriendlyDate = (date: Date) => {
-  return moment(date).utc().fromNow();
+  return formatDistanceToNow(date, { addSuffix: true });;
 };
 
 const startTutorial = async (tutorialKey: string) => {
