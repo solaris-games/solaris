@@ -187,6 +187,7 @@ import type {Carrier, Game, Star} from "@/types/game";
 import type {RulerPoint} from "@/types/ruler";
 import {getCountdownTimeStringByTicks} from "@/util/time";
 import type {Specialist} from "@solaris-common";
+import {useGameServices} from "@/util/gameServices";
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -195,7 +196,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.state.game)
+const serviceProvider = useGameServices();
 
 const points = ref<RulerPoint[]>([]);
 const distanceLightYears = ref(0);
@@ -239,8 +241,13 @@ const onCloseRequested = () => {
 };
 
 const recalculateETAs = () => {
-  const totalTicks = GameHelper.getTicksBetweenLocations(game.value, null, points.value, speedModifier.value)
-  const totalTicksWarp = GameHelper.getTicksBetweenLocations(game.value, null, points.value, game.value.constants.distances.warpSpeedMultiplier * speedModifier.value)
+  const totalDistance = serviceProvider.distanceService.getDistanceAlongLocationList(points.value.map(p => p.location));
+
+  const tickDistance = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, false);
+  const tickDistanceWarp = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, true);
+
+  const totalTicks = serviceProvider.carrierTravelService.getTicksToTravel(totalDistance, tickDistance);
+  const totalTicksWarp = serviceProvider.carrierTravelService.getTicksToTravel(totalDistance, tickDistanceWarp);
 
   totalEta.value = getCountdownTimeStringByTicks(game.value, totalTicks)
   totalEtaWarp.value = getCountdownTimeStringByTicks(game.value, totalTicksWarp)
@@ -281,11 +288,13 @@ const recalculateDistanceLightYears = () => {
     return;
   }
 
-  for (let i = 0; i < points.value.length - 1; i++) {
-    distanceLightYears.value += GameHelper.getDistanceBetweenLocations(points.value[i].location, points.value[i + 1].location)
-  }
+  let dist = 0;
 
-  distanceLightYears.value = Math.round(distanceLightYears.value / game.value.constants.distances.lightYear * 100.0) / 100.0
+  for (let i = 0; i < points.value.length - 1; i++) {
+    dist += GameHelper.getDistanceBetweenLocations(points.value[i].location, points.value[i + 1].location)
+  }
+  
+  distanceLightYears.value = Math.round(dist / game.value.constants.distances.lightYear * 100.0) / 100.0
 };
 
 const recalculateAll = () => {

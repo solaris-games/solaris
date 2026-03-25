@@ -226,38 +226,6 @@ class GameHelper {
     return `${speedLy}LY/tick`;
   }
 
-  getTicksBetweenLocations(game: Game, carrier: Carrier | null, locs: RulerPoint[], tickDistanceModifier = 1) {
-    let totalTicks = 0
-    const tickDistance = this.getTickDistance(game, carrier, tickDistanceModifier);
-
-    for (let i = 1; i < locs.length; i++) {
-      const prevLoc = locs[i - 1]
-      const currLoc = locs[i]
-      const distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
-
-      let ticks: number;
-
-      // Check for worm holes
-      if (this.isInstantTravel(prevLoc, currLoc)) {
-        ticks = 1
-      } else {
-        // fix here
-
-        ticks = 1;
-        let remainingDistance = distance;
-
-        while (remainingDistance > tickDistance) {
-          remainingDistance -= tickDistance;
-          ticks++;
-        }
-      }
-
-      totalTicks += ticks
-    }
-
-    return totalTicks
-  }
-
   getTicksToProduction(game: { settings: { galaxy: GameSettingsGalaxyBase } }, currentTick: number, currentProductionTick: number) {
     const productionTicks = game.settings.galaxy.productionTicks;
 

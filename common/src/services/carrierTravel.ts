@@ -41,7 +41,7 @@ export class CarrierTravelService<ID extends Id> {
             return null;
         }
 
-        let distanceModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
+        let distanceModifier = 1;
 
         if (carrier.specialistId) {
             let specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
@@ -50,6 +50,31 @@ export class CarrierTravelService<ID extends Id> {
                 distanceModifier *= (specialist.modifiers.local.speed || 1);
             }
         }
+
+        return this.getDistancePerTick(game, distanceModifier, warpSpeed)
+    }
+
+    getTicksToTravel(distance: number, distancePerTick: number) {
+        // this needs to be iterative for precision reasons
+        let totalTicks = 0;
+        let remainingDistance = distance;
+
+        while (true) {
+            if (remainingDistance <= 0) {
+                break;
+            }
+
+            remainingDistance -= distancePerTick;
+            totalTicks++;
+        }
+
+        return totalTicks;
+    }
+
+    getDistancePerTick(game: Game<ID>, tickDistanceModifier: number, warpSpeed: boolean) {
+        const warpModifier = warpSpeed ? game.constants.distances.warpSpeedMultiplier : 1;
+
+        const distanceModifier = warpModifier * tickDistanceModifier;
 
         return game.settings.specialGalaxy.carrierSpeed * distanceModifier;
     }
