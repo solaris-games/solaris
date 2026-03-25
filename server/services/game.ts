@@ -446,7 +446,11 @@ export default class GameService extends EventEmitter {
         return (await this.gameRepo.findOne({ _id: gameId }, { 'galaxy.players._id': 1, 'galaxy.players.userId': 1 }))?.galaxy.players.map(p => { return { _id: p._id, userId: p.userId } });
     }
 
-    async resetQuitters(game: Game) {
+    async resetQuitters(game: Game, userId: DBObjectId) {
+        if (!await this.gameAuthService.isGameAdmin(game, userId)) {
+            throw new ValidationError('You do not have permission to force start this game.');
+        }
+
         game.quitters = [];
 
         await this.gameRepo.updateOne({

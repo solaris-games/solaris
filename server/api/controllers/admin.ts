@@ -289,16 +289,6 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        resetQuitters: async (req, res, next) => {
-            try {
-                await container.gameService.resetQuitters(req.game);
-
-                res.sendStatus(200);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
-        },
         createAnnouncement: async (req, res, next) => {
             try {
                 const body = parseAnnouncementRequest(req.body);

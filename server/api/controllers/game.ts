@@ -510,6 +510,16 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
-        }
+        },
+        resetQuitters: async (req, res, next) => {
+            try {
+                await container.gameService.resetQuitters(req.game, req.session.userId);
+
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
     }
 };

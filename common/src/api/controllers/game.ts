@@ -139,4 +139,5 @@ export const createGameRoutes = <ID>() => ({
     touch: new PatchRoute<{ gameId: ID }, {}, {}, {}>("/api/game/:gameId/player/touch"),
     getStatistics: new GetRoute<{ gameId: ID, playerId: ID }, {}, Statistics>("/api/game/:gameId/statistics/:playerId"),
     delete: new DeleteRoute<{ gameId: ID }, {}, {}>("/api/game/:gameId"),
+    resetQuitters: new DeleteRoute<{ gameId: string }, {}, null>('/api/admin/game/:gameId/quitters'),
 });
