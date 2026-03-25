@@ -15,8 +15,8 @@
     </ul>
 
     <div class="tab-content pt-2">
-      <leaderboard-user-table :limit="100"></leaderboard-user-table>
-      <leaderboard-user-elo-table :limit="100"></leaderboard-user-elo-table>
+      <leaderboard-user-table :limit="250"></leaderboard-user-table>
+      <leaderboard-user-elo-table :limit="250"></leaderboard-user-elo-table>
       <leaderboard-guild-table></leaderboard-guild-table>
     </div>
 
