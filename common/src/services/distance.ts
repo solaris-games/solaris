@@ -73,14 +73,14 @@ export class DistanceService {
     }
 
     getAngleTowardsLocation(source: Location, destination: Location): number {
-        let deltaX = destination.x - source.x;
-        let deltaY = destination.y - source.y;
+        const deltaX = destination.x - source.x;
+        const deltaY = destination.y - source.y;
 
         return Math.atan2(deltaY, deltaX);
     }
 
     getNextLocationTowardsLocation(source: Location, destination: Location, distance: number): Location {
-        let angle = this.getAngleTowardsLocation(source, destination);
+        const angle = this.getAngleTowardsLocation(source, destination);
 
         return {
             x: source.x + (distance * Math.cos(angle)),
