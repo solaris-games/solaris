@@ -459,28 +459,35 @@ class GameHelper {
       && destinationStar.wormHoleToStarId === sourceStar._id
   }
 
-  isGameWaitingForPlayers(game) {
-    return game.state.startDate == null
+  isGameWaitingForPlayers(game: { state: { startDate: Date | null } }) {
+    return game.state.startDate == null;
   }
 
-  isGamePaused(game) {
-    return game.state.paused
+  isGamePaused(game: { state: { paused: boolean } }) {
+    return game.state.paused;
   }
 
-  isGameNotStarted(game) {
+  isGameNotStarted(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
     return !game.state.startDate
   }
 
-  isGameStarted(game) {
-    return game.state.startDate != null
+  isGameStarted(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return game.state.startDate != null;
   }
 
-  isGameInProgress(game) {
-    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
+  isGameInProgress(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return !this.isGameWaitingForPlayers(game) &&
+      !this.isGamePaused(game) &&
+      game.state.startDate != null &&
+      moment().utc().diff(game.state.startDate) >= 0 &&
+      !game.state.endDate;
   }
 
-  isGamePendingStart(game) {
-    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
+  isGamePendingStart(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return !this.isGameWaitingForPlayers(game) &&
+      !this.isGamePaused(game) &&
+      game.state.startDate != null &&
+      moment().utc().diff(game.state.startDate) < 0;
   }
 
   isGameFinished(game: { state: GameInfoState<string> }) {
