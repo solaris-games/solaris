@@ -1,4 +1,3 @@
-import moment from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
 import {
@@ -10,6 +9,7 @@ import {
 } from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 import type {TeamLeaderboardData} from "@/types/leaderboard";
+import {add, compareAsc, format, formatDistanceToNow, isAfter, isBefore } from "date-fns";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -479,7 +479,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) &&
       !this.isGamePaused(game) &&
       game.state.startDate != null &&
-      moment().utc().diff(game.state.startDate) >= 0 &&
+      !isBefore(new Date(), game.state.startDate) &&
       !game.state.endDate;
   }
 
@@ -487,7 +487,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) &&
       !this.isGamePaused(game) &&
       game.state.startDate != null &&
-      moment().utc().diff(game.state.startDate) < 0;
+      isAfter(Date.now(), game.state.startDate);
   }
 
   isGameFinished(game: { state: GameInfoState<string> }) {
@@ -727,8 +727,8 @@ class GameHelper {
 
       // Then by defeated date descending
       if (a.defeated && b.defeated) {
-        if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
-        if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
+        if (compareAsc(a.defeatedDate, b.defeatedDate) === 1) return -1;
+        if (compareAsc(a.defeatedDate, b.defeatedDate) === -1) return 1;
       }
 
       // Sort defeated players last.
@@ -780,7 +780,7 @@ class GameHelper {
       return 'Online Now'
     }
     else {
-      return moment(player.lastSeen).utc().fromNow()
+      return formatDistanceToNow(player.lastSeen, { addSuffix: true });
     }
   }
 
@@ -861,12 +861,7 @@ class GameHelper {
   }
 
   getDateString(date: Date | string) {
-    date = moment(date).utc().toDate()
-
-    let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-    return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
+    return format(new Date(date), "E do MMM HH mm");
   }
 
   // For placing items on a player territory (e.g. their name). Will return null if player has no territory
@@ -943,12 +938,12 @@ class GameHelper {
       return true;
     }
 
-    let lastTick = moment(game.state.lastTickDate).utc();
+    let lastTick = game.state.lastTickDate;
     let nextTick;
 
     if (this.isRealTimeGame(game)) {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-      nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
+      nextTick = add(lastTick!, { seconds: game.settings.gameTime.speed });
     } else if (this.isTurnBasedGame(game)) {
       const isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
 
@@ -956,12 +951,12 @@ class GameHelper {
         return true;
       }
 
-      nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
+      nextTick = add(lastTick!, { seconds: game.settings.gameTime.maxTurnWait });
     } else {
       throw new Error(`Unsupported game type.`);
     }
 
-    return nextTick.diff(moment().utc(), 'seconds') <= 0;
+    return isBefore(nextTick, new Date());
   }
 
   starInfrastructureUpgraded(game: Game, data) {
