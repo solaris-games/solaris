@@ -101,7 +101,7 @@ const init = (config: FrontendConfig) => {
   const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
   const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
   const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
-  const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, store, eventBus);
+  const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, eventBus);
 
   app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
   app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
