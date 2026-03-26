@@ -62,6 +62,7 @@ import { getPlayerUser } from '@/services/typedapi/game'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {useGameServices} from "@/util/gameServices";
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   playerId: string,
@@ -81,6 +82,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const isLoading = ref(false);
 const player: Ref<Player<string> | null> = ref(null);
@@ -106,7 +108,7 @@ onMounted(async () => {
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
-    if (store.state.userId && !player.value!.isOpenSlot && !playersAreAnonymous.value) {
+    if (userStore.userId && !player.value!.isOpenSlot && !playersAreAnonymous.value) {
       const response = await getPlayerUser(httpClient)(store.state.game._id, player.value!._id);
 
       if (isOk(response)) {

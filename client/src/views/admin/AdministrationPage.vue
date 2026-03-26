@@ -35,8 +35,10 @@ import ViewTitle from '../components/ViewTitle.vue'
 import { computed } from 'vue';
 import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
+import {useUserStore} from "@/stores/user.ts";
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const props = defineProps<{
   name: string,
@@ -45,8 +47,8 @@ const props = defineProps<{
 
 const name = computed(() => props.name);
 
-const isAdministrator = computed(() => store.state.roles.administrator);
-const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
+const isAdministrator = computed(() => userStore.roles?.administrator);
+const isCommunityManager = computed(() => isAdministrator.value || userStore.roles?.communityManager);
 </script>
 
 <style scoped>

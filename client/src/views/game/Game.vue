@@ -79,7 +79,7 @@ const gameId = computed(() => game.value._id);
 
 const hasGame = computed(() => Boolean(game.value));
 
-const isLoggedIn = computed(() => Boolean(store.state.userId));
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isHistorical = computed(() => store.state.tick !== game.value.state.tick);
 
@@ -164,7 +164,7 @@ const onOpenReportPlayerRequested = (e: { playerId: string }) => {
 };
 
 const attemptLogin = () => {
-  if (!store.state.userId) {
+  if (!userStore.userId) {
     userStore.verify();
   }
 };
@@ -283,7 +283,7 @@ onMounted(async () => {
       store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
     }
   } else {
-    if (store.state.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
+    if (userStore.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
       store.commit('setMenuState', { state: MENU_STATES.WELCOME })
     } else {
       store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.

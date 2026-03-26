@@ -50,11 +50,11 @@
     </div>
     <div class="panel-footer">
       <div class="actions">
-        <i v-if="isCommunityManager && user._id !== store.state.userId" class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
+        <i v-if="isCommunityManager && user._id !== userStore.userId" class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
            @click="toggleBan(user)" title="Toggle Banned"></i>
         <i v-if="isAdministrator" class="fas fa-eraser clickable text-warning ms-1" @click="doResetAchievements(user)"
            title="Reset Achievements"></i>
-        <i v-if="isAdministrator && user._id !== store.state.userId && !store.state.isImpersonating" class="fas fa-user clickable text-info ms-1" @click="doImpersonate(user._id)"
+        <i v-if="isAdministrator && user._id !== userStore.userId && !userStore.isImpersonating" class="fas fa-user clickable text-info ms-1" @click="doImpersonate(user._id)"
            title="Impersonate User"></i>
 
         <add-warning v-if="isCommunityManager" :user-id="user._id" @onWarningAdded="onWarningAdded" />
@@ -95,9 +95,9 @@ const store: Store<State> = useStore();
 const userStore = useUserStore();
 const confirm = makeConfirm(store);
 
-const isAdministrator = computed(() => store.state.roles.administrator);
-const isCommunityManager = computed(() => store.state.roles.communityManager || store.state.roles.administrator);
-const userA = computed(() => isAdministrator.value && props.user as ListUser<string> & AdminSpecificUserInfo);
+const isAdministrator = computed(() => userStore.roles?.administrator);
+const isCommunityManager = computed(() => userStore.roles?.communityManager || userStore.roles?.administrator);
+const userA = computed(() => props.user as ListUser<string> & AdminSpecificUserInfo);
 
 const getLastSeenString = (lastSeen: Date) => {
   if (!lastSeen) {
@@ -181,7 +181,7 @@ const toggleRole = async (user: ListUser<string>, role: UserRoleKinds) => {
   if (isOk(response)) {
     userI.roles[role] = !userI.roles[role];
 
-    if (userI._id === store.state.userId) {
+    if (userI._id === userStore.userId) {
       userStore.setRoles(userI.roles);
     }
   } else {
@@ -210,7 +210,7 @@ const doSetCredits = async (user: ListUser<string>, credits: number) => {
   if (isOk(response)) {
     userI.credits = Math.max(credits, 0);
 
-    if (user._id === store.state.userId) {
+    if (user._id === userStore.userId) {
       userStore.setCredits(response.data.credits);
     }
   } else {

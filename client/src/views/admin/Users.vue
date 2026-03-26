@@ -20,11 +20,13 @@ import { getUsers } from "@/services/typedapi/admin";
 import { useStore, type Store } from 'vuex';
 import type {State} from "@/store";
 import UserPanel from "@/views/admin/components/UserPanel.vue";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const route = useRoute();
 
@@ -32,7 +34,7 @@ const filterUser: Ref<string | undefined> = ref(undefined);
 const filterType: Ref<string> = ref('_id');
 const users: Ref<ListUser<string>[] | null> = ref(null);
 
-const isAdministrator = computed(() => store.state.roles.administrator);
+const isAdministrator = computed(() => userStore.isAdmin);
 
 const getDuplicateIPs = (user: ListUser<string>) => {
   if (!users.value || !isAdministrator) {

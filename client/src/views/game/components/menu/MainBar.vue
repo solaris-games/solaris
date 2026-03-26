@@ -196,6 +196,8 @@ import { eventBusInjectionKey } from '../../../../eventBus'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
 
+import {useUserStore} from "@/stores/user";
+
 export default {
   components: {
     GameStatistics,
@@ -374,7 +376,7 @@ export default {
       return this.$store.state.game
     },
     isLoggedIn () {
-      return this.$store.state.userId != null
+      return useUserStore().isLoggedIn
     }
   }
 }

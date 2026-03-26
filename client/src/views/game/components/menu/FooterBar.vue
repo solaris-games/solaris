@@ -42,6 +42,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -50,8 +51,9 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 const game = computed<Game>(() => store.state.game);
-const isLoggedIn = computed(() => store.state.userId != null);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
 const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));

@@ -88,10 +88,12 @@ import GuildMemberList from './components/MemberList.vue'
 import type {Guild, GuildWithUsers, GuildApplication as GuildApplicationData} from "@solaris-common";
 import {detailMyGuild, listMyGuildApplications, listMyGuildInvites} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 
 const isLoading = ref(false);
 const guild = ref<GuildWithUsers<string> | null>(null);
@@ -101,11 +103,11 @@ const applications = ref<GuildApplicationData<string>[]>([]);
 const guildFullName = computed(() => `${guild.value!.name} [${guild.value!.tag}]`);
 
 const isLeader = computed(() => {
-  return guild.value!.leader != null && guild.value!.leader._id === store.state.userId;
+  return guild.value!.leader != null && guild.value!.leader._id === userStore.userId;
 });
 
 const isOfficer = computed(() => {
-  return guild.value!.officers?.find(x => x._id === store.state.userId) != null;
+  return guild.value!.officers?.find(x => x._id === userStore.userId) != null;
 });
 
 const loadGuild = async () => {

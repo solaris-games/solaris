@@ -73,18 +73,20 @@ import { toastInjectionKey } from '@/util/keys';
 import { useStore, type Store } from 'vuex';
 import type { State } from '@/store';
 import { makeConfirm } from "@/util/confirm";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 const confirm = makeConfirm(store);
 
 const games: Ref<AdminListGame<string>[] | null> = ref(null);
 
-const isAdministrator = computed(() => store.state.roles.administrator);
-const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
-const isGameMaster = computed(() => isAdministrator.value || store.state.roles.gameMaster);
+const isAdministrator = computed(() => userStore.isAdmin);
+const isCommunityManager = computed(() => isAdministrator.value || userStore.roles?.communityManager);
+const isGameMaster = computed(() => isAdministrator.value || userStore.roles?.gameMaster);
 
 const gameNeedsAttention = (game: AdminListGame<string>) => game.state.endDate && game.state.tick <= 12;
 

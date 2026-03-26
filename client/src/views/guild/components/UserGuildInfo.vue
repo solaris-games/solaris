@@ -35,6 +35,7 @@ import {detailMyGuild, inviteGuild} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {makeConfirm} from "@/util/confirm";
 import {toastInjectionKey} from "@/util/keys";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   user: AchievementsUser<string>,
@@ -44,6 +45,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 const confirm = makeConfirm(store);
 
 const isLoadingGuild = ref(false);
@@ -56,7 +58,7 @@ const isUserInvited = computed(() => {
 
 const ownUserCanInvite = computed(() => {
   return myGuild.value &&
-      (myGuild.value.leader?._id === store.state.userId || myGuild.value.officers?.find(x => x._id === store.state.userId));
+      (myGuild.value.leader?._id === userStore.userId || myGuild.value.officers?.find(x => x._id === userStore.userId));
 });
 
 const loadMyGuild = async () => {

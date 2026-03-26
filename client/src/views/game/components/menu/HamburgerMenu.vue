@@ -95,6 +95,7 @@ import {eventBusInjectionKey} from '../../../../eventBus'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {configInjectionKey} from "@/config";
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   buttonClass: string,
@@ -109,6 +110,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const config = inject(configInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 const game = computed<Game>(() => store.state.game);
 
 const setMenuState = (state: string, args: any = null) => {
@@ -158,11 +160,11 @@ const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value))
 
 const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
 
-const gameIsJoinable = computed(() => store.state.userId != null && GameHelper.gameHasOpenSlots(game.value));
+const gameIsJoinable = computed(() => userStore.isLoggedIn && GameHelper.gameHasOpenSlots(game.value));
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
-const isLoggedIn = computed(() => store.state.userId != null);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 

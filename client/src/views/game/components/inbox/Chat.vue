@@ -31,6 +31,7 @@ import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu';
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -40,6 +41,7 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 
 const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
@@ -137,7 +139,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     return
   }
 
-  const isLoggedIn = store.state.userId != null;
+  const isLoggedIn = userStore.isLoggedIn;
   const isInGame = isUserInGame.value;
 
   if (!isLoggedIn || !isInGame) {

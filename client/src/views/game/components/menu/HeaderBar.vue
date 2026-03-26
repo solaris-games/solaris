@@ -89,6 +89,7 @@ import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
 import {unreadCount} from "@/services/typedapi/event";
 import {getCountdownTimeString, getCountdownTimeStringByTicks} from "@/util/time";
+import { useUserStore } from '@/stores/user';
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -99,6 +100,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
+const userStore = useUserStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 const game = computed<Game>(() => store.state.game);
 
@@ -115,7 +117,7 @@ const isDataCleaned = computed(() => game.value.state.cleaned);
 const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 const canEndTurn = computed(() => !gameIsFinished.value);
 
-const isLoggedIn = computed(() => store.state.userId != null);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const gameIsPaused = computed(() => GameHelper.isGamePaused(game.value));
 
@@ -181,7 +183,7 @@ const handleKeyDown = (e: KeyboardEvent): void => {
     return;
   }
 
-  const isLoggedIn = store.state.userId != null;
+  const isLoggedIn = userStore.isLoggedIn;
   const isInGame = userPlayer.value != null;
 
   let menuState = KEYBOARD_SHORTCUTS.all[key];
