@@ -334,7 +334,7 @@ async function toggleChangelog() {
             const resp = await fetch('/api/dash/changelog');
             if (resp.ok) {
                 const text = await resp.text();
-                document.getElementById('changelog-text').textContent = text;
+                document.getElementById('changelog-text').innerHTML = marked.parse(text);
                 changelogLoaded = true;
             }
         } catch (e) {

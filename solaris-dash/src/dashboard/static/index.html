@@ -6,6 +6,7 @@
     <title>Solaris Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
 </head>
 <body>
     <div class="header">
@@ -121,7 +122,7 @@
                 <button class="tab" id="changelog-toggle" onclick="toggleChangelog()">Show</button>
             </div>
             <div id="changelog-content" class="changelog-content" style="display:none">
-                <pre id="changelog-text" class="changelog-text">Loading...</pre>
+                <div id="changelog-text" class="changelog-md">Loading...</div>
             </div>
         </div>
     </div>
