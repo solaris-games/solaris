@@ -81,7 +81,7 @@ const init = (config: FrontendConfig) => {
   const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
   const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
 
-  const store: Store<State> = createSolarisStore(eventBus, httpClient, userClientSocketEmitter);
+  const store: Store<State> = createSolarisStore(eventBus, httpClient);
 
   socket.on("connect", () => {
     store.commit('setSocketConnected', true);

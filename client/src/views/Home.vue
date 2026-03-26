@@ -51,22 +51,21 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 import Parallax from './components/Parallax.vue'
 import LatestAnnouncement from "./components/LatestAnnouncement.vue";
 import { ref, inject, onMounted } from 'vue';
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
 import {configInjectionKey} from "@/config";
+import { useUserStore } from '@/stores/user';
 
 const config = inject(configInjectionKey)!;
 
 const documentationUrl = config.appDocumentationUrl;
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const isAutoLoggingIn = ref(false);
 
 onMounted(async () => {
   isAutoLoggingIn.value = true;
 
-  if (await store.dispatch('verify')) {
+  if (await userStore.verify()) {
     router.push({ name: 'main-menu' });
   }
 

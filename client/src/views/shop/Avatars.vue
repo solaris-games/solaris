@@ -57,9 +57,11 @@ import type { State } from '@/store'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user'
 import { makeConfirm } from '@/util/confirm';
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 const confirm = makeConfirm(store);
 
 const isLoading = ref(false);
@@ -75,7 +77,7 @@ const loadGalacticCredits = async () => {
 
   if (isOk(response)) {
     userCredits.value = response.data.credits;
-    store.commit('setUserCredits', response.data.credits);
+    userStore.setCredits(response.data.credits);
   } else {
     console.error(formatError(response));
   }
@@ -108,7 +110,7 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
     avatar.purchased = true;
     userCredits.value! -= avatar.price;
 
-    store.commit('setUserCredits', userCredits.value!);
+    userStore.setCredits(userCredits.value!);
   } else {
     console.error(formatError(response));
   }

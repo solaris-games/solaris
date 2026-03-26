@@ -19,8 +19,10 @@ import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
 import {useGameServices} from "@/util/gameServices";
+import { useUserStore } from '@/stores/user';
 
 const store = useStore() as Store<State>;
+const userStore = useUserStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast: ToastPluginApi = inject(toastInjectionKey)!;
@@ -68,7 +70,7 @@ onMounted(() => {
 
     const touchPlayer = async () => {
       try {
-        if (store.state.game && store.state.userId) {
+        if (store.state.game && userStore.userId) {
           const response = await touch(httpClient)(store.state.game._id);
 
           if (isError(response)) {
@@ -137,7 +139,7 @@ onMounted(() => {
     eventBus.on(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
     eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
 
-    if (store.state.userId) {
+    if (userStore.userId) {
       polling.value = setInterval(touchPlayer, 60000);
       touchPlayer();
     }

@@ -167,8 +167,10 @@ import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import type { UserPrivate, UserAchievements } from "@solaris-common";
 import Community from "@/views/game/components/menu/Community.vue";
+import { useUserStore } from '@/stores/user';
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -182,10 +184,10 @@ const loadData = async () => {
     user.value = response.data
     achievements.value = response.data.achievements
 
-    store.commit('setUser', response.data)
-    store.commit('setRoles', response.data.roles)
-    store.commit('setUserCredits', response.data.credits)
-    store.commit('setUserIsEstablishedPlayer', response.data.isEstablishedPlayer)
+    userStore.setUser(response.data)
+    userStore.setRoles(response.data.roles)
+    userStore.setCredits(response.data.credits)
+    userStore.setIsEstablishedPlayer(response.data.isEstablishedPlayer)
   } else {
     console.error(formatError(response));
   }

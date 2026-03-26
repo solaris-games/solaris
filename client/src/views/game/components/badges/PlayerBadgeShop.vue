@@ -43,6 +43,7 @@ import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";
+import { useUserStore } from '../../../../stores/user';
 
 
 const props = defineProps<{ recipientPlayerId: string }>();
@@ -58,6 +59,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore() as Store<State>;
+const userStore = useUserStore();
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
@@ -71,7 +73,7 @@ const loadGalacticCredits = async () => {
   if (isOk(response)) {
     userCredits.value = response.data.credits
 
-    store.commit('setUserCredits', response.data)
+    userStore.setCredits(response.data.credits)
   } else {
     console.error(formatError(response));
   }

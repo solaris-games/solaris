@@ -7,16 +7,13 @@ import PlayerMutationNames from './mutationNames/playerMutationNames';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, PlayerColour, Specialist, UserGameSettings, UserPrivate, UserRoles} from "@solaris-common";
+import type {Badge, PlayerColour, Specialist, UserGameSettings} from "@solaris-common";
 import {getBadges} from "./services/typedapi/badge";
 import {formatError, isOk} from "./services/typedapi";
-import type {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
-import {detailMe} from "@/services/typedapi/user";
 import type { OnPreStarParams } from './eventBusEventNames/map';
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 import {addColour, listColours} from "@/services/typedapi/colour";
-import {verify} from "@/services/typedapi/auth";
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
@@ -24,8 +21,6 @@ export type MentionCallbacks = {
 }
 
 export type State = {
-  userId: string | null;
-  user: UserPrivate<string>;
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
@@ -44,21 +39,15 @@ export type State = {
   tutorialPage: number | string;
   menuStateChat: string | null;
   menuArgumentsChat: any;
-  username: string | null;
-  roles: UserRoles | null;
-  userCredits: number | null;
-  isImpersonating: boolean | null;
-  userIsEstablishedPlayer: boolean | null;
   productionTick: number | null;
   unreadMessages: number | null;
   badges: Badge[];
   socketConnected: boolean;
 }
 
-export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Store<State> {
+export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store<State> {
   return createStore<State>({
   state: {
-    userId: null,
     game: null,
     tick: 0,
     cachedConversationComposeMessages: {},
@@ -77,11 +66,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     tutorialPage: 0,
     menuStateChat: null,
     menuArgumentsChat: null,
-    username: null,
-    roles: null,
-    userCredits: null,
-    isImpersonating: null,
-    userIsEstablishedPlayer: null,
     productionTick: null,
     unreadMessages: null,
     badges: [],
@@ -146,53 +130,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
     },
     setStarSpecialists (state: State, starSpecialists) {
       state.starSpecialists = starSpecialists;
-    },
-
-    setUserId (state: State, userId) {
-      state.userId = userId
-    },
-    clearUser (state) {
-      state.userId = null;
-      state.user = null;
-    },
-
-    setUsername (state: State, username) {
-      state.username = username
-    },
-    clearUsername (state) {
-      state.username = null
-    },
-
-    setUser (state: State, user) {
-      state.user = user;
-    },
-
-    setRoles (state: State, roles) {
-      state.roles = roles
-    },
-    clearRoles (state) {
-      state.roles = null
-    },
-
-    setUserCredits (state: State, credits) {
-      state.userCredits = credits
-    },
-    clearUserCredits (state) {
-      state.userCredits = null
-    },
-
-    setIsImpersonating (state: State, isImpersonating) {
-      state.isImpersonating = isImpersonating;
-    },
-    clearIsImpersonating (state) {
-      state.isImpersonating = null;
-    },
-
-    setUserIsEstablishedPlayer (state: State, isEstablishedPlayer) {
-      state.userIsEstablishedPlayer = isEstablishedPlayer
-    },
-    clearUserIsEstablishedPlayer (state) {
-      state.userIsEstablishedPlayer = null
     },
 
     setTick (state: State, tick) {
@@ -552,12 +489,10 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         console.error(formatError(starResponse));
       }
     },
-    async loadColourData ({ commit, state }: { commit: any, state: State }) {
-      if (state.userId) {
-        const resp = await listColours(httpClient)();
-        if (isOk(resp)) {
-          commit('setColoursConfig', resp.data);
-        }
+    async loadColourData ({ commit }: { commit: any }) {
+      const resp = await listColours(httpClient)();
+      if (isOk(resp)) {
+        commit('setColoursConfig', resp.data);
       }
     },
     async addColourMapping ({ commit, state }, data: { playerId: string, colour: PlayerColour }) {
@@ -568,34 +503,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios, userCl
         eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
       } else {
         console.error(formatError(resp));
-      }
-    },
-    async verify({ commit, state }) {
-      const response = await verify(httpClient)();
-      if (isOk(response)) {
-        if (response.data._id) {
-          commit('setUserId', response.data._id);
-          commit('setUsername', response.data.username);
-          commit('setRoles', response.data.roles);
-          commit('setUserCredits', response.data.credits);
-
-          if (!state.user || state.user?._id !== response.data._id) {
-            const resp2 = await detailMe(httpClient)();
-            if (isOk(resp2)) {
-              commit('setUser', resp2.data);
-              userClientSocketEmitter.emitJoined();
-            } else {
-              console.error('Failed to get user info', resp2);
-            }
-          }
-
-          return true;
-        } else {
-          return false;
-        }
-      } else {
-        console.error(formatError(response));
-        return false;
       }
     },
     async getBadges({ commit, state }) {

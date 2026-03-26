@@ -37,25 +37,24 @@
 <script setup lang="ts">
 import ViewContainerTopBar from './ViewContainerTopBar.vue'
 import {withMessages} from "../../util/messages";
-import { useStore, type Store } from 'vuex';
 import { onMounted } from 'vue';
-import type {State} from "@/store";
 import router from '@/router';
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   isAuthPage: boolean,
   hideTopBar?: boolean
 }>();
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 if (props.isAuthPage) {
   withMessages();
 }
 
 onMounted(async () => {
-  if (props.isAuthPage && !store.state.userId) {
-    const isOk = await store.dispatch('verify');
+  if (props.isAuthPage && !userStore.userId) {
+    const isOk = await userStore.verify();
 
     if (!isOk) {
       router.push({ name: 'home' });

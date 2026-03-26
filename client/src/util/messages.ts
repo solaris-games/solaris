@@ -8,13 +8,15 @@ import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
 import MENU_STATES from '../services/data/menuStates';
 import router from "../router";
+import {useUserStore} from "@/stores/user.ts";
 
 export const withMessages = () => {
   const $toast = useToast();
   const eventBus: EventBus = inject(eventBusInjectionKey)!;
   const store: Store<State> = useStore();
+  const userStore = useUserStore();
 
-  const sendForAllGames = computed(() => store.state.user?.subscriptions?.inapp?.notificationsForOtherGames);
+  const sendForAllGames = computed(() => userStore.user?.subscriptions?.inapp?.notificationsForOtherGames);
 
   const handler = (e: ConversationMessageSentResult<string>) => {
     const isInGame = store.state.game?._id === e.gameId;

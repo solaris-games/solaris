@@ -81,6 +81,7 @@ import {
 } from "@/services/typedapi/admin";
 import router from "@/router";
 import { formatDistanceToNow } from "date-fns";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   user: ListUser<string>,
@@ -91,6 +92,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 const confirm = makeConfirm(store);
 
 const isAdministrator = computed(() => store.state.roles.administrator);
@@ -135,11 +137,11 @@ const doImpersonate = async (userId: string) => {
   const response = await impersonate(httpClient)(userId);
 
   if (isOk(response)) {
-    store.commit('setUserId', response.data._id);
-    store.commit('setUsername', response.data.username);
-    store.commit('setRoles', response.data.roles);
-    store.commit('setUserCredits', response.data.credits);
-    store.commit('setIsImpersonating', response.data.isImpersonating);
+    userStore.setUserId(response.data._id);
+    userStore.setUsername(response.data.username);
+    userStore.setRoles(response.data.roles);
+    userStore.setCredits(response.data.credits);
+    userStore.setIsImpersonating(response.data.isImpersonating);
 
     router.push({name: 'home'});
   } else {
@@ -180,7 +182,7 @@ const toggleRole = async (user: ListUser<string>, role: UserRoleKinds) => {
     userI.roles[role] = !userI.roles[role];
 
     if (userI._id === store.state.userId) {
-      store.commit('setRoles', userI.roles);
+      userStore.setRoles(userI.roles);
     }
   } else {
     console.error(formatError(response));
@@ -209,7 +211,7 @@ const doSetCredits = async (user: ListUser<string>, credits: number) => {
     userI.credits = Math.max(credits, 0);
 
     if (user._id === store.state.userId) {
-      store.commit('setUserCredits', response.data.credits);
+      userStore.setCredits(response.data.credits);
     }
   } else {
     console.error(formatError(response));

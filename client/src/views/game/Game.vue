@@ -52,8 +52,10 @@ import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
 
 const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const emit = defineEmits<{
   onPlayerSelected: [playerId: string],
@@ -163,7 +165,7 @@ const onOpenReportPlayerRequested = (e: { playerId: string }) => {
 
 const attemptLogin = () => {
   if (!store.state.userId) {
-    store.dispatch('verify');
+    userStore.verify();
   }
 };
 
