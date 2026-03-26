@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solaris Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Solaris Admin Dashboard</h1>
+        <span class="status" id="conn-status">Connecting...</span>
+    </div>
+
+    <!-- Service Status Bar -->
+    <div class="status-bar" id="services"></div>
+
+    <!-- Main Grid -->
+    <div class="grid">
+        <!-- Container Resources -->
+        <div class="card">
+            <h2>Container Resources</h2>
+            <div id="container-bars"></div>
+        </div>
+
+        <!-- Game Overview -->
+        <div class="card">
+            <h2>Game Overview</h2>
+            <div class="stats" id="game-stats"></div>
+            <canvas id="game-types-chart" height="150"></canvas>
+        </div>
+
+        <!-- MongoDB -->
+        <div class="card">
+            <h2>MongoDB</h2>
+            <div class="stats" id="mongo-stats"></div>
+            <canvas id="opcounters-chart" height="150"></canvas>
+            <table class="coll-table" id="coll-table">
+                <thead><tr><th>Collection</th><th>Docs</th><th>Size</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Notification Pipeline -->
+        <div class="card">
+            <h2>Notification Pipeline</h2>
+            <div class="stats" id="notify-stats"></div>
+            <div class="stats" id="nats-stats"></div>
+        </div>
+
+        <!-- Archive Status -->
+        <div class="card">
+            <h2>Archive Status</h2>
+            <div class="stats" id="archive-stats"></div>
+        </div>
+
+        <!-- Security Overview -->
+        <div class="card card-wide">
+            <h2>Security Overview</h2>
+            <div id="security-scan-info" class="scan-info">Last scan: loading...</div>
+            <div class="stats" id="security-stats"></div>
+            <div id="severity-bars"></div>
+        </div>
+
+        <!-- Vulnerabilities & SBOM -->
+        <div class="card card-wide">
+            <div class="card-header-row">
+                <h2>Vulnerabilities &amp; SBOM</h2>
+                <div class="tab-bar" id="security-tabs">
+                    <button class="tab active" data-tab="vulns">Vulnerabilities</button>
+                    <button class="tab" data-tab="sbom">SBOM</button>
+                    <button class="tab" data-tab="remediation">Remediation</button>
+                </div>
+            </div>
+            <div id="tab-vulns" class="tab-content active">
+                <div class="filter-row" id="vuln-filters">
+                    <select id="filter-severity">
+                        <option value="">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select id="filter-priority">
+                        <option value="">All Priorities</option>
+                        <option value="P0">P0</option>
+                        <option value="P1">P1</option>
+                        <option value="P2">P2</option>
+                        <option value="P3">P3</option>
+                    </select>
+                </div>
+                <div class="table-scroll">
+                    <table class="coll-table" id="vuln-table">
+                        <thead><tr><th>ID</th><th>Sev</th><th>CVSS</th><th>Package</th><th>Component</th><th>Fix</th><th>Priority</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="tab-sbom" class="tab-content">
+                <table class="coll-table" id="sbom-table">
+                    <thead><tr><th>Component</th><th>Type</th><th>Dependencies</th><th>License</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="tab-remediation" class="tab-content">
+                <div id="remediation-list"></div>
+            </div>
+        </div>
+
+        <!-- Bottleneck Alerts -->
+        <div class="card card-wide">
+            <h2>Alerts</h2>
+            <div id="alerts"><span style="color: var(--text-dim)">No alerts</span></div>
+        </div>
+
+        <!-- Changelog -->
+        <div class="card card-wide">
+            <div class="card-header-row">
+                <h2>Changelog</h2>
+                <button class="tab" id="changelog-toggle" onclick="toggleChangelog()">Show</button>
+            </div>
+            <div id="changelog-content" class="changelog-content" style="display:none">
+                <pre id="changelog-text" class="changelog-text">Loading...</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs Modal -->
+    <div class="modal-overlay" id="logs-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <span id="logs-title">Container Logs</span>
+                <button onclick="closeLogs()">&times;</button>
+            </div>
+            <div class="modal-body" id="logs-body">Loading...</div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

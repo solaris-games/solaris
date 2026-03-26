@@ -1,0 +1,29 @@
+services:
+  nats:
+    image: nats:2-alpine
+    command: ["--js", "-m", "8222"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    networks:
+      - solaris-beta_default
+
+  notify:
+    build:
+      context: ./solaris-notify
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      MONGO_URI: "mongodb://database:27017/solaris?replicaSet=rs0"
+      NATS_URL: "nats://nats:4222"
+      PORT: "3002"
+      SESSION_SECRET: "top_secret"
+    depends_on:
+      - nats
+    networks:
+      - solaris-beta_default
+
+networks:
+  solaris-beta_default:
+    external: true

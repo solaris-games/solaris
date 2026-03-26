@@ -1,0 +1,1849 @@
+{
+  "scanId": "seed-2026-03-25",
+  "scannedAt": "2026-03-25T00:00:00Z",
+  "nextScanAt": "2026-04-01T00:00:00Z",
+  "scanDurationSecs": 0,
+  "summary": {
+    "totalDependencies": 110,
+    "totalVulnerabilities": 129,
+    "critical": 4,
+    "high": 31,
+    "medium": 26,
+    "low": 66,
+    "info": 2,
+    "componentsScanned": 10
+  },
+  "components": [
+    {
+      "name": "Solaris Server",
+      "componentType": "npm",
+      "version": "",
+      "sourcePath": "solaris-beta/server/",
+      "dependencies": [
+        {
+          "name": "axios",
+          "version": "1.13.5",
+          "purpose": "HTTP client",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bcrypt",
+          "version": "5.1.1",
+          "purpose": "Password hashing",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "body-parser",
+          "version": "2.2.2",
+          "purpose": "Request body parsing",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "compression",
+          "version": "1.8.1",
+          "purpose": "Response compression",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "connect-mongodb-session",
+          "version": "2.4.1",
+          "purpose": "Session store",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "cookie",
+          "version": "1.1.1",
+          "purpose": "Cookie parsing",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "cookie-parser",
+          "version": "1.4.7",
+          "purpose": "Express cookie middleware",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "discord.js",
+          "version": "12.5.3",
+          "purpose": "Discord bot integration",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "dotenv",
+          "version": "8.2.0",
+          "purpose": "Environment config",
+          "license": "BSD-2-Clause",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "elo-rating",
+          "version": "1.0.1",
+          "purpose": "Player rating system",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "express",
+          "version": "4.22.1",
+          "purpose": "Web framework",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "express-joi-validation",
+          "version": "5.0.1",
+          "purpose": "Request validation",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "express-rate-limit",
+          "version": "5.2.6",
+          "purpose": "Rate limiting",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "express-session",
+          "version": "1.19.0",
+          "purpose": "Session management",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "joi",
+          "version": "17.6.2",
+          "purpose": "Schema validation",
+          "license": "BSD-3-Clause",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "memory-cache",
+          "version": "0.2.0",
+          "purpose": "In-memory caching",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "moment",
+          "version": "2.30.1",
+          "purpose": "Date/time handling",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mongoose",
+          "version": "7.8.9",
+          "purpose": "MongoDB ODM",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mongoose-lean-defaults",
+          "version": "2.3.1",
+          "purpose": "Lean query defaults",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "nodemailer",
+          "version": "8.0.1",
+          "purpose": "Email sending",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "pino",
+          "version": "10.3.1",
+          "purpose": "Logging",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "pino-pretty",
+          "version": "13.1.3",
+          "purpose": "Log formatting",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "qheap",
+          "version": "1.4.0",
+          "purpose": "Priority queue",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "random-seed",
+          "version": "0.3.0",
+          "purpose": "Deterministic RNG",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "simplex-noise",
+          "version": "4.0.1",
+          "purpose": "Noise generation",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "socket.io",
+          "version": "4.8.3",
+          "purpose": "WebSocket server",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "@types/connect-mongodb-session",
+          "version": "2.4.1",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@types/cookie-parser",
+          "version": "1.4.8",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@types/express",
+          "version": "4.17.21",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@types/express-session",
+          "version": "1.17.10",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@types/jasmine",
+          "version": "5.1.5",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@types/node",
+          "version": "17.0.17",
+          "purpose": "Type definitions",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "jasmine",
+          "version": "5.5.0",
+          "purpose": "Test framework",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "ts-node",
+          "version": "10.9.2",
+          "purpose": "TS execution",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "ts-node-dev",
+          "version": "2.0.0",
+          "purpose": "TS dev server",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        }
+      ],
+      "licenseSummary": "Predominantly MIT; discord.js is Apache-2.0; joi is BSD-3-Clause; dotenv is BSD-2-Clause"
+    },
+    {
+      "name": "Solaris Client",
+      "componentType": "npm",
+      "version": "",
+      "sourcePath": "solaris-beta/client/",
+      "dependencies": [
+        {
+          "name": "@popperjs/core",
+          "version": "2.11.5",
+          "purpose": "Tooltip/popover positioning",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "axios",
+          "version": "1.13.5",
+          "purpose": "HTTP client",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bootstrap",
+          "version": "5.1.3",
+          "purpose": "CSS framework",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "chart.js",
+          "version": "4.4.3",
+          "purpose": "Data visualization",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "date-fns",
+          "version": "4.1.0",
+          "purpose": "Date utilities",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "jquery",
+          "version": "3.6.0",
+          "purpose": "DOM manipulation",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "js-cookie",
+          "version": "3.0.5",
+          "purpose": "Cookie management",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "marked",
+          "version": "13.0.2",
+          "purpose": "Markdown rendering",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mitt",
+          "version": "3.0.1",
+          "purpose": "Event emitter",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "moment",
+          "version": "2.29.1",
+          "purpose": "Date/time handling",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "pixi-viewport",
+          "version": "6.0.3",
+          "purpose": "2D camera/viewport",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "pixi.js",
+          "version": "8.16.0",
+          "purpose": "2D WebGL renderer",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "random-seed",
+          "version": "0.3.0",
+          "purpose": "Deterministic RNG",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "socket.io-client",
+          "version": "4.8.1",
+          "purpose": "WebSocket client",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "uuid",
+          "version": "10.0.0",
+          "purpose": "UUID generation",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "voronoi",
+          "version": "1.0.0",
+          "purpose": "Voronoi diagram generation",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "vue",
+          "version": "3.5.28",
+          "purpose": "UI framework",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "vue-chartjs",
+          "version": "5.3.1",
+          "purpose": "Chart.js Vue bindings",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "vue-router",
+          "version": "4.4.0",
+          "purpose": "Client-side routing",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "vue-toast-notification",
+          "version": "3.1.3",
+          "purpose": "Toast notifications",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "vuex",
+          "version": "4.1.0",
+          "purpose": "State management",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "@vitejs/plugin-vue",
+          "version": "6.0.4",
+          "purpose": "Vite Vue plugin",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "@vue/tsconfig",
+          "version": "0.8.1",
+          "purpose": "TS config for Vue",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "less",
+          "version": "4.5.1",
+          "purpose": "CSS preprocessor",
+          "license": "Apache-2.0",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "vite",
+          "version": "7.3.1",
+          "purpose": "Build tool / dev server",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        },
+        {
+          "name": "vue-tsc",
+          "version": "3.2.5",
+          "purpose": "Vue type checking",
+          "license": "MIT",
+          "isDev": true,
+          "isDirect": true
+        }
+      ],
+      "licenseSummary": "Predominantly MIT; less is Apache-2.0"
+    },
+    {
+      "name": "Solaris Archive Service",
+      "componentType": "cargo",
+      "version": "",
+      "sourcePath": "solaris-archive/",
+      "dependencies": [
+        {
+          "name": "tokio",
+          "version": "1.50.0",
+          "purpose": "Async runtime (full)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "axum",
+          "version": "0.7.9",
+          "purpose": "HTTP framework",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mongodb",
+          "version": "3.5.2",
+          "purpose": "Database driver",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde",
+          "version": "1.0.228",
+          "purpose": "Serialization (derive)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde_json",
+          "version": "1.0.149",
+          "purpose": "JSON support",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bson",
+          "version": "2.15.0",
+          "purpose": "BSON support (chrono-0_4)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "zstd",
+          "version": "0.13.3",
+          "purpose": "Zstandard compression",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing",
+          "version": "0.1.44",
+          "purpose": "Structured logging",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing-subscriber",
+          "version": "0.3.23",
+          "purpose": "Log output (env-filter)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tower-http",
+          "version": "0.6.8",
+          "purpose": "CORS middleware",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "chrono",
+          "version": "0.4.44",
+          "purpose": "Date/time (serde)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "futures",
+          "version": "0.3.32",
+          "purpose": "Async utilities",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        }
+      ],
+      "licenseSummary": "MIT and MIT OR Apache-2.0; mongodb is Apache-2.0"
+    },
+    {
+      "name": "Solaris Notify Service",
+      "componentType": "cargo",
+      "version": "",
+      "sourcePath": "solaris-notify/",
+      "dependencies": [
+        {
+          "name": "tokio",
+          "version": "1.50.0",
+          "purpose": "Async runtime (full)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "axum",
+          "version": "0.7.9",
+          "purpose": "HTTP framework (ws)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "axum-extra",
+          "version": "0.9.6",
+          "purpose": "Cookie support",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mongodb",
+          "version": "3.5.2",
+          "purpose": "Database driver",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "async-nats",
+          "version": "0.38.0",
+          "purpose": "NATS JetStream client",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde",
+          "version": "1.0.228",
+          "purpose": "Serialization (derive)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde_json",
+          "version": "1.0.149",
+          "purpose": "JSON support",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bson",
+          "version": "2.15.0",
+          "purpose": "BSON support (chrono-0_4)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "uuid",
+          "version": "1.22.0",
+          "purpose": "UUID v4 generation",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "chrono",
+          "version": "0.4.44",
+          "purpose": "Date/time (serde)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing",
+          "version": "0.1.44",
+          "purpose": "Structured logging",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing-subscriber",
+          "version": "0.3.23",
+          "purpose": "Log output (env-filter)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tower-http",
+          "version": "0.6.8",
+          "purpose": "CORS middleware",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "reqwest",
+          "version": "0.12.28",
+          "purpose": "HTTP client (json)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "futures",
+          "version": "0.3.32",
+          "purpose": "Async utilities",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "hmac",
+          "version": "0.12.1",
+          "purpose": "HMAC authentication",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "sha2",
+          "version": "0.10.9",
+          "purpose": "SHA-256 hashing",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "hex",
+          "version": "0.4.3",
+          "purpose": "Hex encoding",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "dashmap",
+          "version": "6.1.0",
+          "purpose": "Concurrent hash map",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tokio-stream",
+          "version": "0.1.18",
+          "purpose": "Async stream utilities",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "base64",
+          "version": "0.22.1",
+          "purpose": "Base64 encoding",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "async-trait",
+          "version": "0.1.89",
+          "purpose": "Async trait support",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        }
+      ],
+      "licenseSummary": "MIT and MIT OR Apache-2.0; mongodb and async-nats are Apache-2.0"
+    },
+    {
+      "name": "Solaris Dashboard Service",
+      "componentType": "cargo",
+      "version": "",
+      "sourcePath": "solaris-dash/",
+      "dependencies": [
+        {
+          "name": "tokio",
+          "version": "1.50.0",
+          "purpose": "Async runtime (full)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "axum",
+          "version": "0.7.9",
+          "purpose": "HTTP framework (ws)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "mongodb",
+          "version": "3.5.2",
+          "purpose": "Database driver",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde",
+          "version": "1.0.228",
+          "purpose": "Serialization (derive)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "serde_json",
+          "version": "1.0.149",
+          "purpose": "JSON support",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bson",
+          "version": "2.15.0",
+          "purpose": "BSON support (chrono-0_4)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "chrono",
+          "version": "0.4.44",
+          "purpose": "Date/time (serde)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing",
+          "version": "0.1.44",
+          "purpose": "Structured logging",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tracing-subscriber",
+          "version": "0.3.23",
+          "purpose": "Log output (env-filter)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tower-http",
+          "version": "0.6.8",
+          "purpose": "CORS middleware",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "reqwest",
+          "version": "0.12.28",
+          "purpose": "HTTP client (json)",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "bollard",
+          "version": "0.18.1",
+          "purpose": "Docker Engine API",
+          "license": "Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "tokio-stream",
+          "version": "0.1.18",
+          "purpose": "Async stream (sync)",
+          "license": "MIT",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "futures",
+          "version": "0.3.32",
+          "purpose": "Async utilities",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        },
+        {
+          "name": "async-trait",
+          "version": "0.1.89",
+          "purpose": "Async trait support",
+          "license": "MIT OR Apache-2.0",
+          "isDev": false,
+          "isDirect": true
+        }
+      ],
+      "licenseSummary": "MIT and MIT OR Apache-2.0; mongodb and bollard are Apache-2.0"
+    },
+    {
+      "name": "MongoDB",
+      "componentType": "infrastructure",
+      "version": "7.x",
+      "sourcePath": "docker-compose.yml",
+      "dependencies": [],
+      "licenseSummary": "SSPL"
+    },
+    {
+      "name": "NATS JetStream",
+      "componentType": "infrastructure",
+      "version": "2.x",
+      "sourcePath": "docker-compose.notify.yml",
+      "dependencies": [],
+      "licenseSummary": "Apache-2.0"
+    },
+    {
+      "name": "Docker Engine",
+      "componentType": "infrastructure",
+      "version": "",
+      "sourcePath": "",
+      "dependencies": [],
+      "licenseSummary": "Apache-2.0"
+    },
+    {
+      "name": "Node.js",
+      "componentType": "infrastructure",
+      "version": "22/24",
+      "sourcePath": "Dockerfile",
+      "dependencies": [],
+      "licenseSummary": "MIT"
+    },
+    {
+      "name": "nginx",
+      "componentType": "container",
+      "version": "1.29-alpine",
+      "sourcePath": "solaris-beta/client/Dockerfile",
+      "dependencies": [],
+      "licenseSummary": "BSD-2-Clause"
+    },
+    {
+      "name": "Debian bookworm-slim",
+      "componentType": "container",
+      "version": "bookworm-slim",
+      "sourcePath": "Dockerfile (runtime stage)",
+      "dependencies": [],
+      "licenseSummary": "Various (DFSG-free)"
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "id": "CVE-2025-14847",
+      "severity": "critical",
+      "cvss": 8.7,
+      "component": "MongoDB",
+      "packageName": "mongodb",
+      "affectedVersions": "7.0.0 - 7.0.26",
+      "fixedVersion": "7.0.28",
+      "description": "MongoBleed: unauthenticated heap memory disclosure via zlib decompression",
+      "fixAvailable": "Upgrade to >= 7.0.28",
+      "exploitedInWild": true,
+      "referenceUrl": "https://nvd.nist.gov/vuln/detail/CVE-2025-14847",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-4148",
+      "severity": "high",
+      "cvss": 8.7,
+      "component": "MongoDB",
+      "packageName": "mongodb",
+      "affectedVersions": "< 7.0.31",
+      "fixedVersion": "7.0.31",
+      "description": "Use-after-free in sharded clusters by authenticated user",
+      "fixAvailable": "Upgrade to >= 7.0.31",
+      "exploitedInWild": false,
+      "referenceUrl": "https://www.mongodb.com/resources/products/alerts",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-4148-stack",
+      "severity": "high",
+      "cvss": null,
+      "component": "MongoDB",
+      "packageName": "mongodb",
+      "affectedVersions": "< 7.0.31",
+      "fixedVersion": "7.0.31",
+      "description": "Authenticated read of uninitialized stack memory",
+      "fixAvailable": "Upgrade to >= 7.0.31",
+      "exploitedInWild": false,
+      "referenceUrl": "https://www.mongodb.com/resources/products/alerts",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-FIPS",
+      "severity": "medium",
+      "cvss": null,
+      "component": "MongoDB",
+      "packageName": "mongodb",
+      "affectedVersions": "7.0.0 - 7.0.22",
+      "fixedVersion": "7.0.23",
+      "description": "Non-FIPS algorithms used when FIPS mode enabled",
+      "fixAvailable": "Upgrade to >= 7.0.23",
+      "exploitedInWild": false,
+      "referenceUrl": "https://www.mongodb.com/resources/products/alerts",
+      "remediationPriority": "P2"
+    },
+    {
+      "id": "GHSA-34x7-hfp2-rc4v",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Hardlink Path Traversal",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-34x7-hfp2-rc4v",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-8qq5-rm4j-mr97",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Symlink Overwrite",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-8qq5-rm4j-mr97",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-83g3-92jg-28cx",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Hardlink Target Escape",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-83g3-92jg-28cx",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-qffp-2rhf-9h96",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Drive-Relative Hardlink",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-qffp-2rhf-9h96",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-9ppj-qmqm-q256",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Drive-Relative Symlink",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-9ppj-qmqm-q256",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-r6q2-hw4h-h46w",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "tar",
+      "affectedVersions": "<= 7.5.10",
+      "fixedVersion": "bcrypt@6.0.0 (major)",
+      "description": "Race Condition APFS",
+      "fixAvailable": "Upgrade bcrypt to 6.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-r6q2-hw4h-h46w",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-p6mc-m468-83gw",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "lodash.set",
+      "affectedVersions": "*",
+      "fixedVersion": "connect-mongodb-session@5.0.0 (major)",
+      "description": "Prototype Pollution",
+      "fixAvailable": "Upgrade connect-mongodb-session to 5.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-p6mc-m468-83gw",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-5j98-mcp5-4vw2",
+      "severity": "high",
+      "cvss": 7.5,
+      "component": "Solaris Server",
+      "packageName": "glob",
+      "affectedVersions": "10.2.0 - 10.4.5",
+      "fixedVersion": "npm audit fix",
+      "description": "Command injection via --cmd",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-677m-j7p3-52f9",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "socket.io-parser",
+      "affectedVersions": "*",
+      "fixedVersion": "npm audit fix",
+      "description": "Unbounded binary attachments",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-677m-j7p3-52f9",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-3ppc-4f35-3m26",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "minimatch",
+      "affectedVersions": "<= 3.1.3",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS via wildcards",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-7r86-cg39-jmmj",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "minimatch",
+      "affectedVersions": "*",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS GLOBSTAR segments",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-23c5-xmqv-rm74",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "minimatch",
+      "affectedVersions": "*",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS extglobs",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-c2c7-rcm5-vvqj",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "picomatch",
+      "affectedVersions": "<= 2.3.1",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS extglob quantifiers",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-3v7f-55p6-f55p",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "picomatch",
+      "affectedVersions": "<= 2.3.1",
+      "fixedVersion": "npm audit fix",
+      "description": "Method Injection POSIX",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-p92x-r36w-9395",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "mpath",
+      "affectedVersions": "< 0.8.4",
+      "fixedVersion": "connect-mongodb-session@5.0.0 (major)",
+      "description": "Type confusion",
+      "fixAvailable": "Upgrade connect-mongodb-session to 5.0.0",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-p92x-r36w-9395",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-w7fw-mjwx-w883",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "qs",
+      "affectedVersions": "<= 6.14.1",
+      "fixedVersion": "npm audit fix",
+      "description": "arrayLimit bypass DoS",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-w7fw-mjwx-w883",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-6rw7-vpxm-498p",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "qs",
+      "affectedVersions": "<= 6.14.1",
+      "fixedVersion": "npm audit fix",
+      "description": "bracket notation DoS",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-6rw7-vpxm-498p",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-v6h2-p8h4-qcjw",
+      "severity": "low",
+      "cvss": 3.1,
+      "component": "Solaris Server",
+      "packageName": "brace-expansion",
+      "affectedVersions": "*",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-v6h2-p8h4-qcjw",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-73rr-hh4g-fpgx",
+      "severity": "low",
+      "cvss": null,
+      "component": "Solaris Server",
+      "packageName": "diff",
+      "affectedVersions": "4.0.0 - 4.0.3",
+      "fixedVersion": "npm audit fix",
+      "description": "DoS in parsePatch",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-73rr-hh4g-fpgx",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-c2c7-rcm5-vvqj-client",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Client",
+      "packageName": "picomatch",
+      "affectedVersions": "4.0.0 - 4.0.3",
+      "fixedVersion": "npm audit fix",
+      "description": "ReDoS via extglob quantifiers",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-3v7f-55p6-f55p-client",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Client",
+      "packageName": "picomatch",
+      "affectedVersions": "4.0.0 - 4.0.3",
+      "fixedVersion": "npm audit fix",
+      "description": "Method Injection POSIX classes",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "GHSA-677m-j7p3-52f9-client",
+      "severity": "high",
+      "cvss": null,
+      "component": "Solaris Client",
+      "packageName": "socket.io-parser",
+      "affectedVersions": "*",
+      "fixedVersion": "npm audit fix",
+      "description": "Unbounded binary attachments",
+      "fixAvailable": "npm audit fix",
+      "exploitedInWild": false,
+      "referenceUrl": "https://github.com/advisories/GHSA-677m-j7p3-52f9",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "RUSTSEC-2026-0049",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Solaris Notify Service",
+      "packageName": "rustls-webpki",
+      "affectedVersions": "0.102.8",
+      "fixedVersion": ">= 0.103.10",
+      "description": "CRL Distribution Point matching logic flaw - CRLs not considered authoritative",
+      "fixAvailable": "Awaiting async-nats upstream update or pin override",
+      "exploitedInWild": false,
+      "referenceUrl": "https://rustsec.org/advisories/RUSTSEC-2026-0049.html",
+      "remediationPriority": "P2"
+    },
+    {
+      "id": "RUSTSEC-2025-0134",
+      "severity": "info",
+      "cvss": null,
+      "component": "Solaris Notify Service",
+      "packageName": "rustls-pemfile",
+      "affectedVersions": "2.2.0",
+      "fixedVersion": "Migrate away",
+      "description": "Crate is unmaintained",
+      "fixAvailable": "Migrate to alternative crate",
+      "exploitedInWild": false,
+      "referenceUrl": "https://rustsec.org/advisories/RUSTSEC-2025-0134.html",
+      "remediationPriority": "P3"
+    },
+    {
+      "id": "CVE-2026-29785",
+      "severity": "high",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "Server panic via malicious compression on leafnode port (pre-auth)",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.gitlab.com/pkg/golang/github.com/nats-io/nats-server/v2/CVE-2026-29785/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-27889",
+      "severity": "high",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "WebSockets pre-auth remote server crash",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-27571",
+      "severity": "high",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "WebSockets pre-auth memory DoS (compression bomb)",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33219",
+      "severity": "high",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "WebSockets pre-auth memory DoS (unbounded allocation)",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33223",
+      "severity": "medium",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "Identity spoofing via Nats-Request-Info header",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33246",
+      "severity": "medium",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "Leafnode Nats-Request-Info spoofing",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33218",
+      "severity": "medium",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "Pre-auth server panic via leafnode malformed message",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33222",
+      "severity": "medium",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "JetStream authorization bypass (stream restore)",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.gitlab.com/pkg/golang/github.com/nats-io/nats-server/v2/CVE-2026-33222/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33215",
+      "severity": "low",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "MQTT session hijacking via Client ID",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33216",
+      "severity": "low",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "MQTT plaintext password disclosure via monitoring",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-33247",
+      "severity": "low",
+      "cvss": null,
+      "component": "NATS JetStream",
+      "packageName": "nats-server",
+      "affectedVersions": "< 2.11.15 / < 2.12.6",
+      "fixedVersion": "2.11.15 / 2.12.6",
+      "description": "Credentials exposed via monitoring /debug/vars argv",
+      "fixAvailable": "Pin nats:2.12.6-alpine",
+      "exploitedInWild": false,
+      "referenceUrl": "https://advisories.nats.io/",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2026-HTTP2-memleak",
+      "severity": "high",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "WINDOW_UPDATE on stream 0 leaks Http2Session",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/march-2026-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-TLS-SNI",
+      "severity": "high",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "Synchronous throw in SNICallback crashes process",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/march-2026-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-Permission-bypass",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "FileHandle.chmod/chown bypass --permission",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/march-2026-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-V8-HashDoS",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "Integer-like strings trivially collide (V8 HashDoS)",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/march-2026-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-55131",
+      "severity": "high",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "Race condition in buffer allocation leaks memory",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-55130",
+      "severity": "high",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "Symlink chain escapes --allow-fs-read/write sandbox",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-59465",
+      "severity": "high",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "HTTP/2 crash on malformed HEADERS frame",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-59466",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "async_hooks stack exhaustion DoS",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-59464",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "TLS client cert memory leak DoS",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-21636",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "Unix Domain Socket bypasses --permission",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-21637",
+      "severity": "medium",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "TLS PSK/ALPN callback crash + FD leak",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2025-55132",
+      "severity": "low",
+      "cvss": null,
+      "component": "Node.js",
+      "packageName": "node",
+      "affectedVersions": "< 22.22.0 / < 24.13.0",
+      "fixedVersion": "22.22.0 / 24.13.0",
+      "description": "fs.futimes() bypasses read-only permission model",
+      "fixAvailable": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nodejs.org/en/blog/vulnerability/december-2025-security-releases",
+      "remediationPriority": "P1"
+    },
+    {
+      "id": "CVE-2026-1642",
+      "severity": "high",
+      "cvss": 8.2,
+      "component": "nginx",
+      "packageName": "nginx",
+      "affectedVersions": "1.3.0 - 1.29.4",
+      "fixedVersion": "1.29.5",
+      "description": "SSL upstream injection via MitM",
+      "fixAvailable": "Upgrade to >= 1.29.5",
+      "exploitedInWild": false,
+      "referenceUrl": "https://nginx.org/en/security_advisories.html",
+      "remediationPriority": "P0"
+    },
+    {
+      "id": "CVE-2025-53859",
+      "severity": "low",
+      "cvss": null,
+      "component": "nginx",
+      "packageName": "nginx",
+      "affectedVersions": "0.7.22 - 1.29.0",
+      "fixedVersion": "1.29.1",
+      "description": "Buffer overread in ngx_mail_smtp_module",
+      "fixAvailable": "Upgrade to >= 1.29.1",
+      "exploitedInWild": false,
+      "referenceUrl": "https://www.x-cmd.com/blog/250818/",
+      "remediationPriority": "P2"
+    },
+    {
+      "id": "DEBIAN-BOOKWORM-SLIM-SUMMARY",
+      "severity": "critical",
+      "cvss": null,
+      "component": "Debian bookworm-slim",
+      "packageName": "debian:bookworm-slim",
+      "affectedVersions": "bookworm-slim (current)",
+      "fixedVersion": "Rebuild with --no-cache",
+      "description": "86 vulnerabilities reported by Trivy scanner (3 critical, 8 high, 14 medium, 60 low, 1 unknown). Mostly in system libraries (zlib, libxml2, kernel). Many may be false positives \u2014 Debian security team marks some as not-affected when vulnerable code path is not built.",
+      "fixAvailable": "Rebuild images regularly with docker build --no-cache to pull latest bookworm-slim with patches",
+      "exploitedInWild": false,
+      "referenceUrl": "https://security-tracker.debian.org",
+      "remediationPriority": "P2"
+    }
+  ],
+  "remediation": [
+    {
+      "priority": "P0",
+      "component": "MongoDB 7",
+      "action": "Upgrade to >= 7.0.31",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P0",
+      "component": "NATS 2",
+      "action": "Pin nats:2.12.6-alpine in docker-compose",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P0",
+      "component": "nginx",
+      "action": "Upgrade to >= 1.29.5 in prod Dockerfile",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P1",
+      "component": "Node.js",
+      "action": "Upgrade to 22.22.0 (dev) / 24.13.0 (prod)",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P1",
+      "component": "Solaris Server",
+      "action": "npm audit fix (fixes glob, minimatch, picomatch, socket.io-parser, qs, brace-expansion, diff)",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P1",
+      "component": "Solaris Server",
+      "action": "Upgrade bcrypt to 6.0.0 (fixes 6 tar CVEs)",
+      "effort": "Medium",
+      "status": "pending"
+    },
+    {
+      "priority": "P1",
+      "component": "Solaris Server",
+      "action": "Upgrade connect-mongodb-session to 5.0.0 (fixes lodash.set, mpath)",
+      "effort": "Medium",
+      "status": "pending"
+    },
+    {
+      "priority": "P1",
+      "component": "Solaris Client",
+      "action": "npm audit fix (fixes picomatch, socket.io-parser)",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P2",
+      "component": "Notify Service",
+      "action": "Wait for async-nats update or pin rustls-webpki override",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P2",
+      "component": "Debian images",
+      "action": "Rebuild with --no-cache weekly",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P2",
+      "component": "MongoDB",
+      "action": "Disable zlib compression as defense-in-depth",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P3",
+      "component": "Archive Service",
+      "action": "Clean audit \u2014 no action needed",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P3",
+      "component": "Dashboard Service",
+      "action": "Clean audit \u2014 no action needed",
+      "effort": "Low",
+      "status": "pending"
+    },
+    {
+      "priority": "P3",
+      "component": "Notify rustls-pemfile",
+      "action": "Unmaintained warning \u2014 no security impact yet",
+      "effort": "Low",
+      "status": "pending"
+    }
+  ]
+}

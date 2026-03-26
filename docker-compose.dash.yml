@@ -1,0 +1,25 @@
+services:
+  dashboard:
+    build:
+      context: ./solaris-dash
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      MONGO_URI: "mongodb://database:27017/solaris?replicaSet=rs0"
+      NATS_MONITOR_URL: "http://nats:8222"
+      ARCHIVE_URL: "http://archive:3001"
+      NOTIFY_URL: "http://notify:3002"
+      SOLARIS_API_URL: "http://api:3000"
+      SOLARIS_CLIENT_URL: "http://client:8080"
+      COLLECT_INTERVAL_SECS: "10"
+      SECURITY_SCAN_INTERVAL_SECS: "604800"  # 1 week
+      PORT: "3003"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - solaris-beta_default
+
+networks:
+  solaris-beta_default:
+    external: true

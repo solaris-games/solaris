@@ -1,0 +1,23 @@
+services:
+  archive:
+    build:
+      context: ./solaris-archive
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      MONGO_URI: "mongodb://database:27017/solaris?replicaSet=rs0"
+      ARCHIVE_PATH: "/archive"
+      POLL_INTERVAL_SECS: "60"
+      PORT: "3001"
+    volumes:
+      - archive-data:/archive
+    networks:
+      - solaris-beta_default
+
+volumes:
+  archive-data:
+
+networks:
+  solaris-beta_default:
+    external: true
