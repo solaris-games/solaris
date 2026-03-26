@@ -10,7 +10,7 @@ services:
       - "3000:3000"
     environment:
       PORT: 3000
-      CONNECTION_STRING: "mongodb://database:27017/solaris"
+      CONNECTION_STRING: "mongodb://database:27017/solaris?replicaSet=rs0"
       CLIENT_URL: "http://localhost:8080"
       CORS_URLS: "http://localhost:8080"
       SMTP_ENABLED: false
@@ -26,7 +26,7 @@ services:
     image: solaris-jobs-dev
     environment:
       PORT: 3000
-      CONNECTION_STRING: "mongodb://database:27017/solaris"
+      CONNECTION_STRING: "mongodb://database:27017/solaris?replicaSet=rs0"
       CLIENT_URL: "http://localhost:8080"
       CORS_URLS: "http://localhost:8080"
       SMTP_ENABLED: false
@@ -37,9 +37,17 @@ services:
 
   database:
     image: mongo:7
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     volumes:
       - "dbdata:/data/db"
     ports:
       - "27017:27017"
+
+  mongo-init:
+    image: mongo:7
+    depends_on:
+      - database
+    restart: on-failure
+    entrypoint: ["bash", "-c", "sleep 5 && mongosh --host database:27017 --eval \"try { rs.initiate({_id:'rs0',members:[{_id:0,host:'database:27017'}]}) } catch(e) { if (e.codeName !== 'AlreadyInitialized') throw e }\""]
 volumes:
   dbdata:
