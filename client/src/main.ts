@@ -26,6 +26,7 @@ import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user
 import { makeConfirm } from "./util/confirm"
 import type {FrontendConfig} from "@solaris-common";
 import {configInjectionKey} from "@/config";
+import { createPinia } from "pinia"
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -89,6 +90,9 @@ const init = (config: FrontendConfig) => {
   socket.on("disconnect", () => {
     store.commit('setSocketConnected', false);
   });
+
+  const pinia = createPinia();
+  app.use(pinia);
 
   app.use(store);
 

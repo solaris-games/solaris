@@ -162,3 +162,7 @@ export const touch = (axios: Axios) => async (gameId: string): Promise<ResponseR
 export const deleteGame = (axios: Axios) => async (gameId: string): Promise<ResponseResult<{}>> => {
   return doDelete(axios)(routes.delete, { gameId }, {}, {}, { withCredentials: true });
 }
+
+export const resetQuitters = (axios: Axios) => async (gameId: string): Promise<ResponseResult<null>> => {
+  return doDelete(axios)(routes.resetQuitters, { gameId }, {}, {}, { withCredentials: true});
+}

@@ -80,10 +80,6 @@ export const finishGame = (axios: Axios) => async (gameId: string): Promise<Resp
   return doPatch(axios)(routes.finishGame, { gameId }, {}, {}, { withCredentials: true});
 }
 
-export const resetQuitters = (axios: Axios) => async (gameId: string): Promise<ResponseResult<null>> => {
-  return doDelete(axios)(routes.resetQuitters, { gameId }, {}, {}, { withCredentials: true});
-}
-
 export const getConversationForReport = (axios: Axios) => async (reportId: string): Promise<ResponseResult<Conversation<string>>> => {
   return doGet(axios)(routes.getConversationForReport, { reportId }, {}, { withCredentials: true});
 }
