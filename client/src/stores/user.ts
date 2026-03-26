@@ -2,9 +2,10 @@ import {computed, inject, readonly, ref } from 'vue';
 import { defineStore } from 'pinia';
 import type {UserPrivate, UserRoles} from "@solaris-common";
 import {httpInjectionKey, formatError, isOk} from "@/services/typedapi";
-import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
+import {UserClientSocketEmitter, userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 import {verify as verifyApi} from "@/services/typedapi/auth";
 import {detailMe} from "@/services/typedapi/user";
+import type { Axios } from "axios";
 
 export const useUserStore = defineStore('user', () => {
   // State
@@ -66,15 +67,7 @@ export const useUserStore = defineStore('user', () => {
   };
 
   // Verify authentication action
-  const verify = async (): Promise<boolean> => {
-    const httpClient = inject(httpInjectionKey);
-    const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey);
-
-    if (!httpClient) {
-      console.error('httpClient not available in useUserStore.verify()');
-      return false;
-    }
-
+  const verify = async (httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Promise<boolean> => {
     const response = await verifyApi(httpClient)();
     if (isOk(response)) {
       if (response.data._id) {
@@ -114,11 +107,11 @@ export const useUserStore = defineStore('user', () => {
     credits: readonly(credits),
     isImpersonating: readonly(isImpersonating),
     isEstablishedPlayer: readonly(isEstablishedPlayer),
-    
+
     // Computed getters
     isLoggedIn,
     isAdmin,
-    
+
     // Actions
     setUser,
     setUserId,

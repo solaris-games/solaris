@@ -53,8 +53,12 @@ import LatestAnnouncement from "./components/LatestAnnouncement.vue";
 import { ref, inject, onMounted } from 'vue';
 import {configInjectionKey} from "@/config";
 import { useUserStore } from '@/stores/user';
+import {httpInjectionKey} from "@/services/typedapi";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user.ts";
 
 const config = inject(configInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
+const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey)!;
 
 const documentationUrl = config.appDocumentationUrl;
 
@@ -65,7 +69,7 @@ const isAutoLoggingIn = ref(false);
 onMounted(async () => {
   isAutoLoggingIn.value = true;
 
-  if (await userStore.verify()) {
+  if (await userStore.verify(httpClient, userClientSocketEmitter)) {
     router.push({ name: 'main-menu' });
   }
 

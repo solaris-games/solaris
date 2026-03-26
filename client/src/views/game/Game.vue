@@ -165,7 +165,7 @@ const onOpenReportPlayerRequested = (e: { playerId: string }) => {
 
 const attemptLogin = () => {
   if (!userStore.userId) {
-    userStore.verify();
+    userStore.verify(httpClient, userClientSockerEmitter);
   }
 };
 
