@@ -98,7 +98,7 @@ import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
-  buttonClass: string,
+  buttonClass?: string,
   dropType: string,
 }>();
 

@@ -36,13 +36,13 @@
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
 import MENU_STATES from '../../../../services/data/menuStates'
-import HamburgerMenuVue from './HamburgerMenu.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
 import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
+import HamburgerMenu from "@/views/game/components/menu/HamburgerMenu.vue";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
