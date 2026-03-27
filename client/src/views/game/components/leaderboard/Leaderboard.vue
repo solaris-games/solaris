@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="row" v-if="game.state.startDate && !game.state.endDate">
+    <div class="row" v-if="game.state.startDate && !game.state.endDate && !game.state.paused">
       <div class="col text-center pt-2 pb-0">
         <p class="pb-0 mb-2">{{ timeRemaining }}</p>
       </div>
