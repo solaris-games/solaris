@@ -434,7 +434,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) &&
       !this.isGamePaused(game) &&
       game.state.startDate != null &&
-      isAfter(Date.now(), game.state.startDate);
+      isBefore(Date.now(), game.state.startDate);
   }
 
   isGameFinished(game: { state: GameInfoState<string> }) {
