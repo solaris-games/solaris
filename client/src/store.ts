@@ -34,7 +34,6 @@ export type State = {
   colourMapping: Record<string, any>;
   menuState: string | null;
   menuArguments: any;
-  tutorialPage: number | string;
   menuStateChat: string | null;
   menuArgumentsChat: any;
   productionTick: number | null;
@@ -59,7 +58,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     colourMapping: {},
     menuState: null,
     menuArguments: null,
-    tutorialPage: 0,
     menuStateChat: null,
     menuArgumentsChat: null,
     productionTick: null,
@@ -110,15 +108,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     setSocketConnected(state: State, connected: boolean) {
       state.socketConnected = connected;
     },
-
-    // TUTORIAL
-    setTutorialPage (state: State, page) {
-      state.tutorialPage = page || 0
-    },
-    clearTutorialPage (state) {
-      state.tutorialPage = 0
-    },
-    // -------
 
     setCarrierSpecialists (state: State, carrierSpecialists) {
       state.carrierSpecialists = carrierSpecialists;

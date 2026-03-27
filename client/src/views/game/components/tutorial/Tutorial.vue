@@ -23,8 +23,26 @@ import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";
 import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
 import GameHelper from "@/services/gameHelper.ts";
+import { useTutorialStore } from '@/stores/tutorial';
+import TutorialOriginal from './TutorialOriginal.vue';
+import TutorialFleetMovement from './TutorialFleetMovement.vue';
+import TutorialStarsAndCarriers from './TutorialStarsAndCarriers.vue';
+import TutorialInfrastructureAndExpansion from './TutorialInfrastructureAndExpansion.vue';
+import TutorialScienceAndResearch from './TutorialScienceAndResearch.vue';
+import TutorialCombatBasics from './TutorialCombatBasics.vue';
+import TutorialSpecialStarTypes from './TutorialSpecialStarTypes.vue';
 
 const defaultTutorialKey = "original";
+
+const tutorialComponents: Record<string, any> = {
+  'original': TutorialOriginal,
+  'fleet-movement': TutorialFleetMovement,
+  'stars-and-carriers': TutorialStarsAndCarriers,
+  'infrastructure-and-expansion': TutorialInfrastructureAndExpansion,
+  'science-and-research': TutorialScienceAndResearch,
+  'combat-basics': TutorialCombatBasics,
+  'special-star-types': TutorialSpecialStarTypes,
+};
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -34,6 +52,7 @@ const emit = defineEmits<{
 const onCloseRequested = () => emit('onCloseRequested');
 
 const store = useStore();
+const tutorialStore = useTutorialStore();
 const game = computed<Game>(() => store.state.game);
 const title = ref("Tutorial");
 const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defaultTutorialKey);
@@ -41,11 +60,12 @@ const page = ref(0);
 const maxPage = ref(0);
 
 const isTutorialCompleted = computed(() => page.value === -1);
-const currentTutorialComponent = computed(() => `tutorial-${tutorialKey}`);
+const currentTutorialComponent = computed(() => tutorialComponents[tutorialKey.value] || tutorialComponents[defaultTutorialKey]);
 
 const setTutorialCompleted = () => {
   page.value = -1;
-  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+  tutorialStore.setTutorialKey(tutorialKey.value);
+  tutorialStore.setTutorialPage(page.value);
 };
 
 const tutorialProps = computed<TutorialProps>(() => {
@@ -71,21 +91,20 @@ const tutorialProps = computed<TutorialProps>(() => {
 
 const nextPage = () => {
   page.value = page.value + 1;
-  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+  tutorialStore.setTutorialKey(tutorialKey.value);
+  tutorialStore.setTutorialPage(page.value);
 };
 
 const prevPage = () => {
   page.value = Math.max(0, page.value - 1);
-  store.commit('setTutorialPage', `${tutorialKey.value}|${page.value}`);
+  tutorialStore.setTutorialKey(tutorialKey.value);
+  tutorialStore.setTutorialPage(page.value);
 };
 
 onMounted(() => {
-  // TODO
-  const tutPage: string | number = store.state.tutorialPage || 0;
-  if (typeof tutPage === 'string') {
-    page.value = Number.parseInt(tutPage.split("|")[1]);
-  } else {
-    page.value = tutPage;
+  // Load current tutorial page from store only if the tutorial key matches
+  if (tutorialStore.tutorialKey === tutorialKey.value) {
+    page.value = tutorialStore.currentPage;
   }
 });
 </script>

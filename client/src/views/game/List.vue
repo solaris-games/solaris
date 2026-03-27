@@ -523,6 +523,7 @@ import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/
 import { useStore } from 'vuex';
 import gameHelper from '@/services/gameHelper';
 import { formatDistanceToNow } from "date-fns";
+import { useTutorialStore } from '@/stores/tutorial';
 
 type Games = {
   featured: ListGame<string> | undefined,
@@ -540,6 +541,7 @@ type Games = {
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const tutorialStore = useTutorialStore();
 
 const isLoading = ref(false);
 
@@ -599,7 +601,7 @@ const startTutorial = async (tutorialKey: string) => {
   const response = await createTutorial(httpClient)(tutorialKey);
 
   if (isOk(response)) {
-    store.commit('clearTutorialPage')
+    tutorialStore.clearTutorialPage()
     router.push({ name: 'game', query: { id: response.data.gameId } })
   } else {
     console.error(formatError(response));
