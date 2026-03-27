@@ -181,7 +181,7 @@ import type { UserPrivate } from '@solaris-common'
 import { toastInjectionKey } from '@/util/keys'
 import type { State } from "@/store";
 import { useStore, type Store } from 'vuex';
-import { makeConfirm } from '@/util/confirm'
+import { useConfirm } from '@/hooks/confirm.ts'
 import { useRoute } from 'vue-router';
 import {unauthoriseDiscord} from "@/services/typedapi/auth";
 import {configInjectionKey} from "@/config";
@@ -192,7 +192,7 @@ const config = inject(configInjectionKey)!;
 
 const route = useRoute();
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const info: Ref<UserPrivate<string> | null> = ref(null);
 const isChangingEmailNotifications = ref(false);

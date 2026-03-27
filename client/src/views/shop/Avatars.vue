@@ -56,13 +56,13 @@ import { useStore, type Store } from 'vuex'
 import type { State } from '@/store'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user'
-import { makeConfirm } from '@/util/confirm';
+import { useConfirm } from '@/hooks/confirm.ts';
 import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const store: Store<State> = useStore();
 const userStore = useUserStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 const userCredits: Ref<number | null> = ref(null);

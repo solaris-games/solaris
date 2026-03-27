@@ -4,14 +4,14 @@ import AudioService from "@/game/audio";
 import type {State} from "@/store";
 import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {Star} from "@/types/game";
 import { type Ref } from 'vue';
 import {buildWarpGate as buildWarpGateReq, destroyWarpGate as destroyWarpGateReq} from "@/services/typedapi/star";
 import { type Axios } from 'axios';
 
 export const makeUpgrade = (store: Store<State>, toast: ToastPluginApi, star: Star) => (infrastructure: InfrastructureType, needsConfirm: boolean, isLoading: Ref<boolean>, commitName: string, req: (gameId: string, starId: string) => Promise<ResponseResult<InfrastructureUpgradeReport<string>>>) => async () => {
-  const confirm = makeConfirm(store);
+  const confirm = useConfirm();
 
   if (needsConfirm && !await confirm(`Upgrade ${infrastructure}`, `Are you sure you want to upgrade ${infrastructure} at ${star.name} for $${star.upgradeCosts![infrastructure]} credits?`)) {
     return;
@@ -35,7 +35,7 @@ export const makeUpgrade = (store: Store<State>, toast: ToastPluginApi, star: St
 };
 
 export const makeWarpgateActions = (store: Store<State>, toast: ToastPluginApi, httpClient: Axios, star: Star) => {
-  const confirm = makeConfirm(store);
+  const confirm = useConfirm();
 
   const buildWarpGate =  async () => {
     if (store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${star.name}? The upgrade will cost $${star.upgradeCosts!.warpGate}.`)) {

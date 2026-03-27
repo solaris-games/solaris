@@ -29,7 +29,6 @@ export type State = {
   starSpecialists: Specialist[] | null;
   carrierSpecialists: Specialist[] | null;
   settings: UserGameSettings | null;
-  confirmationDialog: any;
   colourOverride: boolean;
   coloursConfig: any;
   colourMapping: Record<string, any>;
@@ -55,7 +54,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
-    confirmationDialog: {},
     colourOverride: true,
     coloursConfig: null,
     colourMapping: {},
@@ -163,9 +161,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     clearSettings (state) {
       state.settings = null
-    },
-    setConfirmationDialogSettings (state: State, settings) {
-      state.confirmationDialog = settings
     },
 
     setUnreadMessages (state: State, count) {

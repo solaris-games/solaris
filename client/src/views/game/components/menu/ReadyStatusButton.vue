@@ -22,7 +22,7 @@ import {toastInjectionKey} from "@/util/keys";
 import { inject, computed } from "vue";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import { useStore } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {notReady, ready, readyToCycle} from "@/services/typedapi/game";
 
 const props = defineProps<{
@@ -33,7 +33,7 @@ const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const player = computed(() => {
   return GameHelper.getUserPlayer(store.state.game)!;

@@ -46,13 +46,13 @@ import { actionReport, listReports } from "@/services/typedapi/admin";
 import { toastInjectionKey } from "@/util/keys";
 import { useStore, type Store } from 'vuex';
 import type {State} from "@/store";
-import { makeConfirm } from "@/util/confirm";
+import { useConfirm } from "@/hooks/confirm.ts";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const reports: Ref<Report<string>[] | null> = ref(null);
 

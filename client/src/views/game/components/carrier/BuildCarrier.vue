@@ -102,7 +102,7 @@ import MenuTitle from '../MenuTitle.vue';
 import { ref, computed, inject } from 'vue';
 import { useStore, type Store } from 'vuex';
 import type { State } from '@/store';
-import { makeConfirm } from '@/util/confirm';
+import { useConfirm } from '@/hooks/confirm.ts';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { buildCarrier } from '@/services/typedapi/star';
 import { toastInjectionKey } from '@/util/keys';
@@ -123,7 +123,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
 
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const star = ref(GameHelper.getStarById(store.state.game, props.starId) as Star);
 const allStarShips = computed(() => star.value.ships || 0);

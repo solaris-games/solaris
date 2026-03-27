@@ -53,7 +53,7 @@ import { inject, computed } from 'vue';
 import { useStore } from 'vuex';
 import type {Game, Player} from "@/types/game";
 import GameHelper from "../../../../services/gameHelper";
-import {makeConfirm} from "@/util/confirm.ts";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {useIsHistoricalMode} from "@/util/reactiveHooks.ts";
 
 const emit = defineEmits<{
@@ -64,7 +64,7 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 const isHistoricalMode = useIsHistoricalMode(store);
 const game = computed<Game>(() => store.state.game);
 const players = computed(() => game.value.galaxy.players);

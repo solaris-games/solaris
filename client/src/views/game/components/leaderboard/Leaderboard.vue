@@ -104,7 +104,7 @@ import { type Game, type Player } from '@solaris-common';
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import { toastInjectionKey } from '@/util/keys'
-import { makeConfirm } from '@/util/confirm'
+import { useConfirm } from '@/hooks/confirm.ts'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 import Winner from "@/views/game/components/leaderboard/Winner.vue";
@@ -120,7 +120,7 @@ const emit = defineEmits<{
 }>();
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;

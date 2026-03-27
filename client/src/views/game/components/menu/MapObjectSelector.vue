@@ -60,7 +60,7 @@ import type {Player} from "@/types/game";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import SpecialistIcon from "@/views/game/components/specialist/SpecialistIcon.vue";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 
 const props = defineProps<{
   mapObjects: ObjectClicked[],

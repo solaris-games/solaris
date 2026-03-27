@@ -22,7 +22,7 @@ import { computed, inject } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { toastInjectionKey } from '@/util/keys';
 import { useStore } from 'vuex';
-import { makeConfirm } from '@/util/confirm';
+import { useConfirm } from '@/hooks/confirm.ts';
 import { kick } from '@/services/typedapi/game';
 
 const props = defineProps<{
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;

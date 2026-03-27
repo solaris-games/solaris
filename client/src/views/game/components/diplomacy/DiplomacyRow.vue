@@ -31,7 +31,7 @@ import DiplomacyIcons from './DiplomacyIcons.vue';
 import { inject, computed } from 'vue';
 import { useStore } from 'vuex';
 import type {DiplomaticStatus} from "@solaris-common";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
@@ -52,7 +52,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const game = computed<Game>(() => store.state.game);
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isGameFinished = computed(() => gameHelper.isGameFinished(game.value));
 const userPlayer = computed(() => gameHelper.getUserPlayer(game.value)!);

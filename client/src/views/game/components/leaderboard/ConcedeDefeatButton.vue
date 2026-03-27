@@ -23,7 +23,7 @@ import { useStore } from 'vuex';
 import type { Store } from 'vuex';
 import type { State } from '../../../../store';
 import { toastInjectionKey } from '../../../../util/keys';
-import { makeConfirm } from "@/util/confirm";
+import { useConfirm } from "@/hooks/confirm.ts";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type { Game } from '../../../../types/game';
 import { concedeDefeat } from '@/services/typedapi/game';
@@ -32,7 +32,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 const game = computed<Game>(() => store.state.game);
 
 const isConcedingDefeat = ref(false);

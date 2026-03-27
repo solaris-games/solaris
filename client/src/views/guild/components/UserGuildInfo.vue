@@ -33,7 +33,7 @@ import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import type {AchievementsUser, Guild, GuildWithUsers} from "@solaris-common";
 import {detailMyGuild, inviteGuild} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {toastInjectionKey} from "@/util/keys";
 import { useUserStore } from '@/stores/user';
 
@@ -46,7 +46,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const userStore = useUserStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isLoadingGuild = ref(false);
 const isInvitingUser = ref(false);

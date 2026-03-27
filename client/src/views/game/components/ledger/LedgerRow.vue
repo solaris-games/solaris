@@ -24,7 +24,7 @@ import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
 import type {LedgerType, PlayerLedgerDebt} from "@solaris-common";
 import type { Game } from "@/types/game";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {
@@ -47,7 +47,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 const game = computed<Game>(() => store.state.game);
 
 const isLoading = ref(false);

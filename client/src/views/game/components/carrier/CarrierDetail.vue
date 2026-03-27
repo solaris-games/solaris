@@ -245,7 +245,7 @@ import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { useStore } from 'vuex';
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";
 
 const props = defineProps<{
@@ -265,7 +265,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;

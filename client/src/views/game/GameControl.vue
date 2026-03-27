@@ -50,7 +50,7 @@ import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typ
 import {toastInjectionKey} from '@/util/keys';
 import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame, resetQuitters as resetQuittersReq } from '@/services/typedapi/game';
 import {useStore} from 'vuex';
-import {makeConfirm} from '@/util/confirm';
+import {useConfirm} from '@/hooks/confirm.ts';
 
 const props = defineProps<{
   game: GameInfoDetail<string>,
@@ -64,7 +64,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 const errors: Ref<string[]> = ref([]);

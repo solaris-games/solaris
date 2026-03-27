@@ -70,7 +70,7 @@ import {useStore} from "vuex";
 import type {Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Specialist} from "@solaris-common";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {hireCarrier} from "@/services/typedapi/specialist";
 import {useGameServices} from "@/util/gameServices";
 
@@ -88,7 +88,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const game = computed<Game>(() => store.state.game);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);

@@ -163,7 +163,7 @@ import type {BulkUpgradeReport, InfrastructureType, MapObject} from "@solaris-co
 import { useStore, type Store } from 'vuex';
 import type { State } from "@/store";
 import {scheduleBulk, upgradeBulk, upgradeBulkCheck} from "@/services/typedapi/star";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
 type ScheduleStrategy =  'future' | 'cycle-start' | 'cycle-end' | 'now';
@@ -178,7 +178,7 @@ const toast = inject(toastInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const errors: Ref<string[]> = ref([]);
 const isUpgrading = ref(false);

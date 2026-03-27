@@ -50,14 +50,14 @@ import FormErrorList from '../components/FormErrorList.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {renameGuild} from "@/services/typedapi/guild";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);

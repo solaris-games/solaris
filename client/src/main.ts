@@ -23,7 +23,7 @@ import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
-import { makeConfirm } from "./util/confirm"
+import { useConfirm } from "./hooks/confirm.ts"
 import type {FrontendConfig} from "@solaris-common";
 import {configInjectionKey} from "@/config";
 import { createPinia } from "pinia"
@@ -112,10 +112,6 @@ const init = (config: FrontendConfig) => {
   app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
   const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
-
-  const confirm = makeConfirm(store);
-
-  app.config.globalProperties.$confirm = confirm;
 
   app.config.globalProperties.$isHistoricalMode = function() {
     return this.$store.state.tick !== this.$store.state.game.state.tick

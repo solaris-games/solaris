@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { useStore } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {Badge} from "@solaris-common";
 
 const props = defineProps<{
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const purchaseBadge = async (badge: Badge) => {
   if (!await confirm(`Purchase Badge`, `Are you sure you want to purchase the '${badge.name}' badge for ${props.recipientName}? It will cost ${badge.price} credit(s).`)) {

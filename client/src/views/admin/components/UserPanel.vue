@@ -67,7 +67,7 @@ import AddWarning from "@/views/admin/components/AddWarning.vue";
 import {formatError, httpInjectionKey, isError, isOk, type ResponseResult} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {State} from "@/store";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import { useStore, type Store } from 'vuex';
 import { inject, computed } from 'vue';
 import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris-common";
@@ -93,7 +93,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
 const userStore = useUserStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isAdministrator = computed(() => userStore.roles?.administrator);
 const isCommunityManager = computed(() => userStore.roles?.communityManager || userStore.roles?.administrator);

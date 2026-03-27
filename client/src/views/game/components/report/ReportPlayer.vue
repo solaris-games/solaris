@@ -69,7 +69,7 @@ import { ref, computed, inject } from 'vue';
 import { useStore, type Store } from 'vuex';
 import type {State} from "@/store";
 import {toastInjectionKey} from "@/util/keys";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {createReport} from "@/services/typedapi/report";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 
@@ -93,7 +93,7 @@ const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
 
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const optionAbuse = ref(false);
 const optionSpamming = ref(false);

@@ -51,7 +51,7 @@ import { useStore } from 'vuex';
 import router from '../../../router';
 import type {GuildWithUsers} from "@solaris-common";
 import type {GuildRole, GuildUser} from "@/views/guild/components/MemberList.vue";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {
@@ -86,7 +86,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const userStore = useUserStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 

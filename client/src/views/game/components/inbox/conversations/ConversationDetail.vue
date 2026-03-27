@@ -62,7 +62,7 @@ import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
 import { useStore } from 'vuex';
 import {detailConversation, leave, markAsRead, mute, unmute} from "@/services/typedapi/conversation";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {
   Conversation,
   ConversationMessageSentResult,
@@ -85,7 +85,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 const game = computed<Game>(() => store.state.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));

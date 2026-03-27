@@ -45,7 +45,7 @@ import {toastInjectionKey} from "@/util/keys";
 import type {Star, Player} from "@solaris-common";
 import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from '@/services/typedapi/star';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {makeUpgrade} from "@/views/game/components/star/upgrade";
@@ -64,7 +64,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 

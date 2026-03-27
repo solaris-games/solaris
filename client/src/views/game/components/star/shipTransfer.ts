@@ -5,11 +5,11 @@ import type {State} from "@/store";
 import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
 import type {Star} from "@/types/game";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {UserGameSettings} from "@solaris-common";
 
 export const makeShipTransferActions = (store: Store<State>, httpClient: Axios, toast: ToastPluginApi) => {
-  const confirm = makeConfirm(store);
+  const confirm = useConfirm();
   const settings: UserGameSettings = store.state.settings;
   const needsConfirm = settings.star.confirmShipDistribution === 'enabled';
 
