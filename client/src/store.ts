@@ -7,8 +7,7 @@ import PlayerMutationNames from './mutationNames/playerMutationNames';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {Badge, PlayerColour, Specialist, UserGameSettings} from "@solaris-common";
-import {getBadges} from "./services/typedapi/badge";
+import type {PlayerColour, Specialist, UserGameSettings} from "@solaris-common";
 import {formatError, isOk} from "./services/typedapi";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type { OnPreStarParams } from './eventBusEventNames/map';
@@ -41,7 +40,6 @@ export type State = {
   menuArgumentsChat: any;
   productionTick: number | null;
   unreadMessages: number | null;
-  badges: Badge[];
   socketConnected: boolean;
 }
 
@@ -68,7 +66,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     menuArgumentsChat: null,
     productionTick: null,
     unreadMessages: null,
-    badges: [],
     socketConnected: false,
   },
   mutations: {
@@ -459,9 +456,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     setColoursConfig (state: State, data) {
       state.coloursConfig = data;
-    },
-    setBadges(state: State, badges: Badge[]) {
-      state.badges = badges;
     }
   },
   actions: {
@@ -503,19 +497,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
         eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
       } else {
         console.error(formatError(resp));
-      }
-    },
-    async getBadges({ commit, state }) {
-      if (state.badges?.length) {
-        return state.badges;
-      }
-
-      const response = await getBadges(httpClient)();
-      if (isOk(response)) {
-        commit('setBadges', response.data);
-        return response.data;
-      } else {
-        console.error(formatError(response));
       }
     }
   },

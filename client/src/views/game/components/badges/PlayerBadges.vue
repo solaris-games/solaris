@@ -40,6 +40,7 @@ import type {Store} from 'vuex/types/index.js';
 import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
 import {getBadgesForPlayer} from "../../../../services/typedapi/badge";
 import {httpInjectionKey, isError} from "../../../../services/typedapi";
+import { useBadgeStore } from '../../../../stores/badge';
 
 const props = defineProps<{ playerId: string }>();
 
@@ -54,6 +55,7 @@ const allBadges: Ref<TBadge[]> = ref([]);
 const badges: Ref<AwardedBadge<string>[]> = ref([]);
 
 const store = useStore() as Store<State>;
+const badgeStore = useBadgeStore();
 
 const game = computed(() => store.state.game!);
 
@@ -80,7 +82,8 @@ const onOpenPurchasePlayerBadgeRequested = () => {
 const httpClient: Axios = inject(httpInjectionKey)!;
 
 onMounted(async () => {
-  allBadges.value = await store.dispatch('getBadges');
+  await badgeStore.loadBadges(httpClient);
+  allBadges.value = [...badgeStore.badges];
 
   if (!canViewBadges.value) {
     return;

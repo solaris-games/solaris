@@ -44,6 +44,7 @@ import type { Store } from 'vuex/types/index.js';
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";
 import { useUserStore } from '../../../../stores/user';
+import { useBadgeStore } from '../../../../stores/badge';
 
 
 const props = defineProps<{ recipientPlayerId: string }>();
@@ -60,6 +61,7 @@ const emit = defineEmits<{
 
 const store = useStore() as Store<State>;
 const userStore = useUserStore();
+const badgeStore = useBadgeStore();
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
@@ -84,8 +86,8 @@ const loadGalacticCredits = async () => {
 onMounted(async () => {
   recipientPlayer.value = GameHelper.getPlayerById(store.state.game!, props.recipientPlayerId)
 
-  const allBadges = await store.dispatch('getBadges');
-  badges.value = allBadges.filter(b => b.price);
+  await badgeStore.loadBadges(httpClient);
+  badges.value = badgeStore.purchasableBadges;
   await loadGalacticCredits()
 });
 
