@@ -35,11 +35,15 @@ const getLastTickDate = (game: TGame) => {
 
   const isBehind = game.state.lastTickDate.getTime() + (game.settings.gameTime.speed * 1000) < Date.now();
 
-  if (GameHelper.isGameInProgress(game) && !isBehind) {
+  if (isBehind) {
+    return null;
+  } else if (GameHelper.isGameInProgress(game)) {
     return game.state.lastTickDate;
+  } else if (GameHelper.isGamePaused(game)) {
+    return new Date();
   }
 
-  return new Date();
+  return null;
 }
 
 export const addTicksToLastTick = (game: Game, ticks: number): Date | null => {
