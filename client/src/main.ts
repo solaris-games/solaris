@@ -27,6 +27,7 @@ import { useConfirm } from "./hooks/confirm.ts"
 import type {FrontendConfig} from "@solaris-common";
 import {configInjectionKey} from "@/config";
 import { createPinia } from "pinia"
+import {useSocketStore} from "@/stores/socket.ts";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -83,20 +84,21 @@ const init = (config: FrontendConfig) => {
 
   const store: Store<State> = createSolarisStore(eventBus, httpClient);
 
-  socket.on("connect", () => {
-    store.commit('setSocketConnected', true);
-  });
-
-  socket.on("disconnect", () => {
-    store.commit('setSocketConnected', false);
-  });
-
   const pinia = createPinia();
   app.use(pinia);
 
   app.use(store);
 
   app.use(ToastPlugin);
+
+  const socketStore = useSocketStore();
+  socket.on("connect", () => {
+    socketStore.setSocketConnected(true);
+  });
+
+  socket.on("disconnect", () => {
+    socketStore.setSocketConnected(false);
+  });
 
   const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
   const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);

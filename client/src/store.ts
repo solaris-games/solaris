@@ -31,7 +31,6 @@ export type State = {
   menuArgumentsChat: any;
   productionTick: number | null;
   unreadMessages: number | null;
-  socketConnected: boolean;
 }
 
 export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store<State> {
@@ -53,7 +52,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     menuArgumentsChat: null,
     productionTick: null,
     unreadMessages: null,
-    socketConnected: false,
   },
   mutations: {
     // Menu
@@ -93,11 +91,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     clearMenuStateChat (state) {
       state.menuStateChat = null
       state.menuArgumentsChat = null
-    },
-    // -------
-
-    setSocketConnected(state: State, connected: boolean) {
-      state.socketConnected = connected;
     },
 
     setCarrierSpecialists (state: State, carrierSpecialists) {
