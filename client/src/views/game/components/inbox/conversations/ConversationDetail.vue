@@ -70,6 +70,7 @@ import type {
   TradeEvent, DiplomacyEvent
 } from "@solaris-common";
 import type { Game } from "@/types/game";
+import {useMentionStore} from "@/stores/mention.ts";
 
 const props = defineProps<{
   conversationId: string,
@@ -85,6 +86,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const mentionStore = useMentionStore();
 const confirm = useConfirm();
 const game = computed<Game>(() => store.state.game);
 
@@ -295,7 +297,7 @@ onMounted(async () => {
     eventBus.off(PlayerEventBusEventNames.PlayerRenownReceived, onTradeEventReceived);
     eventBus.off(PlayerEventBusEventNames.PlayerTechnologyReceived, onTradeEventReceived);
 
-    store.commit('resetMentions');
+    mentionStore.resetMentions();
     store.commit('closeConversation');
   });
 

@@ -17,12 +17,14 @@ import type {State} from "@/store";
 import { useStore, type Store } from 'vuex';
 import { computed } from 'vue';
 import type { Player } from '@/types/game';
+import {useMentionStore} from "@/stores/mention.ts";
 
 const emit = defineEmits<{
   'onOpenPlayerDetailRequested': [playerId: string],
 }>();
 
 const store: Store<State> = useStore();
+const mentionStore = useMentionStore();
 
 const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(store.state.game));
 
@@ -35,7 +37,7 @@ const onPlayerClicked = (player: Player, e: MouseEvent) => {
     return;
   }
 
-  store.commit('playerClicked', {
+  mentionStore.playerClicked({
     player,
     permitCallback: click,
   });

@@ -41,6 +41,7 @@ import { useStore } from 'vuex';
 import {getNotes, writeNotes} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
+import {useMentionStore} from "@/stores/mention.ts";
 
 const emit = defineEmits<{
   onCloseRequested: [e: Event],
@@ -52,6 +53,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
+const mentionStore = useMentionStore();
 
 const isLoadingNotes = ref(false);
 const isSavingNotes = ref(false);
@@ -79,7 +81,7 @@ const beginEditing = () => {
 };
 
 const onSetMessageElement = (element: HTMLElement) => {
-  store.commit('setMentions', {
+  mentionStore.setMentions({
     element,
     callbacks: {
       player: (player) => {
@@ -89,7 +91,7 @@ const onSetMessageElement = (element: HTMLElement) => {
         notes.value = MentionHelper.addMention(notes.value, store.state.mentionReceivingElement, 'star', star.name)
       }
     }
-  })
+  });
 };
 
 const onCloseRequested = (e: Event) => {
@@ -157,7 +159,7 @@ const loadGameNotes = async () => {
 
 onMounted(async () => {
   onUnmounted(() => {
-    store.commit('resetMentions');
+    mentionStore.resetMentions();
   });
 
   await loadGameNotes();

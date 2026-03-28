@@ -20,9 +20,11 @@ import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
 import {useGameServices} from "@/util/gameServices";
 import { useUserStore } from '@/stores/user';
+import {useMentionStore} from "@/stores/mention.ts";
 
 const store = useStore() as Store<State>;
 const userStore = useUserStore();
+const mentionStore = useMentionStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast: ToastPluginApi = inject(toastInjectionKey)!;
@@ -93,11 +95,12 @@ onMounted(() => {
     };
 
     const onPreStarClickedHandler = (params: OnPreStarParams) => {
+      mentionStore.starClicked(params);
       store.commit('starClicked', params);
     };
 
     const onPreStarRightClickedHandler = (params: OnPreStarParams) => {
-      store.commit('starRightClicked', params);
+      mentionStore.starRightClicked(params);
     };
 
     const onStarRightClickedHandler = ({ star }: { star: Star }) => {
@@ -117,10 +120,10 @@ onMounted(() => {
     };
 
     const unwatch = watch(computed(() => store.state.game), (newGame) => {
-      updateGame(newGame)
+      updateGame(newGame);
     }); // watcher is created async, so we have to do the cleanup ourselves
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
 
     checkPerformance();
 

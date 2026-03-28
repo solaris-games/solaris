@@ -14,18 +14,11 @@ import type { OnPreStarParams } from './eventBusEventNames/map';
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 import {addColour, listColours} from "@/services/typedapi/colour";
 
-export type MentionCallbacks = {
-  player: (p: Player) => void;
-  star: (s: Star) => void;
-}
-
 export type State = {
   game: Game | null;
   tick: number;
   cachedConversationComposeMessages: Record<string, string>;
   currentConversation: {id: string, text: string} | null;
-  mentionReceivingElement: HTMLElement | null;
-  mentionCallbacks: MentionCallbacks | null;
   starSpecialists: Specialist[] | null;
   carrierSpecialists: Specialist[] | null;
   settings: UserGameSettings | null;
@@ -48,8 +41,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     tick: 0,
     cachedConversationComposeMessages: {},
     currentConversation: null,
-    mentionReceivingElement: null,
-    mentionCallbacks: null,
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -177,35 +168,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     resetCurrentConversationText (state: State, data) {
       state.currentConversation!.text = ''
-    },
-    setMentions (state: State, data) {
-      state.mentionReceivingElement = data.element;
-      state.mentionCallbacks = data.callbacks;
-    },
-    resetMentions (state: State) {
-      state.mentionReceivingElement = null;
-      state.mentionCallbacks = null;
-    },
-    playerClicked (state: State, data) {
-      if (state.mentionCallbacks && state.mentionCallbacks.player) {
-        state.mentionCallbacks.player(data.player)
-      } else {
-        data.permitCallback(data.player)
-      }
-    },
-    starClicked (state: State, data: OnPreStarParams) {
-      if (state.mentionCallbacks && state.mentionCallbacks.star) {
-        state.mentionCallbacks.star(data.star)
-      } else {
-        data.defaultCallback();
-      }
-    },
-    starRightClicked (state: State, data: OnPreStarParams) {
-      if (state.mentionCallbacks && state.mentionCallbacks.player && data.owningPlayer) {
-        state.mentionCallbacks.player(data.owningPlayer);
-      } else {
-        data.defaultCallback();
-      }
     },
 
     // ----------------

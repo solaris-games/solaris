@@ -22,6 +22,7 @@ import { useStore } from 'vuex';
 import type {Game, Player, Star} from "@/types/game";
 import {sendMessage} from "@/services/typedapi/conversation";
 import type {ConversationMessageSentResult} from "@solaris-common";
+import {useMentionStore} from "@/stores/mention";
 
 const props = defineProps<{
   conversationId: string,
@@ -34,14 +35,14 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const mentionStore = useMentionStore();
 const game = computed<Game>(() => store.state.game);
 
 const isSendingMessage = ref(false);
 const currentMention = ref<string | null>(null);
-const selectedSuggestion = ref<string | null>(null);
 
 const onSetMessageElement = (element: HTMLElement) => {
-  store.commit('setMentions', {
+  mentionStore.setMentions({
     element,
     callbacks: {
       player: (player: Player) => {
