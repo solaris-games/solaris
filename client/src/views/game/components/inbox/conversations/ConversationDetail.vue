@@ -71,6 +71,7 @@ import type {
 } from "@solaris-common";
 import type { Game } from "@/types/game";
 import {useMentionStore} from "@/stores/mention.ts";
+import {useConversationStore} from "@/stores/conversation.ts";
 
 const props = defineProps<{
   conversationId: string,
@@ -86,6 +87,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const conversationStore = useConversationStore();
 const mentionStore = useMentionStore();
 const confirm = useConfirm();
 const game = computed<Game>(() => store.state.game);
@@ -163,7 +165,7 @@ const loadConversation = async () => {
   if (isOk(response)) {
     conversation.value = response.data;
 
-    store.commit('openConversation', props.conversationId);
+    conversationStore.openConversation(props.conversationId);
 
     scrollToEnd();
 
@@ -298,7 +300,7 @@ onMounted(async () => {
     eventBus.off(PlayerEventBusEventNames.PlayerTechnologyReceived, onTradeEventReceived);
 
     mentionStore.resetMentions();
-    store.commit('closeConversation');
+    conversationStore.closeConversation();
   });
 
   eventBus.on(UserEventBusEventNames.GameMessageSent, onMessageReceived);

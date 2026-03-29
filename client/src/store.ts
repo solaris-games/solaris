@@ -17,8 +17,6 @@ import {addColour, listColours} from "@/services/typedapi/colour";
 export type State = {
   game: Game | null;
   tick: number;
-  cachedConversationComposeMessages: Record<string, string>;
-  currentConversation: {id: string, text: string} | null;
   starSpecialists: Specialist[] | null;
   carrierSpecialists: Specialist[] | null;
   settings: UserGameSettings | null;
@@ -39,7 +37,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     game: null,
     tick: 0,
     cachedConversationComposeMessages: {},
-    currentConversation: null,
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -114,7 +111,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     clearGame (state) {
       state.game = null
       state.cachedConversationComposeMessages = {}
-      state.currentConversation = null;
       state.carrierSpecialists = null;
       state.starSpecialists = null;
       state.colourOverride = true;
@@ -141,26 +137,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     clearUnreadMessages (state) {
       state.unreadMessages = null
-    },
-
-    openConversation (state: State, data: string) {
-      state.currentConversation = {
-        id: data,
-        text: state.cachedConversationComposeMessages[data] || ''
-      }
-    },
-    closeConversation (state: State) {
-      if (state.currentConversation) {
-        const id = state.currentConversation.id;
-        state.cachedConversationComposeMessages[id] = state.currentConversation.text
-        state.currentConversation = null
-      }
-    },
-    updateCurrentConversationText (state: State, data) {
-      state.currentConversation!.text = data
-    },
-    resetCurrentConversationText (state: State, data) {
-      state.currentConversation!.text = ''
     },
 
     // ----------------

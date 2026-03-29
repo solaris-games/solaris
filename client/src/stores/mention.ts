@@ -1,14 +1,10 @@
 import { defineStore } from 'pinia';
 import type {Player, Star} from "@/types/game";
-import { ref } from 'vue';
-import GameMutationNames from "@/mutationNames/gameMutationNames.ts";
-import PlayerMutationNames from "@/mutationNames/playerMutationNames.ts";
-import GameHelper from "@/services/gameHelper.ts";
-import type {State} from "@/store.ts";
+import {readonly, ref } from 'vue';
 import type {OnPreStarParams} from "@/eventBusEventNames/map.ts";
 
 export type MentionData = {
-  element: HTMLElement,
+  element: HTMLTextAreaElement,
   callbacks: MentionCallbacks,
 }
 
@@ -23,7 +19,7 @@ export type PlayerClickedData = {
 }
 
 export const useMentionStore = defineStore('mentions', () => {
-  const mentionReceivingElement = ref<HTMLElement | null>(null);
+  const mentionReceivingElement = ref<HTMLTextAreaElement | null>(null);
   const mentionCallbacks = ref<MentionCallbacks | null>(null);
 
   const setMentions = (data: MentionData) => {
@@ -61,6 +57,7 @@ export const useMentionStore = defineStore('mentions', () => {
   };
 
   return {
+    mentionReceivingElement,
     setMentions,
     resetMentions,
     playerClicked,

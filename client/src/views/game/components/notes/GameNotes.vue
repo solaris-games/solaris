@@ -80,7 +80,7 @@ const beginEditing = () => {
   notes.value = MentionHelper.makeMentionsEditable(store.state.game, readonlyNotes.value);
 };
 
-const onSetMessageElement = (element: HTMLElement) => {
+const onSetMessageElement = (element: HTMLTextAreaElement) => {
   mentionStore.setMentions({
     element,
     callbacks: {
