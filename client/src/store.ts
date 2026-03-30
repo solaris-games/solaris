@@ -36,7 +36,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
   state: {
     game: null,
     tick: 0,
-    cachedConversationComposeMessages: {},
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
@@ -110,7 +109,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     },
     clearGame (state) {
       state.game = null
-      state.cachedConversationComposeMessages = {}
       state.carrierSpecialists = null;
       state.starSpecialists = null;
       state.colourOverride = true;
@@ -416,9 +414,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     }
   },
   getters: {
-    getConversationMessage: (state) => (conversationId) => {
-      return state.cachedConversationComposeMessages[conversationId] || ''
-    },
     getColourForPlayer: (state) => (playerId) => {
       let colour: {
         alias: string;
