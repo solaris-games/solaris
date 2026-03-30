@@ -47,7 +47,6 @@
 
 <script setup lang="ts">
 import { ref, inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import router from '../../../router';
 import type {GuildWithUsers} from "@solaris-common";
 import type {GuildRole, GuildUser} from "@/views/guild/components/MemberList.vue";
@@ -84,7 +83,6 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
 const userStore = useUserStore();
 const confirm = useConfirm();
 

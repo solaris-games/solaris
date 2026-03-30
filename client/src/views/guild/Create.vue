@@ -52,7 +52,6 @@
 
 <script setup lang="ts">
 import { inject, ref } from 'vue';
-import { useStore } from 'vuex';
 import router from '../../router';
 import ViewContainer from '../components/ViewContainer.vue';
 import ViewTitle from '../components/ViewTitle.vue';
@@ -66,7 +65,6 @@ import {createGuild} from "@/services/typedapi/guild";
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
 const confirm = useConfirm();
 
 const isLoading = ref(false);

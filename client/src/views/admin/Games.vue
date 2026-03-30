@@ -70,15 +70,12 @@ import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedap
 import { listGames, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
 import { resetQuitters as requestResetQuitters } from '@/services/typedapi/game';
 import { toastInjectionKey } from '@/util/keys';
-import { useStore, type Store } from 'vuex';
-import type { State } from '@/store';
-import { useConfirm } from "@/hooks/confirm.ts";
+import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
 const userStore = useUserStore();
 const confirm = useConfirm();
 

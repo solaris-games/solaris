@@ -33,11 +33,8 @@
 import ViewContainer from '../components/ViewContainer.vue'
 import ViewTitle from '../components/ViewTitle.vue'
 import { computed } from 'vue';
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
-import {useUserStore} from "@/stores/user.ts";
+import {useUserStore} from "@/stores/user";
 
-const store: Store<State> = useStore();
 const userStore = useUserStore();
 
 const props = defineProps<{

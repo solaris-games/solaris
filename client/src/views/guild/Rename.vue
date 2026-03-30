@@ -42,7 +42,6 @@
 
 <script setup lang="ts">
 import { ref, inject } from 'vue';
-import { useStore } from 'vuex';
 import router from '../../router';
 import ViewContainer from '../components/ViewContainer.vue';
 import ViewTitle from '../components/ViewTitle.vue';
@@ -50,13 +49,12 @@ import FormErrorList from '../components/FormErrorList.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import {useConfirm} from "@/hooks/confirm.ts";
+import {useConfirm} from "@/hooks/confirm";
 import {renameGuild} from "@/services/typedapi/guild";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
 const confirm = useConfirm();
 
 const isLoading = ref(false);

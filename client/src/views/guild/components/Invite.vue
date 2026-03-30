@@ -19,7 +19,6 @@
 <script setup lang="ts">
 import { ref, inject } from 'vue';
 import type {Guild} from "@solaris-common";
-import {useStore} from "vuex";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {acceptGuildInvite, declineGuildInvite} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -35,7 +34,6 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
 const confirm = useConfirm();
 
 const isLoading = ref(false);

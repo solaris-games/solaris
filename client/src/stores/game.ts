@@ -64,6 +64,16 @@ export const useGameStore = defineStore('game', () => {
     } as any);
   };
 
+  const setMenuStateChat = (newState: { args: any, state: string }) => {
+    menuArgumentsChat.value = newState.state;
+    menuStateChat.value = newState.args;
+  };
+
+  const clearMenuStateChat = () => {
+    menuStateChat.value = null;
+    menuArgumentsChat.value = null;
+  };
+
   const setTick = (newTick: number) => {
     tick.value = newTick;
   };
@@ -373,5 +383,7 @@ export const useGameStore = defineStore('game', () => {
     loadSpecialistData,
     gameBulkActionAdded,
     gameBulkActionTrashed,
+    setMenuStateChat,
+    clearMenuStateChat,
   };
 });

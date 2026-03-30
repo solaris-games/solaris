@@ -17,9 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject } from 'vue';
-import { useStore } from 'vuex';
-import type {Guild, GuildApplication} from "@solaris-common";
+import { ref, inject } from 'vue';
+import type {GuildApplication} from "@solaris-common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {applyToGuild, withdrawGuildApplication} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -30,7 +29,6 @@ const props = defineProps<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
 const confirm = useConfirm();
 
 const isLoading = ref(false);

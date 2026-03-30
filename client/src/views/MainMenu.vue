@@ -163,13 +163,10 @@ import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
 import { detailMe } from "@/services/typedapi/user";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi/index";
-import { useStore, type Store } from 'vuex';
-import type { State } from "@/store";
 import type { UserPrivate, UserAchievements } from "@solaris-common";
 import Community from "@/views/game/components/menu/Community.vue";
 import { useUserStore } from '@/stores/user';
 
-const store: Store<State> = useStore();
 const userStore = useUserStore();
 
 const httpClient = inject(httpInjectionKey)!;

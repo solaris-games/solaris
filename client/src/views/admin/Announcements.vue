@@ -28,14 +28,11 @@ import type { Announcement } from "@solaris-common";
 import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
 import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
 import { toastInjectionKey } from "@/util/keys";
-import { useStore, type Store } from 'vuex';
-import type { State } from '@/store';
-import { useConfirm } from "@/hooks/confirm.ts";
+import { useConfirm } from "@/hooks/confirm";
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
 const confirm = useConfirm();
 
 const announcements: Ref<Announcement<string>[] | null> = ref(null);

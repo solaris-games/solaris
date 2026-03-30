@@ -28,12 +28,11 @@
 
 <script setup lang="ts">
 import {ref, computed, onMounted, inject} from "vue";
-import {useStore} from "vuex";
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
-import type {AchievementsUser, Guild, GuildWithUsers} from "@solaris-common";
+import type {AchievementsUser, GuildWithUsers} from "@solaris-common";
 import {detailMyGuild, inviteGuild} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {useConfirm} from "@/hooks/confirm.ts";
+import {useConfirm} from "@/hooks/confirm";
 import {toastInjectionKey} from "@/util/keys";
 import { useUserStore } from '@/stores/user';
 
@@ -44,7 +43,6 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
 const userStore = useUserStore();
 const confirm = useConfirm();
 

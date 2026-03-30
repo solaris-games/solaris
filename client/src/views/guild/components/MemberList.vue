@@ -27,7 +27,6 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import SortableLeaderboard from '../../game/components/menu/SortableLeaderboard.vue';
 import GameHelper from '../../../services/gameHelper';
 import {type GuildWithUsers, type UserPublic} from "@solaris-common";
@@ -45,7 +44,6 @@ const props = defineProps<{
   guild: GuildWithUsers<string>,
 }>();
 
-const store = useStore();
 const userStore = useUserStore();
 
 const sortingKey = ref<SortingKey>('role');

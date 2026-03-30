@@ -66,9 +66,7 @@
 import AddWarning from "@/views/admin/components/AddWarning.vue";
 import {formatError, httpInjectionKey, isError, isOk, type ResponseResult} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import type {State} from "@/store";
 import {useConfirm} from "@/hooks/confirm.ts";
-import { useStore, type Store } from 'vuex';
 import { inject, computed } from 'vue';
 import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris-common";
 import {
@@ -91,7 +89,6 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
 const userStore = useUserStore();
 const confirm = useConfirm();
 

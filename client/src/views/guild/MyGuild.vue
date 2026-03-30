@@ -76,7 +76,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, inject } from 'vue';
-import { useStore } from 'vuex';
 import ViewContainer from '../components/ViewContainer.vue';
 import ViewTitle from '../components/ViewTitle.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
@@ -92,7 +91,6 @@ import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
 const userStore = useUserStore();
 
 const isLoading = ref(false);
