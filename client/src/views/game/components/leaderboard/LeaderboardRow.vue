@@ -66,6 +66,7 @@ import { useStore, type Store } from 'vuex';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { notReadyToQuit } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   player: Player,
@@ -80,11 +81,12 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
+const colourStore = useColourStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const playerColourSpec = computed(() => {
-  return store.getters.getColourForPlayer(props.player._id);
+  return colourStore.getColourForPlayer(store.state.game, props.player._id)!;
 });
 
 const shouldShowTeamNames = computed(() => {

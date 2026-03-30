@@ -99,6 +99,7 @@ import type {Game} from "@/types/game";
 import type {Intel} from "@solaris-common";
 import type {PlayerFilter, IntelType, DataCollection, DataSet} from "@/views/game/components/intel/types";
 import type { ChartOptions } from "chart.js"
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   compareWithPlayerId?: string
@@ -111,6 +112,7 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
+const colourStore = useColourStore();
 const game = computed<Game>(() => store.state.game);
 
 const intelType = ref<IntelType>('totalStars');
@@ -124,7 +126,7 @@ watch(startTick, () => {
 });
 
 const dataCollection = ref<DataCollection | null>(null);
-const colourOverride = computed(() => store.state.colourOverride);
+const colourOverride = computed(() => colourStore.colourOverride);
 
 watch(colourOverride, () => {
   fillData();
@@ -176,7 +178,7 @@ const fillData = () => {
 
     const dataset: DataSet = {
       label: player.alias,
-      borderColor: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(store.getters.getColourForPlayer(player._id).value),
+      borderColor: isCurrentPlayer ? '#FFFFFF' : GameHelper.getFriendlyColour(colourStore.getColourForPlayer(game.value, player._id)!.value),
       fill: false,
       pointRadius: 0,
       borderWidth: 3,
@@ -286,7 +288,7 @@ onMounted(async () => {
       alias: p.alias,
       shape: p.shape,
       defeated: p.defeated,
-      colour: isCurrentPlayer ? '#FFFFFF' : store.getters.getColourForPlayer(p._id).value
+      colour: isCurrentPlayer ? '#FFFFFF' : colourStore.getColourForPlayer(game.value, p._id)!.value
     }
   });
 

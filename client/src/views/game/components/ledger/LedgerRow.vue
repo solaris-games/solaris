@@ -33,6 +33,7 @@ import {
   settleLedgerCredits,
   settleLedgerSpecialistTokens
 } from "@/services/typedapi/ledger";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   ledger: PlayerLedgerDebt<string>,
@@ -48,6 +49,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const confirm = useConfirm();
+const colourStore = useColourStore();
 const game = computed<Game>(() => store.state.game);
 
 const isLoading = ref(false);
@@ -62,7 +64,7 @@ const getPlayer = (playerId: string) => gameHelper.getPlayerById(game.value, pla
 
 const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-const getFriendlyColour = (playerId: string) => store.getters.getColourForPlayer(playerId).value;
+const getFriendlyColour = (playerId: string) => colourStore.getColourForPlayer(game.value, playerId)!.value;
 
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 

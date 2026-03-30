@@ -96,6 +96,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {configInjectionKey} from "@/config";
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   buttonClass?: string,
@@ -111,6 +112,7 @@ const config = inject(configInjectionKey)!;
 
 const store = useStore();
 const userStore = useUserStore();
+const colourStore = useColourStore();
 const game = computed<Game>(() => store.state.game);
 
 const setMenuState = (state: string, args: any = null) => {
@@ -153,7 +155,7 @@ const reloadPage = () => {
 };
 
 const toggleCustomColours = () => {
-  store.commit('setColourOverride', !isCustomColoursEnabled.value);
+  colourStore.setColourOverride(!isCustomColoursEnabled.value, eventBus, store.state.game, store.state.settings);
 };
 
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
@@ -180,7 +182,7 @@ const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 
 const isSpectatingEnabled = computed(() => GameHelper.isSpectatingEnabled(game.value));
 
-const isCustomColoursEnabled = computed(() => store.state.colourOverride);
+const isCustomColoursEnabled = computed(() => colourStore.colourOverride);
 </script>
 
 <style scoped>

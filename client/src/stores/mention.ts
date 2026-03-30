@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type {Player, Star} from "@/types/game";
-import {readonly, ref } from 'vue';
+import { ref } from 'vue';
 import type {OnPreStarParams} from "@/eventBusEventNames/map.ts";
 
 export type MentionData = {

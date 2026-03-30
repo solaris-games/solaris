@@ -18,6 +18,7 @@ import { useStore, type Store } from 'vuex';
 import { computed } from 'vue';
 import type { Player } from '@/types/game';
 import {useMentionStore} from "@/stores/mention.ts";
+import { useColourStore } from '@/stores/colour';
 
 const emit = defineEmits<{
   'onOpenPlayerDetailRequested': [playerId: string],
@@ -25,6 +26,7 @@ const emit = defineEmits<{
 
 const store: Store<State> = useStore();
 const mentionStore = useMentionStore();
+const colourStore = useColourStore();
 
 const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(store.state.game));
 
@@ -44,7 +46,7 @@ const onPlayerClicked = (player: Player, e: MouseEvent) => {
 };
 
 const getPlayerColour = (player: Player) => {
-  return store.getters.getColourForPlayer(player._id).value;
+  return colourStore.getColourForPlayer(store.state.game, player._id)!.value;
 }
 </script>
 

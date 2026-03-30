@@ -43,6 +43,7 @@ import { useStore } from "vuex";
 import type {Game} from "@/types/game";
 import {isMobile} from "@/util/mobile";
 import {toastInjectionKey} from "@/util/keys";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   conversation: Conversation<string>,
@@ -61,13 +62,14 @@ const toast = inject(toastInjectionKey)!;
 const messageElement = useTemplateRef("messageElement");
 
 const store = useStore();
+const colourStore = useColourStore();
 const game = computed<Game>(() => store.state.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isFromUserPlayer = computed(() => props.message.fromPlayerId === userPlayer.value._id);
 const fromPlayer = computed(() => GameHelper.getPlayerById(game.value, props.message.fromPlayerId!));
 const userPlayerHasReadMessage = computed(() => props.message.readBy.find(x => userPlayer.value._id === x) != null);
-const fromColour = computed(() => store.getters.getColourForPlayer(fromPlayer.value!._id).value);
+const fromColour = computed(() => colourStore.getColourForPlayer(game.value, fromPlayer.value!._id)!.value);
 const dateText = computed(() => {
   const date = GameHelper.getDateString(props.message.sentDate);
   let tick = '';

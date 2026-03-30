@@ -57,6 +57,7 @@ import type { State } from '@/store';
 import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import type {Player} from "@/types/game";
+import { useColourStore } from '@/stores/colour';
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import SpecialistIcon from "@/views/game/components/specialist/SpecialistIcon.vue";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
@@ -78,6 +79,7 @@ const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store: Store<State> = useStore();
+const colourStore = useColourStore();
 
 const onBuildCarrierRequested = (starId: string) => emit('onBuildCarrierRequested', starId);
 
@@ -171,7 +173,7 @@ const getFriendlyColour = (mapObject: ObjectClicked) => {
     return '';
   }
 
-  return gameHelper.getFriendlyColour(store.getters.getColourForPlayer(owningPlayer._id).value);
+  return gameHelper.getFriendlyColour(colourStore.getColourForPlayer(store.state.game, owningPlayer._id)!.value);
 }
 
 const onViewObjectRequested = (mapObject: ObjectClicked) => {

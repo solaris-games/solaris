@@ -7,12 +7,12 @@ import PlayerMutationNames from './mutationNames/playerMutationNames';
 import GameHelper from './services/gameHelper.js';
 import type { Game, Player, Star } from "./types/game";
 import type { Store } from 'vuex/types/index.js';
-import type {PlayerColour, Specialist, UserGameSettings} from "@solaris-common";
+import type { Specialist, UserGameSettings } from "@solaris-common";
 import {formatError, isOk} from "./services/typedapi";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type { OnPreStarParams } from './eventBusEventNames/map';
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
-import {addColour, listColours} from "@/services/typedapi/colour";
+import { useColourStore } from '@/stores/colour';
 
 export type State = {
   game: Game | null;
@@ -20,9 +20,6 @@ export type State = {
   starSpecialists: Specialist[] | null;
   carrierSpecialists: Specialist[] | null;
   settings: UserGameSettings | null;
-  colourOverride: boolean;
-  coloursConfig: any;
-  colourMapping: Record<string, any>;
   menuState: string | null;
   menuArguments: any;
   menuStateChat: string | null;
@@ -39,9 +36,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
     starSpecialists: null,
     carrierSpecialists: null,
     settings: null,
-    colourOverride: true,
-    coloursConfig: null,
-    colourMapping: {},
     menuState: null,
     menuArguments: null,
     menuStateChat: null,
@@ -105,22 +99,13 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
 
     setGame (state: State, game) {
       state.game = game
-      state.colourMapping = {...GameHelper.getColourMapping(game)};
+      useColourStore().setColourMappingFromGame(game);
     },
     clearGame (state) {
       state.game = null
       state.carrierSpecialists = null;
       state.starSpecialists = null;
-      state.colourOverride = true;
-      state.colourMapping = {};
-    },
-
-    setColourOverride (state: State, value) {
-      state.colourOverride = value
-
-      if (state.game) {
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
-      }
+      useColourStore().clearColourState();
     },
 
     setSettings (state: State, settings) {
@@ -360,16 +345,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
       const star = GameHelper.starInfrastructureUpgraded(state.game!, data)
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
     },
-
-    internalAddColourMapping (state: State, data: { playerId: string, colour: PlayerColour }) {
-      state.colourMapping = {
-        ...state.colourMapping,
-        [data.playerId]: data.colour
-      };
-    },
-    setColoursConfig (state: State, data) {
-      state.coloursConfig = data;
-    }
   },
   actions: {
     async loadSpecialistData ({ commit, state }, gameId: string) {
@@ -396,42 +371,6 @@ export function createSolarisStore(eventBus: EventBus, httpClient: Axios): Store
         console.error(formatError(starResponse));
       }
     },
-    async loadColourData ({ commit }: { commit: any }) {
-      const resp = await listColours(httpClient)();
-      if (isOk(resp)) {
-        commit('setColoursConfig', resp.data);
-      }
-    },
-    async addColourMapping ({ commit, state }, data: { playerId: string, colour: PlayerColour }) {
-      const resp = await addColour(httpClient)(state.game._id, data.playerId, data.colour);
-      if (isOk(resp)) {
-        commit('internalAddColourMapping', data);
-
-        eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: state.game, settings: state.settings });
-      } else {
-        console.error(formatError(resp));
-      }
-    }
   },
-  getters: {
-    getColourForPlayer: (state) => (playerId) => {
-      let colour: {
-        alias: string;
-        value: string;
-    } | null = null;
-
-      if (state.colourOverride) {
-        colour = state.colourMapping?.[playerId] || GameHelper.getPlayerById(state.game, playerId)!.colour;
-      } else {
-        colour = GameHelper.getPlayerById(state.game, playerId)!.colour
-      }
-
-      if (colour != null) {
-        colour.value = GameHelper.getFriendlyColour(colour.value);
-      }
-
-      return colour;
-    }
-  }
   })
 }

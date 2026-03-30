@@ -70,12 +70,14 @@ import {
   TRADE_EVENT_TYPES,
   type TradeEvent
 } from "@solaris-common";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   event: TradeEvent<string> | DiplomacyEvent<string>,
 }>();
 
 const store = useStore();
+const colourStore = useColourStore();
 const game = computed<Game>(() => store.state.game);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
@@ -131,7 +133,7 @@ const getFormattedDebtValue = (withText = false) => {
 const fromPlayerColour = computed(() => {
   const fromPlayer = getFromPlayer();
   if (!fromPlayer) return 'white';
-  return store.getters.getColourForPlayer(fromPlayer._id).value;
+  return colourStore.getColourForPlayer(game.value, fromPlayer._id)!.value;
 });
 
 const dateText = computed(() => {

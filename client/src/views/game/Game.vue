@@ -53,9 +53,11 @@ import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
+import { useColourStore } from '@/stores/colour';
 
 const store: Store<State> = useStore();
 const userStore = useUserStore();
+const colourStore = useColourStore();
 
 const emit = defineEmits<{
   onPlayerSelected: [playerId: string],
@@ -294,7 +296,7 @@ onMounted(async () => {
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
   await store.dispatch('loadSpecialistData', store.state.game._id);
-  await store.dispatch('loadColourData');
+  await colourStore.loadColourData(httpClient);
 });
 
 onBeforeUnmount(() => {
