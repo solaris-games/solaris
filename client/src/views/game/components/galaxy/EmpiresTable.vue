@@ -43,6 +43,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
 import EmpireRow from './EmpireRow.vue'
 import GameHelper from '../../../../services/gameHelper'

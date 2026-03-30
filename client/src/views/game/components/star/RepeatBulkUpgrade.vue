@@ -8,6 +8,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import type {PlayerScheduledActions} from "@solaris-common";
 import {toggleScheduledBulk} from "@/services/typedapi/star";
 import { inject } from 'vue';
@@ -25,7 +26,7 @@ const toast = inject(toastInjectionKey)!;
 const store = useGameStore();
 
 const toggleRepeat = async () => {
-  const response = await toggleScheduledBulk(httpClient)(store.game._id, props.action._id);
+  const response = await toggleScheduledBulk(httpClient)(store.game!._id, props.action._id);
 
   if (isOk(response)) {
     props.action.repeat = !props.action.repeat;

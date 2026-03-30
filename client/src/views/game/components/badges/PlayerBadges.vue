@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {ref, onMounted, computed, type Ref, inject} from 'vue';
 import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'

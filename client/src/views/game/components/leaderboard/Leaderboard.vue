@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import router from '../../../../router'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
@@ -101,7 +102,6 @@ import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
 import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
 import { type Game, type Player } from '@solaris-common';
-import type { State } from "@/store";
 import { toastInjectionKey } from '@/util/keys'
 import { useConfirm } from '@/hooks/confirm.ts'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
@@ -133,7 +133,7 @@ const intervalFunction = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game<string>>(() => store.game);
+const game = computed<Game<string>>(() => store.game!);
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
 const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);

@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '@/services/gameHelper';
 import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.vue';
 import { inject } from 'vue';

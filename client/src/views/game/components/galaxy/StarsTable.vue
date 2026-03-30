@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import StarRow from './StarRow.vue'
@@ -93,7 +94,7 @@ const isEconomyEnabled = computed(() => game.value.settings.player.developmentCo
 const isIndustryEnabled = computed(() => game.value.settings.player.developmentCost.industry !== 'none');
 const isScienceEnabled = computed(() => game.value.settings.player.developmentCost.science !== 'none');
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
-const allowUpgrades = computed(() => store.settings.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
+const allowUpgrades = computed(() => store.settings!.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
 
 const filter = (s: Star) => s.name.toLowerCase().includes(searchFilter.value.toLowerCase());
 

@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import InviteSpectator from './InviteSpectator.vue'
@@ -46,7 +47,7 @@ const onCloseRequested = e => {
 const loadSpectators = async () => {
   isLoading.value = true;
 
-  const response = await listSpectators(httpClient)(store.game._id);
+  const response = await listSpectators(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     spectators.value = response.data || [];

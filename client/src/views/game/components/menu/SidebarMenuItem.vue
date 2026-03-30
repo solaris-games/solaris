@@ -7,7 +7,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { useGameStore } from '@/stores/game';
+import { computed, inject } from 'vue';
+import { eventBusInjectionKey } from '@/eventBus';
 
 const props = defineProps<{
     menuState?: string;
@@ -16,14 +18,15 @@ const props = defineProps<{
 }>();
 
 const store = useGameStore();
+const eventBus = inject(eventBusInjectionKey)!;
 
 const isActive = computed(() => {
     return props.menuState === store.menuState;
 });
 
 const setMenuState = () => {
-    store.setMenuState({
-        state: props.menuState,
+    store.setMenuState(eventBus, {
+        state: props.menuState!,
         args: null
     });
 };

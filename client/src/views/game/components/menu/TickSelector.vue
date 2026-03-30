@@ -25,7 +25,7 @@
         </div>
         <div class="col-5">
           <button class="btn btn-sm btn-secondary" @click="loadPreviousTick(turnTicks)"
-                  :disabled="isLoading || tick <= minimumTick" :title="`Jump back ${turnTicks.value} ticks`">
+                  :disabled="isLoading || tick <= minimumTick" :title="`Jump back ${turnTicks} ticks`">
             <i class="fas fa-angle-double-left"></i>
           </button>
           <button class="btn btn-sm btn-secondary ms-1" @click="loadPreviousTick(1)"
@@ -48,7 +48,7 @@
             Next <i class="fas fa-angle-right"></i>
           </button>
           <button class="btn btn-sm btn-secondary ms-1" @click="loadNextTick(turnTicks)"
-                  :disabled="isLoading || tick >= stateTick" :title="`Jump forward ${turnTicks.value} ticks`">
+                  :disabled="isLoading || tick >= stateTick" :title="`Jump forward ${turnTicks} ticks`">
             <i class="fas fa-angle-double-right"></i>
           </button>
         </div>
@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {eventBusInjectionKey} from '../../../../eventBus'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
@@ -85,9 +86,9 @@ const stateTick = computed(() => store.tick);
 
 const gameTick = computed(() => game.value.state.tick);
 
-const minimumTick = computed(() => store.game.state.timeMachineMinimumTick ?? 1);
+const minimumTick = computed(() => store.game!.state.timeMachineMinimumTick ?? 1);
 
-const turnTicks = computed(() => store.game.settings.gameTime.gameType === 'turnBased' ? store.game.settings.gameTime.turnJumps : 6);
+const turnTicks = computed(() => store.game!.settings.gameTime.gameType === 'turnBased' ? store.game!.settings.gameTime.turnJumps : 6);
 
 const onGameTick = () => {
   const oneIncrement = game.value.settings.gameTime.gameType === 'turnBased' ? game.value.settings.gameTime.turnJumps : 1;
@@ -119,12 +120,12 @@ const onRequestedTickChanged = async () => {
 
   isLoading.value = true;
 
-  const game = store.game;
+  const game = store.game!;
 
   const response = await detailGalaxy(httpClient)(game._id, tick.value);
 
   if (isOk(response)) {
-    store.commit('setGame', response.data);
+    store.setGame(response.data as any);
     tick.value = response.data.state.tick;
     inputTick.value = response.data.state.tick;
   } else {

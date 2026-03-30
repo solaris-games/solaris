@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import EventsListItem from './events/EventsListItem.vue';

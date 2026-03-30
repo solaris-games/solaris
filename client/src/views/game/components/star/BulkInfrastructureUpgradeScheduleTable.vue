@@ -26,6 +26,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed } from 'vue';
 import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow.vue'
 import GameHelper from '../../../../services/gameHelper';

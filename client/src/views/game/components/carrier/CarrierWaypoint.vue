@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
@@ -105,7 +106,7 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const settings = computed<UserGameSettings>(() => store.settings);
+const settings = computed<UserGameSettings>(() => store.settings!);
 const game = computed<Game>(() => store.game!);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));

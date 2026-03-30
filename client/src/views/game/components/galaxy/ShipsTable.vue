@@ -49,6 +49,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import ShipRow from './ShipRow.vue'

@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, inject, computed, onMounted } from 'vue';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game} from "@/types/game";

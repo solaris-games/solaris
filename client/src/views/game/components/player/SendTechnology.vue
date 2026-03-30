@@ -31,6 +31,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, ref, computed, onMounted } from 'vue';
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'

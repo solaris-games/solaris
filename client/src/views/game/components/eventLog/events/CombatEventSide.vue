@@ -45,9 +45,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { type CombatSide, resultToNumber } from '../../../../../services/combat';
-import type { Store } from 'vuex/types/index.js';
-import type { State } from '../../../../../store';
 import CombatActorDescription from './CombatActorDescription.vue';
 import PlayerIcon from "../../../../game/components/player/PlayerIcon.vue";
 import { computed } from 'vue';

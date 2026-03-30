@@ -12,9 +12,9 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, ref, onMounted, onUnmounted, useTemplateRef, watch, computed } from 'vue';
 import MentionHelper, {type Mention} from '@/services/mentionHelper';
-import { type State } from '@/store';
 
 const props = defineProps<{
   placeholder: string,
@@ -97,7 +97,7 @@ const updateSuggestions = () => {
   if (suggestMentions.value) {
     const oldMention = currentMention.value;
 
-    currentMention.value = MentionHelper.getCurrentMention(store.game, messageElement.value!);
+    currentMention.value = MentionHelper.getCurrentMention(store.game!, messageElement.value!);
     const newSuggestions = currentMention.value?.suggestions?.length;
 
     if (oldMention && !currentMention.value) {
@@ -115,7 +115,7 @@ const updateSuggestions = () => {
 
 onMounted(() => {
   emit('onSetMessageElement', messageElement.value as HTMLTextAreaElement);
-  suggestMentions.value = store.settings.interface.suggestMentions === 'enabled';
+  suggestMentions.value = store.settings!.interface.suggestMentions === 'enabled';
 });
 </script>
 

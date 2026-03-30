@@ -92,6 +92,7 @@ import type {Game, Star, Carrier} from "@/types/game";
 import {transferShips} from "@/services/typedapi/carrier";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {useGameStore} from "@/stores/game";
+import { eventBusInjectionKey } from '@/eventBus';
 
 const props = defineProps<{
   carrierId: string,
@@ -103,6 +104,7 @@ const emit = defineEmits<{
   onEditWaypointsRequested: [carrierId: string],
 }>();
 
+const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
@@ -221,7 +223,7 @@ const performSaveTransfer = async () => {
   if (isOk(response)) {
     toast.default(`Ships transferred between ${star.value.name} and ${carrier.value.name}.`);
 
-    store.gameStarCarrierShipTransferred({
+    store.gameStarCarrierShipTransferred(eventBus, {
       starId: star.value._id,
       carrierId: carrier.value._id,
       starShips: sShips,

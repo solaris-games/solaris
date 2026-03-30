@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
@@ -18,7 +19,7 @@ const props = defineProps<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useGameStore();
-const game = computed(() => store.game);
+const game = computed(() => store.game!);
 
 const actualStarName = computed(() => {
   if (props.starName) {

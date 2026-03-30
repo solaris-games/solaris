@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import CapitalRow from './CapitalRow.vue'
 import {createSortInfo, swapSort} from '../../../../services/data/sortInfo'

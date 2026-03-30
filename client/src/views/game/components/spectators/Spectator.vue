@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import type {GameSpectator} from "@solaris-common";
 import {uninviteSpectator} from "@/services/typedapi/spectator";
@@ -39,18 +40,18 @@ const toast = inject(toastInjectionKey)!;
 const isLoading = ref(false);
 
 const players = computed(() => {
-  return store.game.galaxy.players.filter(p => props.spectator.playerIds.includes(p._id));
+  return store.game!.galaxy.players.filter(p => props.spectator.playerIds.includes(p._id));
 });
 
 const userPlayer = computed(() => {
-  return GameHelper.getUserPlayer(store.game);
+  return GameHelper.getUserPlayer(store.game!);
 });
 
 
 const uninvite = async () => {
   isLoading.value = true;
 
-  const response = await uninviteSpectator(httpClient)(store.game._id, props.spectator._id);
+  const response = await uninviteSpectator(httpClient)(store.game!._id, props.spectator._id);
 
   if (isOk(response)) {
     toast.success(`You uninvited ${props.spectator.username} from spectating you in this game.`)

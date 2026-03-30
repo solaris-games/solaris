@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import Selection from './Selection.vue'

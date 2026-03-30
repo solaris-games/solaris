@@ -27,19 +27,18 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, onMounted, type Ref, inject } from 'vue';
 import type { Axios } from 'axios';
 import MenuTitle from '../../components/MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import GameHelper from '../../../../services/gameHelper'
 import BadgeShopList from './BadgeShopList.vue'
-import type { State } from "../../../../store";
 import { formatError, httpInjectionKey, isError, isOk } from "../../../../services/typedapi";
 import type { ToastPluginApi } from "vue-toast-notification";
 import { toastInjectionKey } from "../../../../util/keys";
 import type { Badge } from "@solaris-common";
 import type { Player } from "../../../../types/game";
-import type { Store } from 'vuex/types/index.js';
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";
 import { useUserStore } from '../../../../stores/user';

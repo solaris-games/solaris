@@ -95,6 +95,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, inject, onMounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper';
 import TechnologyHelper from '../../../../services/technologyHelper';

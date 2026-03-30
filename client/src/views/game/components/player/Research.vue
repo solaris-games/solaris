@@ -84,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import gameHelper from "../../../../services/gameHelper"
 import TechnologyHelper from "../../../../services/technologyHelper"

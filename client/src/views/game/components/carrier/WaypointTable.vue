@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import type {Carrier, Game} from "@/types/game";

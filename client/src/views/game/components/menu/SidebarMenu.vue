@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed, inject } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
@@ -46,6 +47,7 @@ import type {Game} from "@/types/game";
 import {configInjectionKey} from "@/config";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { useUserStore } from '@/stores/user';
+import { eventBusInjectionKey } from '@/eventBus';
 
 const store = useGameStore();
 const userStore = useUserStore();
@@ -53,11 +55,12 @@ const userStore = useUserStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const config = inject(configInjectionKey)!;
+const eventBus = inject(eventBusInjectionKey)!;
 
 const game = computed<Game>(() => store.game!);
 
 const setMenuState = (state: string, args: any) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state,
     args
   });
@@ -77,7 +80,7 @@ const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 
-const isDataCleaned = computed(() => store.game.state.cleaned);
+const isDataCleaned = computed(() => store.game!.state.cleaned);
 
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
 

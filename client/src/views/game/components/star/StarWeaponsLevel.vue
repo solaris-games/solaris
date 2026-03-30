@@ -82,6 +82,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed} from 'vue';
 import {useGameServices} from "@/util/gameServices";
 import type {Game, Player, Star} from "@/types/game";
@@ -97,8 +98,8 @@ const gameServices = useGameServices();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
-const starSpecialists = computed<Specialist[]>(() => store.starSpecialists);
-const carrierSpecialists = computed<Specialist[]>(() => store.carrierSpecialists);
+const starSpecialists = computed<readonly Specialist[]>(() => store.starSpecialists!);
+const carrierSpecialists = computed<readonly Specialist[]>(() => store.carrierSpecialists!);
 
 const getSpecialistName = (id: number, kind: 'star' | 'carrier') => {
   if (kind === 'carrier') {

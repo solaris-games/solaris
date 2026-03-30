@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue';
 import ConversationList from './conversations/ConversationList.vue';
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';

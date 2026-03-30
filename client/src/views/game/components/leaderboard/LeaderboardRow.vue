@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import TeamName from '@/views/game/components/shared/TeamName.vue';
 import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
@@ -85,41 +86,41 @@ const colourStore = useColourStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const playerColourSpec = computed(() => {
-  return colourStore.getColourForPlayer(store.game, props.player._id)!;
+  return colourStore.getColourForPlayer(store.game!, props.player._id)!;
 });
 
 const shouldShowTeamNames = computed(() => {
-  return props.showTeamNames && GameHelper.isTeamConquest(store.game);
+  return props.showTeamNames && GameHelper.isTeamConquest(store.game!);
 });
 
 const isTurnBasedGame = computed(() => {
-  return store.game.settings.gameTime.gameType === 'turnBased';
+  return store.game!.settings.gameTime.gameType === 'turnBased';
 });
 
 const isKingOfTheHillMode = computed(() => {
-  return GameHelper.isKingOfTheHillMode(store.game);
+  return GameHelper.isKingOfTheHillMode(store.game!);
 });
 
 const canEndTurn = computed(() => {
-  return !GameHelper.isGameFinished(store.game);
+  return !GameHelper.isGameFinished(store.game!);
 });
 
 const canReadyToQuit = computed(() => {
-  return store.game.settings.general.readyToQuit === 'enabled'
-    && store.game.state.startDate
-    && store.game.state.productionTick;
+  return store.game!.settings.general.readyToQuit === 'enabled'
+    && store.game!.state.startDate
+    && store.game!.state.productionTick;
 });
 
 const isStarCountWinCondition = computed(() => {
-  return GameHelper.isWinConditionStarCount(store.game);
+  return GameHelper.isWinConditionStarCount(store.game!);
 });
 
 const isHomeStarsWinCondition = computed(() => {
-  return GameHelper.isWinConditionHomeStars(store.game);
+  return GameHelper.isWinConditionHomeStars(store.game!);
 });
 
 const getUserPlayer = () => {
-  return GameHelper.getUserPlayer(store.game);
+  return GameHelper.getUserPlayer(store.game!);
 };
 
 const isUserPlayer = (player: Player) => {
@@ -141,7 +142,7 @@ const unconfirmReadyToQuit = async (player: Player) => {
     return;
   }
 
-  const response = await notReadyToQuit(httpClient)(store.game._id);
+  const response = await notReadyToQuit(httpClient)(store.game!._id);
   if (isOk(response)) {
     player.readyToQuit = false;
   } else {

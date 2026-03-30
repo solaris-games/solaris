@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../services/gameHelper';
 import type {NaturalResources} from "@solaris-common";

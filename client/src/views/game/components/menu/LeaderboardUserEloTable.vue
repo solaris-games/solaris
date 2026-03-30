@@ -45,12 +45,12 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
 
-import type { State } from '../../../../store';
 import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;

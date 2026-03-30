@@ -106,6 +106,7 @@ import { buildCarrier } from '@/services/typedapi/star';
 import { toastInjectionKey } from '@/util/keys';
 import type { Star } from '@/types/game';
 import {useGameStore} from "@/stores/game";
+import { eventBusInjectionKey } from '@/eventBus';
 
 const props = defineProps<{
   starId: string,
@@ -117,6 +118,7 @@ const emit = defineEmits < {
   onEditWaypointsRequested: [carrierId: string],
 } > ();
 
+const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
@@ -201,7 +203,7 @@ const saveTransfer = async () => {
   if (isOk(response)) {
     toast.default(`Carrier built at ${star.value.name}.`);
 
-    store.gameStarCarrierBuilt(response.data);
+    store.gameStarCarrierBuilt(eventBus, response.data);
 
     AudioService.join();
 

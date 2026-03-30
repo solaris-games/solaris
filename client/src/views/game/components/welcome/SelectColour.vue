@@ -44,6 +44,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import gameHelper from '../../../../services/gameHelper'
 import PlayerAvatar from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName.vue';

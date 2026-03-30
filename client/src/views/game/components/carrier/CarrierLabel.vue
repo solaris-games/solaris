@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { onMounted, inject, ref } from 'vue';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "../../../../eventBus";
@@ -21,7 +22,7 @@ const store = useGameStore();
 const actualCarrierName = ref('');
 
 const pan = () => {
-  const carrier = gameHelper.getCarrierById(store.game, props.carrierId);
+  const carrier = gameHelper.getCarrierById(store.game!, props.carrierId);
 
   if (carrier) {
     eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier as MapObject<string> });
@@ -32,7 +33,7 @@ onMounted(() => {
   if (props.carrierName) {
     actualCarrierName.value = props.carrierName;
   } else {
-    const carrier = gameHelper.getCarrierById(store.game, props.carrierId);
+    const carrier = gameHelper.getCarrierById(store.game!, props.carrierId);
 
     actualCarrierName.value = carrier ? carrier.name : 'Unknown';
   }

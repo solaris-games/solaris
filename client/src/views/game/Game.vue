@@ -100,7 +100,7 @@ const onViewColourOverrideRequested = (e: string) => {
 };
 
 const onStarClicked = (starId: string) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.STAR_DETAIL,
     args: starId,
   });
@@ -120,7 +120,7 @@ const onStarRightClicked = (starId: string) => {
 };
 
 const onCarrierClicked = (carrierId: string) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.CARRIER_DETAIL,
     args: carrierId,
   });
@@ -140,7 +140,7 @@ const onCarrierRightClicked = (carrierId: string) => {
 };
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.MAP_OBJECT_SELECTOR,
     args: e,
   });
@@ -149,7 +149,7 @@ const onObjectsClicked = (e: ObjectClicked[]) => {
 };
 
 const onPlayerSelected = (playerId: string) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.PLAYER,
     args: playerId,
   });
@@ -158,7 +158,7 @@ const onPlayerSelected = (playerId: string) => {
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.REPORT_PLAYER,
     args: e,
   });
@@ -279,22 +279,22 @@ onMounted(async () => {
 
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
-      store.setMenuState({ state: MENU_STATES.TUTORIAL })
+      store.setMenuState(eventBus, { state: MENU_STATES.TUTORIAL })
     } else {
-      store.setMenuState({ state: MENU_STATES.LEADERBOARD })
+      store.setMenuState(eventBus, { state: MENU_STATES.LEADERBOARD })
     }
   } else {
     if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.setMenuState({ state: MENU_STATES.WELCOME })
+      store.setMenuState(eventBus, { state: MENU_STATES.WELCOME })
     } else {
-      store.setMenuState({ state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
+      store.setMenuState(eventBus, { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
     }
   }
 
   const reloadGameCheckInterval = 1000;
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
-  await store.loadSpecialistData(store.game!._id);
+  await store.loadSpecialistData(httpClient, store.game!._id);
   await colourStore.loadColourData(httpClient);
 });
 

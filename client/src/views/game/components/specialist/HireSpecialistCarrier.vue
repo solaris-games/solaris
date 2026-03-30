@@ -58,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
@@ -92,7 +93,7 @@ const confirm = useConfirm();
 const game = computed<Game>(() => store.game!);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
-const specialists = computed(() => store.carrierSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.carrier.indexOf(s.id) < 0));
+const specialists = computed(() => store.carrierSpecialists!.filter(s => game.value.settings.specialGalaxy.specialistBans.carrier.indexOf(s.id) < 0));
 const isCurrentSpecialistOneShot = computed(() => Boolean(carrier.value.specialist?.oneShot));
 
 const gameServices = useGameServices();

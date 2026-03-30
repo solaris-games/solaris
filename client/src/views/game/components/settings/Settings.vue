@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import GameSettings from './GameSettings.vue'

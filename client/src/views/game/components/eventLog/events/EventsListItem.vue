@@ -69,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {inject, computed} from 'vue';
 import GameEnded from './GameEnded.vue'
 import GamePlayerAfk from './GamePlayerAFK.vue'

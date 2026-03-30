@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
@@ -88,7 +89,7 @@ const isCurrentSpecialistOneShot = computed(() => Boolean(star.value.specialist?
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const specialists = computed(() => store.starSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
+const specialists = computed(() => store.starSpecialists!.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
 
 const isHiringSpecialist = ref(false);
 

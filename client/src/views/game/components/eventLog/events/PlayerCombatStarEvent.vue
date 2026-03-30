@@ -35,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
 import type {PlayerCombatStarEvent} from "@solaris-common";
 import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '@/store';
 import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '@/services/combat';
 import gameHelper from '../../../../../services/gameHelper';
 import type {Game} from "@/types/game";

@@ -498,6 +498,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import featuredImg from '../../assets/screenshots/tiles/featured.jpg';
 import newPlayerRtImg from '../../assets/screenshots/tiles/new_player_rt.jpg';
 import standardRtImg from '../../assets/screenshots/tiles/standard_rt.jpg';

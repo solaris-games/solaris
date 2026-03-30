@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '../../../../../eventBus';
 import LoadingSpinner from '../../../../components/LoadingSpinner.vue';
 import ConversationPreview from './ConversationPreview.vue';

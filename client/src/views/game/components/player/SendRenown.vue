@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, ref, computed } from 'vue';
 import FormErrorList from '../../../components/FormErrorList.vue'
 import type {Game, Player} from "@/types/game";

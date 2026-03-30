@@ -79,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
@@ -121,8 +122,8 @@ const game = computed<Game>(() => store.game!);
 
 const gameServices = useGameServices();
 
-const isStandardUIStyle = computed(() => store.settings.interface.uiStyle === 'standard');
-const isCompactUIStyle = computed(() => store.settings.interface.uiStyle === 'compact');
+const isStandardUIStyle = computed(() => store.settings!.interface.uiStyle === 'standard');
+const isCompactUIStyle = computed(() => store.settings!.interface.uiStyle === 'compact');
 
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);

@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
 import CarrierLabel from '../../carrier/CarrierLabel.vue'

@@ -39,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GameHelper from '../../services/gameHelper'
 import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'

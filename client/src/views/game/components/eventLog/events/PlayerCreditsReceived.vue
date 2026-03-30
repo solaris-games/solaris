@@ -7,6 +7,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
 import type {PlayerCreditsReceivedEvent} from "@solaris-common";
@@ -20,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useGameStore();
-const game = computed(() => store.game);
+const game = computed(() => store.game!);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.event.data.fromPlayerId)!);
 

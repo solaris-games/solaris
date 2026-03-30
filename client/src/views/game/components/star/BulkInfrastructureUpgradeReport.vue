@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import type {BulkUpgradeReport, MapObject} from "@solaris-common";
 import GameHelper from "@/services/gameHelper";
 
@@ -45,7 +46,7 @@ const props = defineProps<{
 }>();
 
 const getStar = (starId: string) => {
-  return GameHelper.getStarById(store.game, starId)!;
+  return GameHelper.getStarById(store.game!, starId)!;
 };
 
 const panToStar = (starId: string) => {

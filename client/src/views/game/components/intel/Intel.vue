@@ -86,6 +86,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
 import LineChart from './LineChart.vue'

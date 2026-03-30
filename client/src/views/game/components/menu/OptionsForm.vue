@@ -573,6 +573,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import { inject, onMounted, ref, type Ref } from 'vue';
@@ -582,7 +583,6 @@ import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind 
 import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris-common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
 import { toastInjectionKey } from '@/util/keys';
-import { type State } from '@/store';
 
 const props = defineProps<{
   isInGame: boolean,

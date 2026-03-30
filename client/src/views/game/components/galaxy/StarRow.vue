@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import AudioService from '../../../../game/audio'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
@@ -71,15 +72,15 @@ const isUpgradingEconomy = ref(false);
 const isUpgradingIndustry = ref(false);
 const isUpgradingScience = ref(false);
 
-const userPlayer = computed<Player<string> | undefined>(() => gameHelper.getUserPlayer(store.game));
+const userPlayer = computed<Player<string> | undefined>(() => gameHelper.getUserPlayer(store.game!));
 
 const hasEconomyCost = computed(() => props.star.upgradeCosts?.economy);
 const hasIndustryCost = computed(() => props.star.upgradeCosts?.industry);
 const hasScienceCost = computed(() => props.star.upgradeCosts?.science);
 
-const isEconomyEnabled = computed(() => store.game.settings.player.developmentCost.economy !== 'none');
-const isIndustryEnabled = computed(() => store.game.settings.player.developmentCost.industry !== 'none');
-const isScienceEnabled = computed(() => store.game.settings.player.developmentCost.science !== 'none');
+const isEconomyEnabled = computed(() => store.game!.settings.player.developmentCost.economy !== 'none');
+const isIndustryEnabled = computed(() => store.game!.settings.player.developmentCost.industry !== 'none');
+const isScienceEnabled = computed(() => store.game!.settings.player.developmentCost.science !== 'none');
 
 const canUpgradeEconomy = computed(() => props.allowUpgrades && hasEconomyCost.value && !isUpgradingEconomy.value && (userPlayer.value?.credits || 0) >= (props.star.upgradeCosts?.economy || 0));
 const canUpgradeIndustry = computed(() => props.allowUpgrades && hasIndustryCost.value && !isUpgradingIndustry.value && (userPlayer.value?.credits || 0) >= (props.star.upgradeCosts?.industry || 0));
@@ -89,11 +90,11 @@ const clickStar = () => emit('onOpenStarDetailRequested', props.star._id);
 
 const goToStar = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: props.star.location });
 
-const upgrade = makeUpgrade(store, toast, props.star);
+const upgrade = makeUpgrade(store, eventBus, toast, props.star);
 
-const upgradeEconomy = upgrade('economy', store.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
-const upgradeIndustry = upgrade('industry', store.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
-const upgradeScience = upgrade('science', store.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
+const upgradeEconomy = upgrade('economy', store.settings!.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, (eb, data) => store.gameStarEconomyUpgraded(eb, data), upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.settings!.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, (eb, data) => store.gameStarIndustryUpgraded(eb, data), upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.settings!.star.confirmBuildScience === 'enabled', isUpgradingScience, (eb, data) => store.gameStarScienceUpgraded(eb, data), upgradeScienceReq(httpClient));
 </script>
 
 <style scoped>

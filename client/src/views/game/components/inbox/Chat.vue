@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '@/eventBus';
 import MENU_STATES from '../../../../services/data/menuStates';
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
@@ -48,7 +49,7 @@ const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, c
 
 const game = computed<Game>(() => store.game!);
 
-const menuState = computed<string>(() => store.menuStateChat);
+const menuState = computed<string | null>(() => store.menuStateChat);
 
 const menuArguments = computed(() => store.menuArgumentsChat);
 

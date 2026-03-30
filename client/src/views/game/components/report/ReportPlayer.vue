@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import { ref, computed, inject } from 'vue';
@@ -100,7 +101,7 @@ const optionMultiboxing = ref(false);
 const optionInappropriateAlias = ref(false);
 
 const player = computed(() => {
-  return GameHelper.getPlayerById(store.game, props.args.playerId)!;
+  return GameHelper.getPlayerById(store.game!, props.args.playerId)!;
 });
 
 const menuTitle = computed(() => {

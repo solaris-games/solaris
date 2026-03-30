@@ -8,6 +8,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import type {PlayerScheduledActions} from "@solaris-common";
 import {trashBulk} from "@/services/typedapi/star";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -29,10 +30,10 @@ const toast = inject(toastInjectionKey)!;
 const store = useGameStore();
 
 const trash = async () => {
-  const response = await trashBulk(httpClient)(store.game._id, props.action._id);
+  const response = await trashBulk(httpClient)(store.game!._id, props.action._id);
 
   if (isOk(response)) {
-    store.commit('gameBulkActionTrashed', props.action);
+    store.gameBulkActionTrashed(props.action);
 
     toast.default('Your scheduled bulk upgrade has been deleted.');
 

@@ -4,6 +4,7 @@
   </span>
 </template>
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconShape from './PlayerIconShape.vue'

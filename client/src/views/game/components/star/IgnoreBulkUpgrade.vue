@@ -34,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { inject, computed } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
@@ -59,11 +60,11 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useGameStore();
 
-const star = computed(() => GameHelper.getStarById(store.game, props.starId)!);
+const star = computed(() => GameHelper.getStarById(store.game!, props.starId)!);
 
-const canIgnoreEconomy = computed(() => store.game.settings.player.developmentCost.economy !== 'none');
-const canIgnoreIndustry = computed(() => store.game.settings.player.developmentCost.industry !== 'none');
-const canIgnoreScience = computed(() => store.game.settings.player.developmentCost.science !== 'none');
+const canIgnoreEconomy = computed(() => store.game!.settings.player.developmentCost.economy !== 'none');
+const canIgnoreIndustry = computed(() => store.game!.settings.player.developmentCost.industry !== 'none');
+const canIgnoreScience = computed(() => store.game!.settings.player.developmentCost.science !== 'none');
 
 const isAllIgnored = computed(() => (!canIgnoreEconomy.value || getInfrastructureIgnoreStatus('economy'))
   && (!canIgnoreIndustry.value || getInfrastructureIgnoreStatus('industry'))
@@ -79,14 +80,14 @@ const triggerChanged = () => {
   emit("bulkIgnoreChanged", {
     starId: props.starId
   });
-  const star = GameHelper.getStarById(store.game, props.starId);
+  const star = GameHelper.getStarById(store.game!, props.starId);
   eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
 };
 
 const getInfrastructureIgnoreStatus = (infrastructureType: InfrastructureType) => star.value.ignoreBulkUpgrade![infrastructureType];
 
 const toggleBulkIgnore = async (infrastructureType: InfrastructureType) => {
-  const response = await toggleBulkIgnoreReq(httpClient)(store.game._id, props.starId, infrastructureType);
+  const response = await toggleBulkIgnoreReq(httpClient)(store.game!._id, props.starId, infrastructureType);
 
   if (isOk(response)) {
     const newVal = !star.value.ignoreBulkUpgrade![infrastructureType];
@@ -107,7 +108,7 @@ const toggleBulkIgnore = async (infrastructureType: InfrastructureType) => {
 };
 
 const toggleBulkIgnoreAll = async (ignoreStatus: boolean) => {
-  const response = await toggleBulkIgnoreAllReq(httpClient)(store.game._id, star.value._id, ignoreStatus);
+  const response = await toggleBulkIgnoreAllReq(httpClient)(store.game!._id, star.value._id, ignoreStatus);
 
   if (isOk(response)) {
     star.value.ignoreBulkUpgrade!.economy = ignoreStatus;

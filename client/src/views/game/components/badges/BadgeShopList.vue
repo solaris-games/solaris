@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Badge} from "@solaris-common";
 

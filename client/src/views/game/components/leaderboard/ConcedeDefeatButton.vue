@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import router from '../../../../router';
 import GameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
@@ -34,9 +35,9 @@ const game = computed<Game>(() => store.game!);
 
 const isConcedingDefeat = ref(false);
 
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.game)!);
-const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.game));
-const isGameInProgress = computed(() => GameHelper.isGameStarted(store.game) && !GameHelper.isGameFinished(store.game));
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.game!)!);
+const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.game!));
+const isGameInProgress = computed(() => GameHelper.isGameStarted(store.game!) && !GameHelper.isGameFinished(store.game!));
 
 const doConcedeDefeat = async (openSlot: boolean) => {
   let message = 'Are you sure you want to concede defeat in this game?';

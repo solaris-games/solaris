@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
 import ConversationMessagePin from './ConversationMessagePin.vue'

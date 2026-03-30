@@ -54,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '../../../../eventBus'
 import MENU_STATES from '../../../../services/data/menuStates'
 import Statistics from './Statistics.vue'
@@ -88,7 +89,7 @@ const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
-const isCompactUIStyle = computed(() => store.settings.interface.uiStyle !== 'standard');
+const isCompactUIStyle = computed(() => store.settings!.interface.uiStyle !== 'standard');
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !GameHelper.isTutorialGame(game.value));
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
@@ -118,13 +119,13 @@ const onViewCompareIntelRequested = () => emit('onViewCompareIntelRequested', pl
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id);
 
 const onOpenDiplomacyRequested = () => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.DIPLOMACY,
   });
 };
 
 const onOpenLedgerRequested = () => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state: MENU_STATES.LEDGER,
   });
 };

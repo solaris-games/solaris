@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MentionHelper, {type Mention} from '../../../../../services/mentionHelper';
 import AudioService from '../../../../../game/audio';
 import MentionBox from '../../shared/MentionBox.vue';

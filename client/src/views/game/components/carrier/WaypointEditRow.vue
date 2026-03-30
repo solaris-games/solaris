@@ -30,6 +30,7 @@
   </tr>
 </template>
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed} from 'vue';
 import type {CarrierWaypoint} from "@solaris-common";
 import {formatAction, isActionRequiresShips, isFirstWaypoint} from "@/util/waypoint";

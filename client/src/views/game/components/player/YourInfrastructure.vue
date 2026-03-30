@@ -28,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../services/gameHelper';
 
@@ -38,11 +39,11 @@ const props = defineProps<{
 const store = useGameStore();
 
 const userPlayer = computed(() => {
-    return GameHelper.getUserPlayer(store.game);
+    return GameHelper.getUserPlayer(store.game!);
 });
 
 const comparePlayer = computed(() => {
-    return GameHelper.getPlayerById(store.game, props.comparePlayerId);
+    return GameHelper.getPlayerById(store.game!, props.comparePlayerId);
 });
 </script>
 

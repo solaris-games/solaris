@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import SendTechnology from './SendTechnology.vue';
 import SendCredits from './SendCredits.vue';
 import SendCreditsSpecialists from './SendCreditsSpecialists.vue';

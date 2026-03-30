@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";

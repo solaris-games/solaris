@@ -1,11 +1,12 @@
 import type { DrawingContext } from "@/game/container";
 import { useColourStore } from '@/stores/colour';
+import type { GameStore } from '@/stores/game';
 
 export class StoreDrawingContext implements DrawingContext {
-  store: Store<State>;
+  store: GameStore;
   private colourStore: ReturnType<typeof useColourStore>;
 
-  constructor (store: Store<State>) {
+  constructor (store: GameStore) {
     this.store = store;
     this.colourStore = useColourStore();
   }

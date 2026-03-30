@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { inject, computed, ref } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";

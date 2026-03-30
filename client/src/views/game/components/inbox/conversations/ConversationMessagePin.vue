@@ -5,6 +5,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, computed } from "vue";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {pinMessage, unpinMessage} from "@/services/typedapi/conversation";

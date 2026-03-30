@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import Overview from './Overview.vue'
 import Infrastructure from '../shared/Infrastructure.vue'
@@ -54,7 +55,6 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, ref, computed, type Ref, onMounted } from 'vue';
 import type { InGameUser, Player, UserPublic } from '@solaris-common'
-import type { State } from "@/store";
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import { getPlayerUser } from '@/services/typedapi/game'
@@ -100,15 +100,15 @@ const playersAreAnonymous = computed(() => isGameFinished.value ? serviceProvide
 onMounted(async () => {
   isLoading.value = true;
 
-  player.value = GameHelper.getPlayerById(store.game, props.playerId) || null;
-  userPlayer.value = GameHelper.getUserPlayer(store.game) || null;
-  playerIndex.value = store.game.galaxy.players.indexOf(player.value);
-  leaderboard.value = GameHelper.getSortedLeaderboardPlayerList(store.game)
+  player.value = GameHelper.getPlayerById(store.game!, props.playerId) || null;
+  userPlayer.value = GameHelper.getUserPlayer(store.game!) || null;
+  playerIndex.value = store.game!.galaxy.players.indexOf(player.value!);
+  leaderboard.value = GameHelper.getSortedLeaderboardPlayerList(store.game!)
 
     // If there is a legit user associated with this user then get the
     // user info so we can show more info like achievements.
     if (userStore.userId && !player.value!.isOpenSlot && !playersAreAnonymous.value) {
-      const response = await getPlayerUser(httpClient)(store.game._id, player.value!._id);
+      const response = await getPlayerUser(httpClient)(store.game!._id, player.value!._id);
 
       if (isOk(response)) {
         user.value = response.data;
@@ -120,7 +120,7 @@ onMounted(async () => {
   isLoading.value = false;
 });
 
-const is1v1Game = computed(() =>GameHelper.is1v1Game(store.game));
+const is1v1Game = computed(() =>GameHelper.is1v1Game(store.game!));
 const onCloseRequested = () => emit('onCloseRequested');
 const onViewCompareIntelRequested = (playerId: string) => emit('onViewCompareIntelRequested', playerId);
 const onViewColourOverrideRequested = (playerId: string) => emit('onViewColourOverrideRequested', playerId);

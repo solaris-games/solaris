@@ -222,6 +222,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, computed, ref, onMounted, onUnmounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
@@ -273,7 +274,7 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
-const settings = computed<UserGameSettings>(() => store.settings);
+const settings = computed<UserGameSettings>(() => store.settings!);
 
 const game = computed<Game>(() => store.game!);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
@@ -291,7 +292,7 @@ const canGiftCarrier = computed<boolean>(() => Boolean(game.value.settings.speci
   && carrierOwningPlayer.value._id === userPlayer.value._id
   && !carrier.value.isGift
   && !userPlayer.value.defeated
-  && !GameHelper.isGameFinished(store.game)
+  && !GameHelper.isGameFinished(store.game!)
 ));
 
 const isOwnedByUserPlayer = computed(() => {

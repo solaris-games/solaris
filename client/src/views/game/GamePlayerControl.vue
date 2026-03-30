@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import type { GameGalaxyDetail, Player } from '@solaris-common';
 import { computed, inject } from 'vue';

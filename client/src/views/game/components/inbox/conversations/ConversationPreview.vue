@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
