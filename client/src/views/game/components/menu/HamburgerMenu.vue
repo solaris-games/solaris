@@ -116,7 +116,7 @@ const colourStore = useColourStore();
 const game = computed<Game>(() => store.game);
 
 const setMenuState = (state: string, args: any = null) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state,
     args
   });

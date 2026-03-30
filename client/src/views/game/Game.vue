@@ -74,7 +74,7 @@ const polling: Ref<number | null> = ref(null);
 const ticking = ref(false);
 const colourOverride: Ref<{ playerId: string } | null> = ref(null);
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const gameId = computed(() => game.value._id);
 
@@ -100,7 +100,7 @@ const onViewColourOverrideRequested = (e: string) => {
 };
 
 const onStarClicked = (starId: string) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.STAR_DETAIL,
     args: starId,
   });
@@ -109,8 +109,8 @@ const onStarClicked = (starId: string) => {
 };
 
 const onStarRightClicked = (starId: string) => {
-  const star = GameHelper.getStarById(store.game, starId)!;
-  const owningPlayer = GameHelper.getStarOwningPlayer(store.game, star);
+  const star = GameHelper.getStarById(store.game!, starId)!;
+  const owningPlayer = GameHelper.getStarOwningPlayer(store.game!, star);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -120,7 +120,7 @@ const onStarRightClicked = (starId: string) => {
 };
 
 const onCarrierClicked = (carrierId: string) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.CARRIER_DETAIL,
     args: carrierId,
   });
@@ -129,8 +129,8 @@ const onCarrierClicked = (carrierId: string) => {
 };
 
 const onCarrierRightClicked = (carrierId: string) => {
-  const carrier = GameHelper.getCarrierById(store.game, carrierId)!;
-  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.game, carrier);
+  const carrier = GameHelper.getCarrierById(store.game!, carrierId)!;
+  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.game!, carrier);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -140,7 +140,7 @@ const onCarrierRightClicked = (carrierId: string) => {
 };
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.MAP_OBJECT_SELECTOR,
     args: e,
   });
@@ -149,7 +149,7 @@ const onObjectsClicked = (e: ObjectClicked[]) => {
 };
 
 const onPlayerSelected = (playerId: string) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.PLAYER,
     args: playerId,
   });
@@ -158,7 +158,7 @@ const onPlayerSelected = (playerId: string) => {
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.REPORT_PLAYER,
     args: e,
   });
@@ -174,7 +174,7 @@ const reloadSettings = async () => {
   const response = await getSettings(httpClient)();
 
   if (isOk(response)) {
-    store.commit('setSettings', response.data);
+    store.setSettings(response.data);
   } else {
     console.error(formatError(response));
   }
@@ -187,9 +187,9 @@ const reloadGame = async () => {
     // Make sure the player is still in the current game, they may have quickly
     // switched to another game.
     if (route.query.id === response.data._id) {
-      store.commit('setGame', response.data); // Persist to storage
-      store.commit('setTick', response.data.state.tick);
-      store.commit('setProductionTick', response.data.state.productionTick);
+      store.setGame(response.data as Game); // Persist to storage // TODO: Fix types
+      store.setTick(response.data.state.tick);
+      store.setProductionTick(response.data.state.productionTick);
 
       document.title = response.data.settings.general.name + ' - Solaris';
     }
@@ -209,12 +209,12 @@ const reloadGameCheck = async () => {
 
   // Check if the next tick date has passed, if so check if the server has finished the game tick.
   // Alternatively if the game is set to 10s ticks then always check.
-  const canTick = store.game.settings.gameTime.speed <= 10 || gameHelper.canTick(store.game);
+  const canTick = store.game!.settings.gameTime.speed <= 10 || gameHelper.canTick(store.game!);
 
   if (canTick) {
     ticking.value = true;
 
-    const response = await detailState(httpClient)(store.game._id);
+    const response = await detailState(httpClient)(store.game!._id);
 
     if (isOk(response)) {
       const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
@@ -223,8 +223,8 @@ const reloadGameCheck = async () => {
         // If the user is currently using the time machine then only set the state variables.
         // Otherwise reload the current game tick.
         if (isHistorical.value) {
-          store.commit('setTick', response.data.state.tick)
-          store.commit('setProductionTick', response.data.state.productionTick)
+          store.setTick(response.data.state.tick);
+          store.setProductionTick(response.data.state.productionTick);
         } else {
           await reloadGame();
         }
@@ -249,7 +249,7 @@ withMessages();
 
 AudioService.loadStore(store);
 
-store.commit('clearGame');
+store.clearGame();
 
 //A CSS class that will load only on the game screen to prevent drag-bounce behavior
 const GAME_BODY_CLASS = 'game-body';
@@ -260,13 +260,13 @@ onMounted(async () => {
   await reloadSettings();
   await reloadGame();
 
-  const userPlayer = GameHelper.getUserPlayer(store.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game!);
 
   if (userPlayer) {
     userClientSockerEmitter.emitJoined();
 
     playerClientSocketEmitter.emitGameRoomJoined({
-      gameId: store.game._id,
+      gameId: store.game!._id,
       playerId: userPlayer?._id
     });
   }
@@ -279,22 +279,22 @@ onMounted(async () => {
 
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
-      store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
+      store.setMenuState({ state: MENU_STATES.TUTORIAL })
     } else {
-      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
+      store.setMenuState({ state: MENU_STATES.LEADERBOARD })
     }
   } else {
     if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.commit('setMenuState', { state: MENU_STATES.WELCOME })
+      store.setMenuState({ state: MENU_STATES.WELCOME })
     } else {
-      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
+      store.setMenuState({ state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
     }
   }
 
   const reloadGameCheckInterval = 1000;
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
-  await store.dispatch('loadSpecialistData', store.game._id);
+  await store.loadSpecialistData(store.game!._id);
   await colourStore.loadColourData(httpClient);
 });
 
@@ -303,16 +303,16 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  const userPlayer = GameHelper.getUserPlayer(store.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game!);
 
   if (userPlayer) {
     playerClientSocketEmitter.emitGameRoomLeft({
-      gameId: store.game._id,
+      gameId: store.game!._id,
       playerId: userPlayer?._id
     });
   }
 
-  store.commit('clearGame');
+  store.clearGame();
 
   document.title = 'Solaris';
 

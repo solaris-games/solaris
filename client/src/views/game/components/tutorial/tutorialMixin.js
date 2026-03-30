@@ -7,7 +7,7 @@ export default {
             this.$parent.$emit('onOpenStarDetailRequested', this.getPlayerHomeStar._id)
         },
         onOpenTutorialRequested () {
-            this.$store.commit('setMenuState', {
+            this.$store.setMenuState({
                 state: MENU_STATES.TUTORIAL
             })
         },

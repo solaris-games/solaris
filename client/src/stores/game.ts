@@ -42,7 +42,7 @@ export const useGameStore = defineStore('game', () => {
   const eventBus = inject(eventBusInjectionKey)!;
   const colourStore = useColourStore();
 
-  const setMenuState = (newMenuState: { state: string, args: any }) => {
+  const setMenuState = (newMenuState: { state: string, args?: any }) => {
     if (newMenuState.state === menuState.value && newMenuState.args === menuArguments.value) {
       menuArguments.value = null;
       menuState.value = null;
@@ -280,10 +280,10 @@ export const useGameStore = defineStore('game', () => {
   };
 
   const socketMutations = {
-    [GameMutationNames.GameStarted]: (data: { state: GameState<string> }) => {
+    'gameStarted': (data: { state: GameState<string> }) => {
       game.value!.state = data.state;
     },
-    [PlayerMutationNames.GamePlayerJoined]: (data: PlayerJoinedData) => {
+    'gamePlayerJoined': (data: PlayerJoinedData) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.isOpenSlot = false;
@@ -293,29 +293,29 @@ export const useGameStore = defineStore('game', () => {
       player.defeatedDate = null;
       player.afk = false;
     },
-    [PlayerMutationNames.GamePlayerQuit]: (data: { playerId: string }) => {
+    'gamePlayerQuit': (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.isOpenSlot = true;
       player.alias = 'Empty Slot';
       player.avatar = null;
     },
-    [PlayerMutationNames.GamePlayerReady]: (data: { playerId: string }) => {
+    'gamePlayerReady': (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.ready = true;
     },
-    [PlayerMutationNames.GamePlayerNotReady]: (data: { playerId: string }) => {
+    'gamePlayerNotReady': (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.ready = false;
     },
-    [PlayerMutationNames.GamePlayerConcededDefeat]: (data: { playerId: string }) => {
+    'gamePlayerConcededDefeat': (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.defeated = true;
     },
-    [PlayerMutationNames.GamePlayerReadyToQuit](data: { playerId: string | null }) {
+    'gamePlayerReadyToQuit': (data: { playerId: string | null }) => {
       if (data.playerId !== null) {
         const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
@@ -324,7 +324,7 @@ export const useGameStore = defineStore('game', () => {
 
       game.value!.state.readyToQuitCount = (game.value!.state.readyToQuitCount ?? 0) + 1;
     },
-    [PlayerMutationNames.GamePlayerNotReadyToQuit](data: { playerId: string | null }) {
+    'gamePlayerNotReadyToQuit': (data: { playerId: string | null }) => {
       if (data.playerId !== null) {
         const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
@@ -333,7 +333,7 @@ export const useGameStore = defineStore('game', () => {
 
       game.value!.state.readyToQuitCount = (game.value!.state.readyToQuitCount ?? 0) - 1;
     },
-    [PlayerMutationNames.PlayerDebtSettled]: (data: { debtorPlayerId: string,
+    'playerDebtSettled': (data: { debtorPlayerId: string,
       creditorPlayerId: string,
       amount: number,
       ledgerType: LedgerType, }) => {

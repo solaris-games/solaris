@@ -100,17 +100,16 @@ import AudioService from '../../../../game/audio';
 import GameHelper from '../../../../services/gameHelper';
 import MenuTitle from '../MenuTitle.vue';
 import { ref, computed, inject } from 'vue';
-
-import type { State } from '@/store';
 import { useConfirm } from '@/hooks/confirm.ts';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { buildCarrier } from '@/services/typedapi/star';
 import { toastInjectionKey } from '@/util/keys';
 import type { Star } from '@/types/game';
+import {useGameStore} from "@/stores/game";
 
-const props = defineProps < {
+const props = defineProps<{
   starId: string,
-} > ();
+}>();
 
 const emit = defineEmits < {
   onCloseRequested: [],
@@ -125,13 +124,13 @@ const store = useGameStore();
 
 const confirm = useConfirm();
 
-const star = ref(GameHelper.getStarById(store.game, props.starId) as Star);
+const star = ref(GameHelper.getStarById(store.game!, props.starId) as Star);
 const allStarShips = computed(() => star.value.ships || 0);
 const starShips = ref(0);
 const carrierShips = ref(allStarShips.value);
 const isBuildingCarrier = ref(false);
 
-const isHistoricalMode = computed(() => store.tick !== store.game.state.tick);
+const isHistoricalMode = computed(() => store.tick !== store.game!.state.tick);
 
 const ensureInt = (v: any) => {
   v = parseInt(v);
@@ -188,7 +187,7 @@ const onOpenStarDetailRequested = () => {
 };
 
 const saveTransfer = async () => {
-  if (store.settings.carrier.confirmBuildCarrier === 'enabled'
+  if (store.settings!.carrier.confirmBuildCarrier === 'enabled'
     && !await confirm('Build a carrier', `Are you sure you want to build a Carrier at ${star.value.name}? The carrier will cost $${star.value.upgradeCosts!.carriers}.`)) {
     return
   }
@@ -197,12 +196,12 @@ const saveTransfer = async () => {
 
   const ships = carrierShips.value;
 
-  const response = await buildCarrier(httpClient)(store.game._id, star.value._id, ships);
+  const response = await buildCarrier(httpClient)(store.game!._id, star.value._id, ships);
 
   if (isOk(response)) {
     toast.default(`Carrier built at ${star.value.name}.`);
 
-    store.commit('gameStarCarrierBuilt', response.data);
+    store.gameStarCarrierBuilt(response.data);
 
     AudioService.join();
 

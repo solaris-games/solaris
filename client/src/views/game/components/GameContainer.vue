@@ -10,7 +10,6 @@ import { eventBusInjectionKey } from '../../../eventBus'
 import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
-import type { State } from '../../../store';
 import { toastInjectionKey } from '../../../util/keys';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
@@ -20,9 +19,10 @@ import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
 import {useGameServices} from "@/util/gameServices";
 import { useUserStore } from '@/stores/user';
-import {useMentionStore} from "@/stores/mention.ts";
+import {useMentionStore} from "@/stores/mention";
+import {useGameStore} from "@/stores/game";
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
 const userStore = useUserStore();
 const mentionStore = useMentionStore();
 
@@ -96,7 +96,6 @@ onMounted(() => {
 
     const onPreStarClickedHandler = (params: OnPreStarParams) => {
       mentionStore.starClicked(params);
-      store.commit('starClicked', params);
     };
 
     const onPreStarRightClickedHandler = (params: OnPreStarParams) => {

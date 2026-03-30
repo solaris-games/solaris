@@ -23,7 +23,7 @@ const isActive = computed(() => {
 });
 
 const setMenuState = () => {
-    store.commit('setMenuState', {
+    store.setMenuState({
         state: props.menuState,
         args: null
     });

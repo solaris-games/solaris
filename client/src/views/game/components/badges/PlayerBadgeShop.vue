@@ -59,7 +59,7 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
 const userStore = useUserStore();
 const badgeStore = useBadgeStore();
 

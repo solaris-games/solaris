@@ -630,7 +630,7 @@ const handleSubmit = async (e: Event) => {
   if (isOk(response)) {
     toast.success(`Settings saved.`);
 
-    store.commit('setSettings', settings.value);
+    store.setSettings( settings.value);
 
     if (props.isInGame) {
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.game, settings: store.settings });

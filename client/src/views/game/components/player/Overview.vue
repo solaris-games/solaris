@@ -119,13 +119,13 @@ const onViewCompareIntelRequested = () => emit('onViewCompareIntelRequested', pl
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id);
 
 const onOpenDiplomacyRequested = () => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.DIPLOMACY,
   });
 };
 
 const onOpenLedgerRequested = () => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state: MENU_STATES.LEDGER,
   });
 };

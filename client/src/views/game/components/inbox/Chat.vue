@@ -64,7 +64,7 @@ const isExpanded = ref(false);
 const toggle = () => {
   isExpanded.value = !isExpanded.value;
 
-  store.commit('setMenuStateChat', {
+  store.setMenuStateChat({
     state: MENU_STATES.INBOX,
     args: null
   });
@@ -86,12 +86,12 @@ const onViewConversationRequested = (e: { conversationId: string, participantIds
   }
 
   if (e.conversationId) {
-    store.commit('setMenuStateChat', {
+    store.setMenuStateChat({
       state: MENU_STATES.CONVERSATION,
       args: e.conversationId
     })
   } else if (e.participantIds) {
-    store.commit('setMenuStateChat', {
+    store.setMenuStateChat({
       state: MENU_STATES.CREATE_CONVERSATION,
       args: e.participantIds
     })
@@ -105,7 +105,7 @@ const onCreateNewConversationRequested = (e: { participantIds?: string[] }) => {
     return;
   }
 
-  store.commit('setMenuStateChat', {
+  store.setMenuStateChat({
     state: MENU_STATES.CREATE_CONVERSATION,
     args: e.participantIds || null
   });
@@ -118,7 +118,7 @@ const onOpenInboxRequested = () => {
     return;
   }
 
-  store.commit('setMenuStateChat', {
+  store.setMenuStateChat({
     state: MENU_STATES.INBOX,
     args: null
   });
@@ -163,7 +163,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     return;
   }
 
-  store.commit('setMenuStateChat', {
+  store.setMenuStateChat({
     state: menuState,
     args: null
   })
@@ -175,7 +175,7 @@ document.addEventListener('keydown', handleKeyDown);
 window.addEventListener('resize', handleResize);
 
 onMounted(() => {
-  store.commit('setMenuStateChat', {
+  store.setMenuStateChat({
     state: MENU_STATES.INBOX,
     args: null
   });

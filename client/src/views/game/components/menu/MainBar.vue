@@ -283,7 +283,7 @@ export default {
       }
     },
     changeMenuState (state, args) {
-      this.$store.commit('setMenuState', {
+      this.$store.setMenuState({
         state,
         args
       })

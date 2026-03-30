@@ -17,7 +17,7 @@ export class GameClientSocketHandler extends ClientSocketHandler<GameSocketEvent
     super(socket);
 
     this.on(GameSocketEventNames.GameStarted, (e: { state: GameState<string> }) => {
-      store.commit(GameMutationNames.GameStarted, e);
+      store.socketMutations[GameMutationNames.GameStarted](e);
 
       eventBus.emit(GameEventBusEventNames.GameStarted, e);
 

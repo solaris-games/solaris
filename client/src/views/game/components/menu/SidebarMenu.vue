@@ -58,7 +58,7 @@ const config = inject(configInjectionKey)!;
 const game = computed<Game>(() => store.game);
 
 const setMenuState = (state: string, args: any) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state,
     args
   });

@@ -29,7 +29,7 @@ const allBadges: Ref<TBadge[]> = ref([]);
 
 const badges: Ref<AwardedBadge<string>[]> = ref([]);
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
 const badgeStore = useBadgeStore();
 
 const httpClient: Axios = inject(httpInjectionKey)!;

@@ -16,9 +16,9 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
               eventBus: EventBus) {
     super(socket);
 
-    this.on(PlayerSocketEventNames.GamePlayerJoined, (e: { playerId: string, alias: string, avatar: string }) => store.commit(PlayerMutationNames.GamePlayerJoined, e));
-    this.on(PlayerSocketEventNames.GamePlayerQuit, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerQuit, e));
-    this.on(PlayerSocketEventNames.GamePlayerConcededDefeat, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerConcededDefeat, e));
+    this.on(PlayerSocketEventNames.GamePlayerJoined, (e: { playerId: string, alias: string, avatar: string }) => store.socketMutations[PlayerMutationNames.GamePlayerJoined](e));
+    this.on(PlayerSocketEventNames.GamePlayerQuit, (e: { playerId: string }) => store.socketMutations[PlayerMutationNames.GamePlayerQuit](e));
+    this.on(PlayerSocketEventNames.GamePlayerConcededDefeat, (e: { playerId: string }) => store.socketMutations[PlayerMutationNames.GamePlayerConcededDefeat](e));
 
     // Only the server handles these.
     //socket.on(PlayerSocketEventNames.GameRoomJoined, (e: { playerId: string, alias: string, avatar: string }) => store.commit(PlayerMutationNames.GameRoomJoined, e));
@@ -41,11 +41,11 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
       player.isOnline = false;
     });
 
-    this.on(PlayerSocketEventNames.GamePlayerReady, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerReady, e));
-    this.on(PlayerSocketEventNames.GamePlayerNotReady, (e: { playerId: string }) => store.commit(PlayerMutationNames.GamePlayerNotReady, e));
+    this.on(PlayerSocketEventNames.GamePlayerReady, (e: { playerId: string }) => store.socketMutations[PlayerMutationNames.GamePlayerReady](e));
+    this.on(PlayerSocketEventNames.GamePlayerNotReady, (e: { playerId: string }) => store.socketMutations[PlayerMutationNames.GamePlayerNotReady](e));
 
-    this.on(PlayerSocketEventNames.GamePlayerReadyToQuit, (e: { playerId?: string }) => store.commit(PlayerMutationNames.GamePlayerReadyToQuit, e));
-    this.on(PlayerSocketEventNames.GamePlayerNotReadyToQuit, (e: { playerId?: string }) => store.commit(PlayerMutationNames.GamePlayerNotReadyToQuit, e));
+    this.on(PlayerSocketEventNames.GamePlayerReadyToQuit, (e: { playerId?: string }) => store.socketMutations[PlayerMutationNames.GamePlayerReadyToQuit](e));
+    this.on(PlayerSocketEventNames.GamePlayerNotReadyToQuit, (e: { playerId?: string }) => store.socketMutations[PlayerMutationNames.GamePlayerNotReadyToQuit](e));
 
     this.on(PlayerSocketEventNames.GameConversationRead, (e: { conversationId: string, readByPlayerId: string }) => eventBus.emit(PlayerEventBusEventNames.GameConversationRead, e));
 
@@ -64,7 +64,7 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
     this.on(PlayerSocketEventNames.PlayerDebtAdded, (e: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) => eventBus.emit(PlayerEventBusEventNames.PlayerDebtAdded, e));
     this.on(PlayerSocketEventNames.PlayerDebtForgiven, (e: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) => eventBus.emit(PlayerEventBusEventNames.PlayerDebtForgiven, e));
     this.on(PlayerSocketEventNames.PlayerDebtSettled, (e: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) => {
-      store.commit(PlayerMutationNames.PlayerDebtSettled, e);
+      store.socketMutations['playerDebtSettled'](e);
       eventBus.emit(PlayerEventBusEventNames.PlayerDebtSettled, e);
     });
   }

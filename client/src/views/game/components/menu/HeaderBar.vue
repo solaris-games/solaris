@@ -157,7 +157,7 @@ const panToHomeStar = () => {
 };
 
 const setMenuState = (state, args) => {
-  store.commit('setMenuState', {
+  store.setMenuState({
     state,
     args
   });

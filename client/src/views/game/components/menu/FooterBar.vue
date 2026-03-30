@@ -62,7 +62,7 @@ const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isDataCleaned = computed(() => game.value.state.cleaned);
 
 const setMenuState = (state: string, args = undefined) => {
-  store.commit('setMenuState', { state, args });
+  store.setMenuState({ state, args });
 };
 
 const panToHomeStar = () => {
