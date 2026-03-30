@@ -1,7 +1,7 @@
 {
     "general": {
         "name": "[[[RANDOM]]]",
-        "description": "Experimental Settings: This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
+        "description": "EXPERIMENTAL SETTINGS: not ultra-dark, 2h ticks, modified research progressions, split resources. This game has 32 players, expect big alliances and epic battles in this huge galaxy!",
         "createdFromTemplate": "32_player_experimental",
         "type": "32_player_rt",
         "mode": "conquest",
@@ -39,7 +39,7 @@
         "randomBinaryStars": 10,
         "randomBlackHoles": 5,
         "randomPulsars": 1,
-        "darkGalaxy": "extra",
+        "darkGalaxy": "standard",
         "giftCarriers": "enabled",
         "defenderBonus": "enabled",
         "carrierToCarrierCombat": "enabled",
@@ -109,11 +109,11 @@
         },
         "researchCosts": {
             "terraforming": "standard",
-            "experimentation": "cheap",
-            "scanning": "cheap",
-            "hyperspace": "cheap",
+            "experimentation": "standard",
+            "scanning": "standard",
+            "hyperspace": "standard",
             "manufacturing": "standard",
-            "banking": "cheap",
+            "banking": "standard",
             "weapons": "expensive",
             "specialists": "expensive"
         },
@@ -127,24 +127,20 @@
                 "growthFactor": "medium"
             },
             "experimentation": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "standard"
             },
             "scanning": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "standard"
             },
             "hyperspace": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "standard"
             },
             "manufacturing": {
                 "progression": "exponential",
                 "growthFactor": "medium"
             },
             "banking": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "standard"
             },
             "weapons": {
                 "progression": "exponential",
@@ -158,7 +154,7 @@
     },
     "gameTime": {
         "gameType": "realTime",
-        "speed": 3600,
+        "speed": 7200,
         "isTickLimited": "disabled",
         "startDelay": 360,
         "afk": {
