@@ -2,7 +2,7 @@ import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
 import {
   type GameInfoState,
-  type GameSettingsGalaxyBase,
+  type GameSettingsGalaxyBase, type InfrastructureUpgradeReport,
   type Location,
   type MapObject, type PlayerDebtEventData, type ResearchTypeNotRandom,
   type Team
@@ -906,8 +906,8 @@ class GameHelper {
     return isBefore(nextTick, new Date());
   }
 
-  starInfrastructureUpgraded(game: Game, data) {
-    let userPlayer = this.getUserPlayer(game)!;
+  starInfrastructureUpgraded(game: Game, data: InfrastructureUpgradeReport<string> & { type: keyof Star["infrastructure"] }) {
+    const userPlayer = this.getUserPlayer(game)!;
 
     userPlayer.credits -= data.cost
 
