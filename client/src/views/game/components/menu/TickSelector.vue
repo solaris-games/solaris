@@ -60,9 +60,7 @@
 <script setup lang="ts">
 import {eventBusInjectionKey} from '../../../../eventBus'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
-import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
-import {type Store, useStore} from 'vuex';
-
+import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {detailGalaxy} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -81,7 +79,7 @@ const display = ref(false);
 const tick = ref(0);
 const inputTick = ref(0);
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const stateTick = computed(() => store.tick);
 

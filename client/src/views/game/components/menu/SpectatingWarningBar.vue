@@ -15,10 +15,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 
-const store = useStore();
+const store = useGameStore();
 
 const isSpectating = computed(() => {
     return GameHelper.isUserSpectatingGame(store.game);

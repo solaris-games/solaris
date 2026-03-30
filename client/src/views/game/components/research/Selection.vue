@@ -56,7 +56,6 @@ import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
 import AudioService from '../../../../game/audio'
 import { ref, computed, onMounted, inject } from 'vue';
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {updateResearchNow, updateResearchNext} from "@/services/typedapi/research";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -68,9 +67,9 @@ import Timer from "@/views/game/components/time/Timer.vue";
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const player = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 

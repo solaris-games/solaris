@@ -21,7 +21,6 @@ import MenuEventBusEventNames from "../../../../../eventBusEventNames/menu";
 import type {ConversationMessage, Conversation} from "@solaris-common";
 import type {Game, Player} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from "vuex";
 import {listPrivate} from "@/services/typedapi/conversation";
 
 const props = defineProps<{
@@ -37,8 +36,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
 const isFromUserPlayer = computed(() => props.message.fromPlayerId === props.userPlayer._id);

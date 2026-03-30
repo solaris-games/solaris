@@ -41,7 +41,6 @@ import FormErrorList from '../../../../components/FormErrorList.vue';
 import { inject, ref, computed, onMounted } from 'vue';
 import { eventBusInjectionKey } from '../../../../../eventBus';
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu';
-import { useStore } from 'vuex';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {createConversation} from "@/services/typedapi/conversation";
 import type {Game, Player} from "@/types/game";
@@ -57,8 +56,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 

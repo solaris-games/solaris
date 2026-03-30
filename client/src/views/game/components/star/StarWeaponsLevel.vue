@@ -85,8 +85,6 @@
 import {computed} from 'vue';
 import {useGameServices} from "@/util/gameServices";
 import type {Game, Player, Star} from "@/types/game";
-
-import {useStore, type Store} from 'vuex';
 import GameHelper from "@/services/gameHelper";
 import type {Specialist} from "@solaris-common";
 
@@ -98,7 +96,7 @@ const props = defineProps<{
 const gameServices = useGameServices();
 
 const store = useGameStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const starSpecialists = computed<Specialist[]>(() => store.starSpecialists);
 const carrierSpecialists = computed<Specialist[]>(() => store.carrierSpecialists);
 

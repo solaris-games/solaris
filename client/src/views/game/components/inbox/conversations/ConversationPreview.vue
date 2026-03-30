@@ -52,7 +52,6 @@ import mentionHelper from '../../../../../services/mentionHelper'
 import { inject, computed } from 'vue'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 import type {ConversationOverview} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 
 const props = defineProps<{
@@ -63,8 +62,8 @@ const props = defineProps<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const hasLastMessage = computed(() => props.conversation.lastMessage != null);

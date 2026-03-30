@@ -21,7 +21,6 @@ import type { GameGalaxyDetail, Player } from '@solaris-common';
 import { computed, inject } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { toastInjectionKey } from '@/util/keys';
-import { useStore } from 'vuex';
 import { useConfirm } from '@/hooks/confirm.ts';
 import { kick } from '@/services/typedapi/game';
 
@@ -33,7 +32,7 @@ const emit = defineEmits<{
   onGameModified: [],
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;

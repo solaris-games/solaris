@@ -21,7 +21,6 @@ import type {GameSpectator} from "@solaris-common";
 import {uninviteSpectator} from "@/services/typedapi/spectator";
 
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import {useStore, type Store} from 'vuex';
 import {ref, inject, computed} from 'vue';
 import {toastInjectionKey} from "@/util/keys";
 

@@ -59,7 +59,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../../services/gameHelper'
 import TechnologyHelper from '../../../../../services/technologyHelper'
 import type {Game} from "@/types/game";
@@ -76,9 +75,9 @@ const props = defineProps<{
   event: TradeEvent<string> | DiplomacyEvent<string>,
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
 const getTechnologyFriendlyName = (key: ResearchTypeNotRandom) => TechnologyHelper.getFriendlyName(key);

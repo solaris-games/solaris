@@ -28,7 +28,6 @@ import ConversationList from '../inbox/conversations/ConversationList.vue';
 import ConversationCreate from './conversations/ConversationCreate.vue';
 import ConversationDetail from './conversations/ConversationDetail.vue';
 import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu';
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
@@ -40,14 +39,14 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 
 const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
 const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, conversationId: string }) => emit('onOpenReportPlayerRequested', e);
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const menuState = computed<string>(() => store.menuStateChat);
 

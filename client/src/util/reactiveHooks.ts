@@ -1,4 +1,3 @@
-import { type Store } from 'vuex';
 
 import { computed, customRef } from 'vue';
 import {loadLocalPreference, storeLocalPreference} from "@/util/localPreference";

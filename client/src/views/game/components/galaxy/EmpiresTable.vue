@@ -44,7 +44,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import EmpireRow from './EmpireRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import {createSortInfo, swapSort} from '../../../../services/data/sortInfo'
@@ -58,8 +57,8 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const defaultSortInfo = createSortInfo([['alias']], true);
 

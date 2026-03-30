@@ -182,7 +182,6 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {ModeKind} from "@/game/map";
-import { useStore } from 'vuex';
 import type {Carrier, Game, Star} from "@/types/game";
 import type {RulerPoint} from "@/types/ruler";
 import {getCountdownTimeStringByTicks} from "@/util/time";
@@ -195,8 +194,8 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game)
+const store = useGameStore();
+const game = computed<Game>(() => store.game!)
 const serviceProvider = useGameServices();
 
 const points = ref<RulerPoint[]>([]);

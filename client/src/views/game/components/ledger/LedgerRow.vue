@@ -19,7 +19,6 @@
 
 <script setup lang="ts">
 import {ref, computed, inject} from 'vue';
-import {useStore} from 'vuex';
 import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
 import type {LedgerType, PlayerLedgerDebt} from "@solaris-common";
@@ -34,6 +33,7 @@ import {
   settleLedgerSpecialistTokens
 } from "@/services/typedapi/ledger";
 import { useColourStore } from '@/stores/colour';
+import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
   ledger: PlayerLedgerDebt<string>,
@@ -47,10 +47,10 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const isLoading = ref(false);
 

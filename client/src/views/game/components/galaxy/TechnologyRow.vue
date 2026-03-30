@@ -15,7 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
 import {eventBusInjectionKey} from "@/eventBus";
@@ -35,8 +34,8 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.player._id);
 

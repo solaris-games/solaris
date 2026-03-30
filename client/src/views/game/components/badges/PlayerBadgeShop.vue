@@ -39,7 +39,6 @@ import type { ToastPluginApi } from "vue-toast-notification";
 import { toastInjectionKey } from "../../../../util/keys";
 import type { Badge } from "@solaris-common";
 import type { Player } from "../../../../types/game";
-import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";

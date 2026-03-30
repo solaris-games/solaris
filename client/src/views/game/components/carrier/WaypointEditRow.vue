@@ -31,7 +31,6 @@
 </template>
 <script setup lang="ts">
 import {computed} from 'vue';
-import {useStore} from "vuex";
 import type {CarrierWaypoint} from "@solaris-common";
 import {formatAction, isActionRequiresShips, isFirstWaypoint} from "@/util/waypoint";
 import GameHelper from "@/services/gameHelper";
@@ -43,8 +42,8 @@ const props = defineProps<{
   allWaypoints: CarrierWaypoint<string>[],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const onChanged = () => emit('onWaypointUpdated', props.waypoint);
 

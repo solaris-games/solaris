@@ -21,7 +21,6 @@ import Reputation from './Reputation.vue';
 import GameHelper from '../../../../services/gameHelper';
 import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import { ref, inject, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import type {Game, Player} from "@/types/game";
 import type {DiplomaticStatus} from "@solaris-common";
 import {detailDiplomacy} from "@/services/typedapi/diplomacy";
@@ -33,8 +32,8 @@ const props = defineProps<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const player = ref<Player | null>(null);
 const userPlayer = ref<Player | null>(null);

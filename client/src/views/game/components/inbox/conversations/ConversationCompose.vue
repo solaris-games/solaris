@@ -18,7 +18,6 @@ import AudioService from '../../../../../game/audio';
 import MentionBox from '../../shared/MentionBox.vue';
 import { inject, ref, computed } from 'vue';
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {Game, Player, Star} from "@/types/game";
 import {sendMessage} from "@/services/typedapi/conversation";
 import type {ConversationMessageSentResult} from "@solaris-common";
@@ -35,10 +34,10 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const conversationStore = useConversationStore();
 const mentionStore = useMentionStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const isSendingMessage = ref(false);
 const currentMention = ref<string | null>(null);

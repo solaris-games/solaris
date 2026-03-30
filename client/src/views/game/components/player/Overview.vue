@@ -63,7 +63,6 @@ import { ref, inject, computed, onMounted } from 'vue'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import type {Game} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {ConversationOverview} from "@solaris-common";
 import GameHelper from "../../../../services/gameHelper";
 import {listPrivate} from "@/services/typedapi/conversation";
@@ -81,8 +80,8 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
 const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));

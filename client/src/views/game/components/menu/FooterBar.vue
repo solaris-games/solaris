@@ -39,10 +39,10 @@ import MENU_STATES from '../../../../services/data/menuStates'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 import HamburgerMenu from "@/views/game/components/menu/HamburgerMenu.vue";
+import { useGameStore } from "@/stores/game";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -50,9 +50,9 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
@@ -62,7 +62,7 @@ const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isDataCleaned = computed(() => game.value.state.cleaned);
 
 const setMenuState = (state: string, args = undefined) => {
-  store.setMenuState({ state, args });
+  store.setMenuState(eventBus, { state, args });
 };
 
 const panToHomeStar = () => {

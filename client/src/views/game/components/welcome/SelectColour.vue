@@ -50,7 +50,6 @@ import TeamName from '../shared/TeamName.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {Game, Player} from "@/types/game";
 import GameHelper from "../../../../services/gameHelper";
 import {useConfirm} from "@/hooks/confirm.ts";
@@ -63,10 +62,10 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const players = computed(() => game.value.galaxy.players);
 
 const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);

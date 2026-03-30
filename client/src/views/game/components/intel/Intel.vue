@@ -94,7 +94,6 @@ import GameHelper from '../../../../services/gameHelper'
 import {getIntel} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject, ref, computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import type {Intel} from "@solaris-common";
 import type {PlayerFilter, IntelType, DataCollection, DataSet} from "@/views/game/components/intel/types";
@@ -111,9 +110,9 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const intelType = ref<IntelType>('totalStars');
 const history = ref<Intel<string>[] | null>(null);

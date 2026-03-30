@@ -89,14 +89,14 @@ import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import MENU_STATES from '../../../../services/data/menuStates'
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
-import {inject, computed} from 'vue'
-import {useStore} from 'vuex';
+import {inject, computed} from 'vue';
 import {eventBusInjectionKey} from '../../../../eventBus'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {configInjectionKey} from "@/config";
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 import { useColourStore } from '@/stores/colour';
+import { useGameStore } from "@/stores/game"
 
 const props = defineProps<{
   buttonClass?: string,
@@ -110,13 +110,13 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const config = inject(configInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const setMenuState = (state: string, args: any = null) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state,
     args
   });
@@ -170,7 +170,7 @@ const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 
-const isDataCleaned = computed(() => store.game.state.cleaned);
+const isDataCleaned = computed(() => store.game!.state.cleaned);
 
 const documentationUrl = computed(() => config.appDocumentationUrl);
 

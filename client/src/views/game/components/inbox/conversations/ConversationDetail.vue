@@ -60,7 +60,6 @@ import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
 import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import {detailConversation, leave, markAsRead, mute, unmute} from "@/services/typedapi/conversation";
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {
@@ -86,11 +85,11 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const conversationStore = useConversationStore();
 const mentionStore = useMentionStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 

@@ -37,7 +37,6 @@ import GameHelper from "@/services/gameHelper";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
 import {getNotes, writeNotes} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
@@ -52,7 +51,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const mentionStore = useMentionStore();
 
 const isLoadingNotes = ref(false);

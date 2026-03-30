@@ -26,7 +26,6 @@ import PlayerIcon from '../../player/PlayerIcon.vue';
 import type {Conversation} from "@solaris-common";
 import { computed } from 'vue';
 import type {Game} from "@/types/game";
-import { useStore } from "vuex";
 
 const props = defineProps<{
   conversation: Conversation<string>,
@@ -36,8 +35,8 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const isPartialPlayers = computed(() => props.conversation.participants.length !== game.value.galaxy.players.length);
 const isOneVsOne = computed(() => game.value.settings.general.playerLimit === 2);

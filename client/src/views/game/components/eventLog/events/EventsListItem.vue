@@ -108,7 +108,6 @@ import PlayerDiplomacyStatusChanged from './PlayerDiplomacyStatusChanged.vue'
 import type {GameEvent} from "@solaris-common";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {markAsRead} from "@/services/typedapi/event";
-import {useStore} from 'vuex';
 import type {Game} from "@/types/game";
 
 const props = defineProps<{
@@ -121,8 +120,8 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 

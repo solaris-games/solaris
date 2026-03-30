@@ -9,7 +9,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import type {ListGame} from "@solaris-common";
 import { useUserStore } from '@/stores/user';
 
@@ -17,7 +16,7 @@ const props = defineProps<{
   game: ListGame<string>,
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 
 const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer)

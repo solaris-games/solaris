@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import StarLabel from '../../star/StarLabel.vue'
 import CarrierLabel from '../../carrier/CarrierLabel.vue'
 import GameHelper from '../../../../../services/gameHelper'
@@ -25,8 +24,8 @@ const emit = defineEmits<{
 
 const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.event.data.toPlayerId);
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.event.data.toPlayerId)!)
 </script>

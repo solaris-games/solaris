@@ -76,7 +76,6 @@ import TickSelector from './TickSelector.vue'
 import ReadyStatusButton from './ReadyStatusButton.vue'
 import { eventBusInjectionKey } from '../../../../eventBus'
 import { inject, ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useStore } from 'vuex';
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 import UserEventBusEventNames from "../../../../eventBusEventNames/user";
@@ -90,6 +89,7 @@ import type {Game} from "@/types/game";
 import {unreadCount} from "@/services/typedapi/event";
 import {getCountdownTimeString, getCountdownTimeStringByTicks} from "@/util/time";
 import { useUserStore } from '@/stores/user';
+import { useGameStore } from "@/stores/game"
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -99,10 +99,10 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const gameIsPendingStart = computed(() => GameHelper.isGamePendingStart(game.value));
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
@@ -157,7 +157,7 @@ const panToHomeStar = () => {
 };
 
 const setMenuState = (state, args) => {
-  store.setMenuState({
+  store.setMenuState(eventBus, {
     state,
     args
   });
@@ -250,7 +250,7 @@ const recalculateTimeRemaining = () => {
   if (gameIsPendingStart.value) {
     timeRemaining.value = getCountdownTimeString(game.value.state.startDate!);
   } else {
-    const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.tick, store.productionTick);
+    const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.tick, store.productionTick || 0);
     timeRemaining.value = getCountdownTimeStringByTicks(game.value, ticksToProduction);
   }
 };
@@ -303,7 +303,7 @@ const checkForUnreadMessages = async () => {
   if (isOk(response)) {
     unreadMessages.value = response.data.unread;
 
-    store.commit('setUnreadMessages', unreadMessages.value);
+    store.setUnreadMessages(unreadMessages.value);
   } else {
     console.error(formatError(response));
   }

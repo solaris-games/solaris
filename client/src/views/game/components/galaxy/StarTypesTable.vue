@@ -65,7 +65,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import StarIcon from '../star/StarIcon.vue'
 import StarTypesRow from './StarTypesRow.vue'
@@ -84,8 +83,8 @@ const SORT_INFO_KEY = "galaxy_startypes_sortInfo";
 
 const defaultSortInfo = createSortInfo([['name']], true);
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);
 

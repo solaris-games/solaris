@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
@@ -14,8 +13,8 @@ const props = defineProps<{
   showETA?: boolean;
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const timeString = ref('');
 

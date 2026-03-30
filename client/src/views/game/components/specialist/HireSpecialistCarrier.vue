@@ -66,7 +66,6 @@ import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import {useStore} from "vuex";
 import type {Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Specialist} from "@solaris-common";
@@ -87,10 +86,10 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const specialists = computed(() => store.carrierSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.carrier.indexOf(s.id) < 0));

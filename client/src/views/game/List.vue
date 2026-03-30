@@ -520,7 +520,6 @@ import { type ListGame, type Tutorial } from "@solaris-common";
 import { ref, computed, inject, onMounted, type Ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/game';
-import { useStore } from 'vuex';
 import gameHelper from '@/services/gameHelper';
 import { formatDistanceToNow } from "date-fns";
 import { useTutorialStore } from '@/stores/tutorial';
@@ -540,7 +539,7 @@ type Games = {
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const tutorialStore = useTutorialStore();
 
 const isLoading = ref(false);

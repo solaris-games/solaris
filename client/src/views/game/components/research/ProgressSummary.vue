@@ -173,15 +173,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
 import type {ResearchTypeNotRandom} from "@solaris-common";
 import type {Game} from "@/types/game";
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const research = computed(() => GameHelper.getUserPlayer(game.value)!.research);
 
 const getRequiredTotal = (key: ResearchTypeNotRandom) => TechnologyHelper.getRequiredResearchProgress(game.value, key, research.value[key].level);

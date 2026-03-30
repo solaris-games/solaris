@@ -40,7 +40,6 @@ import LeaderboardRow from '@/views/game/components/leaderboard/LeaderboardRow.v
 import { inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import type {Game} from "@/types/game";
-import { useStore } from 'vuex';
 import { computed } from 'vue';
 import type {Team} from "@solaris-common";
 import type {TeamLeaderboardData} from "@/types/leaderboard.ts";
@@ -53,8 +52,8 @@ const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailReque
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 
 const sortedTeams = computed(() => GameHelper.getSortedLeaderboardTeamList(game.value));

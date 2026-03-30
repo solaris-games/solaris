@@ -96,7 +96,6 @@
 
 <script setup lang="ts">
 import { ref, computed, inject, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 import TechnologyHelper from '../../../../services/technologyHelper';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
@@ -112,8 +111,8 @@ const props = defineProps<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const isLoading = ref(false);
 const tradeEvents = ref<TradeEvent<string>[]>([]);

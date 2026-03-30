@@ -9,7 +9,7 @@ import {
   type UserGameSettings,
   type WarpgateBuildReport
 } from "@solaris-common";
-import {eventBusInjectionKey} from "@/eventBus";
+import {type EventBus, eventBusInjectionKey} from "@/eventBus";
 import MenuEventBusEventNames from "@/eventBusEventNames/menu";
 import {useColourStore} from "@/stores/colour";
 import GameMutationNames from "@/mutationNames/gameMutationNames";
@@ -18,6 +18,7 @@ import GameHelper from "@/services/gameHelper";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import type { Axios } from "axios";
 
 type PlayerJoinedData = {
   playerId: string,
@@ -38,11 +39,9 @@ export const useGameStore = defineStore('game', () => {
   const productionTick = ref<number | null>(null);
   const unreadMessages = ref<number | null>(null);
 
-  const httpClient = inject(httpInjectionKey)!;
-  const eventBus = inject(eventBusInjectionKey)!;
   const colourStore = useColourStore();
 
-  const setMenuState = (newMenuState: { state: string, args?: any }) => {
+  const setMenuState = (eventBus: EventBus, newMenuState: { state: string, args?: any }) => {
     if (newMenuState.state === menuState.value && newMenuState.args === menuArguments.value) {
       menuArguments.value = null;
       menuState.value = null;
@@ -54,7 +53,7 @@ export const useGameStore = defineStore('game', () => {
     eventBus.emit(MenuEventBusEventNames.OnMenuRequested, { menuState: menuState.value, menuArguments: menuArguments.value });
   };
 
-  const clearMenuState = () => {
+  const clearMenuState = (eventBus: EventBus) => {
     menuState.value = null;
     menuArguments.value = null;
 
@@ -102,7 +101,7 @@ export const useGameStore = defineStore('game', () => {
     unreadMessages.value = count;
   };
 
-  const gameStarBulkUpgraded = (data: BulkUpgradeReport<string>) => {
+  const gameStarBulkUpgraded = (eventBus: EventBus, data: BulkUpgradeReport<string>) => {
     const player = GameHelper.getUserPlayer(game.value!)!;
 
     let newScience = 0;
@@ -164,20 +163,20 @@ export const useGameStore = defineStore('game', () => {
     player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
   };
 
-  const gameStarWarpGateBuilt = (data: WarpgateBuildReport<string>) => {
+  const gameStarWarpGateBuilt = (eventBus: EventBus, data: WarpgateBuildReport<string>) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     star.warpGate = true;
     GameHelper.getUserPlayer(game.value!)!.credits -= data.cost;
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const gameStarWarpGateDestroyed = (data: { starId: string }) => {
+  const gameStarWarpGateDestroyed = (eventBus: EventBus, data: { starId: string }) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     star.warpGate = false;
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const gameStarCarrierBuilt = (data: CarrierBuildReport<string>) => {
+  const gameStarCarrierBuilt = (eventBus: EventBus, data: CarrierBuildReport<string>) => {
     const carrier = GameHelper.getCarrierById(game.value!, data.carrier._id);
 
     if (!carrier) {
@@ -195,7 +194,7 @@ export const useGameStore = defineStore('game', () => {
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: data.carrier });
   };
 
-  const gameStarCarrierShipTransferred = (data: { starId: string, carrierId: string, starShips: number, carrierShips: number }) => {
+  const gameStarCarrierShipTransferred = (eventBus: EventBus, data: { starId: string, carrierId: string, starShips: number, carrierShips: number }) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     const carrier = GameHelper.getCarrierById(game.value!, data.carrierId)!;
 
@@ -218,7 +217,7 @@ export const useGameStore = defineStore('game', () => {
     });
   };
 
-  const gameStarAbandoned = (data: { starId: string }) => {
+  const gameStarAbandoned = (eventBus: EventBus, data: { starId: string }) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
 
     const player = GameHelper.getPlayerById(game.value!, star.ownedByPlayerId!)!;
@@ -239,22 +238,22 @@ export const useGameStore = defineStore('game', () => {
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const gameStarEconomyUpgraded = (data: InfrastructureUpgradeReport<string>) => {
+  const gameStarEconomyUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
     const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'economy', ...data });
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const gameStarIndustryUpgraded = (data: InfrastructureUpgradeReport<string>) => {
+  const gameStarIndustryUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
     const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'industry', ...data });
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const gameStarScienceUpgraded = (data: InfrastructureUpgradeReport<string>) => {
+  const gameStarScienceUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
     const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'science', ...data });
     eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
   };
 
-  const loadSpecialistData = async (gameId: string) => {
+  const loadSpecialistData = async (httpClient: Axios, gameId: string) => {
     const requests = [
       listCarrierForGame(httpClient)(gameId),
       listStarForGame(httpClient)(gameId),

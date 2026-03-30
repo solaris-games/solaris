@@ -31,7 +31,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
@@ -47,9 +46,9 @@ const props = defineProps<{
   player: Player,
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const getPlayerStatus = () => GameHelper.getPlayerStatus(props.player);
 

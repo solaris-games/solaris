@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../../services/gameHelper'
 import type {PlayerSpecialistTokensSentEvent} from "@solaris-common";
 import type {Game} from "@/types/game";
@@ -23,8 +22,8 @@ const emit = defineEmits<{
 
 const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.event.data.toPlayerId);
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.event.data.toPlayerId)!)
 </script>

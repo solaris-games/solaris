@@ -39,7 +39,6 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, onMounted, computed, useTemplateRef } from 'vue';
 import type {Conversation, ConversationMessage, MapObject} from "@solaris-common";
-import { useStore } from "vuex";
 import type {Game} from "@/types/game";
 import {isMobile} from "@/util/mobile";
 import {toastInjectionKey} from "@/util/keys";
@@ -61,9 +60,9 @@ const toast = inject(toastInjectionKey)!;
 
 const messageElement = useTemplateRef("messageElement");
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isFromUserPlayer = computed(() => props.message.fromPlayerId === userPlayer.value._id);

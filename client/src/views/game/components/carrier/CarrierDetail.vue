@@ -242,7 +242,6 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import { useStore } from 'vuex';
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {useConfirm} from "@/hooks/confirm.ts";
@@ -264,7 +263,7 @@ const emit = defineEmits<{
   onEditWaypointRequested: [{carrierId: string, waypoint: CarrierWaypoint<string>}],
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -276,7 +275,7 @@ const isGiftingCarrier = ref(false);
 
 const settings = computed<UserGameSettings>(() => store.settings);
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const carrierOwningPlayer = computed<Player>(() => GameHelper.getPlayerById(game.value, carrier.value.ownedByPlayerId!)!);

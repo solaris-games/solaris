@@ -7,7 +7,6 @@ import { onMounted, inject, ref } from 'vue';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import { useStore } from "vuex";
 import type {MapObject} from "@solaris-common";
 
 const props = defineProps<{
@@ -17,7 +16,7 @@ const props = defineProps<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 
 const actualCarrierName = ref('');
 

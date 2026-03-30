@@ -49,7 +49,6 @@ import type {GameInfoDetail, GameGalaxyDetail} from '@solaris-common';
 import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typedapi';
 import {toastInjectionKey} from '@/util/keys';
 import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame, resetQuitters as resetQuittersReq } from '@/services/typedapi/game';
-import {useStore} from 'vuex';
 import {useConfirm} from '@/hooks/confirm.ts';
 
 const props = defineProps<{
@@ -63,7 +62,7 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
 const isLoading = ref(false);

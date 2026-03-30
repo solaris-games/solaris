@@ -2,7 +2,6 @@ import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
 import {formatError, isOk} from "@/services/typedapi";
 import { type Axios } from 'axios';
 
-import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
 import type {Star} from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";

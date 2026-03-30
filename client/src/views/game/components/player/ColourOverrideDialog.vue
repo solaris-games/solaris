@@ -31,7 +31,6 @@
 
 <script setup lang="ts">
 import { ref, inject, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game} from "@/types/game";
 import {toastInjectionKey} from "@/util/keys.ts";
@@ -52,9 +51,9 @@ const toast = inject(toastInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const currentColour = ref<string | null>(null);
 const modal = ref(null);

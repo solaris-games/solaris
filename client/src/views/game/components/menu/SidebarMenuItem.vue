@@ -8,7 +8,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 
 const props = defineProps<{
     menuState?: string;
@@ -16,7 +15,7 @@ const props = defineProps<{
     iconClass?: string;
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const isActive = computed(() => {
     return props.menuState === store.menuState;

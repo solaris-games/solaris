@@ -24,7 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex';
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Badge} from "@solaris-common";
 
@@ -38,7 +37,7 @@ const emit = defineEmits<{
   onPurchaseBadgeConfirmed: [badge: Badge],
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
 const purchaseBadge = async (badge: Badge) => {

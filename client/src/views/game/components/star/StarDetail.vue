@@ -507,8 +507,6 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {inject, ref, computed, type Ref} from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-
-import {useStore, type Store} from 'vuex';
 import type {Carrier, Game, Player} from "@/types/game";
 import type {MapObject} from "@solaris-common";
 import {abandon} from "@/services/typedapi/star";
@@ -536,7 +534,7 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const store = useGameStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 

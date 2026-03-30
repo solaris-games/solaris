@@ -5,7 +5,6 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
 import type {Game} from "@/types/game";
@@ -16,8 +15,8 @@ const emit = defineEmits<{
 
 const onViewResearchRequested = () => emit('onViewResearchRequested');
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 
 const icon = computed(() => `fas fa-${TechnologyHelper.getIcon(userPlayer.value.researchingNow)}`);

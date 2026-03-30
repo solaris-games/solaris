@@ -19,7 +19,6 @@ import GameHelper from '../../../../services/gameHelper';
 import type {Carrier, Game} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris-common";
 import { ref, computed } from 'vue';
-import { useStore } from "vuex";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {formatAction} from "@/util/waypoint";
 import Timer from "@/views/game/components/time/Timer.vue";
@@ -35,9 +34,9 @@ const emit = defineEmits<{
   onOpenStarDetailRequested: [starId: string],
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);

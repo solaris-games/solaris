@@ -48,7 +48,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow.vue';
 import type {InfrastructureType} from "@solaris-common";
@@ -67,8 +66,8 @@ const emit = defineEmits<{
   onOpenStarDetailRequested: [starId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const tableData = computed(() => game.value.galaxy.stars);
 const isSplitResources = computed(() => GameHelper.isSplitResources(game.value));
 

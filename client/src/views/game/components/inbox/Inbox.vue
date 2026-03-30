@@ -15,7 +15,6 @@ import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';
 import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
 import { eventBusInjectionKey } from '../../../../eventBus';
 import UserEventBusEventNames from "@/eventBusEventNames/user";
-import { useStore } from 'vuex';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game} from "@/types/game";
 import {getUnreadCount} from "@/services/typedapi/conversation";
@@ -24,8 +23,8 @@ const emit = defineEmits<{
   onCloseRequested: [],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const unreadMessages = ref(0);
 

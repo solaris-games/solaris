@@ -1,6 +1,4 @@
 import type { DrawingContext } from "@/game/container";
-import type { Store } from 'vuex';
-import type { State } from '@/store';
 import { useColourStore } from '@/stores/colour';
 
 export class StoreDrawingContext implements DrawingContext {

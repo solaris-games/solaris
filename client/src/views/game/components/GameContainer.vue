@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
-import { useStore } from 'vuex';
 import type { Store } from 'vuex/types/index.js';
 import { eventBusInjectionKey } from '../../../eventBus'
 import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';

@@ -12,7 +12,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import LeaderboardRow from './LeaderboardRow.vue';
 import type {Game} from "@/types/game";
@@ -23,8 +22,8 @@ const emit = defineEmits<{
 
 const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const sortedPlayers = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
 </script>
 

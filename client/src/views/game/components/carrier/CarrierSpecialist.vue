@@ -25,7 +25,6 @@
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import type {Carrier, Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
@@ -37,9 +36,9 @@ const emit = defineEmits<{
   onViewHireCarrierSpecialistRequested: [carrierId: string];
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 
 const carrier = ref<Carrier | null>(null);

@@ -29,14 +29,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 
 const props = defineProps<{
     comparePlayerId: string;
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const userPlayer = computed(() => {
     return GameHelper.getUserPlayer(store.game);

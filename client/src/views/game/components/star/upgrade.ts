@@ -2,7 +2,6 @@ import type {InfrastructureType, InfrastructureUpgradeReport} from "@solaris-com
 import {formatError, isOk, type ResponseResult} from "@/services/typedapi";
 import AudioService from "@/game/audio";
 
-import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Star} from "@/types/game";

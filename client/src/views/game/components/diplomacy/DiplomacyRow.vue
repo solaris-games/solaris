@@ -29,7 +29,6 @@ import gameHelper from '../../../../services/gameHelper';
 import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import DiplomacyIcons from './DiplomacyIcons.vue';
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {DiplomaticStatus} from "@solaris-common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Game} from "@/types/game";
@@ -51,8 +50,8 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const confirm = useConfirm();
 const colourStore = useColourStore();
 

@@ -50,7 +50,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import ShipRow from './ShipRow.vue'
 import {createSortInfo, swapSort} from '../../../../services/data/sortInfo'
@@ -68,8 +67,8 @@ const emit = defineEmits<{
   onOpenCarrierDetailRequested: [carrierId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const showAll = ref(false);
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);

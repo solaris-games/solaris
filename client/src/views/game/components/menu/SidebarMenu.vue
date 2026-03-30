@@ -37,7 +37,6 @@
 
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
@@ -48,14 +47,14 @@ import {configInjectionKey} from "@/config";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { useUserStore } from '@/stores/user';
 
-const store = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const config = inject(configInjectionKey)!;
 
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const setMenuState = (state: string, args: any) => {
   store.setMenuState({

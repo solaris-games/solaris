@@ -19,9 +19,6 @@ import router from '../../../../router';
 import GameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
 import { ref, computed, inject } from 'vue';
-import { useStore } from 'vuex';
-import type { Store } from 'vuex';
-import type { State } from '../../../../store';
 import { toastInjectionKey } from '../../../../util/keys';
 import { useConfirm } from "@/hooks/confirm.ts";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
@@ -33,7 +30,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useGameStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const isConcedingDefeat = ref(false);
 

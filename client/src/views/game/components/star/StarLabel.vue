@@ -7,7 +7,6 @@ import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from "../../../../services/gameHelper";
 import type {MapObject} from "@solaris-common";
 
@@ -18,7 +17,7 @@ const props = defineProps<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const game = computed(() => store.game);
 
 const actualStarName = computed(() => {

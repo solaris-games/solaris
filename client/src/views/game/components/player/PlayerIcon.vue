@@ -5,7 +5,6 @@
 </template>
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconShape from './PlayerIconShape.vue'
 import type {Game} from "@/types/game";
@@ -18,9 +17,9 @@ const props = defineProps<{
   colour?: string,
 }>();
 
-const store = useStore();
+const store = useGameStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 
 const isOnline = ref(false);
 const onlineStatus = ref('');

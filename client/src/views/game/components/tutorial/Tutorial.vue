@@ -18,7 +18,6 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue';
 import type {Game} from "@/types/game";
 import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
@@ -51,9 +50,9 @@ const emit = defineEmits<{
 
 const onCloseRequested = () => emit('onCloseRequested');
 
-const store = useStore();
+const store = useGameStore();
 const tutorialStore = useTutorialStore();
-const game = computed<Game>(() => store.game);
+const game = computed<Game>(() => store.game!);
 const title = ref("Tutorial");
 const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defaultTutorialKey);
 const page = ref(0);
