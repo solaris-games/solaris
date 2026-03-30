@@ -19,7 +19,7 @@ const props = defineProps<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed(() => store.state.game);
+const game = computed(() => store.game);
 
 const actualStarName = computed(() => {
   if (props.starName) {

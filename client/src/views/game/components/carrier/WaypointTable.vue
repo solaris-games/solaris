@@ -66,7 +66,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const showAction = ref(true);

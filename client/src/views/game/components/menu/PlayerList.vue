@@ -13,8 +13,7 @@
 <script setup lang="ts">
 import gameHelper from '../../../../services/gameHelper';
 import PlayerAvatar from './PlayerAvatar.vue';
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import { computed } from 'vue';
 import type { Player } from '@/types/game';
 import {useMentionStore} from "@/stores/mention.ts";
@@ -24,16 +23,16 @@ const emit = defineEmits<{
   'onOpenPlayerDetailRequested': [playerId: string],
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const mentionStore = useMentionStore();
 const colourStore = useColourStore();
 
-const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(store.state.game));
+const sortedPlayers = computed(() => gameHelper.getSortedLeaderboardPlayerList(store.game));
 
 const onPlayerClicked = (player: Player, e: MouseEvent) => {
   const click = () => emit('onOpenPlayerDetailRequested', player._id);
 
-  const doNormalClick = store.state.settings.interface.shiftKeyMentions === 'enabled' && !e.shiftKey;
+  const doNormalClick = store.settings.interface.shiftKeyMentions === 'enabled' && !e.shiftKey;
   if (doNormalClick) {
     click();
     return;
@@ -46,7 +45,7 @@ const onPlayerClicked = (player: Player, e: MouseEvent) => {
 };
 
 const getPlayerColour = (player: Player) => {
-  return colourStore.getColourForPlayer(store.state.game, player._id)!.value;
+  return colourStore.getColourForPlayer(store.game, player._id)!.value;
 }
 </script>
 

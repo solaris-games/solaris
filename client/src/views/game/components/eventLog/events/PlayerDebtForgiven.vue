@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const summary = computed(() => GameHelper.getLedgerGameEventPlayerSummary(game.value, props.event));
 

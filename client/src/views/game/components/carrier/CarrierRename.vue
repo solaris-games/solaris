@@ -55,7 +55,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 
 const isHistoricalMode = useIsHistoricalMode(store);

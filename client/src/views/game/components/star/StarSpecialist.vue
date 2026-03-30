@@ -40,7 +40,7 @@ const emit = defineEmits<{
 const onViewHireStarSpecialistRequested = () => emit('onViewHireStarSpecialistRequested', props.starId);
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const isHistoricalMode = useIsHistoricalMode(store);
 const star = computed(() => GameHelper.getStarById(game.value, props.starId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));

@@ -14,7 +14,6 @@
 <script setup lang="ts">
 import { inject, ref, onMounted, onUnmounted, useTemplateRef, watch, computed } from 'vue';
 import MentionHelper, {type Mention} from '@/services/mentionHelper';
-import { useStore, type Store } from 'vuex';
 import { type State } from '@/store';
 
 const props = defineProps<{
@@ -32,7 +31,7 @@ const emit = defineEmits<{
   onFinish: [],
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const suggestMentions = ref(false);
 const currentMention = ref<{ suggestions: string[], mention: Mention } | null>(null);
@@ -98,7 +97,7 @@ const updateSuggestions = () => {
   if (suggestMentions.value) {
     const oldMention = currentMention.value;
 
-    currentMention.value = MentionHelper.getCurrentMention(store.state.game, messageElement.value!);
+    currentMention.value = MentionHelper.getCurrentMention(store.game, messageElement.value!);
     const newSuggestions = currentMention.value?.suggestions?.length;
 
     if (oldMention && !currentMention.value) {
@@ -116,7 +115,7 @@ const updateSuggestions = () => {
 
 onMounted(() => {
   emit('onSetMessageElement', messageElement.value as HTMLTextAreaElement);
-  suggestMentions.value = store.state.settings.interface.suggestMentions === 'enabled';
+  suggestMentions.value = store.settings.interface.suggestMentions === 'enabled';
 });
 </script>
 

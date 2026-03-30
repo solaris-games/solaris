@@ -44,7 +44,7 @@ const isGiftingCarrier = ref(false);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const canGiftCarrier = computed<boolean>(() => !carrier.value.isGift);
 

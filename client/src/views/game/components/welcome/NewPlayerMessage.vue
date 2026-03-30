@@ -13,11 +13,11 @@ import type { Game } from '@/types/game'
 const store = useStore()
 
 const isGameNotStarted = computed(() => {
-    return GameHelper.isGameNotStarted(store.state.game as Game)
+    return GameHelper.isGameNotStarted(store.game as Game)
 })
 
 const isNewPlayerGame = computed(() => {
-    return GameHelper.isNewPlayerGame(store.state.game as Game)
+    return GameHelper.isNewPlayerGame(store.game as Game)
 })
 </script>
 

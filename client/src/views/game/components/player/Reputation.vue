@@ -46,7 +46,7 @@ const props = defineProps<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 
 const isExtraDark = computed(() => GameHelper.isDarkModeExtra(game.value));

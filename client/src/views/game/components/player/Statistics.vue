@@ -83,7 +83,7 @@ const props = defineProps<{
 }>();
 
 const store = useStore();
-const game = computed(() => store.state.game);
+const game = computed(() => store.game);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isUserPlayer = computed(() => userPlayer.value && player.value._id === userPlayer.value._id);

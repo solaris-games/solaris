@@ -1,7 +1,7 @@
 import type {InfrastructureType, InfrastructureUpgradeReport} from "@solaris-common";
 import {formatError, isOk, type ResponseResult} from "@/services/typedapi";
 import AudioService from "@/game/audio";
-import type {State} from "@/store";
+
 import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
 import {useConfirm} from "@/hooks/confirm.ts";
@@ -19,7 +19,7 @@ export const makeUpgrade = (store: Store<State>, toast: ToastPluginApi, star: St
 
   isLoading.value = true;
 
-  const response = await req(store.state.game._id, star._id);
+  const response = await req(store.game._id, star._id);
 
   if (isOk(response)) {
     toast.default(`Upgraded ${infrastructure} at ${star.name}`);
@@ -38,11 +38,11 @@ export const makeWarpgateActions = (store: Store<State>, toast: ToastPluginApi, 
   const confirm = useConfirm();
 
   const buildWarpGate =  async () => {
-    if (store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${star.name}? The upgrade will cost $${star.upgradeCosts!.warpGate}.`)) {
+    if (store.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Build Warp Gate', `Are you sure you want build a Warp Gate at ${star.name}? The upgrade will cost $${star.upgradeCosts!.warpGate}.`)) {
       return;
     }
 
-    const response = await buildWarpGateReq(httpClient)(store.state.game._id, star._id);
+    const response = await buildWarpGateReq(httpClient)(store.game._id, star._id);
 
     if (isOk(response)) {
       toast.default(`Warp Gate built at ${star.name}.`)
@@ -57,11 +57,11 @@ export const makeWarpgateActions = (store: Store<State>, toast: ToastPluginApi, 
   };
 
   const destroyWarpGate = async () => {
-    if (store.state.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Destroy Warp Gate', `Are you sure you want destroy a Warp Gate at ${star.name}? The upgrade will cost $${star.upgradeCosts!.warpGate}.`)) {
+    if (store.settings.star.confirmBuildWarpGate === 'enabled' && !await confirm('Destroy Warp Gate', `Are you sure you want destroy a Warp Gate at ${star.name}? The upgrade will cost $${star.upgradeCosts!.warpGate}.`)) {
       return;
     }
 
-    const response = await destroyWarpGateReq(httpClient)(store.state.game._id, star._id);
+    const response = await destroyWarpGateReq(httpClient)(store.game._id, star._id);
 
     if (isOk(response)) {
       toast.default(`Warp Gate destroyed at ${star.name}.`)

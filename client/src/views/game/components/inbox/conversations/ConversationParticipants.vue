@@ -37,7 +37,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isPartialPlayers = computed(() => props.conversation.participants.length !== game.value.galaxy.players.length);
 const isOneVsOne = computed(() => game.value.settings.general.playerLimit === 2);

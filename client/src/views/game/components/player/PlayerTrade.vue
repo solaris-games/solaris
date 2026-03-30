@@ -34,7 +34,7 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const player = ref<Player | null>(null);
 const userPlayer = ref<Player | null>(null);

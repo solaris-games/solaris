@@ -36,7 +36,7 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.player._id);
 

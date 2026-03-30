@@ -22,7 +22,7 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const diplomaticStatus = ref<DiplomaticStatus<string> | null>(null);
 

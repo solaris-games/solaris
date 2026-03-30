@@ -15,7 +15,7 @@ const props = defineProps<{
 const store = useStore()
 
 const team = computed(() => {
-    const game = store.state.game as Game;
+    const game = store.game as Game;
     const player = GameHelper.getPlayerById(game, props.playerId);
     return GameHelper.getTeamByPlayer(game, player);
 })

@@ -113,7 +113,7 @@ const config = inject(configInjectionKey)!;
 const store = useStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const setMenuState = (state: string, args: any = null) => {
   store.commit('setMenuState', {
@@ -155,7 +155,7 @@ const reloadPage = () => {
 };
 
 const toggleCustomColours = () => {
-  colourStore.setColourOverride(!isCustomColoursEnabled.value, eventBus, store.state.game, store.state.settings);
+  colourStore.setColourOverride(!isCustomColoursEnabled.value, eventBus, store.game, store.settings);
 };
 
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
@@ -170,7 +170,7 @@ const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 
-const isDataCleaned = computed(() => store.state.game.state.cleaned);
+const isDataCleaned = computed(() => store.game.state.cleaned);
 
 const documentationUrl = computed(() => config.appDocumentationUrl);
 

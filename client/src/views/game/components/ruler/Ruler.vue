@@ -196,7 +196,7 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game)
+const game = computed<Game>(() => store.game)
 const serviceProvider = useGameServices();
 
 const points = ref<RulerPoint[]>([]);
@@ -207,7 +207,7 @@ const totalEta = ref('');
 const totalEtaWarp = ref('');
 const speedModifier = ref(1);
 
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle === 'compact');
+const isCompactUIStyle = computed(() => store.settings.interface.uiStyle === 'compact');
 const isStandardUIStyle = computed(() => !isCompactUIStyle.value);
 
 const warpGateCost = computed(() => {
@@ -224,7 +224,7 @@ const warpGateCost = computed(() => {
   return sum;
 });
 
-const carrierSpecialists = computed<Specialist[]>(() => store.state.carrierSpecialists);
+const carrierSpecialists = computed<Specialist[]>(() => store.carrierSpecialists);
 
 const speeds = computed(() => {
   if (!carrierSpecialists.value) {

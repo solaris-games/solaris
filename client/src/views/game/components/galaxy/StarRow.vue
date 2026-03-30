@@ -43,8 +43,7 @@ import { ref, inject, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Star, Player} from "@solaris-common";
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import {useConfirm} from "@/hooks/confirm.ts";
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from '@/services/typedapi/star';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
@@ -63,7 +62,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 
 const isHistoricalMode = useIsHistoricalMode(store);
@@ -72,15 +71,15 @@ const isUpgradingEconomy = ref(false);
 const isUpgradingIndustry = ref(false);
 const isUpgradingScience = ref(false);
 
-const userPlayer = computed<Player<string> | undefined>(() => gameHelper.getUserPlayer(store.state.game));
+const userPlayer = computed<Player<string> | undefined>(() => gameHelper.getUserPlayer(store.game));
 
 const hasEconomyCost = computed(() => props.star.upgradeCosts?.economy);
 const hasIndustryCost = computed(() => props.star.upgradeCosts?.industry);
 const hasScienceCost = computed(() => props.star.upgradeCosts?.science);
 
-const isEconomyEnabled = computed(() => store.state.game.settings.player.developmentCost.economy !== 'none');
-const isIndustryEnabled = computed(() => store.state.game.settings.player.developmentCost.industry !== 'none');
-const isScienceEnabled = computed(() => store.state.game.settings.player.developmentCost.science !== 'none');
+const isEconomyEnabled = computed(() => store.game.settings.player.developmentCost.economy !== 'none');
+const isIndustryEnabled = computed(() => store.game.settings.player.developmentCost.industry !== 'none');
+const isScienceEnabled = computed(() => store.game.settings.player.developmentCost.science !== 'none');
 
 const canUpgradeEconomy = computed(() => props.allowUpgrades && hasEconomyCost.value && !isUpgradingEconomy.value && (userPlayer.value?.credits || 0) >= (props.star.upgradeCosts?.economy || 0));
 const canUpgradeIndustry = computed(() => props.allowUpgrades && hasIndustryCost.value && !isUpgradingIndustry.value && (userPlayer.value?.credits || 0) >= (props.star.upgradeCosts?.industry || 0));
@@ -92,9 +91,9 @@ const goToStar = () => eventBus.emit(MapCommandEventBusEventNames.MapCommandPanT
 
 const upgrade = makeUpgrade(store, toast, props.star);
 
-const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
-const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
-const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
+const upgradeEconomy = upgrade('economy', store.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 </script>
 
 <style scoped>

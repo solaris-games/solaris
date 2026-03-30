@@ -113,7 +113,7 @@ const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const intelType = ref<IntelType>('totalStars');
 const history = ref<Intel<string>[] | null>(null);
@@ -225,7 +225,7 @@ const reloadData = async () => {
 };
 
 const calculateStartTicks = () => {
-  const currentTick = store.state.tick
+  const currentTick = store.tick
   const prodTicks = game.value.settings.galaxy.productionTicks
 
   startTickOptions.value.push({

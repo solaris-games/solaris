@@ -39,7 +39,7 @@ const emit = defineEmits<{
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 
 const carrier = ref<Carrier | null>(null);

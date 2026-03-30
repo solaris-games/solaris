@@ -38,7 +38,7 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useStore();
 const conversationStore = useConversationStore();
 const mentionStore = useMentionStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isSendingMessage = ref(false);
 const currentMention = ref<string | null>(null);

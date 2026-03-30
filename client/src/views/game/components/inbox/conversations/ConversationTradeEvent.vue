@@ -78,7 +78,7 @@ const props = defineProps<{
 
 const store = useStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
 const getTechnologyFriendlyName = (key: ResearchTypeNotRandom) => TechnologyHelper.getFriendlyName(key);

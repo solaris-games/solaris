@@ -62,7 +62,7 @@ import {eventBusInjectionKey} from '../../../../eventBus'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
 import {type Store, useStore} from 'vuex';
-import type {State} from "@/store";
+
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {detailGalaxy} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -71,7 +71,7 @@ import type {Game} from "@/types/game";
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -81,15 +81,15 @@ const display = ref(false);
 const tick = ref(0);
 const inputTick = ref(0);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
-const stateTick = computed(() => store.state.tick);
+const stateTick = computed(() => store.tick);
 
 const gameTick = computed(() => game.value.state.tick);
 
-const minimumTick = computed(() => store.state.game.state.timeMachineMinimumTick ?? 1);
+const minimumTick = computed(() => store.game.state.timeMachineMinimumTick ?? 1);
 
-const turnTicks = computed(() => store.state.game.settings.gameTime.gameType === 'turnBased' ? store.state.game.settings.gameTime.turnJumps : 6);
+const turnTicks = computed(() => store.game.settings.gameTime.gameType === 'turnBased' ? store.game.settings.gameTime.turnJumps : 6);
 
 const onGameTick = () => {
   const oneIncrement = game.value.settings.gameTime.gameType === 'turnBased' ? game.value.settings.gameTime.turnJumps : 1;
@@ -121,7 +121,7 @@ const onRequestedTickChanged = async () => {
 
   isLoading.value = true;
 
-  const game = store.state.game;
+  const game = store.game;
 
   const response = await detailGalaxy(httpClient)(game._id, tick.value);
 

@@ -82,14 +82,14 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const star = computed(() => game.value.galaxy.stars.find(s => s._id === props.starId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isCurrentSpecialistOneShot = computed(() => Boolean(star.value.specialist?.oneShot));
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const specialists = computed(() => store.state.starSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
+const specialists = computed(() => store.starSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
 
 const isHiringSpecialist = ref(false);
 

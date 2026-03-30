@@ -27,11 +27,11 @@ import Spectator from './Spectator.vue'
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {inject, ref, onMounted, type Ref} from 'vue';
 import {listSpectators} from "@/services/typedapi/spectator";
-import type {State} from "@/store";
+
 import {useStore, type Store} from 'vuex';
 import type {GameSpectator} from "@solaris-common";
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const httpClient = inject(httpInjectionKey)!;
 
 const emit = defineEmits<{
@@ -48,7 +48,7 @@ const onCloseRequested = e => {
 const loadSpectators = async () => {
   isLoading.value = true;
 
-  const response = await listSpectators(httpClient)(store.state.game._id);
+  const response = await listSpectators(httpClient)(store.game._id);
 
   if (isOk(response)) {
     spectators.value = response.data || [];

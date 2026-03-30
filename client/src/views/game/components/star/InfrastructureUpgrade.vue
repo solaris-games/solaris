@@ -31,8 +31,7 @@
 import GameHelper from '../../../../services/gameHelper'
 import type {Star} from "@/types/game";
 import {httpInjectionKey} from "@/services/typedapi";
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import {toastInjectionKey} from "@/util/keys";
 import { ref, computed, inject } from 'vue';
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from "@/services/typedapi/star";
@@ -50,20 +49,20 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const isUpgradingEconomy = ref(false);
 const isUpgradingIndustry = ref(false);
 const isUpgradingScience = ref(false);
 
-const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
+const isGameFinished = computed(() => GameHelper.isGameFinished(store.game));
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const upgrade = makeUpgrade(store, toast, props.star);
 
-const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
-const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
-const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
+const upgradeEconomy = upgrade('economy', store.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
 </script>
 
 <style scoped>

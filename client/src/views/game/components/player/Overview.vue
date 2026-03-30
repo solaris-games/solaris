@@ -82,14 +82,14 @@ const httpClient = inject(httpInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
 const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle !== 'standard');
+const isCompactUIStyle = computed(() => store.settings.interface.uiStyle !== 'standard');
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !GameHelper.isTutorialGame(game.value));
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);

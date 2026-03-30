@@ -19,7 +19,7 @@ const props = defineProps<{
 const store = useStore();
 
 const isActive = computed(() => {
-    return props.menuState === store.state.menuState;
+    return props.menuState === store.menuState;
 });
 
 const setMenuState = () => {

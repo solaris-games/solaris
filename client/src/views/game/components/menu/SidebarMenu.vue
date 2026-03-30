@@ -55,7 +55,7 @@ const isHistoricalMode = useIsHistoricalMode(store);
 
 const config = inject(configInjectionKey)!;
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const setMenuState = (state: string, args: any) => {
   store.commit('setMenuState', {
@@ -78,7 +78,7 @@ const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 
-const isDataCleaned = computed(() => store.state.game.state.cleaned);
+const isDataCleaned = computed(() => store.game.state.cleaned);
 
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
 

@@ -69,7 +69,7 @@ const password = ref('');
 const serviceProvider = useGameServices();
 
 const store = useStore()
-const game = computed(() => store.state.game as Game);
+const game = computed(() => store.game as Game);
 const isAnonymousGame = computed(() => serviceProvider.gameTypeService.isAnonymousGameDuringGame(game.value));
 const isPasswordRequired = computed(() => game.value.settings.general.passwordRequired);
 const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot === 'enabled');

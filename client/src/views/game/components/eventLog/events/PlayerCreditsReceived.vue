@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const game = computed(() => store.state.game);
+const game = computed(() => store.game);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.event.data.fromPlayerId)!);
 

@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userPlayerOwnsCarrier = computed(() => userPlayer.value && GameHelper.getCarrierOwningPlayer(game.value, props.carrier)!._id === userPlayer.value._id);

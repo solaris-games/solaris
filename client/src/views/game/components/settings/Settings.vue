@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const onCloseRequested = () => emit('onCloseRequested');
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 </script>
 
 <style scoped>

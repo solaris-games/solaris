@@ -54,7 +54,7 @@ const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const currentColour = ref<string | null>(null);
 const modal = ref(null);
@@ -72,7 +72,7 @@ const setToDefault = () => {
 
 const onConfirm = async () => {
   try {
-    await colourStore.addColourMapping(httpClient, eventBus, game.value, store.state.settings, {
+    await colourStore.addColourMapping(httpClient, eventBus, game.value, store.settings, {
       playerId: player.value._id,
       colour: {
         alias: currentColour.value!,

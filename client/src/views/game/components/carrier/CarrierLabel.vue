@@ -22,7 +22,7 @@ const store = useStore();
 const actualCarrierName = ref('');
 
 const pan = () => {
-  const carrier = gameHelper.getCarrierById(store.state.game, props.carrierId);
+  const carrier = gameHelper.getCarrierById(store.game, props.carrierId);
 
   if (carrier) {
     eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: carrier as MapObject<string> });
@@ -33,7 +33,7 @@ onMounted(() => {
   if (props.carrierName) {
     actualCarrierName.value = props.carrierName;
   } else {
-    const carrier = gameHelper.getCarrierById(store.state.game, props.carrierId);
+    const carrier = gameHelper.getCarrierById(store.game, props.carrierId);
 
     actualCarrierName.value = carrier ? carrier.name : 'Unknown';
   }

@@ -39,11 +39,11 @@ const props = defineProps<{
 const store = useStore();
 
 const userPlayer = computed(() => {
-    return GameHelper.getUserPlayer(store.state.game);
+    return GameHelper.getUserPlayer(store.game);
 });
 
 const comparePlayer = computed(() => {
-    return GameHelper.getPlayerById(store.state.game, props.comparePlayerId);
+    return GameHelper.getPlayerById(store.game, props.comparePlayerId);
 });
 </script>
 

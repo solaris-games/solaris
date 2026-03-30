@@ -57,7 +57,7 @@ const badges: Ref<AwardedBadge<string>[]> = ref([]);
 const store = useStore() as Store<State>;
 const badgeStore = useBadgeStore();
 
-const game = computed(() => store.state.game!);
+const game = computed(() => store.game!);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId));
 

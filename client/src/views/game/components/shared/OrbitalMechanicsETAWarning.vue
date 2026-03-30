@@ -11,7 +11,7 @@ import type { Game } from '@/types/game'
 const store = useStore()
 
 const isOrbitalMechanicsEnabled = computed(() => {
-    return GameHelper.isOrbitalMechanicsEnabled(store.state.game as Game)
+    return GameHelper.isOrbitalMechanicsEnabled(store.game as Game)
 })
 </script>
 

@@ -58,7 +58,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 

@@ -66,8 +66,7 @@
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import { ref, computed, inject } from 'vue';
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
+
 import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {createReport} from "@/services/typedapi/report";
@@ -91,7 +90,7 @@ const emit = defineEmits<{
 const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const confirm = useConfirm();
 
@@ -101,7 +100,7 @@ const optionMultiboxing = ref(false);
 const optionInappropriateAlias = ref(false);
 
 const player = computed(() => {
-  return GameHelper.getPlayerById(store.state.game, props.args.playerId)!;
+  return GameHelper.getPlayerById(store.game, props.args.playerId)!;
 });
 
 const menuTitle = computed(() => {
@@ -125,7 +124,7 @@ const confirmReportPlayer = async () => {
     return;
   }
 
-  const response = await createReport(httpClient)(store.state.game!._id, props.args.playerId, props.args.messageId, props.args.conversationId, optionAbuse.value, optionSpamming.value, optionMultiboxing.value, optionInappropriateAlias.value);
+  const response = await createReport(httpClient)(store.game!._id, props.args.playerId, props.args.messageId, props.args.conversationId, optionAbuse.value, optionSpamming.value, optionMultiboxing.value, optionInappropriateAlias.value);
   if (isOk(response)) {
     toast.success(`You have reported ${player.value?.alias}. We will investigate and take action if necessary.`);
 

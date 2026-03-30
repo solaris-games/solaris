@@ -136,7 +136,7 @@ const errors = ref<string[]>([]);
 const isTurnBased = ref(true);
 const result = ref<CombatResultShips | null>(null);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const hasDefenderBonus = computed(() => game.value.settings.specialGalaxy.defenderBonus === 'enabled');
 
 const includeDefenderBonus = ref(hasDefenderBonus.value);

@@ -48,7 +48,7 @@ const onCloseRequested = () => emit('onCloseRequested');
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 const playerIndex = computed(() => game.value.galaxy.players.indexOf(player.value));
 const leaderboard = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));

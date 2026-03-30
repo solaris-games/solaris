@@ -1,5 +1,5 @@
 import type { InjectionKey } from "vue";
-import type {State} from "@/store";
+
 import type { Store } from "vuex";
 import { inject } from "vue";
 import {initialize, type ServiceProvider} from "@/services/services";
@@ -14,8 +14,8 @@ export const createGameServices = (store: Store<State>) => {
   };
 
   const specialistService = {
-    getByIdStar: (id: number) => store.state.starSpecialists.find((s) => s.id === id)!,
-    getByIdCarrier: (id: number) => store.state.carrierSpecialists.find((s) => s.id === id)!,
+    getByIdStar: (id: number) => store.starSpecialists.find((s) => s.id === id)!,
+    getByIdCarrier: (id: number) => store.carrierSpecialists.find((s) => s.id === id)!,
   };
 
   const diplomacyService = {

@@ -106,8 +106,8 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const settings = computed<UserGameSettings>(() => store.state.settings);
-const game = computed<Game>(() => store.state.game);
+const settings = computed<UserGameSettings>(() => store.settings);
+const game = computed<Game>(() => store.game);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isInTransit = computed(() => !carrier.value.orbiting);

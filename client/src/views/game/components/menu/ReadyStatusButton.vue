@@ -36,11 +36,11 @@ const store = useStore();
 const confirm = useConfirm();
 
 const player = computed(() => {
-  return GameHelper.getUserPlayer(store.state.game)!;
+  return GameHelper.getUserPlayer(store.game)!;
 });
 
 const isTutorialGame = computed(() => {
-  return GameHelper.isTutorialGame(store.state.game);
+  return GameHelper.isTutorialGame(store.game);
 });
 
 const confirmReady = async () => {
@@ -48,7 +48,7 @@ const confirmReady = async () => {
     return;
   }
 
-  const response = await ready(httpClient)(store.state.game._id);
+  const response = await ready(httpClient)(store.game._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
@@ -68,7 +68,7 @@ const confirmReadyToCycle = async () => {
     return;
   }
 
-  const response = await readyToCycle(httpClient)(store.state.game._id);
+  const response = await readyToCycle(httpClient)(store.game._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
@@ -85,7 +85,7 @@ const confirmReadyToCycle = async () => {
 };
 
 const unconfirmReady = async () => {
-  const response = await notReady(httpClient)(store.state.game._id);
+  const response = await notReady(httpClient)(store.game._id);
 
   if (isOk(response)) {
     player.value.ready = false;

@@ -274,9 +274,9 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
-const settings = computed<UserGameSettings>(() => store.state.settings);
+const settings = computed<UserGameSettings>(() => store.settings);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const carrierOwningPlayer = computed<Player>(() => GameHelper.getPlayerById(game.value, carrier.value.ownedByPlayerId!)!);
@@ -292,7 +292,7 @@ const canGiftCarrier = computed<boolean>(() => Boolean(game.value.settings.speci
   && carrierOwningPlayer.value._id === userPlayer.value._id
   && !carrier.value.isGift
   && !userPlayer.value.defeated
-  && !GameHelper.isGameFinished(store.state.game)
+  && !GameHelper.isGameFinished(store.game)
 ));
 
 const isOwnedByUserPlayer = computed(() => {

@@ -47,13 +47,13 @@ const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailReque
 
 const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, conversationId: string }) => emit('onOpenReportPlayerRequested', e);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
-const menuState = computed<string>(() => store.state.menuStateChat);
+const menuState = computed<string>(() => store.menuStateChat);
 
-const menuArguments = computed(() => store.state.menuArgumentsChat);
+const menuArguments = computed(() => store.menuArgumentsChat);
 
-const unreadMessages = computed<number | null>(() => store.state.unreadMessages);
+const unreadMessages = computed<number | null>(() => store.unreadMessages);
 
 const isUserInGame = computed(() => Boolean(GameHelper.getUserPlayer(game.value)));
 

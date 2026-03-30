@@ -68,7 +68,7 @@ const noteLength = computed(() => {
     return 0
   }
 
-  const staticText = MentionHelper.makeMentionsStatic(store.state.game, notes.value)
+  const staticText = MentionHelper.makeMentionsStatic(store.game, notes.value)
 
   return staticText.length
 });
@@ -77,7 +77,7 @@ const isExceededMaxLength = computed(() => noteLength.value > 5000);
 
 const beginEditing = () => {
   isEditing.value = true
-  notes.value = MentionHelper.makeMentionsEditable(store.state.game, readonlyNotes.value);
+  notes.value = MentionHelper.makeMentionsEditable(store.game, readonlyNotes.value);
 };
 
 const onSetMessageElement = (element: HTMLTextAreaElement) => {
@@ -85,10 +85,10 @@ const onSetMessageElement = (element: HTMLTextAreaElement) => {
     element,
     callbacks: {
       player: (player) => {
-        notes.value = MentionHelper.addMention(notes.value, store.state.mentionReceivingElement, 'player', player.alias)
+        notes.value = MentionHelper.addMention(notes.value, store.mentionReceivingElement, 'player', player.alias)
       },
       star: (star) => {
-        notes.value = MentionHelper.addMention(notes.value, store.state.mentionReceivingElement, 'star', star.name)
+        notes.value = MentionHelper.addMention(notes.value, store.mentionReceivingElement, 'star', star.name)
       }
     }
   });
@@ -99,15 +99,15 @@ const onCloseRequested = (e: Event) => {
 };
 
 const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
-  notes.value = MentionHelper.useSuggestion(notes.value, store.state.mentionReceivingElement, data);
+  notes.value = MentionHelper.useSuggestion(notes.value, store.mentionReceivingElement, data);
 };
 
 const updateGameNotes = async () => {
   isEditing.value = false;
   isSavingNotes.value = true;
 
-  const newNotes = MentionHelper.makeMentionsStatic(store.state.game, notes.value);
-  const response = await writeNotes(httpClient)(store.state.game._id, newNotes);
+  const newNotes = MentionHelper.makeMentionsStatic(store.game, notes.value);
+  const response = await writeNotes(httpClient)(store.game._id, newNotes);
 
   if (isOk(response)) {
     setReadonlyNotes(newNotes)
@@ -127,7 +127,7 @@ const setReadonlyNotes = (notesParam: string) => {
 };
 
 const panToStar = (id: string) => {
-  const star = GameHelper.getStarById(store.state.game, id);
+  const star = GameHelper.getStarById(store.game, id);
   if (star) {
     eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: star.location });
   } else {
@@ -147,7 +147,7 @@ const onPlayerClicked = (id: string) => {
 const loadGameNotes = async () => {
   isLoadingNotes.value = true;
 
-  const response = await getNotes(httpClient)(store.state.game._id);
+  const response = await getNotes(httpClient)(store.game._id);
   if (isOk(response)) {
     setReadonlyNotes(response.data.notes || '')
   } else {

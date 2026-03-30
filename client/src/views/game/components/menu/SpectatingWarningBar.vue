@@ -21,11 +21,11 @@ import GameHelper from '../../../../services/gameHelper';
 const store = useStore();
 
 const isSpectating = computed(() => {
-    return GameHelper.isUserSpectatingGame(store.state.game);
+    return GameHelper.isUserSpectatingGame(store.game);
 });
 
 const isSpectatingDarkMode = computed(() => {
-    return (GameHelper.isDarkMode(store.state.game) || GameHelper.isDarkFogged(store.state.game)) && !store.state.game.galaxy.stars.length;
+    return (GameHelper.isDarkMode(store.game) || GameHelper.isDarkFogged(store.game)) && !store.game.galaxy.stars.length;
 });
 </script>
 

@@ -1,7 +1,7 @@
 import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
 import {formatError, isOk} from "@/services/typedapi";
 import { type Axios } from 'axios';
-import type {State} from "@/store";
+
 import { type Store } from 'vuex';
 import { type ToastPluginApi } from "vue-toast-notification"
 import type {Star} from "@/types/game";
@@ -10,7 +10,7 @@ import type {UserGameSettings} from "@solaris-common";
 
 export const makeShipTransferActions = (store: Store<State>, httpClient: Axios, toast: ToastPluginApi) => {
   const confirm = useConfirm();
-  const settings: UserGameSettings = store.state.settings;
+  const settings: UserGameSettings = store.settings;
   const needsConfirm = settings.star.confirmShipDistribution === 'enabled';
 
   const transferAllToStar = async (star: Star) => {
@@ -18,7 +18,7 @@ export const makeShipTransferActions = (store: Store<State>, httpClient: Axios, 
       return;
     }
 
-    const response = await garrisonAllShips(httpClient)(store.state.game._id, star._id);
+    const response = await garrisonAllShips(httpClient)(store.game._id, star._id);
 
     if (isOk(response)) {
       toast.success(`All ships transferred to ${star.name}.`);
@@ -34,7 +34,7 @@ export const makeShipTransferActions = (store: Store<State>, httpClient: Axios, 
       return;
     }
 
-    const response = await distributeAllShips(httpClient)(store.state.game._id, star._id);
+    const response = await distributeAllShips(httpClient)(store.game._id, star._id);
 
     if (isOk(response)) {
       toast.success(`All ships at ${star.name} distributed to carriers in orbit.`);

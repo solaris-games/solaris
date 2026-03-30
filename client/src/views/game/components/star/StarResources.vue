@@ -79,7 +79,7 @@ const props = withDefaults(defineProps<{
 const store = useStore();
 
 const isSplitResources = computed(() => {
-    return GameHelper.isSplitResources(store.state.game);
+    return GameHelper.isSplitResources(store.game);
 });
 </script>
 

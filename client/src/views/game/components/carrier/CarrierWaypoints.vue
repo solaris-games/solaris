@@ -118,12 +118,12 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const gameServices = useGameServices();
 
-const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle === 'compact');
+const isStandardUIStyle = computed(() => store.settings.interface.uiStyle === 'standard');
+const isCompactUIStyle = computed(() => store.settings.interface.uiStyle === 'compact');
 
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);

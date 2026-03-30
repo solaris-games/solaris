@@ -63,7 +63,7 @@ const messageElement = useTemplateRef("messageElement");
 
 const store = useStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isFromUserPlayer = computed(() => props.message.fromPlayerId === userPlayer.value._id);

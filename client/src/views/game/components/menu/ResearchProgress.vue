@@ -17,7 +17,7 @@ const emit = defineEmits<{
 const onViewResearchRequested = () => emit('onViewResearchRequested');
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 
 const icon = computed(() => `fas fa-${TechnologyHelper.getIcon(userPlayer.value.researchingNow)}`);

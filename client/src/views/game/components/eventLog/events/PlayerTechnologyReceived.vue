@@ -26,7 +26,7 @@ const emit = defineEmits<{
 const onOpenPlayerDetailRequested = () => emit('onOpenPlayerDetailRequested', props.event.data.fromPlayerId);
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.event.data.fromPlayerId)!);
 

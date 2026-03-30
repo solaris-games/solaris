@@ -109,7 +109,7 @@ const toast = inject(toastInjectionKey)!;
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const carrier = ref<Carrier | undefined>(GameHelper.getCarrierById(game.value, props.carrierId));
 const carrierOwningPlayer = computed(() => carrier.value && GameHelper.getCarrierOwningPlayer(game.value, carrier.value));

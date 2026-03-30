@@ -52,7 +52,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
 const userStore = useUserStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));

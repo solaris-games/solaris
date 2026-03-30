@@ -66,13 +66,12 @@ import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
-import { useStore, type Store } from 'vuex';
 import type { State } from '../../../../store';
 import type {LeaderboardUser, UserLeaderboard} from "@solaris-common";
 import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
-const store: Store<State> = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 
 const props = defineProps<{

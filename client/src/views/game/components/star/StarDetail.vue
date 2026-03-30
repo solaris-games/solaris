@@ -507,7 +507,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {inject, ref, computed, type Ref} from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import type {State} from "@/store";
+
 import {useStore, type Store} from 'vuex';
 import type {Carrier, Game, Player} from "@/types/game";
 import type {MapObject} from "@solaris-common";
@@ -535,8 +535,8 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -548,7 +548,7 @@ const canBuildWarpGates = computed(() => game.value.settings.specialGalaxy.warpg
 const canDestroyWarpGates = computed(() => Boolean(game.value.state.startDate));
 const warpSpeedMultiplier = computed(() => game.value.constants.distances.warpSpeedMultiplier);
 const isSpecialistsEnabled = computed(() => game.value.settings.specialGalaxy.specialistCost !== 'none');
-const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
+const isStandardUIStyle = computed(() => store.settings.interface.uiStyle === 'standard');
 const isCompactUIStyle = computed(() => !isStandardUIStyle.value);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isGameInProgress = computed(() => GameHelper.isGameInProgress(game.value));

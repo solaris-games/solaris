@@ -24,7 +24,7 @@ const emit = defineEmits<{
 const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const sortedPlayers = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
 </script>
 

@@ -31,15 +31,15 @@ import { concedeDefeat } from '@/services/typedapi/game';
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isConcedingDefeat = ref(false);
 
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game)!);
-const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.state.game));
-const isGameInProgress = computed(() => GameHelper.isGameStarted(store.state.game) && !GameHelper.isGameFinished(store.state.game));
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.game)!);
+const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.game));
+const isGameInProgress = computed(() => GameHelper.isGameStarted(store.game) && !GameHelper.isGameFinished(store.game));
 
 const doConcedeDefeat = async (openSlot: boolean) => {
   let message = 'Are you sure you want to concede defeat in this game?';

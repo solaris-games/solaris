@@ -68,7 +68,7 @@ const emit = defineEmits<{
 
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isTeamGame = computed(() => GameHelper.isTeamConquest(game.value));
 const hasRankResults = computed(() => Boolean(props.event?.data?.rankingResult?.ranks?.length));

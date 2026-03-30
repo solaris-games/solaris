@@ -20,7 +20,7 @@ const props = defineProps<{
 
 const store = useStore();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isOnline = ref(false);
 const onlineStatus = ref('');

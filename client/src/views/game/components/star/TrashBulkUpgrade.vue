@@ -12,8 +12,7 @@ import type {PlayerScheduledActions} from "@solaris-common";
 import {trashBulk} from "@/services/typedapi/star";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject } from 'vue';
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import {toastInjectionKey} from "@/util/keys";
 
 const props = defineProps<{
@@ -27,10 +26,10 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const trash = async () => {
-  const response = await trashBulk(httpClient)(store.state.game._id, props.action._id);
+  const response = await trashBulk(httpClient)(store.game._id, props.action._id);
 
   if (isOk(response)) {
     store.commit('gameBulkActionTrashed', props.action);

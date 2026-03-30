@@ -1,10 +1,10 @@
 import { type Store } from 'vuex';
-import type {State} from "@/store";
+
 import { computed, customRef } from 'vue';
 import {loadLocalPreference, storeLocalPreference} from "@/util/localPreference";
 
 export const useIsHistoricalMode = (store: Store<State>) => {
-  return computed(() => store.state.tick !== store.state.game.state.tick);
+  return computed(() => store.tick !== store.game.state.tick);
 }
 
 export const useLocalStorage = <T>(key: string, defaultValue: T) => {

@@ -582,7 +582,6 @@ import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind 
 import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris-common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
 import { toastInjectionKey } from '@/util/keys';
-import { useStore, type Store } from 'vuex';
 import { type State } from '@/store';
 
 const props = defineProps<{
@@ -597,7 +596,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const isSavingSettings = ref(false);
 const errors: Ref<string[]> = ref([]);
@@ -634,7 +633,7 @@ const handleSubmit = async (e: Event) => {
     store.commit('setSettings', settings.value);
 
     if (props.isInGame) {
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.state.game, settings: store.state.settings });
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, { game: store.game, settings: store.settings });
     }
 
     onOptionsSaved();

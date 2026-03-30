@@ -43,7 +43,7 @@ const emit = defineEmits<{
 const onTrashed = (actionId: string) => emit('bulkScheduleTrashed', actionId);
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const tableData = computed(() => userPlayer.value.scheduledActions);
 

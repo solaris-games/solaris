@@ -85,7 +85,7 @@ const SORT_INFO_KEY = "galaxy_startypes_sortInfo";
 const defaultSortInfo = createSortInfo([['name']], true);
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);
 

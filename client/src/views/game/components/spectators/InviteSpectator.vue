@@ -29,13 +29,12 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import { ref, inject, type Ref } from 'vue';
 import {useConfirm} from "@/hooks/confirm.ts";
-import { useStore, type Store } from 'vuex';
 import type { State } from '@/store';
 import {toastInjectionKey} from "@/util/keys";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {inviteSpectators} from "@/services/typedapi/spectator";
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const confirm = useConfirm();
 const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -70,7 +69,7 @@ const handleSubmit = async e => {
 
   isLoading.value = true;
 
-  const response = await inviteSpectators(httpClient)(store.state.game._id, actualUsernames);
+  const response = await inviteSpectators(httpClient)(store.game._id, actualUsernames);
 
   if (isOk(response)) {
     toast.success(`You invited ${usernamesText} to spectate you in this game.`);

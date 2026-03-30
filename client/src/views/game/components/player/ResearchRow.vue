@@ -30,7 +30,7 @@ const props = defineProps<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const playerResearchLevel = computed(() => props.player.research[props.research].level);
 

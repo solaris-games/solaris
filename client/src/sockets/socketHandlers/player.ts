@@ -3,17 +3,16 @@ import type { Player } from "@solaris-common";
 import type { LedgerType } from "@solaris-common";
 import type { TradeEventTechnology } from "@solaris-common";
 import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris-common';
-import type { Store } from "vuex/types/index.js";
 import type { EventBus } from "../../eventBus";
 import PlayerEventBusEventNames from "../../eventBusEventNames/player";
 import PlayerMutationNames from "../../mutationNames/playerMutationNames";
 import gameHelper from "../../services/gameHelper";
-import type { State } from "../../store";
 import { ClientSocketHandler } from "./clientSocketHandler";
+import type {GameStore} from "@/stores/game";
 
 export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketEventType> {
   constructor(socket: Socket,
-              store: Store<State>,
+              store: GameStore,
               eventBus: EventBus) {
     super(socket);
 
@@ -26,17 +25,17 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
     //socket.on(PlayerSocketEventNames.GameRoomLeft, (e: { playerId: string, alias: string, avatar: string }) => store.commit(PlayerMutationNames.GameRoomLeft, e));
 
     // We don't need to do this as we should just subscribe to all events "forever" (until the browser tab/app is closed)".  The room should determine what events we receive.'
-    //if (!gameHelper.isHiddenPlayerOnlineStatus(store.state.game))
+    //if (!gameHelper.isHiddenPlayerOnlineStatus(store.game))
 
     this.on(PlayerSocketEventNames.GamePlayerRoomJoined, (e: { playerId: string }) => {
-      let player: Player<string> = gameHelper.getPlayerById(store.state.game!, e.playerId)!;
+      let player: Player<string> = gameHelper.getPlayerById(store.game!, e.playerId)!;
 
       player.lastSeen = new Date();
       player.isOnline = true;
     });
 
     this.on(PlayerSocketEventNames.GamePlayerRoomLeft, (e: { playerId: string }) => {
-      let player: Player<string> = gameHelper.getPlayerById(store.state.game!, e.playerId)!;
+      let player: Player<string> = gameHelper.getPlayerById(store.game!, e.playerId)!;
 
       player.lastSeen = new Date();
       player.isOnline = false;

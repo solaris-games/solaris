@@ -13,6 +13,6 @@ export class StoreDrawingContext implements DrawingContext {
   }
 
   getPlayerColour (playerId: string) {
-    return this.colourStore.getColourForPlayer(this.store.state.game, playerId)!.value;
+    return this.colourStore.getColourForPlayer(this.store.game, playerId)!.value;
   }
 }

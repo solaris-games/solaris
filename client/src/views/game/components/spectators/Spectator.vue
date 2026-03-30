@@ -19,7 +19,7 @@
 import GameHelper from '../../../../services/gameHelper'
 import type {GameSpectator} from "@solaris-common";
 import {uninviteSpectator} from "@/services/typedapi/spectator";
-import type {State} from "@/store";
+
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {useStore, type Store} from 'vuex';
 import {ref, inject, computed} from 'vue';
@@ -33,25 +33,25 @@ const emit = defineEmits<{
   (e: 'onSpectatorUninvited', spectator: GameSpectator<string>): void
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
 const isLoading = ref(false);
 
 const players = computed(() => {
-  return store.state.game.galaxy.players.filter(p => props.spectator.playerIds.includes(p._id));
+  return store.game.galaxy.players.filter(p => props.spectator.playerIds.includes(p._id));
 });
 
 const userPlayer = computed(() => {
-  return GameHelper.getUserPlayer(store.state.game);
+  return GameHelper.getUserPlayer(store.game);
 });
 
 
 const uninvite = async () => {
   isLoading.value = true;
 
-  const response = await uninviteSpectator(httpClient)(store.state.game._id, props.spectator._id);
+  const response = await uninviteSpectator(httpClient)(store.game._id, props.spectator._id);
 
   if (isOk(response)) {
     toast.success(`You uninvited ${props.spectator.username} from spectating you in this game.`)

@@ -66,7 +66,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const store = useStore();
 const confirm = useConfirm();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const players = computed(() => game.value.galaxy.players);
 
 const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);

@@ -53,7 +53,7 @@ const onCloseRequested = () => emit('onCloseRequested');
 
 const store = useStore();
 const tutorialStore = useTutorialStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const title = ref("Tutorial");
 const tutorialKey = ref(game.value.settings.general.createdFromTemplate || defaultTutorialKey);
 const page = ref(0);

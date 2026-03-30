@@ -44,8 +44,6 @@ import { withMessages } from "../../util/messages";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getSettings} from "@/services/typedapi/user";
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
 import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
@@ -54,8 +52,9 @@ import {createGameServices, gameServicesKey} from "@/util/gameServices";
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 import { useColourStore } from '@/stores/colour';
+import {useGameStore} from "@/stores/game";
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
 
@@ -75,7 +74,7 @@ const polling: Ref<number | null> = ref(null);
 const ticking = ref(false);
 const colourOverride: Ref<{ playerId: string } | null> = ref(null);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const gameId = computed(() => game.value._id);
 
@@ -83,7 +82,7 @@ const hasGame = computed(() => Boolean(game.value));
 
 const isLoggedIn = computed(() => userStore.isLoggedIn);
 
-const isHistorical = computed(() => store.state.tick !== game.value.state.tick);
+const isHistorical = computed(() => store.tick !== game.value.state.tick);
 
 const gameServices = createGameServices(store);
 provide(gameServicesKey, gameServices);
@@ -110,8 +109,8 @@ const onStarClicked = (starId: string) => {
 };
 
 const onStarRightClicked = (starId: string) => {
-  const star = GameHelper.getStarById(store.state.game, starId)!;
-  const owningPlayer = GameHelper.getStarOwningPlayer(store.state.game, star);
+  const star = GameHelper.getStarById(store.game, starId)!;
+  const owningPlayer = GameHelper.getStarOwningPlayer(store.game, star);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -130,8 +129,8 @@ const onCarrierClicked = (carrierId: string) => {
 };
 
 const onCarrierRightClicked = (carrierId: string) => {
-  const carrier = GameHelper.getCarrierById(store.state.game, carrierId)!;
-  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.state.game, carrier);
+  const carrier = GameHelper.getCarrierById(store.game, carrierId)!;
+  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.game, carrier);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -210,17 +209,17 @@ const reloadGameCheck = async () => {
 
   // Check if the next tick date has passed, if so check if the server has finished the game tick.
   // Alternatively if the game is set to 10s ticks then always check.
-  const canTick = store.state.game.settings.gameTime.speed <= 10 || gameHelper.canTick(store.state.game);
+  const canTick = store.game.settings.gameTime.speed <= 10 || gameHelper.canTick(store.game);
 
   if (canTick) {
     ticking.value = true;
 
-    const response = await detailState(httpClient)(store.state.game._id);
+    const response = await detailState(httpClient)(store.game._id);
 
     if (isOk(response)) {
       const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
 
-      if (store.state.tick < response.data.state.tick || hasEnded) {
+      if (store.tick < response.data.state.tick || hasEnded) {
         // If the user is currently using the time machine then only set the state variables.
         // Otherwise reload the current game tick.
         if (isHistorical.value) {
@@ -261,13 +260,13 @@ onMounted(async () => {
   await reloadSettings();
   await reloadGame();
 
-  const userPlayer = GameHelper.getUserPlayer(store.state.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game);
 
   if (userPlayer) {
     userClientSockerEmitter.emitJoined();
 
     playerClientSocketEmitter.emitGameRoomJoined({
-      gameId: store.state.game._id,
+      gameId: store.game._id,
       playerId: userPlayer?._id
     });
   }
@@ -279,13 +278,13 @@ onMounted(async () => {
 // Otherwise show the welcome screen if there are empty slots.
 
   if (userPlayer && !userPlayer.defeated) {
-    if (GameHelper.isTutorialGame(store.state.game)) {
+    if (GameHelper.isTutorialGame(store.game)) {
       store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
     } else {
       store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
     }
   } else {
-    if (userStore.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
+    if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
       store.commit('setMenuState', { state: MENU_STATES.WELCOME })
     } else {
       store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
@@ -295,7 +294,7 @@ onMounted(async () => {
   const reloadGameCheckInterval = 1000;
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
-  await store.dispatch('loadSpecialistData', store.state.game._id);
+  await store.dispatch('loadSpecialistData', store.game._id);
   await colourStore.loadColourData(httpClient);
 });
 
@@ -304,11 +303,11 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  const userPlayer = GameHelper.getUserPlayer(store.state.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game);
 
   if (userPlayer) {
     playerClientSocketEmitter.emitGameRoomLeft({
-      gameId: store.state.game._id,
+      gameId: store.game._id,
       playerId: userPlayer?._id
     });
   }

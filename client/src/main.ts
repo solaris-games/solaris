@@ -6,7 +6,6 @@ import { Socket, io } from 'socket.io-client'
 import { createApp } from 'vue'
 import ToastPlugin from "vue-toast-notification"
 import 'vue-toast-notification/dist/theme-default.css'
-import type { Store } from "vuex/types/index.js"
 import App from './App.vue'
 import { ClientEventBus } from "./clientEventBus"
 import { eventBusInjectionKey, type EventBus } from './eventBus'
@@ -16,18 +15,17 @@ import { ClientHandler } from "./sockets/socketHandlers/clientHandler"
 import { DiplomacyClientSocketHandler } from './sockets/socketHandlers/diplomacy'
 import { GameClientSocketHandler } from './sockets/socketHandlers/game'
 import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
-import { createSolarisStore, type State } from './store'
 import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
 import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
-import { useConfirm } from "./hooks/confirm.ts"
 import type {FrontendConfig} from "@solaris-common";
 import {configInjectionKey} from "@/config";
 import { createPinia } from "pinia"
 import {useSocketStore} from "@/stores/socket.ts";
+import {useGameStore} from "@/stores/game.ts";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -82,12 +80,8 @@ const init = (config: FrontendConfig) => {
   const playerClientSocketEmitter: PlayerClientSocketEmitter = new PlayerClientSocketEmitter(socket);
   const userClientSocketEmitter: UserClientSocketEmitter = new UserClientSocketEmitter(socket);
 
-  const store: Store<State> = createSolarisStore(eventBus, httpClient);
-
   const pinia = createPinia();
   app.use(pinia);
-
-  app.use(store);
 
   app.use(ToastPlugin);
 
@@ -100,9 +94,11 @@ const init = (config: FrontendConfig) => {
     socketStore.setSocketConnected(false);
   });
 
+  const gameStore = useGameStore();
+
   const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
-  const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, store, app.config.globalProperties.$toast, eventBus);
-  const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
+  const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, gameStore, app.config.globalProperties.$toast, eventBus);
+  const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, gameStore, eventBus);
   const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, eventBus);
 
   app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
@@ -113,10 +109,10 @@ const init = (config: FrontendConfig) => {
 
   app.provide(toastInjectionKey, app.config.globalProperties.$toast);
 
-  const clientHandler: ClientHandler = new ClientHandler(socket, store, playerClientSocketEmitter, userClientSocketEmitter);
+  const clientHandler: ClientHandler = new ClientHandler(socket, gameStore, playerClientSocketEmitter, userClientSocketEmitter);
 
   app.config.globalProperties.$isHistoricalMode = function() {
-    return this.$store.state.tick !== this.$store.state.game.state.tick
+    return this.$store.tick !== this.$store.game.state.tick
   }
 
   app.config.globalProperties.$isMobile = function () {

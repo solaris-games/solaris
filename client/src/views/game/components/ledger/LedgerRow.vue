@@ -50,7 +50,7 @@ const toast = inject(toastInjectionKey)!;
 const store = useStore();
 const confirm = useConfirm();
 const colourStore = useColourStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const isLoading = ref(false);
 

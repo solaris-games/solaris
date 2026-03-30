@@ -64,7 +64,7 @@ const props = defineProps<{
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const hasLastMessage = computed(() => props.conversation.lastMessage != null);

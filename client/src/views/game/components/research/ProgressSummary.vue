@@ -181,7 +181,7 @@ import type {ResearchTypeNotRandom} from "@solaris-common";
 import type {Game} from "@/types/game";
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const research = computed(() => GameHelper.getUserPlayer(game.value)!.research);
 
 const getRequiredTotal = (key: ResearchTypeNotRandom) => TechnologyHelper.getRequiredResearchProgress(game.value, key, research.value[key].level);

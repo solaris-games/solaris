@@ -54,7 +54,7 @@ const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailReque
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 
 const sortedTeams = computed(() => GameHelper.getSortedLeaderboardTeamList(game.value));

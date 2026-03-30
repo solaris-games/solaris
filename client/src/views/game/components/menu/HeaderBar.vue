@@ -102,7 +102,7 @@ const toast = inject(toastInjectionKey)!;
 const store = useStore();
 const userStore = useUserStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const gameIsPendingStart = computed(() => GameHelper.isGamePendingStart(game.value));
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
@@ -250,7 +250,7 @@ const recalculateTimeRemaining = () => {
   if (gameIsPendingStart.value) {
     timeRemaining.value = getCountdownTimeString(game.value.state.startDate!);
   } else {
-    const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.state.tick, store.state.productionTick);
+    const ticksToProduction = GameHelper.getTicksToProduction(game.value, store.tick, store.productionTick);
     timeRemaining.value = getCountdownTimeStringByTicks(game.value, ticksToProduction);
   }
 };

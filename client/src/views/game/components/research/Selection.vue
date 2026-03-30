@@ -70,7 +70,7 @@ const toast = inject(toastInjectionKey)!;
 
 const store = useStore();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 const player = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 

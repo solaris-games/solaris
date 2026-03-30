@@ -84,7 +84,7 @@ const loadGalacticCredits = async () => {
 }
 
 onMounted(async () => {
-  recipientPlayer.value = GameHelper.getPlayerById(store.state.game!, props.recipientPlayerId)
+  recipientPlayer.value = GameHelper.getPlayerById(store.game!, props.recipientPlayerId)
 
   await badgeStore.loadBadges(httpClient);
   badges.value = badgeStore.purchasableBadges;
@@ -103,7 +103,7 @@ const onPurchaseBadgeConfirmed = async (badge: Badge) => {
   isLoading.value = true
 
   try {
-    const response = await purchaseBadgeForPlayer(httpClient)(store.state.game!._id, recipientPlayer.value!._id, badge.key);
+    const response = await purchaseBadgeForPlayer(httpClient)(store.game!._id, recipientPlayer.value!._id, badge.key);
 
     if (!isError(response)) {
       toast.success(`You successfully purchased the ${badge.name} badge for ${recipientPlayer.value!.alias}!`)

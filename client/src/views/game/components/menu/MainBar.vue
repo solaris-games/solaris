@@ -373,7 +373,7 @@ export default {
   },
   computed: {
     game () {
-      return this.$store.state.game
+      return this.$store.game
     },
     isLoggedIn () {
       return useUserStore().isLoggedIn

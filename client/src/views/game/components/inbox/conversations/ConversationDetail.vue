@@ -90,7 +90,7 @@ const store = useStore();
 const conversationStore = useConversationStore();
 const mentionStore = useMentionStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 

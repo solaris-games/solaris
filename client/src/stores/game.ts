@@ -350,7 +350,7 @@ export const useGameStore = defineStore('game', () => {
   };
 
   return {
-    game: readonly(game),
+    game,
     tick: readonly(tick),
     starSpecialists: readonly(starSpecialists),
     carrierSpecialists: readonly(carrierSpecialists),
@@ -387,3 +387,5 @@ export const useGameStore = defineStore('game', () => {
     clearMenuStateChat,
   };
 });
+
+export type GameStore = ReturnType<typeof useGameStore>;

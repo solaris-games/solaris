@@ -31,22 +31,21 @@
 <script setup lang="ts">
 import type {BulkUpgradeReport, MapObject} from "@solaris-common";
 import GameHelper from "@/services/gameHelper";
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const props = defineProps<{
   upgradeReport: BulkUpgradeReport<string>,
 }>();
 
 const getStar = (starId: string) => {
-  return GameHelper.getStarById(store.state.game, starId)!;
+  return GameHelper.getStarById(store.game, starId)!;
 };
 
 const panToStar = (starId: string) => {

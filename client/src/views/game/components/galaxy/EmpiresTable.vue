@@ -59,7 +59,7 @@ const emit = defineEmits<{
 }>();
 
 const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game);
 
 const defaultSortInfo = createSortInfo([['alias']], true);
 
