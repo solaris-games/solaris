@@ -72,15 +72,10 @@ import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {createReport} from "@/services/typedapi/report";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-
-export type Args = {
-  playerId: string,
-  messageId?: string,
-  conversationId?: string,
-};
+import type {ReportPlayerArgs} from "@/types/menu";
 
 const props = defineProps<{
-  args: Args,
+  args: ReportPlayerArgs,
 }>();
 
 const emit = defineEmits<{

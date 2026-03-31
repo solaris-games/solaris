@@ -19,11 +19,28 @@ import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type { Axios } from "axios";
+import type {MenuState, MenuStateChat} from "@/types/menu.ts";
 
 type PlayerJoinedData = {
   playerId: string,
   alias: string,
   avatar: string,
+};
+
+const EMPTY_MENU: MenuState = { state: 'none' };
+
+const menuStatesEqual = (a: MenuState, b: MenuState): boolean => {
+  if (a.state !== b.state) return false;
+
+  const aRecord = a as Record<string, unknown>;
+  const bRecord = b as Record<string, unknown>;
+
+  for (const key of Object.keys(aRecord)) {
+    if (key === 'state') continue;
+    if (aRecord[key] !== bRecord[key]) return false;
+  }
+
+  return true;
 };
 
 export const useGameStore = defineStore('game', () => {
@@ -32,45 +49,34 @@ export const useGameStore = defineStore('game', () => {
   const starSpecialists = ref<Specialist[] | null>(null);
   const carrierSpecialists = ref<Specialist[] | null>(null);
   const settings = ref<UserGameSettings | null>(null);
-  const menuState = ref<string | null>(null);
-  const menuArguments = ref<any>(null);
-  const menuStateChat = ref<string | null>(null);
-  const menuArgumentsChat = ref<any>(null);
+  const menuState = ref<MenuState>(EMPTY_MENU);
+  const menuStateChat = ref<MenuStateChat>(EMPTY_MENU);
   const productionTick = ref<number | null>(null);
   const unreadMessages = ref<number | null>(null);
 
   const colourStore = useColourStore();
 
-  const setMenuState = (eventBus: EventBus, newMenuState: { state: string, args?: any }) => {
-    if (newMenuState.state === menuState.value && newMenuState.args === menuArguments.value) {
-      menuArguments.value = null;
-      menuState.value = null;
+  const setMenuState = (eventBus: EventBus, newMenuState: MenuState) => {
+    if (menuStatesEqual(menuState.value, newMenuState)) {
+      menuState.value = EMPTY_MENU;
     } else {
-      menuArguments.value = newMenuState.args;
-      menuState.value = newMenuState.state;
+      menuState.value = newMenuState;
     }
 
-    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, { menuState: menuState.value, menuArguments: menuArguments.value });
+    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, newMenuState);
   };
 
   const clearMenuState = (eventBus: EventBus) => {
-    menuState.value = null;
-    menuArguments.value = null;
-
-    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, {
-      menuState: null,
-      menuArguments: null,
-    } as any);
+    menuState.value = EMPTY_MENU;
+    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, EMPTY_MENU as MenuState);
   };
 
-  const setMenuStateChat = (newState: { args: any, state: string }) => {
-    menuArgumentsChat.value = newState.state;
-    menuStateChat.value = newState.args;
+  const setMenuStateChat = (newState: MenuStateChat) => {
+    menuStateChat.value = newState;
   };
 
   const clearMenuStateChat = () => {
-    menuStateChat.value = null;
-    menuArgumentsChat.value = null;
+    menuStateChat.value = EMPTY_MENU;
   };
 
   const setTick = (newTick: number) => {
@@ -355,9 +361,7 @@ export const useGameStore = defineStore('game', () => {
     carrierSpecialists: readonly(carrierSpecialists),
     settings: readonly(settings),
     menuState: readonly(menuState),
-    menuArguments: readonly(menuArguments),
     menuStateChat: readonly(menuStateChat),
-    menuArgumentsChat: readonly(menuArgumentsChat),
     productionTick: readonly(productionTick),
     unreadMessages: readonly(unreadMessages),
     setMenuState,
