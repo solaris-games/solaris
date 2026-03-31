@@ -69,7 +69,8 @@ const emit = defineEmits<{
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
-const tableData = computed(() => game.value.galaxy.stars);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const tableData = computed(() => game.value.galaxy.stars.filter(s => s.ownedByPlayerId === userPlayer.value._id));
 const isSplitResources = computed(() => GameHelper.isSplitResources(game.value));
 
 const sortInfo = ref(defaultSortInfo);
