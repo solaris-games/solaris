@@ -1,4 +1,5 @@
 import type {CarrierWaypoint} from "@solaris-common";
+import type {ObjectClicked} from "@/eventBusEventNames/map.ts";
 
 export type GalaxyMenuState =
   | 'empires'
@@ -23,6 +24,7 @@ export type MenuState =
   | { state: 'intel', compareWithPlayerId?: string }
   | { state: 'options' }
   | { state: 'eventLog' }
+  | { state: 'mapObjectSelector', objects: ObjectClicked[] }
   | { state: 'combatCalculator', carrierId?: string }
   | { state: 'player', playerId: string }
   | { state: 'trade', playerId: string }
@@ -37,6 +39,7 @@ export type MenuState =
   | { state: 'ruler' }
   | { state: 'ledger' }
   | { state: 'diplomacy' }
+  | { state: 'settings' }
   | { state: 'hireSpecialistCarrier'; carrierId: string }
   | { state: 'hireSpecialistStar'; starId: string }
   | { state: 'gameNotes' }

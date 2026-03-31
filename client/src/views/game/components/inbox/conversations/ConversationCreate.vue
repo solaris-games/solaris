@@ -47,7 +47,7 @@ import {createConversation} from "@/services/typedapi/conversation";
 import type {Game, Player} from "@/types/game";
 
 const props = defineProps<{
-  participantIds: string[],
+  participantIds: readonly string[],
 }>();
 
 const emit = defineEmits<{

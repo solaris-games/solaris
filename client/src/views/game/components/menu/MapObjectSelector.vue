@@ -63,7 +63,7 @@ import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer
 import {useConfirm} from "@/hooks/confirm.ts";
 
 const props = defineProps<{
-  mapObjects: ObjectClicked[],
+  mapObjects: readonly ObjectClicked[],
 }>();
 
 const emit = defineEmits<{
