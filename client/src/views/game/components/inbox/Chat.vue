@@ -5,13 +5,12 @@
     </div>
 
     <div id="window" v-if="isExpanded" class="header-bar-bg">
-      <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
-      <conversation-create v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
-        :participantIds="menuArguments"
+      <conversation-list v-if="store.menuStateChat.state === 'inbox'"/>
+      <conversation-create v-if="store.menuStateChat.state === 'createConversation'"
+        :participantIds="store.menuStateChat.participantIds"
         @onCloseRequested="toggle"/>
-      <conversation-detail v-if="menuState == MENU_STATES.CONVERSATION"
-        :conversationId="menuArguments"
-        :key="menuArguments"
+      <conversation-detail v-if="store.menuStateChat.state === 'conversation'"
+        :conversationId="store.menuStateChat.conversationId"
         @onCloseRequested="toggle"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
@@ -22,7 +21,6 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '@/eventBus';
-import MENU_STATES from '../../../../services/data/menuStates';
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
 import GameHelper from '../../../../services/gameHelper';
 import ConversationList from '../inbox/conversations/ConversationList.vue';
@@ -49,10 +47,6 @@ const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, c
 
 const game = computed<Game>(() => store.game!);
 
-const menuState = computed<string | null>(() => store.menuStateChat);
-
-const menuArguments = computed(() => store.menuArgumentsChat);
-
 const unreadMessages = computed<number | null>(() => store.unreadMessages);
 
 const isUserInGame = computed(() => Boolean(GameHelper.getUserPlayer(game.value)));
@@ -64,10 +58,7 @@ const isExpanded = ref(false);
 const toggle = () => {
   isExpanded.value = !isExpanded.value;
 
-  store.setMenuStateChat({
-    state: MENU_STATES.INBOX,
-    args: null
-  });
+  store.setMenuStateChat({ state: 'inbox' });
 };
 
 const canHandleConversationEvents = () => window.innerWidth >= 992;
@@ -86,15 +77,12 @@ const onViewConversationRequested = (e: { conversationId: string, participantIds
   }
 
   if (e.conversationId) {
-    store.setMenuStateChat({
-      state: MENU_STATES.CONVERSATION,
-      args: e.conversationId
-    })
+    store.setMenuStateChat({ state: "conversation", conversationId: e.conversationId });
   } else if (e.participantIds) {
     store.setMenuStateChat({
-      state: MENU_STATES.CREATE_CONVERSATION,
-      args: e.participantIds
-    })
+      state: "createConversation",
+      participantIds: e.participantIds
+    });
   }
 
   isExpanded.value = true;
@@ -105,10 +93,7 @@ const onCreateNewConversationRequested = (e: { participantIds?: string[] }) => {
     return;
   }
 
-  store.setMenuStateChat({
-    state: MENU_STATES.CREATE_CONVERSATION,
-    args: e.participantIds || null
-  });
+  store.setMenuStateChat({ state: 'createConversation', participantIds: e.participantIds || [] });
 
   isExpanded.value = true;
 };
@@ -118,10 +103,7 @@ const onOpenInboxRequested = () => {
     return;
   }
 
-  store.setMenuStateChat({
-    state: MENU_STATES.INBOX,
-    args: null
-  });
+  store.setMenuStateChat({ state: 'inbox' });
 
   isExpanded.value = true;
 };
@@ -159,14 +141,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 
   // Special case for Inbox shortcut, only do this if the screen is large
-  if (menuState !== MENU_STATES.INBOX || !canHandleConversationEvents()) {
+  if (menuState !== "inbox" || !canHandleConversationEvents()) {
     return;
   }
 
-  store.setMenuStateChat({
-    state: menuState,
-    args: null
-  })
+  store.setMenuStateChat({ state: menuState });
 
   toggle()
 };
@@ -175,10 +154,7 @@ document.addEventListener('keydown', handleKeyDown);
 window.addEventListener('resize', handleResize);
 
 onMounted(() => {
-  store.setMenuStateChat({
-    state: MENU_STATES.INBOX,
-    args: null
-  });
+  store.setMenuStateChat({ state: 'inbox' });
 
   eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, toggle);
   eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);

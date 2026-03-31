@@ -4,10 +4,9 @@ import type {ConversationMessageSentResult} from "@solaris-common";
 import UserEventBusEventNames from "../eventBusEventNames/user";
 import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
-import MENU_STATES from '../services/data/menuStates';
 import router from "../router";
-import {useUserStore} from "@/stores/user.ts";
-import {useGameStore} from "@/stores/game.ts";
+import {useUserStore} from "@/stores/user";
+import {useGameStore} from "@/stores/game";
 
 export const withMessages = () => {
   const $toast = useToast();
@@ -35,10 +34,7 @@ export const withMessages = () => {
       $toast.info(`New message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
-          gameStore.setMenuStateChat({
-            state: MENU_STATES.CONVERSATION,
-            args: e.conversationId,
-          });
+          gameStore.setMenuStateChat({ state: 'conversation', conversationId: e.conversationId });
         }
       });
     } else {

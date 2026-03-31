@@ -2,7 +2,7 @@
 <div class="container-fluid header-bar-bg pt-2 pb-2 footer-bar">
     <div class="row g-0">
         <div class="col" v-if="!userPlayer && gameIsJoinable">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.WELCOME)">
+          <button class="btn" v-on:click="setMenuState({ state: 'welcome' })">
             <i class="fas fa-handshake"></i>
           </button>
         </div>
@@ -12,17 +12,17 @@
           </button>
         </div>
         <div class="col" v-if="userPlayer">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.RESEARCH)">
+          <button class="btn" v-on:click="setMenuState({ state: 'research' })">
             <i class="fas fa-flask"></i>
           </button>
         </div>
         <div class="col">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
+          <button class="btn" v-on:click="setMenuState({ state: 'galaxy', menu: undefined })">
             <i class="fas fa-sun"></i>
           </button>
         </div>
         <div class="col" v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
+          <button class="btn" v-on:click="setMenuState({ state: 'intel' })">
             <i class="fas fa-chart-line"></i>
           </button>
         </div>
@@ -35,7 +35,6 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import MENU_STATES from '../../../../services/data/menuStates'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
@@ -43,6 +42,7 @@ import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 import HamburgerMenu from "@/views/game/components/menu/HamburgerMenu.vue";
 import { useGameStore } from "@/stores/game";
+import type {MenuState} from "@/types/menu.ts";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -61,8 +61,8 @@ const gameIsJoinable = computed(() => !gameIsInProgress.value && !gameIsFinished
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isDataCleaned = computed(() => game.value.state.cleaned);
 
-const setMenuState = (state: string, args = undefined) => {
-  store.setMenuState(eventBus, { state, args });
+const setMenuState = (state: MenuState) => {
+  store.setMenuState(eventBus, state);
 };
 
 const panToHomeStar = () => {

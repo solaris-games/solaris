@@ -28,16 +28,15 @@
 import Logo from '../components/Logo.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GameContainer from './components/GameContainer.vue'
-import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
-import { eventBusInjectionKey } from '../../eventBus'
+import { eventBusInjectionKey } from '@/eventBus'
 import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
-import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
+import { playerClientSocketEmitterInjectionKey } from '@/sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
 import { withMessages } from "../../util/messages";
@@ -101,8 +100,8 @@ const onViewColourOverrideRequested = (e: string) => {
 
 const onStarClicked = (starId: string) => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.STAR_DETAIL,
-    args: starId,
+    state: 'starDetail',
+    starId,
   });
 
   AudioService.click();
@@ -121,8 +120,8 @@ const onStarRightClicked = (starId: string) => {
 
 const onCarrierClicked = (carrierId: string) => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.CARRIER_DETAIL,
-    args: carrierId,
+    state: 'carrierDetail',
+    carrierId,
   });
 
   AudioService.click();
@@ -141,8 +140,8 @@ const onCarrierRightClicked = (carrierId: string) => {
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.MAP_OBJECT_SELECTOR,
-    args: e,
+    state: 'mapObjectSelector',
+    objects: e,
   });
 
   AudioService.open();
@@ -150,8 +149,8 @@ const onObjectsClicked = (e: ObjectClicked[]) => {
 
 const onPlayerSelected = (playerId: string) => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.PLAYER,
-    args: playerId,
+    state: 'player',
+    playerId,
   });
 
   emit('onPlayerSelected', playerId);
@@ -159,8 +158,8 @@ const onPlayerSelected = (playerId: string) => {
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.REPORT_PLAYER,
-    args: e,
+    state: 'reportPlayer',
+    args: { playerId: e.playerId },
   });
 };
 
@@ -279,15 +278,15 @@ onMounted(async () => {
 
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
-      store.setMenuState(eventBus, { state: MENU_STATES.TUTORIAL })
+      store.setMenuState(eventBus, { state: 'tutorial' })
     } else {
-      store.setMenuState(eventBus, { state: MENU_STATES.LEADERBOARD })
+      store.setMenuState(eventBus, { state: 'leaderboard' })
     }
   } else {
     if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.setMenuState(eventBus, { state: MENU_STATES.WELCOME })
+      store.setMenuState(eventBus, { state: 'welcome' })
     } else {
-      store.setMenuState(eventBus, { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
+      store.setMenuState(eventBus, { state: 'leaderboard' }) // Assume the user is spectating.
     }
   }
 
