@@ -14,6 +14,9 @@
         @onCloseRequested="toggle"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
+      <inbox v-if="store.menuStateChat.state == 'inbox'"
+             @onCloseRequested="toggle"
+             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
 </template>
@@ -30,6 +33,7 @@ import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
 import MenuEventBusEventNames from '../../../../eventBusEventNames/menu';
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
+import Inbox from "@/views/game/components/inbox/Inbox.vue";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],

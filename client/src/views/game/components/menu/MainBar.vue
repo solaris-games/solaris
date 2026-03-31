@@ -82,9 +82,6 @@
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <inbox v-if="menuStateChat.state == 'inbox'"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <event-log v-if="menuState.state == 'eventLog'"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
