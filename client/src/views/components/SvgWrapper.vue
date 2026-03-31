@@ -34,7 +34,8 @@ const horribleSvgGetBBox = (svg: SVGGraphicsElement) => {
 };
 
 const svgInner = defineAsyncComponent(async () => {
-  const svgText = await import(`../../assets/map-objects-symbols/${props.iconName}.svg`)
+  const svgModule = await import(`../../assets/map-objects-symbols/${props.iconName}.svg?raw`)
+  const svgText: string = svgModule.default;
 
   if (svgText != null) {
     const range = document.createRange();
