@@ -1,34 +1,34 @@
 <template>
   <a @click="setMenuState()"
-    :title="tooltip"
-    :class="{'active':isActive}">
-      <i :class="iconClass"></i>
+     :title="tooltip"
+     :class="{'active': isActive}">
+    <i :class="iconClass"></i>
   </a>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { computed, inject } from 'vue';
-import { eventBusInjectionKey } from '@/eventBus';
+import {useGameStore} from '@/stores/game';
+import {computed, inject} from 'vue';
+import {eventBusInjectionKey} from '@/eventBus';
+import type {MenuState} from "@/types/menu";
 
 const props = defineProps<{
-    menuState?: string;
-    tooltip?: string;
-    iconClass?: string;
+  menuState?: MenuState;
+  tooltip?: string;
+  iconClass?: string;
 }>();
 
 const store = useGameStore();
 const eventBus = inject(eventBusInjectionKey)!;
 
 const isActive = computed(() => {
-    return props.menuState === store.menuState;
+  return props.menuState?.state === store.menuState.state;
 });
 
 const setMenuState = () => {
-    store.setMenuState(eventBus, {
-        state: props.menuState!,
-        args: null
-    });
+  if (props.menuState) {
+    store.setMenuState(eventBus, props.menuState);
+  }
 };
 </script>
 

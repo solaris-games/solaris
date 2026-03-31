@@ -48,6 +48,8 @@ export type MenuState =
   | { state: 'spectators' }
   | { state: 'statistics' };
 
+export type MenuStateKey = MenuState['state'];
+
 export type MenuStateChat =
   | { state: 'none' }
   | { state: 'inbox' }

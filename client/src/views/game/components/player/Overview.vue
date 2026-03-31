@@ -56,7 +56,6 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '../../../../eventBus'
-import MENU_STATES from '../../../../services/data/menuStates'
 import Statistics from './Statistics.vue'
 import PlayerTitle from './PlayerTitle.vue'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
@@ -120,13 +119,13 @@ const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id
 
 const onOpenDiplomacyRequested = () => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.DIPLOMACY,
+    state: 'diplomacy',
   });
 };
 
 const onOpenLedgerRequested = () => {
   store.setMenuState(eventBus, {
-    state: MENU_STATES.LEDGER,
+    state: 'ledger',
   });
 };
 

@@ -1,25 +1,25 @@
 <template>
 <div class="container-fluid header-bar" :class="{'header-bar-bg': !isHistoricalMode,'bg-dark': isHistoricalMode}">
     <div class="row pt-2 pb-2 g-0">
-        <div class="col-auto d-none d-md-inline-block me-5 pointer pt-1" v-on:click="setMenuState(MENU_STATES.LEADERBOARD, null)">
+        <div class="col-auto d-none d-md-inline-block me-5 pointer pt-1" v-on:click="setMenuState({state: 'leaderboard'})">
             <server-connection-status/>
 
             {{game.settings.general.name}}
         </div>
         <div class="col-auto pt-1 me-3">
-            <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState(MENU_STATES.LEADERBOARD, null)">{{getGameStatusText}}</span>
-            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState(MENU_STATES.LEADERBOARD, null)" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
-            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState(MENU_STATES.LEADERBOARD, null)" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPaused" v-on:click="setMenuState({ state: 'leaderboard' })">{{getGameStatusText}}</span>
+            <span class="pointer" v-if="gameIsInProgress" v-on:click="setMenuState({ state: 'leaderboard' })" title="Next production tick"><i class="fas fa-clock"></i> {{timeRemaining}}</span>
+            <span class="pointer" v-if="gameIsPendingStart" v-on:click="setMenuState({ state: 'leaderboard' })" title="Game starts in"><i class="fas fa-stopwatch"></i> {{timeRemaining}}</span>
         </div>
         <div class="col-auto pt-1" v-if="isLoggedIn && isTimeMachineEnabled && !isDataCleaned && !gameIsWaitingForPlayers">
           <tick-selector />
         </div>
         <div class="col text-end pt-1">
-            <span v-if="userPlayer" class="pointer me-2" title="Total credits" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, null)">
+            <span v-if="userPlayer" class="pointer me-2" title="Total credits" @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })">
                 <i class="fas fa-dollar-sign text-success"></i> {{userPlayer.credits}}
             </span>
 
-            <span class="pointer me-2" v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, null)">
+            <span class="pointer me-2" v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists" title="Total specialist tokens" @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })">
                 <i class="fas fa-coins text-success"></i> {{userPlayer.creditsSpecialists}}
             </span>
 
@@ -37,20 +37,20 @@
             </span>
         </div>
         <div class="col-auto">
-            <button class="btn btn-sm btn-warning" v-if="isTutorialGame" @click="setMenuState(MENU_STATES.TUTORIAL, null)">
+            <button class="btn btn-sm btn-warning" v-if="isTutorialGame" @click="setMenuState({ state: 'tutorial' })">
               <i class="fas fa-user-graduate"></i>
               <span class="d-none d-md-inline-block ms-1">Tutorial</span>
             </button>
 
-            <button class="btn btn-sm btn-success ms-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState(MENU_STATES.WELCOME, null)">Join Now</button>
+            <button class="btn btn-sm btn-success ms-1" v-if="!userPlayer && gameIsJoinable" @click="setMenuState({ state: 'welcome' })">Join Now</button>
 
             <ready-status-button :smallButtons="true" v-if="!isHistoricalMode && userPlayer && isTurnBasedGame && canEndTurn && !userPlayer.defeated" class="ms-1" />
 
-            <button class="btn btn-sm ms-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-outline-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="setMenuState(MENU_STATES.INBOX, null)" title="Inbox (M)">
+            <button class="btn btn-sm ms-1 d-lg-none" v-if="userPlayer && !isTutorialGame" :class="{'btn-outline-info': !unreadMessages, 'btn-warning': unreadMessages}" v-on:click="store.setMenuStateChat({ state: 'inbox' })" title="Inbox (M)">
                 <i class="fas fa-comments"></i> <span class="ms-1" v-if="unreadMessages">{{unreadMessages}}</span>
             </button>
 
-            <button class="btn btn-sm ms-1" v-if="userPlayer" :class="{'btn-outline-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState(MENU_STATES.EVENT_LOG, null)" title="Event Log (E)">
+            <button class="btn btn-sm ms-1" v-if="userPlayer" :class="{'btn-outline-info': !unreadEvents, 'btn-warning': unreadEvents}" v-on:click="setMenuState({ state: 'eventLog' })" title="Event Log (E)">
                 <i class="fas fa-inbox"></i> <span class="ms-1" v-if="unreadEvents">{{unreadEvents}}</span>
             </button>
 
@@ -67,7 +67,6 @@
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
 import router from '../../../../router'
-import MENU_STATES from '../../../../services/data/menuStates'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import ServerConnectionStatus from './ServerConnectionStatus.vue'
 import ResearchProgress from './ResearchProgress.vue'
@@ -90,6 +89,7 @@ import {unreadCount} from "@/services/typedapi/event";
 import {getCountdownTimeString, getCountdownTimeStringByTicks} from "@/util/time";
 import { useUserStore } from '@/stores/user';
 import { useGameStore } from "@/stores/game"
+import type {MenuState} from "@/types/menu.ts";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
@@ -156,19 +156,16 @@ const panToHomeStar = () => {
   }
 };
 
-const setMenuState = (state, args) => {
-  store.setMenuState(eventBus, {
-    state,
-    args
-  });
+const setMenuState = (newState: MenuState) => {
+  store.setMenuState(eventBus, newState);
 };
 
 const onViewResearchRequested = () => {
-  setMenuState(MENU_STATES.RESEARCH, null);
+  setMenuState({ state: 'research' });
 };
 
 const onViewBulkUpgradeRequested = () => {
-  setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE, null);
+  setMenuState({ state: 'bulkInfrastructureUpgrade' });
 };
 
 const handleKeyDown = (e: KeyboardEvent): void => {
@@ -189,7 +186,7 @@ const handleKeyDown = (e: KeyboardEvent): void => {
   let menuState = KEYBOARD_SHORTCUTS.all[key];
 
   if (menuState === null) {
-    setMenuState(null, null);
+    setMenuState({ state: 'none' });
     return;
   }
 
@@ -208,21 +205,18 @@ const handleKeyDown = (e: KeyboardEvent): void => {
   }
 
   // Special case for Inbox shortcut, only do this if the screen is small.
-  if (menuState === MENU_STATES.INBOX && window.innerWidth >= 992) {
+  if (menuState === 'inbox' && window.innerWidth >= 992) {
     return;
   }
 
-  let menuArguments = menuState.split('|')[1];
-  menuState = menuState.split('|')[0];
-
   // Special case for intel, which is not accessible for dark mode extra games.
-  if (menuState === MENU_STATES.INTEL && GameHelper.isDarkModeExtra(game.value) && !gameIsFinished.value) {
+  if (menuState === 'intel' && GameHelper.isDarkModeExtra(game.value) && !gameIsFinished.value) {
     return;
   }
 
   switch (menuState) {
     case null:
-      setMenuState(null, null);
+      setMenuState({ state: 'none' });
       break;
     case 'HOME_STAR':
       panToHomeStar();
@@ -237,7 +231,7 @@ const handleKeyDown = (e: KeyboardEvent): void => {
       eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
       break;
     default:
-      setMenuState(menuState, menuArguments || null);
+      setMenuState({ state: menuState });
       break;
   }
 };
