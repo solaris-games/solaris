@@ -56,19 +56,16 @@ export const useGameStore = defineStore('game', () => {
 
   const colourStore = useColourStore();
 
-  const setMenuState = (eventBus: EventBus, newMenuState: MenuState) => {
+  const setMenuState = (newMenuState: MenuState) => {
     if (menuStatesEqual(menuState.value, newMenuState)) {
       menuState.value = EMPTY_MENU;
     } else {
       menuState.value = newMenuState;
     }
-
-    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, newMenuState);
   };
 
-  const clearMenuState = (eventBus: EventBus) => {
+  const clearMenuState = () => {
     menuState.value = EMPTY_MENU;
-    eventBus.emit(MenuEventBusEventNames.OnMenuRequested, EMPTY_MENU as MenuState);
   };
 
   const setMenuStateChat = (newState: MenuStateChat) => {

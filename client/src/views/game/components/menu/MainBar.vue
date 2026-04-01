@@ -216,7 +216,7 @@ const menuStateChat = computed(() => store.menuStateChat);
 const canHandleConversationEvents = () => window.innerWidth < 992;
 
 const changeMenuState = (newState: MenuState) => {
-  store.setMenuState(eventBus, newState);
+  store.setMenuState(newState);
 };
 
 const onCreateNewConversationRequested = (es: {}) => {

@@ -8,8 +8,7 @@
 
 <script setup lang="ts">
 import {useGameStore} from '@/stores/game';
-import {computed, inject} from 'vue';
-import {eventBusInjectionKey} from '@/eventBus';
+import {computed} from 'vue';
 import type {MenuState} from "@/types/menu";
 
 const props = defineProps<{
@@ -19,7 +18,6 @@ const props = defineProps<{
 }>();
 
 const store = useGameStore();
-const eventBus = inject(eventBusInjectionKey)!;
 
 const isActive = computed(() => {
   return props.menuState?.state === store.menuState.state;
@@ -27,7 +25,7 @@ const isActive = computed(() => {
 
 const setMenuState = () => {
   if (props.menuState) {
-    store.setMenuState(eventBus, props.menuState);
+    store.setMenuState(props.menuState);
   }
 };
 </script>

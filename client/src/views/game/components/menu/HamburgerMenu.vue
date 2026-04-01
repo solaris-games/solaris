@@ -116,7 +116,7 @@ const colourStore = useColourStore();
 const game = computed<Game>(() => store.game!);
 
 const setMenuState = (state: MenuState) => {
-  store.setMenuState(eventBus, state);
+  store.setMenuState(state);
 };
 
 const onMenuChatSidebarRequested = () => {

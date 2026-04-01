@@ -99,7 +99,7 @@ const onViewColourOverrideRequested = (e: string) => {
 };
 
 const onStarClicked = (starId: string) => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'starDetail',
     starId,
   });
@@ -119,7 +119,7 @@ const onStarRightClicked = (starId: string) => {
 };
 
 const onCarrierClicked = (carrierId: string) => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'carrierDetail',
     carrierId,
   });
@@ -139,7 +139,7 @@ const onCarrierRightClicked = (carrierId: string) => {
 };
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'mapObjectSelector',
     objects: e,
   });
@@ -148,7 +148,7 @@ const onObjectsClicked = (e: ObjectClicked[]) => {
 };
 
 const onPlayerSelected = (playerId: string) => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'player',
     playerId,
   });
@@ -157,7 +157,7 @@ const onPlayerSelected = (playerId: string) => {
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'reportPlayer',
     args: { playerId: e.playerId },
   });
@@ -278,15 +278,15 @@ onMounted(async () => {
 
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
-      store.setMenuState(eventBus, { state: 'tutorial' })
+      store.setMenuState({ state: 'tutorial' })
     } else {
-      store.setMenuState(eventBus, { state: 'leaderboard' })
+      store.setMenuState({ state: 'leaderboard' })
     }
   } else {
     if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.setMenuState(eventBus, { state: 'welcome' })
+      store.setMenuState({ state: 'welcome' })
     } else {
-      store.setMenuState(eventBus, { state: 'leaderboard' }) // Assume the user is spectating.
+      store.setMenuState({ state: 'leaderboard' }) // Assume the user is spectating.
     }
   }
 

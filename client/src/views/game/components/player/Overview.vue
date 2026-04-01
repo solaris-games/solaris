@@ -118,13 +118,13 @@ const onViewCompareIntelRequested = () => emit('onViewCompareIntelRequested', pl
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id);
 
 const onOpenDiplomacyRequested = () => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'diplomacy',
   });
 };
 
 const onOpenLedgerRequested = () => {
-  store.setMenuState(eventBus, {
+  store.setMenuState({
     state: 'ledger',
   });
 };

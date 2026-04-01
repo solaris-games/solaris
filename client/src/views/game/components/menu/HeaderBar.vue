@@ -157,7 +157,7 @@ const panToHomeStar = () => {
 };
 
 const setMenuState = (newState: MenuState) => {
-  store.setMenuState(eventBus, newState);
+  store.setMenuState(newState);
 };
 
 const onViewResearchRequested = () => {
