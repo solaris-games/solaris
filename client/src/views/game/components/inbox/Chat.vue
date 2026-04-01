@@ -64,17 +64,6 @@ const toggle = () => {
   }
 };
 
-const onViewConversationRequested = (e: { conversationId: string, participantIds: string[] }) => {
-  if (e.conversationId) {
-    store.setMenuStateChat({ state: "conversation", conversationId: e.conversationId });
-  } else if (e.participantIds) {
-    store.setMenuStateChat({
-      state: "createConversation",
-      participantIds: e.participantIds
-    });
-  }
-};
-
 const handleKeyDown = (e: KeyboardEvent) => {
 // Note: We only care about the INBOX key here.
   if (/^(?:input|textarea|select|button)$/i.test((e.target as HTMLElement)?.tagName)) {
@@ -117,10 +106,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
   toggle()
 };
 
-document.addEventListener('keydown', handleKeyDown);
-
 onMounted(() => {
-  store.setMenuStateChat({ state: 'inbox' });
+  document.addEventListener('keydown', handleKeyDown);
 
   onUnmounted(() => {
     document.removeEventListener('keydown', handleKeyDown);
