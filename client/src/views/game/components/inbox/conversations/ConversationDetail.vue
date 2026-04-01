@@ -58,7 +58,6 @@ import ConversationTradeEvent from './ConversationTradeEvent.vue'
 import { inject, ref, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
 import {detailConversation, leave, markAsRead, mute, unmute} from "@/services/typedapi/conversation";
@@ -120,7 +119,9 @@ const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, c
 
 const onCloseRequested = () => emit('onCloseRequested');
 
-const onOpenInboxRequested = () => eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested);
+const onOpenInboxRequested = () => {
+  store.setMenuStateChat({ state: 'inbox' });
+};
 
 const toggleConversationWindow = () => {
   toggleDisplay.value = !toggleDisplay.value;

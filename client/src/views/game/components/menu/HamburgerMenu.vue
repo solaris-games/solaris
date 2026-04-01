@@ -87,7 +87,6 @@
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
 import {inject, computed} from 'vue';
 import {eventBusInjectionKey} from '@/eventBus'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";

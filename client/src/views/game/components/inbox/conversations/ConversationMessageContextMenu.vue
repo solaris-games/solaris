@@ -18,7 +18,6 @@ import { useGameStore } from '@/stores/game';
 import gameHelper from "../../../../../services/gameHelper";
 import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
-import MenuEventBusEventNames from "../../../../../eventBusEventNames/menu";
 import type {ConversationMessage, Conversation} from "@solaris-common";
 import type {Game, Player} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -68,9 +67,7 @@ const onViewConversationRequested = async (playerId: string) => {
   const conversation = await loadConversation(playerId);
 
   if (conversation) {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      conversationId: conversation._id,
-    });
+    store.setMenuStateChat({ state: 'conversation', conversationId: conversation._id });
   } else {
     // todo: select participants
     store.setMenuStateChat({ state: 'createConversation', participantIds: [] });

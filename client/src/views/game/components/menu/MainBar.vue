@@ -185,7 +185,6 @@ import ReportPlayer from '../report/ReportPlayer.vue';
 import Spectators from '../spectators/Spectators.vue';
 import { eventBusInjectionKey } from '@/eventBus';
 import type { CarrierWaypoint as CWTp } from "@solaris-common";
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu';
 import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
 import {useUserStore} from "@/stores/user";
 import {useGameStore} from "@/stores/game";

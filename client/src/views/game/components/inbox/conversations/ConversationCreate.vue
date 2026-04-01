@@ -41,7 +41,6 @@ import MenuTitle from '../../MenuTitle.vue';
 import FormErrorList from '../../../../components/FormErrorList.vue';
 import { inject, ref, computed, onMounted } from 'vue';
 import { eventBusInjectionKey } from '../../../../../eventBus';
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {createConversation} from "@/services/typedapi/conversation";
 import type {Game, Player} from "@/types/game";
@@ -70,7 +69,9 @@ const possibleParticipants = ref<Player[]>([]);
 
 const onCloseRequested = () => emit('onCloseRequested');
 
-const onOpenInboxRequested = () => eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested);
+const onOpenInboxRequested = () => {
+  store.setMenuStateChat({ state: 'inbox' });
+};
 
 const doCreateConversation = async (e: Event) => {
   errors.value = [];
@@ -93,9 +94,7 @@ const doCreateConversation = async (e: Event) => {
 
   const response = await createConversation(httpClient)(game.value._id, name.value, participants.value);
   if (isOk(response)) {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      conversationId: response.data._id,
-    });
+    store.setMenuStateChat({ state: 'conversation', conversationId: response.data._id });
   } else {
     console.error(formatError(response));
   }

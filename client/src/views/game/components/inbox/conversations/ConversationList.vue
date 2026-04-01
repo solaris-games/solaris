@@ -39,7 +39,6 @@ import LoadingSpinner from '../../../../components/LoadingSpinner.vue';
 import ConversationPreview from './ConversationPreview.vue';
 import gameHelper from '../../../../../services/gameHelper';
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu';
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {type ConversationMessageSentResult, type ConversationOverview} from "@solaris-common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

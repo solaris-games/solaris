@@ -55,12 +55,11 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import { eventBusInjectionKey } from '../../../../eventBus'
-import Statistics from './Statistics.vue'
-import PlayerTitle from './PlayerTitle.vue'
-import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import { ref, inject, computed, onMounted } from 'vue'
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import { eventBusInjectionKey } from '../../../../eventBus';
+import Statistics from './Statistics.vue';
+import PlayerTitle from './PlayerTitle.vue';
+import DiplomacyHelper from '../../../../services/diplomacyHelper';
+import { ref, inject, computed, onMounted } from 'vue';
 import type {Game} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {ConversationOverview} from "@solaris-common";
@@ -135,16 +134,12 @@ const onViewConversationRequested = () => {
   }
 
   if (conversation.value) {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      conversationId: conversation.value._id,
-    });
+    store.setMenuStateChat({ state: 'conversation', conversationId: conversation.value._id });
   } else {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      participantIds: [
-        userPlayer.value!._id,
-        player.value._id
-      ]
-    });
+    store.setMenuStateChat({ state: 'createConversation', participantIds: [
+      userPlayer.value!._id,
+      player.value._id
+    ] });
   }
 }
 

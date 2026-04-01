@@ -46,12 +46,10 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import { eventBusInjectionKey } from '../../../../../eventBus'
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
-import { inject, computed } from 'vue'
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+import { computed } from 'vue'
 import type {ConversationOverview} from "@solaris-common";
 import type {Game} from "@/types/game";
 
@@ -60,8 +58,6 @@ const props = defineProps<{
   isTruncated: boolean,
   isFullWidth: boolean,
 }>();
-
-const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
@@ -75,12 +71,8 @@ const isAllPlayersConversation = computed(() => props.conversation.participants.
 
 const lastMessageText = computed(() => lastMessage.value && mentionHelper.replaceMentionsWithNames(lastMessage.value.message));
 
-const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);
-
 const openConversation = () => {
-  eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-    conversationId: props.conversation._id,
-  });
+  store.setMenuStateChat({ state: 'conversation', conversationId: props.conversation._id });
 };
 </script>
 
