@@ -57,7 +57,11 @@ const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 const isExpanded = computed(() => store.menuStateChat.state !== 'none');
 
 const toggle = () => {
-  store.setMenuStateChat({ state: 'inbox' });
+  if (store.menuStateChat.state === 'none') {
+    store.setMenuStateChat({ state: 'inbox' });
+  } else {
+    store.setMenuStateChat(store.menuStateChat);
+  }
 };
 
 const onViewConversationRequested = (e: { conversationId: string, participantIds: string[] }) => {

@@ -26,7 +26,7 @@ type PlayerJoinedData = {
 
 const EMPTY_MENU: MenuState = { state: 'none' };
 
-const menuStatesEqual = (a: MenuState, b: MenuState): boolean => {
+const menuStatesEqual = <T extends { state: K }, K extends string>(a: T, b: T): boolean => {
   if (a.state !== b.state) return false;
 
   const aRecord = a as Record<string, unknown>;
@@ -66,7 +66,11 @@ export const useGameStore = defineStore('game', () => {
   };
 
   const setMenuStateChat = (newState: MenuStateChat) => {
-    menuStateChat.value = newState;
+    if (menuStatesEqual(menuStateChat.value, newState)) {
+      menuStateChat.value = EMPTY_MENU;
+    } else {
+      menuStateChat.value = newState;
+    }
   };
 
   const clearMenuStateChat = () => {
@@ -355,7 +359,7 @@ export const useGameStore = defineStore('game', () => {
     carrierSpecialists: readonly(carrierSpecialists),
     settings: readonly(settings),
     menuState: readonly(menuState),
-    menuStateChat: readonly(menuStateChat),
+    menuStateChat: menuStateChat,
     productionTick: readonly(productionTick),
     unreadMessages: readonly(unreadMessages),
     setMenuState,
