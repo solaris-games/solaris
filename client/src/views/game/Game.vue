@@ -216,6 +216,10 @@ const reloadGameCheck = async () => {
     const response = await detailState(httpClient)(store.game!._id);
 
     if (isOk(response)) {
+      if (!game.value) {
+        return;
+      }
+
       const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
 
       if (store.tick < response.data.state.tick || hasEnded) {
