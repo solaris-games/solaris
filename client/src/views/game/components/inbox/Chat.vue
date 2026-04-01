@@ -1,6 +1,6 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
-    <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
+  <div class="d-lg-block" v-if="isUserInGame && !isTutorialGame">
+    <div id="toggle" class="d-none d-lg-inline-block text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
@@ -22,12 +22,11 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import { eventBusInjectionKey } from '@/eventBus';
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
 import GameHelper from '../../../../services/gameHelper';
 import ConversationCreate from './conversations/ConversationCreate.vue';
 import ConversationDetail from './conversations/ConversationDetail.vue';
-import { inject, computed, onMounted, onUnmounted } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';
 import Inbox from "@/views/game/components/inbox/Inbox.vue";
@@ -36,8 +35,6 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
   onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
 }>();
-
-const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useGameStore();
 const userStore = useUserStore();
@@ -130,9 +127,9 @@ onMounted(() => {
 
 #window {
   position: absolute;
-  right: 0px;
+  right: 0;
   bottom: 100px;
-  width: 473px;
+  width: min(100%, 473px);
   top: 45px;
   overflow: auto;
   overflow-x: hidden;
