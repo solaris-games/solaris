@@ -25,7 +25,6 @@ import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '@/eventBus';
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
 import GameHelper from '../../../../services/gameHelper';
-import ConversationList from '../inbox/conversations/ConversationList.vue';
 import ConversationCreate from './conversations/ConversationCreate.vue';
 import ConversationDetail from './conversations/ConversationDetail.vue';
 import { inject, computed, onMounted, onUnmounted } from 'vue';

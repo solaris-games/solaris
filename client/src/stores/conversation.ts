@@ -1,7 +1,7 @@
 import { ref, readonly } from 'vue';
 import { defineStore } from "pinia";
 
-export const useConversationStore = defineStore('', () => {
+export const useConversationStore = defineStore('conversation', () => {
   const cachedConversationComposeMessages = ref<Record<string, string>>({});
   const currentConversation = ref<{id: string, text: string} | null>(null);
 
