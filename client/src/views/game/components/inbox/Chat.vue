@@ -5,7 +5,6 @@
     </div>
 
     <div id="window" v-if="isExpanded" class="header-bar-bg">
-      <conversation-list v-if="store.menuStateChat.state === 'inbox'"/>
       <conversation-create v-if="store.menuStateChat.state === 'createConversation'"
         :participantIds="store.menuStateChat.participantIds"
         @onCloseRequested="toggle"/>
