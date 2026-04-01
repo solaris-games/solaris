@@ -120,14 +120,6 @@
         @onCloseRequested="onCloseRequested"/>
       <settings v-if="menuState.state == 'settings'"
         @onCloseRequested="onCloseRequested"/>
-      <conversation-create v-if="menuStateChat.state == 'createConversation'"
-        :participantIds="menuStateChat.participantIds"
-        @onCloseRequested="onCloseRequested"/>
-      <conversation-detail v-if="menuStateChat.state == 'conversation'"
-        :conversationId="menuStateChat.conversationId"
-        :key="menuStateChat.conversationId"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
       <player-badge-shop v-if="menuState.state == 'playerBadgeShop'"
         :recipientPlayerId="menuState.recipientPlayerId"
         @onCloseRequested="onCloseRequested"
@@ -211,36 +203,9 @@ const userStore = useUserStore();
 const store = useGameStore();
 
 const menuState = computed(() => store.menuState);
-const menuStateChat = computed(() => store.menuStateChat);
-
-const canHandleConversationEvents = () => window.innerWidth < 992;
 
 const changeMenuState = (newState: MenuState) => {
   store.setMenuState(newState);
-};
-
-const onCreateNewConversationRequested = (es: {}) => {
-  if (canHandleConversationEvents()) {
-    store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
-  }
-};
-
-const onViewConversationRequested = (e: { conversationId?: string, participantIds?: string[] }) => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  if (e.conversationId) {
-    store.setMenuStateChat({ state: 'conversation', conversationId: e.conversationId });
-  } else if (e.participantIds) {
-    store.setMenuStateChat({ state: 'createConversation', participantIds: e.participantIds });
-  }
-};
-
-const onOpenInboxRequested = () => {
-  if (canHandleConversationEvents()) {
-    store.setMenuStateChat({ state: 'inbox' });
-  }
 };
 
 const onCloseRequested = () => changeMenuState({ state: 'none' });
@@ -282,18 +247,6 @@ const onOpenReportPlayerRequested = (args: ReportPlayerArgs) => changeMenuState(
 const onViewColourOverrideRequested = (e: string) => emit('onViewColourOverrideRequested', e);
 
 const onReloadGameRequested = () => emit('onReloadGameRequested');
-
-onMounted(() => {
-  eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
-
-  onUnmounted(() => {
-    eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
-  });
-});
 </script>
 
 <style scoped>

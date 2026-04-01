@@ -102,7 +102,9 @@ const onMessageReceived = (e: ConversationMessageSentResult<string>) => {
   convo.unreadCount++;
 };
 
-const onCreateNewConversationRequested = () => eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, {});
+const onCreateNewConversationRequested = () => {
+  store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
+};
 
 onMounted(() => {
   eventBus.on(UserEventBusEventNames.GameMessageSent, onMessageReceived);

@@ -9,9 +9,6 @@ const toEventName: <TData>(value: string) => MenuEventBusEventName<TData> = make
 export default class MenuEventBusEventNames {
   private constructor() { };
 
-  public static readonly OnMenuChatSidebarRequested: MenuEventBusEventName<void> = toEventName('onMenuChatSidebarRequested');
-
-  public static readonly OnCreateNewConversationRequested: MenuEventBusEventName<{ participantIds?: string[] }> = toEventName('onCreateNewConversationRequested');
   public static readonly OnViewConversationRequested: MenuEventBusEventName<{ conversationId: string, participantIds: string[] }> = toEventName('onViewConversationRequested');
   public static readonly OnOpenInboxRequested: MenuEventBusEventName<void> = toEventName('onOpenInboxRequested');
 }

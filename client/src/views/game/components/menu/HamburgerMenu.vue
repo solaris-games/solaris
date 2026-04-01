@@ -120,7 +120,7 @@ const setMenuState = (state: MenuState) => {
 };
 
 const onMenuChatSidebarRequested = () => {
-  eventBus.emit(MenuEventBusEventNames.OnMenuChatSidebarRequested);
+  store.setMenuStateChat({ state: 'inbox' })
 };
 
 const goToMainMenu = () => {

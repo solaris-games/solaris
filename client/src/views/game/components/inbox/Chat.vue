@@ -57,29 +57,13 @@ const isUserInGame = computed(() => Boolean(GameHelper.getUserPlayer(game.value)
 
 const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 
-const isExpanded = ref(false);
+const isExpanded = computed(() => store.menuStateChat.state !== 'none');
 
 const toggle = () => {
-  isExpanded.value = !isExpanded.value;
-
   store.setMenuStateChat({ state: 'inbox' });
 };
 
-const canHandleConversationEvents = () => window.innerWidth >= 992;
-
-const handleResize = () => {
-  if (!isExpanded.value) { // Don't care about this if it is already collapsed
-    return;
-  }
-
-  isExpanded.value = canHandleConversationEvents();
-};
-
 const onViewConversationRequested = (e: { conversationId: string, participantIds: string[] }) => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
   if (e.conversationId) {
     store.setMenuStateChat({ state: "conversation", conversationId: e.conversationId });
   } else if (e.participantIds) {
@@ -88,28 +72,6 @@ const onViewConversationRequested = (e: { conversationId: string, participantIds
       participantIds: e.participantIds
     });
   }
-
-  isExpanded.value = true;
-};
-
-const onCreateNewConversationRequested = (e: { participantIds?: string[] }) => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  store.setMenuStateChat({ state: 'createConversation', participantIds: e.participantIds || [] });
-
-  isExpanded.value = true;
-};
-
-const onOpenInboxRequested = () => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  store.setMenuStateChat({ state: 'inbox' });
-
-  isExpanded.value = true;
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -145,7 +107,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 
   // Special case for Inbox shortcut, only do this if the screen is large
-  if (menuState !== "inbox" || !canHandleConversationEvents()) {
+  if (menuState !== "inbox") {
     return;
   }
 
@@ -155,24 +117,12 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 document.addEventListener('keydown', handleKeyDown);
-window.addEventListener('resize', handleResize);
 
 onMounted(() => {
   store.setMenuStateChat({ state: 'inbox' });
 
-  eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, toggle);
-  eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
-
   onUnmounted(() => {
-    eventBus.off(MenuEventBusEventNames.OnMenuChatSidebarRequested, toggle);
-    eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
-
     document.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('resize', handleResize);
   });
 });
 </script>

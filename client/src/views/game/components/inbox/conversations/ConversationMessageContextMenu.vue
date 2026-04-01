@@ -73,7 +73,7 @@ const onViewConversationRequested = async (playerId: string) => {
     });
   } else {
     // todo: select participants
-    eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, {});
+    store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
   }
 };
 </script>

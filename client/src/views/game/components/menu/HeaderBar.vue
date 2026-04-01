@@ -205,7 +205,7 @@ const handleKeyDown = (e: KeyboardEvent): void => {
   }
 
   // Special case for Inbox shortcut, only do this if the screen is small.
-  if (menuState === 'inbox' && window.innerWidth >= 992) {
+  if (menuState === 'inbox') {
     return;
   }
 
