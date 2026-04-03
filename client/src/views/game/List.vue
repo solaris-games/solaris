@@ -498,6 +498,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import featuredImg from '../../assets/screenshots/tiles/featured.jpg';
 import newPlayerRtImg from '../../assets/screenshots/tiles/new_player_rt.jpg';
 import standardRtImg from '../../assets/screenshots/tiles/standard_rt.jpg';
@@ -515,14 +516,14 @@ import RandomHelper from '../../services/randomHelper'
 import HelpTooltip from '../components/HelpTooltip.vue'
 import FluxBar from './components/menu/FluxBar.vue'
 import LockedGameOverlay from './components/menu/LockedGameOverlay.vue'
-import moment from 'moment'
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 import { type ListGame, type Tutorial } from "@solaris-common";
 import { ref, computed, inject, onMounted, type Ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/game';
-import { useStore } from 'vuex';
 import gameHelper from '@/services/gameHelper';
+import { formatDistanceToNow } from "date-fns";
+import { useTutorialStore } from '@/stores/tutorial';
 
 type Games = {
   featured: ListGame<string> | undefined,
@@ -539,7 +540,8 @@ type Games = {
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
+const tutorialStore = useTutorialStore();
 
 const isLoading = ref(false);
 
@@ -592,14 +594,14 @@ const getSpecialGame = () => {
 };
 
 const getFriendlyDate = (date: Date) => {
-  return moment(date).utc().fromNow();
+  return formatDistanceToNow(date, { addSuffix: true });;
 };
 
 const startTutorial = async (tutorialKey: string) => {
   const response = await createTutorial(httpClient)(tutorialKey);
 
   if (isOk(response)) {
-    store.commit('clearTutorialPage')
+    tutorialStore.clearTutorialPage()
     router.push({ name: 'game', query: { id: response.data.gameId } })
   } else {
     console.error(formatError(response));

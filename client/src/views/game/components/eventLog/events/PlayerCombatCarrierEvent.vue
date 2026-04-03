@@ -9,11 +9,10 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import type {PlayerCombatCarrierEvent} from "@solaris-common";
-import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '@/store';
 import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
 
 const props = defineProps<{
@@ -24,9 +23,9 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
-const game = store.state.game!;
+const game = store.game!;
 
 const defenderSide = computed(() => createCarrierDefenderSide(game, props.event));
 

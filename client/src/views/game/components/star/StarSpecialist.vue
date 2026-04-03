@@ -22,8 +22,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import type {Game} from "@/types/game";
@@ -39,8 +39,8 @@ const emit = defineEmits<{
 
 const onViewHireStarSpecialistRequested = () => emit('onViewHireStarSpecialistRequested', props.starId);
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const isHistoricalMode = useIsHistoricalMode(store);
 const star = computed(() => GameHelper.getStarById(game.value, props.starId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));

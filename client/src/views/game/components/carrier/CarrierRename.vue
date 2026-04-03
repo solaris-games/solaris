@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
@@ -36,7 +37,6 @@ import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Carrier, Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import { useStore } from 'vuex';
 import type {MapObject} from "@solaris-common";
 import {rename} from "@/services/typedapi/carrier";
 
@@ -49,13 +49,13 @@ const emit = defineEmits<{
   (e: 'onOpenCarrierDetailRequested', carrierId: string): void;
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 
 const isHistoricalMode = useIsHistoricalMode(store);

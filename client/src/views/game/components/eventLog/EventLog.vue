@@ -77,12 +77,12 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import EventsListItem from './events/EventsListItem.vue';
 import { inject, ref, computed, onMounted } from 'vue';
 import type {GameEvent} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {listEvents, markAllAsRead} from "@/services/typedapi/event";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -96,8 +96,8 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 

@@ -24,18 +24,19 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
 import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import DiplomacyIcons from './DiplomacyIcons.vue';
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {DiplomaticStatus} from "@solaris-common";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {ally, enemy, neutral} from "@/services/typedapi/diplomacy";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   diplomaticStatus: DiplomaticStatus<string>,
@@ -50,9 +51,10 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const confirm = useConfirm();
+const colourStore = useColourStore();
 
 const isGameFinished = computed(() => gameHelper.isGameFinished(game.value));
 const userPlayer = computed(() => gameHelper.getUserPlayer(game.value)!);
@@ -61,7 +63,7 @@ const getPlayer = (playerId: string) => gameHelper.getPlayerById(game.value, pla
 
 const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-const getFriendlyColour = (playerId: string) => store.getters.getColourForPlayer(playerId).value;
+const getFriendlyColour = (playerId: string) => colourStore.getColourForPlayer(game.value, playerId)!.value;
 
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 

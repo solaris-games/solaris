@@ -26,8 +26,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
 import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow.vue'
 import GameHelper from '../../../../services/gameHelper';
 import type {Game} from "@/types/game";
@@ -42,8 +42,8 @@ const emit = defineEmits<{
 
 const onTrashed = (actionId: string) => emit('bulkScheduleTrashed', actionId);
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const tableData = computed(() => userPlayer.value.scheduledActions);
 

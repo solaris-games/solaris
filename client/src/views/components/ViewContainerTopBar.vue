@@ -54,30 +54,29 @@
 <script setup lang="ts">
 import router from '../../router'
 import { ref, computed, inject } from 'vue';
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
 import type { UserRoles } from '@solaris-common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { endImpersonate } from '@/services/typedapi/admin';
 import { toastInjectionKey } from '@/util/keys';
 import {logout} from "@/services/typedapi/auth";
+import { useUserStore } from '@/stores/user';
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const userId = computed(() => store.state.userId);
-const username = computed(() => store.state.username);
-const userCredits = computed(() => store.state.userCredits);
+const userId = computed(() => userStore.userId);
+const username = computed(() => userStore.username);
+const userCredits = computed(() => userStore.credits);
 
 const userHasAdminRole = computed(() => {
-  const roles: UserRoles = store.state.roles;
+  const roles: UserRoles | null = userStore.roles;
 
   return roles?.administrator || roles?.communityManager || roles?.gameMaster;
 });
 
-const userIsImpersonated = computed(() => store.state.isImpersonating);
+const userIsImpersonated = computed(() => userStore.isImpersonating);
 
 
 const isLoggingOut = ref(false);
@@ -86,11 +85,11 @@ const doEndImpersonate = async () => {
   const response = await endImpersonate(httpClient)();
 
   if (isOk(response)) {
-    store.commit('setUserId', response.data._id);
-    store.commit('setUsername', response.data.username);
-    store.commit('setRoles', response.data.roles);
-    store.commit('setUserCredits', response.data.credits);
-    store.commit('setIsImpersonating', undefined);
+    userStore.setUserId(response.data._id);
+    userStore.setUsername(response.data.username);
+    userStore.setRoles(response.data.roles);
+    userStore.setCredits(response.data.credits);
+    userStore.setIsImpersonating(undefined);
 
     router.push({name: 'home'})
   } else {
@@ -108,12 +107,7 @@ const doLogout = async () => {
 
   const response = await logout(httpClient)();
   if (isOk(response)) {
-    store.commit('clearUser');
-    store.commit('clearUsername');
-    store.commit('clearRoles');
-    store.commit('clearUserCredits');
-    store.commit('clearUserIsEstablishedPlayer');
-    store.commit('clearIsImpersonating');
+    userStore.clearAll();
 
     isLoggingOut.value = false;
 

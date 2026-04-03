@@ -38,11 +38,12 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import type {Star} from "@/types/game";
 import {httpInjectionKey} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import type {State} from "@/store";
+
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {makeUpgrade, makeWarpgateActions} from "@/views/game/components/star/upgrade";
 import {
@@ -51,7 +52,7 @@ import {
   upgradeScience as upgradeScienceReq
 } from "@/services/typedapi/star";
 import { ref, computed, inject } from 'vue';
-import { useStore, type Store } from 'vuex';
+import {eventBusInjectionKey} from "@/eventBus";
 
 const props = defineProps<{
   star: Star,
@@ -65,30 +66,31 @@ const emit = defineEmits<{
   onBuildCarrierRequested: [starId: string],
 }>();
 
+const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const isUpgradingEconomy = ref(false);
 const isUpgradingIndustry = ref(false);
 const isUpgradingScience = ref(false);
 
-const isGameFinished = computed(() => GameHelper.isGameFinished(store.state.game));
+const isGameFinished = computed(() => GameHelper.isGameFinished(store.game!));
 const isHistoricalMode = useIsHistoricalMode(store);
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
-const canBuildWarpGates = computed(() => store.state.game.settings.specialGalaxy.warpgateCost !== 'none');
-const canDestroyWarpGates = computed(() => store.state.game.state.startDate != null);
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.game!));
+const canBuildWarpGates = computed(() => store.game!.settings.specialGalaxy.warpgateCost !== 'none');
+const canDestroyWarpGates = computed(() => store.game!.state.startDate != null);
 
 const onBuildCarrierRequested = () => emit('onBuildCarrierRequested', props.star._id);
 
-const upgrade = makeUpgrade(store, toast, props.star);
+const upgrade = makeUpgrade(store, eventBus, toast, props.star);
 
-const upgradeEconomy = upgrade('economy', store.state.settings.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, 'gameStarEconomyUpgraded', upgradeEconomyReq(httpClient));
-const upgradeIndustry = upgrade('industry', store.state.settings.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, 'gameStarIndustryUpgraded', upgradeIndustryReq(httpClient));
-const upgradeScience = upgrade('science', store.state.settings.star.confirmBuildScience === 'enabled', isUpgradingScience, 'gameStarScienceUpgraded', upgradeScienceReq(httpClient));
+const upgradeEconomy = upgrade('economy', store.settings!.star.confirmBuildEconomy === 'enabled', isUpgradingEconomy, (eb, data) => store.gameStarEconomyUpgraded(eb, data), upgradeEconomyReq(httpClient));
+const upgradeIndustry = upgrade('industry', store.settings!.star.confirmBuildIndustry === 'enabled', isUpgradingIndustry, (eb, data) => store.gameStarIndustryUpgraded(eb, data), upgradeIndustryReq(httpClient));
+const upgradeScience = upgrade('science', store.settings!.star.confirmBuildScience === 'enabled', isUpgradingScience, (eb, data) => store.gameStarScienceUpgraded(eb, data), upgradeScienceReq(httpClient));
 
-const { buildWarpGate, destroyWarpGate } = makeWarpgateActions(store, toast, httpClient, props.star);
+const { buildWarpGate, destroyWarpGate } = makeWarpgateActions(store, eventBus, toast, httpClient, props.star);
 </script>
 
 <style scoped>

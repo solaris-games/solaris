@@ -271,9 +271,6 @@ export default class GameTickService extends EventEmitter {
             await this._moveCarriers(game, gameUsers);
             logTime('Move carriers and produce ships');
 
-            await this._combatContestedStars(game, gameUsers);
-            logTime('Combat at contested stars');
-
             const ticked = this._endOfGalacticCycleCheck(game);
             logTime('Galactic cycle check');
 
@@ -476,14 +473,26 @@ export default class GameTickService extends EventEmitter {
             }
         }
 
+        // Check for scenario where a player changes diplomatic status to another player.
+        // Perform combat at contested stars.
+        const contestedStars = this.starContestedService.listContestedStars(game);
+
+        for (let i = 0; i < contestedStars.length; i++) {
+            const { star: contestedStar } = contestedStars[i];
+
+            if (!combatStars.includes(contestedStar)) {
+                combatStars.push(contestedStar);
+            }
+        }
+
         // 3. Now that all carriers have finished moving, perform combat.
         for (let i = 0; i < combatStars.length; i++) {
-            let combatStar = combatStars[i];
+            const combatStar = combatStars[i];
 
             // Get all carriers orbiting the star and perform combat.
-            let carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
+            const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
-            let starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
+            const starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
 
             await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
@@ -507,25 +516,6 @@ export default class GameTickService extends EventEmitter {
         // Moving it out of here technically introduces a bug where carriers may travel to stars they cannot see _within_ a turn (rare occurrence).
         // Performance gain outweighs the risk of encountering this issue.
         // this._sanitiseDarkModeCarrierWaypoints(game);
-    }
-
-    async _combatContestedStars(game: Game, gameUsers: User[]) {
-        // Note: Contested stars are only possible when formal alliances is enabled.
-        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
-            return;
-        }
-
-        // Check for scenario where a player changes diplomatic status to another player.
-        // Perform combat at contested stars.
-        let contestedStars = this.starContestedService.listContestedStars(game);
-
-        for (let i = 0; i < contestedStars.length; i++) {
-            let contestedStar = contestedStars[i];
-
-            let starOwningPlayer = this.playerService.getById(game, contestedStar.star.ownedByPlayerId!)!;
-
-            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, contestedStar.star, contestedStar.carriersInOrbit);
-        }
     }
 
     async _captureAbandonedStars(game: Game, gameUsers: User[]) {

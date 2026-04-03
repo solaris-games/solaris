@@ -59,8 +59,8 @@
         </p>
 
         <p>
-            To win a game of Solaris, you must capture a specified number of stars. You are currently in control of <span class="text-info">{{getStarCount.length}} stars</span>
-            and you need to capture <span class="text-warning">{{getStarsForVictory}} stars</span> to win the game and end the tutorial.
+            To win a game of Solaris, you must capture a specified number of stars. You are currently in control of <span class="text-info">{{playerStars.length}} stars</span>
+            and you need to capture <span class="text-warning">{{starsForVictory}} stars</span> to win the game and end the tutorial.
         </p>
     </div>
 
@@ -78,7 +78,7 @@
         </ul>
 
         <p>
-            At the start of the game, you are in control of <span class="text-info">{{getStartingStars}} stars</span>. Click on a star on the map
+            At the start of the game, you are in control of <span class="text-info">{{startingStars}} stars</span>. Click on a star on the map
             to view the star detail screen.
         </p>
 
@@ -117,7 +117,7 @@
         </p>
 
         <p>
-            At the start of the game, your capital star <a href="javascript:;" @click="onOpenStarDetailRequested">{{getPlayerHomeStar.name}}</a> has a carrier for free.
+            At the start of the game, your capital star <a href="javascript:;" @click="onOpenStarDetailRequested(playerHomeStar._id)">{{playerHomeStar.name}}</a> has a carrier for free.
             Use this carrier to plot waypoints to stars.
         </p>
 
@@ -149,8 +149,8 @@
         <h5>How to Win</h5>
 
         <p>
-            To win a game of Solaris, you must capture a specified number of stars. You are currently in control of <span class="text-info">{{getStarCount.length}} stars</span>
-            and you need to capture <span class="text-warning">{{getStarsForVictory}} stars</span> to win the game and end the tutorial.
+            To win a game of Solaris, you must capture a specified number of stars. You are currently in control of <span class="text-info">{{playerStars.length}} stars</span>
+            and you need to capture <span class="text-warning">{{starsForVictory}} stars</span> to win the game and end the tutorial.
         </p>
 
         <p class="text-danger">
@@ -167,25 +167,20 @@
 </div>
 </template>
 
-<script>
-import tutorialMixin from './tutorialMixin';
-export default {
-    mixins: [tutorialMixin],
-    mounted: function () {
-        this.setTutorial("Tutorial - Fleet Movement", 7)
-        if (this.gameIsFinished) {
-            console.log("FINISHED")
-            this.setTutorialCompleted()
-        }
-    },
-    watch: {
-        game (newGame, _oldGame) {
-            console.log("GAME UPDATE", newGame)
-            if (this.gameIsFinished)
-                this.setTutorialCompleted()
-        }
-    }
-}
+<script setup lang="ts">
+import { watch } from 'vue';
+import type {TutorialProps} from "@/views/game/components/tutorial/tutorial";
+import GameHelper from "@/services/gameHelper";
+
+const props = defineProps<TutorialProps>();
+
+props.setTutorial("Tutorial - Fleet Movement", 7);
+
+watch(props.game, (newGame, _) => {
+  if (GameHelper.isGameFinished(newGame)) {
+    props.setTutorialCompleted();
+  }
+});
 </script>
 
 <style scoped>

@@ -28,13 +28,13 @@
 
 <script setup lang="ts">
 import {ref, computed, onMounted, inject} from "vue";
-import {useStore} from "vuex";
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
-import type {AchievementsUser, Guild, GuildWithUsers} from "@solaris-common";
+import type {AchievementsUser, GuildWithUsers} from "@solaris-common";
 import {detailMyGuild, inviteGuild} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm";
 import {toastInjectionKey} from "@/util/keys";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   user: AchievementsUser<string>,
@@ -43,8 +43,8 @@ const props = defineProps<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const userStore = useUserStore();
+const confirm = useConfirm();
 
 const isLoadingGuild = ref(false);
 const isInvitingUser = ref(false);
@@ -56,7 +56,7 @@ const isUserInvited = computed(() => {
 
 const ownUserCanInvite = computed(() => {
   return myGuild.value &&
-      (myGuild.value.leader?._id === store.state.userId || myGuild.value.officers?.find(x => x._id === store.state.userId));
+      (myGuild.value.leader?._id === userStore.userId || myGuild.value.officers?.find(x => x._id === userStore.userId));
 });
 
 const loadMyGuild = async () => {

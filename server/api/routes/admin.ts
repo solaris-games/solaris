@@ -144,17 +144,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
             controller.forceEndGame
     );
 
-    answer(routes.resetQuitters,
-            mw.auth.authenticate({ admin: true }),
-            mw.game.loadGame({
-                lean: true,
-                settings: true,
-                state: true,
-                'galaxy.players': true
-            }),
-            controller.resetQuitters
-    );
-
     answer(routes.createAnnouncement,
         mw.auth.authenticate({ admin: true }),
         controller.createAnnouncement);

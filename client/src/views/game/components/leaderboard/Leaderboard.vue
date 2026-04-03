@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="row" v-if="game.state.startDate && !game.state.endDate">
+    <div class="row" v-if="game.state.startDate && !game.state.endDate && !game.state.paused">
       <div class="col text-center pt-2 pb-0">
         <p class="pb-0 mb-2">{{ timeRemaining }}</p>
       </div>
@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import router from '../../../../router'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
@@ -101,10 +102,8 @@ import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
 import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
 import { type Game, type Player } from '@solaris-common';
-import { useStore, type Store } from 'vuex';
-import type { State } from "@/store";
 import { toastInjectionKey } from '@/util/keys'
-import { makeConfirm } from '@/util/confirm'
+import { useConfirm } from '@/hooks/confirm.ts'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 import Winner from "@/views/game/components/leaderboard/Winner.vue";
@@ -119,8 +118,8 @@ const emit = defineEmits<{
   onViewSettingsRequested: [],
 }>();
 
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
@@ -134,7 +133,7 @@ const intervalFunction = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game<string>>(() => store.state.game);
+const game = computed<Game<string>>(() => store.game!);
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
 const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);

@@ -1,6 +1,7 @@
 import Repository from './repository';
 import {Carrier} from './types/Carrier';
 import {
+    CarrierTravelService,
     CarrierWaypoint,
     DistanceService,
     StarDataService,
@@ -17,7 +18,6 @@ import SpecialistService from './specialist';
 import StarService from './star';
 import {logger} from "../utils/logging";
 import {DBObjectId} from "./types/DBObjectId";
-import { CarrierTravelService } from 'solaris-common';
 
 type CarrierMovementReport = {
     carrier: Carrier;
@@ -191,10 +191,10 @@ export default class CarrierMovementService {
             combatRequiredStar: false,
             arrivedAtStar: false
         };
-        
+
         if (instantSpeed || (distancePerTick && (carrierInTransit.distanceToDestination || 0) <= distancePerTick)) {
-            let starArrivalReport = this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
-            
+            const starArrivalReport = this.arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
+
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;
             carrierMovementReport.arrivedAtStar = true;

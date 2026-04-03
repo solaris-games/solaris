@@ -21,11 +21,10 @@
 </template>
 
 <script setup lang="ts">
-import router from '../../router'
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
+import router from '../../router';
 import { computed, inject } from 'vue';
 import {configInjectionKey} from "@/config";
+import { useUserStore } from '@/stores/user';
 
 type Props = {
   title: string,
@@ -39,9 +38,9 @@ const { title, navigation  = "main-menu", icon = "home", hideHomeButton, showSoc
 
 const config = inject(configInjectionKey)!;
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
-const isLoggedIn = computed(() => Boolean(store.state.userId));
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const documentationUrl = config.appDocumentationUrl;
 

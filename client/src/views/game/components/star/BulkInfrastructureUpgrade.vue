@@ -146,6 +146,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
@@ -160,10 +161,8 @@ import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkIn
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {BulkUpgradeReport, InfrastructureType, MapObject} from "@solaris-common";
-import { useStore, type Store } from 'vuex';
-import type { State } from "@/store";
 import {scheduleBulk, upgradeBulk, upgradeBulkCheck} from "@/services/typedapi/star";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
 type ScheduleStrategy =  'future' | 'cycle-start' | 'cycle-end' | 'now';
@@ -177,8 +176,8 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const errors: Ref<string[]> = ref([]);
 const isUpgrading = ref(false);
@@ -194,7 +193,7 @@ const selectedType: Ref<InfrastructureType | null> = ref("economy");
 const selectedUpgradeStrategy = ref("totalCredits");
 const selectedScheduleStrategy: Ref<ScheduleStrategy> = ref('now');
 const repeat = ref("false");
-const tick: Ref<number> = ref(store.state.game.state.tick);
+const tick: Ref<number> = ref(store.game!.state.tick);
 const types: Ref<{ key: InfrastructureType, name: string }[]> = ref([]);
 const actionCount = ref(0);
 
@@ -211,21 +210,21 @@ const checkText = computed(() => {
 const setupInfrastructureTypes = () => {
   types.value = [];
 
-  if (store.state.game.settings.player.developmentCost.economy !== 'none') {
+  if (store.game!.settings.player.developmentCost.economy !== 'none') {
     types.value.push({
       key: 'economy',
       name: 'Economy'
     })
   }
 
-  if (store.state.game.settings.player.developmentCost.industry !== 'none') {
+  if (store.game!.settings.player.developmentCost.industry !== 'none') {
     types.value.push({
       key: 'industry',
       name: 'Industry'
     })
   }
 
-  if (store.state.game.settings.player.developmentCost.science !== 'none') {
+  if (store.game!.settings.player.developmentCost.science !== 'none') {
     types.value.push({
       key: 'science',
       name: 'Science'
@@ -244,16 +243,16 @@ const resetPreview = () => {
   upgradePreview.value = null;
 };
 
-const updateActionCount = () => actionCount.value = GameHelper.getUserPlayer(store.state.game)?.scheduledActions?.length || 0;
+const updateActionCount = () => actionCount.value = GameHelper.getUserPlayer(store.game!)?.scheduledActions?.length || 0;
 
-const getStar = (starId: string) => GameHelper.getStarById(store.state.game, starId)!;
+const getStar = (starId: string) => GameHelper.getStarById(store.game!, starId)!;
 
 const panToStar = (starId: string) => {
   const star: MapObject<string> = getStar(starId)!;
   eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: star });
 };
 
-const gameIsFinished = () => GameHelper.isGameFinished(store.state.game);
+const gameIsFinished = () => GameHelper.isGameFinished(store.game!);
 
 const resetHasChecked = () => !hasChecked.value;
 
@@ -267,7 +266,7 @@ const check = async () => {
     return;
   }
 
-  if (selectedScheduleStrategy.value === 'future' && tick.value < store.state.game.state.tick) {
+  if (selectedScheduleStrategy.value === 'future' && tick.value < store.game!.state.tick) {
     return;
   }
 
@@ -275,18 +274,18 @@ const check = async () => {
 
   if (isFutureStrategy(selectedScheduleStrategy.value)) {
     if (selectedScheduleStrategy.value === 'cycle-end') {
-      const cycleTicks = store.state.game.settings.galaxy.productionTicks;
-      const currentTick = store.state.game.state.tick;
+      const cycleTicks = store.game!.settings.galaxy.productionTicks;
+      const currentTick = store.game!.state.tick;
       const cycle = Math.floor(currentTick / cycleTicks) + 1;
       tick.value = cycle * cycleTicks - 1;
     } else if (selectedScheduleStrategy.value === 'cycle-start') {
-      const cycleTicks = store.state.game.settings.galaxy.productionTicks;
-      const currentTick = store.state.game.state.tick;
+      const cycleTicks = store.game!.settings.galaxy.productionTicks;
+      const currentTick = store.game!.state.tick;
       const cycle = Math.floor(currentTick / cycleTicks) + 1;
       tick.value = cycle * cycleTicks;
     }
 
-    const response = await scheduleBulk(httpClient)(store.state.game._id, {
+    const response = await scheduleBulk(httpClient)(store.game!._id, {
       infrastructureType: selectedType.value!,
       buyType: selectedUpgradeStrategy.value,
       tick: tick.value,
@@ -297,7 +296,7 @@ const check = async () => {
     if (isOk(response)) {
       AudioService.join();
 
-      store.commit('gameBulkActionAdded', response.data);
+      store.gameBulkActionAdded(response.data);
 
       updateActionCount();
 
@@ -310,7 +309,7 @@ const check = async () => {
     upgradeAvailable.value = 0;
     cost.value = 0;
 
-    const response = await upgradeBulkCheck(httpClient)(store.state.game._id, {
+    const response = await upgradeBulkCheck(httpClient)(store.game!._id, {
       infrastructure: selectedType.value!,
       upgradeStrategy: selectedUpgradeStrategy.value,
       amount: amount.value,
@@ -347,7 +346,7 @@ const upgrade = async () => {
 
   isUpgrading.value = true;
 
-  const response = await upgradeBulk(httpClient)(store.state.game._id, {
+  const response = await upgradeBulk(httpClient)(store.game!._id, {
     infrastructure: selectedType.value!,
     upgradeStrategy: selectedUpgradeStrategy.value,
     amount: amount.value,
@@ -356,12 +355,12 @@ const upgrade = async () => {
   if (isOk(response)) {
     AudioService.join();
 
-    store.commit('gameStarBulkUpgraded', response.data);
+    store.gameStarBulkUpgraded(eventBus, response.data);
 
     toast.success(`Upgrade complete. Purchased ${response.data.upgraded} ${selectedType.value} for ${response.data.cost} credits.`);
 
     if (selectedUpgradeStrategy.value === 'totalCredits') {
-      const userPlayer = GameHelper.getUserPlayer(store.state.game)!;
+      const userPlayer = GameHelper.getUserPlayer(store.game!)!;
       amount.value = userPlayer.credits;
     }
   } else {
@@ -376,7 +375,7 @@ const upgrade = async () => {
 onMounted(() => {
   eventBus.emit(MapCommandEventBusEventNames.MapCommandShowIgnoreBulkUpgrade, {});
 
-  const userPlayer = GameHelper.getUserPlayer(store.state.game)!;
+  const userPlayer = GameHelper.getUserPlayer(store.game!)!;
   amount.value = userPlayer.credits;
   actionCount.value = userPlayer?.scheduledActions?.length || 0;
 

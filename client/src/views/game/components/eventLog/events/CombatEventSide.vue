@@ -45,10 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex';
+import { useGameStore } from '@/stores/game';
 import { type CombatSide, resultToNumber } from '../../../../../services/combat';
-import type { Store } from 'vuex/types/index.js';
-import type { State } from '../../../../../store';
 import CombatActorDescription from './CombatActorDescription.vue';
 import PlayerIcon from "../../../../game/components/player/PlayerIcon.vue";
 import { computed } from 'vue';
@@ -62,7 +60,7 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
 
 const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);

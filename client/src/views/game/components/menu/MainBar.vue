@@ -6,21 +6,23 @@
   <sidebar-menu />
 
   <div class="menu">
-    <not-logged-in-bar v-if="!isLoggedIn"/>
+    <not-logged-in-bar v-if="!userStore.isLoggedIn"/>
+
     <spectating-warning-bar/>
 
     <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
 
-    <div class="menu-content" v-if="menuState">
-      <welcome v-if="menuState == MENU_STATES.WELCOME" @onCloseRequested="onCloseRequested"
+    <div class="menu-content">
+      <welcome v-if="menuState.state == 'welcome'" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
-      <tutorial v-if="menuState == MENU_STATES.TUTORIAL" @onCloseRequested="onCloseRequested"
+      <tutorial v-if="menuState.state == 'tutorial'" @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-      <leaderboard v-if="menuState == MENU_STATES.LEADERBOARD" @onCloseRequested="onCloseRequested"
+      <leaderboard v-if="menuState.state == 'leaderboard'" @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"/>
-      <player v-if="menuState == MENU_STATES.PLAYER" @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
+      <player v-if="menuState.state == 'player'" @onCloseRequested="onCloseRequested"
+              :playerId="menuState.playerId" :key="menuState.playerId"
         @onViewCompareIntelRequested="onViewCompareIntelRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenTradeRequested="onOpenTradeRequested"
@@ -28,12 +30,13 @@
         @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
         @onViewColourOverrideRequested="onViewColourOverrideRequested"
       />
-      <trade v-if="menuState == MENU_STATES.TRADE"
-        @onCloseRequested="onCloseRequested" :playerId="menuArguments" :key="menuArguments"
+      <trade v-if="menuState.state == 'trade'"
+        @onCloseRequested="onCloseRequested" :playerId="menuState.playerId" :key="menuState.playerId"
         @onOpenTradeRequested="onOpenTradeRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <research v-if="menuState == MENU_STATES.RESEARCH" @onCloseRequested="onCloseRequested"/>
-      <star-detail v-if="menuState == MENU_STATES.STAR_DETAIL" :starId="menuArguments" :key="menuArguments"
+      <research v-if="menuState.state == 'research'" @onCloseRequested="onCloseRequested"/>
+      <star-detail v-if="menuState.state == 'starDetail'"
+                   :starId="menuState.starId" :key="menuState.starId"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
@@ -42,8 +45,8 @@
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"
         @onShipTransferRequested="onShipTransferRequested"/>
-      <carrier-detail v-if="menuState == MENU_STATES.CARRIER_DETAIL"
-        @onCloseRequested="onCloseRequested" :carrierId="menuArguments" :key="menuArguments"
+      <carrier-detail v-if="menuState.state == 'carrierDetail'"
+        @onCloseRequested="onCloseRequested" :carrierId="menuState.carrierId" :key="menuState.carrierId"
         @onShipTransferRequested="onShipTransferRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onEditWaypointRequested="onEditWaypointRequested"
@@ -53,92 +56,81 @@
         @onViewHireCarrierSpecialistRequested="onViewHireCarrierSpecialistRequested"
         @onCarrierRenameRequested="onCarrierRenameRequested"
         @onViewCarrierCombatCalculatorRequested="onViewCarrierCombatCalculatorRequested"/>
-      <carrier-waypoints v-if="menuState == MENU_STATES.CARRIER_WAYPOINTS"
-        @onCloseRequested="onCloseRequested" :carrierId="menuArguments"
+      <carrier-waypoints v-if="menuState.state == 'carrierWaypoints'"
+        @onCloseRequested="onCloseRequested" :carrierId="menuState.carrierId"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onEditWaypointRequested="onEditWaypointRequested"/>
-      <carrier-waypoint v-if="menuState == MENU_STATES.CARRIER_WAYPOINT_DETAIL"
+      <carrier-waypoint v-if="menuState.state == 'carrierWaypointDetail'"
         @onCloseRequested="onCloseRequested"
-        :carrierId="menuArguments.carrierId"
-        :waypoint="menuArguments.waypoint"
+        :carrierId="menuState.carrierId"
+        :waypoint="menuState.waypoint"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <carrier-rename v-if="menuState == MENU_STATES.CARRIER_RENAME"
+      <carrier-rename v-if="menuState.state == 'carrierRename'"
         @onCloseRequested="onCloseRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        :carrierId="menuArguments" />
-      <combat-calculator v-if="menuState == MENU_STATES.COMBAT_CALCULATOR"
-        :carrierId="menuArguments"
+        :carrierId="menuState.carrierId" />
+      <combat-calculator v-if="menuState.state == 'combatCalculator'"
+        :carrierId="menuState.carrierId"
         @onCloseRequested="onCloseRequested"/>
-      <ship-transfer v-if="menuState == MENU_STATES.SHIP_TRANSFER"
+      <ship-transfer v-if="menuState.state == 'shipTransfer'"
         @onCloseRequested="onCloseRequested"
-        :carrierId="menuArguments"
+        :carrierId="menuState.carrierId"
         @onShipsTransferred="onShipsTransferred"
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <build-carrier v-if="menuState == MENU_STATES.BUILD_CARRIER"
-        :starId="menuArguments"
+      <build-carrier v-if="menuState.state == 'buildCarrier'"
+        :starId="menuState.starId"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onEditWaypointsRequested="onEditWaypointsRequested"/>
-      <inbox v-if="menuState == MENU_STATES.INBOX"
+      <event-log v-if="menuState.state == 'eventLog'"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <event-log v-if="menuState == MENU_STATES.EVENT_LOG"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <intel v-if="menuState == MENU_STATES.INTEL" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuArguments"/>
-      <galaxy v-if="menuState == MENU_STATES.GALAXY"
-        :tab="menuArguments"
+      <intel v-if="menuState.state == 'intel'" @onCloseRequested="onCloseRequested" :compareWithPlayerId="menuState?.compareWithPlayerId"/>
+      <galaxy v-if="menuState.state == 'galaxy'"
+        :tab="menuState.menu"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <bulk-infrastructure-upgrade v-if="menuState == MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE"
+      <bulk-infrastructure-upgrade v-if="menuState.state == 'bulkInfrastructureUpgrade'"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"/>
-      <map-object-selector v-if="menuState == MENU_STATES.MAP_OBJECT_SELECTOR"
+      <map-object-selector v-if="menuState.state == 'mapObjectSelector'"
         @onCloseRequested="onCloseRequested"
-        :mapObjects="menuArguments"
+        :mapObjects="menuState.objects as ObjectClicked[]"
         @onEditWaypointsRequested="onEditWaypointsRequested"
         @onShipTransferRequested="onShipTransferRequested"
         @onBuildCarrierRequested="onBuildCarrierRequested"/>
-      <ruler v-if="menuState == MENU_STATES.RULER" @onCloseRequested="onCloseRequested"/>
-      <ledger v-if="menuState == MENU_STATES.LEDGER" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <diplomacy v-if="menuState == MENU_STATES.DIPLOMACY" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <hire-specialist-carrier v-if="menuState == MENU_STATES.HIRE_SPECIALIST_CARRIER"
-        :carrierId="menuArguments"
+      <ruler v-if="menuState.state == 'ruler'" @onCloseRequested="onCloseRequested"/>
+      <ledger v-if="menuState.state == 'ledger'" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <diplomacy v-if="menuState.state == 'diplomacy'" @onCloseRequested="onCloseRequested" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+      <hire-specialist-carrier v-if="menuState.state == 'hireSpecialistCarrier'"
+        :carrierId="menuState.carrierId"
         @onCloseRequested="onCloseRequested"
         @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"/>
-      <hire-specialist-star v-if="menuState == MENU_STATES.HIRE_SPECIALIST_STAR"
-        :starId="menuArguments"
+      <hire-specialist-star v-if="menuState.state == 'hireSpecialistStar'"
+        :starId="menuState.starId"
         @onCloseRequested="onCloseRequested"
         @onOpenStarDetailRequested="onOpenStarDetailRequested"
         @onReloadGameRequested="onReloadGameRequested"/>
-      <game-notes v-if="menuState == MENU_STATES.GAME_NOTES"
+      <game-notes v-if="menuState.state == 'gameNotes'"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <options v-if="menuState == MENU_STATES.OPTIONS"
+      <options v-if="menuState.state == 'options'"
         @onCloseRequested="onCloseRequested"/>
-      <settings v-if="menuState == MENU_STATES.SETTINGS"
+      <settings v-if="menuState.state == 'settings'"
         @onCloseRequested="onCloseRequested"/>
-      <create-conversation v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
-        :participantIds="menuArguments"
-        @onCloseRequested="onCloseRequested"/>
-      <conversation v-if="menuState == MENU_STATES.CONVERSATION"
-        :conversationId="menuArguments"
-        :key="menuArguments"
+      <player-badge-shop v-if="menuState.state == 'playerBadgeShop'"
+        :recipientPlayerId="menuState.recipientPlayerId"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <player-badge-shop v-if="menuState == MENU_STATES.PLAYER_BADGE_SHOP"
-        :recipientPlayerId="menuArguments"
+      <report-player v-if="menuState.state == 'reportPlayer'"
+        :args="menuState.args"
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <report-player v-if="menuState == MENU_STATES.REPORT_PLAYER"
-        :args="menuArguments"
-        @onCloseRequested="onCloseRequested"
-        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
-      <spectators v-if="menuState == MENU_STATES.SPECTATORS"
+      <spectators v-if="menuState.state == 'spectators'"
         @onCloseRequested="onCloseRequested"/>
-      <game-statistics v-if="menuState == MENU_STATES.STATISTICS"
+      <game-statistics v-if="menuState.state == 'statistics'"
         @onCloseRequested="onCloseRequested" />
     </div>
 
@@ -150,234 +142,110 @@
 </div>
 </template>
 
-<script>
-import MENU_STATES from '../../../../services/data/menuStates'
-import PlayerListVue from './PlayerList.vue'
-import LeaderboardVue from '../leaderboard/Leaderboard.vue'
-import PlayerVue from '../player/Player.vue'
-import TradeVue from '../player/Trade.vue'
-import WelcomeVue from '../welcome/Welcome.vue'
-import TutorialVue from '../tutorial/Tutorial.vue'
-import ResearchVue from '../research/Research.vue'
-import StarDetailVue from '../star/StarDetail.vue'
-import CarrierDetailVue from '../carrier/CarrierDetail.vue'
-import CarrierWaypointsVue from '../carrier/CarrierWaypoints.vue'
-import CarrierWaypointVue from '../carrier/CarrierWaypoint.vue'
-import CarrierRenameVue from '../carrier/CarrierRename.vue'
-import ShipTransferVue from '../carrier/ShipTransfer.vue'
-import BuildCarrierVue from '../carrier/BuildCarrier.vue'
-import InboxVue from '../inbox/Inbox.vue'
-import EventLogVue from '../eventLog/EventLog.vue'
-import IntelVue from '../intel/Intel.vue'
-import GalaxyVue from '../galaxy/Galaxy.vue'
-import BulkInfrastructureUpgradeVue from '../star/BulkInfrastructureUpgrade.vue'
-import MapObjectSelectorVue from './MapObjectSelector.vue'
-import CombatCalculatorVue from '../carrier/CombatCalculator.vue'
-import RulerVue from '../ruler/Ruler.vue'
-import HeaderBarVue from './HeaderBar.vue'
-import SidebarMenuVue from './SidebarMenu.vue'
-import LedgerVue from '../ledger/Ledger.vue'
-import DiplomacyVue from '../diplomacy/Diplomacy.vue'
-import HireSpecialistCarrierVue from '../specialist/HireSpecialistCarrier.vue'
-import HireSpecialistStarVue from '../specialist/HireSpecialistStar.vue'
-import GameNotesVue from '../notes/GameNotes.vue'
-import OptionsVue from './Options.vue'
-import SettingsVue from '../settings/Settings.vue'
-import ConversationCreateVue from '../inbox/conversations/ConversationCreate.vue'
-import ConversationDetailVue from '../inbox/conversations/ConversationDetail.vue'
-import FooterBarVue from './FooterBar.vue'
-import NotLoggedInBarVue from './NotLoggedInBar.vue'
-import SpectatingWarningBarVue from './SpectatingWarningBar.vue'
-import PlayerBadgeShopVue from '../badges/PlayerBadgeShop.vue'
-import ReportPlayerVue from '../report/ReportPlayer.vue'
-import SpectatorVue from '../spectators/Spectators.vue'
-import { inject } from 'vue'
-import { eventBusInjectionKey } from '../../../../eventBus'
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+<script setup lang="ts">
+import { onMounted, onUnmounted, inject, computed } from 'vue';
+import PlayerList from './PlayerList.vue';
+import Leaderboard from '../leaderboard/Leaderboard.vue';
+import Player from '../player/Player.vue';
+import Trade from '../player/Trade.vue';
+import Welcome from '../welcome/Welcome.vue';
+import Tutorial from '../tutorial/Tutorial.vue';
+import Research from '../research/Research.vue';
+import StarDetail from '../star/StarDetail.vue';
+import CarrierDetail from '../carrier/CarrierDetail.vue';
+import CarrierWaypoints from '../carrier/CarrierWaypoints.vue';
+import CarrierWaypoint from '../carrier/CarrierWaypoint.vue';
+import CarrierRename from '../carrier/CarrierRename.vue';
+import ShipTransfer from '../carrier/ShipTransfer.vue';
+import BuildCarrier from '../carrier/BuildCarrier.vue';
+import Inbox from '../inbox/Inbox.vue';
+import EventLog from '../eventLog/EventLog.vue';
+import Intel from '../intel/Intel.vue';
+import Galaxy from '../galaxy/Galaxy.vue';
+import BulkInfrastructureUpgrade from '../star/BulkInfrastructureUpgrade.vue';
+import MapObjectSelector from './MapObjectSelector.vue';
+import CombatCalculator from '../carrier/CombatCalculator.vue';
+import Ruler from '../ruler/Ruler.vue';
+import HeaderBar from './HeaderBar.vue';
+import SidebarMenu from './SidebarMenu.vue';
+import Ledger from '../ledger/Ledger.vue';
+import Diplomacy from '../diplomacy/Diplomacy.vue';
+import HireSpecialistCarrier from '../specialist/HireSpecialistCarrier.vue';
+import HireSpecialistStar from '../specialist/HireSpecialistStar.vue';
+import GameNotes from '../notes/GameNotes.vue';
+import Options from './Options.vue';
+import Settings from '../settings/Settings.vue';
+import ConversationCreate from '../inbox/conversations/ConversationCreate.vue';
+import ConversationDetail from '../inbox/conversations/ConversationDetail.vue';
+import FooterBar from './FooterBar.vue';
+import NotLoggedInBar from './NotLoggedInBar.vue';
+import SpectatingWarningBar from './SpectatingWarningBar.vue';
+import PlayerBadgeShop from '../badges/PlayerBadgeShop.vue';
+import ReportPlayer from '../report/ReportPlayer.vue';
+import Spectators from '../spectators/Spectators.vue';
+import { eventBusInjectionKey } from '@/eventBus';
+import type { CarrierWaypoint as CWTp } from "@solaris-common";
 import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
+import {useUserStore} from "@/stores/user";
+import {useGameStore} from "@/stores/game";
+import type {MenuState, ReportPlayerArgs} from "@/types/menu";
+import type {ObjectClicked} from "@/eventBusEventNames/map";
 
-export default {
-  components: {
-    GameStatistics,
-    'header-bar': HeaderBarVue,
-    'footer-bar': FooterBarVue,
-    'sidebar-menu': SidebarMenuVue,
-    'welcome': WelcomeVue,
-    'tutorial': TutorialVue,
-    'player-list': PlayerListVue,
-    'leaderboard': LeaderboardVue,
-    'player': PlayerVue,
-    'trade': TradeVue,
-    'research': ResearchVue,
-    'star-detail': StarDetailVue,
-    'carrier-detail': CarrierDetailVue,
-    'carrier-waypoints': CarrierWaypointsVue,
-    'carrier-waypoint': CarrierWaypointVue,
-    'carrier-rename': CarrierRenameVue,
-    'combat-calculator': CombatCalculatorVue,
-    'ship-transfer': ShipTransferVue,
-    'build-carrier': BuildCarrierVue,
-    'inbox': InboxVue,
-    'event-log': EventLogVue,
-    'intel': IntelVue,
-    'galaxy': GalaxyVue,
-    'bulk-infrastructure-upgrade': BulkInfrastructureUpgradeVue,
-    'map-object-selector': MapObjectSelectorVue,
-    'ruler': RulerVue,
-    'ledger': LedgerVue,
-    'diplomacy': DiplomacyVue,
-    'hire-specialist-carrier': HireSpecialistCarrierVue,
-    'hire-specialist-star': HireSpecialistStarVue,
-    'game-notes': GameNotesVue,
-    'options': OptionsVue,
-    'settings': SettingsVue,
-    'create-conversation': ConversationCreateVue,
-    'conversation': ConversationDetailVue,
-    'not-logged-in-bar': NotLoggedInBarVue,
-    'spectating-warning-bar': SpectatingWarningBarVue,
-    'player-badge-shop': PlayerBadgeShopVue,
-    'report-player': ReportPlayerVue,
-    'spectators': SpectatorVue
-  },
-  data () {
-    return {
-      MENU_STATES: MENU_STATES,
-      menuState: null,
-      menuArguments: null
-    }
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  mounted () {
-    this.eventBus.on(MenuEventBusEventNames.OnMenuRequested, this.onMenuRequested);
-    this.eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
-    this.eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
-    this.eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
-  },
-  unmounted () {
-    this.eventBus.off(MenuEventBusEventNames.OnMenuRequested, this.onMenuRequested);
-    this.eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, this.onCreateNewConversationRequested);
-    this.eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, this.onViewConversationRequested);
-    this.eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, this.onOpenInboxRequested);
-  },
-  methods: {
-    onMenuRequested (menuState) {
-      // TODO: For some reason, using the state to drive
-      // the menus doesn't work correctly so instead we use the data() function
-      // above to store the menu state in the component.
-      menuState.state = menuState.state || null
-      menuState.args = menuState.args || null
+const emit = defineEmits<{
+  onViewColourOverrideRequested: [playerId: string],
+  onReloadGameRequested: [],
+}>();
 
-      // Toggle menu if its already open.
-      if (menuState.state === this.menuState && menuState.args === this.menuArguments) {
-        this.menuArguments = null
-        this.menuState = null
-      } else {
-        this.menuArguments = menuState.args
-        this.menuState = menuState.state
-      }
-    },
-    changeMenuState (state, args) {
-      this.$store.commit('setMenuState', {
-        state,
-        args
-      })
-    },
-    onCloseRequested (e) {
-      this.changeMenuState(null, null)
-    },
-    onViewCompareIntelRequested (e) {
-      this.changeMenuState(MENU_STATES.INTEL, e)
-    },
-    onShipTransferRequested (e) {
-      this.changeMenuState(MENU_STATES.SHIP_TRANSFER, e)
-    },
-    onShipsTransferred (e) {
-      this.changeMenuState(MENU_STATES.CARRIER_DETAIL, e)
-    },
-    onOpenCarrierDetailRequested (e) {
-      this.changeMenuState(MENU_STATES.CARRIER_DETAIL, e)
-    },
-    onOpenStarDetailRequested (e) {
-      this.changeMenuState(MENU_STATES.STAR_DETAIL, e)
-    },
-    onOpenPlayerDetailRequested (e) {
-      this.changeMenuState(MENU_STATES.PLAYER, e)
-    },
-    onOpenTradeRequested (e) {
-      this.changeMenuState(MENU_STATES.TRADE, e)
-    },
-    onEditWaypointsRequested (e) {
-      this.changeMenuState(MENU_STATES.CARRIER_WAYPOINTS, e)
-    },
-    onEditWaypointRequested (e) {
-      this.changeMenuState(MENU_STATES.CARRIER_WAYPOINT_DETAIL, e)
-    },
-    onViewHireCarrierSpecialistRequested (e) {
-      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_CARRIER, e)
-    },
-    onViewHireStarSpecialistRequested (e) {
-      this.changeMenuState(MENU_STATES.HIRE_SPECIALIST_STAR, e)
-    },
-    onBuildCarrierRequested (e) {
-      this.changeMenuState(MENU_STATES.BUILD_CARRIER, e)
-    },
-    onCarrierRenameRequested (e) {
-      this.changeMenuState(MENU_STATES.CARRIER_RENAME, e)
-    },
-    onViewCarrierCombatCalculatorRequested (e) {
-      this.changeMenuState(MENU_STATES.COMBAT_CALCULATOR, e)
-    },
-    onViewSettingsRequested (e) {
-      this.changeMenuState(MENU_STATES.SETTINGS, e)
-    },
-    onOpenInboxRequested (e) {
-      if (!this.canHandleConversationEvents()) return
+const eventBus = inject(eventBusInjectionKey)!;
 
-      this.changeMenuState(MENU_STATES.INBOX, e)
-    },
-    onCreateNewConversationRequested (e) {
-      if (!this.canHandleConversationEvents()) return
+const userStore = useUserStore();
+const store = useGameStore();
 
-      this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e)
-    },
-    onViewConversationRequested (e) {
-      if (!this.canHandleConversationEvents()) return
+const menuState = computed(() => store.menuState);
 
-      if (e.conversationId) {
-        this.changeMenuState(MENU_STATES.CONVERSATION, e.conversationId)
-      } else if (e.participantIds) {
-        this.changeMenuState(MENU_STATES.CREATE_CONVERSATION, e.participantIds)
-      }
-    },
-    onOpenPurchasePlayerBadgeRequested (e) {
-      this.changeMenuState(MENU_STATES.PLAYER_BADGE_SHOP, e)
-    },
-    onOpenReportPlayerRequested (e) {
-      this.changeMenuState(MENU_STATES.REPORT_PLAYER, e)
-    },
-    onViewColourOverrideRequested (e) {
-      this.$emit('onViewColourOverrideRequested', e)
-    },
-    canHandleConversationEvents () {
-      return window.innerWidth < 992
-    },
-    onReloadGameRequested (e) {
-      this.$emit('onReloadGameRequested', e)
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    isLoggedIn () {
-      return this.$store.state.userId != null
-    }
-  }
-}
+const changeMenuState = (newState: MenuState) => {
+  store.setMenuState(newState);
+};
+
+const onCloseRequested = () => changeMenuState({ state: 'none' });
+
+const onViewCompareIntelRequested = (e: string) => changeMenuState({ state: 'intel', compareWithPlayerId: e });
+
+const onShipTransferRequested = (e: string) => changeMenuState({ state: 'shipTransfer', carrierId: e });
+
+const onShipsTransferred = (e: string) => changeMenuState({ state: 'carrierDetail', carrierId: e });
+
+const onOpenCarrierDetailRequested = (e: string) => changeMenuState({ state: 'carrierDetail', carrierId: e });
+
+const onOpenStarDetailRequested = (e: string) => changeMenuState({ state: 'starDetail', starId: e });
+
+const onOpenPlayerDetailRequested = (e: string) => changeMenuState({ state: 'player', playerId: e });
+
+const onOpenTradeRequested = (e: string) => changeMenuState({ state: 'trade', playerId: e });
+
+const onEditWaypointsRequested = (e: string) => changeMenuState({ state: 'carrierWaypoints', carrierId: e });
+
+const onEditWaypointRequested = ({ carrierId, waypoint }: { carrierId: string, waypoint: CWTp<string> }) => changeMenuState({ state: 'carrierWaypointDetail', carrierId, waypoint });
+
+const onViewHireCarrierSpecialistRequested = (e: string) => changeMenuState({ state: "hireSpecialistCarrier", carrierId: e });
+
+const onViewHireStarSpecialistRequested = (e: string) => changeMenuState({ state: 'hireSpecialistStar', starId: e });
+
+const onBuildCarrierRequested = (e: string) => changeMenuState({ state: 'buildCarrier', starId: e });
+
+const onCarrierRenameRequested = (e: string) => changeMenuState({ state: 'carrierRename', carrierId: e });
+
+const onViewCarrierCombatCalculatorRequested = (e: string | undefined) => changeMenuState({ state: 'combatCalculator', carrierId: e });
+
+const onViewSettingsRequested = () => changeMenuState({ state: 'options' });
+
+const onOpenPurchasePlayerBadgeRequested = (e: string) => changeMenuState({ state: "playerBadgeShop", recipientPlayerId: e });
+
+const onOpenReportPlayerRequested = (args: ReportPlayerArgs) => changeMenuState({ state: 'reportPlayer', args });
+
+const onViewColourOverrideRequested = (e: string) => emit('onViewColourOverrideRequested', e);
+
+const onReloadGameRequested = () => emit('onReloadGameRequested');
 </script>
 
 <style scoped>

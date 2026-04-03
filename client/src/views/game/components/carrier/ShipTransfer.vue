@@ -82,7 +82,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 import MenuTitle from '../MenuTitle.vue';
 import StarLabel from '../star/StarLabel.vue';
@@ -92,6 +91,8 @@ import {toastInjectionKey} from "@/util/keys";
 import type {Game, Star, Carrier} from "@/types/game";
 import {transferShips} from "@/services/typedapi/carrier";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import {useGameStore} from "@/stores/game";
+import { eventBusInjectionKey } from '@/eventBus';
 
 const props = defineProps<{
   carrierId: string,
@@ -103,13 +104,14 @@ const emit = defineEmits<{
   onEditWaypointsRequested: [carrierId: string],
 }>();
 
+const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const carrier = ref<Carrier | undefined>(GameHelper.getCarrierById(game.value, props.carrierId));
 const carrierOwningPlayer = computed(() => carrier.value && GameHelper.getCarrierOwningPlayer(game.value, carrier.value));
@@ -221,17 +223,17 @@ const performSaveTransfer = async () => {
   if (isOk(response)) {
     toast.default(`Ships transferred between ${star.value.name} and ${carrier.value.name}.`);
 
-    store.commit('gameStarCarrierShipTransferred', {
+    store.gameStarCarrierShipTransferred(eventBus, {
       starId: star.value._id,
       carrierId: carrier.value._id,
       starShips: sShips,
-      carrierShips: cShips
-    })
+      carrierShips: cShips,
+    });
 
-    star.value.ships = sShips
-    carrier.value.ships = cShips
+    star.value.ships = sShips;
+    carrier.value.ships = cShips;
 
-    transferred = true
+    transferred = true;
   } else {
     toast.error('Failed to transfer ships.');
     console.error(formatError(response));

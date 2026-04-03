@@ -36,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
@@ -46,7 +47,6 @@ import NewPlayerMessage from './NewPlayerMessage.vue'
 import ShareLink from './ShareLink.vue'
 import gameHelper from "@/services/gameHelper";
 import { ref, computed, inject, type Ref } from 'vue';
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {join} from "@/services/typedapi/game";
@@ -68,8 +68,8 @@ const password = ref('');
 
 const serviceProvider = useGameServices();
 
-const store = useStore()
-const game = computed(() => store.state.game as Game);
+const store = useGameStore()
+const game = computed(() => store.game as Game);
 const isAnonymousGame = computed(() => serviceProvider.gameTypeService.isAnonymousGameDuringGame(game.value));
 const isPasswordRequired = computed(() => game.value.settings.general.passwordRequired);
 const isJoinRandomSlot = computed(() => game.value.settings.general.joinRandomSlot === 'enabled');

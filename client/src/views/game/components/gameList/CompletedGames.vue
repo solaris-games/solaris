@@ -29,7 +29,7 @@
                   <br/>
                   <span v-if="game.userNotifications.unreadConversations" class="me-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>
                 </td>
-                <td class="d-none d-sm-table-cell text-end">{{getEndDateFromNow(game)}}</td>
+                <td class="d-none d-sm-table-cell text-end" v-if="game.state.endDate">{{getEndDateFromNow(game)}}</td>
                 <td>
                     <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button" class="btn btn-outline-success float-end">View</router-link>
                 </td>
@@ -47,18 +47,18 @@
 <script setup lang="ts">
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import GameHelper from '../../../../services/gameHelper';
-import moment from 'moment';
 import { ref, inject, type Ref, onMounted } from 'vue';
 import type { ListGame, UserActiveListGame } from '@solaris-common';
 import { listMyCompleted } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { formatDistanceToNow } from "date-fns";
 
 const httpClient = inject(httpInjectionKey)!;
 
 const isLoading = ref(false);
 const completedGames: Ref<UserActiveListGame<string>[]> = ref([]);
 
-const getEndDateFromNow = (game: ListGame<string>) => moment(game.state.endDate).fromNow();
+const getEndDateFromNow = (game: ListGame<string>) => formatDistanceToNow(game.state.endDate!, { addSuffix: true });
 
 onMounted(async () => {
   isLoading.value = true;

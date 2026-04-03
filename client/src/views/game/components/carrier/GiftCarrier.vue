@@ -17,15 +17,15 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { inject, computed, ref } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import { useStore } from 'vuex';
 import type {Game, Carrier} from "@/types/game";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {gift} from "@/services/typedapi/carrier";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
@@ -33,8 +33,8 @@ const props = defineProps<{
   carrierId: string,
 }>();
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -44,7 +44,7 @@ const isGiftingCarrier = ref(false);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const canGiftCarrier = computed<boolean>(() => !carrier.value.isGift);
 

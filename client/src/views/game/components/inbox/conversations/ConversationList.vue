@@ -33,24 +33,23 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { eventBusInjectionKey } from '../../../../../eventBus';
 import LoadingSpinner from '../../../../components/LoadingSpinner.vue';
 import ConversationPreview from './ConversationPreview.vue';
 import gameHelper from '../../../../../services/gameHelper';
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu';
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {type ConversationMessageSentResult, type ConversationOverview} from "@solaris-common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {listConversations} from "@/services/typedapi/conversation";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
 
@@ -102,7 +101,9 @@ const onMessageReceived = (e: ConversationMessageSentResult<string>) => {
   convo.unreadCount++;
 };
 
-const onCreateNewConversationRequested = () => eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, {});
+const onCreateNewConversationRequested = () => {
+  store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
+};
 
 onMounted(() => {
   eventBus.on(UserEventBusEventNames.GameMessageSent, onMessageReceived);

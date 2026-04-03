@@ -15,7 +15,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="player of leaderboard" :key="player._id" :class="{ 'bg-primary': store.state.userId === player._id }">
+          <tr v-for="player of leaderboard" :key="player._id" :class="{ 'bg-primary': userStore.userId === player._id }">
             <td>{{ player.position }}</td>
             <td>
               <router-link :to="{ name: 'account-achievements', params: { userId: player._id } }">
@@ -45,15 +45,17 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
-import { useStore, type Store } from 'vuex';
-import type { State } from '../../../../store';
+
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
-const store: Store<State> = useStore();
+const store = useGameStore();
+const userStore = useUserStore();
 
 const props = defineProps<{
   limit: number

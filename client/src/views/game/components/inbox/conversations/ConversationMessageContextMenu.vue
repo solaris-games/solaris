@@ -14,14 +14,13 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import gameHelper from "../../../../../services/gameHelper";
 import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
-import MenuEventBusEventNames from "../../../../../eventBusEventNames/menu";
 import type {ConversationMessage, Conversation} from "@solaris-common";
 import type {Game, Player} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from "vuex";
 import {listPrivate} from "@/services/typedapi/conversation";
 
 const props = defineProps<{
@@ -37,8 +36,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
 const isFromUserPlayer = computed(() => props.message.fromPlayerId === props.userPlayer._id);
@@ -68,12 +67,10 @@ const onViewConversationRequested = async (playerId: string) => {
   const conversation = await loadConversation(playerId);
 
   if (conversation) {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      conversationId: conversation._id,
-    });
+    store.setMenuStateChat({ state: 'conversation', conversationId: conversation._id });
   } else {
     // todo: select participants
-    eventBus.emit(MenuEventBusEventNames.OnCreateNewConversationRequested, {});
+    store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
   }
 };
 </script>

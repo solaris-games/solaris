@@ -1,15 +1,15 @@
-import moment from 'moment'
 import DiplomacyHelper from './diplomacyHelper.js'
 import type {Carrier, Game, Player, Star} from "../types/game";
 import {
   type GameInfoState,
-  type GameSettingsGalaxyBase,
+  type GameSettingsGalaxyBase, type InfrastructureUpgradeReport,
   type Location,
   type MapObject, type PlayerDebtEventData, type ResearchTypeNotRandom,
   type Team
 } from '@solaris-common';
 import type {RulerPoint} from '@/types/ruler';
 import type {TeamLeaderboardData} from "@/types/leaderboard";
+import {add, compareAsc, format, formatDistanceToNow, isAfter, isBefore } from "date-fns";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -225,59 +225,6 @@ class GameHelper {
     return `${speedLy}LY/tick`;
   }
 
-  getTicksBetweenLocations(game: Game, carrier: Carrier | null, locs: RulerPoint[], tickDistanceModifier = 1) {
-    let totalTicks = 0
-    const tickDistance = this.getTickDistance(game, carrier, tickDistanceModifier);
-
-    for (let i = 1; i < locs.length; i++) {
-      const prevLoc = locs[i - 1]
-      const currLoc = locs[i]
-      const distance = this.getDistanceBetweenLocations(prevLoc.location, currLoc.location)
-
-      let ticks: number;
-
-      // Check for worm holes
-      if (this.isInstantTravel(prevLoc, currLoc)) {
-        ticks = 1
-      } else {
-        // fix here
-
-        ticks = 1;
-        let remainingDistance = distance;
-
-        while (remainingDistance > tickDistance) {
-          remainingDistance -= tickDistance;
-          ticks++;
-        }
-      }
-
-      totalTicks += ticks
-    }
-
-    return totalTicks
-  }
-
-  getActualTicksBetweenLocations(game, player, carrier, sourceStar, destinationStar, hyperspaceDistance) {
-    const instantSpeed = this.isStarPairWormHole(sourceStar, destinationStar)
-
-    if (instantSpeed) {
-      return 1 // 1 tick for worm hole pairs
-    }
-
-    // If the carrier is within hyperspace range and can travel at warp speed, then return the warp speed ticks
-    // otherwise return the normal speed
-    const distanceBetweenStars = this.getDistanceBetweenLocations(sourceStar.location, destinationStar.location)
-
-    const isInHyperspaceRange = distanceBetweenStars <= hyperspaceDistance
-    const canWarpSpeed = this.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar)
-
-    if (isInHyperspaceRange && canWarpSpeed) {
-      return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar], game.constants.distances.warpSpeedMultiplier)
-    }
-
-    return this.getTicksBetweenLocations(game, carrier, [sourceStar, destinationStar])
-  }
-
   getTicksToProduction(game: { settings: { galaxy: GameSettingsGalaxyBase } }, currentTick: number, currentProductionTick: number) {
     const productionTicks = game.settings.galaxy.productionTicks;
 
@@ -459,28 +406,35 @@ class GameHelper {
       && destinationStar.wormHoleToStarId === sourceStar._id
   }
 
-  isGameWaitingForPlayers(game) {
-    return game.state.startDate == null
+  isGameWaitingForPlayers(game: { state: { startDate: Date | null } }) {
+    return game.state.startDate == null;
   }
 
-  isGamePaused(game) {
-    return game.state.paused
+  isGamePaused(game: { state: { paused: boolean } }) {
+    return game.state.paused;
   }
 
-  isGameNotStarted(game) {
+  isGameNotStarted(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
     return !game.state.startDate
   }
 
-  isGameStarted(game) {
-    return game.state.startDate != null
+  isGameStarted(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return game.state.startDate != null;
   }
 
-  isGameInProgress(game) {
-    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) >= 0 && !game.state.endDate
+  isGameInProgress(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return !this.isGameWaitingForPlayers(game) &&
+      !this.isGamePaused(game) &&
+      game.state.startDate != null &&
+      !isBefore(new Date(), game.state.startDate) &&
+      !game.state.endDate;
   }
 
-  isGamePendingStart(game) {
-    return !this.isGameWaitingForPlayers(game) && !this.isGamePaused(game) && game.state.startDate != null && moment().utc().diff(game.state.startDate) < 0
+  isGamePendingStart(game: { state: { startDate: Date | null, endDate: Date | null, paused: boolean } }) {
+    return !this.isGameWaitingForPlayers(game) &&
+      !this.isGamePaused(game) &&
+      game.state.startDate != null &&
+      isBefore(Date.now(), game.state.startDate);
   }
 
   isGameFinished(game: { state: GameInfoState<string> }) {
@@ -720,8 +674,8 @@ class GameHelper {
 
       // Then by defeated date descending
       if (a.defeated && b.defeated) {
-        if (moment(a.defeatedDate) > moment(b.defeatedDate)) return -1
-        if (moment(a.defeatedDate) < moment(b.defeatedDate)) return 1
+        if (compareAsc(a.defeatedDate, b.defeatedDate) === 1) return -1;
+        if (compareAsc(a.defeatedDate, b.defeatedDate) === -1) return 1;
       }
 
       // Sort defeated players last.
@@ -773,7 +727,7 @@ class GameHelper {
       return 'Online Now'
     }
     else {
-      return moment(player.lastSeen).utc().fromNow()
+      return formatDistanceToNow(player.lastSeen, { addSuffix: true });
     }
   }
 
@@ -854,12 +808,7 @@ class GameHelper {
   }
 
   getDateString(date: Date | string) {
-    date = moment(date).utc().toDate()
-
-    let dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    let monthOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
-    return `${dayOfWeek[date.getDay()]} ${date.getDate()} ${monthOfYear[date.getMonth()]} ${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`
+    return format(new Date(date), "E do MMM HH mm");
   }
 
   // For placing items on a player territory (e.g. their name). Will return null if player has no territory
@@ -936,12 +885,12 @@ class GameHelper {
       return true;
     }
 
-    let lastTick = moment(game.state.lastTickDate).utc();
+    let lastTick = game.state.lastTickDate;
     let nextTick;
 
     if (this.isRealTimeGame(game)) {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-      nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
+      nextTick = add(lastTick!, { seconds: game.settings.gameTime.speed });
     } else if (this.isTurnBasedGame(game)) {
       const isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
 
@@ -949,16 +898,16 @@ class GameHelper {
         return true;
       }
 
-      nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
+      nextTick = add(lastTick!, { seconds: game.settings.gameTime.maxTurnWait });
     } else {
       throw new Error(`Unsupported game type.`);
     }
 
-    return nextTick.diff(moment().utc(), 'seconds') <= 0;
+    return isBefore(nextTick, new Date());
   }
 
-  starInfrastructureUpgraded(game: Game, data) {
-    let userPlayer = this.getUserPlayer(game)!;
+  starInfrastructureUpgraded(game: Game, data: InfrastructureUpgradeReport<string> & { type: keyof Star["infrastructure"] }) {
+    const userPlayer = this.getUserPlayer(game)!;
 
     userPlayer.credits -= data.cost
 

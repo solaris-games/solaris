@@ -62,8 +62,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import StarRow from './StarRow.vue'
 import {createSortInfo, swapSort} from "@/services/data/sortInfo";
@@ -79,8 +79,8 @@ const SORT_INFO_KEY = "galaxy_stars_sortInfo";
 
 const defaultSortInfo = createSortInfo([['name']], true);
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);
 
@@ -94,7 +94,7 @@ const isEconomyEnabled = computed(() => game.value.settings.player.developmentCo
 const isIndustryEnabled = computed(() => game.value.settings.player.developmentCost.industry !== 'none');
 const isScienceEnabled = computed(() => game.value.settings.player.developmentCost.science !== 'none');
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
-const allowUpgrades = computed(() => store.state.settings.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
+const allowUpgrades = computed(() => store.settings!.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
 
 const filter = (s: Star) => s.name.toLowerCase().includes(searchFilter.value.toLowerCase());
 

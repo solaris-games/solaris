@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import DiplomacyRow from './DiplomacyRow.vue'
@@ -71,7 +72,6 @@ import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
 import { eventBusInjectionKey } from '../../../../eventBus'
 import DiplomacyEventBusEventNames from '../../../../eventBusEventNames/diplomacy'
 import {type DiplomaticStatus} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {listDiplomacy} from "@/services/typedapi/diplomacy";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -84,8 +84,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
 const isTradeRestricted = computed(() => DiplomacyHelper.isTradeRestricted(game.value));

@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import TeamName from '@/views/game/components/shared/TeamName.vue';
 import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
@@ -61,11 +62,11 @@ import {eventBusInjectionKey} from "@/eventBus";
 import { inject, computed } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type { Player } from '@/types/game';
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
+
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import { notReadyToQuit } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   player: Player,
@@ -79,46 +80,47 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
+const colourStore = useColourStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const playerColourSpec = computed(() => {
-  return store.getters.getColourForPlayer(props.player._id);
+  return colourStore.getColourForPlayer(store.game!, props.player._id)!;
 });
 
 const shouldShowTeamNames = computed(() => {
-  return props.showTeamNames && GameHelper.isTeamConquest(store.state.game);
+  return props.showTeamNames && GameHelper.isTeamConquest(store.game!);
 });
 
 const isTurnBasedGame = computed(() => {
-  return store.state.game.settings.gameTime.gameType === 'turnBased';
+  return store.game!.settings.gameTime.gameType === 'turnBased';
 });
 
 const isKingOfTheHillMode = computed(() => {
-  return GameHelper.isKingOfTheHillMode(store.state.game);
+  return GameHelper.isKingOfTheHillMode(store.game!);
 });
 
 const canEndTurn = computed(() => {
-  return !GameHelper.isGameFinished(store.state.game);
+  return !GameHelper.isGameFinished(store.game!);
 });
 
 const canReadyToQuit = computed(() => {
-  return store.state.game.settings.general.readyToQuit === 'enabled'
-    && store.state.game.state.startDate
-    && store.state.game.state.productionTick;
+  return store.game!.settings.general.readyToQuit === 'enabled'
+    && store.game!.state.startDate
+    && store.game!.state.productionTick;
 });
 
 const isStarCountWinCondition = computed(() => {
-  return GameHelper.isWinConditionStarCount(store.state.game);
+  return GameHelper.isWinConditionStarCount(store.game!);
 });
 
 const isHomeStarsWinCondition = computed(() => {
-  return GameHelper.isWinConditionHomeStars(store.state.game);
+  return GameHelper.isWinConditionHomeStars(store.game!);
 });
 
 const getUserPlayer = () => {
-  return GameHelper.getUserPlayer(store.state.game);
+  return GameHelper.getUserPlayer(store.game!);
 };
 
 const isUserPlayer = (player: Player) => {
@@ -140,7 +142,7 @@ const unconfirmReadyToQuit = async (player: Player) => {
     return;
   }
 
-  const response = await notReadyToQuit(httpClient)(store.state.game._id);
+  const response = await notReadyToQuit(httpClient)(store.game!._id);
   if (isOk(response)) {
     player.readyToQuit = false;
   } else {

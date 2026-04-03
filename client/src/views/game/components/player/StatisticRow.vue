@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import type {Player} from "@/types/game";
 
@@ -24,8 +24,8 @@ const props = defineProps<{
   formatFunction?: (p: Player, n: number) => string,
 }>();
 
-const store = useStore();
-const game = computed(() => store.state.game);
+const store = useGameStore();
+const game = computed(() => store.game!);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const userIsInGame = computed(() => Boolean(userPlayer.value));

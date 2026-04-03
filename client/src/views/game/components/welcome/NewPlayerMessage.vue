@@ -5,19 +5,19 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import type { Game } from '@/types/game'
 
-const store = useStore()
+const store = useGameStore()
 
 const isGameNotStarted = computed(() => {
-    return GameHelper.isGameNotStarted(store.state.game as Game)
+    return GameHelper.isGameNotStarted(store.game as Game)
 })
 
 const isNewPlayerGame = computed(() => {
-    return GameHelper.isNewPlayerGame(store.state.game as Game)
+    return GameHelper.isNewPlayerGame(store.game as Game)
 })
 </script>
 

@@ -9,11 +9,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useStore } from 'vuex';
+import {useSocketStore} from "@/stores/socket.ts";
 
-const store = useStore();
+const socketStore = useSocketStore();
 
-const connectedToServer = computed(() => store.state.socketConnected);
+const connectedToServer = computed(() => socketStore.socketConnected);
 </script>
 
 <style scoped>

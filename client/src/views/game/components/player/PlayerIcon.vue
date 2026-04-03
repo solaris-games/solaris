@@ -4,11 +4,12 @@
   </span>
 </template>
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIconShape from './PlayerIconShape.vue'
 import type {Game} from "@/types/game";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   playerId: string,
@@ -17,15 +18,16 @@ const props = defineProps<{
   colour?: string,
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
 const isOnline = ref(false);
 const onlineStatus = ref('');
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 
-const playerColour = computed(() => store.getters.getColourForPlayer(props.playerId).value);
+const playerColour = computed(() => colourStore.getColourForPlayer(game.value, props.playerId)!.value);
 const iconColour = computed(() => !props.colour ? GameHelper.getFriendlyColour(playerColour.value) : props.colour);
 const iconFilled = computed(() => {
   const unknownStatus = player.value.isOnline == null;

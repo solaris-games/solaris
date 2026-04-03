@@ -12,8 +12,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../../services/gameHelper';
 import type {PlayerDebtSettledEvent} from "@solaris-common";
 import type {Game, Player} from "@/types/game";
@@ -26,8 +26,8 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const summary = computed(() => GameHelper.getLedgerGameEventPlayerSummary(game.value, props.event));
 

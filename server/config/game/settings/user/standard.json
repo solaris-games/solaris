@@ -18,7 +18,7 @@
        "readyToQuit": "enabled",
        "readyToQuitFraction": 0.9,
        "readyToQuitTimerCycles": 0,
-       "readyToQuitVisibility": "visible",
+       "readyToQuitVisibility": "anonymous",
        "awardRankTo": "all",
        "awardRankToTopN": 1,
        "joinRandomSlot": "disabled"

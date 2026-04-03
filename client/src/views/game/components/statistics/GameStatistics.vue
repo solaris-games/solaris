@@ -179,19 +179,18 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, inject, computed, onMounted, type Ref } from 'vue';
 import {formatError, httpInjectionKey, isOk, ResponseResultKind} from "@/services/typedapi";
 import type {Statistics} from "@solaris-common";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import {getGameStatistics} from "@/services/typedapi/game";
-import { useStore, type Store } from 'vuex';
-import type { State } from "@/store";
 import GameHelper from "@/services/gameHelper";
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const emit = defineEmits<{
   onCloseRequested: [];
@@ -199,7 +198,7 @@ const emit = defineEmits<{
 
 const statistics: Ref<Statistics | 'not-available' | null> = ref(null);
 
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game));
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.game!));
 
 const onCloseRequested = () => {
   emit('onCloseRequested');
@@ -210,7 +209,7 @@ onMounted(async () => {
     return;
   }
 
-  const response = await getGameStatistics(httpClient)(store.state.game._id, userPlayer.value!._id);
+  const response = await getGameStatistics(httpClient)(store.game!._id, userPlayer.value!._id);
 
   if (isOk(response)) {
     statistics.value = response.data;

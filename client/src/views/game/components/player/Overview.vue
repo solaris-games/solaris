@@ -54,16 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { eventBusInjectionKey } from '../../../../eventBus'
-import MENU_STATES from '../../../../services/data/menuStates'
-import Statistics from './Statistics.vue'
-import PlayerTitle from './PlayerTitle.vue'
-import DiplomacyHelper from '../../../../services/diplomacyHelper'
-import { ref, inject, computed, onMounted } from 'vue'
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
+import { useGameStore } from '@/stores/game';
+import { eventBusInjectionKey } from '../../../../eventBus';
+import Statistics from './Statistics.vue';
+import PlayerTitle from './PlayerTitle.vue';
+import DiplomacyHelper from '../../../../services/diplomacyHelper';
+import { ref, inject, computed, onMounted } from 'vue';
 import type {Game} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {ConversationOverview} from "@solaris-common";
 import GameHelper from "../../../../services/gameHelper";
 import {listPrivate} from "@/services/typedapi/conversation";
@@ -81,15 +79,15 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
 const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle !== 'standard');
+const isCompactUIStyle = computed(() => store.settings!.interface.uiStyle !== 'standard');
 const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !GameHelper.isTutorialGame(game.value));
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
@@ -119,14 +117,14 @@ const onViewCompareIntelRequested = () => emit('onViewCompareIntelRequested', pl
 const onOpenTradeRequested = () => emit('onOpenTradeRequested', player.value._id);
 
 const onOpenDiplomacyRequested = () => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.DIPLOMACY,
+  store.setMenuState({
+    state: 'diplomacy',
   });
 };
 
 const onOpenLedgerRequested = () => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.LEDGER,
+  store.setMenuState({
+    state: 'ledger',
   });
 };
 
@@ -136,16 +134,12 @@ const onViewConversationRequested = () => {
   }
 
   if (conversation.value) {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      conversationId: conversation.value._id,
-    });
+    store.setMenuStateChat({ state: 'conversation', conversationId: conversation.value._id });
   } else {
-    eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-      participantIds: [
-        userPlayer.value!._id,
-        player.value._id
-      ]
-    });
+    store.setMenuStateChat({ state: 'createConversation', participantIds: [
+      userPlayer.value!._id,
+      player.value._id
+    ] });
   }
 }
 

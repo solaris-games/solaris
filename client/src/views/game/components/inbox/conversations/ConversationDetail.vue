@@ -47,6 +47,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../../services/gameHelper'
 import LoadingSpinner from '../../../../components/LoadingSpinner.vue'
 import MenuTitle from '../../MenuTitle.vue'
@@ -57,12 +58,10 @@ import ConversationTradeEvent from './ConversationTradeEvent.vue'
 import { inject, ref, computed, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import { eventBusInjectionKey } from '../../../../../eventBus'
 import PlayerEventBusEventNames from '../../../../../eventBusEventNames/player'
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import {detailConversation, leave, markAsRead, mute, unmute} from "@/services/typedapi/conversation";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import type {
   Conversation,
   ConversationMessageSentResult,
@@ -70,6 +69,8 @@ import type {
   TradeEvent, DiplomacyEvent
 } from "@solaris-common";
 import type { Game } from "@/types/game";
+import {useMentionStore} from "@/stores/mention.ts";
+import {useConversationStore} from "@/stores/conversation.ts";
 
 const props = defineProps<{
   conversationId: string,
@@ -84,9 +85,11 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const conversationStore = useConversationStore();
+const mentionStore = useMentionStore();
+const confirm = useConfirm();
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
@@ -116,7 +119,9 @@ const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, c
 
 const onCloseRequested = () => emit('onCloseRequested');
 
-const onOpenInboxRequested = () => eventBus.emit(MenuEventBusEventNames.OnOpenInboxRequested);
+const onOpenInboxRequested = () => {
+  store.setMenuStateChat({ state: 'inbox' });
+};
 
 const toggleConversationWindow = () => {
   toggleDisplay.value = !toggleDisplay.value;
@@ -161,7 +166,7 @@ const loadConversation = async () => {
   if (isOk(response)) {
     conversation.value = response.data;
 
-    store.commit('openConversation', props.conversationId);
+    conversationStore.openConversation(props.conversationId);
 
     scrollToEnd();
 
@@ -295,8 +300,8 @@ onMounted(async () => {
     eventBus.off(PlayerEventBusEventNames.PlayerRenownReceived, onTradeEventReceived);
     eventBus.off(PlayerEventBusEventNames.PlayerTechnologyReceived, onTradeEventReceived);
 
-    store.commit('resetMentions');
-    store.commit('closeConversation');
+    mentionStore.resetMentions();
+    conversationStore.closeConversation();
   });
 
   eventBus.on(UserEventBusEventNames.GameMessageSent, onMessageReceived);

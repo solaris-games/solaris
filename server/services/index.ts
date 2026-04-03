@@ -243,7 +243,7 @@ export default (config: Config,
     const waypointActionService = new WaypointActionService();
     const waypointService = new WaypointService<DBObjectId>(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
     const cullWaypointsService = new CullWaypointsService(gameRepository, starService, playerService, waypointService, carrierTravelService, starDataService, scanningService, distanceService);
-    const saveWaypointsService = new SaveWaypointsService(gameRepository, carrierMovementService, starService, waypointService, carrierService, starDataService);
+    const saveWaypointsService = new SaveWaypointsService(gameRepository, carrierMovementService, starService, waypointService, carrierService, starDataService, scanningService, distanceService, gameTypeService);
     const specialistBanService = new SpecialistBanService(specialistService);
     const specialistHireService = new SpecialistHireService(gameRepository, specialistService, userAchievementService, cullWaypointsService, playerCreditsService, starService, gameTypeService, specialistBanService, technologyService, statisticsService, starDataService);
     const shipTransferService = new ShipTransferService(gameRepository, carrierService, starService);

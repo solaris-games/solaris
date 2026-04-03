@@ -58,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../../services/gameHelper'
 import TechnologyHelper from '../../../../../services/technologyHelper'
 import type {Game} from "@/types/game";
@@ -70,13 +70,15 @@ import {
   TRADE_EVENT_TYPES,
   type TradeEvent
 } from "@solaris-common";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   event: TradeEvent<string> | DiplomacyEvent<string>,
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
 const getTechnologyFriendlyName = (key: ResearchTypeNotRandom) => TechnologyHelper.getFriendlyName(key);
@@ -131,7 +133,7 @@ const getFormattedDebtValue = (withText = false) => {
 const fromPlayerColour = computed(() => {
   const fromPlayer = getFromPlayer();
   if (!fromPlayer) return 'white';
-  return store.getters.getColourForPlayer(fromPlayer._id).value;
+  return colourStore.getColourForPlayer(game.value, fromPlayer._id)!.value;
 });
 
 const dateText = computed(() => {

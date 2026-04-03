@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
@@ -58,10 +59,9 @@ import {inject, ref, computed} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import type {Specialist} from "@solaris-common";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {hireStar} from "@/services/typedapi/specialist";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
@@ -80,16 +80,16 @@ const httpClient = inject(httpInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const confirm = useConfirm();
+const game = computed<Game>(() => store.game!);
 const star = computed(() => game.value.galaxy.stars.find(s => s._id === props.starId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isCurrentSpecialistOneShot = computed(() => Boolean(star.value.specialist?.oneShot));
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const specialists = computed(() => store.state.starSpecialists.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
+const specialists = computed(() => store.starSpecialists!.filter(s => game.value.settings.specialGalaxy.specialistBans.star.indexOf(s.id) < 0));
 
 const isHiringSpecialist = ref(false);
 

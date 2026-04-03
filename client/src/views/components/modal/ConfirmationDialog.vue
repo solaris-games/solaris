@@ -1,15 +1,14 @@
 <template>
   <DialogModal
-  v-if="Boolean(props.dialogSettings)"
-  :cancelText="props.dialogSettings.cancelText"
-  :confirmText="props.dialogSettings.confirmText"
-  :hideCancelButton="props.dialogSettings.hideCancelButton"
-  :cover="props.dialogSettings.cover"
+  :cancelText="props.dialogSettings?.cancelText || 'Cancel'"
+  :confirmText="props.dialogSettings?.confirmText || 'Confirm'"
+  :hideCancelButton="props.dialogSettings?.hideCancelButton || false"
+  :cover="props.dialogSettings?.cover || false"
   modalName="confirmModal"
-  :titleText="props.dialogSettings.titleText"
+  :titleText="props.dialogSettings?.titleText || ''"
   @onConfirm="onConfirm"
   @onCancel="onCancel">
-    <p style="white-space: pre-wrap">{{props.dialogSettings.text}}</p>
+    <p style="white-space: pre-wrap">{{props.dialogSettings?.text || ''}}</p>
   </DialogModal>
 </template>
 
@@ -26,12 +25,20 @@ const props = defineProps<{
     cover: boolean,
     onConfirm: () => void,
     onCancel: () => void
-  }
+  } | null
 }>();
 
-const onConfirm = () => props.dialogSettings.onConfirm();
+const onConfirm = () => {
+  if (props.dialogSettings?.onConfirm) {
+    props.dialogSettings.onConfirm();
+  }
+};
 
-const onCancel = () => props.dialogSettings.onCancel();
+const onCancel = () => {
+  if (props.dialogSettings?.onCancel) {
+    props.dialogSettings.onCancel();
+  }
+};
 </script>
 
 <style>

@@ -35,8 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import type {Game} from "@/types/game";
@@ -45,8 +45,8 @@ const props = defineProps<{
   playerId: string,
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 
 const isExtraDark = computed(() => GameHelper.isDarkModeExtra(game.value));

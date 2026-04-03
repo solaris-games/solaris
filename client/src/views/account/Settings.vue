@@ -179,9 +179,7 @@ import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typeda
 import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference, updateIsAnonymous } from '@/services/typedapi/user'
 import type { UserPrivate } from '@solaris-common'
 import { toastInjectionKey } from '@/util/keys'
-import type { State } from "@/store";
-import { useStore, type Store } from 'vuex';
-import { makeConfirm } from '@/util/confirm'
+import { useConfirm } from '@/hooks/confirm'
 import { useRoute } from 'vue-router';
 import {unauthoriseDiscord} from "@/services/typedapi/auth";
 import {configInjectionKey} from "@/config";
@@ -191,8 +189,7 @@ const toast = inject(toastInjectionKey)!;
 const config = inject(configInjectionKey)!;
 
 const route = useRoute();
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const confirm = useConfirm();
 
 const info: Ref<UserPrivate<string> | null> = ref(null);
 const isChangingEmailNotifications = ref(false);

@@ -47,20 +47,19 @@
 </template>
 
 <script setup lang="ts">
-import ViewTitle from '../components/ViewTitle.vue'
-import ViewContainer from '../components/ViewContainer.vue'
-import LoadingSpinner from '../components/LoadingSpinner.vue'
-import { computed, inject, onMounted, ref, type Ref } from 'vue'
-import type { UserAvatar } from '@solaris-common'
-import { useStore, type Store } from 'vuex'
-import type { State } from '@/store'
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
-import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user'
-import { makeConfirm } from '@/util/confirm';
+import ViewTitle from '../components/ViewTitle.vue';
+import ViewContainer from '../components/ViewContainer.vue';
+import LoadingSpinner from '../components/LoadingSpinner.vue';
+import { computed, inject, onMounted, ref, type Ref } from 'vue';
+import type { UserAvatar } from '@solaris-common';
+import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
+import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user';
+import { useConfirm } from '@/hooks/confirm';
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const userStore = useUserStore();
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 const userCredits: Ref<number | null> = ref(null);
@@ -75,7 +74,7 @@ const loadGalacticCredits = async () => {
 
   if (isOk(response)) {
     userCredits.value = response.data.credits;
-    store.commit('setUserCredits', response.data.credits);
+    userStore.setCredits(response.data.credits);
   } else {
     console.error(formatError(response));
   }
@@ -108,7 +107,7 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
     avatar.purchased = true;
     userCredits.value! -= avatar.price;
 
-    store.commit('setUserCredits', userCredits.value!);
+    userStore.setCredits(userCredits.value!);
   } else {
     console.error(formatError(response));
   }

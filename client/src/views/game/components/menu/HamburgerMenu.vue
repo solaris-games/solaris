@@ -16,12 +16,12 @@
           class="fas fa-home"></i></button>
         <div>
           <button v-if="isLoggedIn" class="btn btn-primary btn-sm me-1 mb-1"
-                  @click="setMenuState(MENU_STATES.COMBAT_CALCULATOR)" title="Calculator (C)"><i
+                  @click="setMenuState({ state: 'combatCalculator' })" title="Calculator (C)"><i
             class="fas fa-calculator"></i></button>
-          <button v-if="isLoggedIn" class="btn btn-primary btn-sm me-1 mb-1" @click="setMenuState(MENU_STATES.RULER)"
+          <button v-if="isLoggedIn" class="btn btn-primary btn-sm me-1 mb-1" @click="setMenuState({ state: 'ruler' })"
                   title="Ruler (V)"><i class="fas fa-ruler"></i></button>
           <button v-if="userPlayer && !userPlayer.defeated" class="btn btn-primary btn-sm me-1 mb-1"
-                  @click="setMenuState(MENU_STATES.BULK_INFRASTRUCTURE_UPGRADE)" title="Bulk Upgrade (B)"><i
+                  @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })" title="Bulk Upgrade (B)"><i
             class="fas fa-money-bill"></i></button>
           <button class="btn btn-primary btn-sm me-1 mb-1" @click="reloadPage" title="Reload Game"><i
             class="fas fa-sync"></i></button>
@@ -34,39 +34,39 @@
       </button>
       <div class="dropdown-divider"></div>
       <div v-if="!userPlayer && gameIsJoinable">
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.WELCOME)"><i class="fas fa-handshake me-2"></i>Welcome</a>
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'welcome' })"><i class="fas fa-handshake me-2"></i>Welcome</a>
       </div>
       <div v-if="!userPlayer && !gameIsJoinable">
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'leaderboard' })" title="Leaderboard (Q)"><i
           class="fas fa-users me-2"></i>Leaderboard</a>
       </div>
-      <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GALAXY)" title="Galaxy (G)"><i
+      <a class="dropdown-item" v-on:click="setMenuState({ state: 'galaxy', menu: undefined })" title="Galaxy (G)"><i
         class="fas fa-sun me-2"></i>Galaxy</a>
       <div v-if="userPlayer">
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEADERBOARD)" title="Leaderboard (Q)"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'leaderboard' })" title="Leaderboard (Q)"><i
           class="fas fa-users me-2"></i>Leaderboard</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.RESEARCH)" title="Research (R)"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'research' })" title="Research (R)"><i
           class="fas fa-flask me-2"></i>Research</a>
-        <a class="dropdown-item d-lg-none" v-on:click="setMenuState(MENU_STATES.INBOX)" title="Inbox (M)"
+        <a class="dropdown-item d-lg-none" v-on:click="store.setMenuStateChat({ state: 'inbox' })" title="Inbox (M)"
            v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>
         <a class="dropdown-item d-none d-lg-inline-block" v-on:click="onMenuChatSidebarRequested()" title="Inbox (M)"
            v-if="!isTutorialGame"><i class="fas fa-comments me-2"></i>Inbox</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.DIPLOMACY)" title="Diplomacy (D)"
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'diplomacy' })" title="Diplomacy (D)"
            v-if="isFormalAlliancesEnabled"><i class="fas fa-globe-americas me-2"></i>Diplomacy</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.LEDGER)" title="Ledger (L)" v-if="isTradeEnabled"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'ledger' })" title="Ledger (L)" v-if="isTradeEnabled"><i
           class="fas fa-file-invoice-dollar me-2"></i>Ledger</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.STATISTICS)" title="Statistics"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'statistics' })" title="Statistics"><i
           class="fas fa-chart-bar me-2"></i>Statistics</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.GAME_NOTES)" title="Notes (N)"><i
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'gameNotes' })" title="Notes (N)"><i
           class="fas fa-book-open me-2"></i>Notes</a>
-        <a class="dropdown-item" v-on:click="setMenuState(MENU_STATES.SPECTATORS)" title="Spectators"
+        <a class="dropdown-item" v-on:click="setMenuState({ state: 'spectators' })" title="Spectators"
            v-if="isSpectatingEnabled"><i class="fas fa-people-arrows me-2"></i>Spectators</a>
       </div>
       <a
         v-if="isLoggedIn && !isDataCleaned && (!(isDarkModeExtra && gameIsInProgress)) && (gameIsInProgress || gameIsFinished)"
-        class="dropdown-item" v-on:click="setMenuState(MENU_STATES.INTEL)" title="Intel (I)"><i
+        class="dropdown-item" v-on:click="setMenuState({ state: 'intel' })" title="Intel (I)"><i
         class="fas fa-chart-line me-2"></i>Intel</a>
-      <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState(MENU_STATES.OPTIONS)" title="Options (O)"><i
+      <a v-if="isLoggedIn" class="dropdown-item" v-on:click="setMenuState({ state: 'options' })" title="Options (O)"><i
         class="fas fa-cog me-2"></i>Options</a>
       <a :href="documentationUrl" class="dropdown-item" target="_blank"><i class="far fa-question-circle me-2"></i>How
         to Play</a>
@@ -87,17 +87,18 @@
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
-import MENU_STATES from '../../../../services/data/menuStates'
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu'
-import {inject, computed} from 'vue'
-import {useStore} from 'vuex';
-import {eventBusInjectionKey} from '../../../../eventBus'
+import {inject, computed} from 'vue';
+import {eventBusInjectionKey} from '@/eventBus'
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {configInjectionKey} from "@/config";
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
+import { useColourStore } from '@/stores/colour';
+import { useGameStore } from "@/stores/game"
+import type {MenuState} from "@/types/menu";
 
 const props = defineProps<{
-  buttonClass: string,
+  buttonClass?: string,
   dropType: string,
 }>();
 
@@ -108,18 +109,17 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const config = inject(configInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const userStore = useUserStore();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
-const setMenuState = (state: string, args: any = null) => {
-  store.commit('setMenuState', {
-    state,
-    args
-  });
+const setMenuState = (state: MenuState) => {
+  store.setMenuState(state);
 };
 
 const onMenuChatSidebarRequested = () => {
-  eventBus.emit(MenuEventBusEventNames.OnMenuChatSidebarRequested);
+  store.setMenuStateChat({ state: 'inbox' })
 };
 
 const goToMainMenu = () => {
@@ -151,22 +151,22 @@ const reloadPage = () => {
 };
 
 const toggleCustomColours = () => {
-  store.commit('setColourOverride', !isCustomColoursEnabled.value);
+  colourStore.setColourOverride(!isCustomColoursEnabled.value, eventBus, store.game, store.settings);
 };
 
 const gameIsInProgress = computed(() => GameHelper.isGameInProgress(game.value));
 
 const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
 
-const gameIsJoinable = computed(() => store.state.userId != null && GameHelper.gameHasOpenSlots(game.value));
+const gameIsJoinable = computed(() => userStore.isLoggedIn && GameHelper.gameHasOpenSlots(game.value));
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
-const isLoggedIn = computed(() => store.state.userId != null);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 
-const isDataCleaned = computed(() => store.state.game.state.cleaned);
+const isDataCleaned = computed(() => store.game!.state.cleaned);
 
 const documentationUrl = computed(() => config.appDocumentationUrl);
 
@@ -178,7 +178,7 @@ const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 
 const isSpectatingEnabled = computed(() => GameHelper.isSpectatingEnabled(game.value));
 
-const isCustomColoursEnabled = computed(() => store.state.colourOverride);
+const isCustomColoursEnabled = computed(() => colourStore.colourOverride);
 </script>
 
 <style scoped>

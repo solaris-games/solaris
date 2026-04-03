@@ -1,32 +1,32 @@
 <template>
   <a @click="setMenuState()"
-    :title="tooltip"
-    :class="{'active':isActive}">
-      <i :class="iconClass"></i>
+     :title="tooltip"
+     :class="{'active': isActive}">
+    <i :class="iconClass"></i>
   </a>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import {useGameStore} from '@/stores/game';
+import {computed} from 'vue';
+import type {MenuState} from "@/types/menu";
 
 const props = defineProps<{
-    menuState?: string;
-    tooltip?: string;
-    iconClass?: string;
+  menuState?: MenuState;
+  tooltip?: string;
+  iconClass?: string;
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const isActive = computed(() => {
-    return props.menuState === store.state.menuState;
+  return props.menuState?.state === store.menuState.state;
 });
 
 const setMenuState = () => {
-    store.commit('setMenuState', {
-        state: props.menuState,
-        args: null
-    });
+  if (props.menuState) {
+    store.setMenuState(props.menuState);
+  }
 };
 </script>
 

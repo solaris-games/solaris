@@ -37,25 +37,29 @@
 <script setup lang="ts">
 import ViewContainerTopBar from './ViewContainerTopBar.vue'
 import {withMessages} from "../../util/messages";
-import { useStore, type Store } from 'vuex';
-import { onMounted } from 'vue';
-import type {State} from "@/store";
+import { onMounted, inject } from 'vue';
 import router from '@/router';
+import { useUserStore } from '@/stores/user';
+import {httpInjectionKey} from "@/services/typedapi";
+import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user.ts";
 
 const props = defineProps<{
   isAuthPage: boolean,
   hideTopBar?: boolean
 }>();
 
-const store: Store<State> = useStore();
+const httpClient = inject(httpInjectionKey)!;
+const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey)!;
+
+const userStore = useUserStore();
 
 if (props.isAuthPage) {
   withMessages();
 }
 
 onMounted(async () => {
-  if (props.isAuthPage && !store.state.userId) {
-    const isOk = await store.dispatch('verify');
+  if (props.isAuthPage && !userStore.userId) {
+    const isOk = await userStore.verify(httpClient, userClientSocketEmitter);
 
     if (!isOk) {
       router.push({ name: 'home' });

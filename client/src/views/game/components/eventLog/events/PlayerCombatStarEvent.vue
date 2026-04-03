@@ -35,12 +35,11 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
 import type {PlayerCombatStarEvent} from "@solaris-common";
-import { useStore, type Store } from 'vuex';
 import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '@/store';
 import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '@/services/combat';
 import gameHelper from '../../../../../services/gameHelper';
 import type {Game} from "@/types/game";
@@ -53,9 +52,9 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
-const game: Game = store.state.game!;
+const game: Game = store.game!;
 
 const defenderSide = computed(() => createStarDefenderSide(game, props.event));
 
