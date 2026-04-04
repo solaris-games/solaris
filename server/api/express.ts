@@ -17,7 +17,7 @@ const log = logger("express");
 export default async (config: Config, app, container: DependencyContainer) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
-    app.use(require('body-parser').json({
+    app.use(express.json({
         limit: '1500kb' // Note: This allows large custom galaxies to be uploaded.
     }));
 
@@ -93,7 +93,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     
     const limiter = rateLimit({
         windowMs: 1000, // 1 second
-        max: 10 // limit each IP to X requests per windowMs
+        limit: 10 // limit each IP to X requests per windowMs
     });
     
     //  apply to all requests
