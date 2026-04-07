@@ -30,7 +30,7 @@
     "axios": "1.13.5",
     "bcrypt": "5.1.1",
     "compression": "1.8.1",
-    "connect-mongodb-session": "2.4.1",
+    "connect-mongo": "6.0.0",
     "cookie": "1.1.1",
     "cookie-parser": "1.4.7",
     "discord.js": "12.5.3",
@@ -54,7 +54,6 @@
     "socket.io": "4.8.3"
   },
   "devDependencies": {
-    "@types/connect-mongodb-session": "2.4.1",
     "@types/express": "^5.0.6",
     "@types/express-session": "1.17.10",
     "@types/jasmine": "5.1.5",
