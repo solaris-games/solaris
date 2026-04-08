@@ -1,4 +1,4 @@
-import {object, string, Validator} from "@solaris-common";
+import {object, string, Validator} from "solaris.common";
 
 export type AuthLoginRequest = {
     email: string,

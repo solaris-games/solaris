@@ -1,15 +1,16 @@
-import express = require('express');
-const router = express.Router();
-import session = require('express-session');
-const compression = require('compression');
-const rateLimit = require("express-rate-limit");
-import { Config } from '../config/types/Config';
-import { DependencyContainer } from '../services/types/DependencyContainer';
+import express from "express";
+import session from "express-session";
+import compression from 'compression';
+import rateLimit from "express-rate-limit";
+import {Config} from '../config/types/Config';
+import {DependencyContainer} from '../services/types/DependencyContainer';
 import registerRoutes from './routes';
 import {SingleRouter} from "./singleRoute";
 import Middleware from "./middleware";
 import {logger} from "../utils/logging";
 import MongoStore from 'connect-mongo';
+
+const router = express.Router();
 
 const log = logger("express");
 
