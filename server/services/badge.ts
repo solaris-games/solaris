@@ -150,7 +150,7 @@ export default class BadgeService extends EventEmitter {
             }
         });
 
-        let e: InternalGamePlayerBadgePurchasedEvent = {
+        const e: InternalGamePlayerBadgePurchasedEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             purchasedByPlayerId: buyer._id,

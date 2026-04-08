@@ -278,7 +278,7 @@ export default class TradeService extends EventEmitter {
         }
 
         // Get the players.
-        let toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
+        const toPlayer: Player = this.playerService.getById(game, toPlayerId)!;
 
         if (fromPlayer === toPlayer) {
             throw new ValidationError(`Cannot award renown to yourself.`);
@@ -294,7 +294,7 @@ export default class TradeService extends EventEmitter {
 
         // The receiving player has to be a legit user otherwise
         // renown should not be sent. It's possible that players can delete their accounts.
-        let toUser: User | null = await this.userService.getById(toPlayer.userId);
+        const toUser: User | null = await this.userService.getById(toPlayer.userId);
 
         if (!toUser) {
             throw new ValidationError(`There is no user associated with this player.`);
@@ -321,7 +321,7 @@ export default class TradeService extends EventEmitter {
             }
         }
 
-        let eventObject = {
+        const eventObject = {
             gameId: game._id,
             gameTick: game.state.tick,
             fromPlayer,

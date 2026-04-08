@@ -47,7 +47,7 @@ async function startup() {
     // Jobs that run every time the server restarts.
 
     log.info('Unlock all games...');
-    await container.gameService.lockAll(false);
+    await container.gameLockService.lockAll(false);
     log.info('All games unlocked');
 
     const schedulerOptions: SchedulerOptions = {

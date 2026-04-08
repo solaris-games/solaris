@@ -48,15 +48,12 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
 
-                let trade = await container.tradeService.sendRenown(
+                const trade = await container.tradeService.sendRenown(
                     req.game,
                     req.player,
                     reqObj.toPlayerId,
                     reqObj.amount);
-    
-                // TODO: Implement receiving renown on the UI, should use a user socket.
-                //container.broadcastService.userRenownReceived(req.game, // to user id, reqObj.amount);
-    
+
                 res.sendStatus(200);
     
                 container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());

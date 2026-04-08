@@ -462,17 +462,6 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    // TODO: Move to a gameLockService
-    async lockAll(locked: boolean = true) {
-        await this.gameRepo.updateMany({
-            'state.locked': { $ne: locked }
-        }, {
-            $set: {
-                'state.locked': locked
-            }
-        });
-    }
-
     listAllUndefeatedPlayers(game: Game) {
         if (this.gameTypeService.isTutorialGame(game)) {
             return game.galaxy.players.filter(p => p.userId);

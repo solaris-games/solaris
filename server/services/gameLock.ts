@@ -30,4 +30,14 @@ export default class GameLockService {
 
         return Boolean(game?.state?.locked);
     }
+
+    async lockAll(locked: boolean = true) {
+        await this.gameRepo.updateMany({
+            'state.locked': { $ne: locked }
+        }, {
+            $set: {
+                'state.locked': locked
+            }
+        });
+    }
 }

@@ -59,14 +59,12 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = mapToConversationCreateConversationRequest(req.body);
 
-                let convo = await container.conversationService.create(
+                const convo = await container.conversationService.create(
                     req.game,
                     req.player._id,
                     reqObj.name,
                     reqObj.participants);
-    
-                // TODO: Broadcast convo created.
-    
+
                 res.status(200).json(convo);
                 return next();
             } catch (err) {

@@ -227,10 +227,6 @@ export default class BroadcastService {
         this.diplomacyServerSocketEmitter.emitPlayerDiplomaticStatusChanged(playerIdTo.toString(), data);
     }
 
-    // userRenownReceived(game, toUserId, renown) {
-    //     this.io.to(toUserId).emit('playerRenownReceived', renown); // TODO: Do we have a socket for the user?
-    // }
-
     private mapGameStateObjectIds(gameState: GameState<DBObjectId>): GameState<string> {
         const { winner, winningTeam, leaderboard, teamLeaderboard, ...gs } = gameState
 

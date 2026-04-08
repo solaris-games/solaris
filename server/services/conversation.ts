@@ -33,8 +33,6 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
         throw new ValidationError(`Name is required and must not exceed 100 characters.`);
     }
 
-    // TODO: Check if a convo already exists with this name?
-
     // Append the current player ID to the participants if it isn't there already.
     if (playerId && !participantIds.find(x => x.toString() === playerId.toString())) {
         participantIds.unshift(playerId);
@@ -95,7 +93,7 @@ export default class ConversationService extends EventEmitter {
     }
 
     async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation<DBObjectId>> {
-        let newConvo = getNewConversation(game, playerId, name, participantIds);
+        const newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
         await this.gameRepo.updateOne({
