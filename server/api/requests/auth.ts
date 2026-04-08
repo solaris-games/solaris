@@ -1,8 +1,11 @@
-import * as Joi from 'joi';
+import {object, string, Validator} from "@solaris-common";
 
-export const authLoginRequestSchema = Joi.object({
-  email: Joi.string().required().email().message('Email is required and must be a valid email address.'),
-  password: Joi.string().required().messages({
-    'string.empty': 'Password is required.'
-  })
+export type AuthLoginRequest = {
+    email: string,
+    password: string,
+}
+
+export const parseAuthLoginRequest : Validator<AuthLoginRequest> = object({
+    email: string,
+    password: string,
 });

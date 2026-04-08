@@ -1,4 +1,5 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
+import {parseBadgesPurchaseRequest} from "../requests/badges";
 
 export default (container: DependencyContainer) => {
     return {
@@ -34,7 +35,9 @@ export default (container: DependencyContainer) => {
         },
         purchaseForPlayer: async (req, res, next) => {
             try {
-                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, req.body.badgeKey);
+                const body = parseBadgesPurchaseRequest(req.body);
+
+                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, body.badgeKey);
                 
                 res.sendStatus(200);
                 return next();

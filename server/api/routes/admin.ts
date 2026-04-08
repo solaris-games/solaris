@@ -2,13 +2,6 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
-import {
-    adminAddWarningRequestSchema,
-    adminSetGameFeaturedRequestSchema,
-    adminSetGameTimeMachineRequestSchema,
-    adminSetUserCreditsRequestSchema,
-    adminSetUserRoleRequestSchema
-} from "../requests/admin";
 import {SingleRouter} from "../singleRoute";
 import {createRoutes} from "../typedapi/routes";
 import {createAdminRoutes} from "solaris-common";
@@ -49,36 +42,30 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     );
 
     answer(routes.addWarning, mw.auth.authenticate({ communityManager: true }),
-        validator.body(adminAddWarningRequestSchema),
         controller.addWarning);
 
     answer(routes.setRoleContributor,
             mw.auth.authenticate({ admin: true }),
-            validator.body(adminSetUserRoleRequestSchema),
             controller.setRoleContributor
     );
 
     answer(routes.setRoleDeveloper,
             mw.auth.authenticate({ admin: true }),
-            validator.body(adminSetUserRoleRequestSchema),
             controller.setRoleDeveloper
     );
 
     answer(routes.setRoleCommunityManager,
             mw.auth.authenticate({ admin: true }),
-            validator.body(adminSetUserRoleRequestSchema),
             controller.setRoleCommunityManager
     );
 
     answer(routes.setRoleGameMaster,
             mw.auth.authenticate({ admin: true }),
-            validator.body(adminSetUserRoleRequestSchema),
             controller.setRoleGameMaster
     );
 
     answer(routes.setCredits,
             mw.auth.authenticate({ admin: true }),
-            validator.body(adminSetUserCreditsRequestSchema),
             controller.setCredits
     );
 
@@ -119,13 +106,11 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
 
     answer(routes.setGameFeatured,
             mw.auth.authenticate({ subAdmin: true }),
-            validator.body(adminSetGameFeaturedRequestSchema),
             controller.setGameFeatured
     );
 
     answer(routes.setGameTimeMachine,
             mw.auth.authenticate({ subAdmin: true }),
-            validator.body(adminSetGameTimeMachineRequestSchema),
             controller.setGameTimeMachine
     );
 

@@ -316,22 +316,22 @@ export const UNICODE_INVISIBLE_CHARACTERS = /[\p{C}\p{Mn}\p{Me}]+/u;
 
 export const UNICODE_LETTERS_NUMBERS_PUNCTUATION = /^[\p{L}\p{N}\p{P}]+$/u;
 
-export const username = stringValue({
+export const username = named("username", stringValue({
     minLength: 3,
     maxLength: 30,
     trim: true,
     matches: /^[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}]+[\p{L}\p{N}\p{M}\p{Cf}\p{S}\p{P}\p{Z}]*$/u,
-});
+}));
 
-export const email = stringValue({
+export const email = named("email", stringValue({
     minLength: 3,
     maxLength: 100,
     trim: true,
     matches: /^.+@.+$/u,
-});
+}));
 
-export const password = stringValue({
+export const password = named("password", stringValue({
     minLength: 8,
     maxLength: 100,
     matches: UNICODE_PRINTABLE_CHARACTERS_NON_WHITESPACE,
-});
+}));

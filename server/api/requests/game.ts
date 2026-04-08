@@ -69,8 +69,7 @@ import {
 } from "solaris-common";
 import {GameSettingsGalaxyReq, GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
-
-const enabledDisabled = stringEnumeration<GameSettingEnabledDisabled, GameSettingEnabledDisabled[]>(['enabled', 'disabled']);
+import {enabledDisabled} from "./validators";
 
 const parseGameSettingsGeneral: Validator<GameSettingsGeneralBase> = object({
     name: stringValue({

@@ -2,7 +2,6 @@ import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AuthController from '../controllers/auth';
 import { MiddlewareContainer } from "../middleware";
-import { authLoginRequestSchema } from "../requests/auth";
 import {SingleRouter} from "../singleRoute";
 import {createAuthRoutes} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
@@ -14,7 +13,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
     const answer = createRoutes(router, mw);
 
     answer(routes.login,
-            validator.body(authLoginRequestSchema),
             controller.login
     );
 

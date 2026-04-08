@@ -1,6 +1,7 @@
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {logger} from "../../utils/logging";
 import { default as axios, AxiosError } from "axios";
+import {parseAuthLoginRequest} from "../requests/auth";
 
 const log = logger("Auth Controller");
 
@@ -8,7 +9,9 @@ export default (container: DependencyContainer) => {
     return {
         login: async (req, res, next) => {        
             try {
-                let user = await container.authService.login(req.body.email, req.body.password);
+                const body = parseAuthLoginRequest(req.body);
+
+                const user = await container.authService.login(body.email, body.password);
         
                 // Store the user id in the session.
                 req.session.userId = user._id;

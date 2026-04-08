@@ -3,12 +3,17 @@ import { ValidationError } from 'solaris-common';
 import { DBObjectId } from '../../services/types/DBObjectId';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import { parseAnnouncementRequest } from "../requests/announcements";
+import {
+    parseAdminAddWarningRequest, parseAdminSetGameFeaturedRequest, parseAdminSetGameTimeMachineRequest,
+    parseAdminSetUserCreditsRequest,
+    parseAdminSetUserRoleRequest
+} from "../requests/admin";
 
 export default (container: DependencyContainer) => {
     return {
         getInsights: async (req, res, next) => {
             try {
-                let result = await container.adminService.getInsights();
+                const result = await container.adminService.getInsights();
                 
                 res.status(200).json(result);
                 return next();
@@ -18,7 +23,9 @@ export default (container: DependencyContainer) => {
         },
         addWarning: async (req, res, next) => {
            try {
-               const result = await container.adminService.addWarning(req.params.userId, req.body.text);
+               const body = parseAdminAddWarningRequest(req.body);
+
+               const result = await container.adminService.addWarning(req.params.userId, body.text);
 
                res.status(200).json(result);
                return next();
@@ -28,7 +35,7 @@ export default (container: DependencyContainer) => {
         },
         listUsers: async (req: Request<unknown>, res, next) => {
             try {
-                let result = await container.adminService.listUsers(req.session.userId!, 300);
+                const result = await container.adminService.listUsers(req.session.userId!, 300);
                 
                 res.status(200).json(result);
                 return next();
@@ -38,7 +45,7 @@ export default (container: DependencyContainer) => {
         },
         listPasswordResets: async (req, res, next) => {
             try {
-                let result = await container.adminService.listPasswordResets();
+                const result = await container.adminService.listPasswordResets();
                 
                 res.status(200).json(result);
                 return next();
@@ -58,7 +65,7 @@ export default (container: DependencyContainer) => {
         },
         listReports: async (req, res, next) => {
             try {
-                let result = await container.reportService.listReports(req.session.userId);
+                const result = await container.reportService.listReports(req.session.userId);
                 
                 res.status(200).json(result);
                 return next();
@@ -79,7 +86,9 @@ export default (container: DependencyContainer) => {
 
         setRoleContributor: async (req, res, next) => {
             try {
-                await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleContributor(req.params.userId, body.enabled);
     
                 res.sendStatus(200);
                 return next();
@@ -89,7 +98,9 @@ export default (container: DependencyContainer) => {
         },
         setRoleDeveloper: async (req, res, next) => {
             try {
-                await container.adminService.setRoleDeveloper(req.params.userId, req.body.enabled);
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleDeveloper(req.params.userId, body.enabled);
     
                 res.sendStatus(200);
                 return next();
@@ -99,7 +110,9 @@ export default (container: DependencyContainer) => {
         },
         setRoleGameMaster: async (req, res, next) => {
             try {
-                await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleGameMaster(req.params.userId, body.enabled);
     
                 res.sendStatus(200);
                 return next();
@@ -109,7 +122,9 @@ export default (container: DependencyContainer) => {
         },
         setRoleCommunityManager: async (req, res, next) => {
             try {
-                await container.adminService.setRoleCommunityManager(req.params.userId, req.body.enabled);
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleCommunityManager(req.params.userId, body.enabled);
     
                 res.sendStatus(200);
                 return next();
@@ -119,7 +134,9 @@ export default (container: DependencyContainer) => {
         },
         setCredits: async (req, res, next) => {
             try {
-                let credits = await container.userService.setCredits(req.params.userId, req.body.credits);
+                const body = parseAdminSetUserCreditsRequest(req.body);
+
+                const credits = await container.userService.setCredits(req.params.userId, body.credits);
     
                 res.status(200).json({
                     credits
@@ -131,7 +148,6 @@ export default (container: DependencyContainer) => {
         },
         banUser: async (req: Request<{ userId?: DBObjectId }>, res, next) => {
             try {
-
                 if (req.params.userId == null) {
                     throw new ValidationError(`Parameter 'userId' is required.`);
                 }
@@ -251,7 +267,7 @@ export default (container: DependencyContainer) => {
         },
         listGames: async (req, res, next) => {
             try {
-                let result = await container.adminService.listGames(25);
+                const result = await container.adminService.listGames(25);
                 
                 res.status(200).json(result);
                 return next();
@@ -261,7 +277,9 @@ export default (container: DependencyContainer) => {
         },
         setGameFeatured: async (req, res, next) => {
             try {
-                await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
+                const body = parseAdminSetGameFeaturedRequest(req.body);
+
+                await container.adminService.setGameFeatured(req.params.gameId, body.featured);
     
                 res.sendStatus(200);
                 return next();
@@ -271,7 +289,9 @@ export default (container: DependencyContainer) => {
         },
         setGameTimeMachine: async (req, res, next) => {
             try {
-                await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
+                const body = parseAdminSetGameTimeMachineRequest(req.body)
+
+                await container.adminService.setGameTimeMachine(req.params.gameId, body.timeMachine);
     
                 res.sendStatus(200);
                 return next();

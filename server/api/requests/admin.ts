@@ -1,21 +1,42 @@
-import * as Joi from 'joi';
+import {boolean, GameSettingEnabledDisabled, number, object, string, Validator} from "@solaris-common";
+import {enabledDisabled} from "./validators";
 
-export const adminSetUserRoleRequestSchema = Joi.object({
-    enabled: Joi.boolean().required()
+export type AdminSetUserRoleRequest = {
+    enabled: boolean,
+}
+
+export const parseAdminSetUserRoleRequest: Validator<AdminSetUserRoleRequest> = object({
+    enabled: boolean,
 });
 
-export const adminSetUserCreditsRequestSchema = Joi.object({
-    credits: Joi.number().required()
+export type AdminSetUserCreditsRequest = {
+    credits: number,
+}
+
+export const parseAdminSetUserCreditsRequest: Validator<AdminSetUserCreditsRequest> = object({
+    credits: number,
 });
 
-export const adminSetGameFeaturedRequestSchema = Joi.object({
-    featured: Joi.boolean().required()
+export type AdminSetGameFeaturedRequest = {
+    featured: boolean,
+}
+
+export const parseAdminSetGameFeaturedRequest: Validator<AdminSetGameFeaturedRequest> = object({
+    featured: boolean,
 });
 
-export const adminSetGameTimeMachineRequestSchema = Joi.object({
-    timeMachine: Joi.string().required().valid('enabled', 'disabled')
+export type AdminSetGameTimeMachineRequest = {
+    timeMachine: GameSettingEnabledDisabled,
+}
+
+export const parseAdminSetGameTimeMachineRequest: Validator<AdminSetGameTimeMachineRequest> = object({
+    timeMachine: enabledDisabled,
 });
 
-export const adminAddWarningRequestSchema = Joi.object({
-    text: Joi.string().required()
+export type AdminAddWarningRequest = {
+    text: string,
+}
+
+export const parseAdminAddWarningRequest: Validator<AdminAddWarningRequest> = object({
+    text: string,
 });

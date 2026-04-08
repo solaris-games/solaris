@@ -1,5 +1,5 @@
-import * as Joi from 'joi';
+import {object, PurchaseForPlayerReq, string, Validator} from "@solaris-common";
 
-export const badgesPurchaseBadgeRequestSchema = Joi.object({
-    badgeKey: Joi.string().required()
+export const parseBadgesPurchaseRequest: Validator<PurchaseForPlayerReq> = object({
+    badgeKey: string,
 });
