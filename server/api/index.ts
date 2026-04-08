@@ -35,9 +35,9 @@ async function startServer() {
 
   const container = containerLoader(config, socketServer, log);
 
-  const { sessionStorage } = await expressLoader(config, app, container);
-  container.sessionService.setSessionStorage(sessionStorage);
-  container.socketService.setSessionStorage(sessionStorage);
+  const { sessionStore } = await expressLoader(config, app, container);
+  container.sessionService.setSessionStorage(sessionStore);
+  container.socketService.setSessionStorage(sessionStore);
 
   server.on('error', (err) => {
     if (err) {

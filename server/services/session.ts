@@ -1,18 +1,18 @@
-import { MongoDBStore } from 'connect-mongodb-session';
 import session from 'express-session';
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
 import { User } from './types/User';
+import MongoStore from 'connect-mongo';
 
 export default class SessionService {
     private userRepo: Repository<User>;
-    private sessionStorage?: MongoDBStore;
+    private sessionStorage?: MongoStore;
     
     constructor(userRepo: Repository<User>) {
         this.userRepo = userRepo;
     }
 
-    public setSessionStorage(sessionStorage: MongoDBStore) {
+    public setSessionStorage(sessionStorage: MongoStore) {
         this.sessionStorage = sessionStorage;
     }
 

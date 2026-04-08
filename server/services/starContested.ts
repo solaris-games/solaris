@@ -12,6 +12,11 @@ export default class StarContestedService {
     }
 
     listContestedStars(game: Game) {
+        // Contested stars are only possible when formal alliances is enabled.
+        if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
+            return [];
+        }
+
         const cInOrbit = game.galaxy.carriers.filter(c => c.orbiting)
 
         return game.galaxy.stars

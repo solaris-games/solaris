@@ -28,22 +28,22 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 
 const props = defineProps<{
     comparePlayerId: string;
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const userPlayer = computed(() => {
-    return GameHelper.getUserPlayer(store.state.game);
+    return GameHelper.getUserPlayer(store.game!);
 });
 
 const comparePlayer = computed(() => {
-    return GameHelper.getPlayerById(store.state.game, props.comparePlayerId);
+    return GameHelper.getPlayerById(store.game!, props.comparePlayerId);
 });
 </script>
 

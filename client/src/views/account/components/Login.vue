@@ -45,15 +45,14 @@ import router from '../../../router';
 import FormErrorList from '../../components/FormErrorList.vue';
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 import {inject, ref, type Ref} from 'vue';
-import type {State} from "@/store";
-import { useStore, type Store } from 'vuex';
 import {login} from "@/services/typedapi/auth";
 import {extractErrors, httpInjectionKey, isOk} from "@/services/typedapi";
+import { useUserStore } from '@/stores/user';
 
 const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const isLoading = ref(false);
 const errors: Ref<string[]> = ref([]);
@@ -83,10 +82,10 @@ const handleSubmit = async (e: Event) => {
 
   const response = await login(httpClient)(emailAddress, password.value);
   if (isOk(response)) {
-    store.commit('setUserId', response.data._id)
-    store.commit('setUsername', response.data.username)
-    store.commit('setRoles', response.data.roles)
-    store.commit('setUserCredits', response.data.credits)
+    userStore.setUserId(response.data._id)
+    userStore.setUsername(response.data.username)
+    userStore.setRoles(response.data.roles)
+    userStore.setCredits(response.data.credits)
 
     userClientSocketEmitter.emitJoined();
 

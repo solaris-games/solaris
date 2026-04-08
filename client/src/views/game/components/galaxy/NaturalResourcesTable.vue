@@ -50,8 +50,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import NaturalResourcesRow from './NaturalResourcesRow.vue'
 import {createSortInfo, swapSort} from '../../../../services/data/sortInfo'
@@ -67,8 +67,8 @@ const emit = defineEmits<{
   onOpenStarDetailRequested: [starId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const showAll = ref(false);
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);

@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import StatisticRow from './StatisticRow.vue'
 import type {Player} from "@/types/game.ts";
@@ -82,8 +82,8 @@ const props = defineProps<{
   playerId: string,
 }>();
 
-const store = useStore();
-const game = computed(() => store.state.game);
+const store = useGameStore();
+const game = computed(() => store.game!);
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isUserPlayer = computed(() => userPlayer.value && player.value._id === userPlayer.value._id);

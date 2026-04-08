@@ -47,11 +47,10 @@
 
 <script setup lang="ts">
 import { ref, inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import router from '../../../router';
 import type {GuildWithUsers} from "@solaris-common";
 import type {GuildRole, GuildUser} from "@/views/guild/components/MemberList.vue";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {
@@ -61,6 +60,7 @@ import {
   promoteGuildMember, rejectGuildApplication,
   uninviteGuild
 } from "@/services/typedapi/guild";
+import { useUserStore } from '@/stores/user';
 
 type SortingKey = 'role' | 'rank' | 'victories' | 'renown';
 
@@ -83,8 +83,8 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const userStore = useUserStore();
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 
@@ -92,11 +92,11 @@ const levelSrc = computed(() => new URL(`../../../assets/levels/${props.user.ach
 
 const roleName = computed(() => props.role.charAt(0).toUpperCase() + props.role.slice(1));
 
-const isCurrentUser = computed(() => props.user._id === store.state.userId);
+const isCurrentUser = computed(() => props.user._id === userStore.userId);
 
-const currentUserIsLeader = computed(() => props.guild.leader != null && props.guild.leader._id === store.state.userId);
+const currentUserIsLeader = computed(() => props.guild.leader != null && props.guild.leader._id === userStore.userId);
 
-const currentUserIsOfficer = computed(() => props.guild.officers?.find(x => x._id === store.state.userId) != null);
+const currentUserIsOfficer = computed(() => props.guild.officers?.find(x => x._id === userStore.userId) != null);
 
 const userIsLeader = computed(() => props.guild.leader != null && props.guild.leader._id === props.user._id);
 

@@ -21,9 +21,9 @@ import GameHelper from '../../../../services/gameHelper'
 import {toastInjectionKey} from "@/util/keys";
 import { inject, computed } from "vue";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {notReady, ready, readyToCycle} from "@/services/typedapi/game";
+import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
   smallButtons: boolean
@@ -32,15 +32,15 @@ const props = defineProps<{
 const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const player = computed(() => {
-  return GameHelper.getUserPlayer(store.state.game)!;
+  return GameHelper.getUserPlayer(store.game!)!;
 });
 
 const isTutorialGame = computed(() => {
-  return GameHelper.isTutorialGame(store.state.game);
+  return GameHelper.isTutorialGame(store.game);
 });
 
 const confirmReady = async () => {
@@ -48,7 +48,7 @@ const confirmReady = async () => {
     return;
   }
 
-  const response = await ready(httpClient)(store.state.game._id);
+  const response = await ready(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
@@ -68,7 +68,7 @@ const confirmReadyToCycle = async () => {
     return;
   }
 
-  const response = await readyToCycle(httpClient)(store.state.game._id);
+  const response = await readyToCycle(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
@@ -85,7 +85,7 @@ const confirmReadyToCycle = async () => {
 };
 
 const unconfirmReady = async () => {
-  const response = await notReady(httpClient)(store.state.game._id);
+  const response = await notReady(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     player.value.ready = false;

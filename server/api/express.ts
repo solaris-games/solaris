@@ -3,34 +3,26 @@ const router = express.Router();
 import session = require('express-session');
 const compression = require('compression');
 const rateLimit = require("express-rate-limit");
-import MongoDBSession = require('connect-mongodb-session');
-const MongoDBStore = MongoDBSession(session);
 import { Config } from '../config/types/Config';
 import { DependencyContainer } from '../services/types/DependencyContainer';
 import registerRoutes from './routes';
 import {SingleRouter} from "./singleRoute";
 import Middleware from "./middleware";
 import {logger} from "../utils/logging";
+import MongoStore from 'connect-mongo';
 
 const log = logger("express");
 
 export default async (config: Config, app, container: DependencyContainer) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
-    app.use(require('body-parser').json({
+    app.use(express.json({
         limit: '1500kb' // Note: This allows large custom galaxies to be uploaded.
     }));
 
-    // ---------------
-    // Set up MongoDB session store
-    const sessionStorage = new MongoDBStore({
-        uri: config.connectionString!,
-        collection: 'sessions'
-    });
-
-    // Catch session store errors
-    sessionStorage.on('error', function(err) {
-        log.error(err);
+    const sessionStore = MongoStore.create({
+        mongoUrl: config.connectionString!,
+        collectionName: 'sessions2', // use new sessions collection
     });
 
     // ---------------
@@ -43,7 +35,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
             secure: config.sessionSecureCookies, // Requires HTTPS
             maxAge: 1000 * 60 * 60 * 24 * 365 // 1 Year
         },
-        store: sessionStorage
+        store: sessionStore,
     }));
 
     // ---------------
@@ -93,7 +85,7 @@ export default async (config: Config, app, container: DependencyContainer) => {
     
     const limiter = rateLimit({
         windowMs: 1000, // 1 second
-        max: 10 // limit each IP to X requests per windowMs
+        limit: 10 // limit each IP to X requests per windowMs
     });
     
     //  apply to all requests
@@ -128,6 +120,6 @@ export default async (config: Config, app, container: DependencyContainer) => {
     
     return {
         app,
-        sessionStorage
+        sessionStore,
     };
 };

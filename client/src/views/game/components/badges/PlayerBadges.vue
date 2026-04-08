@@ -29,17 +29,16 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {ref, onMounted, computed, type Ref, inject} from 'vue';
 import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge.vue'
 import GameHelper from '../../../../services/gameHelper'
-import type {State} from "../../../../store";
-import {useStore} from 'vuex';
-import type {Store} from 'vuex/types/index.js';
 import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
 import {getBadgesForPlayer} from "../../../../services/typedapi/badge";
 import {httpInjectionKey, isError} from "../../../../services/typedapi";
+import { useBadgeStore } from '../../../../stores/badge';
 
 const props = defineProps<{ playerId: string }>();
 
@@ -53,9 +52,10 @@ const allBadges: Ref<TBadge[]> = ref([]);
 
 const badges: Ref<AwardedBadge<string>[]> = ref([]);
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
+const badgeStore = useBadgeStore();
 
-const game = computed(() => store.state.game!);
+const game = computed(() => store.game!);
 
 const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId));
 
@@ -80,7 +80,8 @@ const onOpenPurchasePlayerBadgeRequested = () => {
 const httpClient: Axios = inject(httpInjectionKey)!;
 
 onMounted(async () => {
-  allBadges.value = await store.dispatch('getBadges');
+  await badgeStore.loadBadges(httpClient);
+  allBadges.value = [...badgeStore.badges];
 
   if (!canViewBadges.value) {
     return;

@@ -52,10 +52,10 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, ref, computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
 import type {EloRatingChange, GameEndedEvent} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 
 const props = defineProps<{
@@ -67,8 +67,8 @@ const emit = defineEmits<{
 }>();
 
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const isTeamGame = computed(() => GameHelper.isTeamConquest(game.value));
 const hasRankResults = computed(() => Boolean(props.event?.data?.rankingResult?.ranks?.length));

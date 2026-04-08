@@ -5,9 +5,9 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, computed } from "vue";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from "vuex";
 import {pinMessage, unpinMessage} from "@/services/typedapi/conversation";
 import type {Game} from "@/types/game";
 
@@ -24,8 +24,8 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const togglePinned = async () => {
   if (props.pinned) {

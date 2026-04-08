@@ -13,8 +13,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import MenuTitle from '../MenuTitle.vue'
 import Selection from './Selection.vue'
 import ProgressSummary from './ProgressSummary.vue'
@@ -26,8 +26,8 @@ const emit = defineEmits<{
 
 const onCloseRequested = () => emit('onCloseRequested');
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 </script>
 
 <style scoped>

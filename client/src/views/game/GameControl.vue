@@ -23,6 +23,10 @@
               @click="fastForwardGame">Fast Forward Game
       </button>
 
+      <button class="btn btn-warning ms-1"
+              @click="resetQuitters">Allow quit players to rejoin
+      </button>
+
       <view-collapse-panel @onToggle="togglePlayerControl" title="Player Control" :starts-opened="false">
         <game-player-control v-if="fullGame" :game="fullGame" @onGameModified="loadFullGame"/>
       </view-collapse-panel>
@@ -35,18 +39,18 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GameHelper from '../../services/gameHelper'
 import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import GamePlayerControl from './GamePlayerControl.vue';
 import router from "../../router";
 import {ref, inject, computed, type Ref} from 'vue';
-import type {GameInfoDetail, GameGalaxy, GameGalaxyDetail} from '@solaris-common';
+import type {GameInfoDetail, GameGalaxyDetail} from '@solaris-common';
 import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typedapi';
 import {toastInjectionKey} from '@/util/keys';
-import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame} from '@/services/typedapi/game';
-import {useStore} from 'vuex';
-import {makeConfirm} from '@/util/confirm';
+import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame, resetQuitters as resetQuittersReq } from '@/services/typedapi/game';
+import {useConfirm} from '@/hooks/confirm.ts';
 
 const props = defineProps<{
   game: GameInfoDetail<string>,
@@ -59,8 +63,8 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const isLoading = ref(false);
 const errors: Ref<string[]> = ref([]);
@@ -133,6 +137,24 @@ const fastForwardGame = async () => {
 
     if (isOk(response)) {
       toast.success(`The game has been fast-forwarded.`);
+      emit('onGameModified');
+    } else {
+      console.error(formatError(response));
+      errors.value = extractErrors(response);
+    }
+
+    isLoading.value = false;
+  }
+};
+
+const resetQuitters = async () => {
+  if (await confirm('Reset quitters', 'Are you sure you want to allow players who have quit to rejoin this game?')) {
+    isLoading.value = true;
+
+    const response = await resetQuittersReq(httpClient)(props.game._id);
+
+    if (isOk(response)) {
+      toast.success(`Quitter reset successful`);
       emit('onGameModified');
     } else {
       console.error(formatError(response));

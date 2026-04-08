@@ -82,11 +82,10 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed} from 'vue';
 import {useGameServices} from "@/util/gameServices";
 import type {Game, Player, Star} from "@/types/game";
-import type {State} from "@/store";
-import {useStore, type Store} from 'vuex';
 import GameHelper from "@/services/gameHelper";
 import type {Specialist} from "@solaris-common";
 
@@ -97,10 +96,10 @@ const props = defineProps<{
 
 const gameServices = useGameServices();
 
-const store: Store<State> = useStore();
-const game = computed<Game>(() => store.state.game);
-const starSpecialists = computed<Specialist[]>(() => store.state.starSpecialists);
-const carrierSpecialists = computed<Specialist[]>(() => store.state.carrierSpecialists);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const starSpecialists = computed<readonly Specialist[]>(() => store.starSpecialists!);
+const carrierSpecialists = computed<readonly Specialist[]>(() => store.carrierSpecialists!);
 
 const getSpecialistName = (id: number, kind: 'star' | 'carrier') => {
   if (kind === 'carrier') {

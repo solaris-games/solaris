@@ -72,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
@@ -80,7 +81,6 @@ import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris-common"
-import {useStore} from 'vuex';
 import {httpInjectionKey} from "@/services/typedapi";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
@@ -103,11 +103,11 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const settings = computed<UserGameSettings>(() => store.state.settings);
-const game = computed<Game>(() => store.state.game);
+const settings = computed<UserGameSettings>(() => store.settings!);
+const game = computed<Game>(() => store.game!);
 const carrier = computed(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const isInTransit = computed(() => !carrier.value.orbiting);

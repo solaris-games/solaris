@@ -15,15 +15,13 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import router from '../../../../router';
 import GameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
 import { ref, computed, inject } from 'vue';
-import { useStore } from 'vuex';
-import type { Store } from 'vuex';
-import type { State } from '../../../../store';
 import { toastInjectionKey } from '../../../../util/keys';
-import { makeConfirm } from "@/util/confirm";
+import { useConfirm } from "@/hooks/confirm.ts";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type { Game } from '../../../../types/game';
 import { concedeDefeat } from '@/services/typedapi/game';
@@ -31,15 +29,15 @@ import { concedeDefeat } from '@/services/typedapi/game';
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const confirm = useConfirm();
+const game = computed<Game>(() => store.game!);
 
 const isConcedingDefeat = ref(false);
 
-const userPlayer = computed(() => GameHelper.getUserPlayer(store.state.game)!);
-const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.state.game));
-const isGameInProgress = computed(() => GameHelper.isGameStarted(store.state.game) && !GameHelper.isGameFinished(store.state.game));
+const userPlayer = computed(() => GameHelper.getUserPlayer(store.game!)!);
+const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.game!));
+const isGameInProgress = computed(() => GameHelper.isGameStarted(store.game!) && !GameHelper.isGameFinished(store.game!));
 
 const doConcedeDefeat = async (openSlot: boolean) => {
   let message = 'Are you sure you want to concede defeat in this game?';

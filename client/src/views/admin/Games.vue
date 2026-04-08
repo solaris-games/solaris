@@ -67,23 +67,23 @@ import AdministrationPage from "./AdministrationPage.vue";
 import { ref, inject, onMounted, computed, type Ref } from 'vue';
 import type { AdminListGame } from '@solaris-common';
 import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedapi';
-import { listGames, resetQuitters as requestResetQuitters, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
+import { listGames, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
+import { resetQuitters as requestResetQuitters } from '@/services/typedapi/game';
 import { toastInjectionKey } from '@/util/keys';
-import { useStore, type Store } from 'vuex';
-import type { State } from '@/store';
-import { makeConfirm } from "@/util/confirm";
+import { useConfirm } from "@/hooks/confirm";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const userStore = useUserStore();
+const confirm = useConfirm();
 
 const games: Ref<AdminListGame<string>[] | null> = ref(null);
 
-const isAdministrator = computed(() => store.state.roles.administrator);
-const isCommunityManager = computed(() => isAdministrator.value || store.state.roles.communityManager);
-const isGameMaster = computed(() => isAdministrator.value || store.state.roles.gameMaster);
+const isAdministrator = computed(() => userStore.isAdmin);
+const isCommunityManager = computed(() => isAdministrator.value || userStore.roles?.communityManager);
+const isGameMaster = computed(() => isAdministrator.value || userStore.roles?.gameMaster);
 
 const gameNeedsAttention = (game: AdminListGame<string>) => game.state.endDate && game.state.tick <= 12;
 

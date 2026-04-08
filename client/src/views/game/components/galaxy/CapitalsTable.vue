@@ -47,11 +47,11 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import CapitalRow from './CapitalRow.vue'
 import {createSortInfo, swapSort} from '../../../../services/data/sortInfo'
 import { ref, onMounted, onUnmounted, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {Game, Star} from "@/types/game";
 import {useSortedMapObjectData} from "@/views/game/components/galaxy/table";
 import {useLocalStorage} from "@/util/reactiveHooks";
@@ -64,8 +64,8 @@ const SORT_INFO_KEY = "galaxy_capitals_sortInfo";
 
 const defaultSortInfo = createSortInfo([['name']], true);
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);
 

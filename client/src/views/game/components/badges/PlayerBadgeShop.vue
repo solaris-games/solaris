@@ -27,22 +27,22 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, onMounted, type Ref, inject } from 'vue';
 import type { Axios } from 'axios';
 import MenuTitle from '../../components/MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import GameHelper from '../../../../services/gameHelper'
 import BadgeShopList from './BadgeShopList.vue'
-import type { State } from "../../../../store";
 import { formatError, httpInjectionKey, isError, isOk } from "../../../../services/typedapi";
 import type { ToastPluginApi } from "vue-toast-notification";
 import { toastInjectionKey } from "../../../../util/keys";
 import type { Badge } from "@solaris-common";
 import type { Player } from "../../../../types/game";
-import { useStore } from 'vuex';
-import type { Store } from 'vuex/types/index.js';
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";
+import { useUserStore } from '../../../../stores/user';
+import { useBadgeStore } from '../../../../stores/badge';
 
 
 const props = defineProps<{ recipientPlayerId: string }>();
@@ -57,7 +57,9 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store = useStore() as Store<State>;
+const store = useGameStore();
+const userStore = useUserStore();
+const badgeStore = useBadgeStore();
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
@@ -71,7 +73,7 @@ const loadGalacticCredits = async () => {
   if (isOk(response)) {
     userCredits.value = response.data.credits
 
-    store.commit('setUserCredits', response.data)
+    userStore.setCredits(response.data.credits)
   } else {
     console.error(formatError(response));
   }
@@ -80,10 +82,10 @@ const loadGalacticCredits = async () => {
 }
 
 onMounted(async () => {
-  recipientPlayer.value = GameHelper.getPlayerById(store.state.game!, props.recipientPlayerId)
+  recipientPlayer.value = GameHelper.getPlayerById(store.game!, props.recipientPlayerId)
 
-  const allBadges = await store.dispatch('getBadges');
-  badges.value = allBadges.filter(b => b.price);
+  await badgeStore.loadBadges(httpClient);
+  badges.value = badgeStore.purchasableBadges;
   await loadGalacticCredits()
 });
 
@@ -99,7 +101,7 @@ const onPurchaseBadgeConfirmed = async (badge: Badge) => {
   isLoading.value = true
 
   try {
-    const response = await purchaseBadgeForPlayer(httpClient)(store.state.game!._id, recipientPlayer.value!._id, badge.key);
+    const response = await purchaseBadgeForPlayer(httpClient)(store.game!._id, recipientPlayer.value!._id, badge.key);
 
     if (!isError(response)) {
       toast.success(`You successfully purchased the ${badge.name} badge for ${recipientPlayer.value!.alias}!`)

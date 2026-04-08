@@ -3,19 +3,19 @@
 </template>
 
 <script setup lang="ts">
-import GameHelper from '../../../../services/gameHelper'
-import { computed } from 'vue'
-import { useStore } from 'vuex'
-import type { Game } from '@/types/game'
+import GameHelper from '../../../../services/gameHelper';
+import { computed } from 'vue';
+import type { Game } from '@/types/game';
+import {useGameStore} from "@/stores/game";
 
 const props = defineProps<{
     playerId: string
 }>()
 
-const store = useStore()
+const store = useGameStore();
 
 const team = computed(() => {
-    const game = store.state.game as Game;
+    const game = store.game as Game;
     const player = GameHelper.getPlayerById(game, props.playerId);
     return GameHelper.getTeamByPlayer(game, player);
 })

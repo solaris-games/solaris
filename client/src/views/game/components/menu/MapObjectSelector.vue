@@ -46,24 +46,24 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import { useStore, type Store } from 'vuex';
-import type { State } from '@/store';
 import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import type {Player} from "@/types/game";
+import { useColourStore } from '@/stores/colour';
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import SpecialistIcon from "@/views/game/components/specialist/SpecialistIcon.vue";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 
 const props = defineProps<{
-  mapObjects: ObjectClicked[],
+  mapObjects: readonly ObjectClicked[],
 }>();
 
 const emit = defineEmits<{
@@ -77,7 +77,8 @@ const eventBus = inject(eventBusInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
+const colourStore = useColourStore();
 
 const onBuildCarrierRequested = (starId: string) => emit('onBuildCarrierRequested', starId);
 
@@ -94,7 +95,7 @@ const hasEnoughCredits = (mo: ObjectClicked) => {
     return;
   }
 
-  const userPlayer = gameHelper.getUserPlayer(store.state.game)!;
+  const userPlayer = gameHelper.getUserPlayer(store.game!)!;
   return userPlayer.credits >= star.upgradeCosts!.carriers!;
 };
 
@@ -104,7 +105,7 @@ const transferAllToStar = (mo: ObjectClicked) => mo.type === 'star' && tats(mo.d
 const distributeShips = (mo: ObjectClicked) => mo.type === 'star' && ds(mo.data);
 
 const userOwnsObject = (mapObject: ObjectClicked) => {
-  const userPlayer = gameHelper.getUserPlayer(store.state.game);
+  const userPlayer = gameHelper.getUserPlayer(store.game!);
 
   if (!userPlayer) {
     return false;
@@ -114,10 +115,10 @@ const userOwnsObject = (mapObject: ObjectClicked) => {
 
   switch (mapObject.type) {
     case 'star':
-      owningPlayer = gameHelper.getStarOwningPlayer(store.state.game, mapObject.data)!;
+      owningPlayer = gameHelper.getStarOwningPlayer(store.game!, mapObject.data)!;
       break;
     case 'carrier':
-      owningPlayer = gameHelper.getCarrierOwningPlayer(store.state.game, mapObject.data)!;
+      owningPlayer = gameHelper.getCarrierOwningPlayer(store.game!, mapObject.data)!;
       break;
   }
 
@@ -129,29 +130,29 @@ const userOwnsObject = (mapObject: ObjectClicked) => {
 };
 
 const userOwnsStar = (starId: string) => {
-  const userPlayer = gameHelper.getUserPlayer(store.state.game)!;
-  const star = gameHelper.getStarById(store.state.game, starId)!;
-  const owner = gameHelper.getStarOwningPlayer(store.state.game, star);
+  const userPlayer = gameHelper.getUserPlayer(store.game!)!;
+  const star = gameHelper.getStarById(store.game!, starId)!;
+  const owner = gameHelper.getStarOwningPlayer(store.game!, star);
 
   return userPlayer && owner && userPlayer._id === owner._id;
 };
 
 const hasCarriersInOrbit = (mapObject: ObjectClicked) => {
-  const star = gameHelper.getStarById(store.state.game, mapObject.data._id)!;
+  const star = gameHelper.getStarById(store.game!, mapObject.data._id)!;
 
-  return gameHelper.getCarriersOrbitingStar(store.state.game, star).length > 0;
+  return gameHelper.getCarriersOrbitingStar(store.game!, star).length > 0;
 };
 
 const isGameFinished = () => {
-  return gameHelper.isGameFinished(store.state.game);
+  return gameHelper.isGameFinished(store.game!);
 };
 
 const getObjectOwningPlayer = (mapObject: ObjectClicked) => {
   switch (mapObject.type) {
     case 'star':
-      return gameHelper.getStarOwningPlayer(store.state.game, mapObject.data)!;
+      return gameHelper.getStarOwningPlayer(store.game!, mapObject.data)!;
     case 'carrier':
-      return gameHelper.getCarrierOwningPlayer(store.state.game, mapObject.data)!;
+      return gameHelper.getCarrierOwningPlayer(store.game!, mapObject.data)!;
   }
 };
 
@@ -160,10 +161,10 @@ const getFriendlyColour = (mapObject: ObjectClicked) => {
 
   switch (mapObject.type) {
     case 'star':
-      owningPlayer = gameHelper.getStarOwningPlayer(store.state.game, mapObject.data)!;
+      owningPlayer = gameHelper.getStarOwningPlayer(store.game!, mapObject.data)!;
       break;
     case 'carrier':
-      owningPlayer = gameHelper.getCarrierOwningPlayer(store.state.game, mapObject.data)!;
+      owningPlayer = gameHelper.getCarrierOwningPlayer(store.game!, mapObject.data)!;
       break;
   }
 
@@ -171,7 +172,7 @@ const getFriendlyColour = (mapObject: ObjectClicked) => {
     return '';
   }
 
-  return gameHelper.getFriendlyColour(store.getters.getColourForPlayer(owningPlayer._id).value);
+  return gameHelper.getFriendlyColour(colourStore.getColourForPlayer(store.game!, owningPlayer._id)!.value);
 }
 
 const onViewObjectRequested = (mapObject: ObjectClicked) => {

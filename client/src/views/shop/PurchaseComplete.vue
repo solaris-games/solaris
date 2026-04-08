@@ -13,14 +13,14 @@ import ViewTitle from '../components/ViewTitle.vue'
 import ViewContainer from '../components/ViewContainer.vue'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useStore } from 'vuex'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
-const store = useStore()
+const userStore = useUserStore()
 
 onMounted(() => {
     let credits = +route.query.credits!
-    store.commit('setUserCredits', store.state.userCredits + credits)
+    userStore.setCredits((userStore.credits || 0) + credits)
 })
 </script>
 

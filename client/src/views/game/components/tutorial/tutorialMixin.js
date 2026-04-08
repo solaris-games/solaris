@@ -7,7 +7,7 @@ export default {
             this.$parent.$emit('onOpenStarDetailRequested', this.getPlayerHomeStar._id)
         },
         onOpenTutorialRequested () {
-            this.$store.commit('setMenuState', {
+            this.$store.setMenuState({
                 state: MENU_STATES.TUTORIAL
             })
         },
@@ -21,7 +21,7 @@ export default {
     },
     computed: {
         game () {
-            return this.$store.state.game
+            return this.$store.game
         },
         gameIsFinished () {
             return GameHelper.isGameFinished(this.game)
@@ -51,7 +51,7 @@ export default {
             return this.$parent.isTutorialCompleted
         },
         menuState () {
-            return this.$store.state.menuStateChat
+            return this.$store.menuStateChat
         }
     }
 }

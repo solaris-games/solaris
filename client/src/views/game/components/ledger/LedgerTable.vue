@@ -25,13 +25,13 @@
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import LedgerRow from './LedgerRow.vue';
 import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
-import { eventBusInjectionKey } from '../../../../eventBus';
+import { eventBusInjectionKey } from '@/eventBus';
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';
 import {LedgerType, type PlayerLedgerDebt} from "@solaris-common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {detailLedgerCredits, detailLedgerSpecialistTokens} from "@/services/typedapi/ledger";
 import type {Game} from "@/types/game";
+import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
   ledgerType: LedgerType,
@@ -44,8 +44,8 @@ const emit = defineEmits<{
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const isLoading = ref(false);
 const ledgers = ref<PlayerLedgerDebt<string>[]>([]);

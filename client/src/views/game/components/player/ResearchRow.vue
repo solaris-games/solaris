@@ -15,8 +15,8 @@
   </tr>
 </template>
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game, Player} from "@/types/game";
 import type {ResearchTypeNotRandom} from "@solaris-common";
@@ -29,8 +29,8 @@ const props = defineProps<{
   iconClass: string,
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const playerResearchLevel = computed(() => props.player.research[props.research].level);
 

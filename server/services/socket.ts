@@ -1,21 +1,20 @@
-import { MongoDBStore } from 'connect-mongodb-session';
 import * as cookie from 'cookie';
 import cookieParser from 'cookie-parser';
 import { DefaultEventsMap, Server, Socket } from 'socket.io';
 import { Config } from "../config/types/Config";
-import { DBObjectId } from '../services/types/DBObjectId';
+import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
+import MongoStore from 'connect-mongo';
 
 export default class SocketService {
-
-    private sessionStorage?: MongoDBStore;
+    private sessionStorage?: MongoStore;
 
     constructor(private config: Config,
                 private socketServer: Server) {
     }
 
-    public setSessionStorage(sessionStorage: MongoDBStore) {
+    public setSessionStorage(sessionStorage: MongoStore) {
         this.sessionStorage = sessionStorage;
     }
 

@@ -30,14 +30,13 @@ import FormErrorList from '../components/FormErrorList.vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updateUsername } from '@/services/typedapi/user'
 import { ref, inject } from 'vue';
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
 import {toastInjectionKey} from "@/util/keys";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store: Store<State> = useStore();
+const userStore = useUserStore();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);
@@ -60,7 +59,8 @@ const handleSubmit = async (e) => {
 
   const response = await updateUsername(httpClient)(username.value);
 
-  if (isOk(response)) {store.commit('setUsername', username.value);
+  if (isOk(response)) {
+    userStore.setUsername(username.value);
     toast.success(`Username updated.`)
     router.push({ name: 'account-settings' })
   } else {

@@ -168,14 +168,14 @@ import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { getCredits } from '@/services/typedapi/user';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { inject, ref, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import {purchaseGalacticCredits} from "@/services/typedapi/shopPurchase";
 import {toastInjectionKey} from "@/util/keys";
+import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
+const userStore = useUserStore();
 
 const userCredits = ref(0);
 const isLoading = ref(false);
@@ -186,7 +186,7 @@ const loadGalacticCredits = async () => {
   if (isOk(response)) {
     userCredits.value = response.data.credits;
 
-    store.commit('setUserCredits', response.data.credits);
+    userStore.setCredits(response.data.credits);
   } else {
     console.error(formatError(response));
   }

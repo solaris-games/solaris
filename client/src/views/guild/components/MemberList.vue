@@ -27,10 +27,10 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import SortableLeaderboard from '../../game/components/menu/SortableLeaderboard.vue';
 import GameHelper from '../../../services/gameHelper';
 import {type GuildWithUsers, type UserPublic} from "@solaris-common";
+import { useUserStore } from '@/stores/user';
 
 export type GuildRole = 'leader' | 'officer' | 'member' | 'invitee' | 'applicant';
 
@@ -44,12 +44,12 @@ const props = defineProps<{
   guild: GuildWithUsers<string>,
 }>();
 
-const store = useStore();
+const userStore = useUserStore();
 
 const sortingKey = ref<SortingKey>('role');
 const members = ref<GuildUser<string>[]>([]);
 
-const isInGuild = computed(() => GameHelper.isInGuild(props.guild, store.state.userId));
+const isInGuild = computed(() => GameHelper.isInGuild(props.guild, userStore.userId));
 
 const roleToValue = (role: GuildRole) => {
   if (role === 'leader') {

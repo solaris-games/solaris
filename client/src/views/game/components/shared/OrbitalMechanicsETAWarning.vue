@@ -3,15 +3,15 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { computed } from 'vue'
-import { useStore } from 'vuex'
 import type { Game } from '@/types/game'
 
-const store = useStore()
+const store = useGameStore()
 
 const isOrbitalMechanicsEnabled = computed(() => {
-    return GameHelper.isOrbitalMechanicsEnabled(store.state.game as Game)
+    return GameHelper.isOrbitalMechanicsEnabled(store.game as Game)
 })
 </script>
 

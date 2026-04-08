@@ -10,7 +10,7 @@
           <div class="colour-override-controls form-group">
             <label for="colour">Colour</label>
             <select v-model="currentColour">
-              <option v-for="colour in store.state.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
+              <option v-for="colour in colourStore.coloursConfig" :value="colour.alias">{{ colour.alias }}</option>
             </select>
             <span class="override-current-colour" :style="{ 'background-color': toColourValue(currentColour!) }" />
             <button class="btn btn-default btn-sm" v-on:click="setToDefault">Use default</button>
@@ -30,11 +30,14 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, inject, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game} from "@/types/game";
 import {toastInjectionKey} from "@/util/keys.ts";
+import { useColourStore } from '@/stores/colour';
+import { eventBusInjectionKey } from '@/eventBus';
+import { httpInjectionKey } from '@/services/typedapi';
 
 const props = defineProps<{
   playerId: string,
@@ -46,9 +49,12 @@ const emit = defineEmits<{
 }>();
 
 const toast = inject(toastInjectionKey)!;
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
 const currentColour = ref<string | null>(null);
 const modal = ref(null);
@@ -58,7 +64,7 @@ const title = computed(() => `Custom colour for ${player.value.alias}`)
 
 const onCancel = () => emit('onColourOverrideCancelled');
 
-const toColourValue = (alias: string) => store.state.coloursConfig.find(colour => colour.alias === alias)?.value;
+const toColourValue = (alias: string) => colourStore.coloursConfig!.find(colour => colour.alias === alias)?.value;
 
 const setToDefault = () => {
   currentColour.value = ensureExists(player.value.colour.alias);
@@ -66,11 +72,11 @@ const setToDefault = () => {
 
 const onConfirm = async () => {
   try {
-    await store.dispatch('addColourMapping', {
+    await colourStore.addColourMapping(httpClient, eventBus, game.value, store.settings, {
       playerId: player.value._id,
       colour: {
-        alias: currentColour.value,
-        value: toColourValue(currentColour.value!),
+        alias: currentColour.value!,
+        value: toColourValue(currentColour.value!)!,
       }
     });
 
@@ -82,19 +88,19 @@ const onConfirm = async () => {
 }
 
 const ensureExists = (alias: string) => {
-  const existsA = store.state.coloursConfig.find(colour => colour.alias === alias);
+  const existsA = colourStore.coloursConfig!.find(colour => colour.alias === alias);
 
   if (existsA) {
     return alias;
   }
 
-  const existsV = store.state.coloursConfig.find(colour => colour.value === gameHelper.getFriendlyColour(player.value.colour.value))?.alias;
+  const existsV = colourStore.coloursConfig!.find(colour => colour.value === gameHelper.getFriendlyColour(player.value.colour.value))?.alias;
 
   if (existsV) {
     return existsV;
   }
 
-  return store.state.coloursConfig[0].alias;
+  return colourStore.coloursConfig![0].alias;
 }
 
 onMounted(() => {
@@ -108,7 +114,7 @@ onMounted(() => {
   modal.value = new bootstrap.Modal(modalEl);
   //@ts-ignore
   modal.value.show();
-  currentColour.value = ensureExists(store.getters.getColourForPlayer(props.playerId).alias);
+  currentColour.value = ensureExists(colourStore.getColourForPlayer(game.value, props.playerId)!.alias);
 });
 </script>
 

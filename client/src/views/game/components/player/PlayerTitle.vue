@@ -30,8 +30,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper'
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
@@ -41,19 +41,21 @@ import PlayerMissedTurns from './PlayerMissedTurns.vue'
 import PlayerDiplomaticStatusIcon from './PlayerDiplomaticStatusIcon.vue'
 import TeamName from '../shared/TeamName.vue';
 import type {Game, Player} from "@/types/game";
+import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{
   player: Player,
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
 const getPlayerStatus = () => GameHelper.getPlayerStatus(props.player);
 
 const isFormalAlliancesEnabled = computed(() => DiplomacyHelper.isFormalAlliancesEnabled(game.value));
 
-const colour = computed(() => GameHelper.getFriendlyColour(store.getters.getColourForPlayer(props.player._id).value));
+const colour = computed(() => GameHelper.getFriendlyColour(colourStore.getColourForPlayer(game.value, props.player._id)!.value));
 </script>
 
 <style scoped>

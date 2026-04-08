@@ -62,8 +62,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import GameHelper from '../../../../services/gameHelper';
 import type {NaturalResources} from "@solaris-common";
 
@@ -76,10 +76,10 @@ const props = withDefaults(defineProps<{
     displayIcon: true
 });
 
-const store = useStore();
+const store = useGameStore();
 
 const isSplitResources = computed(() => {
-    return GameHelper.isSplitResources(store.state.game);
+    return GameHelper.isSplitResources(store.game);
 });
 </script>
 

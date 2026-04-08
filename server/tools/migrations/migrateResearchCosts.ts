@@ -1,5 +1,5 @@
 import {JobParameters} from "../tool";
-import {GameResearchProgression, GameSettingsTechnology} from "@solaris-common";
+import {GameResearchProgression, GameSettingsTechnology} from "solaris-common";
 import {Game} from "../../services/types/Game";
 import { Logger } from "pino";
 

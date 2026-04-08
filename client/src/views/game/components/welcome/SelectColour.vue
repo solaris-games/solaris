@@ -44,16 +44,16 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import gameHelper from '../../../../services/gameHelper'
 import PlayerAvatar from '../menu/PlayerAvatar.vue'
 import TeamName from '../shared/TeamName.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
-import { useStore } from 'vuex';
 import type {Game, Player} from "@/types/game";
 import GameHelper from "../../../../services/gameHelper";
-import {makeConfirm} from "@/util/confirm.ts";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {useIsHistoricalMode} from "@/util/reactiveHooks.ts";
 
 const emit = defineEmits<{
@@ -63,10 +63,10 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 const isHistoricalMode = useIsHistoricalMode(store);
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const players = computed(() => game.value.galaxy.players);
 
 const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);

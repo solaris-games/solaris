@@ -7,10 +7,10 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import { ref, onMounted, computed, inject } from 'vue'
 import type {DiplomaticStatus} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 import {detailDiplomacy} from "@/services/typedapi/diplomacy";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
@@ -21,8 +21,8 @@ const props = defineProps<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const diplomaticStatus = ref<DiplomaticStatus<string> | null>(null);
 

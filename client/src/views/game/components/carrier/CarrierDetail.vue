@@ -222,6 +222,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { inject, computed, ref, onMounted, onUnmounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
@@ -242,10 +243,9 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import { useStore } from 'vuex';
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";
 
 const props = defineProps<{
@@ -264,8 +264,8 @@ const emit = defineEmits<{
   onEditWaypointRequested: [{carrierId: string, waypoint: CarrierWaypoint<string>}],
 }>();
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -274,9 +274,9 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
-const settings = computed<UserGameSettings>(() => store.state.settings);
+const settings = computed<UserGameSettings>(() => store.settings!);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
 const carrierOwningPlayer = computed<Player>(() => GameHelper.getPlayerById(game.value, carrier.value.ownedByPlayerId!)!);
@@ -292,7 +292,7 @@ const canGiftCarrier = computed<boolean>(() => Boolean(game.value.settings.speci
   && carrierOwningPlayer.value._id === userPlayer.value._id
   && !carrier.value.isGift
   && !userPlayer.value.defeated
-  && !GameHelper.isGameFinished(store.state.game)
+  && !GameHelper.isGameFinished(store.game!)
 ));
 
 const isOwnedByUserPlayer = computed(() => {

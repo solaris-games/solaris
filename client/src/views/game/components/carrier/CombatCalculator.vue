@@ -96,6 +96,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import MenuTitle from '../MenuTitle.vue';
 import FormErrorList from '../../../components/FormErrorList.vue';
@@ -108,7 +109,6 @@ import type {Carrier, Game, Player, Star} from "@/types/game";
 import type {CombatResultShips} from "@solaris-common";
 import {calculateCombat} from "@/services/typedapi/carrier";
 import {onMounted, ref, computed} from 'vue';
-import {useStore} from 'vuex';
 
 type CombatSide = {
   ships: number,
@@ -126,7 +126,7 @@ const emit = defineEmits<{
   onCloseRequested: [e: Event],
 }>();
 
-const store = useStore();
+const store = useGameStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -136,7 +136,7 @@ const errors = ref<string[]>([]);
 const isTurnBased = ref(true);
 const result = ref<CombatResultShips | null>(null);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 const hasDefenderBonus = computed(() => game.value.settings.specialGalaxy.defenderBonus === 'enabled');
 
 const includeDefenderBonus = ref(hasDefenderBonus.value);

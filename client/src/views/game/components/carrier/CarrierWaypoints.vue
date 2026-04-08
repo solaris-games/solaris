@@ -79,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import {computed, inject, onMounted, onUnmounted, ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
@@ -91,7 +92,6 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {type Mode, ModeKind} from "@/game/map";
 import {toastInjectionKey} from "@/util/keys";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import {useStore} from 'vuex';
 import type {Carrier, Game, Player} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
@@ -115,15 +115,15 @@ const eventBus = inject(eventBusInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
+const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 
 const gameServices = useGameServices();
 
-const isStandardUIStyle = computed(() => store.state.settings.interface.uiStyle === 'standard');
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle === 'compact');
+const isStandardUIStyle = computed(() => store.settings!.interface.uiStyle === 'standard');
+const isCompactUIStyle = computed(() => store.settings!.interface.uiStyle === 'compact');
 
 const userPlayer = computed<Player | undefined>(() => GameHelper.getUserPlayer(game.value));
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);

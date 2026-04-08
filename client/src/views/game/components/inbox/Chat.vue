@@ -1,127 +1,64 @@
 <template>
-  <div class="d-none d-lg-block" v-if="isUserInGame && !isTutorialGame">
-    <div id="toggle" class="text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
+  <div class="d-lg-block" v-if="isUserInGame && !isTutorialGame">
+    <div id="toggle" class="d-none d-lg-inline-block text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
       <span class="icon-text"><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
     <div id="window" v-if="isExpanded" class="header-bar-bg">
-      <conversation-list v-if="menuState === MENU_STATES.INBOX"/>
-      <conversation-create v-if="menuState == MENU_STATES.CREATE_CONVERSATION"
-        :participantIds="menuArguments"
+      <conversation-create v-if="store.menuStateChat.state === 'createConversation'"
+        :participantIds="store.menuStateChat.participantIds"
         @onCloseRequested="toggle"/>
-      <conversation-detail v-if="menuState == MENU_STATES.CONVERSATION"
-        :conversationId="menuArguments"
-        :key="menuArguments"
+      <conversation-detail v-if="store.menuStateChat.state === 'conversation'"
+        :conversationId="store.menuStateChat.conversationId"
         @onCloseRequested="toggle"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
+      <inbox v-if="store.menuStateChat.state == 'inbox'"
+             @onCloseRequested="toggle"
+             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { eventBusInjectionKey } from '@/eventBus';
-import MENU_STATES from '../../../../services/data/menuStates';
+import { useGameStore } from '@/stores/game';
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
 import GameHelper from '../../../../services/gameHelper';
-import ConversationList from '../inbox/conversations/ConversationList.vue';
 import ConversationCreate from './conversations/ConversationCreate.vue';
 import ConversationDetail from './conversations/ConversationDetail.vue';
-import { ref, inject, computed, onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
-import MenuEventBusEventNames from '../../../../eventBusEventNames/menu';
+import { computed, onMounted, onUnmounted } from 'vue';
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
+import Inbox from "@/views/game/components/inbox/Inbox.vue";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
   onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
 }>();
 
-const eventBus = inject(eventBusInjectionKey)!;
-
-const store = useStore();
+const store = useGameStore();
+const userStore = useUserStore();
 
 const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
 
 const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, conversationId: string }) => emit('onOpenReportPlayerRequested', e);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 
-const menuState = computed<string>(() => store.state.menuStateChat);
-
-const menuArguments = computed(() => store.state.menuArgumentsChat);
-
-const unreadMessages = computed<number | null>(() => store.state.unreadMessages);
+const unreadMessages = computed<number | null>(() => store.unreadMessages);
 
 const isUserInGame = computed(() => Boolean(GameHelper.getUserPlayer(game.value)));
 
 const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 
-const isExpanded = ref(false);
+const isExpanded = computed(() => store.menuStateChat.state !== 'none');
 
 const toggle = () => {
-  isExpanded.value = !isExpanded.value;
-
-  store.commit('setMenuStateChat', {
-    state: MENU_STATES.INBOX,
-    args: null
-  });
-};
-
-const canHandleConversationEvents = () => window.innerWidth >= 992;
-
-const handleResize = () => {
-  if (!isExpanded.value) { // Don't care about this if it is already collapsed
-    return;
+  if (store.menuStateChat.state === 'none') {
+    store.setMenuStateChat({ state: 'inbox' });
+  } else {
+    store.setMenuStateChat(store.menuStateChat);
   }
-
-  isExpanded.value = canHandleConversationEvents();
-};
-
-const onViewConversationRequested = (e: { conversationId: string, participantIds: string[] }) => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  if (e.conversationId) {
-    store.commit('setMenuStateChat', {
-      state: MENU_STATES.CONVERSATION,
-      args: e.conversationId
-    })
-  } else if (e.participantIds) {
-    store.commit('setMenuStateChat', {
-      state: MENU_STATES.CREATE_CONVERSATION,
-      args: e.participantIds
-    })
-  }
-
-  isExpanded.value = true;
-};
-
-const onCreateNewConversationRequested = (e: { participantIds?: string[] }) => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  store.commit('setMenuStateChat', {
-    state: MENU_STATES.CREATE_CONVERSATION,
-    args: e.participantIds || null
-  });
-
-  isExpanded.value = true;
-};
-
-const onOpenInboxRequested = () => {
-  if (!canHandleConversationEvents()) {
-    return;
-  }
-
-  store.commit('setMenuStateChat', {
-    state: MENU_STATES.INBOX,
-    args: null
-  });
-
-  isExpanded.value = true;
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -137,7 +74,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     return
   }
 
-  const isLoggedIn = store.state.userId != null;
+  const isLoggedIn = userStore.isLoggedIn;
   const isInGame = isUserInGame.value;
 
   if (!isLoggedIn || !isInGame) {
@@ -157,40 +94,20 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 
   // Special case for Inbox shortcut, only do this if the screen is large
-  if (menuState !== MENU_STATES.INBOX || !canHandleConversationEvents()) {
+  if (menuState !== "inbox") {
     return;
   }
 
-  store.commit('setMenuStateChat', {
-    state: menuState,
-    args: null
-  })
+  store.setMenuStateChat({ state: menuState });
 
   toggle()
 };
 
-document.addEventListener('keydown', handleKeyDown);
-window.addEventListener('resize', handleResize);
-
 onMounted(() => {
-  store.commit('setMenuStateChat', {
-    state: MENU_STATES.INBOX,
-    args: null
-  });
-
-  eventBus.on(MenuEventBusEventNames.OnMenuChatSidebarRequested, toggle);
-  eventBus.on(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-  eventBus.on(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
+  document.addEventListener('keydown', handleKeyDown);
 
   onUnmounted(() => {
-    eventBus.off(MenuEventBusEventNames.OnMenuChatSidebarRequested, toggle);
-    eventBus.off(MenuEventBusEventNames.OnCreateNewConversationRequested, onCreateNewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnViewConversationRequested, onViewConversationRequested);
-    eventBus.off(MenuEventBusEventNames.OnOpenInboxRequested, onOpenInboxRequested);
-
     document.removeEventListener('keydown', handleKeyDown);
-    window.removeEventListener('resize', handleResize);
   });
 });
 </script>
@@ -210,9 +127,9 @@ onMounted(() => {
 
 #window {
   position: absolute;
-  right: 0px;
+  right: 0;
   bottom: 100px;
-  width: 473px;
+  width: min(100%, 473px);
   top: 45px;
   overflow: auto;
   overflow-x: hidden;

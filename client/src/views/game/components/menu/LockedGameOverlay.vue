@@ -8,17 +8,19 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import type {ListGame} from "@solaris-common";
+import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{
   game: ListGame<string>,
 }>();
 
-const store = useStore();
+const store = useGameStore();
+const userStore = useUserStore();
 
-const userIsEstablishedPlayer = computed(() => Boolean(store.state.user?.isEstablishedPlayer))
+const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer)
 
 const userCanJoinGame = computed(() => userIsEstablishedPlayer.value || props.game.settings.general.playerType === 'all');
 </script>

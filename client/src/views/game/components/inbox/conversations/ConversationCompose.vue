@@ -1,6 +1,6 @@
 <template>
 <form class="pb-1 conversation">
-  <mention-box placeholder="Compose a message" :rows="3" v-model="store.state.currentConversation.text" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
+  <mention-box placeholder="Compose a message" :rows="3" v-model="conversationStore.currentConversation!.text" @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage" @onFinish="send"></mention-box>
   <div class="mb-2 text-end">
     <div class="d-grid gap-2">
       <button type="button" class="btn btn-success" @click="send" :disabled="isSendingMessage">
@@ -13,15 +13,17 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import MentionHelper, {type Mention} from '../../../../../services/mentionHelper';
 import AudioService from '../../../../../game/audio';
 import MentionBox from '../../shared/MentionBox.vue';
 import { inject, ref, computed } from 'vue';
 import {httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
 import type {Game, Player, Star} from "@/types/game";
 import {sendMessage} from "@/services/typedapi/conversation";
 import type {ConversationMessageSentResult} from "@solaris-common";
+import {useMentionStore} from "@/stores/mention";
+import {useConversationStore} from "@/stores/conversation.ts";
 
 const props = defineProps<{
   conversationId: string,
@@ -33,40 +35,37 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const conversationStore = useConversationStore();
+const mentionStore = useMentionStore();
+const game = computed<Game>(() => store.game!);
 
 const isSendingMessage = ref(false);
 const currentMention = ref<string | null>(null);
-const selectedSuggestion = ref<string | null>(null);
 
-const onSetMessageElement = (element: HTMLElement) => {
-  store.commit('setMentions', {
+const onSetMessageElement = (element: HTMLTextAreaElement) => {
+  mentionStore.setMentions({
     element,
     callbacks: {
       player: (player: Player) => {
-        store.commit('updateCurrentConversationText', MentionHelper.addMention(store.state.currentConversation.text, store.state.mentionReceivingElement, 'player', player.alias))
+        conversationStore.updateCurrentConversationText(MentionHelper.addMention(conversationStore.currentConversation!.text, mentionStore.mentionReceivingElement!, 'player', player.alias));
       },
       star: (star: Star) => {
-        store.commit('updateCurrentConversationText', MentionHelper.addMention(store.state.currentConversation.text, store.state.mentionReceivingElement, 'star', star.name))
-      }
-    }
+        conversationStore.updateCurrentConversationText(MentionHelper.addMention(conversationStore.currentConversation!.text, mentionStore.mentionReceivingElement!, 'star', star.name));
+      },
+    },
   });
 };
 
 const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
-  store.commit('updateCurrentConversationText', MentionHelper.useSuggestion(store.state.currentConversation.text, store.state.mentionReceivingElement, data))
+  conversationStore.updateCurrentConversationText(MentionHelper.useSuggestion(conversationStore.currentConversation!.text, mentionStore.mentionReceivingElement!, data));
 };
 
 const send = async () => {
-  let messageText = '';
+  const messageText = conversationStore.currentConversation?.text;
 
-  if (store.state.currentConversation) {
-    messageText = store.state.currentConversation.text;
-
-    if (!messageText) {
-      return;
-    }
+  if (!messageText) {
+    return;
   }
 
   const message = MentionHelper.makeMentionsStatic(game.value, messageText);
@@ -79,7 +78,7 @@ const send = async () => {
 
     emit('onConversationMessageSent', response.data);
 
-    store.commit('resetCurrentConversationText');
+    conversationStore.resetCurrentConversationText();
     currentMention.value = null;
   }
 

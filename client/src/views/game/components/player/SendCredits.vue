@@ -29,6 +29,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, inject, computed } from 'vue';
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
@@ -36,7 +37,6 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import type {Game, Player} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {sendCredits} from "@/services/typedapi/trade";
-import { useStore } from 'vuex';
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
@@ -52,8 +52,8 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const errors = ref<string[]>([]);

@@ -45,14 +45,12 @@
 </template>
 
 <script setup lang="ts">
-import { eventBusInjectionKey } from '../../../../../eventBus'
+import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
-import { inject, computed } from 'vue'
-import MenuEventBusEventNames from '../../../../../eventBusEventNames/menu'
+import { computed } from 'vue'
 import type {ConversationOverview} from "@solaris-common";
-import { useStore } from 'vuex';
 import type {Game} from "@/types/game";
 
 const props = defineProps<{
@@ -61,10 +59,8 @@ const props = defineProps<{
   isFullWidth: boolean,
 }>();
 
-const eventBus = inject(eventBusInjectionKey)!;
-
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 const hasLastMessage = computed(() => props.conversation.lastMessage != null);
@@ -75,12 +71,8 @@ const isAllPlayersConversation = computed(() => props.conversation.participants.
 
 const lastMessageText = computed(() => lastMessage.value && mentionHelper.replaceMentionsWithNames(lastMessage.value.message));
 
-const getFriendlyColour = (colour: string) => GameHelper.getFriendlyColour(colour);
-
 const openConversation = () => {
-  eventBus.emit(MenuEventBusEventNames.OnViewConversationRequested, {
-    conversationId: props.conversation._id,
-  });
+  store.setMenuStateChat({ state: 'conversation', conversationId: props.conversation._id });
 };
 </script>
 

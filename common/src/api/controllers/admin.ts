@@ -106,7 +106,6 @@ export const createAdminRoutes = <ID>() => ({
     setGameFeatured: new PatchRoute<{ gameId: string }, {}, SetFeaturedReq, null>('/api/admin/game/:gameId/featured'),
     setGameTimeMachine: new PatchRoute<{ gameId: string }, {}, SetTimeMachineReq, null>('/api/admin/game/:gameId/timeMachine'),
     finishGame: new PatchRoute<{ gameId: string }, {}, null, null>('/api/admin/game/:gameId/finish'),
-    resetQuitters: new DeleteRoute<{ gameId: string }, {}, null>('/api/admin/game/:gameId/quitters'),
     getConversationForReport: new GetRoute<{ reportId: string }, {}, Conversation<ID>>('/api/admin/reports/:reportId/conversation'),
     listReports: new SimpleGetRoute<Report<ID>[]>('/api/admin/reports'),
     actionReport: new PatchRoute<{ reportId: string }, {}, {}, null>('/api/admin/reports/:reportId/action'),

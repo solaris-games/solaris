@@ -14,8 +14,8 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import { useStore } from 'vuex';
 import PlayerIcon from '../player/PlayerIcon.vue'
 import type {Game, Player} from "@/types/game";
 import GameHelper from "../../../../services/gameHelper";
@@ -30,8 +30,8 @@ const emit = defineEmits<{
 
 const onClick = () => emit('onClick');
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const leaderboard = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
 const showMedals = computed(() => GameHelper.isGameInProgress(game.value) || GameHelper.isGameFinished(game.value));
 

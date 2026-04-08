@@ -1,23 +1,23 @@
 import type {EventBus} from "../eventBus";
 import { onMounted, onUnmounted, inject, computed } from "vue";
-import type {State} from "../store";
-import { useStore, type Store } from 'vuex';
 import type {ConversationMessageSentResult} from "@solaris-common";
 import UserEventBusEventNames from "../eventBusEventNames/user";
 import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";
-import MENU_STATES from '../services/data/menuStates';
 import router from "../router";
+import {useUserStore} from "@/stores/user";
+import {useGameStore} from "@/stores/game";
 
 export const withMessages = () => {
   const $toast = useToast();
   const eventBus: EventBus = inject(eventBusInjectionKey)!;
-  const store: Store<State> = useStore();
+  const gameStore = useGameStore();
+  const userStore = useUserStore();
 
-  const sendForAllGames = computed(() => store.state.user?.subscriptions?.inapp?.notificationsForOtherGames);
+  const sendForAllGames = computed(() => userStore.user?.subscriptions?.inapp?.notificationsForOtherGames);
 
   const handler = (e: ConversationMessageSentResult<string>) => {
-    const isInGame = store.state.game?._id === e.gameId;
+    const isInGame = gameStore.game?._id === e.gameId;
 
     if (!sendForAllGames.value && !isInGame) {
       return;
@@ -34,10 +34,7 @@ export const withMessages = () => {
       $toast.info(`New message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
-          store.commit('setMenuStateChat', {
-            state: MENU_STATES.CONVERSATION,
-            args: e.conversationId
-          })
+          gameStore.setMenuStateChat({ state: 'conversation', conversationId: e.conversationId });
         }
       });
     } else {

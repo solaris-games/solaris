@@ -46,11 +46,11 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import type {Carrier, Game} from "@/types/game";
 import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import type {CarrierWaypoint} from "@solaris-common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
@@ -65,8 +65,8 @@ const emit = defineEmits<{
   onOpenStarDetailRequested: [starId: string],
 }>();
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const showAction = ref(true);

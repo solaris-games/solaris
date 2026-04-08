@@ -174,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game';
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
@@ -182,11 +183,11 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {ModeKind} from "@/game/map";
-import { useStore } from 'vuex';
 import type {Carrier, Game, Star} from "@/types/game";
 import type {RulerPoint} from "@/types/ruler";
 import {getCountdownTimeStringByTicks} from "@/util/time";
 import type {Specialist} from "@solaris-common";
+import {useGameServices} from "@/util/gameServices";
 
 const emit = defineEmits<{
   onCloseRequested: [],
@@ -194,8 +195,9 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!)
+const serviceProvider = useGameServices();
 
 const points = ref<RulerPoint[]>([]);
 const distanceLightYears = ref(0);
@@ -205,7 +207,7 @@ const totalEta = ref('');
 const totalEtaWarp = ref('');
 const speedModifier = ref(1);
 
-const isCompactUIStyle = computed(() => store.state.settings.interface.uiStyle === 'compact');
+const isCompactUIStyle = computed(() => store.settings!.interface.uiStyle === 'compact');
 const isStandardUIStyle = computed(() => !isCompactUIStyle.value);
 
 const warpGateCost = computed(() => {
@@ -222,7 +224,7 @@ const warpGateCost = computed(() => {
   return sum;
 });
 
-const carrierSpecialists = computed<Specialist[]>(() => store.state.carrierSpecialists);
+const carrierSpecialists = computed<readonly Specialist[]>(() => store.carrierSpecialists!);
 
 const speeds = computed(() => {
   if (!carrierSpecialists.value) {
@@ -239,8 +241,13 @@ const onCloseRequested = () => {
 };
 
 const recalculateETAs = () => {
-  const totalTicks = GameHelper.getTicksBetweenLocations(game.value, null, points.value, speedModifier.value)
-  const totalTicksWarp = GameHelper.getTicksBetweenLocations(game.value, null, points.value, game.value.constants.distances.warpSpeedMultiplier * speedModifier.value)
+  const locations = points.value.map(p => p.location);
+
+  const tickDistance = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, false);
+  const tickDistanceWarp = serviceProvider.carrierTravelService.getDistancePerTick(game.value, speedModifier.value, true);
+
+  const totalTicks = serviceProvider.carrierTravelService.getTicksToTravel(locations, tickDistance) || 0;
+  const totalTicksWarp = serviceProvider.carrierTravelService.getTicksToTravel(locations, tickDistanceWarp) || 0;
 
   totalEta.value = getCountdownTimeStringByTicks(game.value, totalTicks)
   totalEtaWarp.value = getCountdownTimeStringByTicks(game.value, totalTicksWarp)
@@ -281,11 +288,13 @@ const recalculateDistanceLightYears = () => {
     return;
   }
 
+  let dist = 0;
+
   for (let i = 0; i < points.value.length - 1; i++) {
-    distanceLightYears.value += GameHelper.getDistanceBetweenLocations(points.value[i].location, points.value[i + 1].location)
+    dist += GameHelper.getDistanceBetweenLocations(points.value[i].location, points.value[i + 1].location)
   }
 
-  distanceLightYears.value = Math.round(distanceLightYears.value / game.value.constants.distances.lightYear * 100.0) / 100.0
+  distanceLightYears.value = Math.round(dist / game.value.constants.distances.lightYear * 100.0) / 100.0
 };
 
 const recalculateAll = () => {

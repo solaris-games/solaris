@@ -28,32 +28,34 @@
 import Logo from '../components/Logo.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import GameContainer from './components/GameContainer.vue'
-import MENU_STATES from '../../services/data/menuStates'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameHelper from '../../services/gameHelper'
 import AudioService from '../../game/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
-import { eventBusInjectionKey } from '../../eventBus'
+import { eventBusInjectionKey } from '@/eventBus'
 import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
-import { playerClientSocketEmitterInjectionKey } from '../../sockets/socketEmitters/player'
+import { playerClientSocketEmitterInjectionKey } from '@/sockets/socketEmitters/player'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
 import { withMessages } from "../../util/messages";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getSettings} from "@/services/typedapi/user";
-import { useStore, type Store } from 'vuex';
-import type {State} from "@/store";
 import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
 import type {Game} from "@/types/game";
+import { useUserStore } from '@/stores/user';
+import { useColourStore } from '@/stores/colour';
+import {useGameStore} from "@/stores/game";
 
-const store: Store<State> = useStore();
+const store = useGameStore();
+const userStore = useUserStore();
+const colourStore = useColourStore();
 
 const emit = defineEmits<{
   onPlayerSelected: [playerId: string],
@@ -71,15 +73,15 @@ const polling: Ref<number | null> = ref(null);
 const ticking = ref(false);
 const colourOverride: Ref<{ playerId: string } | null> = ref(null);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 
 const gameId = computed(() => game.value._id);
 
 const hasGame = computed(() => Boolean(game.value));
 
-const isLoggedIn = computed(() => Boolean(store.state.userId));
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 
-const isHistorical = computed(() => store.state.tick !== game.value.state.tick);
+const isHistorical = computed(() => store.tick !== game.value.state.tick);
 
 const gameServices = createGameServices(store);
 provide(gameServicesKey, gameServices);
@@ -97,17 +99,17 @@ const onViewColourOverrideRequested = (e: string) => {
 };
 
 const onStarClicked = (starId: string) => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.STAR_DETAIL,
-    args: starId,
+  store.setMenuState({
+    state: 'starDetail',
+    starId,
   });
 
   AudioService.click();
 };
 
 const onStarRightClicked = (starId: string) => {
-  const star = GameHelper.getStarById(store.state.game, starId)!;
-  const owningPlayer = GameHelper.getStarOwningPlayer(store.state.game, star);
+  const star = GameHelper.getStarById(store.game!, starId)!;
+  const owningPlayer = GameHelper.getStarOwningPlayer(store.game!, star);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -117,17 +119,17 @@ const onStarRightClicked = (starId: string) => {
 };
 
 const onCarrierClicked = (carrierId: string) => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.CARRIER_DETAIL,
-    args: carrierId,
+  store.setMenuState({
+    state: 'carrierDetail',
+    carrierId,
   });
 
   AudioService.click();
 };
 
 const onCarrierRightClicked = (carrierId: string) => {
-  const carrier = GameHelper.getCarrierById(store.state.game, carrierId)!;
-  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.state.game, carrier);
+  const carrier = GameHelper.getCarrierById(store.game!, carrierId)!;
+  const owningPlayer = GameHelper.getCarrierOwningPlayer(store.game!, carrier);
 
   if (owningPlayer) {
     onPlayerSelected(owningPlayer._id);
@@ -137,33 +139,33 @@ const onCarrierRightClicked = (carrierId: string) => {
 };
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.MAP_OBJECT_SELECTOR,
-    args: e,
+  store.setMenuState({
+    state: 'mapObjectSelector',
+    objects: e,
   });
 
   AudioService.open();
 };
 
 const onPlayerSelected = (playerId: string) => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.PLAYER,
-    args: playerId,
+  store.setMenuState({
+    state: 'player',
+    playerId,
   });
 
   emit('onPlayerSelected', playerId);
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
-  store.commit('setMenuState', {
-    state: MENU_STATES.REPORT_PLAYER,
-    args: e,
+  store.setMenuState({
+    state: 'reportPlayer',
+    args: { playerId: e.playerId },
   });
 };
 
 const attemptLogin = () => {
-  if (!store.state.userId) {
-    store.dispatch('verify');
+  if (!userStore.userId) {
+    userStore.verify(httpClient, userClientSockerEmitter);
   }
 };
 
@@ -171,7 +173,7 @@ const reloadSettings = async () => {
   const response = await getSettings(httpClient)();
 
   if (isOk(response)) {
-    store.commit('setSettings', response.data);
+    store.setSettings(response.data);
   } else {
     console.error(formatError(response));
   }
@@ -184,9 +186,9 @@ const reloadGame = async () => {
     // Make sure the player is still in the current game, they may have quickly
     // switched to another game.
     if (route.query.id === response.data._id) {
-      store.commit('setGame', response.data); // Persist to storage
-      store.commit('setTick', response.data.state.tick);
-      store.commit('setProductionTick', response.data.state.productionTick);
+      store.setGame(response.data as Game); // Persist to storage // TODO: Fix types
+      store.setTick(response.data.state.tick);
+      store.setProductionTick(response.data.state.productionTick);
 
       document.title = response.data.settings.general.name + ' - Solaris';
     }
@@ -206,22 +208,26 @@ const reloadGameCheck = async () => {
 
   // Check if the next tick date has passed, if so check if the server has finished the game tick.
   // Alternatively if the game is set to 10s ticks then always check.
-  const canTick = store.state.game.settings.gameTime.speed <= 10 || gameHelper.canTick(store.state.game);
+  const canTick = store.game!.settings.gameTime.speed <= 10 || gameHelper.canTick(store.game!);
 
   if (canTick) {
     ticking.value = true;
 
-    const response = await detailState(httpClient)(store.state.game._id);
+    const response = await detailState(httpClient)(store.game!._id);
 
     if (isOk(response)) {
+      if (!game.value) {
+        return;
+      }
+
       const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
 
-      if (store.state.tick < response.data.state.tick || hasEnded) {
+      if (store.tick < response.data.state.tick || hasEnded) {
         // If the user is currently using the time machine then only set the state variables.
         // Otherwise reload the current game tick.
         if (isHistorical.value) {
-          store.commit('setTick', response.data.state.tick)
-          store.commit('setProductionTick', response.data.state.productionTick)
+          store.setTick(response.data.state.tick);
+          store.setProductionTick(response.data.state.productionTick);
         } else {
           await reloadGame();
         }
@@ -246,7 +252,7 @@ withMessages();
 
 AudioService.loadStore(store);
 
-store.commit('clearGame');
+store.clearGame();
 
 //A CSS class that will load only on the game screen to prevent drag-bounce behavior
 const GAME_BODY_CLASS = 'game-body';
@@ -257,13 +263,13 @@ onMounted(async () => {
   await reloadSettings();
   await reloadGame();
 
-  const userPlayer = GameHelper.getUserPlayer(store.state.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game!);
 
   if (userPlayer) {
     userClientSockerEmitter.emitJoined();
 
     playerClientSocketEmitter.emitGameRoomJoined({
-      gameId: store.state.game._id,
+      gameId: store.game!._id,
       playerId: userPlayer?._id
     });
   }
@@ -275,24 +281,24 @@ onMounted(async () => {
 // Otherwise show the welcome screen if there are empty slots.
 
   if (userPlayer && !userPlayer.defeated) {
-    if (GameHelper.isTutorialGame(store.state.game)) {
-      store.commit('setMenuState', { state: MENU_STATES.TUTORIAL })
+    if (GameHelper.isTutorialGame(store.game)) {
+      store.setMenuState({ state: 'tutorial' })
     } else {
-      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD })
+      store.setMenuState({ state: 'leaderboard' })
     }
   } else {
-    if (store.state.userId && GameHelper.gameHasOpenSlots(store.state.game)) {
-      store.commit('setMenuState', { state: MENU_STATES.WELCOME })
+    if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
+      store.setMenuState({ state: 'welcome' })
     } else {
-      store.commit('setMenuState', { state: MENU_STATES.LEADERBOARD }) // Assume the user is spectating.
+      store.setMenuState({ state: 'leaderboard' }) // Assume the user is spectating.
     }
   }
 
   const reloadGameCheckInterval = 1000;
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
 
-  await store.dispatch('loadSpecialistData', store.state.game._id);
-  await store.dispatch('loadColourData');
+  await store.loadSpecialistData(httpClient, store.game!._id);
+  await colourStore.loadColourData(httpClient);
 });
 
 onBeforeUnmount(() => {
@@ -300,16 +306,16 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
-  const userPlayer = GameHelper.getUserPlayer(store.state.game);
+  const userPlayer = GameHelper.getUserPlayer(store.game!);
 
   if (userPlayer) {
     playerClientSocketEmitter.emitGameRoomLeft({
-      gameId: store.state.game._id,
+      gameId: store.game!._id,
       playerId: userPlayer?._id
     });
   }
 
-  store.commit('clearGame');
+  store.clearGame();
 
   document.title = 'Solaris';
 

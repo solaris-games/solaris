@@ -19,12 +19,11 @@
 
 <script setup lang="ts">
 import {ref, computed, inject} from 'vue';
-import {useStore} from 'vuex';
 import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
 import type {LedgerType, PlayerLedgerDebt} from "@solaris-common";
 import type { Game } from "@/types/game";
-import {makeConfirm} from "@/util/confirm";
+import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {
@@ -33,6 +32,8 @@ import {
   settleLedgerCredits,
   settleLedgerSpecialistTokens
 } from "@/services/typedapi/ledger";
+import { useColourStore } from '@/stores/colour';
+import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
   ledger: PlayerLedgerDebt<string>,
@@ -46,9 +47,10 @@ const emit = defineEmits<{
 const httpClient = inject(httpInjectionKey)!;
 const toast = inject(toastInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const confirm = useConfirm();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
 const isLoading = ref(false);
 
@@ -62,7 +64,7 @@ const getPlayer = (playerId: string) => gameHelper.getPlayerById(game.value, pla
 
 const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-const getFriendlyColour = (playerId: string) => store.getters.getColourForPlayer(playerId).value;
+const getFriendlyColour = (playerId: string) => colourStore.getColourForPlayer(game.value, playerId)!.value;
 
 const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
 
