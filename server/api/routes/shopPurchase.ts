@@ -1,4 +1,3 @@
-import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ShopController from '../controllers/shop';
 import { MiddlewareContainer } from "../middleware";
@@ -6,7 +5,7 @@ import {SingleRouter} from "../singleRoute";
 import {createShopPurchaseRoutes} from "solaris-common";
 import {createRoutes} from "../typedapi/routes";
 
-export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const controller = ShopController(container);
     const routes = createShopPurchaseRoutes();
     const answer = createRoutes(router, mw);

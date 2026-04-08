@@ -1,7 +1,7 @@
 import { Location } from "../services/types/Location";
 import { MapObject } from "../services/types/Map";
 import { Star } from "../services/types/Star";
-import { DistanceService } from 'solaris.common';
+import { DistanceService } from 'solaris-common';
 
 interface KDTreeNode {
     objectIndex: number;

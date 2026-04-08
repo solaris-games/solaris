@@ -1,4 +1,3 @@
-import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import GameController from '../controllers/game';
 import { MiddlewareContainer } from "../middleware";
@@ -7,7 +6,7 @@ import {createGameRoutes} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 
-export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const routes = createGameRoutes<DBObjectId>();
     const controller = GameController(container);
     const answer = createRoutes(router, mw);

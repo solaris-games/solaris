@@ -1,4 +1,3 @@
-import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpectatorController from '../controllers/spectator';
 import { MiddlewareContainer } from "../middleware";
@@ -7,7 +6,7 @@ import {createSpectatorRoutes} from "solaris-common/dist/api/controllers/spectat
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 
-export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const controller = SpectatorController(container);
     const routes = createSpectatorRoutes<DBObjectId>();
     const answer = createRoutes(router, mw);

@@ -1,4 +1,4 @@
-import {FrontendConfig} from "solaris.common";
+import {FrontendConfig} from "solaris-common";
 
 export type LoggingType = 'pretty' | 'stdout';
 

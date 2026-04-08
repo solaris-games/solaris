@@ -1,4 +1,3 @@
-import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import BadgeController from '../controllers/badges';
 import { MiddlewareContainer } from "../middleware";
@@ -7,7 +6,7 @@ import {createBadgeRoutes} from "solaris-common";
 import {createRoutes} from "../typedapi/routes";
 import {DBObjectId} from "../../services/types/DBObjectId";
 
-export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const controller = BadgeController(container);
     const routes = createBadgeRoutes<DBObjectId>();
 

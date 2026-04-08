@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { ExpressJoiError } from 'express-joi-validation';
 import { ValidationError } from 'solaris-common';
 import { DependencyContainer } from '../../services/types/DependencyContainer';
 import {logger} from "../../utils/logging";
@@ -31,17 +30,6 @@ export const middleware = (container: DependencyContainer): CoreMiddleware => {
                     });
                     res.status(err.statusCode).json({
                         errors
-                    });
-
-                    return;
-                }
-
-                // If its a Joi error then return the error messages only.
-                if (err.type && ['body', 'query', 'headers', 'fields', 'params'].includes(err.type)) {
-                    const jerr = err as ExpressJoiError;
-
-                    res.status(400).json({
-                        errors: jerr.error!.details.map(d => d.message)
                     });
 
                     return;

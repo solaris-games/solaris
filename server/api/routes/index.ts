@@ -1,4 +1,3 @@
-import { createValidator } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {MiddlewareContainer} from '../middleware';
 
@@ -27,29 +26,27 @@ import registerColourRoutes from './colour';
 import {SingleRouter} from "../singleRoute";
 
 export default (router: SingleRouter, container: DependencyContainer, middleware: MiddlewareContainer) => {
-    const validator = createValidator({ passError: true });
-
     registerConfigRoutes(router, middleware, container);
-    registerAdminRoutes(router, middleware, validator, container);
-    registerAnnouncementsRoutes(router, middleware, validator, container);
-    registerAuthRoutes(router, middleware, validator, container);
-    registerBadgeRoutes(router, middleware, validator, container);
-    registerCarrierRoutes(router, middleware, validator, container);
-    registerConversationRoutes(router, middleware, validator, container);
-    registerDiplomacyRoutes(router, middleware, validator, container);
-    registerEventRoutes(router, middleware, validator, container);
-    registerGameRoutes(router, middleware, validator, container);
-    registerGuildRoutes(router, middleware, validator, container);
-    registerLedgerRoutes(router, middleware, validator, container);
-    registerReportRoutes(router, middleware, validator, container);
-    registerResearchRoutes(router, middleware, validator, container);
-    registerShopProcessRoutes(router, middleware, validator, container);
-    registerShopPurchaseRoutes(router, middleware, validator, container);
-    registerSpecialistRoutes(router, middleware, validator, container);
-    registerStarRoutes(router, middleware, validator, container);
-    registerTradeRoutes(router, middleware, validator, container);
-    registerUserRoutes(router, middleware, validator, container);
-    registerSpectatorRoutes(router, middleware, validator, container);
+    registerAdminRoutes(router, middleware, container);
+    registerAnnouncementsRoutes(router, middleware, container);
+    registerAuthRoutes(router, middleware, container);
+    registerBadgeRoutes(router, middleware, container);
+    registerCarrierRoutes(router, middleware, container);
+    registerConversationRoutes(router, middleware, container);
+    registerDiplomacyRoutes(router, middleware, container);
+    registerEventRoutes(router, middleware, container);
+    registerGameRoutes(router, middleware, container);
+    registerGuildRoutes(router, middleware, container);
+    registerLedgerRoutes(router, middleware, container);
+    registerReportRoutes(router, middleware, container);
+    registerResearchRoutes(router, middleware, container);
+    registerShopProcessRoutes(router, middleware, container);
+    registerShopPurchaseRoutes(router, middleware, container);
+    registerSpecialistRoutes(router, middleware, container);
+    registerStarRoutes(router, middleware, container);
+    registerTradeRoutes(router, middleware, container);
+    registerUserRoutes(router, middleware, container);
+    registerSpectatorRoutes(router, middleware, container);
     registerColourRoutes(router, middleware, container);
 
     return router;

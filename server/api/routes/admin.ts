@@ -1,4 +1,3 @@
-import { ExpressJoiInstance } from "express-joi-validation";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
@@ -7,7 +6,7 @@ import {createRoutes} from "../typedapi/routes";
 import {createAdminRoutes} from "solaris-common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 
-export default (router: SingleRouter, mw: MiddlewareContainer, validator: ExpressJoiInstance, container: DependencyContainer) => {
+export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {
     const controller = AdminController(container);
     const routes = createAdminRoutes<DBObjectId>();
 
