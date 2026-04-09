@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import {useConfirm} from "@/hooks/confirm.ts";
-import type {Badge} from "@solaris-common";
+import type {Badge} from "@solaris/common";
 
 const props = defineProps<{
   badges: Badge[],

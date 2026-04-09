@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ref, inject, computed } from 'vue';
 import router from '../../../router';
-import type {GuildWithUsers} from "@solaris-common";
+import type {GuildWithUsers} from "@solaris/common";
 import type {GuildRole, GuildUser} from "@/views/guild/components/MemberList.vue";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

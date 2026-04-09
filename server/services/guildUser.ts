@@ -2,7 +2,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { User } from "./types/User";
 import GuildService from "./guild";
-import { GuildUserWithTag } from "solaris-common";
+import { GuildUserWithTag } from "@solaris/common";
 
 export default class UserGuildService {
     userRepo: Repository<User>;

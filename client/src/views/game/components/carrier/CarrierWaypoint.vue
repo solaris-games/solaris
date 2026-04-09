@@ -80,7 +80,7 @@ import gameHelper from '../../../../services/gameHelper';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris-common"
+import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris/common"
 import {httpInjectionKey} from "@/services/typedapi";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";

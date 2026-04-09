@@ -46,7 +46,7 @@ import ViewCollapsePanel from '../components/ViewCollapsePanel.vue'
 import GamePlayerControl from './GamePlayerControl.vue';
 import router from "../../router";
 import {ref, inject, computed, type Ref} from 'vue';
-import type {GameInfoDetail, GameGalaxyDetail} from '@solaris-common';
+import type {GameInfoDetail, GameGalaxyDetail} from '@solaris/common';
 import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typedapi';
 import {toastInjectionKey} from '@/util/keys';
 import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame, resetQuitters as resetQuittersReq } from '@/services/typedapi/game';

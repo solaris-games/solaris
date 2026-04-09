@@ -1,6 +1,6 @@
 import { DBObjectId } from './types/DBObjectId';
 import UserService from './user';
-import { ValidationError, Tutorial } from "solaris-common";
+import { ValidationError, Tutorial } from "@solaris/common";
 
 const tutorials = require('../config/game/tutorials.json') as Tutorial[];
 const defaultTutorialKey = "original"

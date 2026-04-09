@@ -1,5 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
-import { Guild } from "solaris-common";
+import { Guild } from "@solaris/common";
 import { Player } from "./Player";
 import {Team} from "./Game";
 

@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { CarrierTravelService } from 'solaris-common';
-import {StarDataService} from "solaris-common";
+import { CarrierTravelService } from '@solaris/common';
+import {StarDataService} from "@solaris/common";
 
 let playerId,
     carrierId,

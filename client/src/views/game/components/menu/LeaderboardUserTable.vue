@@ -67,7 +67,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getLeaderboard } from '@/services/typedapi/user';
-import type {LeaderboardUser, UserLeaderboard} from "@solaris-common";
+import type {LeaderboardUser, UserLeaderboard} from "@solaris/common";
 import { useUserStore } from '@/stores/user';
 
 const httpClient = inject(httpInjectionKey)!;

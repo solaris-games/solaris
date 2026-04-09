@@ -62,7 +62,7 @@ import {updateResearchNow, updateResearchNext} from "@/services/typedapi/researc
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import type {ResearchType} from "@solaris-common";
+import type {ResearchType} from "@solaris/common";
 import Timer from "@/views/game/components/time/Timer.vue";
 
 const httpClient = inject(httpInjectionKey)!;

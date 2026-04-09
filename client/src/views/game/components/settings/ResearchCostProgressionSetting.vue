@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
 import GameSettingValue from "@/views/game/components/settings/GameSettingValue.vue";
-import type {GameResearchProgression} from "@solaris-common";
+import type {GameResearchProgression} from "@solaris/common";
 
 const props = defineProps<{
   progression: GameResearchProgression,

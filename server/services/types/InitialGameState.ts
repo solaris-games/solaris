@@ -2,7 +2,7 @@ import {DBObjectId} from "./DBObjectId";
 import {Infrastructure, NaturalResources} from "./Star";
 import {PlayerDiplomaticState, PlayerResearch } from "./Player";
 import {Location} from "./Location";
-import {ResearchType, ResearchTypeNotRandom, CarrierWaypoint} from "solaris-common";
+import {ResearchType, ResearchTypeNotRandom, CarrierWaypoint} from "@solaris/common";
 
 export type InitialStar = {
     starId: DBObjectId,

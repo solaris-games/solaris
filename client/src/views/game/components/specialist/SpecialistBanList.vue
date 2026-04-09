@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
 import { ref, onMounted, inject } from 'vue';
-import type {GameSettings, Specialist} from '@solaris-common';
+import type {GameSettings, Specialist} from '@solaris/common';
 import {listCarrier, listStar} from "@/services/typedapi/specialist";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 

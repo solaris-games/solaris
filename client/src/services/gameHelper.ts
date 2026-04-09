@@ -6,7 +6,7 @@ import {
   type Location,
   type MapObject, type PlayerDebtEventData, type ResearchTypeNotRandom,
   type Team
-} from '@solaris-common';
+} from '@solaris/common';
 import type {RulerPoint} from '@/types/ruler';
 import type {TeamLeaderboardData} from "@/types/leaderboard";
 import {add, compareAsc, format, formatDistanceToNow, isAfter, isBefore } from "date-fns";

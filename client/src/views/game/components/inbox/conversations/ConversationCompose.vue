@@ -21,7 +21,7 @@ import { inject, ref, computed } from 'vue';
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game, Player, Star} from "@/types/game";
 import {sendMessage} from "@/services/typedapi/conversation";
-import type {ConversationMessageSentResult} from "@solaris-common";
+import type {ConversationMessageSentResult} from "@solaris/common";
 import {useMentionStore} from "@/stores/mention";
 import {useConversationStore} from "@/stores/conversation.ts";
 

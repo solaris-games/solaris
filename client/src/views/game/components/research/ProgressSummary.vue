@@ -177,7 +177,7 @@ import { computed } from 'vue';
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
-import type {ResearchTypeNotRandom} from "@solaris-common";
+import type {ResearchTypeNotRandom} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const store = useGameStore();

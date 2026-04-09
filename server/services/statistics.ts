@@ -1,5 +1,5 @@
 import Repository from "./repository";
-import {StatsSlice, Statistics, UserAchievements} from "solaris-common";
+import {StatsSlice, Statistics, UserAchievements} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 import {Game} from "./types/Game";
 import {logger} from "../utils/logging";

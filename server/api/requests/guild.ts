@@ -6,7 +6,7 @@ import {
     object,
     stringValue,
     username
-} from "solaris-common";
+} from "@solaris/common";
 
 const guildName: Validator<string> = stringValue({
     minLength: 4,

@@ -1,7 +1,7 @@
 import { Container } from 'pixi.js'
 import type {Game} from '../types/game';
 import type { DrawingContext } from './container';
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings} from "@solaris/common";
 import {drawTerritoriesMarchingSquare} from "@/game/territories/marchingSquares";
 import {drawTerritoriesVoronoi} from "@/game/territories/voronoi";
 

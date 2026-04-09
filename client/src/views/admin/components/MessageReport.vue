@@ -22,7 +22,7 @@
 import { ref, inject, type Ref } from 'vue';
 import { httpInjectionKey, isError, formatError, extractErrors, isOk } from "@/services/typedapi";
 import { getConversationForReport } from "@/services/typedapi/admin";
-import type { Report, Conversation, ConversationMessage } from '@solaris-common';
+import type { Report, Conversation, ConversationMessage } from '@solaris/common';
 
 const props = defineProps<{
   report: Report<string>,

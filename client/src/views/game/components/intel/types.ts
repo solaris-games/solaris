@@ -1,4 +1,4 @@
-import type {IntelPlayer} from "@solaris-common";
+import type {IntelPlayer} from "@solaris/common";
 
 export type DataSet = {
   label: string;

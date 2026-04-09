@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import LoadingSpinner from '../components/LoadingSpinner.vue'
-import type { GameGalaxyDetail, Player } from '@solaris-common';
+import type { GameGalaxyDetail, Player } from '@solaris/common';
 import { computed, inject } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { toastInjectionKey } from '@/util/keys';

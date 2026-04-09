@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {PlayerConversationInvitedEvent} from "@solaris-common";
+import type {PlayerConversationInvitedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerConversationInvitedEvent<string>,

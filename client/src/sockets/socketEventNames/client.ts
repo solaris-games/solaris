@@ -1,5 +1,5 @@
-import { type EventName } from "@solaris-common";
-import { makeCastFunc } from "@solaris-common";
+import { type EventName } from "@solaris/common";
+import { makeCastFunc } from "@solaris/common";
 
 export type ClientSocketEventType = { clientSocketEventType: 'clientSocketEventType' };
 export type ClientSocketEventName<TData> = EventName<ClientSocketEventType, TData> & { clientSocketEventName: 'clientSocketEventName' };

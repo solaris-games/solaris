@@ -4,7 +4,7 @@ import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
 import type { Game } from '../types/game'
 import type { DrawingContext } from './container'
-import type { UserGameSettings } from '@solaris-common'
+import type { UserGameSettings } from '@solaris/common'
 
 interface BackgroundSprite extends Sprite {
   parallax: number;

@@ -3,7 +3,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import StarController from '../controllers/star';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import { createStarRoutes } from "solaris-common";
+import { createStarRoutes } from "@solaris/common";
 import { createRoutes } from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {

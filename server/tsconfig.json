@@ -13,12 +13,7 @@
         "noImplicitThis": true,
         "useDefineForClassFields": true,
         "skipLibCheck": true,
-        "allowJs": true,
-        "paths": {
-            "@solaris-common": [
-                "../common/src/index.ts"
-            ]
-        }
+        "allowJs": true
     },
     "include": [
         "**/*.ts",

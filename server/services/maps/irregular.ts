@@ -3,7 +3,7 @@ import {Game} from '../types/Game';
 import { Location } from '../types/Location';
 import ResourceService from '../resource';
 import StarService from '../star';
-import { StarDistanceService, GameResourceDistribution, RandomGen, GameTypeService, DistanceService, ValidationError } from 'solaris-common';
+import { StarDistanceService, GameResourceDistribution, RandomGen, GameTypeService, DistanceService, ValidationError } from '@solaris/common';
 
 export default class IrregularMapService {
     starService: StarService;

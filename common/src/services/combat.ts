@@ -2,7 +2,7 @@ import type {Id} from "../types/id";
 import type {CombatGroupService} from "./combatGroup";
 import type {Star} from "../types/common/star";
 import type {Carrier} from "../types/common/carrier";
-import {Game} from "../types/common/game";
+import type {Game} from "../types/common/game";
 
 export class CombatService<ID extends Id> {
     combatGroupService: CombatGroupService<ID>;

@@ -69,7 +69,7 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {hireCarrier} from "@/services/typedapi/specialist";
 import {useGameServices} from "@/util/gameServices";

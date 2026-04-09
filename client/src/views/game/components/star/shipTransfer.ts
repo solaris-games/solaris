@@ -5,7 +5,7 @@ import { type Axios } from 'axios';
 import { type ToastPluginApi } from "vue-toast-notification"
 import type {Star} from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings} from "@solaris/common";
 import type { GameStore } from '@/stores/game';
 
 export const makeShipTransferActions = (store: GameStore, httpClient: Axios, toast: ToastPluginApi) => {

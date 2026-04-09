@@ -1,6 +1,6 @@
 import { computed, readonly, ref } from 'vue';
 import { defineStore } from 'pinia';
-import type { Badge } from '@solaris-common';
+import type { Badge } from '@solaris/common';
 import { formatError, isOk } from '@/services/typedapi';
 import { getBadges } from '@/services/typedapi/badge';
 import type { Axios } from 'axios';

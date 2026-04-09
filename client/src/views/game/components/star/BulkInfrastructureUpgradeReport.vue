@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import type {BulkUpgradeReport, MapObject} from "@solaris-common";
+import type {BulkUpgradeReport, MapObject} from "@solaris/common";
 import GameHelper from "@/services/gameHelper";
 
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";

@@ -84,7 +84,7 @@ import GuildInvite from './components/Invite.vue';
 import GuildApplication from './components/Application.vue';
 import GuildMember from './components/Member.vue'
 import GuildMemberList from './components/MemberList.vue'
-import type {Guild, GuildWithUsers, GuildApplication as GuildApplicationData} from "@solaris-common";
+import type {Guild, GuildWithUsers, GuildApplication as GuildApplicationData} from "@solaris/common";
 import {detailMyGuild, listMyGuildApplications, listMyGuildInvites} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { useUserStore } from '@/stores/user';

@@ -1,5 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
-import {DiplomaticState, ResearchType, ResearchTypeNotRandom} from "solaris-common";
+import {DiplomaticState, ResearchType, ResearchTypeNotRandom} from "@solaris/common";
 import { PlayerStatistics } from "./Leaderboard";
 import { AiState } from "./Ai";
 import { InfrastructureType } from "./Star";

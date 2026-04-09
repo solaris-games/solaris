@@ -93,7 +93,7 @@ import {type Mode, ModeKind} from "@/game/map";
 import {toastInjectionKey} from "@/util/keys";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player} from "@/types/game";
-import type {CarrierWaypoint} from "@solaris-common";
+import type {CarrierWaypoint} from "@solaris/common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {TempWaypoint} from "@/types/waypoint";
 import {useGameServices} from "@/util/gameServices";

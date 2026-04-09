@@ -2,7 +2,7 @@ import {logger} from "../utils/logging";
 
 import mongoose from 'mongoose';
 
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import StarUpgradeService from './starUpgrade';
 

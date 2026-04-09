@@ -1,4 +1,4 @@
-import {createShopPurchaseRoutes, type ShopPurchaseResponse} from "@solaris-common";
+import {createShopPurchaseRoutes, type ShopPurchaseResponse} from "@solaris/common";
 import type { Axios } from "axios";
 import {doGet, type ResponseResult} from "@/services/typedapi/index";
 

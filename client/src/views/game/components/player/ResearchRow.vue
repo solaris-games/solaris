@@ -19,7 +19,7 @@ import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game, Player} from "@/types/game";
-import type {ResearchTypeNotRandom} from "@solaris-common";
+import type {ResearchTypeNotRandom} from "@solaris/common";
 
 const props = defineProps<{
   player: Player,

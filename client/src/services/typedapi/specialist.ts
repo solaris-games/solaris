@@ -1,4 +1,4 @@
-import {createSpecialistRoutes, type MonthlyBans, type Specialist, type StarSpecialistHireResult, type CarrierSpecialistHireResult} from "@solaris-common";
+import {createSpecialistRoutes, type MonthlyBans, type Specialist, type StarSpecialistHireResult, type CarrierSpecialistHireResult} from "@solaris/common";
 import type { Axios } from "axios";
 import {doGet, doPut, type ResponseResult} from ".";
 

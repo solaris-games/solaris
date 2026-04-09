@@ -1,10 +1,10 @@
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import StarService from "./star";
-import { StarDataService, TechnologyService } from 'solaris-common';
+import { StarDataService, TechnologyService } from '@solaris/common';
 import { MapObject } from "./types/Map";
 import { KDTree } from "../utils/kdTree";
-import { DistanceService, StarDistanceService } from 'solaris-common';
+import { DistanceService, StarDistanceService } from '@solaris/common';
 import { Star } from "./types/Star";
 import GameStateService from "./gameState";
 import { Carrier } from "./types/Carrier";

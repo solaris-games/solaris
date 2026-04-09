@@ -3,7 +3,7 @@ import Map from './map';
 import gameHelper from '../services/gameHelper';
 import textureService from './texture';
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
-import {DEFAULT_SETTINGS, type Location, type UserGameSettings} from "@solaris-common";
+import {DEFAULT_SETTINGS, type Location, type UserGameSettings} from "@solaris/common";
 import type {Game, Star, Carrier} from "../types/game";
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';

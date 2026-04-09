@@ -1,8 +1,8 @@
 import {ClientSocketHandler} from "./clientSocketHandler";
-import type {ConversationMessageSentResult, UserSocketEventType} from "@solaris-common";
+import type {ConversationMessageSentResult, UserSocketEventType} from "@solaris/common";
 import type {EventBus} from "../../eventBus";
 import type { Socket } from "socket.io-client";
-import {UserSocketEventNames} from "@solaris-common";
+import {UserSocketEventNames} from "@solaris/common";
 import UserEventBusEventNames from "../../eventBusEventNames/user";
 
 export class UserClientSocketHandler extends ClientSocketHandler<UserSocketEventType> {

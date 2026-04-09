@@ -1,4 +1,4 @@
-import { Flux } from "solaris-common";
+import { Flux } from "@solaris/common";
 import { Game } from "./types/Game";
 
 import moment from "moment";

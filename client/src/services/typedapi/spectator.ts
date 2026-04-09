@@ -1,4 +1,4 @@
-import {createSpectatorRoutes, type GameSpectator} from "@solaris-common";
+import {createSpectatorRoutes, type GameSpectator} from "@solaris/common";
 import {doGet, doPut, doDelete, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 

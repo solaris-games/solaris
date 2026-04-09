@@ -1,4 +1,4 @@
-import { DiplomaticStatus } from "solaris-common";
+import { DiplomaticStatus } from "@solaris/common";
 import { InternalGameEvent } from "./InternalGameEvent";
 import {DBObjectId} from "../DBObjectId";
 

@@ -2,7 +2,7 @@ import moment from "moment/moment";
 
 import EventEmitter from "events";
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
@@ -10,7 +10,7 @@ import UserAchievementService from './userAchievement';
 import AvatarService from './avatar';
 import CarrierService from './carrier';
 import GameStateService from './gameState';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import PasswordService from './password';
 import PlayerService from './player';
 import StarService from './star';

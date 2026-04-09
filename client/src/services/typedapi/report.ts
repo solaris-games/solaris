@@ -1,4 +1,4 @@
-import {createReportRoutes} from "@solaris-common";
+import {createReportRoutes} from "@solaris/common";
 import { type Axios } from "axios";
 import {doPost, type ResponseResult} from "@/services/typedapi/index";
 

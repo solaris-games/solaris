@@ -106,7 +106,7 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player, Star} from "@/types/game";
-import type {CombatResultShips} from "@solaris-common";
+import type {CombatResultShips} from "@solaris/common";
 import {calculateCombat} from "@/services/typedapi/carrier";
 import {onMounted, ref, computed} from 'vue';
 

@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpecialistController from '../controllers/specialist';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createSpecialistRoutes} from "solaris-common";
+import {createSpecialistRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 

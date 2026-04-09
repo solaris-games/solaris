@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import TechnologyHelper from '../../../../../services/technologyHelper'
-import type {PlayerGalacticCycleCompleteEvent, ResearchType} from "@solaris-common";
+import type {PlayerGalacticCycleCompleteEvent, ResearchType} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerGalacticCycleCompleteEvent<string>,

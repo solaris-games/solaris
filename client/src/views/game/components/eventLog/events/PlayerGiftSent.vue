@@ -12,7 +12,7 @@ import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
 import CarrierLabel from '../../carrier/CarrierLabel.vue'
 import GameHelper from '../../../../../services/gameHelper'
-import type {PlayerGiftSentEvent} from "@solaris-common";
+import type {PlayerGiftSentEvent} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const props = defineProps<{

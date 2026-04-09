@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import type {PlayerCombatCarrierEvent} from "@solaris-common";
+import type {PlayerCombatCarrierEvent} from "@solaris/common";
 import CombatEventSide from './CombatEventSide.vue';
 import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
 

@@ -1,6 +1,6 @@
 import type { Socket } from "socket.io-client";
-import type { DiplomaticStatus } from "@solaris-common";
-import { DiplomacySocketEventNames, type DiplomacySocketEventType } from '@solaris-common';
+import type { DiplomaticStatus } from "@solaris/common";
+import { DiplomacySocketEventNames, type DiplomacySocketEventType } from '@solaris/common';
 import type { EventBus } from "../../eventBus";
 import DiplomacyEventBusEventNames from "../../eventBusEventNames/diplomacy";
 import { ClientSocketHandler } from "./clientSocketHandler";

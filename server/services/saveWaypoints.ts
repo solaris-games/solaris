@@ -2,17 +2,17 @@ import { Game } from "./types/Game";
 import { Carrier } from "./types/Carrier";
 import { Player } from "./types/Player";
 import { DBObjectId } from "./types/DBObjectId";
-import { CarrierWaypointBase, ValidationError } from "solaris-common";
+import { CarrierWaypointBase, ValidationError } from "@solaris/common";
 import CarrierMovementService from "./carrierMovement";
 import StarService from "./star";
 import Repository from "./repository";
-import { WaypointService } from 'solaris-common';
+import { WaypointService } from '@solaris/common';
 import mongoose from 'mongoose';
 import CarrierService from "./carrier";
-import { StarDataService } from 'solaris-common';
+import { StarDataService } from '@solaris/common';
 import { KDTree } from "../utils/kdTree";
 import ScanningService from "./scanning";
-import { DistanceService, GameTypeService } from 'solaris-common';
+import { DistanceService, GameTypeService } from '@solaris/common';
 import { Star } from "./types/Star";
 
 export default class SaveWaypointsService {

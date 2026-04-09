@@ -1,12 +1,12 @@
 import { MathRandomGen, SeededRandomGen } from "../utils/randomGen";
 
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import { Game } from './types/Game';
 import UserAchievementService from './userAchievement';
 import ConversationService from './conversation';
 import GameFluxService from './gameFlux';
 import GameListService from './gameList';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import HistoryService from './history';
 import MapService from './map';
 import NameService from './name';
@@ -21,7 +21,7 @@ import DiplomacyService from "./diplomacy";
 import TeamService from "./team";
 import CarrierService from './carrier';
 import { logger } from "../utils/logging";
-import { StarDistanceService } from 'solaris-common';
+import { StarDistanceService } from '@solaris/common';
 import { DBObjectId } from "./types/DBObjectId";
 import CustomGalaxyService from "./customGalaxy";
 import {
@@ -29,7 +29,7 @@ import {
     GameSettingsGalaxy,
     GameSettingsGeneralBase, GameSettingsInvariable,
     GameSettingsSpecialGalaxyBase
-} from "solaris-common";
+} from "@solaris/common";
 import InitialGameStateService from "./initialGameState";
 
 const GAME_MASTER_LIMIT = 5;

@@ -11,7 +11,7 @@ import {
   type ShipTransferReport,
   type WarpgateBuildReport,
   type ScheduleBulkUpgradeReq
-} from "@solaris-common";
+} from "@solaris/common";
 
 type PRR<A> = Promise<ResponseResult<A>>;
 

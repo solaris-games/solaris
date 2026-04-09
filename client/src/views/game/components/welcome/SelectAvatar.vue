@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, type Ref, inject, onMounted } from 'vue';
-import {sorterByProperty, type UserAvatar} from '@solaris-common';
+import {sorterByProperty, type UserAvatar} from '@solaris/common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listMyAvatars } from '@/services/typedapi/user';
 

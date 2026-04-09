@@ -2,7 +2,7 @@ import {Carrier} from "./types/Carrier";
 
 import EventEmitter from "events";
 import {DBObjectId} from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import {
     BulkUpgradeReport,
@@ -15,15 +15,15 @@ import {Player} from './types/Player';
 import {InfrastructureType, Star, TerraformedResources} from './types/Star';
 import UserAchievementService from './userAchievement';
 import CarrierService from './carrier';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import ResearchService from './research';
 import StarService from './star';
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
 import StatisticsService from "./statistics";
-import {GameInfrastructureExpenseMultiplier} from "solaris-common";
-import { StarDataService } from "solaris-common";
+import {GameInfrastructureExpenseMultiplier} from "@solaris/common";
+import { StarDataService } from "@solaris/common";
 
 const Heap = require('qheap');
 

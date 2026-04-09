@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GamePlayerBadgePurchasedEvent} from "@solaris-common";
+import type {GamePlayerBadgePurchasedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GamePlayerBadgePurchasedEvent<string>,

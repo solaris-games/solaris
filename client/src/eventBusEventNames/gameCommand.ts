@@ -1,6 +1,6 @@
 import type { Carrier, Game, Star } from "@/types/game";
 import type {EventBusEventName} from "./eventBusEventName";
-import {type MapObject, makeCastFunc, type Location, type UserGameSettings} from "@solaris-common";
+import {type MapObject, makeCastFunc, type Location, type UserGameSettings} from "@solaris/common";
 
 export type GameCommandEventBusEventType = { gameCommandEventBusEventType: 'GameCommandEventBusEventType' };
 export type GameCommandEventBusEventName<TData> = EventBusEventName<GameCommandEventBusEventType, TData> & { gameCommandEventBusEventType: 'gameCommandEventBusEventType' };

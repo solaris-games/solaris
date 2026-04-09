@@ -13,7 +13,7 @@ import {
   type GameStateDetail,
   type GameGalaxyDetail,
   type UserListGame,
-} from "@solaris-common";
+} from "@solaris/common";
 import {doDelete, doGet, doPatch, doPost, doPut, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 

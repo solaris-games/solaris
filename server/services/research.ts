@@ -1,14 +1,14 @@
 import EventEmitter from "events";
-import { ValidationError, ResearchType, ResearchTypeNotRandom } from "solaris-common";
+import { ValidationError, ResearchType, ResearchTypeNotRandom } from "@solaris/common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import {Player, ResearchProgress } from './types/Player';
 import { User } from './types/User';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import UserService from './user';
 import StatisticsService from './statistics';
 

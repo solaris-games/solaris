@@ -9,7 +9,7 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
 import GameHelper from "../../../../services/gameHelper";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 
 const props = defineProps<{
   starId: string,

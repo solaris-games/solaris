@@ -243,7 +243,7 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris-common";
+import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris/common";
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {useConfirm} from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";

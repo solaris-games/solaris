@@ -30,7 +30,7 @@ import ViewTitle from "./components/ViewTitle.vue";
 import LoadingSpinner from "./components/LoadingSpinner.vue";
 import AnnouncementPanel from "./components/Announcement.vue";
 import { ref, onMounted, inject, type Ref } from 'vue';
-import type {Announcement, AnnouncementState} from "@solaris-common";
+import type {Announcement, AnnouncementState} from "@solaris/common";
 import {getAnnouncementState, getCurrentAnnouncements, markAsRead} from "@/services/typedapi/announcement";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";

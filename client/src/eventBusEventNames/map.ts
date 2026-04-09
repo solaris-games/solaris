@@ -1,4 +1,4 @@
-import { makeCastFunc } from "@solaris-common";
+import { makeCastFunc } from "@solaris/common";
 import type { EventBusEventName } from "./eventBusEventName";
 import type { Star, Carrier, Player } from "../types/game";
 import type { TempWaypoint } from "../types/waypoint";

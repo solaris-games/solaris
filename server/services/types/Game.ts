@@ -1,10 +1,10 @@
 import { Carrier } from "./Carrier";
-import { Conversation } from "solaris-common";
+import { Conversation } from "@solaris/common";
 import { DBObjectId } from "./DBObjectId";
 import { Location } from "./Location";
 import { Player } from "./Player";
 import { Star } from "./Star";
-import {GameSettings} from "solaris-common";
+import {GameSettings} from "@solaris/common";
 
 export interface GameUserNotification {
 	unreadConversations: number | null;

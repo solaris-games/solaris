@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import SpectatorController from '../controllers/spectator';
 import { MiddlewareContainer } from "../middleware";
 import { SingleRouter } from "../singleRoute";
-import {createSpectatorRoutes} from "solaris-common/dist/api/controllers/spectator";
+import {createSpectatorRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 

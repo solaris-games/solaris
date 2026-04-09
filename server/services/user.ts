@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import {UserGameSettings, ValidationError} from "solaris-common";
+import {UserGameSettings, ValidationError} from "@solaris/common";
 import PasswordService from './password';
 import Repository from './repository';
 import SessionService from './session';

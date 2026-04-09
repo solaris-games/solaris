@@ -1,5 +1,5 @@
-import { TechnologyService } from 'solaris-common';
-import { GameTypeService } from 'solaris-common'
+import { TechnologyService } from '@solaris/common';
+import { GameTypeService } from '@solaris/common'
 import mongoose from 'mongoose';
 
 let service,

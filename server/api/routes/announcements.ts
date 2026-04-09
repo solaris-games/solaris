@@ -2,7 +2,7 @@ import {MiddlewareContainer} from "../middleware";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
 import AnnouncementController from "../controllers/announcement";
 import {SingleRouter} from "../singleRoute";
-import {createAnnouncementRoutes} from "solaris-common/dist/api/controllers/announcement";
+import {createAnnouncementRoutes} from "@solaris/common";
 import {createRoutes} from "../typedapi/routes";
 import {DBObjectId} from "../../services/types/DBObjectId";
 

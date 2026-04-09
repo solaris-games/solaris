@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import DiplomacyController from '../controllers/diplomacy';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createDiplomacyRoutes} from "solaris-common";
+import {createDiplomacyRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 

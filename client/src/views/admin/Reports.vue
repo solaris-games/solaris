@@ -40,7 +40,7 @@ import { inject, onMounted, ref, type Ref } from "vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import MessageReport from "./components/MessageReport.vue";
-import { type Report } from "@solaris-common";
+import { type Report } from "@solaris/common";
 import { httpInjectionKey, isOk, formatError } from "@/services/typedapi";
 import { actionReport, listReports } from "@/services/typedapi/admin";
 import { toastInjectionKey } from "@/util/keys";

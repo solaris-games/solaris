@@ -48,7 +48,7 @@ import CountdownTimer from '../time/CountdownDateTimer.vue';
 import { type Ref, ref, onMounted, inject } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { listSpectating } from '@/services/typedapi/game';
-import { type UserListGame } from '@solaris-common';
+import { type UserListGame } from '@solaris/common';
 import {
   getCountdownTimeForProductionCycle,
   getTurnTimeoutTime,

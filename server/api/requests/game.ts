@@ -1,4 +1,4 @@
-import {customGalaxyValidator, ValidationError} from "solaris-common";
+import {customGalaxyValidator, ValidationError} from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
@@ -15,7 +15,7 @@ import {
     stringEnumeration,
     withDefault,
     numberAdv, maybeNull, maybeUndefined, numberEnumeration, map
-} from "solaris-common";
+} from "@solaris/common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
     GAME_ALLIANCE_UPKEEP_COST,
@@ -66,7 +66,7 @@ import {
     ReadyToQuitTimerCycles,
     ReadyToQuitVisibility,
     GameJoinGameRequest,
-} from "solaris-common";
+} from "@solaris/common";
 import {GameSettingsGalaxyReq, GameSettingsReq} from "../../services/gameCreate";
 import {objectId} from "../../utils/validation";
 import {enabledDisabled} from "./validators";

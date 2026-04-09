@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import CarrierLabel from '../../carrier/CarrierLabel.vue'
-import type {PlayerCarrierSpecialistHiredEvent} from "@solaris-common";
+import type {PlayerCarrierSpecialistHiredEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerCarrierSpecialistHiredEvent<string>,

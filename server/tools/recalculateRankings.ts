@@ -1,7 +1,7 @@
 import {GameWinnerKind} from "../services/leaderboard";
 import {User} from '../services/types/User';
 import {JobParameters, makeJob} from './tool';
-import {EVENT_TYPES} from "solaris-common";
+import {EVENT_TYPES} from "@solaris/common";
 
 const binarySearchUsers = (users: User[], id: string) => {
     let start = 0;

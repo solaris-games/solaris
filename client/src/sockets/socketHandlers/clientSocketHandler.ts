@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import {type EventName, Handler} from "@solaris-common";
+import {type EventName, Handler} from "@solaris/common";
 import {convertDates} from "@/util/http";
 
 export abstract class ClientSocketHandler<TEventType> extends Handler<TEventType> {

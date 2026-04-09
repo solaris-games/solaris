@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref, inject } from 'vue';
-import type {Guild} from "@solaris-common";
+import type {Guild} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {acceptGuildInvite, declineGuildInvite} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

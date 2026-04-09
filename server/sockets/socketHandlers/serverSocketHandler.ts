@@ -1,4 +1,4 @@
-import {type EventName, Handler} from "solaris-common";
+import {type EventName, Handler} from "@solaris/common";
 import { ServerHandler } from "./serverHandler";
 
 export abstract class ServerSocketHandler<TEventType> extends Handler<TEventType> {

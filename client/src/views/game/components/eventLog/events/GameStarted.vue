@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GameStartedEvent} from "@solaris-common";
+import type {GameStartedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GameStartedEvent<string>,

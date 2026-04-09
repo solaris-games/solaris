@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GamePlayerAfkEvent} from "@solaris-common";
+import type {GamePlayerAfkEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GamePlayerAfkEvent<string>,

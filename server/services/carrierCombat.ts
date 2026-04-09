@@ -9,7 +9,7 @@ import PlayerService from "./player";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import {CarrierCollision, DualCarrierCollision} from "./types/CarrierCollision";
-import {CarrierTravelService, DistanceService} from "solaris-common";
+import {CarrierTravelService, DistanceService} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 
 const EPSILON = 10**-10;

@@ -5,7 +5,7 @@ import {
   type ReputationResponse,
   type ResearchTypeNotRandom, type TradeEvent,
   type TradeTechnology
-} from "@solaris-common";
+} from "@solaris/common";
 
 type PRR<A> = Promise<ResponseResult<A>>;
 

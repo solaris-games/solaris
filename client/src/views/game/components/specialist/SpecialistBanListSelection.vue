@@ -38,7 +38,7 @@
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import SpecialistBanListTable from './SpecialistBanListTable.vue'
 import { ref, inject, onMounted } from 'vue';
-import type {Specialist, SpecialistBans} from "@solaris-common";
+import type {Specialist, SpecialistBans} from "@solaris/common";
 import {listCarrier, listStar} from "@/services/typedapi/specialist";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 

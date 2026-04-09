@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import StarLabel from '../../star/StarLabel.vue'
-import type {PlayerStarAbandonedEvent} from "@solaris-common";
+import type {PlayerStarAbandonedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerStarAbandonedEvent<string>,

@@ -1,4 +1,4 @@
-import type { Location } from '@solaris-common';
+import type { Location } from '@solaris/common';
 import { Graphics } from 'pixi.js';
 
 const STAR_HIGHLIGHT_RADIUS = 12;

@@ -29,8 +29,8 @@ import {
     PlayerTechnologyReceivedEvent,
     PlayerTechnologySentEvent, TradeEventTechnology,
     Conversation
-} from 'solaris-common';
-import { ValidationError } from "solaris-common";
+} from '@solaris/common';
+import { ValidationError } from "@solaris/common";
 import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
 import CarrierGiftService, { CarrierGiftServiceEvents } from "./carrierGift";
@@ -50,11 +50,11 @@ import TradeService, { TradeServiceEvents } from "./trade";
 import { Carrier } from "./types/Carrier";
 import { CombatResult } from "./types/Combat";
 import { DBObjectId } from "./types/DBObjectId";
-import { DiplomaticStatus } from "solaris-common";
+import { DiplomaticStatus } from "@solaris/common";
 import { Game } from "./types/Game";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
-import { Specialist } from 'solaris-common';
+import { Specialist } from '@solaris/common';
 import { Star, StarCaptureResult } from "./types/Star";
 import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";

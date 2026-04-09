@@ -50,7 +50,7 @@ import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
 import { computed } from 'vue'
-import type {ConversationOverview} from "@solaris-common";
+import type {ConversationOverview} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const props = defineProps<{

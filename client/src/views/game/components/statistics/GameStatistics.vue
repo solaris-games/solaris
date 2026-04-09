@@ -182,7 +182,7 @@
 import { useGameStore } from '@/stores/game';
 import { ref, inject, computed, onMounted, type Ref } from 'vue';
 import {formatError, httpInjectionKey, isOk, ResponseResultKind} from "@/services/typedapi";
-import type {Statistics} from "@solaris-common";
+import type {Statistics} from "@solaris/common";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import {getGameStatistics} from "@/services/typedapi/game";

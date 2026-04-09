@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
-import type {ListGame} from "@solaris-common";
+import type {ListGame} from "@solaris/common";
 import { useUserStore } from '@/stores/user';
 
 const props = defineProps<{

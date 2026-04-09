@@ -3,7 +3,7 @@ import {
   type CombatResultShips,
   createCarrierRoutes,
   type SaveWaypointsResp
-} from "@solaris-common";
+} from "@solaris/common";
 import { type Axios } from "axios";
 import {doDelete, doPost, doPatch, doPut, type ResponseResult} from "@/services/typedapi/index";
 

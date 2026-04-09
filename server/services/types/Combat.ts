@@ -1,5 +1,5 @@
 import { DBObjectId } from "./DBObjectId";
-import { Specialist } from 'solaris-common';
+import { Specialist } from '@solaris/common';
 
 export interface Defender {
     ships: number;

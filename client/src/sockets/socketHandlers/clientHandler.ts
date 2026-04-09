@@ -1,6 +1,6 @@
 import { Emitter, type DefaultEventsMap } from '@socket.io/component-emitter';
 import { Socket } from 'socket.io-client';
-import type {EventName} from 'solaris-common';
+import type {EventName} from '@solaris/common';
 import GameHelper from '../../services/gameHelper';
 import type { PlayerClientSocketEmitter } from '../socketEmitters/player';
 import ClientSocketEventNames, { type ClientSocketEventType } from "../socketEventNames/client";

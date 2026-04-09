@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { computed } from 'vue';
-import type {AwardedBadge, Badge as BadgeData} from "@solaris-common";
+import type {AwardedBadge, Badge as BadgeData} from "@solaris/common";
 
 const props = defineProps<{
   badge: AwardedBadge<string>,

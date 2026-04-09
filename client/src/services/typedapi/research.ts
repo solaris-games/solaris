@@ -3,7 +3,7 @@ import {
   type ResearchType,
   type ResearchTypeNotRandom,
   type ResearchUpdateResponse
-} from "@solaris-common";
+} from "@solaris/common";
 import {doPut, type ResponseResult} from "@/services/typedapi/index";
 import type { Axios } from "axios";
 

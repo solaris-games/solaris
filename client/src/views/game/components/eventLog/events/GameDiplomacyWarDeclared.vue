@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GameDiplomacyWarDeclaredEvent} from "@solaris-common";
+import type {GameDiplomacyWarDeclaredEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GameDiplomacyWarDeclaredEvent<string>,

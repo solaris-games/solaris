@@ -1,4 +1,4 @@
-import {ConversationCreateConversationRequest, ConversationSendMessageRequest, ValidationError} from "solaris-common";
+import {ConversationCreateConversationRequest, ConversationSendMessageRequest, ValidationError} from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasArrayValue, keyHasStringValue } from "./helpers";
 

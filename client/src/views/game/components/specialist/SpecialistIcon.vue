@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import type { Specialist } from "@solaris-common";
+import type { Specialist } from "@solaris/common";
 import { type PropType } from 'vue'
 
 export default {

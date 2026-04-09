@@ -42,7 +42,7 @@ import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 
-import type {InfrastructureType} from "@solaris-common";
+import type {InfrastructureType} from "@solaris/common";
 import { toggleBulkIgnore as toggleBulkIgnoreReq, toggleBulkIgnoreAll as toggleBulkIgnoreAllReq } from '@/services/typedapi/star';
 
 const props = defineProps<{

@@ -10,7 +10,7 @@
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
-import type {PlayerCreditsReceivedEvent} from "@solaris-common";
+import type {PlayerCreditsReceivedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerCreditsReceivedEvent<string>,

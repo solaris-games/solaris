@@ -4,7 +4,7 @@ import {httpInjectionKey, isOk} from "@/services/typedapi";
 import AudioService from "@/game/audio";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type {Carrier, Game} from "@/types/game";
-import type {CarrierWaypoint} from "@solaris-common";
+import type {CarrierWaypoint} from "@solaris/common";
 import {toastInjectionKey} from "@/util/keys";
 import {eventBusInjectionKey} from "@/eventBus";
 import {useGameServices} from "@/util/gameServices";

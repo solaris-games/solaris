@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import RepeatBulkUpgrade from './RepeatBulkUpgrade.vue'
 import TrashBulkUpgrade from './TrashBulkUpgrade.vue'
-import type {PlayerScheduledActions} from "@solaris-common";
+import type {PlayerScheduledActions} from "@solaris/common";
 
 const props = defineProps<{
   action: PlayerScheduledActions<string>,

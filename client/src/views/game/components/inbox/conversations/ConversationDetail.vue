@@ -67,7 +67,7 @@ import type {
   ConversationMessageSentResult,
   ConversationMessage as CMessage,
   TradeEvent, DiplomacyEvent
-} from "@solaris-common";
+} from "@solaris/common";
 import type { Game } from "@/types/game";
 import {useMentionStore} from "@/stores/mention.ts";
 import {useConversationStore} from "@/stores/conversation.ts";

@@ -2,16 +2,16 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { Specialist } from 'solaris-common';
+import { Specialist } from '@solaris/common';
 import UserAchievementService from "./userAchievement";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import { StarDataService } from "solaris-common";
-import { ValidationError } from "solaris-common";
+import { StarDataService } from "@solaris/common";
+import { ValidationError } from "@solaris/common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import StatisticsService from "./statistics";
 import CullWaypointsService from "./cullWaypoints";
 

@@ -82,7 +82,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {getUnreadCount} from "@/services/typedapi/conversation";
 import {toastInjectionKey} from "@/util/keys";
-import type {TradeEventTechnology} from "@solaris-common";
+import type {TradeEventTechnology} from "@solaris/common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
 import {unreadCount} from "@/services/typedapi/event";

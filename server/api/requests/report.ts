@@ -1,4 +1,4 @@
-import {boolean, maybeUndefined, object, ReportCreateReportRequest, Validator} from "solaris-common";
+import {boolean, maybeUndefined, object, ReportCreateReportRequest, Validator} from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {objectId} from "../../utils/validation";
 

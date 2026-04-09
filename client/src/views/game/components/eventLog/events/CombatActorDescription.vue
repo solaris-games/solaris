@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import { type CombatActor } from '../../../../../services/combat';
 import SpecialistIcon from "../../specialist/SpecialistIcon.vue";
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 
 const props = defineProps<{
   actor: CombatActor,

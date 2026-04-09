@@ -7,7 +7,7 @@ import {
     StarDataService,
     StarDistanceService,
     TechnologyService
-} from 'solaris-common';
+} from '@solaris/common';
 import {Game} from './types/Game';
 import {Player} from './types/Player';
 import {Star} from './types/Star';

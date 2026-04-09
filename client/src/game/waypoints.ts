@@ -5,7 +5,7 @@ import type {Game, Carrier as CarrierData, Star as StarData} from '../types/game
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '@/types/waypoint';
 import { createStarHighlight } from './highlight';
-import type {Location, UserGameSettings} from "@solaris-common";
+import type {Location, UserGameSettings} from "@solaris/common";
 import { v7 as generateV7Uuid } from 'uuid';
 import type {ServiceProvider} from "@/services/services";
 

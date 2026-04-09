@@ -8,7 +8,7 @@ import { onMounted, inject, ref } from 'vue';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 
 const props = defineProps<{
   carrierId: string,

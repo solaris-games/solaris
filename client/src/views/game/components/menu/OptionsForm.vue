@@ -580,7 +580,7 @@ import { inject, onMounted, ref, type Ref } from 'vue';
 import { eventBusInjectionKey } from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi';
-import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris-common';
+import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris/common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
 import { toastInjectionKey } from '@/util/keys';
 

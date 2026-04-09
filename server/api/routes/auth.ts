@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import AuthController from '../controllers/auth';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createAuthRoutes} from "solaris-common";
+import {createAuthRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 

@@ -71,7 +71,7 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
 import { eventBusInjectionKey } from '../../../../eventBus'
 import DiplomacyEventBusEventNames from '../../../../eventBusEventNames/diplomacy'
-import {type DiplomaticStatus} from "@solaris-common";
+import {type DiplomaticStatus} from "@solaris/common";
 import type {Game} from "@/types/game";
 import {listDiplomacy} from "@/services/typedapi/diplomacy";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";

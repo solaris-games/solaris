@@ -6,7 +6,7 @@ import {
   type UserPrivate,
   type UserAvatar,
   type AchievementsUser
-} from "@solaris-common";
+} from "@solaris/common";
 import {doGet, doPost, doPut, doDelete, type ResponseResult} from "@/services/typedapi/index";
 import { type Axios } from "axios";
 

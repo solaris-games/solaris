@@ -55,7 +55,7 @@
 import { useGameStore } from '@/stores/game';
 import { inject, ref, computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
-import type {EloRatingChange, GameEndedEvent} from "@solaris-common";
+import type {EloRatingChange, GameEndedEvent} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const props = defineProps<{

@@ -2,7 +2,7 @@ import { Container, Text, TextStyle, Graphics } from 'pixi.js'
 import gameHelper from '../services/gameHelper'
 import type {Game} from "../types/game";
 import type {DrawingContext} from "./container";
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings} from "@solaris/common";
 
 class PlayerNames {
 

@@ -51,7 +51,7 @@ import ViewTitle from '../components/ViewTitle.vue';
 import ViewContainer from '../components/ViewContainer.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { computed, inject, onMounted, ref, type Ref } from 'vue';
-import type { UserAvatar } from '@solaris-common';
+import type { UserAvatar } from '@solaris/common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getCredits, listMyAvatars, purchaseAvatar as reqPurchaseAvatar } from '@/services/typedapi/user';
 import { useConfirm } from '@/hooks/confirm';

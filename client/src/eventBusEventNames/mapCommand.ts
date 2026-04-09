@@ -1,5 +1,5 @@
 import type {EventBusEventName} from "./eventBusEventName";
-import {type MapObject, makeCastFunc, type Location} from "@solaris-common";
+import {type MapObject, makeCastFunc, type Location} from "@solaris/common";
 import type {Player} from "../types/game";
 import type {Mode} from "@/game/map";
 

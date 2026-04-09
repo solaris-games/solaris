@@ -24,7 +24,7 @@
 import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../../services/gameHelper';
 import PlayerIcon from '../../player/PlayerIcon.vue';
-import type {Conversation} from "@solaris-common";
+import type {Conversation} from "@solaris/common";
 import { computed } from 'vue';
 import type {Game} from "@/types/game";
 

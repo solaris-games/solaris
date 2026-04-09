@@ -1,5 +1,5 @@
 import {ServerSocketHandler} from "./serverSocketHandler";
-import {UserSocketEventNames, UserSocketEventType} from "solaris-common";
+import {UserSocketEventNames, UserSocketEventType} from "@solaris/common";
 import SocketService from "../../services/socket";
 import {ServerHandler} from "./serverHandler";
 import type { Socket } from "socket.io";

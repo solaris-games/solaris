@@ -7,7 +7,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import type {AwardedBadge, Badge} from "@solaris-common";
+import type {AwardedBadge, Badge} from "@solaris/common";
 
 const props = defineProps<{
   badge: AwardedBadge<string>,

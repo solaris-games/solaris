@@ -1,4 +1,4 @@
-import {RandomGen} from "solaris-common";
+import {RandomGen} from "@solaris/common";
 
 const randomSeeded = require('random-seed');
 

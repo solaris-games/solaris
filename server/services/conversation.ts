@@ -2,9 +2,9 @@ import BroadcastService from "./broadcast";
 
 import moment from "moment";
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
-import { Conversation, ConversationMessage, ConversationMessageSentResult } from 'solaris-common';
+import { Conversation, ConversationMessage, ConversationMessageSentResult } from '@solaris/common';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import TradeService from './trade';

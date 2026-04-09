@@ -3,7 +3,7 @@ import AdminController from '../controllers/admin';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
 import {createRoutes} from "../typedapi/routes";
-import {createAdminRoutes} from "solaris-common";
+import {createAdminRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {

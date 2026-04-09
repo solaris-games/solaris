@@ -3,9 +3,9 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import PlayerStatisticsService from './playerStatistics';
 import StarService from './star';
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import SpecialistService from './specialist';
-import { StarDataService } from "solaris-common";
+import { StarDataService } from "@solaris/common";
 
 export default class PlayerCycleRewardsService {
     starService: StarService;

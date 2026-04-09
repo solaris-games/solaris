@@ -27,7 +27,7 @@ import LedgerRow from './LedgerRow.vue';
 import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
 import { eventBusInjectionKey } from '@/eventBus';
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';
-import {LedgerType, type PlayerLedgerDebt} from "@solaris-common";
+import {LedgerType, type PlayerLedgerDebt} from "@solaris/common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {detailLedgerCredits, detailLedgerSpecialistTokens} from "@/services/typedapi/ledger";
 import type {Game} from "@/types/game";

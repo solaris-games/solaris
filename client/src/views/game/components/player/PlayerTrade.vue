@@ -23,7 +23,7 @@ import GameHelper from '../../../../services/gameHelper';
 import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import { ref, inject, computed, onMounted } from 'vue';
 import type {Game, Player} from "@/types/game";
-import type {DiplomaticStatus} from "@solaris-common";
+import type {DiplomaticStatus} from "@solaris/common";
 import {detailDiplomacy} from "@/services/typedapi/diplomacy";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 

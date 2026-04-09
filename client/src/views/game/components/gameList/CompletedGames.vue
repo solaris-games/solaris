@@ -48,7 +48,7 @@
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import GameHelper from '../../../../services/gameHelper';
 import { ref, inject, type Ref, onMounted } from 'vue';
-import type { ListGame, UserActiveListGame } from '@solaris-common';
+import type { ListGame, UserActiveListGame } from '@solaris/common';
 import { listMyCompleted } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { formatDistanceToNow } from "date-fns";

@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GamePlayerDefeatedEvent} from "@solaris-common";
+import type {GamePlayerDefeatedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GamePlayerDefeatedEvent<string>,

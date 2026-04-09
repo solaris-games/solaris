@@ -4,8 +4,8 @@ import {
     ResearchUpdateNowRequest,
     stringEnumeration,
     Validator
-} from "solaris-common";
-import { ResearchType, ResearchTypeNotRandom } from "solaris-common";
+} from "@solaris/common";
+import { ResearchType, ResearchTypeNotRandom } from "@solaris/common";
 
 export const parseUpdateResearchNowRequest: Validator<ResearchUpdateNowRequest> = object({
     preference: stringEnumeration<ResearchTypeNotRandom, ResearchTypeNotRandom[]>(RESEARCH_TYPES_NOT_RANDOM),

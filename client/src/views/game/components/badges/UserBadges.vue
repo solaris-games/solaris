@@ -13,7 +13,7 @@ import { useGameStore } from '@/stores/game';
 import {ref, onMounted, type Ref, inject, watch} from 'vue';
 import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
+import type {AwardedBadge, Badge as TBadge} from "@solaris/common";
 import {getBadgesForUser} from "../../../../services/typedapi/badge";
 import {httpInjectionKey, isOk} from "../../../../services/typedapi";
 import BadgeWithHistory from "@/views/game/components/badges/BadgeWithHistory.vue";

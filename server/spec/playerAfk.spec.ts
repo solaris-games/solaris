@@ -1,7 +1,7 @@
 import moment from "moment";
 import CarrierService from "../services/carrier";
 import GameStateService from "../services/gameState";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import PlayerService from "../services/player";
 import PlayerAfkService from "../services/playerAfk"
 import Repository from "../services/repository";

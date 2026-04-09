@@ -3,9 +3,9 @@ import { Game } from "./types/Game";
 import { Location } from "./types/Location";
 import { Star } from "./types/Star";
 import MapService from "./map";
-import { StarDistanceService } from 'solaris-common';
+import { StarDistanceService } from '@solaris/common';
 import SpecialistService from "./specialist";
-import { WaypointService } from 'solaris-common';
+import { WaypointService } from '@solaris/common';
 import CullWaypointsService from "./cullWaypoints";
 
 export default class starMovementService {

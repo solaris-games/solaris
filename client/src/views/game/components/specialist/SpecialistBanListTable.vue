@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 
 const props = defineProps<{
   specialists: Specialist[],

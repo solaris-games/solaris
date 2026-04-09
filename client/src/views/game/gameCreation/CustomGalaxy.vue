@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import HelpTooltip from "@/views/components/HelpTooltip.vue";
-import {customGalaxyValidator} from "@solaris-common";
+import {customGalaxyValidator} from "@solaris/common";
 
 type ValidationState =
   | null

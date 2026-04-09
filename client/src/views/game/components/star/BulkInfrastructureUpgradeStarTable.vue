@@ -51,7 +51,7 @@ import { useGameStore } from '@/stores/game';
 import { ref, computed } from 'vue';
 import GameHelper from '../../../../services/gameHelper';
 import BulkInfrastructureUpgradeStarTableRow from './BulkInfrastructureUpgradeStarTableRow.vue';
-import type {InfrastructureType} from "@solaris-common";
+import type {InfrastructureType} from "@solaris/common";
 import {createSortInfo, swapSort} from "@/services/data/sortInfo";
 import type {Game} from "@/types/game";
 import {useSorted} from "@/util/sort";

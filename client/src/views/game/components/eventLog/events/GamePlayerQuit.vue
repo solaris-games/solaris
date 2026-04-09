@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import type {GamePlayerQuitEvent} from "@solaris-common";
+import type {GamePlayerQuitEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: GamePlayerQuitEvent<string>,

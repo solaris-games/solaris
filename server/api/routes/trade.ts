@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import TradeController from '../controllers/trade';
 import { MiddlewareContainer } from "../middleware";
 import { SingleRouter} from "../singleRoute";
-import { createTradeRoutes } from "solaris-common";
+import { createTradeRoutes } from "@solaris/common";
 import {createRoutes} from "../typedapi/routes";
 
 export default (router: SingleRouter, mw: MiddlewareContainer, container: DependencyContainer) => {

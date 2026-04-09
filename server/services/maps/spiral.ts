@@ -1,15 +1,15 @@
 import { Location } from '../types/Location'
-import { DistanceService } from 'solaris-common';
-import { GameTypeService } from 'solaris-common'
+import { DistanceService } from '@solaris/common';
+import { GameTypeService } from '@solaris/common'
 import RandomService from "../random";
 import ResourceService from "../resource";
 import StarService from "../star";
-import { StarDistanceService } from 'solaris-common';
+import { StarDistanceService } from '@solaris/common';
 import { GalaxyDimensions } from '../types/Dimensions';
 const randomSeeded = require('random-seed');
 
 import { createNoise2D } from 'simplex-noise';
-import {GameResourceDistribution} from "solaris-common";
+import {GameResourceDistribution} from "@solaris/common";
 
 export default class SpiralMapService {
 

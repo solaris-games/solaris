@@ -31,7 +31,7 @@
 import { inject, onMounted, ref, type Ref } from "vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
-import type { ListPasswordReset } from "@solaris-common";
+import type { ListPasswordReset } from "@solaris/common";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { getPasswordResets } from "@/services/typedapi/admin";
 import { toastInjectionKey } from "@/util/keys";

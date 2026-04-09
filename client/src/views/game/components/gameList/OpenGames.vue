@@ -39,7 +39,7 @@ import GameHelper from "../../../../services/gameHelper";
 import HelpTooltip from "../../../components/HelpTooltip.vue";
 import { listMyOpen } from '@/services/typedapi/game';
 import { httpInjectionKey, isOk } from '@/services/typedapi';
-import type { ListGame } from '@solaris-common';
+import type { ListGame } from '@solaris/common';
 
 const httpClient = inject(httpInjectionKey)!;
 

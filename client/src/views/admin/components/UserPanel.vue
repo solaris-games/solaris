@@ -68,7 +68,7 @@ import {formatError, httpInjectionKey, isError, isOk, type ResponseResult} from 
 import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm.ts";
 import { inject, computed } from 'vue';
-import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris-common";
+import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris/common";
 import {
   ban,
   impersonate,

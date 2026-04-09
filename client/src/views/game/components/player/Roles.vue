@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import type {UserPublic} from "@solaris-common";
+import type {UserPublic} from "@solaris/common";
 
 const props = defineProps<{
   user: UserPublic<string>,

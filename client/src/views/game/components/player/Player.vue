@@ -54,7 +54,7 @@ import GameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, ref, computed, type Ref, onMounted } from 'vue';
-import type { InGameUser, Player, UserPublic } from '@solaris-common'
+import type { InGameUser, Player, UserPublic } from '@solaris/common'
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import { getPlayerUser } from '@/services/typedapi/game'

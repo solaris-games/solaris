@@ -96,7 +96,7 @@ import {getIntel} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject, ref, computed, onMounted, watch } from 'vue';
 import type {Game} from "@/types/game";
-import type {Intel} from "@solaris-common";
+import type {Intel} from "@solaris/common";
 import type {PlayerFilter, IntelType, DataCollection, DataSet} from "@/views/game/components/intel/types";
 import type { ChartOptions } from "chart.js"
 import { useColourStore } from '@/stores/colour';

@@ -4,14 +4,14 @@ import { Star } from "./types/Star";
 import Repository from "./repository";
 import StarService from "./star";
 import PlayerService from "./player";
-import { WaypointService } from 'solaris-common';
+import { WaypointService } from '@solaris/common';
 import { Player } from "./types/Player";
-import { CarrierTravelService } from 'solaris-common';
-import { StarDataService } from "solaris-common";
+import { CarrierTravelService } from '@solaris/common';
+import { StarDataService } from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
 import ScanningService from "./scanning";
 import { KDTree } from "../utils/kdTree";
-import { DistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
 
 export default class CullWaypointsService {
     gameRepo: Repository<Game>;

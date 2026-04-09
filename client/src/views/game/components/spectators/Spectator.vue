@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
-import type {GameSpectator} from "@solaris-common";
+import type {GameSpectator} from "@solaris/common";
 import {uninviteSpectator} from "@/services/typedapi/spectator";
 
 import {httpInjectionKey, isOk} from "@/services/typedapi";

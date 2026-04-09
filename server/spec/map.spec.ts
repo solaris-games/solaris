@@ -4,7 +4,7 @@ import RandomService from '../services/random';
 import { Game } from '../services/types/Game';
 import { Star } from '../services/types/Star';
 import { SeededRandomGen } from '../utils/randomGen';
-import { RandomGen } from 'solaris-common';
+import { RandomGen } from '@solaris/common';
 
 const game: Game = {
     settings: {

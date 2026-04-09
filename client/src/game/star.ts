@@ -5,7 +5,7 @@ import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import { type MapObject } from './mapObject';
 import type {Game, Star as StarData} from "../types/game";
-import type { Location, NaturalResources, UserGameSettings } from '@solaris-common';
+import type { Location, NaturalResources, UserGameSettings } from '@solaris/common';
 import type { DrawingContext } from './container';
 import {EventEmitter} from "./eventEmitter";
 

@@ -6,7 +6,7 @@ import {
   StarDistanceService,
   TechnologyService,
   WaypointService
-} from "@solaris-common";
+} from "@solaris/common";
 
 export type ServiceProvider = {
   distanceService: DistanceService;

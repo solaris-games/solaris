@@ -15,7 +15,7 @@ import { useRoute } from 'vue-router';
 import { inject, onMounted, ref, computed, type Ref } from "vue";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { toastInjectionKey } from "@/util/keys";
-import type { ListUser, AdminSpecificUserInfo } from "@solaris-common";
+import type { ListUser, AdminSpecificUserInfo } from "@solaris/common";
 import { getUsers } from "@/services/typedapi/admin";
 import UserPanel from "@/views/admin/components/UserPanel.vue";
 import { useUserStore } from '@/stores/user';

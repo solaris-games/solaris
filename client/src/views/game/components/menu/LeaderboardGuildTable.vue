@@ -37,7 +37,7 @@
 import { ref, inject, computed, type Ref, onMounted } from "vue";
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import SortableLeaderboard from './SortableLeaderboard.vue';
-import type {GuildLeaderboard, GuildSortingKey} from "@solaris-common";
+import type {GuildLeaderboard, GuildSortingKey} from "@solaris/common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {listGuildLeaderboard} from "@/services/typedapi/guild";
 

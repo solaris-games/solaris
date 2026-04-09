@@ -60,7 +60,7 @@ import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game} from "@/types/game";
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {hireStar} from "@/services/typedapi/specialist";
 import {toastInjectionKey} from "@/util/keys";

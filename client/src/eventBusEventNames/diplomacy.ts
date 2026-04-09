@@ -1,5 +1,5 @@
-import type { DiplomaticStatus } from "@solaris-common";
-import { makeCastFunc } from "@solaris-common";
+import type { DiplomaticStatus } from "@solaris/common";
+import { makeCastFunc } from "@solaris/common";
 import type { EventBusEventName } from "./eventBusEventName";
 
 export type DiplomacyEventBusEventType = { diplomacyEventBusEventType: 'diplomacyEventBusEventType' };

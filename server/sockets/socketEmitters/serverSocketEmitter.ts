@@ -1,6 +1,6 @@
 import type { DefaultEventsMap, Server } from "socket.io";
 import type { Room } from "socket.io-adapter";
-import {Emitter, type EventName} from "solaris-common";
+import {Emitter, type EventName} from "@solaris/common";
 import { TypedEventBroadcaster } from "../../../node_modules/socket.io/dist/typed-events";
 
 export abstract class ServerSocketEmitter<TEventType> extends Emitter<TEventType> {

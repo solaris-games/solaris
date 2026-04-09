@@ -42,7 +42,7 @@ import { inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import type {Game} from "@/types/game";
 import { computed } from 'vue';
-import type {Team} from "@solaris-common";
+import type {Team} from "@solaris/common";
 import type {TeamLeaderboardData} from "@/types/leaderboard.ts";
 
 const emit = defineEmits<{

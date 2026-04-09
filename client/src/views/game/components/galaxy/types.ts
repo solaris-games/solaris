@@ -1,4 +1,4 @@
-import type {MapObject, Specialist} from "@solaris-common";
+import type {MapObject, Specialist} from "@solaris/common";
 import type {Star} from "@/types/game";
 
 export type MapObjectWithShips = MapObject<string> & {

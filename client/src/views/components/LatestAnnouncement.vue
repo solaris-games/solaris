@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import AnnouncementPanel from "./Announcement.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
-import type {Announcement} from "@solaris-common";
+import type {Announcement} from "@solaris/common";
 import { ref, onMounted, computed, inject, type Ref } from 'vue';
 import {getLatestAnnouncement} from "@/services/typedapi/announcement";
 import {isOk, formatError, httpInjectionKey} from "@/services/typedapi";

@@ -3,7 +3,7 @@ import type { InjectionKey } from "vue";
 import { inject } from "vue";
 import {initialize, type ServiceProvider} from "@/services/services";
 import GameHelper from "@/services/gameHelper";
-import type {Game} from "@solaris-common";
+import type {Game} from "@solaris/common";
 import type { GameStore } from "@/stores/game";
 
 export const gameServicesKey: InjectionKey<ServiceProvider> = Symbol('gameServices');

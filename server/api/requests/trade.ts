@@ -1,4 +1,4 @@
-import { ValidationError, ResearchTypeNotRandom } from "solaris-common";
+import { ValidationError, ResearchTypeNotRandom } from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { keyHasNumberValue, keyHasStringValue } from "./helpers";
 

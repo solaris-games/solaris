@@ -24,7 +24,7 @@ import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
 import AnnouncementTile from "../components/Announcement.vue";
 import { ref, inject, type Ref, onMounted } from 'vue';
-import type { Announcement } from "@solaris-common";
+import type { Announcement } from "@solaris/common";
 import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
 import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
 import { toastInjectionKey } from "@/util/keys";

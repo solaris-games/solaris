@@ -54,7 +54,7 @@
 <script setup lang="ts">
 import router from '../../router'
 import { ref, computed, inject } from 'vue';
-import type { UserRoles } from '@solaris-common';
+import type { UserRoles } from '@solaris/common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { endImpersonate } from '@/services/typedapi/admin';
 import { toastInjectionKey } from '@/util/keys';

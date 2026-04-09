@@ -5,7 +5,7 @@ import {
   type GuildLeaderboardResponse,
   type GuildRank, type GuildSortingKey,
   type GuildWithUsers
-} from "@solaris-common";
+} from "@solaris/common";
 import {doDelete, doGet, doPatch, doPost, doPut, type ResponseResult} from "@/services/typedapi/index";
 
 const routes = createGuildRoutes<string>();

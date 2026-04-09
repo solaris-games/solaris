@@ -1,4 +1,4 @@
-import {type Badge, createBadgeRoutes, type AwardedBadge } from "@solaris-common";
+import {type Badge, createBadgeRoutes, type AwardedBadge } from "@solaris/common";
 import {doGet, doPost, type ResponseResult} from "./index";
 import { type Axios } from "axios";
 

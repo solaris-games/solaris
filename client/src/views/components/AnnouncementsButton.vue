@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import {httpInjectionKey, isOk, formatError} from "@/services/typedapi";
-import type {AnnouncementState} from "@solaris-common";
+import type {AnnouncementState} from "@solaris/common";
 import { ref, inject, onMounted, type Ref } from 'vue';
 import {getAnnouncementState} from "@/services/typedapi/announcement";
 import router from '@/router';

@@ -30,7 +30,7 @@ import gameHelper from '../../../../services/gameHelper';
 import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import DiplomacyIcons from './DiplomacyIcons.vue';
 import { inject, computed } from 'vue';
-import type {DiplomaticStatus} from "@solaris-common";
+import type {DiplomaticStatus} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";

@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import TechnologyHelper from '../../../../../services/technologyHelper'
-import type {PlayerResearchCompleteEvent, ResearchType} from "@solaris-common";
+import type {PlayerResearchCompleteEvent, ResearchType} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerResearchCompleteEvent<string>,

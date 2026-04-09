@@ -12,7 +12,7 @@ import {
 import {
   type GameInfoState,
   type GameSettingsGalaxyBase, type GameSettingsGameTime, type ListGameSettingsGeneral
-} from "@solaris-common";
+} from "@solaris/common";
 
 type TGame = {
   settings: {

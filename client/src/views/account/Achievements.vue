@@ -33,7 +33,7 @@ import UserBadges from '../game/components/badges/UserBadges.vue'
 import { ref, inject, onMounted, computed, watch, type Ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { getAchievements } from '@/services/typedapi/user'
-import type {AchievementsUser} from "@solaris-common";
+import type {AchievementsUser} from "@solaris/common";
 import { useRoute } from 'vue-router';
 import AchievementStats from "@/views/account/components/AchievementStats.vue";
 

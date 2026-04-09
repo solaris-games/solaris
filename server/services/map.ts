@@ -1,6 +1,6 @@
 import { Game } from "./types/Game";
 import { Star } from "./types/Star";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import CircularMapService from "./maps/circular";
 import CircularBalancedMapService from "./maps/circularBalanced";
 import DoughnutMapService from "./maps/doughnut";
@@ -9,11 +9,11 @@ import SpiralMapService from "./maps/spiral";
 import NameService from "./name";
 import RandomService from "./random";
 import StarService from "./star";
-import { StarDistanceService } from 'solaris-common';
-import { ValidationError } from "solaris-common";
-import { shuffle, RandomGen } from "solaris-common";
+import { StarDistanceService } from '@solaris/common';
+import { ValidationError } from "@solaris/common";
+import { shuffle, RandomGen } from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
-import { StarDataService } from "solaris-common";
+import { StarDataService } from "@solaris/common";
 
 const OFFSET = 20000;
 

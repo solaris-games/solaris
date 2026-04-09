@@ -39,7 +39,7 @@ import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, onMounted, computed, useTemplateRef } from 'vue';
-import type {Conversation, ConversationMessage, MapObject} from "@solaris-common";
+import type {Conversation, ConversationMessage, MapObject} from "@solaris/common";
 import type {Game} from "@/types/game";
 import {isMobile} from "@/util/mobile";
 import {toastInjectionKey} from "@/util/keys";

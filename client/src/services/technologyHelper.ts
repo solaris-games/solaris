@@ -1,4 +1,4 @@
-import type {GameResearchCost, ResearchType} from "@solaris-common";
+import type {GameResearchCost, ResearchType} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 // TODO: Deduplicate with common library

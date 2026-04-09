@@ -1,8 +1,8 @@
 import {logger} from "../../utils/logging";
 import {DependencyContainer} from "../../services/types/DependencyContainer";
-import {StatsSlice} from "solaris-common";
+import {StatsSlice} from "@solaris/common";
 import {DBObjectId, objectIdFromString} from "../../services/types/DBObjectId";
-import {groupBy} from "solaris-common";
+import {groupBy} from "@solaris/common";
 
 const log = logger("Sum game statistics Job");
 

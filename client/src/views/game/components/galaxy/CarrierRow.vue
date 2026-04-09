@@ -27,7 +27,7 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import type {Carrier} from "@/types/game";
 import Timer from "@/views/game/components/time/Timer.vue";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 
 const props = defineProps<{
   carrier: Carrier,

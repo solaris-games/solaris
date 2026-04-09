@@ -1,5 +1,5 @@
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import { Report } from './types/Report';
@@ -8,7 +8,7 @@ import ConversationService from "./conversation";
 import UserService from "./user";
 import GameListService from "./gameList";
 import GameService from "./game";
-import {Conversation, ReportCreateReportRequest} from "solaris-common";
+import {Conversation, ReportCreateReportRequest} from "@solaris/common";
 
 export default class ReportService {
     reportModel;

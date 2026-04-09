@@ -1,4 +1,4 @@
-import {boolean, GameSettingEnabledDisabled, number, object, string, Validator} from "solaris-common";
+import {boolean, GameSettingEnabledDisabled, number, object, string, Validator} from "@solaris/common";
 import {enabledDisabled} from "./validators";
 
 export type AdminSetUserRoleRequest = {

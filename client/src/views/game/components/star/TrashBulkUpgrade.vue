@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import type {PlayerScheduledActions} from "@solaris-common";
+import type {PlayerScheduledActions} from "@solaris/common";
 import {trashBulk} from "@/services/typedapi/star";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject } from 'vue';

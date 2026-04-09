@@ -1,5 +1,5 @@
 import { type Axios } from "axios";
-import {createDiplomacyRoutes, type DiplomaticStatus} from "@solaris-common";
+import {createDiplomacyRoutes, type DiplomaticStatus} from "@solaris/common";
 import {doGet, doPut, type ResponseResult} from "@/services/typedapi/index";
 
 const routes = createDiplomacyRoutes<string>();

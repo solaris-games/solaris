@@ -1,6 +1,6 @@
 import {computed, inject, readonly, ref } from 'vue';
 import { defineStore } from 'pinia';
-import type {UserPrivate, UserRoles} from "@solaris-common";
+import type {UserPrivate, UserRoles} from "@solaris/common";
 import {httpInjectionKey, formatError, isOk} from "@/services/typedapi";
 import {UserClientSocketEmitter, userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
 import {verify as verifyApi} from "@/services/typedapi/auth";

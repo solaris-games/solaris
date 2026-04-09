@@ -28,7 +28,7 @@ import Spectator from './Spectator.vue'
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {inject, ref, onMounted, type Ref} from 'vue';
 import {listSpectators} from "@/services/typedapi/spectator";
-import type {GameSpectator} from "@solaris-common";
+import type {GameSpectator} from "@solaris/common";
 
 const store = useGameStore();
 const httpClient = inject(httpInjectionKey)!;

@@ -1,18 +1,18 @@
 import {Game, Team} from "./types/Game";
 import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam, PlayerStatistics} from "./types/Leaderboard";
 import { Player } from "./types/Player";
-import {EloRatingChangeResult, GameRanking, GameRankingResult} from "solaris-common";
+import {EloRatingChangeResult, GameRanking, GameRankingResult} from "@solaris/common";
 import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import { reverseSort, sorterByProperty} from "solaris-common";
+import { reverseSort, sorterByProperty} from "@solaris/common";
 import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
 import {isSpecialGameMode} from "./officialGames";

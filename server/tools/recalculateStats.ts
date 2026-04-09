@@ -1,8 +1,8 @@
 import {makeJob} from "./tool";
 import {User} from "../services/types/User";
-import {StatsSlice} from "solaris-common";
+import {StatsSlice} from "@solaris/common";
 import {DBObjectId, objectIdFromString} from "../services/types/DBObjectId";
-import {groupBy} from "solaris-common";
+import {groupBy} from "@solaris/common";
 
 const dbQuery = {
     closed: true,

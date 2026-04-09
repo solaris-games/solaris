@@ -184,7 +184,7 @@ import PlayerBadgeShop from '../badges/PlayerBadgeShop.vue';
 import ReportPlayer from '../report/ReportPlayer.vue';
 import Spectators from '../spectators/Spectators.vue';
 import { eventBusInjectionKey } from '@/eventBus';
-import type { CarrierWaypoint as CWTp } from "@solaris-common";
+import type { CarrierWaypoint as CWTp } from "@solaris/common";
 import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
 import {useUserStore} from "@/stores/user";
 import {useGameStore} from "@/stores/game";

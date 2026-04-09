@@ -30,7 +30,7 @@ import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import { inject, ref, onMounted, type Ref } from 'vue';
-import type { GetInsight } from "@solaris-common";
+import type { GetInsight } from "@solaris/common";
 import { getInsights } from "@/services/typedapi/admin";
 import { toastInjectionKey } from "@/util/keys";
 

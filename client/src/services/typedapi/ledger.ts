@@ -1,4 +1,4 @@
-import {createLedgerRoutes, type LedgerModificationResponse, type PlayerLedgerDebt} from "@solaris-common";
+import {createLedgerRoutes, type LedgerModificationResponse, type PlayerLedgerDebt} from "@solaris/common";
 import {doGet, doPut, type ResponseResult} from "@/services/typedapi/index";
 import type { Axios } from "axios";
 

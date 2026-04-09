@@ -87,7 +87,7 @@ import {computed} from 'vue';
 import {useGameServices} from "@/util/gameServices";
 import type {Game, Player, Star} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 
 const props = defineProps<{
   star: Star,

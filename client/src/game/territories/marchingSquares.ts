@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import type {UserGameSettings} from "@solaris-common";
+import type {UserGameSettings} from "@solaris/common";
 import type {Game, Player} from "@/types/game";
 import type {DrawingContext} from "@/game/container";
 import gameHelper from "@/services/gameHelper";

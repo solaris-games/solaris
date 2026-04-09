@@ -1,4 +1,4 @@
-import type {CarrierWaypoint, CarrierWaypointActionType} from "@solaris-common";
+import type {CarrierWaypoint, CarrierWaypointActionType} from "@solaris/common";
 
 export const formatAction = (waypoint: CarrierWaypoint<string>, action: CarrierWaypointActionType) => {
   switch (action) {

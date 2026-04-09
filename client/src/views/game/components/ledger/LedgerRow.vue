@@ -21,7 +21,7 @@
 import {ref, computed, inject} from 'vue';
 import PlayerAvatar from '../menu/PlayerAvatar.vue';
 import gameHelper from '../../../../services/gameHelper';
-import type {LedgerType, PlayerLedgerDebt} from "@solaris-common";
+import type {LedgerType, PlayerLedgerDebt} from "@solaris/common";
 import type { Game } from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

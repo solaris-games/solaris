@@ -18,7 +18,7 @@
 import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper';
 import type {Carrier, Game} from "@/types/game";
-import type {CarrierWaypoint} from "@solaris-common";
+import type {CarrierWaypoint} from "@solaris/common";
 import { ref, computed } from 'vue';
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {formatAction} from "@/util/waypoint";

@@ -1,4 +1,4 @@
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import CarrierService from "./carrier";
 import NameService from "./name";
 import PlayerService from "./player";
@@ -6,14 +6,14 @@ import PlayerColourService from "./playerColour";
 import SpecialistService from "./specialist";
 import TeamService from "./team";
 import { Carrier } from "./types/Carrier";
-import { CarrierWaypoint } from "solaris-common";
+import { CarrierWaypoint } from "@solaris/common";
 import {
     CustomGalaxy,
     CustomGalaxyCarrier,
     CustomGalaxyPlayer,
     CustomGalaxyStar,
     PlayerColourShapeCombination
-} from "solaris-common";
+} from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game, Team } from "./types/Game";
 import { Location } from "./types/Location";

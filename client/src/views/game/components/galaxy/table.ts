@@ -1,7 +1,7 @@
 import { type Ref, computed } from "vue";
 import { type SortInfo } from "@/services/data/sortInfo";
 import type {Game, Player} from "@/types/game";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 import GameHelper from "@/services/gameHelper";
 import {useSorted} from "@/util/sort";
 

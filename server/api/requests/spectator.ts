@@ -1,4 +1,4 @@
-import {type Validator, array, object, username} from "solaris-common";
+import {type Validator, array, object, username} from "@solaris/common";
 
 export type SpectatorInviteRequest = {
     usernames: string[];

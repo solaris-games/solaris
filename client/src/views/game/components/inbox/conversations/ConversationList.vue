@@ -40,7 +40,7 @@ import ConversationPreview from './ConversationPreview.vue';
 import gameHelper from '../../../../../services/gameHelper';
 import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
-import {type ConversationMessageSentResult, type ConversationOverview} from "@solaris-common";
+import {type ConversationMessageSentResult, type ConversationOverview} from "@solaris/common";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game} from "@/types/game";
 import {listConversations} from "@/services/typedapi/conversation";

@@ -10,7 +10,7 @@
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper'
-import type {PlayerRenownReceivedEvent} from "@solaris-common";
+import type {PlayerRenownReceivedEvent} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const props = defineProps<{

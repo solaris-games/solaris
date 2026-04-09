@@ -37,7 +37,7 @@ import GuildMemberList from './components/MemberList.vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { useRoute } from 'vue-router';
 import {detailGuild} from "@/services/typedapi/guild";
-import type {GuildWithUsers} from "@solaris-common";
+import type {GuildWithUsers} from "@solaris/common";
 
 type SortingKey = 'rank' | 'victories' | 'renown' | 'role';
 

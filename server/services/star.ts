@@ -1,7 +1,7 @@
-import { shuffle } from "solaris-common";
+import { shuffle } from "@solaris/common";
 import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { Game } from './types/Game';
@@ -9,20 +9,20 @@ import { Location } from './types/Location';
 import { Player } from './types/Player';
 import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
 import { User } from './types/User';
-import { DistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
 import GameStateService from './gameState';
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import NameService from './name';
 import RandomService from './random';
 import SpecialistService from './specialist';
-import { StarDistanceService } from 'solaris-common';
-import { TechnologyService } from 'solaris-common';
+import { StarDistanceService } from '@solaris/common';
+import { TechnologyService } from '@solaris/common';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
 import StatisticsService from "./statistics";
-import { GameSettings } from "solaris-common";
+import { GameSettings } from "@solaris/common";
 import EventEmitter from "events";
-import { StarDataService } from "solaris-common";
+import { StarDataService } from "@solaris/common";
 
 const RNG = require('random-seed');
 

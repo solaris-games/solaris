@@ -186,7 +186,7 @@ import {ModeKind} from "@/game/map";
 import type {Carrier, Game, Star} from "@/types/game";
 import type {RulerPoint} from "@/types/ruler";
 import {getCountdownTimeStringByTicks} from "@/util/time";
-import type {Specialist} from "@solaris-common";
+import type {Specialist} from "@solaris/common";
 import {useGameServices} from "@/util/gameServices";
 
 const emit = defineEmits<{

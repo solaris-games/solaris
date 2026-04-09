@@ -37,7 +37,7 @@ import BadgeShopList from './BadgeShopList.vue'
 import { formatError, httpInjectionKey, isError, isOk } from "../../../../services/typedapi";
 import type { ToastPluginApi } from "vue-toast-notification";
 import { toastInjectionKey } from "../../../../util/keys";
-import type { Badge } from "@solaris-common";
+import type { Badge } from "@solaris/common";
 import type { Player } from "../../../../types/game";
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
 import { getCredits } from "../../../../services/typedapi/user";

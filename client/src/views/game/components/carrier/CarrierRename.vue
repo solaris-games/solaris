@@ -37,7 +37,7 @@ import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Carrier, Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 import {rename} from "@/services/typedapi/carrier";
 
 const props = defineProps<{

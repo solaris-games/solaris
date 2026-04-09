@@ -69,7 +69,7 @@ import {
   type ResearchTypeNotRandom,
   TRADE_EVENT_TYPES,
   type TradeEvent
-} from "@solaris-common";
+} from "@solaris/common";
 import { useColourStore } from '@/stores/colour';
 
 const props = defineProps<{

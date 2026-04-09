@@ -35,7 +35,7 @@ import type {Axios} from 'axios';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import Badge from './Badge.vue'
 import GameHelper from '../../../../services/gameHelper'
-import type {AwardedBadge, Badge as TBadge} from "@solaris-common";
+import type {AwardedBadge, Badge as TBadge} from "@solaris/common";
 import {getBadgesForPlayer} from "../../../../services/typedapi/badge";
 import {httpInjectionKey, isError} from "../../../../services/typedapi";
 import { useBadgeStore } from '../../../../stores/badge';

@@ -1,4 +1,4 @@
-import { type Location } from '@solaris-common';
+import { type Location } from '@solaris/common';
 
 const LIGHTYEARS = 50;
 

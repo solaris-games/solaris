@@ -1,4 +1,4 @@
-import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type AdminListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report, type ImpersonateResp } from "@solaris-common";
+import {type Announcement, createAdminRoutes, type CreateAnnouncementReq, type GetInsight, type AdminListGame, type ListPasswordReset, type ListUser, type SettingEnabledDisabled, type Conversation, type ConversationMessage, type Report, type ImpersonateResp } from "@solaris/common";
 import type { Axios } from "axios";
 import {doGet, doPost, doPatch, type ResponseResult, doDelete} from ".";
 

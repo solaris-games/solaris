@@ -1,4 +1,4 @@
-import { type Route, type GetRoute, type PostRoute, type PatchRoute, type DeleteRoute, type PutRoute } from "@solaris-common";
+import { type Route, type GetRoute, type PostRoute, type PatchRoute, type DeleteRoute, type PutRoute } from "@solaris/common";
 import { type Axios, type AxiosRequestConfig, type AxiosError, isAxiosError } from "axios";
 import type { InjectionKey } from "vue";
 

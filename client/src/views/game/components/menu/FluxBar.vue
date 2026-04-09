@@ -37,7 +37,7 @@ import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import { ref, inject, type Ref, onMounted } from 'vue';
 import { getCurrentFlux } from '@/services/typedapi/game';
-import type { Flux, MonthlyBans } from '@solaris-common';
+import type { Flux, MonthlyBans } from '@solaris/common';
 import { listBans } from '@/services/typedapi/specialist';
 
 const httpClient = inject(httpInjectionKey)!;

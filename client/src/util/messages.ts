@@ -1,6 +1,6 @@
 import type {EventBus} from "../eventBus";
 import { onMounted, onUnmounted, inject, computed } from "vue";
-import type {ConversationMessageSentResult} from "@solaris-common";
+import type {ConversationMessageSentResult} from "@solaris/common";
 import UserEventBusEventNames from "../eventBusEventNames/user";
 import {useToast} from 'vue-toast-notification';
 import {eventBusInjectionKey} from "../eventBus";

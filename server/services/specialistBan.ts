@@ -1,5 +1,5 @@
 import { Game } from "./types/Game";
-import { Specialist } from 'solaris-common';
+import { Specialist } from '@solaris/common';
 import SpecialistService from "./specialist";
 const RNG = require('random-seed');
 import moment from "moment";

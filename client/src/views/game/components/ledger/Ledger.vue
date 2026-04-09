@@ -30,7 +30,7 @@
 import {ref} from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import LedgerTable from './LedgerTable.vue'
-import {LedgerType} from "@solaris-common";
+import {LedgerType} from "@solaris/common";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],

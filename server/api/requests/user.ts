@@ -8,9 +8,9 @@ import {
     stringEnumeration,
     UserGameSettings,
     ValidationError
-} from "solaris-common";
+} from "@solaris/common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
-import {email, object, password, string, stringValue, username, Validator} from "solaris-common";
+import {email, object, password, string, stringValue, username, Validator} from "@solaris/common";
 
 export interface UserCreateUserRequest {
     email: string;

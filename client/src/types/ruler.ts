@@ -1,4 +1,4 @@
-import type {MapObject, Location} from "@solaris-common";
+import type {MapObject, Location} from "@solaris/common";
 
 export type RulerPoint = {
   type: 'star' | 'carrier',

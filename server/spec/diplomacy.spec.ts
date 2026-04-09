@@ -1,5 +1,5 @@
 import DiplomacyService from '../services/diplomacy';
-import { DiplomaticState } from 'solaris-common';
+import { DiplomaticState } from '@solaris/common';
 
 describe('diplomacy', () => {
 

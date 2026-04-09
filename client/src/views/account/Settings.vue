@@ -177,7 +177,7 @@ import Notifications from "./components/Notifications.vue";
 import { inject, onMounted, ref, computed, type Ref } from 'vue'
 import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
 import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference, updateIsAnonymous } from '@/services/typedapi/user'
-import type { UserPrivate } from '@solaris-common'
+import type { UserPrivate } from '@solaris/common'
 import { toastInjectionKey } from '@/util/keys'
 import { useConfirm } from '@/hooks/confirm'
 import { useRoute } from 'vue-router';

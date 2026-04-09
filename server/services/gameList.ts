@@ -4,7 +4,7 @@ import { Game, GameUserNotification } from "./types/Game";
 import ConversationService from "./conversation";
 import EventService from "./event";
 import GameService from "./game";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import LeaderboardService from "./leaderboard";
 
 import moment from "moment";

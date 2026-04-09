@@ -9,7 +9,7 @@ import {
     TradeEventTechnology,
     TradeTechnology,
     ValidationError
-} from 'solaris-common';
+} from '@solaris/common';
 import UserAchievementService from './userAchievement';
 import DiplomacyService from './diplomacy';
 import LedgerService from './ledger';
@@ -27,7 +27,7 @@ import UserService from './user';
 import StatisticsService from './statistics';
 import ScanningService from "./scanning";
 import { KDTree } from "../utils/kdTree";
-import { DistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
 
 export const TradeServiceEvents = {
     onPlayerCreditsReceived: 'onPlayerCreditsReceived',

@@ -3,7 +3,7 @@ import ViewSubtitle from '../../components/ViewSubtitle.vue'
 import PieChart from '../../game/components/intel/PieChart.vue'
 import PolarAreaChart from '../../game/components/intel/PolarAreaChart.vue'
 import {computed, onMounted, ref, type Ref} from 'vue';
-import type {AchievementsUser} from "@solaris-common";
+import type {AchievementsUser} from "@solaris/common";
 import { type ChartOptions, type TooltipItem } from 'chart.js';
 
 const props = defineProps<{

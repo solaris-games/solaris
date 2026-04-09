@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import ReportController from '../controllers/report';
 import { MiddlewareContainer } from "../middleware";
 import { SingleRouter} from "../singleRoute";
-import {createReportRoutes} from "solaris-common";
+import {createReportRoutes} from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {createRoutes} from "../typedapi/routes";
 

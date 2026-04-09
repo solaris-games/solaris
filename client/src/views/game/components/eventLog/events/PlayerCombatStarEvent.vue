@@ -38,7 +38,7 @@
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import StarLabel from '../../star/StarLabel.vue'
-import type {PlayerCombatStarEvent} from "@solaris-common";
+import type {PlayerCombatStarEvent} from "@solaris/common";
 import CombatEventSide from './CombatEventSide.vue';
 import {createStarAttackerSide, createStarDefenderSide, getOriginalStarOwner} from '@/services/combat';
 import gameHelper from '../../../../../services/gameHelper';

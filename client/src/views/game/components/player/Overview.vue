@@ -62,7 +62,7 @@ import DiplomacyHelper from '../../../../services/diplomacyHelper';
 import { ref, inject, computed, onMounted } from 'vue';
 import type {Game} from "@/types/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import type {ConversationOverview} from "@solaris-common";
+import type {ConversationOverview} from "@solaris/common";
 import GameHelper from "../../../../services/gameHelper";
 import {listPrivate} from "@/services/typedapi/conversation";
 

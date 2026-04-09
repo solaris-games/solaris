@@ -570,7 +570,7 @@ import ViewSubtitle from '../../../components/ViewSubtitle.vue';
 import SpecialistBanList from '../specialist/SpecialistBanList.vue';
 import GameSettingValue from './GameSettingValue.vue';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
-import type { GameInfoDetail, GameSettingsSpec } from '@solaris-common';
+import type { GameInfoDetail, GameSettingsSpec } from '@solaris/common';
 import { ref, inject, type Ref, onMounted } from 'vue';
 import { getDefaultSettings } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';

@@ -1,5 +1,5 @@
 import { Carrier } from "./Carrier";
-import { CarrierWaypoint } from "solaris-common";
+import { CarrierWaypoint } from "@solaris/common";
 import { Star } from "./Star";
 import {DBObjectId} from "./DBObjectId";
 

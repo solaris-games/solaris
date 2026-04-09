@@ -43,7 +43,7 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import { ref, inject, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
-import type {Star, Player} from "@solaris-common";
+import type {Star, Player} from "@solaris/common";
 
 import {useConfirm} from "@/hooks/confirm.ts";
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from '@/services/typedapi/star';

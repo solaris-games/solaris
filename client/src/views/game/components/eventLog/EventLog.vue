@@ -82,7 +82,7 @@ import MenuTitle from '../MenuTitle.vue';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import EventsListItem from './events/EventsListItem.vue';
 import { inject, ref, computed, onMounted } from 'vue';
-import type {GameEvent} from "@solaris-common";
+import type {GameEvent} from "@solaris/common";
 import type {Game} from "@/types/game";
 import {listEvents, markAllAsRead} from "@/services/typedapi/event";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

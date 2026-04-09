@@ -1,4 +1,4 @@
-import type {CarrierWaypoint} from "@solaris-common";
+import type {CarrierWaypoint} from "@solaris/common";
 import type {ObjectClicked} from "@/eventBusEventNames/map.ts";
 
 export type GalaxyMenuState =

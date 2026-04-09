@@ -163,7 +163,7 @@ import Warnings from "./account/Warnings.vue";
 import AnnouncementsButton from "./components/AnnouncementsButton.vue";
 import { detailMe } from "@/services/typedapi/user";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi/index";
-import type { UserPrivate, UserAchievements } from "@solaris-common";
+import type { UserPrivate, UserAchievements } from "@solaris/common";
 import Community from "@/views/game/components/menu/Community.vue";
 import { useUserStore } from '@/stores/user';
 

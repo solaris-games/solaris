@@ -1,4 +1,4 @@
-import type {Location, UserGameSettings} from "@solaris-common";
+import type {Location, UserGameSettings} from "@solaris/common";
 import gameHelper from "@/services/gameHelper";
 import type {Game} from "@/types/game";
 import type {DrawingContext} from "@/game/container";

@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 
-import type { PlayerBulkInfrastructureUpgradedEvent } from "@solaris-common";
+import type { PlayerBulkInfrastructureUpgradedEvent } from "@solaris/common";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
 
 const props = defineProps<{

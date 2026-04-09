@@ -91,7 +91,7 @@ import TechnologyHelper from "../../../../services/technologyHelper"
 import ResearchRow from "./ResearchRow.vue"
 import type {Game} from "@/types/game.ts";
 import GameHelper from "@/services/gameHelper.ts";
-import type {ResearchTypeNotRandom} from "@solaris-common";
+import type {ResearchTypeNotRandom} from "@solaris/common";
 
 const props = defineProps<{
   playerId: string,

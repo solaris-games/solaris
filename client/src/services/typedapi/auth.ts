@@ -1,4 +1,4 @@
-import {type AuthResponse, createAuthRoutes} from "@solaris-common";
+import {type AuthResponse, createAuthRoutes} from "@solaris/common";
 import type { Axios } from "axios";
 import {doDelete, doGet, doPost, type ResponseResult} from "@/services/typedapi/index";
 

@@ -25,7 +25,7 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import type {Star} from "@/types/game";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 
 const props = defineProps<{
   star: Star,

@@ -922,7 +922,7 @@ import FluxBar from './components/menu/FluxBar.vue'
 import router from '../../router'
 import SelectTemplate from "@/views/game/gameCreation/SelectTemplate.vue";
 import { ref, onMounted, inject, type Ref, computed } from 'vue';
-import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris-common";
+import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris/common";
 import {createGame, getDefaultSettings} from "@/services/typedapi/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";

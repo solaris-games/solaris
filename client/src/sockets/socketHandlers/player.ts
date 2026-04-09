@@ -1,8 +1,8 @@
 import type { Socket } from "socket.io-client";
-import type { Player } from "@solaris-common";
-import type { LedgerType } from "@solaris-common";
-import type { TradeEventTechnology } from "@solaris-common";
-import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris-common';
+import type { Player } from "@solaris/common";
+import type { LedgerType } from "@solaris/common";
+import type { TradeEventTechnology } from "@solaris/common";
+import { PlayerSocketEventNames, type PlayerSocketEventType } from '@solaris/common';
 import type { EventBus } from "../../eventBus";
 import PlayerEventBusEventNames from "../../eventBusEventNames/player";
 import PlayerMutationNames from "../../mutationNames/playerMutationNames";

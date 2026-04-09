@@ -40,7 +40,7 @@ import { inject, ref, onMounted, watch } from 'vue';
 import SelectAvatar from './SelectAvatar.vue'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { detailMe } from '@/services/typedapi/user';
-import type {UserAvatar} from "@solaris-common";
+import type {UserAvatar} from "@solaris/common";
 
 const props = defineProps<{
   isAnonymousGame: boolean,

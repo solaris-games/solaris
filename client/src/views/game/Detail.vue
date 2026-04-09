@@ -45,7 +45,7 @@ import GameSettings from './components/settings/GameSettings.vue'
 import GameControl from './GameControl.vue'
 import GameHelper from '../../services/gameHelper'
 import { ref, inject, computed, type Ref, onMounted } from 'vue';
-import type { GameInfoDetail } from '@solaris-common'
+import type { GameInfoDetail } from '@solaris/common'
 import { useRoute } from 'vue-router'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { detailInfo } from '@/services/typedapi/game'

@@ -8,7 +8,7 @@ import {
     DiplomaticState,
     DiplomaticStatus,
     ValidationError
-} from "solaris-common";
+} from "@solaris/common";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerDiplomaticState } from "./types/Player";

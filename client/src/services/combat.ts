@@ -1,4 +1,4 @@
-import type {BaseCombatEvent, CombatCarrier, CombatStar, PlayerCombatStarEvent, Specialist} from "@solaris-common"
+import type {BaseCombatEvent, CombatCarrier, CombatStar, PlayerCombatStarEvent, Specialist} from "@solaris/common"
 import type { Player, Carrier, Star, Game } from "../types/game"
 import gameHelper from "./gameHelper"
 

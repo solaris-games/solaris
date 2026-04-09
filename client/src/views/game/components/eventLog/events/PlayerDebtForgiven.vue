@@ -15,7 +15,7 @@
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
-import type {PlayerDebtForgivenEvent} from "@solaris-common";
+import type {PlayerDebtForgivenEvent} from "@solaris/common";
 import type {Game, Player} from "@/types/game";
 
 const props = defineProps<{

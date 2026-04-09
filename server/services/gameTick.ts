@@ -7,10 +7,10 @@ import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
 import CombatService from "./combat";
 import DiplomacyService from "./diplomacy";
-import { DistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
 import GameService from "./game";
 import GameStateService from "./gameState";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from '@solaris/common'
 import HistoryService from "./history";
 import LeaderboardService, {GameWinner} from "./leaderboard";
 import StarMovementService from "./starMovement";
@@ -20,7 +20,7 @@ import ResearchService from "./research";
 import SpecialistService from "./specialist";
 import StarService from "./star";
 import StarUpgradeService from "./starUpgrade";
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import UserService from "./user";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
@@ -44,7 +44,7 @@ import {logger} from "../utils/logging";
 import StatisticsService from "./statistics";
 import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
-import { CarrierTravelService } from 'solaris-common';
+import { CarrierTravelService } from '@solaris/common';
 
 import EventEmitter from "events";
 import moment from "moment";

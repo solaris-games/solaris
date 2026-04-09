@@ -1,4 +1,4 @@
-import type {InfrastructureType, InfrastructureUpgradeReport} from "@solaris-common";
+import type {InfrastructureType, InfrastructureUpgradeReport} from "@solaris/common";
 import {formatError, isOk, type ResponseResult} from "@/services/typedapi";
 import AudioService from "@/game/audio";
 

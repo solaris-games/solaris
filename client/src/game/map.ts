@@ -13,7 +13,7 @@ import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
-import type {Location, MapObject, UserGameSettings} from "@solaris-common";
+import type {Location, MapObject, UserGameSettings} from "@solaris/common";
 import { Chunks } from './chunks'
 import Carrier, {type CarrierClickEvent} from "./carrier";
 import type { EventBus } from '@/eventBus'

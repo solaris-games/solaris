@@ -21,7 +21,7 @@ import PlayerBadges from "@/views/game/components/badges/PlayerBadges.vue";
 import SendRenown from "@/views/game/components/player/SendRenown.vue";
 import Achievements from "@/views/game/components/player/Achievements.vue";
 import { computed } from 'vue';
-import type {Player, InGameUser} from '@solaris-common';
+import type {Player, InGameUser} from '@solaris/common';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {useGameServices} from "@/util/gameServices";

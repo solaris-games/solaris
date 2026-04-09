@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { renderMarkdown } from "../../util/markdown";
-import type {Announcement} from "@solaris-common";
+import type {Announcement} from "@solaris/common";
 import { computed } from "vue";
 
 const props = defineProps<{

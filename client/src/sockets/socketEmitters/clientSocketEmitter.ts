@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io-client";
-import {Emitter, type EventName} from "@solaris-common";
+import {Emitter, type EventName} from "@solaris/common";
 
 export abstract class ClientSocketEmitter<TEventType> extends Emitter<TEventType> {
   constructor(private socket: Socket) {

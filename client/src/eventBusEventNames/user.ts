@@ -1,5 +1,5 @@
 import type {EventBusEventName} from "./eventBusEventName";
-import {type ConversationMessageSentResult, makeCastFunc} from "@solaris-common";
+import {type ConversationMessageSentResult, makeCastFunc} from "@solaris/common";
 
 export type UserEventBusEventType = { playerEventBusEventType: 'playerEventBusEventType' };
 export type UserEventBusEventName<TData> = EventBusEventName<UserEventBusEventType, TData> & { playerEventBusEventName: 'playerEventBusEventName' }

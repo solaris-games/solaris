@@ -3,7 +3,7 @@ import {
   type ConversationMessageSentResult,
   type ConversationOverview,
   createConversationRoutes
-} from "@solaris-common";
+} from "@solaris/common";
 import { type Axios } from "axios";
 import {doGet, doPatch, doPost, type ResponseResult} from "@/services/typedapi/index";
 

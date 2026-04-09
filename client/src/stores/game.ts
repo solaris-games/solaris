@@ -8,7 +8,7 @@ import {
   type Specialist,
   type UserGameSettings,
   type WarpgateBuildReport
-} from "@solaris-common";
+} from "@solaris/common";
 import {type EventBus} from "@/eventBus";
 import {useColourStore} from "@/stores/colour";
 import GameHelper from "@/services/gameHelper";

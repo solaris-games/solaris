@@ -12,7 +12,7 @@ import { computed } from 'vue';
 import GameHelper from '../../../../../services/gameHelper';
 import TechnologyHelper from '../../../../../services/technologyHelper';
 
-import type {PlayerTechnologySentEvent, ResearchType} from "@solaris-common";
+import type {PlayerTechnologySentEvent, ResearchType} from "@solaris/common";
 import type {Game} from "@/types/game";
 
 const props = defineProps<{

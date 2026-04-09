@@ -102,7 +102,7 @@ import TechnologyHelper from '../../../../services/technologyHelper';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import { compareAsc } from 'date-fns';
 import type {Game} from "@/types/game";
-import {type BasePlayerDebtEvent, type ResearchTypeNotRandom, type TradeEvent} from "@solaris-common";
+import {type BasePlayerDebtEvent, type ResearchTypeNotRandom, type TradeEvent} from "@solaris/common";
 import {listTradeEvents} from "@/services/typedapi/trade";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 

@@ -509,7 +509,7 @@ import {inject, ref, computed, type Ref} from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
-import type {MapObject} from "@solaris-common";
+import type {MapObject} from "@solaris/common";
 import {abandon} from "@/services/typedapi/star";
 import {makeWarpgateActions} from "@/views/game/components/star/upgrade";
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";

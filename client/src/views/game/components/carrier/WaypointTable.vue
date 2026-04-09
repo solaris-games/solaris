@@ -51,7 +51,7 @@ import WaypointRow from './WaypointRow.vue'
 import GameHelper from '../../../../services/gameHelper'
 import type {Carrier, Game} from "@/types/game";
 import { ref, computed, onMounted } from 'vue';
-import type {CarrierWaypoint} from "@solaris-common";
+import type {CarrierWaypoint} from "@solaris/common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
 import {saveWaypoints} from "@/views/game/components/carrier/action";

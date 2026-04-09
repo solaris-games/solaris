@@ -22,7 +22,7 @@ import {eventBusInjectionKey} from "@/eventBus";
 import { inject, computed } from 'vue';
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type {Game, Player} from "@/types/game";
-import type {ResearchTypeNotRandom} from "@solaris-common";
+import type {ResearchTypeNotRandom} from "@solaris/common";
 
 const props = defineProps<{
   player: Player,

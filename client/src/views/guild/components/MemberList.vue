@@ -29,7 +29,7 @@
 import { ref, computed, onMounted } from 'vue';
 import SortableLeaderboard from '../../game/components/menu/SortableLeaderboard.vue';
 import GameHelper from '../../../services/gameHelper';
-import {type GuildWithUsers, type UserPublic} from "@solaris-common";
+import {type GuildWithUsers, type UserPublic} from "@solaris/common";
 import { useUserStore } from '@/stores/user';
 
 export type GuildRole = 'leader' | 'officer' | 'member' | 'invitee' | 'applicant';

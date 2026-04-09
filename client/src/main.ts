@@ -21,7 +21,7 @@ import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
-import type {FrontendConfig} from "@solaris-common";
+import type {FrontendConfig} from "@solaris/common";
 import {configInjectionKey} from "@/config";
 import { createPinia } from "pinia"
 import {useSocketStore} from "@/stores/socket.ts";

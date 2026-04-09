@@ -2,15 +2,15 @@ import {Player} from "../services/types/Player";
 
 import mongoose from 'mongoose';
 
-import { DistanceService } from 'solaris-common';
-import { StarDistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
+import { StarDistanceService } from '@solaris/common';
 import MapService from '../services/map';
 import RandomService from '../services/random';
 import StarService from '../services/star';
 import CarrierService from '../services/carrier';
 import PlayerService from '../services/player';
 import NameService from '../services/name';
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import PlayerColourService from "../services/playerColour";
 
 const gameNames = require('../config/game/gameNames');

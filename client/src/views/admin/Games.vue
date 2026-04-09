@@ -65,7 +65,7 @@
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import { ref, inject, onMounted, computed, type Ref } from 'vue';
-import type { AdminListGame } from '@solaris-common';
+import type { AdminListGame } from '@solaris/common';
 import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedapi';
 import { listGames, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
 import { resetQuitters as requestResetQuitters } from '@/services/typedapi/game';

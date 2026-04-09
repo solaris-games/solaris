@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
-import {ValidationError} from "solaris-common";
+import {ValidationError} from "@solaris/common";
 import Repository from './repository';
 import SessionService from './session';
 import {DBObjectId} from './types/DBObjectId';
-import {Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers} from 'solaris-common';
+import {Guild, GuildLeaderboard, GuildRank, GuildUserApplication, GuildWithUsers} from '@solaris/common';
 import {User} from './types/User';
 import UserService from './user';
 

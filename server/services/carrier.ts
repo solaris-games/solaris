@@ -1,17 +1,17 @@
 import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
+import { ValidationError } from "@solaris/common";
 import Repository from './repository';
 import { Carrier } from './types/Carrier';
-import { CarrierWaypoint } from 'solaris-common';
+import { CarrierWaypoint } from '@solaris/common';
 import { Game } from './types/Game';
 import { MapObject } from './types/Map';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
-import { DistanceService } from 'solaris-common';
+import { DistanceService } from '@solaris/common';
 import SpecialistService from './specialist';
 import StarService from './star';
-import { TechnologyService } from 'solaris-common';
+import { TechnologyService } from '@solaris/common';
 import EventEmitter from "events";
 
 const CARRIER_LIMIT_MIN = 50;

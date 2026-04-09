@@ -1,4 +1,4 @@
-import {createEventRoutes, type ListEventsResponse} from "@solaris-common";
+import {createEventRoutes, type ListEventsResponse} from "@solaris/common";
 import {doGet, doPatch, type ResponseResult} from "@/services/typedapi/index";
 import {type Axios} from "axios";
 

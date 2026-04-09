@@ -101,7 +101,7 @@ import ShareLink from '../welcome/ShareLink.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
 import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
-import { type Game, type Player } from '@solaris-common';
+import { type Game, type Player } from '@solaris/common';
 import { toastInjectionKey } from '@/util/keys'
 import { useConfirm } from '@/hooks/confirm.ts'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'

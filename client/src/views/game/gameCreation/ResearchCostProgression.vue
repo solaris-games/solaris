@@ -19,7 +19,7 @@
 
 </template>
 <script setup lang="ts">
-import {GAME_CREATION_OPTIONS, type GameResearchProgression} from "@solaris-common";
+import {GAME_CREATION_OPTIONS, type GameResearchProgression} from "@solaris/common";
 import HelpTooltip from "@/views/components/HelpTooltip.vue";
 
 const options = GAME_CREATION_OPTIONS;

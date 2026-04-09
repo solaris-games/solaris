@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import type { InGameUser } from '@solaris-common';
+import type { InGameUser } from '@solaris/common';
 
 const props = defineProps<{
   user: InGameUser<string>,

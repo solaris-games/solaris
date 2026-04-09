@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import {type DiplomaticState, type PlayerDiplomacyStatusChangedEvent} from "@solaris-common";
+import {type DiplomaticState, type PlayerDiplomacyStatusChangedEvent} from "@solaris/common";
 
 const props = defineProps<{
   event: PlayerDiplomacyStatusChangedEvent<string>,

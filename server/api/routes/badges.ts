@@ -2,7 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import BadgeController from '../controllers/badges';
 import { MiddlewareContainer } from "../middleware";
 import {SingleRouter} from "../singleRoute";
-import {createBadgeRoutes} from "solaris-common";
+import {createBadgeRoutes} from "@solaris/common";
 import {createRoutes} from "../typedapi/routes";
 import {DBObjectId} from "../../services/types/DBObjectId";
 
