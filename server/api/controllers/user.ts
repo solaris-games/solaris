@@ -19,7 +19,17 @@ export default (container: DependencyContainer) => {
         listLeaderboard: async (req, res, next) => {
             try {
                 const limit = +req.query.limit || null;
-                const result = await container.userLeaderboardService.getUserLeaderboard(limit, req.query.sortingKey);
+                const skip = +req.query.skip || 0;
+
+                if (limit !== null && limit > 1000) {
+                    throw new ValidationError('Limit cannot exceed 1000.');
+                }
+
+                if (skip > 1000) {
+                    throw new ValidationError('Skip cannot exceed 1000.');
+                }
+
+                const result = await container.userLeaderboardService.getUserLeaderboard(limit, req.query.sortingKey, skip);
     
                 res.status(200).json(result);
                 return next();

@@ -13,8 +13,8 @@ import { type Axios } from "axios";
 const routes = createUserRoutes<string>();
 
 // TODO: Needs query params
-export const getLeaderboard = (axios: Axios) => async (limit: number, sortingKey: string): Promise<ResponseResult<UserLeaderboard>> => {
-  return doGet(axios)(routes.listLeaderboard, {}, { limit, sortingKey }, {withCredentials: true});
+export const getLeaderboard = (axios: Axios) => async (limit: number, sortingKey: string, skip: number = 0): Promise<ResponseResult<UserLeaderboard>> => {
+  return doGet(axios)(routes.listLeaderboard, {}, { limit, sortingKey, skip }, {withCredentials: true});
 }
 
 export const createUser = (axios: Axios) => async (email: string, username: string, password: string): Promise<ResponseResult<{ id: string }>> => {
