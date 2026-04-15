@@ -2,7 +2,7 @@ import { type Game } from '../types/common/game';
 import { type Player } from '../types/common/player';
 import type {Id} from "../types/id";
 
-export type CombatGroupResult<ID> = {
+export type CombatPlayerGrouping<ID> = {
     groups: Player<ID>[][],
     mapping: Map<ID, number>, // maps player ID to combat group idx
 }
@@ -26,7 +26,7 @@ export class CombatGroupService<ID extends Id> {
         this.diplomacyService = diplomacyService;
     }
 
-    computeCombatGroups(game: Game<ID>, players: Player<ID>[]): CombatGroupResult<ID> {
+    computeCombatGroups(game: Game<ID>, players: Player<ID>[]): CombatPlayerGrouping<ID> {
         const queue = Array.from(players);
 
         const groups: Player<ID>[][] = [];

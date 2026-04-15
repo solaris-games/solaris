@@ -17,8 +17,7 @@ import PasswordService from './password';
 import AuthService from './auth';
 import BroadcastService from './broadcast';
 import CarrierService from './carrier';
-import CombatService from './combat';
-import {BaseGameEvent, DistanceService, PathfindingService} from '@solaris/common';
+import {BaseGameEvent, DistanceService, PathfindingService, CombatService, CombatGroupService} from '@solaris/common';
 import EmailService from './email';
 import EventService from './event';
 import LeaderboardService from './leaderboard';
@@ -238,7 +237,8 @@ export default (config: Config,
     const userServerSocketHandler = new UserServerSocketHandler(socketService, serverHandler);
     const leaderboardService = new LeaderboardService(playerService, playerAfkService, userLevelService, ratingService, gameService, gameTypeService, gameStateService, badgeService, playerStatisticsService, teamService);
     const userLeaderboardService = new UserLeaderboardService(userRepository, guildUserService);
-    const combatService = new CombatService(technologyService, specialistService, playerService, starService, reputationService, diplomacyService, gameTypeService, starCaptureService, statisticsService);
+    const combatGroupService = new CombatGroupService(diplomacyService);
+    const combatService = new CombatService(combatGroupService, technologyService, specialistService);
     const historyService = new HistoryService(historyRepository, playerService, gameService, playerStatisticsService, gameStateService);
     const waypointActionService = new WaypointActionService();
     const waypointService = new WaypointService<DBObjectId>(starService as any, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService); // todo: fix any once we consolidate common lib and server types
@@ -291,6 +291,8 @@ export default (config: Config,
         broadcastService,
         carrierService,
         combatService,
+        carrierCombatService,
+        combatGroupService,
         distanceService,
         emailService,
         eventService,

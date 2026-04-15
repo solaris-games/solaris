@@ -18,12 +18,11 @@ import CacheService from "../cache";
 import CarrierService from "../carrier";
 import CarrierGiftService from "../carrierGift";
 import CarrierMovementService from "../carrierMovement";
-import CombatService from "../combat";
 import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
-import {DistanceService, PathfindingService} from '@solaris/common';
+import {CombatGroupService, CombatService, DistanceService, PathfindingService} from '@solaris/common';
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -97,6 +96,8 @@ import CullWaypointsService from "../cullWaypoints";
 import { CarrierTravelService } from '@solaris/common';
 import { StarDataService } from "@solaris/common";
 import {DBObjectId} from "./DBObjectId";
+import CarrierCombatService from "../carrierCombat";
+import CombatProcessingService from "../combatProcessing";
 
 export interface DependencyContainer {
     config: Config,
@@ -111,7 +112,10 @@ export interface DependencyContainer {
     diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
     userServerSocketEmitter: UserServerSocketEmitter,
     carrierService: CarrierService,
-    combatService: CombatService,
+    combatService: CombatService<DBObjectId>,
+    combatGroupService: CombatGroupService<DBObjectId>,
+    combatProcessingService: CombatProcessingService,
+    carrierCombatService: CarrierCombatService,
     distanceService: DistanceService,
     emailService: EmailService,
     eventService: EventService,
