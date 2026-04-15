@@ -23,13 +23,13 @@ interface ISpecialistService {
     getByIdCarrier(id: number): Specialist | null;
 }
 
-type Buff = {
+export type Buff = {
     kind: 'star' | 'carrier',
     amount: number,
     specialistId: number,
 }
 
-type WeaponsDetail = {
+export type WeaponsDetail = {
     total: number,
     appliedBuffs: Buff[],
     weaponsLevel: number,

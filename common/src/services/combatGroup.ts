@@ -2,7 +2,7 @@ import { type Game } from '../types/common/game';
 import { type Player } from '../types/common/player';
 import type {Id} from "../types/id";
 
-type CombatGroupResult<ID> = {
+export type CombatGroupResult<ID> = {
     groups: Player<ID>[][],
     mapping: Map<ID, number>, // maps player ID to combat group idx
 }
