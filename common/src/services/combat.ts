@@ -39,8 +39,6 @@ interface ISpecialistService {
 
 type MO<ID> = { type: 'carrier', carrier: Carrier<ID> } | { type: 'star', star: Star<ID> };
 
-// TODO: Track ship kills per player
-
 export class CombatService<ID extends Id> {
     combatGroupService: CombatGroupService<ID>;
     technologyService: TechnologyService;
@@ -296,7 +294,7 @@ export class CombatService<ID extends Id> {
         return this._makeResult(state);
     }
 
-    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]) {
+    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): CombatResult<ID> {
         const playerIds = new Set<ID>([star.ownedByPlayerId!]);
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
@@ -310,7 +308,7 @@ export class CombatService<ID extends Id> {
         return this._combatLoop({round: 0, groups: combatGroups});
     }
 
-    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]) {
+    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]): CombatResult<ID> {
         const playerIds = new Set<ID>();
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
