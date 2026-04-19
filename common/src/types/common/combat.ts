@@ -32,6 +32,11 @@ export type CombatResultGroup<ID> = {
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
+    shipsKilled: number,
+    carriersKilled: number,
+    carriersLost: number,
+    specialistsKilled: number,
+    specialistsLost: number,
 }
 
 export type GroupedCombatResult<ID> = {

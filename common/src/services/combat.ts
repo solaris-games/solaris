@@ -133,22 +133,28 @@ export class CombatService<ID extends Id> {
     }
 
     _performCombatRound(oldState: CombatRoundState<ID>): CombatRoundState<ID> {
-        // todo: handle small fleets
-
         const newGroups = oldState.groups.map((group, groupIdx) => {
-            const incomingDamage = oldState.groups.reduce((dmg, otherGroup, otherGroupIdx) => {
-                if (otherGroupIdx === groupIdx) {
-                    return dmg;
-                } else {
-                    const dmgFromOther = otherGroup.attackAgainst.get(groupIdx)!;
+            let dmg = 0;
 
-                    return dmg + dmgFromOther.total;
+            for (let otherGroupIdx = 0; otherGroupIdx < oldState.groups.length; otherGroupIdx++){
+                if (otherGroupIdx === groupIdx) {
+                    continue;
                 }
-            }, 0);
+
+                const otherGroup = oldState.groups[otherGroupIdx];
+
+                const dmgFromOther = otherGroup.attackAgainst.get(groupIdx)!;
+
+                if (otherGroup.ships < dmgFromOther.total) {
+                    dmg += otherGroup.ships;
+                } else {
+                    dmg += dmgFromOther.total;
+                }
+            }
 
             return {
                 ...group,
-                ships: group.ships - incomingDamage,
+                ships: group.ships - dmg,
             };
         });
 
@@ -259,6 +265,11 @@ export class CombatService<ID extends Id> {
             shipsBefore: group.shipsBefore,
             shipsLost: group.shipsLost,
             shipsAfter: group.shipsAfter,
+            shipsKilled: 0, // todo
+            carriersKilled: 0,
+            carriersLost: 0,
+            specialistsKilled: 0,
+            specialistsLost: 0,
         };
     }
 
@@ -279,12 +290,16 @@ export class CombatService<ID extends Id> {
         }
     }
 
+    _isCombatOver(state: CombatRoundState<ID>) {
+        return state.groups.filter(g => g.ships > 0).length <= 1; // mutual destruction is possible
+    }
+
     _combatLoop(initState: CombatRoundState<ID>): CombatResult<ID> {
         let state = initState;
 
         while (true) {
             // check for dead
-            if (state.groups.find((g) => g.ships <= 0)) {
+            if (this._isCombatOver(state)) {
                 break;
             }
 

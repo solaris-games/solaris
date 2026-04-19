@@ -32,6 +32,7 @@ export type Buff = {
 export type WeaponsDetail = {
     total: number,
     appliedBuffs: Buff[],
+    weaponsBuff: number,
     weaponsLevel: number,
 }
 

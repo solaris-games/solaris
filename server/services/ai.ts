@@ -2,8 +2,7 @@ import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {KnownAttack} from "./types/Ai";
 import CarrierService from "./carrier";
-import CombatService from "./combat";
-import {DistanceService, PathfindingService} from '@solaris/common';
+import {CombatService, DistanceService, PathfindingService} from '@solaris/common';
 import PlayerService from "./player";
 import ShipTransferService from "./shipTransfer";
 import StarService from "./star";
@@ -138,7 +137,7 @@ export default class AIService {
     starService: StarService;
     distanceService: DistanceService;
     waypointService: WaypointService<DBObjectId>;
-    combatService: CombatService;
+    combatService: CombatService<DBObjectId>;
     shipTransferService: ShipTransferService;
     technologyService: TechnologyService;
     playerService: PlayerService;
@@ -158,7 +157,7 @@ export default class AIService {
         starService: StarService,
         distanceService: DistanceService,
         waypointService: WaypointService<DBObjectId>,
-        combatService: CombatService,
+        combatService: CombatService<DBObjectId>,
         shipTransferService: ShipTransferService,
         technologyService: TechnologyService,
         playerService: PlayerService,
@@ -955,7 +954,8 @@ export default class AIService {
             weaponsLevel: player.research.weapons.level
         };
 
-        const result = this.combatService.calculate(defender, attacker, true, true);
+        // todo
+        const result = this.combatService.computeStar(defender, attacker, true, true);
 
         return result.needed!.attacker;
     }

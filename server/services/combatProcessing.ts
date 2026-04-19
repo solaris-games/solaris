@@ -14,6 +14,7 @@ import {DBObjectId} from "./types/DBObjectId";
 import StarCaptureService from "./starCapture";
 import ReputationService from "./reputation";
 import PlayerService from "./player";
+import StatisticsService from "./statistics";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',
@@ -26,6 +27,7 @@ export default class CombatProcessingService extends EventEmitter {
     starCaptureService: StarCaptureService;
     reputationService: ReputationService;
     playerService: PlayerService;
+    statisticsService: StatisticsService;
 
     constructor(
         combatService: CombatService<DBObjectId>,
@@ -33,6 +35,7 @@ export default class CombatProcessingService extends EventEmitter {
         starCaptureService: StarCaptureService,
         reputationService: ReputationService,
         playerService: PlayerService,
+        statisticsService: StatisticsService,
     ) {
         super();
 
@@ -41,6 +44,7 @@ export default class CombatProcessingService extends EventEmitter {
         this.starCaptureService = starCaptureService;
         this.reputationService = reputationService;
         this.playerService = playerService;
+        this.statisticsService = statisticsService;
     }
 
     _distributeDamage(combatResult: CombatResult<DBObjectId>) {
@@ -155,53 +159,27 @@ export default class CombatProcessingService extends EventEmitter {
         return null;
     }
 
-    _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: CombatResult<DBObjectId>) {
-        // TODO
+    async _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: CombatResult<DBObjectId>) {
+        for (let group of combatResult.groups) {
+            for (let player of group.players) {
+                const user = this._findUser(gameUsers, player);
 
-        /*
+                if (!user) {
+                    continue;
+                }
 
-        let defenderCarriersDestroyed = defenderCarriers.filter(c => !c.ships).length;
-        let defenderSpecialistsDestroyed = defenderCarriers.filter(c => !c.ships && c.specialistId).length;
+                const pc = group.players.length;
 
-        let attackerCarriersDestroyed = attackerCarriers.filter(c => !c.ships).length;
-        let attackerSpecialistsDestroyed = attackerCarriers.filter(c => !c.ships && c.specialistId).length;
+                await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+                    stats.combat.kills.ships += Math.floor(group.shipsKilled / pc);
+                    stats.combat.kills.carriers += Math.floor(group.carriersKilled / pc);
+                    stats.combat.kills.specialists += Math.floor(group.specialistsKilled / pc);
 
-        // Add combat result stats to defender achievements.
-        for (let defenderUser of defenderUsers) {
-            let defender = defenders.find(u => u.userId && u.userId.toString() === defenderUser._id.toString())!;
-
-            if (defender && !defender.defeated) {
-                const playerCarriers = defenderCarriers.filter(c => c.ownedByPlayerId!.toString() === defender._id.toString());
-
-                this.statisticsService.modifyStats(game._id, defender._id, (stats) => {
-                    stats.combat.kills.ships += combatResult.lost.attacker;
-                    stats.combat.kills.carriers += attackerCarriersDestroyed;
-                    stats.combat.kills.specialists += attackerSpecialistsDestroyed;
-
-                    stats.combat.losses.ships += combatResult.lost.defender; // TODO: This will not be correct in combat where its more than 2 players.
-                    stats.combat.losses.carriers += playerCarriers.filter(c => !c.ships).length;
-                    stats.combat.losses.specialists += playerCarriers.filter(c => !c.ships && c.specialistId).length;
+                    stats.combat.losses.ships += Math.floor(group.shipsLost / pc);
+                    stats.combat.losses.carriers += Math.floor(group.carriersLost / pc);
+                    stats.combat.losses.specialists += Math.floor(group.specialistsLost / pc);
                 });
             }
         }
-
-        // Add combat result stats to attacker achievements.
-        for (let attackerUser of attackerUsers) {
-            let attacker = attackers.find(u => u.userId && u.userId.toString() === attackerUser._id.toString())!;
-
-            if (attacker && !attacker.defeated) {
-                const playerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === attacker._id.toString());
-
-                this.statisticsService.modifyStats(game._id, attacker._id, (stats) => {
-                    stats.combat.kills.ships += combatResult.lost.defender;
-                    stats.combat.kills.carriers += defenderCarriersDestroyed;
-                    stats.combat.kills.specialists += defenderSpecialistsDestroyed;
-
-                    stats.combat.losses.ships += combatResult.lost.attacker; // TODO: This will not be correct in combat where its more than 2 players.
-                    stats.combat.losses.carriers += playerCarriers.filter(c => !c.ships).length;
-                    stats.combat.losses.specialists += playerCarriers.filter(c => !c.ships && c.specialistId).length;
-                });
-            }
-        } */
     }
 }
