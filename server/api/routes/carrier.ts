@@ -131,10 +131,5 @@ export default (router: SingleRouter, mw: MiddlewareContainer, container: Depend
             mw.playerMutex.release()
     );
 
-    answer(routes.calculateCombat,
-            mw.auth.authenticate(),
-            controller.calculateCombat
-    );
-
     return router;
 }

@@ -7,7 +7,14 @@ import {groupBy} from "../utilities/utils";
 import type {Player} from "../types/common/player";
 import {TechnologyService, type WeaponsDetail} from "./technology";
 import type {Specialist} from "../types/common/specialist";
-import type {CombatResult, CombatResultGroup} from "../types/common/combat";
+import {
+    GroupedCombatResult,
+    CombatResultGrouped,
+    CombatResult,
+    CombatResultGroup,
+    CombatResultStar, CombatResultCarrier
+} from "../types/common/combat";
+import EventEmitter from "events";
 
 type CombatGroup<ID> = {
     specialists: Specialist[],
@@ -29,6 +36,8 @@ interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
     getByIdCarrier(id: number): Specialist | null;
 }
+
+type MO<ID> = { type: 'carrier', carrier: Carrier<ID> } | { type: 'star', star: Star<ID> };
 
 // TODO: Track ship kills per player
 
@@ -126,6 +135,8 @@ export class CombatService<ID extends Id> {
     }
 
     _performCombatRound(oldState: CombatRoundState<ID>): CombatRoundState<ID> {
+        // todo: handle small fleets
+
         const newGroups = oldState.groups.map((group, groupIdx) => {
             const incomingDamage = oldState.groups.reduce((dmg, otherGroup, otherGroupIdx) => {
                 if (otherGroupIdx === groupIdx) {
@@ -150,17 +161,119 @@ export class CombatService<ID extends Id> {
         }
     }
 
+    _distributeDamage(group: CombatResultGrouped<ID>): CombatResultGroup<ID> {
+        let shipsToKill = group.shipsLost;
+
+        const groupObjects: MO<ID>[] = group.carriers.map(carrier => ({ type: 'carrier', carrier }));
+        if (group.star) {
+            groupObjects.push({ type: 'star', star: group.star });
+        }
+
+        let starRes: CombatResultStar<ID> | undefined;
+        const carriersRes: CombatResultCarrier<ID>[] = [];
+
+        const deductShips = (ships: number, obj: MO<ID>) => {
+            if (obj.type === 'star') {
+                if (starRes) {
+                    starRes.shipsLost += ships;
+                    starRes.shipsAfter -= ships;
+                } else {
+                    starRes = {
+                        star: obj.star,
+                        shipsBefore: obj.star.ships || 0,
+                        shipsLost: ships,
+                        shipsAfter: (obj.star.ships || 0) - ships,
+                    }
+                }
+            } else if (obj.type === 'carrier') {
+                const existingRes = carriersRes.find(c => c.carrier === obj.carrier);
+                if (existingRes) {
+                    existingRes.shipsLost += ships;
+                    existingRes.shipsAfter -= ships;
+                } else {
+                    carriersRes.push({
+                        carrier: obj.carrier,
+                        shipsBefore: obj.carrier.ships || 0,
+                        shipsLost: ships,
+                        shipsAfter: (obj.carrier.ships || 0) - ships,
+                    });
+                }
+            }
+        };
+
+        const getShips = (obj: MO<ID>) => {
+            if (obj.type === 'carrier') {
+                return carriersRes.find(c => c.carrier === obj.carrier)?.shipsAfter || obj.carrier.ships || 0;
+            } else {
+                return starRes?.shipsAfter || obj.star.ships || 0;
+            }
+        };
+
+        while (shipsToKill > 0) {
+            const objectsToDeduct = groupObjects.filter(o => {
+                if (o.type === 'carrier') {
+                    return getShips(o) > 1; // carrier alive
+                } else {
+                    return getShips(o) > 0; // star alive
+                }
+            });
+
+            objectsToDeduct.sort((a, b) => {
+                const specsIdA = a.type === 'carrier' ? a.carrier.specialistId : a.star.specialistId;
+                const specsIdB = b.type === 'carrier' ? b.carrier.specialistId : b.star.specialistId;
+
+                // Sort by specialist (kill objects without specialists first)
+                if (specsIdA == null && specsIdB != null) {
+                    return -1;
+                } else if (specsIdA != null && specsIdB == null) {
+                    return 1;
+                }
+
+                const shipsA = getShips(a);
+                const shipsB = getShips(b);
+
+                // Sort by ships descending (kill objects with the most ships first)
+                if (shipsA > shipsB) return -1;
+                if (shipsA < shipsB) return 1;
+
+                return 0; // Both are the same.
+            });
+
+            const killPerObject = shipsToKill / objectsToDeduct.length;
+
+            for (let obj of objectsToDeduct) {
+                const killForObj = Math.floor(killPerObject);
+
+                const shipsRemain = getShips(obj);
+
+                const actualKill = Math.min(killForObj, shipsRemain);
+
+                deductShips(actualKill, obj);
+
+                shipsToKill -= actualKill;
+            }
+        }
+
+        return {
+            players: group.players,
+            carriers: carriersRes,
+            star: starRes,
+            shipsBefore: group.shipsBefore,
+            shipsLost: group.shipsLost,
+            shipsAfter: group.shipsAfter,
+        };
+    }
+
     _makeResult(state: CombatRoundState<ID>): CombatResult<ID> {
         const groups: CombatResultGroup<ID>[] = state.groups.map((g) => {
-            return {
+            return this._distributeDamage({
                 players: g.players,
-                carriers: g.carriers,
                 star: g.star,
+                carriers: g.carriers,
                 shipsBefore: g.originalShips,
                 shipsAfter: g.ships,
                 shipsLost: g.originalShips - g.ships,
-                shipsNeededToWin: 0, // TODO
-            };
+            });
         });
 
         return {

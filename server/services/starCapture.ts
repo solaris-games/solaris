@@ -2,9 +2,7 @@ import {Game} from "./types/Game";
 import {Star, StarCaptureResult} from "./types/Star";
 import {Player} from "./types/Player";
 import {User} from "./types/User";
-import {Carrier} from "./types/Carrier";
-import { GameTypeService } from '@solaris/common'
-import PlayerService from "./player";
+import {Carrier, GameTypeService} from '@solaris/common'
 import StarService from "./star";
 import SpecialistService from "./specialist";
 import GameStateService from "./gameState";
@@ -12,6 +10,7 @@ import DiplomacyService from "./diplomacy";
 import { TechnologyService } from '@solaris/common';
 import StarUpgradeService from "./starUpgrade";
 import StatisticsService from "./statistics";
+import {DBObjectId} from "./types/DBObjectId";
 
 export default class StarCaptureService {
     specialistService: SpecialistService;
@@ -43,7 +42,7 @@ export default class StarCaptureService {
         this.statisticsService = statisticsService;
     }
 
-    captureStar(game: Game, star: Star, owner: Player, defenders: Player[], defenderUsers: User[], attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier[]): StarCaptureResult {
+    captureStar(game: Game, star: Star, owner: Player, ownerUser: User | undefined, attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier<DBObjectId>[]): StarCaptureResult {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         const specialist = this.specialistService.getByIdStar(star.specialistId);
@@ -115,10 +114,8 @@ export default class StarCaptureService {
         // Reset the ignore bulk upgrade statuses as it has been captured by a new player.
         this.starService.resetIgnoreBulkUpgradeStatuses(star);
 
-        const oldStarUser = defenderUsers.find(u => owner.userId && u._id.toString() === owner.userId.toString()) || null;
-
         if (!isTutorialGame) {
-            if (oldStarUser && !owner.defeated) {
+            if (ownerUser && !owner.defeated) {
                 this.statisticsService.modifyStats(game._id, owner._id, (stats) => {
                     stats.combat.stars.lost += 1;
 
@@ -166,16 +163,16 @@ export default class StarCaptureService {
         return sum;
     }
 
-    calculateCaptureReward(game: Game, star: Star, newStarPlayerCarriers: Carrier[]): number | null {
+    calculateCaptureReward(game: Game, star: Star, newStarPlayerCarriers: Carrier<DBObjectId>[]): number | null {
         // If star capture reward is enabled, destroy the economic infrastructure
-        // and add the capture amount to the attacker
+        // and add the capture amount to the attackers
 
         if (game.settings.specialGalaxy.starCaptureReward === 'enabled' && star.canBeLooted) {
             const starEconomy = star.infrastructure.economy || 0;
             const baseReward = starEconomy * game.constants.star.captureRewardMultiplier; // Attacker gets X credits for every eco destroyed.
 
             // Check to see whether to double the capture reward.
-            let captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers);
+            const captureRewardMultiplier = this.specialistService.hasAwardDoubleCaptureRewardSpecialist(newStarPlayerCarriers as any); //todo: types
 
             const finalReward = Math.floor(baseReward * captureRewardMultiplier);
 

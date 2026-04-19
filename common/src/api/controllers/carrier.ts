@@ -1,6 +1,5 @@
-import {DeleteRoute, PatchRoute, PostRoute, PutRoute} from ".";
+import {DeleteRoute, PatchRoute, PutRoute} from ".";
 import { type CarrierWaypointBase, type CarrierWaypoint } from "../../types/common/carrierWaypoint";
-import { type CombatResultShips } from "../../types/common/combat";
 
 export type CarrierSaveWaypointsRequest<ID> = {
     waypoints: CarrierWaypointBase<ID>[];
@@ -36,5 +35,4 @@ export const createCarrierRoutes = <ID>() => ({
     gift: new PutRoute<{ gameId: ID, carrierId: ID }, {}, {}, {}>('/api/game/:gameId/carrier/:carrierId/gift'),
     rename: new PatchRoute<{ gameId: ID, carrierId: ID }, {}, { name: string }, {}>('/api/game/:gameId/carrier/:carrierId/rename'),
     scuttle: new DeleteRoute<{ gameId: ID, carrierId: ID }, {}, {}>('/api/game/:gameId/carrier/:carrierId/scuttle'),
-    calculateCombat: new PostRoute<{ gameId: ID }, {}, CarrierCalculateCombatRequest, CombatResultShips>('/api/game/:gameId/carrier/calculateCombat'),
 });

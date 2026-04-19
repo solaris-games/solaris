@@ -101,22 +101,6 @@ export default (container: DependencyContainer) => {
             } catch (err) {
                 return next(err);
             }
-        },
-        calculateCombat: (req, res, next) => {
-            try {
-                const reqObj = mapToCarrierCalculateCombatRequest(req.body);
-    
-                let result = container.combatService.calculate(
-                    reqObj.defender,
-                    reqObj.attacker,
-                    reqObj.isTurnBased,
-                    true);
-    
-                res.status(200).json(result);
-                return next();
-            } catch (err) {
-                return next(err);
-            }
         }
     }
 };

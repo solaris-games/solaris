@@ -1,5 +1,5 @@
 import type { StarCaptureResult } from "../star";
-import type { CombatResult } from "../combat";
+import type { GroupedCombatResult } from "../combat";
 import type {BulkUpgradeReport} from "../infrastructureUpgrade";
 import type {BaseGameEvent} from "./game";
 import type {LedgerType} from "../ledger";
@@ -231,7 +231,7 @@ export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
 export interface CombatEventData<ID> {
     playerIdDefenders: ID[];
     playerIdAttackers: ID[];
-    combatResult: CombatResult<ID>;
+    combatResult: GroupedCombatResult<ID>;
 }
 
 export interface BaseCombatEvent<ID> extends BasePlayerEvent<ID> {

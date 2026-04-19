@@ -1,11 +1,10 @@
 import { DBObjectId } from "./types/DBObjectId";
-import { Carrier, CarrierPosition } from "./types/Carrier";
+import { Carrier } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { User } from "./types/User";
 import AIService from "./ai";
 import BattleRoyaleService from "./battleRoyale";
 import CarrierService from "./carrier";
-import CombatService from "./combat";
 import DiplomacyService from "./diplomacy";
 import { DistanceService } from '@solaris/common';
 import GameService from "./game";
@@ -49,6 +48,7 @@ import { CarrierTravelService } from '@solaris/common';
 import EventEmitter from "events";
 import moment from "moment";
 import CarrierCombatService from "./carrierCombat";
+import CombatProcessingService from "./combatProcessing";
 
 const log = logger("Game Tick Service");
 
@@ -69,7 +69,6 @@ export default class GameTickService extends EventEmitter {
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
     historyService: HistoryService;
-    combatService: CombatService;
     leaderboardService: LeaderboardService;
     userService: UserService;
     gameService: GameService;
@@ -97,6 +96,7 @@ export default class GameTickService extends EventEmitter {
     cullWaypointsService: CullWaypointsService;
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierCombatService: CarrierCombatService;
+    combatProcessingService: CombatProcessingService;
 
     constructor(
         distanceService: DistanceService,
@@ -106,7 +106,6 @@ export default class GameTickService extends EventEmitter {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         historyService: HistoryService,
-        combatService: CombatService,
         leaderboardService: LeaderboardService,
         userService: UserService,
         gameService: GameService,
@@ -134,6 +133,7 @@ export default class GameTickService extends EventEmitter {
         cullWaypointsService: CullWaypointsService,
         carrierTravelService: CarrierTravelService<DBObjectId>,
         carrierCombatService: CarrierCombatService,
+        combatProcessingService: CombatProcessingService,
     ) {
         super();
             
@@ -144,7 +144,6 @@ export default class GameTickService extends EventEmitter {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
         this.historyService = historyService;
-        this.combatService = combatService;
         this.leaderboardService = leaderboardService;
         this.userService = userService;
         this.gameService = gameService;
@@ -172,6 +171,7 @@ export default class GameTickService extends EventEmitter {
         this.cullWaypointsService = cullWaypointsService;
         this.carrierTravelService = carrierTravelService;
         this.carrierCombatService = carrierCombatService;
+        this.combatProcessingService = combatProcessingService;
     }
 
     async tick(gameId: DBObjectId) {
@@ -494,7 +494,7 @@ export default class GameTickService extends EventEmitter {
 
             const starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
 
-            await this.combatService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+            await this.combatProcessingService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
