@@ -75,7 +75,7 @@ export default class CombatProcessingService extends EventEmitter {
         this._distributeDamage(combatResult);
 
         if (!this.gameTypeService.isTutorialGame(game)) {
-            this._updatePlayersCombatAchievements(game, gameUsers, combatResult);
+            await this._updatePlayersCombatAchievements(game, gameUsers, combatResult);
         }
 
         // Remove any carriers from the game that have been destroyed.

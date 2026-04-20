@@ -12,20 +12,9 @@ import {
     CombatResultGrouped,
     CombatResult,
     CombatResultGroup,
-    CombatResultStar, CombatResultCarrier
+    CombatResultStar, CombatResultCarrier, CombatGroup
 } from "../types/common/combat";
 import EventEmitter from "events";
-
-type CombatGroup<ID> = {
-    specialists: Specialist[],
-    originalShips: number,
-    ships: number,
-    isDefender: boolean,
-    attackAgainst: Map<number, WeaponsDetail>,
-    players: Player<ID>[],
-    carriers: Carrier<ID>[],
-    star: Star<ID> | undefined,
-}
 
 type CombatRoundState<ID> = {
     round: number,
@@ -79,18 +68,6 @@ export class CombatService<ID extends Id> {
         };
     }
 
-    _weaponsAgainstGroup(game: Game<ID>, group: CombatGroup<ID>, otherGroup: CombatGroup<ID>, isCarrierToStarCombat: boolean): WeaponsDetail {
-        // todo: infiltrator etc.
-
-        if (group.star) {
-            return this.technologyService.getStarEffectiveWeaponsLevel(game, group.players, group.star, group.carriers);
-        } else if (isCarrierToStarCombat) { //C2S, one of the attackers
-            return this.technologyService.getCarriersEffectiveWeaponsLevel(game, group.players, group.carriers, true, true, 'anyCarrier');
-        } else { //C2C
-            return this.technologyService.getCarriersEffectiveWeaponsLevel(game, group.players, group.carriers, false, false, 'anyCarrier');
-        }
-    }
-
     _computeGroupWeapons(game: Game<ID>, groups: CombatGroup<ID>[], isCarrierToStarCombat: boolean) {
         // siege breaker should apply a weapons bonus against ALL groups which contain a player that was targeted at launch
 
@@ -104,7 +81,7 @@ export class CombatService<ID extends Id> {
                     continue;
                 }
 
-                const weps = this._weaponsAgainstGroup(game, group, otherGroup, isCarrierToStarCombat);
+                const weps = this.technologyService.getEffectiveWeaponsDetail(game, group, otherGroup, isCarrierToStarCombat);
                 group.attackAgainst.set(otherGroupIdx, weps);
             }
         }

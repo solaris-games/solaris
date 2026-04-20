@@ -1,11 +1,12 @@
 import type {Player, PlayerTechnologyLevels, ResearchTypeNotRandom} from "../types/common/player";
 import type {Specialist} from "../types/common/specialist";
 import type {GameTypeService} from "./gameType";
-import type {CombatResolutionMalusStrategy, Game} from "../types/common/game";
+import type {Game} from "../types/common/game";
 import type {Star} from "../types/common/star";
 import type {Id} from "../types/id";
 import type {Carrier} from "../types/common/carrier";
 import {maxBy, maxOf, minOf, notUndefined} from "../utilities/utils";
+import {CombatGroup} from "../types/common/combat";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -172,7 +173,7 @@ export class TechnologyService {
         return techs;
     }
 
-    getStarWeaponsBuff<ID>(star: Star<ID>): Buff | undefined {
+    _getStarWeaponsBuff<ID>(star: Star<ID>): Buff | undefined {
         if (star.specialistId) {
             const specialist = this.specialistService.getByIdStar(star.specialistId);
 
@@ -188,7 +189,7 @@ export class TechnologyService {
         return undefined;
     }
 
-    getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number, strategy: CombatResolutionMalusStrategy, isLargestCarrier: boolean): Buff | undefined {
+    _getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number): Buff | undefined {
         if (!carrier.specialistId) {
             return undefined;
         }
@@ -221,12 +222,7 @@ export class TechnologyService {
             }
 
             if (specialist.modifiers.local.weapons) {
-                const isDebuff = specialist.modifiers.local.weapons < 0;
-                const isMalusCarrier = (strategy === 'anyCarrier') || (strategy === 'largestCarrier' && isLargestCarrier);
-
-                if (!isDebuff || isMalusCarrier) {
-                    buffs.push(specialist.modifiers.local.weapons);
-                }
+                buffs.push(specialist.modifiers.local.weapons);
             }
         }
 
@@ -243,42 +239,45 @@ export class TechnologyService {
         }
     }
 
-    getCarriersWeaponsDebuff<ID>(carriersToCheck: Carrier<ID>[]) {
-        let deduction = 0;
-        
+    getCarriersWeaponsDebuff<ID>(carriersToCheck: Carrier<ID>[]): Buff | undefined {
         if (!carriersToCheck.length) {
-            return 0;
+            return undefined;
         }
         
         // If any of the carriers have a specialist which deducts enemy weapons
         // then find the one that has the highest deduction.
-        deduction = carriersToCheck
+        const allBuffs = carriersToCheck
             .filter(c => c.specialistId != null)
-            .map(c => {
+            .flatMap(c => {
                 let specialist = this.specialistService.getByIdCarrier(c.specialistId!);
 
                 if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
-                    return specialist.modifiers.special.deductEnemyWeapons;
+                    const buff: Buff = {
+                        kind: 'carrier',
+                        specialistId: specialist.id,
+                        amount: specialist.modifiers.special.deductEnemyWeapons,
+                    };
+
+                    return [buff];
                 }
 
-                return 0;
-            })
-            .sort((a, b) => b - a)[0];
+                return [];
+            });
 
-        return deduction || 0;
+        return maxOf(b => b.amount, allBuffs);
     }
 
-    getStarEffectiveWeaponsLevel<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
+    getStarOwnWeaponsDetail<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
         const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         const defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs: Buff[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => (this.getCarrierWeaponsBuff(c, true, false, defenders.length, 'anyCarrier', false))).filter(notUndefined);
+            buffs = carriersInOrbit.map(c => (this._getCarrierWeaponsBuff(c, true, false, defenders.length))).filter(notUndefined);
         }
 
-        const starBuff = this.getStarWeaponsBuff(star);
+        const starBuff = this._getStarWeaponsBuff(star);
 
         if (starBuff) {
             buffs.push(starBuff);
@@ -292,26 +291,36 @@ export class TechnologyService {
         }
     }
 
-    getCarriersEffectiveWeaponsLevel<ID>(game: Game<ID>, players: Player<ID>[], carriers: Carrier<ID>[], isCarrierToStarCombat: boolean, isAttacker: boolean,  strategy: CombatResolutionMalusStrategy): WeaponsDetail {
-        const weapons = players.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+    getEffectiveWeaponsDetail<ID>(game: Game<ID>, group: CombatGroup<ID>, opponents: CombatGroup<ID>, isCarrierToStarCombat: boolean): WeaponsDetail {
+        const baseWeapons = maxBy(p => p.research.weapons.level, group.players);
 
-        if (!carriers.length) {
-            return {
-                total: weapons,
-                appliedBuffs: [],
-                weaponsLevel: weapons,
-            };
-        }
-
-        const largestCarrierShips = maxBy(c => c.ships || 0, carriers);
-
-        const buffs: Buff[] = carriers.map(c => {
-            const isLargest = (c.ships || 0) === (largestCarrierShips || 0);
-
-            return this.getCarrierWeaponsBuff(c, isCarrierToStarCombat, isAttacker, players.length, strategy, isLargest);
+        const buffs: Buff[] = group.carriers.map(c => {
+            return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, !group.isDefender, group.players.length);
         }).filter(notUndefined);
 
-        return this._calculateActualWeaponsBuff(weapons, buffs, 0);
+        const buff = this._calculateActualWeaponsBuff(baseWeapons, buffs, 0);;
+
+        const opponentDebuff = this.getCarriersWeaponsDebuff(opponents.carriers);
+
+        const appliedBuffs = buff.appliedBuffs;
+
+        if (opponentDebuff) {
+            appliedBuffs.push(opponentDebuff);
+
+            return {
+                weaponsLevel: baseWeapons,
+                appliedBuffs,
+                weaponsBuff: buff.weaponsBuff - opponentDebuff.amount,
+                total: buff.total - opponentDebuff.amount,
+            }
+        } else {
+            return {
+                weaponsLevel: baseWeapons,
+                appliedBuffs,
+                weaponsBuff: buff.weaponsBuff,
+                total: buff.total,
+            }
+        }
     }
 
     _calculateActualWeaponsBuff(weapons: number, buffs: Buff[], additionalBuff: number): WeaponsDetail {
@@ -339,6 +348,7 @@ export class TechnologyService {
             weaponsLevel: weapons,
             total,
             appliedBuffs,
+            weaponsBuff: buffsTotal,
         }
     }   
 
