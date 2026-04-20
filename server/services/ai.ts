@@ -954,8 +954,7 @@ export default class AIService {
             weaponsLevel: player.research.weapons.level
         };
 
-        // todo
-        const result = this.combatService.computeStar(defender, attacker, true, true);
+        const result = this.combatService.computeStar(game, starToInvade, );
 
         return result.needed!.attacker;
     }

@@ -8,6 +8,7 @@ export type CombatResultGrouped<ID> = {
     players: Player<ID>[],
     carriers: Carrier<ID>[],
     star: Star<ID> | undefined,
+    shipsKilled: number,
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
@@ -58,4 +59,5 @@ export type CombatGroup<ID> = {
     players: Player<ID>[],
     carriers: Carrier<ID>[],
     star: Star<ID> | undefined,
+    shipsKilled: number,
 }

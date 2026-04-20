@@ -65,6 +65,7 @@ export class CombatService<ID extends Id> {
             players,
             carriers,
             star,
+            shipsKilled: 0,
         };
     }
 
@@ -110,31 +111,39 @@ export class CombatService<ID extends Id> {
     }
 
     _performCombatRound(oldState: CombatRoundState<ID>): CombatRoundState<ID> {
-        const newGroups = oldState.groups.map((group, groupIdx) => {
-            let dmg = 0;
-
-            for (let otherGroupIdx = 0; otherGroupIdx < oldState.groups.length; otherGroupIdx++){
-                if (otherGroupIdx === groupIdx) {
-                    continue;
+        const groupsWithDamage: [CombatGroup<ID>, number[]][] = oldState.groups.map((group, groupIdx) => {
+            const damageFromGroups = oldState.groups.map((otherGroup, otherGroupIdx) => {
+                if (groupIdx === otherGroupIdx) {
+                    return 0;
                 }
-
-                const otherGroup = oldState.groups[otherGroupIdx];
 
                 const dmgFromOther = otherGroup.attackAgainst.get(groupIdx)!;
 
                 if (otherGroup.ships < dmgFromOther.total) {
-                    dmg += otherGroup.ships;
+                    return otherGroup.ships;
                 } else {
-                    dmg += dmgFromOther.total;
+                    return dmgFromOther.total;
                 }
-            }
+            });
+
+            const totalDamage = damageFromGroups.reduce((sum, d) => sum + d, 0);
+
+            return [{
+                ...group,
+                ships: group.ships - totalDamage,
+            }, damageFromGroups];
+        });
+
+        const newGroups = groupsWithDamage.map(([group, _], groupIdx) => {
+            const damageDoneList = groupsWithDamage.map(([_, dd]) => dd[groupIdx]);
+
+            const damageDone = damageDoneList.reduce((sum, d) => sum + d, 0);
 
             return {
                 ...group,
-                ships: group.ships - dmg,
+                shipsKilled: damageDone,
             };
         });
-
 
         return {
             round: oldState.round + 1,
@@ -235,6 +244,10 @@ export class CombatService<ID extends Id> {
             }
         }
 
+        const carriersLost = carriersRes.filter(c => c.shipsAfter <= 0);
+
+        const specialistsLost = carriersRes.filter(c => c.carrier.specialistId && c.carrier.specialistId !== 0);
+
         return {
             players: group.players,
             carriers: carriersRes,
@@ -242,12 +255,38 @@ export class CombatService<ID extends Id> {
             shipsBefore: group.shipsBefore,
             shipsLost: group.shipsLost,
             shipsAfter: group.shipsAfter,
-            shipsKilled: 0, // todo
-            carriersKilled: 0,
-            carriersLost: 0,
-            specialistsKilled: 0,
-            specialistsLost: 0,
+            shipsKilled: group.shipsKilled,
+            carriersKilled: 0, // backfilled later
+            carriersLost: carriersLost.length,
+            specialistsKilled: 0, // backfilled later
+            specialistsLost: specialistsLost.length,
         };
+    }
+
+    _computeKills(groups: CombatResultGroup<ID>[]) {
+        const otherGroupsCount = groups.length - 1;
+
+        for (let i = 0; i < groups.length; i++){
+            const group = groups[i];
+            const carriersKilledInOtherGroups = groups.map((og, oI) => {
+                if (oI === i) {
+                    return 0;
+                } else {
+                    return og.carriersKilled
+                }
+            }).reduce((sum, c) => sum + c, 0);
+
+            const specialistsKilledInOtherGroups = groups.map((og, oI) => {
+                if (oI === i) {
+                    return 0;
+                } else {
+                    return og.specialistsKilled
+                }
+            }).reduce((sum, c) => sum + c, 0);
+
+            group.carriersKilled = Math.floor(carriersKilledInOtherGroups / otherGroupsCount);
+            group.specialistsKilled = Math.floor(specialistsKilledInOtherGroups / otherGroupsCount);
+        }
     }
 
     _makeResult(state: CombatRoundState<ID>): CombatResult<ID> {
@@ -259,8 +298,11 @@ export class CombatService<ID extends Id> {
                 shipsBefore: g.originalShips,
                 shipsAfter: g.ships,
                 shipsLost: g.originalShips - g.ships,
+                shipsKilled: g.shipsKilled,
             });
         });
+
+        this._computeKills(groups);
 
         return {
             groups,
