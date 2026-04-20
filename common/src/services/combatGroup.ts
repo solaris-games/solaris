@@ -1,9 +1,10 @@
 import { type Game } from '../types/common/game';
 import { type Player } from '../types/common/player';
 import type {Id} from "../types/id";
+import {CombatBasePlayer} from "../types/common/combat";
 
-export type CombatPlayerGrouping<ID> = {
-    groups: Player<ID>[][],
+export type CombatPlayerGrouping<ID, P extends CombatBasePlayer<ID>> = {
+    groups: P[][],
     mapping: Map<ID, number>, // maps player ID to combat group idx
 }
 
@@ -26,10 +27,10 @@ export class CombatGroupService<ID extends Id> {
         this.diplomacyService = diplomacyService;
     }
 
-    computeCombatGroups(game: Game<ID>, players: Player<ID>[]): CombatPlayerGrouping<ID> {
+    computeCombatGroups<P extends CombatBasePlayer<ID>>(game: Game<ID>, players: P[]): CombatPlayerGrouping<ID, P> {
         const queue = Array.from(players);
 
-        const groups: Player<ID>[][] = [];
+        const groups: P[][] = [];
         const mapping: Map<ID, number> = new Map();
 
         let groupIdx = 0;
@@ -59,7 +60,7 @@ export class CombatGroupService<ID extends Id> {
         };
     }
 
-    _areAllied(game: Game<ID>, player1: Player<ID>, player2: Player<ID>) {
+    _areAllied<P extends CombatBasePlayer<ID>>(game: Game<ID>, player1: P, player2: P) {
         return this.diplomacyService.isDiplomaticStatusToPlayersAllied(game, player1._id, [player2._id]);
     }
 }

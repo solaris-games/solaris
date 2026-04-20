@@ -47,7 +47,7 @@ export default class CombatProcessingService extends EventEmitter {
         this.statisticsService = statisticsService;
     }
 
-    _distributeDamage(combatResult: CombatResult<DBObjectId>) {
+    _distributeDamage(combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         for (let group of combatResult.groups) {
             if (group.star) {
                 const star = group.star.star;
@@ -64,7 +64,7 @@ export default class CombatProcessingService extends EventEmitter {
     }
 
     async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]) {
-        let combatResult: CombatResult<DBObjectId>;
+        let combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>;
         if (star) {
             combatResult = this.combatService.computeStar(game, star, carriers);
         } else {
@@ -114,7 +114,7 @@ export default class CombatProcessingService extends EventEmitter {
         return combatResult;
     }
 
-    async _deductReputation(game: Game, combatResult: CombatResult<DBObjectId>) {
+    async _deductReputation(game: Game, combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         const defenderGroup = combatResult.groups.find((g) => Boolean(g.star));
 
         if (defenderGroup) {
@@ -139,7 +139,7 @@ export default class CombatProcessingService extends EventEmitter {
         return gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
     }
 
-    _starDefeatedCheck(game: Game, star: Star<DBObjectId>, combatResult: CombatResult<DBObjectId>, gameUsers: User[]) {
+    _starDefeatedCheck(game: Game, star: Star<DBObjectId>, combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, gameUsers: User[]) {
         const defenderGroup = combatResult.groups.find((g) => Boolean(g.star))!;
 
         const starDead = star && !Math.floor(star.shipsActual!);
@@ -159,7 +159,7 @@ export default class CombatProcessingService extends EventEmitter {
         return null;
     }
 
-    async _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: CombatResult<DBObjectId>) {
+    async _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         for (let group of combatResult.groups) {
             for (let player of group.players) {
                 const user = this._findUser(gameUsers, player);

@@ -6,7 +6,7 @@ import type {Star} from "../types/common/star";
 import type {Id} from "../types/id";
 import type {Carrier} from "../types/common/carrier";
 import {maxBy, maxOf, minOf, notUndefined} from "../utilities/utils";
-import {CombatGroup} from "../types/common/combat";
+import {CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup} from "../types/common/combat";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',
@@ -189,7 +189,7 @@ export class TechnologyService {
         return undefined;
     }
 
-    _getCarrierWeaponsBuff<ID>(carrier: Carrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number): Buff | undefined {
+    _getCarrierWeaponsBuff<ID>(carrier: CombatBaseCarrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number): Buff | undefined {
         if (!carrier.specialistId) {
             return undefined;
         }
@@ -239,7 +239,7 @@ export class TechnologyService {
         }
     }
 
-    getCarriersWeaponsDebuff<ID>(carriersToCheck: Carrier<ID>[]): Buff | undefined {
+    getCarriersWeaponsDebuff<ID>(carriersToCheck: CombatBaseCarrier<ID>[]): Buff | undefined {
         if (!carriersToCheck.length) {
             return undefined;
         }
@@ -291,7 +291,7 @@ export class TechnologyService {
         }
     }
 
-    getEffectiveWeaponsDetail<ID>(game: Game<ID>, group: CombatGroup<ID>, opponents: CombatGroup<ID>, isCarrierToStarCombat: boolean): WeaponsDetail {
+    getEffectiveWeaponsDetail<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
         const baseWeapons = maxBy(p => p.research.weapons.level, group.players);
 
         const buffs: Buff[] = group.carriers.map(c => {
