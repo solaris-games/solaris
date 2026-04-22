@@ -9,7 +9,7 @@ import {
     Star,
     StarCaptureResult,
     CombatResult, CombatResultGroup, DetailedCombatResultCarrier, CombatResultCarrier, DetailedCombatResultGroup,
-    DetailedCombatResultStar, CombatResultStar, Specialist,
+    CombatResultStar, Specialist,
 } from '@solaris/common'
 import EventEmitter from "events";
 import {DBObjectId} from "./types/DBObjectId";
@@ -18,12 +18,10 @@ import ReputationService from "./reputation";
 import PlayerService from "./player";
 import StatisticsService from "./statistics";
 import SpecialistService from "./specialist";
-import StarService from "./star";
-import CarrierService from "./carrier";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',
-    onPlayerCombatCarrier: 'onPlayerCombatCarrier'
+    onPlayerCombatCarrier: 'onPlayerCombatCarrier',
 }
 
 export default class CombatProcessingService extends EventEmitter {
@@ -94,7 +92,7 @@ export default class CombatProcessingService extends EventEmitter {
         };
     }
 
-    _lowerResultStar(group: DetailedCombatResultGroup<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>): CombatResultStar<DBObjectId> | undefined {
+    _lowerResultStar(group: DetailedCombatResultGroup<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, captureResult: StarCaptureResult<DBObjectId> | null): CombatResultStar<DBObjectId> | undefined {
         if (!group.star) {
             return undefined;
         }
@@ -110,16 +108,16 @@ export default class CombatProcessingService extends EventEmitter {
             shipsAfter: group.star.shipsAfter,
             shipsLost: group.star.shipsLost,
             hasScrambler,
-            captureResult: undefined,
+            captureResult,
         }
     }
 
-    lowerResult(result: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>): CombatResult<DBObjectId> {
+    lowerResult(result: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, captureResult: StarCaptureResult<DBObjectId> | null): CombatResult<DBObjectId> {
         const groups: CombatResultGroup<DBObjectId>[] = result.groups.map((g) => {
             return {
                 playerIds: g.players.map(p => p._id),
                 carriers: g.carriers.map(c => this._lowerResultCarriers(g, c)),
-                star: this._lowerResultStar(g),
+                star: this._lowerResultStar(g, captureResult),
                 attackAgainst: g.attackAgainst,
                 shipsBefore: g.shipsBefore,
                 shipsAfter: g.shipsAfter,
@@ -165,21 +163,20 @@ export default class CombatProcessingService extends EventEmitter {
 
         await this._deductReputation(game, combatResult);
 
+        const eventResult = this.lowerResult(combatResult, captureResult);
+
         // Log the combat event
         if (star) {
             this.emit(CombatServiceEvents.onPlayerCombatStar, {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                owner: owner!,
-                star,
-                combatResult,
-                captureResult
+                combatResult: eventResult,
             });
         } else {
             this.emit(CombatServiceEvents.onPlayerCombatCarrier, {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                combatResult
+                combatResult: eventResult,
             });
         }
 

@@ -1,4 +1,3 @@
-import {Player} from "./types/Player";
 import {CombatResult} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 import SpecialistService from "./specialist";
@@ -10,7 +9,7 @@ export class CombatMaskingService {
         this.specialistService = specialistService;
     }
 
-    maskCombatResult(combatResult: CombatResult<DBObjectId>, player: Player) {
+    maskCombatResult(combatResult: CombatResult<DBObjectId>, playerId: DBObjectId): CombatResult<DBObjectId> {
         const result: CombatResult<DBObjectId> = Object.assign({}, combatResult);
 
         const groups = result.groups.map((g) => {
@@ -19,7 +18,7 @@ export class CombatMaskingService {
             let scrambled = false;
 
             if (g.star) {
-                const isPlayerObj = g.star.ownedByPlayerId.toString() === player._id.toString();
+                const isPlayerObj = g.star.ownedByPlayerId.toString() === playerId.toString();
 
                 if (!isPlayerObj && g.star.hasScrambler) {
                     g.star.shipsLost = '???';
@@ -33,7 +32,7 @@ export class CombatMaskingService {
             }
 
             for (let carrier of group.carriers) {
-                const isPlayerObj = carrier.ownedByPlayerId.toString() === player._id.toString();
+                const isPlayerObj = carrier.ownedByPlayerId.toString() === playerId.toString();
 
                 if (!isPlayerObj && carrier.hasScrambler) {
                     carrier.shipsLost = '???';

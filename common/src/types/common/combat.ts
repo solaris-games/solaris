@@ -89,7 +89,7 @@ export type CombatResultStar<ID> = {
     shipsBefore: number | '???',
     shipsAfter: number | '???',
     shipsLost: number | '???',
-    captureResult: StarCaptureResult<ID> | undefined,
+    captureResult: StarCaptureResult<ID> | null,
 }
 
 export type CombatResultGroup<ID> = {
