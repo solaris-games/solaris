@@ -1,42 +1,62 @@
-import {CombatCarrier, CombatResult, CombatStar} from "./types/Combat";
 import {Player} from "./types/Player";
+import {CombatResult} from "@solaris/common";
+import {DBObjectId} from "./types/DBObjectId";
+import SpecialistService from "./specialist";
 
 export class CombatMaskingService {
-    maskCombatResult(combatResult: CombatResult, player: Player) {
-        let result: CombatResult = Object.assign({}, combatResult);
+    specialistService: SpecialistService;
 
-        if (result.star) {
-            result.star = this._tryMaskObjectShips(combatResult.star, player) as CombatStar;
-        }
-
-        result.carriers = combatResult.carriers.map(c => this._tryMaskObjectShips(c, player)) as CombatCarrier[];
-
-        return result;
+    constructor(specialistService: SpecialistService) {
+        this.specialistService = specialistService;
     }
 
-    _tryMaskObjectShips(carrierOrStar: CombatStar | CombatCarrier | null, player: Player) {
-        if (!carrierOrStar) {
-            return carrierOrStar;
-        }
+    maskCombatResult(combatResult: CombatResult<DBObjectId>, player: Player) {
+        const result: CombatResult<DBObjectId> = Object.assign({}, combatResult);
 
-        // If the player doesn't own the object and the object is a scrambler then we need
-        // to mask the before and lost amounts.
-        if (carrierOrStar.scrambled && carrierOrStar.ownedByPlayerId && player._id.toString() !== carrierOrStar.ownedByPlayerId.toString()) {
-            let clone: CombatStar | CombatCarrier = Object.assign({}, carrierOrStar);
+        const groups = result.groups.map((g) => {
+            const group = Object.assign({}, g);
 
-            clone.before = '???';
-            clone.lost = '???';
+            let scrambled = false;
 
-            // If the object lost ships and is now dead, then we need to mask the after value too.
-            // Note: Stars can have a 0 ship garrison and be a scrambler so we want to ensure that the 0 ships is still scrambled.
-            // cast is safe here because it can't be a string at this stage
-            if (carrierOrStar.before === 0 || (carrierOrStar.after as number) > 0) {
-                clone.after = '???';
+            if (g.star) {
+                const isPlayerObj = g.star.ownedByPlayerId.toString() === player._id.toString();
+
+                if (!isPlayerObj && g.star.hasScrambler) {
+                    g.star.shipsLost = '???';
+                    g.star.shipsBefore = '???';
+                    scrambled = true;
+
+                    if (typeof g.star.shipsAfter === 'number' && g.star.shipsAfter > 0) {
+                        g.star.shipsAfter = '???';
+                    }
+                }
             }
 
-            return clone;
-        }
+            for (let carrier of group.carriers) {
+                const isPlayerObj = carrier.ownedByPlayerId.toString() === player._id.toString();
 
-        return carrierOrStar;
+                if (!isPlayerObj && carrier.hasScrambler) {
+                    carrier.shipsLost = '???';
+                    carrier.shipsBefore = '???';
+                    scrambled = true;
+
+                    if (typeof carrier.shipsAfter === 'number' && carrier.shipsAfter > 0) {
+                        carrier.shipsAfter = '???';
+                    }
+                }
+            }
+
+            if (scrambled) {
+                g.shipsLost = '???';
+                g.shipsBefore = '???';
+                g.shipsAfter = '???';
+            }
+
+            return group;
+        });
+
+        return {
+            groups,
+        };
     }
 }

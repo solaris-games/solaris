@@ -187,11 +187,11 @@ export default class SpecialistService {
         });
     }
 
-    getStarHideShips(star: Star) {
+    getStarHideShips(star: Star): boolean {
         return this._getStarSpecialValue(star, 'hideShips', false);
     }
 
-    getCarrierHideShips(carrier: Carrier) {
+    getCarrierHideShips(carrier: Carrier): boolean {
         return this._getCarrierSpecialValue(carrier, 'hideShips', false);
     }
 

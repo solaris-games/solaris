@@ -2,12 +2,14 @@ import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import {User} from "./types/User";
 import {
-    Carrier, CombatResult,
+    Carrier, DetailedCombatResult,
     CombatService,
-    GameTypeService, GroupedCombatResult,
+    GameTypeService,
     notUndefined,
     Star,
-    StarCaptureResult
+    StarCaptureResult,
+    CombatResult, CombatResultGroup, DetailedCombatResultCarrier, CombatResultCarrier, DetailedCombatResultGroup,
+    DetailedCombatResultStar, CombatResultStar, Specialist,
 } from '@solaris/common'
 import EventEmitter from "events";
 import {DBObjectId} from "./types/DBObjectId";
@@ -15,6 +17,9 @@ import StarCaptureService from "./starCapture";
 import ReputationService from "./reputation";
 import PlayerService from "./player";
 import StatisticsService from "./statistics";
+import SpecialistService from "./specialist";
+import StarService from "./star";
+import CarrierService from "./carrier";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',
@@ -28,6 +33,7 @@ export default class CombatProcessingService extends EventEmitter {
     reputationService: ReputationService;
     playerService: PlayerService;
     statisticsService: StatisticsService;
+    specialistService: SpecialistService;
 
     constructor(
         combatService: CombatService<DBObjectId>,
@@ -36,6 +42,7 @@ export default class CombatProcessingService extends EventEmitter {
         reputationService: ReputationService,
         playerService: PlayerService,
         statisticsService: StatisticsService,
+        specialistService: SpecialistService,
     ) {
         super();
 
@@ -45,9 +52,10 @@ export default class CombatProcessingService extends EventEmitter {
         this.reputationService = reputationService;
         this.playerService = playerService;
         this.statisticsService = statisticsService;
+        this.specialistService = specialistService;
     }
 
-    _distributeDamage(combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
+    _distributeDamage(combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         for (let group of combatResult.groups) {
             if (group.star) {
                 const star = group.star.star;
@@ -63,8 +71,72 @@ export default class CombatProcessingService extends EventEmitter {
         }
     }
 
-    async performCombat(game: Game, gameUsers: User[], defender: Player, star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]) {
-        let combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>;
+    _couldHideShips(star: Star<DBObjectId> | undefined, specialist: Specialist | null) {
+        const isNebula = Boolean(star?.isNebula);
+
+        const hideShips = Boolean(specialist?.modifiers?.special?.hideShips);
+
+        return isNebula || hideShips;
+    }
+
+    _lowerResultCarriers(group: DetailedCombatResultGroup<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, c: DetailedCombatResultCarrier<DBObjectId, Carrier<DBObjectId>>): CombatResultCarrier<DBObjectId> {
+        const hasScrambler = this._couldHideShips(group.star?.star, this.specialistService.getByIdCarrier(c.carrier.specialistId));
+
+        return {
+            carrierId: c.carrier._id,
+            specialistId: c.carrier.specialistId,
+            carrierName: c.carrier.name,
+            ownedByPlayerId: c.carrier.ownedByPlayerId!,
+            shipsAfter: c.shipsAfter,
+            shipsLost: c.shipsLost,
+            shipsBefore: c.shipsBefore,
+            hasScrambler,
+        };
+    }
+
+    _lowerResultStar(group: DetailedCombatResultGroup<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>): CombatResultStar<DBObjectId> | undefined {
+        if (!group.star) {
+            return undefined;
+        }
+
+        const hasScrambler = this._couldHideShips(group.star?.star, this.specialistService.getByIdCarrier(group.star.star.specialistId));
+
+        return {
+            starId: group.star.star._id,
+            specialistId: group.star.star.specialistId,
+            starName: group.star.star.name,
+            ownedByPlayerId: group.star.star.ownedByPlayerId!,
+            shipsBefore: group.star.shipsBefore,
+            shipsAfter: group.star.shipsAfter,
+            shipsLost: group.star.shipsLost,
+            hasScrambler,
+            captureResult: undefined,
+        }
+    }
+
+    lowerResult(result: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>): CombatResult<DBObjectId> {
+        const groups: CombatResultGroup<DBObjectId>[] = result.groups.map((g) => {
+            return {
+                playerIds: g.players.map(p => p._id),
+                carriers: g.carriers.map(c => this._lowerResultCarriers(g, c)),
+                star: this._lowerResultStar(g),
+                attackAgainst: g.attackAgainst,
+                shipsBefore: g.shipsBefore,
+                shipsAfter: g.shipsAfter,
+                shipsLost: g.shipsLost,
+            };
+        });
+
+        return {
+            groups,
+        };
+    }
+
+    async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>> {
+        let combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>;
+
+        const owner = star && this.playerService.getById(game, star.ownedByPlayerId!);
+
         if (star) {
             combatResult = this.combatService.computeStar(game, star, carriers);
         } else {
@@ -98,7 +170,7 @@ export default class CombatProcessingService extends EventEmitter {
             this.emit(CombatServiceEvents.onPlayerCombatStar, {
                 gameId: game._id,
                 gameTick: game.state.tick,
-                owner: defender,
+                owner: owner!,
                 star,
                 combatResult,
                 captureResult
@@ -114,7 +186,7 @@ export default class CombatProcessingService extends EventEmitter {
         return combatResult;
     }
 
-    async _deductReputation(game: Game, combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
+    async _deductReputation(game: Game, combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         const defenderGroup = combatResult.groups.find((g) => Boolean(g.star));
 
         if (defenderGroup) {
@@ -139,7 +211,7 @@ export default class CombatProcessingService extends EventEmitter {
         return gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
     }
 
-    _starDefeatedCheck(game: Game, star: Star<DBObjectId>, combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, gameUsers: User[]) {
+    _starDefeatedCheck(game: Game, star: Star<DBObjectId>, combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, gameUsers: User[]) {
         const defenderGroup = combatResult.groups.find((g) => Boolean(g.star))!;
 
         const starDead = star && !Math.floor(star.shipsActual!);
@@ -159,7 +231,7 @@ export default class CombatProcessingService extends EventEmitter {
         return null;
     }
 
-    async _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: CombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
+    async _updatePlayersCombatAchievements(game: Game, gameUsers: User[], combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
         for (let group of combatResult.groups) {
             for (let player of group.players) {
                 const user = this._findUser(gameUsers, player);

@@ -1,4 +1,5 @@
 import type {WeaponsDetail} from "../../services/technology";
+import {StarCaptureResult} from "./star";
 
 export interface CombatBaseStar<ID> {
     _id: ID;
@@ -23,34 +24,36 @@ export interface CombatBasePlayer<ID> {
     }
 }
 
-export type CombatResultGrouped<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+export type CombatGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+    originalShips: number,
+    ships: number,
+    isDefender: boolean,
+    attackAgainst: Map<number, WeaponsDetail>,
     players: P[],
     carriers: C[],
     star: S | undefined,
     shipsKilled: number,
-    shipsBefore: number,
-    shipsAfter: number,
-    shipsLost: number,
 }
 
-export type CombatResultCarrier<ID, C extends CombatBaseCarrier<ID>> = {
+export type DetailedCombatResultCarrier<ID, C extends CombatBaseCarrier<ID>> = {
     carrier: C,
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
 }
 
-export type CombatResultStar<ID, S extends CombatBaseStar<ID>> = {
+export type DetailedCombatResultStar<ID, S extends CombatBaseStar<ID>> = {
     star: S,
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
 }
 
-export type CombatResultGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+export type DetailedCombatResultGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
     players: P[],
-    carriers: CombatResultCarrier<ID, C>[],
-    star: CombatResultStar<ID, S> | undefined,
+    carriers: DetailedCombatResultCarrier<ID, C>[],
+    star: DetailedCombatResultStar<ID, S> | undefined,
+    attackAgainst: Map<number, WeaponsDetail>,
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
@@ -61,21 +64,44 @@ export type CombatResultGroup<ID, P extends CombatBasePlayer<ID>, S extends Comb
     specialistsLost: number,
 }
 
-export type GroupedCombatResult<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
-    groups: CombatResultGrouped<ID, P, S, C>[],
+export type DetailedCombatResult<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+    groups: DetailedCombatResultGroup<ID, P, S, C>[],
 }
 
-export type CombatResult<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
-    groups: CombatResultGroup<ID, P, S, C>[],
+// Suitable for events etc.
+export type CombatResultCarrier<ID> = {
+    carrierId: ID,
+    specialistId: number | null;
+    carrierName: string,
+    ownedByPlayerId: ID,
+    hasScrambler: boolean,
+    shipsBefore: number | '???',
+    shipsAfter: number | '???',
+    shipsLost: number | '???',
 }
 
-export type CombatGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
-    originalShips: number,
-    ships: number,
-    isDefender: boolean,
+export type CombatResultStar<ID> = {
+    starId: ID,
+    specialistId: number | null;
+    starName: string,
+    ownedByPlayerId: ID,
+    hasScrambler: boolean,
+    shipsBefore: number | '???',
+    shipsAfter: number | '???',
+    shipsLost: number | '???',
+    captureResult: StarCaptureResult<ID> | undefined,
+}
+
+export type CombatResultGroup<ID> = {
+    playerIds: ID[],
+    carriers: CombatResultCarrier<ID>[],
+    star: CombatResultStar<ID> | undefined,
     attackAgainst: Map<number, WeaponsDetail>,
-    players: P[],
-    carriers: C[],
-    star: S | undefined,
-    shipsKilled: number,
+    shipsBefore: number | '???',
+    shipsAfter: number | '???',
+    shipsLost: number | '???',
+}
+
+export type CombatResult<ID> = {
+    groups: CombatResultGroup<ID>[],
 }

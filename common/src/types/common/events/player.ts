@@ -1,12 +1,9 @@
-import type {Star, StarCaptureResult} from "../star";
-import type { GroupedCombatResult } from "../combat";
+import type {CombatResult} from "../combat";
 import type {BulkUpgradeReport} from "../infrastructureUpgrade";
 import type {BaseGameEvent} from "./game";
 import type {LedgerType} from "../ledger";
 import type {DiplomaticStatus} from "../diplomacy";
 import type {TradeEventTechnology} from "../trade";
-import {Carrier} from "../carrier";
-import {Player} from "../player";
 
 export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
     playerId: ID;
@@ -230,29 +227,18 @@ export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
     },
 }
 
-export interface CombatEventData<ID> {
-    playerIdDefenders: ID[];
-    playerIdAttackers: ID[];
-    combatResult: GroupedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>; // TODO
-}
-
 export interface BaseCombatEvent<ID> extends BasePlayerEvent<ID> {
-    data: CombatEventData<ID>,
+    data: CombatResult<ID>,
 }
 
 export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCombatStar';
-    data: CombatEventData<ID> & {
-        playerIdOwner: ID;
-        starId: ID;
-        starName: string;
-        captureResult: StarCaptureResult<ID>;
-    };
+    type: 'playerCombatStar',
+    data: CombatResult<ID>,
 }
 
 export interface PlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
     type: 'playerCombatCarrier',
-    data: CombatEventData<ID>,
+    data: CombatResult<ID>,
 }
 
 export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BasePlayerEvent<ID> {

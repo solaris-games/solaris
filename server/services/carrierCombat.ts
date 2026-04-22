@@ -1,9 +1,8 @@
-import { Carrier, CarrierPosition } from "./types/Carrier";
+import { CarrierPosition } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { User } from "./types/User";
 
 import CarrierMovementService from "./carrierMovement";
-import CombatService from "./combat";
 import DiplomacyService from "./diplomacy";
 import PlayerService from "./player";
 import SpecialistService from "./specialist";
@@ -11,35 +10,37 @@ import StarService from "./star";
 import {CarrierCollision, DualCarrierCollision} from "./types/CarrierCollision";
 import {CarrierTravelService, DistanceService} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
+import CombatProcessingService from "./combatProcessing";
 
 const EPSILON = 10**-10;
 
 export default class CarrierCombatService {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierMovementService: CarrierMovementService;
-    combatService: CombatService;
     diplomacyService: DiplomacyService;
     distanceService: DistanceService;
     playerService: PlayerService;
     specialistService: SpecialistService;
     starService: StarService;
+    combatProcessingService: CombatProcessingService;
 
     constructor(carrierTravelService: CarrierTravelService<DBObjectId>,
                 carrierMovementService: CarrierMovementService,
-                combatService: CombatService,
                 diplomacyService: DiplomacyService,
                 distanceService: DistanceService,
                 playerService: PlayerService,
                 specialistService: SpecialistService,
-                starService: StarService) {
+                starService: StarService,
+                combatProcessingService: CombatProcessingService,
+                ) {
         this.carrierMovementService = carrierMovementService;
         this.carrierTravelService = carrierTravelService;
-        this.combatService = combatService;
         this.diplomacyService = diplomacyService;
         this.distanceService = distanceService;
         this.playerService = playerService;
         this.specialistService = specialistService;
         this.starService = starService;
+        this.combatProcessingService = combatProcessingService;
     }
 
     async combatCarriers(game: Game, gameUsers: User[]) {
@@ -106,21 +107,21 @@ export default class CarrierCombatService {
 
             const dualCollisions: DualCarrierCollision[] = this._getDualCollisionsInPath(positions);
 
-            // TODO: Rewrite merging logic, until here everything looks good
-
-            const collisions = this._mergeCollisionsinPath(dualCollisions);
+            const collisions = this._mergeCollisionsInPath(dualCollisions);
 
             // A collision will at this point be cleaned up to a list of carriers
-            for( let collision of collisions) {
+            for(let collision of collisions) {
                 // It could very well be that in a previous collision, carriers were destroyed/reduced to 0 ships.
                 collision.carriers.filter(c => c.ships! > 0)
 
                 // This gets all the player ids of the players involved, and removes duplicates.
-                let playersIds = [...new Set(collision.carriers.map(c => c.ownedByPlayerId!.toString()))]
+                const playersIds = [...new Set(collision.carriers.map(c => c.ownedByPlayerId!.toString()))]
 
                 // Now if we have little carriers remaining due to a previous filter, or if all are owned by the same player,
                 // we quit the process here as no combat has to occur.
-                if(playersIds.length <= 1) continue;
+                if (playersIds.length <= 1) {
+                    continue;
+                }
 
                 await this._performCarrierCombat(game, gameUsers, collision)
             }
@@ -128,7 +129,7 @@ export default class CarrierCombatService {
     }
 
     async _performCarrierCombat(game: Game, gameUsers: User[], collision: CarrierCollision) {
-        // TODO
+        await this.combatProcessingService.performCombat(game, gameUsers, null, collision.carriers);
     }
 
     _getCarrierPositionGraph(carrierPositions: CarrierPosition[]) {
@@ -138,7 +139,7 @@ export default class CarrierCombatService {
             const graphKeyA = carrierPosition.destination.toString() + carrierPosition.source.toString();
             const graphKeyB = carrierPosition.source.toString() + carrierPosition.destination.toString();
 
-            // If the source and distination are the same, we ignore c2cc.
+            // If the source and destination are the same, we ignore c2cc.
             if (graphKeyA === graphKeyB) {
                 continue;
             }
@@ -186,7 +187,7 @@ export default class CarrierCombatService {
 
                 // The time we need is the distance devided by the relative speed.
                 // Important is that carriers may overlap, getting them intercepting with a relative speed of 0.
-                // Therefore we must filter out this problem. Time will always be between 0 and 1. (It can be 0 or 1 itself)
+                // Therefore, we must filter out this problem. Time will always be between 0 and 1. (It can be 0 or 1 itself)
                 let time = 0;
                 if(head_to_head) {
                     // Now relative speed is definitely not 0.
@@ -196,7 +197,7 @@ export default class CarrierCombatService {
                 }
 
                 // Location is the distance to the "direction star" at the location where combat occurs
-                let location = carrierPositionA.destination.toString() === pathDirection ? carrierPositionA.distanceToDestinationCurrent + time * carrierPositionA.speed : carrierPositionA.distanceToSourceCurrent - time * carrierPositionA.speed
+                const location = carrierPositionA.destination.toString() === pathDirection ? carrierPositionA.distanceToDestinationCurrent + time * carrierPositionA.speed : carrierPositionA.distanceToSourceCurrent - time * carrierPositionA.speed
 
                 collisionList.push({
                     time,
@@ -209,7 +210,7 @@ export default class CarrierCombatService {
         return collisionList;
     }
 
-    _mergeCollisionsinPath(collisionList: DualCarrierCollision[]): CarrierCollision[] {
+    _mergeCollisionsInPath(collisionList: DualCarrierCollision[]): CarrierCollision[] {
         const collisions: CarrierCollision[] = [];
 
         // As long as there are still ungrouped dual collisions, we continue to group.

@@ -492,9 +492,7 @@ export default class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
-            const starOwningPlayer = this.playerService.getById(game, combatStar.ownedByPlayerId!)!;
-
-            await this.combatProcessingService.performCombat(game, gameUsers, starOwningPlayer, combatStar, carriersAtStar);
+            await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.

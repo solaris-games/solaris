@@ -944,45 +944,28 @@ export default class AIService {
         const shipsProduced = this.shipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
         const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
 
-        const defender = {
-            ships: Math.ceil(shipsAtArrival),
-            weaponsLevel: this.technologyService.getStarOwnWeaponsDetail(game, [defendingPlayer], starToInvade, defendingCarriers).total,
-        };
+        // TODO: Account for ships at arrival
+        const result = this.combatService.computeStar(game, starToInvade, []);
+        const ownResult = this.combatService.getGroup(result, player._id)!;
 
-        const attacker = {
-            ships: 0,
-            weaponsLevel: player.research.weapons.level
-        };
-
-        const result = this.combatService.computeStar(game, starToInvade, );
-
-        return result.needed!.attacker;
+        return this.combatService.estimateNeeded(game, result, ownResult);
     }
 
-    _calculateRequiredShipsForDefense(game: Game, player: Player, context: Context, attackData: KnownAttack, attackingCarriers, defendingStar) {
-        const attackerIds = new Set();
-        const attackers: Player[] = [];
-
-        for (const attackingCarrier of attackingCarriers) {
-            const attacker = this.playerService.getById(game, attackingCarrier.ownedByPlayerId)!;
-            const attackerId = attacker._id.toString();
-            
-            if (!attackerIds.has(attackerId)) {
-                attackerIds.add(attackerId);
-                attackers.push(attacker);
-            }
-        }
-
+    _calculateRequiredShipsForDefense(game: Game, player: Player, context: Context, attackData: KnownAttack, attackingCarriers: Carrier[], defendingStar: Star) {
         const defenseCarriersAtStar = context.carriersOrbiting.get(defendingStar._id.toString()) || [];
+
         let defenseCarriersOnTheWay: Carrier[] = [];
         if (attackData) {
             defenseCarriersOnTheWay = attackData.carriersOnTheWay.map(carrierId => context.carriersById.get(carrierId.toString())!);
         }
-        const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
-        const result = this.combatService.calculateStar(game, defendingStar, [player], attackers, defenseCarriers, attackingCarriers, true);
 
-        if (result.after.defender <= 0) {
-            return result.needed!.defender - result.before.defender;
+        const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
+
+        const result = this.combatService.computeStar(game, defendingStar, attackingCarriers.concat(defenseCarriers));
+        const defenderResult = this.combatService.getDefender(result);
+
+        if (defenderResult && defenderResult.shipsAfter <= 0) {
+            return this.combatService.estimateNeeded(game, result, defenderResult);
         }
 
         return 0;
