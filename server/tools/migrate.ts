@@ -5,6 +5,7 @@ import {migrateStats} from "./migrations/migrateStats";
 import { migrateInitialGameState } from "./migrations/migrateInitialGameState";
 import {migrateWormholesHistory} from "./migrations/migrateWormholesHistory";
 import {migrateResearchCosts} from "./migrations/migrateResearchCosts";
+import {migrateCombatEvents} from "./migrations/migrateCombatEvents";
 
 const MIGRATIONS = {
     "2025-02-05-badges": migrateBadges,
@@ -13,6 +14,7 @@ const MIGRATIONS = {
     "2025-10-19-initial-game-state": migrateInitialGameState,
     "2025-11-08-wormholes-history": migrateWormholesHistory,
     "2026-03-11-research-costs": migrateResearchCosts,
+    "2026-04-22-combat-events": migrateCombatEvents,
 };
 
 const job = makeJob('Migration', async (ctx) => {
