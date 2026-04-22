@@ -60,19 +60,19 @@ export const listSummary = (axios: Axios) => async (): Promise<ResponseResult<Ga
 }
 
 export const listOfficial = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
-  return doGet(axios)(routes.listOfficial, {}, {}, { withCredentials: true });
+  return doGet(axios)(routes.listOfficial, {}, {});
 }
 
 export const listCustom = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
-  return doGet(axios)(routes.listCustom, {}, {}, { withCredentials: true });
+  return doGet(axios)(routes.listCustom, {}, {});
 }
 
 export const listInProgress = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
-  return doGet(axios)(routes.listInProgress, {}, {}, { withCredentials: true });
+  return doGet(axios)(routes.listInProgress, {}, {});
 }
 
 export const listRecentlyCompleted = (axios: Axios) => async (): Promise<ResponseResult<ListGame<string>[]>> => {
-  return doGet(axios)(routes.listRecentlyCompleted, {}, {}, { withCredentials: true });
+  return doGet(axios)(routes.listRecentlyCompleted, {}, {});
 }
 
 export const listMyCompleted = (axios: Axios) => async (): Promise<ResponseResult<UserActiveListGame<string>[]>> => {
