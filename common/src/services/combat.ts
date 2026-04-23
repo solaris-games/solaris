@@ -15,7 +15,7 @@ import type {
     CombatGroup,
     CombatBaseStar,
     CombatBaseCarrier,
-    CombatBasePlayer,
+    CombatBasePlayer, BasicCombatResult,
 } from "../types/common/combat";
 
 type CombatRoundState<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
@@ -357,7 +357,7 @@ export class CombatService<ID extends Id> {
         return estimateNeeded(combatResult, estimateForGroup);
     }
 
-    computeBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean) {
+    computeBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean): BasicCombatResult {
         const attackMap = (group: number, level: number) => {
             const m = new Map<number, WeaponsDetail>();
             m.set(group, {

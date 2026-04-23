@@ -105,3 +105,19 @@ export type CombatResultGroup<ID> = {
 export type CombatResult<ID> = {
     groups: CombatResultGroup<ID>[],
 }
+
+// For combat calculator etc
+export type BasicCombatResult = {
+    defender: {
+        shipsBefore: number,
+        shipsAfter: number,
+        shipsLost: number,
+        shipsNeeded: number,
+    },
+    attacker: {
+        shipsBefore: number,
+        shipsAfter: number,
+        shipsLost: number,
+        shipsNeeded: number,
+    },
+}

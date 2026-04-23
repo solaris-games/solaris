@@ -28,7 +28,7 @@
                 <div class="mb-2 row">
                   <div class="col-8">
                     <div class="form-check">
-                      <input class="form-check-input" type="checkbox" v-model="isTurnBased" id="chkIsTurnBased">
+                      <input class="form-check-input" type="checkbox" v-model="isCarrierToStar" id="chkIsTurnBased">
                       <label class="form-check-label" for="chkIsTurnBased">
                         Carrier-to-Star Combat
                       </label>
@@ -71,44 +71,38 @@
 
                 <div class="mb-2 row">
                   <div class="col-auto col-sm-8">
-                    <button type="button" class="btn btn-outline-info" :disabled="isLoading" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i> Swap Values</button>
+                    <button type="button" class="btn btn-outline-info" title="Swap the defender/attacker values" @click="swapValues"><i class="fas fa-exchange-alt"></i> Swap Values</button>
                   </div>
                   <div class="col col-sm-4">
                     <div class="d-grid gap-2">
-                      <button type="submit" class="btn btn-success" :disabled="isLoading || isInvalid" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
+                      <button type="submit" class="btn btn-success" :disabled="isInvalid" title="Calculate the combat result"><i class="fas fa-fist-raised"></i> Fight</button>
                     </div>
                   </div>
                 </div>
             </form>
         </div>
 
-        <loading-spinner :loading="isLoading"/>
-
         <div class="row bg-dark pt-2 pb-2" v-if="result">
-          <p class="col text-center mb-0" v-if="result.after.defender >= result.after.attacker"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.after.defender}}</span> ship(s) remaining.</p>
-          <p class="col text-center mb-0" v-if="result.after.attacker > result.after.defender"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.after.attacker}}</span> ship(s) remaining.</p>
+          <p class="col text-center mb-0" v-if="result.defender.shipsAfter >= result.attacker.shipsAfter"><span class="text-success">Defender</span> wins with <span class="text-success">{{result.defender.shipsAfter}}</span> ship(s) remaining.</p>
+          <p class="col text-center mb-0" v-if="result.attacker.shipsAfter > result.defender.shipsAfter"><span class="text-danger">Attacker</span> wins with <span class="text-danger">{{result.attacker.shipsAfter}}</span> ship(s) remaining.</p>
         </div>
-        <div class="row bg-dark pb-2" v-if="result?.needed">
-          <p class="col text-center mb-0" v-if="result.needed.defender"><small><span class="text-success">Defender</span> would need <span class="text-success">{{result.needed.defender}}</span> ship(s) to win.</small></p>
-          <p class="col text-center mb-0" v-if="result.needed.attacker"><small><span class="text-danger">Attacker</span> would need <span class="text-danger">{{result.needed.attacker}}</span> ship(s) to win.</small></p>
-        </div>
+      <p class="col text-center mb-0" v-if="result?.defender.shipsNeeded"><small><span class="text-success">Defender</span> would need <span class="text-success">{{result.defender.shipsNeeded}}</span> ship(s) to win.</small></p>
+      <p class="col text-center mb-0" v-if="result?.attacker.shipsNeeded"><small><span class="text-danger">Attacker</span> would need <span class="text-danger">{{result.attacker.shipsNeeded}}</span> ship(s) to win.</small></p>
     </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import LoadingSpinner from '../../../components/LoadingSpinner.vue';
 import MenuTitle from '../MenuTitle.vue';
 import FormErrorList from '../../../components/FormErrorList.vue';
 import GameHelper from '../../../../services/gameHelper';
 import {inject} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player, Star} from "@/types/game";
-import type {CombatResultShips} from "@solaris/common";
-import {calculateCombat} from "@/services/typedapi/carrier";
 import {onMounted, ref, computed} from 'vue';
+import type {BasicCombatResult} from "@solaris/common";
+import {useGameServices} from "@/util/gameServices.ts";
 
 type CombatSide = {
   ships: number,
@@ -129,12 +123,12 @@ const emit = defineEmits<{
 const store = useGameStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const httpClient = inject(httpInjectionKey)!;
 
-const isLoading = ref(false);
+const serviceProvider = useGameServices();
+
 const errors = ref<string[]>([]);
-const isTurnBased = ref(true);
-const result = ref<CombatResultShips | null>(null);
+const isCarrierToStar = ref(true);
+const result = ref<BasicCombatResult | null>(null);
 
 const game = computed<Game>(() => store.game!);
 const hasDefenderBonus = computed(() => game.value.settings.specialGalaxy.defenderBonus === 'enabled');
@@ -252,20 +246,7 @@ const calculate = async (e: Event) => {
     return;
   }
 
-  isLoading.value = true;
-
-  const defenderWeapons = defender.value.weaponsLevel + (includeDefenderBonus.value ? 1 : 0);
-
-  const response = await calculateCombat(httpClient)(game.value._id, { ships: defender.value.ships, weaponsLevel: defenderWeapons }, { ships: attacker.value.ships, weaponsLevel: attacker.value.weaponsLevel }, isTurnBased.value);
-
-  if (isOk(response)) {
-    result.value = response.data;
-  } else {
-    console.error(formatError(response));
-    errors.value = extractErrors(response);
-  }
-
-  isLoading.value = false;
+  result.value = serviceProvider.combatService.computeBasic(defender.value, attacker.value, isCarrierToStar.value);
 }
 
 onMounted(async () => {
