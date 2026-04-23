@@ -115,7 +115,7 @@ const carriersInOrbit = computed(() => GameHelper.getCarriersOrbitingStar(game.v
 
 const defenders = computed(() => starOwningPlayer.value ? [starOwningPlayer.value].concat(...carriersInOrbit.value.map(c => GameHelper.getPlayerById(game.value, c.ownedByPlayerId!)!)) : []);
 
-const weaponsDetail = computed(() => gameServices.technologyService.getStarEffectiveWeaponsLevel(game.value, defenders.value, props.star, carriersInOrbit.value));
+const weaponsDetail = computed(() => gameServices.technologyService.getStarOwnWeaponsDetail<string>(game.value, defenders.value, props.star, carriersInOrbit.value));
 </script>
 
 <style scoped>
