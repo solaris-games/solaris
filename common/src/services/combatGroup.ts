@@ -1,7 +1,6 @@
 import { type Game } from '../types/common/game';
-import { type Player } from '../types/common/player';
 import type {Id} from "../types/id";
-import {CombatBasePlayer} from "../types/common/combat";
+import type {CombatBasePlayer} from "../types/common/combat";
 
 export type CombatPlayerGrouping<ID, P extends CombatBasePlayer<ID>> = {
     groups: P[][],

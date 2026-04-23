@@ -1,5 +1,5 @@
 import type {WeaponsDetail} from "../../services/technology";
-import {StarCaptureResult} from "./star";
+import type {StarCaptureResult} from "./star";
 
 export interface CombatBaseStar<ID> {
     _id: ID;

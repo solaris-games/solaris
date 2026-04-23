@@ -6,7 +6,7 @@ import type {Star} from "../types/common/star";
 import type {Id} from "../types/id";
 import type {Carrier} from "../types/common/carrier";
 import {maxBy, maxOf, minOf, notUndefined} from "../utilities/utils";
-import {CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup} from "../types/common/combat";
+import type {CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup} from "../types/common/combat";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
     'terraforming',

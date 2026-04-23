@@ -936,7 +936,6 @@ export default class AIService {
         const invadedPlayer = starToInvade.ownedByPlayerId!;
 
         const starId = starToInvade._id.toString();
-        const defendingPlayer = this.playerService.getById(game, invadedPlayer)!;
         const defendingCarriers = context.carriersOrbiting.get(starId) || [];
 
         const techLevel = this.technologyService.getStarEffectiveTechnologyLevels(game, starToInvade, false);
@@ -944,11 +943,13 @@ export default class AIService {
         const shipsProduced = this.shipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
         const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
 
-        // TODO: Account for ships at arrival
-        const result = this.combatService.computeStar(game, starToInvade, []);
-        const ownResult = this.combatService.getGroup(result, player._id)!;
-
-        return this.combatService.estimateNeeded(game, result, ownResult);
+        return this.combatService.computeBasic({
+            ships: shipsAtArrival,
+            weaponsLevel: techLevel.weapons,
+        }, {
+            ships: 1,
+            weaponsLevel: player.research.weapons.level,
+        }, true).attacker.shipsNeeded;
     }
 
     _calculateRequiredShipsForDefense(game: Game, player: Player, context: Context, attackData: KnownAttack, attackingCarriers: Carrier[], defendingStar: Star) {
@@ -965,7 +966,7 @@ export default class AIService {
         const defenderResult = this.combatService.getDefender(result);
 
         if (defenderResult && defenderResult.shipsAfter <= 0) {
-            return this.combatService.estimateNeeded(game, result, defenderResult);
+            return this.combatService.estimateNeeded(result, defenderResult);
         }
 
         return 0;
