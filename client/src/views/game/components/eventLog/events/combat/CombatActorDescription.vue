@@ -8,19 +8,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { type CombatActor } from '../../../../../services/combat';
-import SpecialistIcon from "../../specialist/SpecialistIcon.vue";
+import SpecialistIcon from "../../../specialist/SpecialistIcon.vue";
 import type {Specialist} from "@solaris/common";
 
 const props = defineProps<{
-  actor: CombatActor,
+  name: string,
   specialist: Specialist | null,
+  kind: 'star' | 'carrier',
 }>();
-
-const kind = computed(() => props.actor.object.kind);
-const name = computed(() => props.actor.object.kind === 'star' ? props.actor.object.starName : props.actor.object.carrier.name);
-
 </script>
 <style scoped>
 .combat-actor-name {

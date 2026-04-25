@@ -26,16 +26,6 @@ export type CombatSide = {
   weaponsLevel: number,
 }
 
-const starToCombatActor = (event: PlayerCombatStarEvent<string>, star: CombatStar<string>): CombatActor => {
-  return {
-    specialist: star.specialist,
-    object: { kind: 'star', star, starName: event.data.starName },
-    before: star.before,
-    after: star.after,
-    lost: star.lost,
-  }
-}
-
 const carrierToCombatActor = (carrier: CombatCarrier<string>): CombatActor => {
   return {
     specialist: carrier.specialist,
@@ -82,35 +72,6 @@ const createSide = (participantsGroups: Map<string, CombatActor[]>, game: Game, 
   }
 }
 
-export const createStarDefenderSide = (game: Game, event: PlayerCombatStarEvent<string>): CombatSide => {
-  const defenders = event.data.playerIdDefenders.map(id => gameHelper.getPlayerById(game, id)!);
-
-  const defenderCarriers = event.data.combatResult.carriers.filter(c => defenders.find(d => d._id === c.ownedByPlayerId));
-
-  const weaponsLevel = event.data.combatResult.weapons.defender;
-
-  const participantsGroups = new Map<string, CombatActor[]>();
-
-  const star = event.data.combatResult.star!;
-  participantsGroups.set(star.ownedByPlayerId!, [starToCombatActor(event, star)])
-
-  for (const car of defenderCarriers) {
-    const group = participantsGroups.get(car.ownedByPlayerId) || [];
-    group.push(carrierToCombatActor(car));
-    participantsGroups.set(car.ownedByPlayerId, group);
-  }
-
-  return createSide(participantsGroups, game, weaponsLevel);
-};
-
-export const getOriginalStarOwner = (game: Game, event: PlayerCombatStarEvent<string>) => {
-  if ( event.data.combatResult.star?.ownedByPlayerId) {
-    return gameHelper.getPlayerById(game, event.data.combatResult.star!.ownedByPlayerId!)!;
-  }
-
-  return null;
-}
-
 export const resultToNumber = (result: CombatParticipantResult) => {
   return typeof result === 'number' ? result : 0;
 }
@@ -128,12 +89,6 @@ const createCarrierSide = (game: Game, event: BaseCombatEvent<string>, sidePlaye
 
   return createSide(participantsGroups, game, weaponsLevel);
 }
-
-export const createStarAttackerSide = (game: Game, event: PlayerCombatStarEvent<string>) => {
-  const attackers = event.data.playerIdAttackers.map(id => gameHelper.getPlayerById(game, id)!);
-
-  return createCarrierSide(game, event, attackers, event.data.combatResult.weapons.attacker);
-};
 
 export const createCarrierDefenderSide = (game: Game, event: BaseCombatEvent<string>) => {
   const defenders = event.data.playerIdDefenders.map(id => gameHelper.getPlayerById(game, id)!);

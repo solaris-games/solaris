@@ -340,6 +340,18 @@ export class CombatService<ID extends Id> {
             }
         });
 
+        groups.sort((g1, g2) => {
+            if (g1.isDefender) {
+                return -1;
+            }
+
+            if (g2.isDefender) {
+                return 1;
+            }
+
+            return g2.originalShips - g1.originalShips;
+        });
+
         this._computeGroupWeapons(game, groups, Boolean(star));
 
         return groups;

@@ -1,4 +1,4 @@
-import { ref, readonly, inject } from 'vue';
+import { ref, readonly } from 'vue';
 import { defineStore } from 'pinia';
 import type {Game} from "@/types/game";
 import {
@@ -14,9 +14,9 @@ import {useColourStore} from "@/stores/colour";
 import GameHelper from "@/services/gameHelper";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import {formatError, isOk} from "@/services/typedapi";
 import type { Axios } from "axios";
-import type {MenuState, MenuStateChat} from "@/types/menu.ts";
+import type {MenuState, MenuStateChat} from "@/types/menu";
 
 type PlayerJoinedData = {
   playerId: string,
@@ -352,6 +352,14 @@ export const useGameStore = defineStore('game', () => {
     },
   };
 
+  const getSpecialist = (id: number, kind: 'star' | 'carrier'): Specialist => {
+    if (kind === 'star') {
+      return starSpecialists.value!.find(spec => spec.id === id)!;
+    } else {
+      return carrierSpecialists.value!.find(spec => spec.id === id)!;
+    }
+  }
+
   return {
     game,
     tick: readonly(tick),
@@ -386,6 +394,7 @@ export const useGameStore = defineStore('game', () => {
     gameBulkActionTrashed,
     setMenuStateChat,
     clearMenuStateChat,
+    getSpecialist,
   };
 });
 

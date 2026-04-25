@@ -3,8 +3,8 @@
         <p>
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-carrier</span> combat.
         </p>
-      <CombatEventSide title="Defender" :side="defenderSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
-      <CombatEventSide title="Attacker" :side="attackerSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
+      <CombatEventGroup title="Defender" :side="defenderSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
+      <CombatEventGroup title="Attacker" :side="attackerSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
     </div>
 </template>
 
@@ -12,7 +12,7 @@
 import { useGameStore } from '@/stores/game';
 import { computed } from 'vue';
 import type {PlayerCombatCarrierEvent} from "@solaris/common";
-import CombatEventSide from './CombatEventSide.vue';
+import CombatEventGroup from './combat/CombatEventGroup.vue';
 import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
 
 const props = defineProps<{
