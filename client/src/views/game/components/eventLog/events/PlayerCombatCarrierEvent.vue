@@ -3,17 +3,14 @@
         <p>
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-carrier</span> combat.
         </p>
-      <CombatEventGroup title="Defender" :side="defenderSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
-      <CombatEventGroup title="Attacker" :side="attackerSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
+
+      <combat-event-group v-for="(group, groupIndex) of event.data.groups" :title="getTitle(group, groupIndex)" :group="group" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" :groupIndex="groupIndex" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { computed } from 'vue';
-import type {PlayerCombatCarrierEvent} from "@solaris/common";
+import type {CombatResultGroup, PlayerCombatCarrierEvent} from "@solaris/common";
 import CombatEventGroup from './combat/CombatEventGroup.vue';
-import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
 
 const props = defineProps<{
   event: PlayerCombatCarrierEvent<string>
@@ -23,18 +20,13 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
 
-const store = useGameStore();
-
-const game = store.game!;
-
-const defenderSide = computed(() => createCarrierDefenderSide(game, props.event));
-
-const attackerSide = computed(() => createCarrierAttackerSide(game, props.event));
+const getTitle = (group: CombatResultGroup<string>, groupIndex: number) => {
+  return `Group ${groupIndex}`;
+};
 
 const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);
 };
-
 </script>
 
 <style scoped>
