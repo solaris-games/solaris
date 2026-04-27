@@ -71,15 +71,6 @@ export default class StarCaptureService {
         const attackerPlayers = attackers.filter(p => p._id.toString() !== capturePlayerId.toString());
         const newStarPlayer = attackers.find(p => p._id.toString() === capturePlayerId.toString())!;
 
-        let isAlliedToNewOwner = (player: Player) => false;
-
-        if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-            const newStarPlayerAllies = this.diplomacyService.getAlliesOfPlayer(game, newStarPlayer);
-            isAlliedToNewOwner = (player: Player) => newStarPlayerAllies.some(a => a._id.toString() === player._id.toString());
-        }
-
-        const hostileAttackersRemaining = attackerPlayers.some(p => !isAlliedToNewOwner(p));
-
         // Capture the star.
         const newStarUser = attackerUsers.find(u => newStarPlayer.userId && u._id.toString() === newStarPlayer.userId.toString());
         const newStarPlayerCarriers = attackerCarriers.filter(c => c.ownedByPlayerId!.toString() === newStarPlayer._id.toString());
@@ -93,17 +84,6 @@ export default class StarCaptureService {
 
             if (captureReward > 0) {
                 newStarPlayer.credits += captureReward;
-            }
-        }
-
-        let specialistDestroyed = false;
-
-        if (hostileAttackersRemaining && star.specialistId) {
-            const specialist = this.specialistService.getById(star.specialistId, 'star');
-
-            if (!specialist.oneShot) {
-                specialistDestroyed = true;
-                star.specialistId = null;
             }
         }
 
@@ -146,7 +126,6 @@ export default class StarCaptureService {
             capturedById: newStarPlayer._id,
             capturedByAlias: newStarPlayer.alias!,
             captureReward: captureReward || 0,
-            specialistDestroyed,
         };
     }
 
