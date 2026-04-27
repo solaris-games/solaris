@@ -428,4 +428,29 @@ export default class DiplomacyService extends EventEmitter {
         });
     }
 
+    transitivelyGetAllies(game: Game, destinationOwner: Player): DBObjectId[] {
+        const queue = [destinationOwner._id];
+
+        const allies = new Set<DBObjectId>();
+        allies.add(destinationOwner._id);
+
+        while (queue.length > 0) {
+            const next = queue.pop()!;
+
+            const player = game.galaxy.players.find(p => p._id === next)!;
+
+            const pAllies = this.getAlliesOfPlayer(game, player);
+
+            for (let pAlly of pAllies) {
+                if (allies.has(pAlly._id)) {
+                    continue;
+                }
+
+                allies.add(pAlly._id);
+                queue.push(pAlly._id);
+            }
+        }
+
+        return Array.from(allies);
+    }
 };

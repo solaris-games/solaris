@@ -12,6 +12,7 @@ const schema = new Schema({
     ships: { type: Types.Number, required: true },
     specialistId: { type: Types.Number, required: false, default: null },
     specialistExpireTick: { type: Types.Number, required: false, default: null },
+    specialistTargetedPlayers: [{ type: Types.ObjectId, required: false }],
     isGift: { type: Types.Boolean, required: false, default: false },
     isScuttled: { type: Types.Boolean, required: false, default: false },
     location: {

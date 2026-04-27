@@ -5,7 +5,6 @@ import Repository from './repository';
 import { Carrier } from './types/Carrier';
 import { CarrierWaypoint } from '@solaris/common';
 import { Game } from './types/Game';
-import { MapObject } from './types/Map';
 import { Player } from './types/Player';
 import { Star } from './types/Star';
 import { DistanceService } from '@solaris/common';
@@ -99,6 +98,7 @@ export default class CarrierService extends EventEmitter {
             specialistId: null,
             specialistExpireTick: null,
             specialist: null,
+            specialistTargetedPlayers: [],
             isGift: false,
             isScuttled: false,
             locationNext: null,

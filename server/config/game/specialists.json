@@ -407,6 +407,7 @@
                 "local": {
                     "speed": 0.75,
                     "carrierToStarCombat": {
+                        "captureTargetedPlayers": true,
                         "attacker": {
                             "perAlly": {
                                 "weapons": 2,
@@ -433,6 +434,7 @@
             "modifiers": {
                 "local": {
                     "carrierToStarCombat": {
+                        "captureTargetedPlayers": true,
                         "attacker": {
                             "weapons": 4
                         }

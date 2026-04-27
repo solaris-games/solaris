@@ -25,6 +25,7 @@ export interface Specialist {
                 weapons?: number;
             }
             carrierToStarCombat?: {
+                captureTargetedPlayers?: boolean,
                 attacker: {
                     weapons?: number;
                     perAlly?: {

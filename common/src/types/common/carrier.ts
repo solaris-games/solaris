@@ -12,6 +12,7 @@ export interface Carrier<ID> extends MapObject<ID> {
     specialistId: number | null;
     specialistExpireTick: number | null;
     specialist: Specialist | null;
+    specialistTargetedPlayers: ID[],
     isGift: boolean;
     isScuttled: boolean;
     waypoints: CarrierWaypoint<ID>[];
