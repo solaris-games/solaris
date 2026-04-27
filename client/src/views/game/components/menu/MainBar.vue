@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, inject, computed } from 'vue';
+import { computed } from 'vue';
 import PlayerList from './PlayerList.vue';
 import Leaderboard from '../leaderboard/Leaderboard.vue';
 import Player from '../player/Player.vue';
@@ -158,13 +158,12 @@ import CarrierWaypoint from '../carrier/CarrierWaypoint.vue';
 import CarrierRename from '../carrier/CarrierRename.vue';
 import ShipTransfer from '../carrier/ShipTransfer.vue';
 import BuildCarrier from '../carrier/BuildCarrier.vue';
-import Inbox from '../inbox/Inbox.vue';
 import EventLog from '../eventLog/EventLog.vue';
 import Intel from '../intel/Intel.vue';
 import Galaxy from '../galaxy/Galaxy.vue';
 import BulkInfrastructureUpgrade from '../star/BulkInfrastructureUpgrade.vue';
 import MapObjectSelector from './MapObjectSelector.vue';
-import CombatCalculator from '../carrier/CombatCalculator.vue';
+import CombatCalculator from '@/views/game/components/combatcalculator/CombatCalculator.vue';
 import Ruler from '../ruler/Ruler.vue';
 import HeaderBar from './HeaderBar.vue';
 import SidebarMenu from './SidebarMenu.vue';
@@ -175,15 +174,12 @@ import HireSpecialistStar from '../specialist/HireSpecialistStar.vue';
 import GameNotes from '../notes/GameNotes.vue';
 import Options from './Options.vue';
 import Settings from '../settings/Settings.vue';
-import ConversationCreate from '../inbox/conversations/ConversationCreate.vue';
-import ConversationDetail from '../inbox/conversations/ConversationDetail.vue';
 import FooterBar from './FooterBar.vue';
 import NotLoggedInBar from './NotLoggedInBar.vue';
 import SpectatingWarningBar from './SpectatingWarningBar.vue';
 import PlayerBadgeShop from '../badges/PlayerBadgeShop.vue';
 import ReportPlayer from '../report/ReportPlayer.vue';
 import Spectators from '../spectators/Spectators.vue';
-import { eventBusInjectionKey } from '@/eventBus';
 import type { CarrierWaypoint as CWTp } from "@solaris/common";
 import GameStatistics from "@/views/game/components/statistics/GameStatistics.vue";
 import {useUserStore} from "@/stores/user";
@@ -195,8 +191,6 @@ const emit = defineEmits<{
   onViewColourOverrideRequested: [playerId: string],
   onReloadGameRequested: [],
 }>();
-
-const eventBus = inject(eventBusInjectionKey)!;
 
 const userStore = useUserStore();
 const store = useGameStore();
