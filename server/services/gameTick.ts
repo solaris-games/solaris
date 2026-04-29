@@ -26,7 +26,7 @@ import { Star } from "./types/Star";
 import { GameRankingResult } from "../../common/src/types/common/rating";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
-import CarrierMovementService from "./carrierMovement";
+import CarrierMovementService, {CarrierMovementReport} from "./carrierMovement";
 import PlayerCycleRewardsService from "./playerCycleRewards";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
@@ -445,7 +445,7 @@ export default class GameTickService extends EventEmitter {
         // this means that always the carrier that is closest to its destination
         // will land first. This is important for unclaimed stars and defender bonuses.
 
-        let combatStars: Star[] = [];
+        const combatStars: Star[] = [];
         let actionWaypoints: CarrierActionWaypoint[] = [];
 
         for (let i = 0; i < carriersInTransit.length; i++) {
@@ -492,6 +492,7 @@ export default class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
+            // TODO: claim unclaimed stars here?
             await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar);
         }
 
@@ -508,12 +509,6 @@ export default class GameTickService extends EventEmitter {
         // 4c. Do the rest of the waypoint actions.
         this.waypointActionService.performWaypointActionsCollects(game, actionWaypoints);
         this.waypointActionService.performWaypointActionsGarrisons(game, actionWaypoints);
-
-        // TODO: This is incredibly inefficient in large turn based games; moved it outside the main tick loop
-        // for performance reasons because it needs to calculate the scanning ranges of all players.
-        // Moving it out of here technically introduces a bug where carriers may travel to stars they cannot see _within_ a turn (rare occurrence).
-        // Performance gain outweighs the risk of encountering this issue.
-        // this._sanitiseDarkModeCarrierWaypoints(game);
     }
 
     async _captureAbandonedStars(game: Game, gameUsers: User[]) {
@@ -523,13 +518,13 @@ export default class GameTickService extends EventEmitter {
             return;
         }
 
-        let contestedAbandonedStars = this.starContestedService.listContestedUnownedStars(game);
+        const contestedAbandonedStars = this.starContestedService.listContestedUnownedStars(game);
 
         for (let i = 0; i < contestedAbandonedStars.length; i++) {
-            let contestedStar = contestedAbandonedStars[i];
+            const contestedStar = contestedAbandonedStars[i];
 
             // The player who owns the carrier with the most ships will capture the star.
-            let carrier = contestedStar.carriersInOrbit
+            const carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
             this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);

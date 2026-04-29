@@ -20,7 +20,7 @@ import {logger} from "../utils/logging";
 import {DBObjectId} from "./types/DBObjectId";
 import PlayerService from "./player";
 
-type CarrierMovementReport = {
+export type CarrierMovementReport = {
     carrier: Carrier;
     sourceStar: Star;
     destinationStar: Star;
@@ -80,9 +80,9 @@ export default class CarrierMovementService {
 
     private _arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
         // Remove the current waypoint as we have arrived at the destination.
-        let currentWaypoint = carrier.waypoints.splice(0, 1)[0];
+        const currentWaypoint = carrier.waypoints.splice(0, 1)[0];
 
-        let report = {
+        const report = {
             waypoint: currentWaypoint,
             combatRequiredStar: false
         };
@@ -96,21 +96,14 @@ export default class CarrierMovementService {
             carrier.waypoints.push(currentWaypoint);
         }
 
-        // If the star is unclaimed, then claim it.
-        // TODO: Move this logic out of this function so that carrier movement will correctly
-        // take into account multiple players arriving at an unclaimed star at the same time.
-        if (destinationStar.ownedByPlayerId == null) {
-            this.starService.claimUnownedStar(game, gameUsers, destinationStar, carrier);
-        }
-
         // Reignite dead stars if applicable
         // Note: Black holes cannot be reignited.
-        if (!carrier.isGift && this.starDataService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
-            let reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
+        if (!carrier.isGift && destinationStar.ownedByPlayerId && this.starDataService.isDeadStar(destinationStar) && this.specialistService.getReigniteDeadStar(carrier)) {
+            const reigniteSpecialistNaturalResources = this.specialistService.getReigniteDeadStarNaturalResources(carrier);
 
             // Double resources for binary stars.
-            let modifier = destinationStar.isBinaryStar ? 2 : 1
-            let reigniteNaturalResources = {
+            const modifier = destinationStar.isBinaryStar ? 2 : 1
+            const reigniteNaturalResources = {
                 economy: reigniteSpecialistNaturalResources.economy * modifier,
                 industry: reigniteSpecialistNaturalResources.industry * modifier,
                 science: reigniteSpecialistNaturalResources.science * modifier
@@ -121,16 +114,12 @@ export default class CarrierMovementService {
             carrier.specialistId = null;
         }
 
-        // If the star is owned by another player, then perform combat.
-        if (destinationStar.ownedByPlayerId!.toString() !== carrier.ownedByPlayerId!.toString()) {
-            // If the carrier is a gift, then transfer the carrier ownership to the star owning player.
-            // Otherwise, perform combat.
+        // we leave combat handling for later
+        if (!destinationStar.ownedByPlayerId) {
+            report.combatRequiredStar = true;
+        } else if (destinationStar.ownedByPlayerId !== carrier.ownedByPlayerId!) {
             if (carrier.isGift) {
                 this.carrierGiftService.transferGift(game, gameUsers, destinationStar, carrier);
-            } else if (this.diplomacyService.isFormalAlliancesEnabled(game)) {
-                let isAllied = this.diplomacyService.isDiplomaticStatusBetweenPlayersAllied(game, [carrier.ownedByPlayerId!, destinationStar.ownedByPlayerId!]);
-
-                report.combatRequiredStar = !isAllied;
             } else {
                 report.combatRequiredStar = true;
             }
