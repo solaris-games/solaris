@@ -14,7 +14,7 @@ export const mapToTradeSendToPlayerRequest = (body: any, userId: any): TradeSend
         errors.push('To Player ID is required.');
     }
 
-    if (body.toPlayerId && userId === body.toPlayerId) {
+    if (body.toPlayerId && userId.toString() === body.toPlayerId.toString()) {
         errors.push('Cannot trade with yourself.');
     }
     

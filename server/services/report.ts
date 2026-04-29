@@ -71,8 +71,8 @@ export default class ReportService {
     }
 
     isUserInvolved(report: Report, userId: DBObjectId, userGameIds: string[]): boolean {
-        return report.reportedByUserId === userId ||
-            report.reportedUserId === userId ||
+        return report.reportedByUserId.equals(userId) ||
+            report.reportedUserId.equals(userId) ||
             userGameIds.includes(report.gameId.toString());
     }
 

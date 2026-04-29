@@ -54,9 +54,11 @@ export default class CullWaypointsService {
             const otherCarriers: Carrier[] = [];
 
             remaining.forEach(c => {
-                if (c.ownedByPlayerId === player.player._id) {
+                if (c.ownedByPlayerId?.equals(player.player._id)) {
                     playerCarriers.push(c);
-                } else otherCarriers.push(c);
+                } else {
+                    otherCarriers.push(c);
+                }
             });
             remaining = otherCarriers;
 

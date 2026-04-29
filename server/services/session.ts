@@ -26,7 +26,7 @@ export default class SessionService {
             }
             else {
                 if (Array.isArray(obj)) {
-                    for (let o of obj.filter(o => o.userId === userId)) {
+                    for (let o of obj.filter(o => o.userId.toString() === userId.toString())) {
                         action(o);
                     }
                 }

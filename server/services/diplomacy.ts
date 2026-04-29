@@ -437,7 +437,7 @@ export default class DiplomacyService extends EventEmitter {
         while (queue.length > 0) {
             const next = queue.pop()!;
 
-            const player = game.galaxy.players.find(p => p._id === next)!;
+            const player = game.galaxy.players.find(p => p._id.equals(next))!;
 
             const pAllies = this.getAlliesOfPlayer(game, player);
 
