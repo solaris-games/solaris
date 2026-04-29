@@ -15,7 +15,7 @@ import type {
     CombatGroup,
     CombatBaseStar,
     CombatBaseCarrier,
-    CombatBasePlayer, BasicCombatResult,
+    CombatBasePlayer, BasicCombatResult, CombatResult,
 } from "../types/common/combat";
 
 type CombatRoundState<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
@@ -270,8 +270,12 @@ const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends Com
     return makeResult(state);
 }
 
-const findGroup = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(result: DetailedCombatResult<ID, P, S, C>, playerId: ID) => {
-    return result.groups.find(g => g.players.find(p => p._id === playerId));
+const findGroupDetailed = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(result: DetailedCombatResult<ID, P, S, C>, playerId: ID) => {
+    return result.groups.find(g => g.players.find(p => p._id.toString() === playerId.toString()));
+}
+
+const findGroup = <ID extends Id>(result: CombatResult<ID>, playerId: ID) => {
+    return result.groups.find(g => g.playerIds.find(id => id.toString() === playerId.toString()));
 }
 
 const estimateNeeded = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>) => {
@@ -357,11 +361,23 @@ export class CombatService<ID extends Id> {
         return groups;
     }
 
-    getGroup(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>, playerId: ID) {
+    getGroup(combatResult: CombatResult<ID>, playerId: ID) {
         return findGroup(combatResult, playerId);
     }
 
-    getDefender(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>) {
+    getWinner(combatResult: CombatResult<ID>) {
+        return combatResult.groups.find(g => (typeof g.shipsAfter === 'number' ? g.shipsAfter : 1) > 0); // if result is masked it is non-zero
+    }
+
+    getWinnerDetailed(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>) {
+        return combatResult.groups.find(g => (typeof g.shipsAfter === 'number' ? g.shipsAfter : 1) > 0); // if result is masked it is non-zero
+    }
+
+    getGroupDetailed(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>, playerId: ID) {
+        return findGroupDetailed(combatResult, playerId);
+    }
+
+    getDefenderDetailed(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>) {
         return combatResult.groups.find(g => g.star);
     }
 
@@ -453,8 +469,8 @@ export class CombatService<ID extends Id> {
 
         const result: DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> = combatLoop({ round: 0, groups });
 
-        const defenderGroup = findGroup(result, "defender")!;
-        const attackerGroup = findGroup(result, "attacker")!;
+        const defenderGroup = findGroupDetailed(result, "defender")!;
+        const attackerGroup = findGroupDetailed(result, "attacker")!;
 
         const defenderNeeded = estimateNeeded(result, defenderGroup);
         const attackerNeeded = estimateNeeded(result, attackerGroup);

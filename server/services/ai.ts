@@ -963,7 +963,7 @@ export default class AIService {
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
 
         const result = this.combatService.computeStar(game, defendingStar, attackingCarriers.concat(defenseCarriers));
-        const defenderResult = this.combatService.getDefender(result);
+        const defenderResult = this.combatService.getDefenderDetailed(result);
 
         if (defenderResult && defenderResult.shipsAfter <= 0) {
             return this.combatService.estimateNeeded(result, defenderResult);

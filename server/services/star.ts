@@ -1,9 +1,8 @@
-import { shuffle } from "@solaris/common";
+import {Carrier, shuffle} from "@solaris/common";
 import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "@solaris/common";
 import Repository from './repository';
-import { Carrier } from './types/Carrier';
 import { Game } from './types/Game';
 import { Location } from './types/Location';
 import { Player } from './types/Player';
@@ -308,7 +307,7 @@ export default class StarService extends EventEmitter {
         return true;
     }
 
-    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier<DBObjectId>) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }

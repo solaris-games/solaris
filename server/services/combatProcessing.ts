@@ -9,7 +9,7 @@ import {
     Star,
     StarCaptureResult,
     CombatResult, CombatResultGroup, DetailedCombatResultCarrier, CombatResultCarrier, DetailedCombatResultGroup,
-    CombatResultStar, Specialist,
+    CombatResultStar, Specialist, maxBy, maxOf,
 } from '@solaris/common'
 import EventEmitter from "events";
 import {DBObjectId} from "./types/DBObjectId";
@@ -18,6 +18,7 @@ import ReputationService from "./reputation";
 import PlayerService from "./player";
 import StatisticsService from "./statistics";
 import SpecialistService from "./specialist";
+import StarService from "./star";
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',
@@ -32,6 +33,7 @@ export default class CombatProcessingService extends EventEmitter {
     playerService: PlayerService;
     statisticsService: StatisticsService;
     specialistService: SpecialistService;
+    starService: StarService;
 
     constructor(
         combatService: CombatService<DBObjectId>,
@@ -41,6 +43,7 @@ export default class CombatProcessingService extends EventEmitter {
         playerService: PlayerService,
         statisticsService: StatisticsService,
         specialistService: SpecialistService,
+        starService: StarService,
     ) {
         super();
 
@@ -51,6 +54,7 @@ export default class CombatProcessingService extends EventEmitter {
         this.playerService = playerService;
         this.statisticsService = statisticsService;
         this.specialistService = specialistService;
+        this.starService = starService;
     }
 
     _distributeDamage(combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
@@ -133,9 +137,11 @@ export default class CombatProcessingService extends EventEmitter {
     async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>> {
         let combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>;
 
+        const isOwnedStar = Boolean(star?.ownedByPlayerId);
+
         // for unclaimed stars, we do C2C first
-        if (star && star.ownedByPlayerId) {
-            combatResult = this.combatService.computeStar(game, star, carriers);
+        if (isOwnedStar) {
+            combatResult = this.combatService.computeStar(game, star!, carriers);
         } else {
             combatResult = this.combatService.computeCarrier(game, carriers);
         }
@@ -157,7 +163,19 @@ export default class CombatProcessingService extends EventEmitter {
         let captureResult: StarCaptureResult<DBObjectId> | null = null;
 
         if (star) {
-            captureResult = this._starDefeatedCheck(game, star, combatResult, gameUsers);
+            if (star.ownedByPlayerId) {
+                // capture star because it may be owned by hostile player
+                captureResult = this._starDefeatedCheck(game, star, combatResult, gameUsers);
+            } else {
+                const winnerGroup = this.combatService.getWinnerDetailed(combatResult);
+
+                // have to check because of mutual destruction
+                if (winnerGroup) {
+                    const claimingCarrier = maxOf(c => c.shipsAfter, winnerGroup.carriers)!;
+
+                    this.starService.claimUnownedStar(game, gameUsers, star, claimingCarrier.carrier);
+                }
+            }
         }
 
         await this._deductReputation(game, combatResult);
@@ -165,7 +183,7 @@ export default class CombatProcessingService extends EventEmitter {
         const eventResult = this.lowerResult(combatResult, captureResult);
 
         // Log the combat event
-        if (star) {
+        if (isOwnedStar) {
             this.emit(CombatServiceEvents.onPlayerCombatStar, {
                 gameId: game._id,
                 gameTick: game.state.tick,

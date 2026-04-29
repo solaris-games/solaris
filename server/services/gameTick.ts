@@ -493,6 +493,7 @@ export default class GameTickService extends EventEmitter {
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
             // TODO: claim unclaimed stars here?
+            // properly handle combat at unclaimed stars!
             await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar);
         }
 
