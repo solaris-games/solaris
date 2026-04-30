@@ -10,12 +10,12 @@
 
         <div v-if="captureResult">
           <p>
-            The star <star-label :starId="starGroup.star!.starId" :starName="starGroup.star!.starName"/> has been captured
-            by <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', captureResult.capturedById)">{{captureResult.capturedByAlias}}</a>
             <span v-if="originalOwner">
-              from <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', originalOwner._id)">{{originalOwner.alias}}</a>
+              <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', originalOwner._id)">{{originalOwner.alias}}</a>'s
             </span>
-            .
+            <span v-else>The</span>
+             star <star-label :starId="starGroup.star!.starId" :starName="starGroup.star!.starName"/> has been captured
+            by <a href="javascript:;" @click="emit('onOpenPlayerDetailRequested', captureResult.capturedById)">{{captureResult.capturedByAlias}}</a>.
           </p>
           <p v-if="captureResult?.specialistDestroyed">
             The specialist at <star-label :starId="starGroup.star!.starId" :starName="starGroup.star!.starName"/> was destroyed due to the intense combat.
