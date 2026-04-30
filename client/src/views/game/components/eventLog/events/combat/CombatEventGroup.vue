@@ -88,12 +88,13 @@ const getSpecialist = (id: number | null, kind: 'star' | 'carrier') => {
 };
 
 const playerGroupedObjects = computed(() => {
-  const groupedMap = groupBy(props.group.carriers, (c) => c.ownedByPlayerId);
+  const groupedCarriers = groupBy(props.group.carriers, (c) => c.ownedByPlayerId);
 
   const grouped: Participant[] = [];
 
-  for (let [playerId, carriers] of groupedMap) {
+  for (let playerId of props.group.playerIds) {
     const player = GameHelper.getPlayerById(game.value, playerId)!;
+    const carriers = groupedCarriers.get(playerId) || [];
 
     const entry: Participant = {
       player,
