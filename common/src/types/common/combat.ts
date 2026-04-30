@@ -97,7 +97,7 @@ export type CombatResultGroup<ID> = {
     playerIds: ID[],
     carriers: CombatResultCarrier<ID>[],
     star: CombatResultStar<ID> | undefined,
-    attackAgainst: Map<number, WeaponsDetail>,
+    attackAgainst: Record<number, WeaponsDetail>, // using a record here because it needs to be stored in MongoDB
     shipsBefore: number | '???',
     shipsAfter: number | '???',
     shipsLost: number | '???',

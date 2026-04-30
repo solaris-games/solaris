@@ -9,7 +9,7 @@ import {
     Star,
     StarCaptureResult,
     CombatResult, CombatResultGroup, DetailedCombatResultCarrier, CombatResultCarrier, DetailedCombatResultGroup,
-    CombatResultStar, Specialist, maxBy, maxOf,
+    CombatResultStar, Specialist, maxBy, maxOf, WeaponsDetail,
 } from '@solaris/common'
 import EventEmitter from "events";
 import {DBObjectId} from "./types/DBObjectId";
@@ -116,13 +116,23 @@ export default class CombatProcessingService extends EventEmitter {
         }
     }
 
+    _mapToRecord(map: Map<number, WeaponsDetail>): Record<string, WeaponsDetail> {
+        const obj: Record<number, WeaponsDetail> = {};
+
+        for (let [k, v] of map) {
+            obj[k] = v;
+        }
+
+        return obj;
+    }
+
     lowerResult(result: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>, captureResult: StarCaptureResult<DBObjectId> | null): CombatResult<DBObjectId> {
         const groups: CombatResultGroup<DBObjectId>[] = result.groups.map((g) => {
             return {
                 playerIds: g.players.map(p => p._id),
                 carriers: g.carriers.map(c => this._lowerResultCarriers(g, c)),
                 star: this._lowerResultStar(g, captureResult),
-                attackAgainst: g.attackAgainst,
+                attackAgainst: this._mapToRecord(g.attackAgainst),
                 shipsBefore: g.shipsBefore,
                 shipsAfter: g.shipsAfter,
                 shipsLost: g.shipsLost,

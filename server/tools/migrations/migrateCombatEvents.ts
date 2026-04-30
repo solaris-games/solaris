@@ -9,6 +9,7 @@ import {
     StarCaptureResult, WeaponsDetail
 } from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
+import {logger} from "../../utils/logging";
 
 interface OldCombatWeapons {
     defender: number;
@@ -77,7 +78,9 @@ interface OldPlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
     data: OldCombatEventData<ID>,
 }
 
-const processStarCombatEvent = (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) => {
+const log = logger("Migrate combat events");
+
+const processStarCombatEvent = async (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) => {
     const mapCarrier = (oldC: OldCombatCarrier<DBObjectId>): CombatResultCarrier<DBObjectId> => {
         return {
             carrierId: oldC._id,
@@ -105,17 +108,17 @@ const processStarCombatEvent = (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) 
         };
     };
 
-    const defenderAttackMap = new Map<number, WeaponsDetail>();
-    defenderAttackMap.set(1, {
+    const defenderAttackMap: Record<number, WeaponsDetail> = {};
+    defenderAttackMap[1] = {
         total: oldEvent.data.combatResult.weapons.defender,
         appliedBuffs: [],
         weaponsBuff: oldEvent.data.combatResult.weapons.defender - oldEvent.data.combatResult.weapons.defenderBase,
         weaponsLevel: oldEvent.data.combatResult.weapons.defenderBase,
-    });
+    };
 
     const defenderGroup: CombatResultGroup<DBObjectId> = {
         playerIds: oldEvent.data.playerIdDefenders,
-        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdDefenders.includes(c._id)).map(mapCarrier),
+        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdDefenders.find(pi => pi.toString() === c.ownedByPlayerId.toString())).map(mapCarrier),
         star: oldEvent.data.combatResult.star ? mapStar(oldEvent.data.combatResult.star) : undefined,
         shipsBefore: oldEvent.data.combatResult.before.defender,
         shipsAfter: oldEvent.data.combatResult.after.defender,
@@ -123,17 +126,17 @@ const processStarCombatEvent = (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) 
         attackAgainst: defenderAttackMap,
     }
 
-    const attackerAttackMap = new Map<number, WeaponsDetail>();
-    attackerAttackMap.set(0, {
+    const attackerAttackMap: Record<number, WeaponsDetail> = {};
+    attackerAttackMap[0] = {
         total: oldEvent.data.combatResult.weapons.attacker,
         appliedBuffs: [],
         weaponsBuff: oldEvent.data.combatResult.weapons.attacker - oldEvent.data.combatResult.weapons.attackerBase,
         weaponsLevel: oldEvent.data.combatResult.weapons.attackerBase,
-    });
+    };
 
     const attackerGroup = {
         playerIds: oldEvent.data.playerIdAttackers,
-        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdAttackers.includes(c._id)).map(mapCarrier),
+        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdAttackers.find(pi => pi.toString() === c.ownedByPlayerId.toString())).map(mapCarrier),
         star: undefined,
         shipsBefore: oldEvent.data.combatResult.before.attacker,
         shipsAfter: oldEvent.data.combatResult.after.attacker,
@@ -148,10 +151,12 @@ const processStarCombatEvent = (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) 
     const newEvent = oldEvent as any as PlayerCombatStarEvent<DBObjectId>;
     newEvent.data = newResult;
     // @ts-ignore
-    newEvent.save();
+    newEvent.markModified('data');
+    // @ts-ignore
+    await newEvent.save();
 }
 
-const processCarrierCombatEvent = (oldEvent: OldPlayerCombatCarrierEvent<DBObjectId>) => {
+const processCarrierCombatEvent = async (oldEvent: OldPlayerCombatCarrierEvent<DBObjectId>) => {
     const mapCarrier = (oldC: OldCombatCarrier<DBObjectId>): CombatResultCarrier<DBObjectId> => {
         return {
             carrierId: oldC._id,
@@ -165,17 +170,17 @@ const processCarrierCombatEvent = (oldEvent: OldPlayerCombatCarrierEvent<DBObjec
         };
     };
 
-    const defenderAttackMap = new Map<number, WeaponsDetail>();
-    defenderAttackMap.set(1, {
+    const defenderAttackMap: Record<number, WeaponsDetail> = {};
+    defenderAttackMap[1] = {
         total: oldEvent.data.combatResult.weapons.defender,
         appliedBuffs: [],
         weaponsBuff: oldEvent.data.combatResult.weapons.defender - oldEvent.data.combatResult.weapons.defenderBase,
         weaponsLevel: oldEvent.data.combatResult.weapons.defenderBase,
-    });
+    };
 
     const defenderGroup: CombatResultGroup<DBObjectId> = {
         playerIds: oldEvent.data.playerIdDefenders,
-        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdDefenders.includes(c._id)).map(mapCarrier),
+        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdDefenders.find(pi => pi.toString() === c.ownedByPlayerId.toString())).map(mapCarrier),
         star: undefined,
         shipsBefore: oldEvent.data.combatResult.before.defender,
         shipsAfter: oldEvent.data.combatResult.after.defender,
@@ -183,17 +188,17 @@ const processCarrierCombatEvent = (oldEvent: OldPlayerCombatCarrierEvent<DBObjec
         attackAgainst: defenderAttackMap,
     }
 
-    const attackerAttackMap = new Map<number, WeaponsDetail>();
-    attackerAttackMap.set(0, {
+    const attackerAttackMap: Record<number, WeaponsDetail> = {};
+    attackerAttackMap[0] = {
         total: oldEvent.data.combatResult.weapons.attacker,
         appliedBuffs: [],
         weaponsBuff: oldEvent.data.combatResult.weapons.attacker - oldEvent.data.combatResult.weapons.attackerBase,
         weaponsLevel: oldEvent.data.combatResult.weapons.attackerBase,
-    });
+    };
 
     const attackerGroup = {
         playerIds: oldEvent.data.playerIdAttackers,
-        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdAttackers.includes(c._id)).map(mapCarrier),
+        carriers: oldEvent.data.combatResult.carriers.filter(c => oldEvent.data.playerIdAttackers.find(pi => pi.toString() === c.ownedByPlayerId.toString())).map(mapCarrier),
         star: undefined,
         shipsBefore: oldEvent.data.combatResult.before.attacker,
         shipsAfter: oldEvent.data.combatResult.after.attacker,
@@ -208,19 +213,39 @@ const processCarrierCombatEvent = (oldEvent: OldPlayerCombatCarrierEvent<DBObjec
     const newEvent = oldEvent as any as PlayerCombatCarrierEvent<DBObjectId>;
     newEvent.data = newResult;
     // @ts-ignore
-    newEvent.save();
+    newEvent.markModified('data');
+    // @ts-ignore
+    await newEvent.save();
+}
+
+const migrateEvents = async <T>(ctx: JobParameters, process: (ev: T) => Promise<void>, type: string) => {
+    const QUERY = { type };
+
+    log.info(`Migrating events of type: ${type}`);
+
+    const eventRepo = ctx.container.eventService.eventRepo;
+
+    const pageSize = 50;
+    const total = await eventRepo.count(QUERY);
+    const totalPages = Math.ceil(total / pageSize);
+    let page = 0;
+
+    do {
+        const events: T[] = await eventRepo.findAsModels(QUERY, {}, { _id: 1 }, pageSize, page * pageSize);
+
+        for (let event of events) {
+            process(event);
+        }
+
+        log.info(`Page ${page}/${totalPages}`);
+
+        page++;
+    } while (page <= totalPages)
+
+    log.info(`FINISHED migrating events of type: ${type}`);
 }
 
 export const migrateCombatEvents = async (ctx: JobParameters) => {
-    const starEventsCursor = EventModel.find({type: 'playerCombatStar'}).cursor();
-
-    for (let document = await starEventsCursor.next(); document !== null; document = await starEventsCursor.next()) {
-        processStarCombatEvent(document as OldPlayerCombatStarEvent<DBObjectId>);
-    }
-
-    const carrierEventsCursor = EventModel.find({ type: 'playerCombatCarrier' }).cursor();
-
-    for (let document = await carrierEventsCursor.next(); document !== null; document = await carrierEventsCursor.next()) {
-        processCarrierCombatEvent(document as OldPlayerCombatCarrierEvent<DBObjectId>);
-    }
+    await migrateEvents(ctx, processStarCombatEvent, 'playerCombatStar');
+    await migrateEvents(ctx, processCarrierCombatEvent, 'playerCombatCarrier');
 };
