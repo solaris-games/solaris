@@ -12,6 +12,7 @@ export interface CombatBaseCarrier<ID> {
     _id: ID;
     ships: number | null; // annoying, but for weird compat reasons
     specialistId: number | null;
+    specialistTargetedPlayers: ID[],
     ownedByPlayerId: ID | null;
 }
 

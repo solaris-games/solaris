@@ -418,6 +418,7 @@ export class CombatService<ID extends Id> {
                         ships,
                         specialistId: null,
                         ownedByPlayerId: id,
+                        specialistTargetedPlayers: [],
                     },
                 ],
                 star: undefined,

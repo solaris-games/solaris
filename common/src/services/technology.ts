@@ -189,13 +189,15 @@ export class TechnologyService {
         return undefined;
     }
 
-    _getCarrierWeaponsBuff<ID>(carrier: CombatBaseCarrier<ID>, isCarrierToStarCombat: boolean, isAttacker: boolean, allyCount: number): Buff | undefined {
+    _getCarrierWeaponsBuff<ID extends Id>(carrier: CombatBaseCarrier<ID>, isCarrierToStarCombat: boolean, isDefender: boolean, opponentIsDefender: boolean, allyCount: number, targetedPlayers: ID[]): Buff | undefined {
         if (!carrier.specialistId) {
             return undefined;
         }
 
         const buffs: number[] = [];
         const specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+
+        const isAttacker = !isDefender;
 
         if (!specialist) {
             return undefined;
@@ -204,7 +206,16 @@ export class TechnologyService {
         if (specialist.modifiers.local) {
             if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat) {
                 if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.weapons) {
-                    buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                    if (specialist.modifiers.local?.carrierToStarCombat?.captureTargetedPlayers) {
+                        // apply buff when either: against defender group OR group contains one of the targeted players
+                        if (opponentIsDefender) {
+                            buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                        } else if (carrier.specialistTargetedPlayers.find(tpId => targetedPlayers.find(pId => pId.toString() === tpId.toString()))) {
+                            buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                        }
+                    } else {
+                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                    }
                 }
 
                 if (!isAttacker && specialist.modifiers.local.carrierToStarCombat.defender?.weapons) {
@@ -267,14 +278,14 @@ export class TechnologyService {
         return maxOf(b => b.amount, allBuffs);
     }
 
-    getStarOwnWeaponsDetail<ID>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
+    getStarOwnWeaponsDetail<ID extends Id>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
         const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         const defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs: Buff[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => (this._getCarrierWeaponsBuff(c, true, false, defenders.length))).filter(notUndefined);
+            buffs = carriersInOrbit.map(c => (this._getCarrierWeaponsBuff(c, true, true, false, defenders.length, []))).filter(notUndefined);
         }
 
         const starBuff = this._getStarWeaponsBuff(star);
@@ -291,11 +302,11 @@ export class TechnologyService {
         }
     }
 
-    getEffectiveWeaponsDetail<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
+    getEffectiveWeaponsDetail<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
         const baseWeapons = maxBy(p => p.research.weapons.level, group.players);
 
         const buffs: Buff[] = group.carriers.map(c => {
-            return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, !group.isDefender, group.players.length);
+            return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, group.isDefender, opponents.isDefender, group.players.length, c.specialistTargetedPlayers);
         }).filter(notUndefined);
 
         const buff = this._calculateActualWeaponsBuff(baseWeapons, buffs, 0);;
