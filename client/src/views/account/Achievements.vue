@@ -9,6 +9,10 @@
 
     <roles v-if="user" :user="user" :displayText="true" />
 
+    <p v-if="user && user.signupDate" class="text-muted mb-2">
+      Member since {{ new Date(user.signupDate).toLocaleDateString() }}
+    </p>
+
     <loading-spinner :loading="!user && !loadError" />
 
     <user-guild-info v-if="user" :user="user" />

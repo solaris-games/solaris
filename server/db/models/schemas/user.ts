@@ -16,6 +16,7 @@ const schema = new Schema({
     credits: {type: Types.Number, default: 0},
     premiumEndDate: {type: Types.Date, default: null},
     banned: {type: Types.Boolean, default: false},
+    signupDate: {type: Types.Date, required: false, default: null},
     lastSeen: {type: Types.Date, required: false, default: null},
     lastSeenIP: {type: Types.String, required: false, default: null},
     isEstablishedPlayer: {type: Types.Boolean, required: true, default: false},

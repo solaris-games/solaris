@@ -73,6 +73,7 @@ export interface User {
     banned: boolean;
     lastSeen: Date | null;
     lastSeenIP: string | null;
+    signupDate: Date | null;
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
     isAnonymous: boolean;
