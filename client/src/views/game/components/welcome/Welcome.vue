@@ -21,6 +21,10 @@
       </div>
     </div>
 
+    <div class="row p-1" v-if="isInProgress">
+      <p>Joining an afk slot <i class="fas fa-user-clock"></i> means you gain 1.5x rank and will lose none.</p>
+    </div>
+
     <form-error-list v-bind:errors="errors" class="mt-2"/>
 
     <loading-spinner :loading="isJoiningGame"/>
@@ -52,6 +56,7 @@ import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typ
 import {join} from "@/services/typedapi/game";
 import PlayerLeaderboard from "@/views/game/components/leaderboard/PlayerLeaderboard.vue";
 import {useGameServices} from "@/util/gameServices";
+import GameHelper from "@/services/gameHelper";
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -119,6 +124,8 @@ const onJoinRequested = async (playerId: string | undefined) => {
 const joinRandomSlot = async () => {
   await onJoinRequested(undefined);
 };
+
+const isInProgress = computed(() => GameHelper.isGameInProgress(game.value));
 </script>
 
 <style scoped>
