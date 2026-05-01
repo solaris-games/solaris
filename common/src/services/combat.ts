@@ -492,6 +492,10 @@ export class CombatService<ID extends Id> {
         };
     }
 
+    computeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {
+        return combatLoop<ID, P, S, C>({ round: 0, groups });
+    }
+
     computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {
         const playerIds = new Set<ID>([star.ownedByPlayerId!]);
 
