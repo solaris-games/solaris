@@ -34,14 +34,10 @@
   },
   "devDependencies": {
     "@types/random-seed": "0.3.5",
-    "@vitejs/plugin-vue": "6.0.4",
+    "@vitejs/plugin-vue": "6.0.6",
     "@vue/tsconfig": "0.8.1",
     "less": "4.5.1",
-    "vite": "7.3.1",
+    "vite": "8.0.10",
     "vue-tsc": "3.2.5"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.29.1",
-    "@esbuild/darwin-arm64": "^0.24.2"
   }
 }
