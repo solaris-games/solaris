@@ -1,7 +1,7 @@
 <template>
   <div class="d-lg-block" v-if="isUserInGame && !isTutorialGame">
-    <div id="toggle" class="d-none d-lg-inline-block text-center" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
-      <span class="icon-text"><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
+    <div id="toggle" class="d-none d-lg-flex chat-toggle" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
+      <span><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
     </div>
 
     <div id="window" v-if="isExpanded" class="header-bar-bg">
@@ -136,11 +136,6 @@ onMounted(() => {
   scrollbar-width: none;
 }
 
-.icon-text {
-  display: table-cell;
-  vertical-align: middle;
-}
-
 .has-unread {
   font-size: 20px;
 }
@@ -153,6 +148,10 @@ onMounted(() => {
   animation: blinker 1.5s linear infinite;
 }
 
+.chat-toggle {
+  align-items: center;
+  justify-content: center;
+}
 @keyframes blinker {
   0% {
     opacity: 0.5;
