@@ -448,6 +448,8 @@ export default class GameTickService extends EventEmitter {
         const combatStars: Star[] = [];
         let actionWaypoints: CarrierActionWaypoint[] = [];
 
+        const arrivals: CarrierMovementReport[] = new Array(100);
+
         for (let i = 0; i < carriersInTransit.length; i++) {
             const carrierInTransit = carriersInTransit[i];
         
@@ -465,6 +467,8 @@ export default class GameTickService extends EventEmitter {
                     star: carrierMovementReport.destinationStar,
                     waypoint: carrierMovementReport.waypoint
                 });
+
+                arrivals.push(carrierMovementReport);
             }
 
             // Check if combat is required, if so add the destination star to the array of combat stars to check later.
@@ -492,13 +496,17 @@ export default class GameTickService extends EventEmitter {
             // Get all carriers orbiting the star and perform combat.
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
-            // TODO: claim unclaimed stars here?
             // properly handle combat at unclaimed stars!
             await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
         actionWaypoints = actionWaypoints.filter(x => x.carrier.orbiting && x.carrier.ships! > 0);
+
+        // reset specialist enemy tracking
+        for (let arrival of arrivals) {
+            arrival.carrier.specialistTargetedPlayers = [];
+        }
 
         // 4a. Now that combat is done, perform any carrier waypoint actions.
         // Do the drops first
