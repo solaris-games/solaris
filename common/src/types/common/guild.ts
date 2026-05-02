@@ -7,6 +7,9 @@ export type GuildDataForUser<ID> = {
     tag: string;
 };
 
+export type GuildAchievementIcon =
+    | 'victory';
+
 export type GuildAchievement = {
     icon: GuildAchievementIcon;
     description: string;
