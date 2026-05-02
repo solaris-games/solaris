@@ -5,6 +5,8 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading && guild" class="mb-4">
+      <guild-achievements :achievements="guild.achievements || []" />
+
       <p class="float-end">Total Rank Points: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5 class="mb-0">Guild Roster</h5>
@@ -33,13 +35,15 @@ import ViewTitle from '../components/ViewTitle.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import GuildApiService from '../../services/api/guild';
 import GuildMemberList from './components/MemberList.vue';
+import GuildAchievements from './components/Achievements.vue';
 
 export default {
   components: {
     'view-container': ViewContainer,
     'loading-spinner': LoadingSpinner,
     'view-title': ViewTitle,
-    'guild-member-list': GuildMemberList
+    'guild-member-list': GuildMemberList,
+    'guild-achievements': GuildAchievements
   },
   data () {
     return {
