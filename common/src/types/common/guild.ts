@@ -7,6 +7,11 @@ export type GuildDataForUser<ID> = {
     tag: string;
 };
 
+export type GuildAchievement = {
+    icon: GuildAchievementIcon;
+    description: string;
+};
+
 export interface Guild<ID> {
     _id: ID;
     name: string;
@@ -16,6 +21,7 @@ export interface Guild<ID> {
     members: ID[];
     invitees: ID[];
     applicants: ID[];
+    achievements: GuildAchievement[];
 };
 
 export interface GuildRank<ID> extends Guild<ID> {
@@ -37,6 +43,7 @@ export interface GuildWithUsers<ID> {
     _id: ID;
     name: string;
     tag: string;
+    achievements: GuildAchievement[];
     leader?: UserPublic<ID>;
     officers?: UserPublic<ID>[];
     members?: UserPublic<ID>[];

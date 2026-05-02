@@ -5,6 +5,8 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading && guild" class="mb-4">
+      <guild-achievements :achievements="guild.achievements || []" />
+
       <p class="float-end">Total Rank Points: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5 class="mb-0">Guild Roster</h5>
@@ -38,6 +40,7 @@ import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { useRoute } from 'vue-router';
 import {detailGuild} from "@/services/typedapi/guild";
 import type {GuildWithUsers} from "@solaris/common";
+import GuildAchievements from './components/Achievements.vue';
 
 type SortingKey = 'rank' | 'victories' | 'renown' | 'role';
 

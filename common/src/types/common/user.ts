@@ -60,6 +60,7 @@ export type UserPublic<ID> = {
     roles: UserRoles,
     level?: UserLevel,
     achievements: UserAchievements<ID>;
+    signupDate: Date | null;
 }
 
 export type UserPrivate<ID> = UserPublic<ID> & {

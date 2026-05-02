@@ -217,6 +217,7 @@ export default class UserService extends EventEmitter {
         let user = {
             username: username.trim(),
             email: email.trim().toLowerCase(),
+            signupDate: moment().utc(),
             lastSeen: moment().utc(),
             lastSeenIP: ipAddress,
         };

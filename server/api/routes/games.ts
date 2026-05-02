@@ -86,7 +86,6 @@ export default (router: SingleRouter, mw: MiddlewareContainer, container: Depend
     );
 
     answer(routes.listRecentlyCompleted,
-            mw.auth.authenticate(),
             controller.listRecentlyCompleted
     );
 

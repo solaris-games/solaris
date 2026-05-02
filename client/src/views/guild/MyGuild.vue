@@ -5,6 +5,8 @@
     <loading-spinner :loading="isLoading"/>
 
     <div v-if="!isLoading && guild" class="mb-4">
+      <guild-achievements :achievements="guild.achievements || []" />
+
       <p class="float-end">Total Rank Points: <span class="text-warning">{{guild.totalRank}}</span></p>
 
       <h5 class="mb-0">Guild Roster</h5>
@@ -84,6 +86,7 @@ import GuildInvite from './components/Invite.vue';
 import GuildApplication from './components/Application.vue';
 import GuildMember from './components/Member.vue'
 import GuildMemberList from './components/MemberList.vue'
+import GuildAchievements from './components/Achievements.vue'
 import type {Guild, GuildWithUsers, GuildApplication as GuildApplicationData} from "@solaris/common";
 import {detailMyGuild, listMyGuildApplications, listMyGuildInvites} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

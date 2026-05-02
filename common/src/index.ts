@@ -20,6 +20,7 @@ export * from "./types/common/infrastructureUpgrade";
 export * from "./types/common/announcement";
 export * from "./types/common/badge";
 export * from "./types/common/user";
+export * from "./types/common/guild";
 export * from "./types/common/leaderboard";
 export * from "./types/common/subscriptions";
 export * from "./types/common/avatar";

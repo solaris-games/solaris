@@ -23,6 +23,7 @@ export default class UserAchievementService {
             guildId: 1,
             username: 1,
             isAnonymous: 1,
+            signupDate: 1,
             'roles.contributor': 1,
             'roles.developer': 1,
             'roles.communityManager': 1,
