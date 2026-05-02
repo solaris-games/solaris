@@ -1,6 +1,6 @@
 <template>
   <div class="p-2 row">
-    <calculator-combat-group @onGroupRemove="onGroupRemoved" v-for="(group, index) in groups" :key="index" v-model="groups[index]" :validation-errors="getErrors(group)" />
+    <calculator-combat-group @onGroupRemove="onGroupRemoved" v-for="(group, index) in groups" :key="index" v-model="groups[index]" :groups="groups" :validation-errors="getErrors(group)" />
   </div>
   <div class="p-2 row" v-if="result">
     <calculator-combat-result :result="result" />
