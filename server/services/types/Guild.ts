@@ -1,4 +1,4 @@
-import { SettingVisibility } from "solaris-common";
+import { GuildAchievement, SettingVisibility } from "solaris-common";
 import { DBObjectId } from "./DBObjectId";
 import { User } from "./User";
 
@@ -11,6 +11,7 @@ export interface Guild {
     members: DBObjectId[];
     invitees: DBObjectId[];
     applicants: DBObjectId[];
+    achievements: GuildAchievement[];
 };
 
 export interface GuildRank extends Guild {
@@ -38,6 +39,7 @@ export interface GuildWithUsers {
     invitees?: User[];
     applicants?: User[];
     totalRank?: number;
+    achievements: GuildAchievement[];
 };
 
 export interface GuildUserWithTag {

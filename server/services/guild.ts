@@ -33,7 +33,8 @@ export default class GuildService {
             // All guilds
         }, {
             name: 1,
-            tag: 1
+            tag: 1,
+            achievements: 1
         });
 
         let guildsWithRank: GuildRank[] = guilds.map(guild => {
@@ -57,7 +58,8 @@ export default class GuildService {
             }
         }, {
             name: 1,
-            tag: 1
+            tag: 1,
+            achievements: 1
         });
     }
 
@@ -66,7 +68,8 @@ export default class GuildService {
             _id: guildId
         }, {
             name: 1,
-            tag: 1
+            tag: 1,
+            achievements: 1
         });
     }
 
@@ -77,7 +80,8 @@ export default class GuildService {
             }
         }, {
             name: 1,
-            tag: 1
+            tag: 1,
+            achievements: 1
         });
     }
 
@@ -119,7 +123,8 @@ export default class GuildService {
         let guildWithUsers: GuildWithUsers = {
             _id: guild._id,
             name: guild.name,
-            tag: guild.tag
+            tag: guild.tag,
+            achievements: guild.achievements
         };
 
         let userSelectObject = {
@@ -736,7 +741,8 @@ export default class GuildService {
             tag: 1,
             leader: 1,
             officers: 1,
-            members: 1
+            members: 1,
+            achievements: 1
         });
 
         // Calculate the rankings of each guild.

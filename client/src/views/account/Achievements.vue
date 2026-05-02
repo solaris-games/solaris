@@ -9,6 +9,10 @@
 
     <roles v-if="user" :user="user" :displayText="true" />
 
+    <p v-if="user && user.signupDate" class="text-center mb-2">
+      Playing Solaris since {{ new Date(user.signupDate).toLocaleDateString() }}
+    </p>
+
     <loading-spinner :loading="!user && !loadError" />
 
     <user-guild-info v-if="user" :user="user" />
