@@ -160,6 +160,9 @@ export default class CarrierService extends EventEmitter {
         // to the player.
         return game.galaxy.carriers
         .map(c => {
+            // @ts-ignore
+            delete c.specialistTargetedPlayers;
+
             if (ids.includes(c.ownedByPlayerId!.toString())) {
                 return c;
             }
