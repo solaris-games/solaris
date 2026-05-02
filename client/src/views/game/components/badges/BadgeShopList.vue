@@ -2,7 +2,10 @@
 <div>
     <div class="row" v-for="badge in badges" :key="badge.key">
         <div class="col-auto">
-            <img :src="getBadgeSrc(badge)" :alt="badge.name"/>
+            <picture style="display: contents">
+              <source :srcset="getBadgeWebpSrc(badge)" type="image/webp">
+              <img :src="getBadgeSrc(badge)" :alt="badge.name"/>
+            </picture>
 
             <div class="d-grid gap-2">
                 <button class="btn btn-sm btn-success" v-if="userCredits >= badge.price" @click="purchaseBadge(badge)">
@@ -51,6 +54,10 @@ const purchaseBadge = async (badge: Badge) => {
 
 const getBadgeSrc = (badge: Badge) => {
   return new URL(`../../../../assets/badges/${badge.key}.png`, import.meta.url).href;
+};
+
+const getBadgeWebpSrc = (badge: Badge) => {
+  return new URL(`../../../../assets/badges/${badge.key}.webp`, import.meta.url).href;
 };
 </script>
 

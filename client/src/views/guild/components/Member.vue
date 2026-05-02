@@ -12,7 +12,10 @@
     }">{{roleName}}</td>
     <td align="right" :class="getColumnClass('rank')">
       {{user.achievements.rank}}
-      <img class="user-level-icon" :src="levelSrc">
+      <picture style="display: contents">
+        <source :srcset="levelWebpSrc" type="image/webp">
+        <img class="user-level-icon" :src="levelSrc">
+      </picture>
     </td>
     <td align="right" :class="getColumnClass('victories')">{{user.achievements.victories}}</td>
     <td align="right" :class="getColumnClass('renown')">{{user.achievements.renown}}</td>
@@ -89,6 +92,7 @@ const confirm = useConfirm();
 const isLoading = ref(false);
 
 const levelSrc = computed(() => new URL(`../../../assets/levels/${props.user.achievements.level}.png`, import.meta.url).href);
+const levelWebpSrc = computed(() => new URL(`../../../assets/levels/${props.user.achievements.level}.webp`, import.meta.url).href);
 
 const roleName = computed(() => props.role.charAt(0).toUpperCase() + props.role.slice(1));
 

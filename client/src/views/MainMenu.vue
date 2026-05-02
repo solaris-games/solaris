@@ -30,7 +30,10 @@
     <div class="row pb-0 pt-0">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/game/active-games')">
-          <img class="card-img" :src="home1" alt="View my games">
+          <picture style="display: contents">
+            <source :srcset="home1Webp" type="image/webp">
+            <img class="card-img" :src="home1" alt="View my games">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-user"></i>
@@ -47,7 +50,10 @@
       </div>
       <div class="col-sm-12 col-md-6 col-lg-6" @click="routeToPath('/game/list')">
         <div class="card bg-dark text-white p-1">
-          <img class="card-img" :src="home2" alt="Join a game">
+          <picture style="display: contents">
+            <source :srcset="home2Webp" type="image/webp">
+            <img class="card-img" :src="home2" alt="Join a game">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-gamepad"></i>
@@ -64,7 +70,10 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/leaderboard')">
-          <img class="card-img" :src="home3" alt="Leaderboard">
+          <picture style="display: contents">
+            <source :srcset="home3Webp" type="image/webp">
+            <img class="card-img" :src="home3" alt="Leaderboard">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-list-ol"></i>
@@ -81,7 +90,10 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/guild')">
-          <img class="card-img" :src="home4" alt="Guilds">
+          <picture style="display: contents">
+            <source :srcset="home4Webp" type="image/webp">
+            <img class="card-img" :src="home4" alt="Guilds">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title">
               <i class="fas fa-shield-alt"></i>
@@ -98,7 +110,10 @@
       </div>
       <div class="col-sm-12 col-md-4 col-lg-4">
         <div class="card bg-dark text-white p-1" @click="routeToPath('/avatars')">
-          <img class="card-img" :src="home5" alt="Shop">
+          <picture style="display: contents">
+            <source :srcset="home5Webp" type="image/webp">
+            <img class="card-img" :src="home5" alt="Shop">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title card-title-success">
               <i class="fas fa-shopping-basket"></i>
@@ -118,7 +133,10 @@
     <div class="row pb-0">
       <div class="col-sm-12 col-md-12 col-lg-12">
         <a class="card bg-dark text-white p-1" href="https://command.solaris.games/">
-          <img class="card-img" alt="Solaris:Command" :src="solarisCommandImg">
+          <picture style="display: contents">
+            <source :srcset="solarisCommandImgWebp" type="image/webp">
+            <img class="card-img" alt="Solaris:Command" :src="solarisCommandImg">
+          </picture>
           <div class="card-img-overlay">
             <h5 class="card-title">
               Solaris:Command
@@ -147,11 +165,17 @@
 
 <script setup lang="ts">
 import home1 from '../assets/screenshots/tiles/home-1.jpg'
+import home1Webp from '../assets/screenshots/tiles/home-1.webp'
 import home2 from '../assets/screenshots/tiles/home-2.jpg'
+import home2Webp from '../assets/screenshots/tiles/home-2.webp'
 import home3 from '../assets/screenshots/tiles/home-3.jpg'
+import home3Webp from '../assets/screenshots/tiles/home-3.webp'
 import home4 from '../assets/screenshots/tiles/home-4.jpg'
+import home4Webp from '../assets/screenshots/tiles/home-4.webp'
 import home5 from '../assets/screenshots/tiles/home-5.jpg'
+import home5Webp from '../assets/screenshots/tiles/home-5.webp'
 import solarisCommandImg from '../assets/screenshots/solaris_command_1.jpg';
+import solarisCommandImgWebp from '../assets/screenshots/solaris_command_1.webp';
 import { ref, onMounted, type Ref, inject } from 'vue';
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import router from '../router'

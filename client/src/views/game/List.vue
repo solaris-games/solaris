@@ -36,7 +36,10 @@
             <!-- Featured -->
             <div class="col-sm-12 col-md-12 col-lg-12 mb-0" v-if="games.featured">
               <div class="card featured-card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.featured._id })">
-                <img class="card-img" :src="featuredImg" alt="Featured Game">
+                <picture style="display: contents">
+                  <source :srcset="featuredImgWebp" type="image/webp">
+                  <img class="card-img" :src="featuredImg" alt="Featured Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h4 class="card-title featured-card-title">
                     <i class="fas fa-star"></i>
@@ -76,7 +79,10 @@
             <!-- New Player -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.newPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.newPlayerRT._id })">
-                <img class="card-img" :src="newPlayerRtImg" alt="View New Player Game">
+                <picture style="display: contents">
+                  <source :srcset="newPlayerRtImgWebp" type="image/webp">
+                  <img class="card-img" :src="newPlayerRtImg" alt="View New Player Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h5 class="card-title new-player-card-title">
                     <i class="fas fa-user-graduate"></i>
@@ -99,7 +105,10 @@
             <!-- Special Game -->
             <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.special._id })">
-                <img class="card-img" :src="specialGameSrc" alt="Special Game">
+                <picture style="display: contents">
+                  <source :srcset="specialGameWebpSrc || undefined" type="image/webp">
+                  <img class="card-img" :src="specialGameSrc" alt="Special Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h5 class="card-title special-card-title">
                     <i class="fas" :class="{
@@ -134,7 +143,10 @@
             <!-- Standard -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardRT._id })">
-                <img class="card-img" :src="standardRtImg" alt="Standard Game">
+                <picture style="display: contents">
+                  <source :srcset="standardRtImgWebp" type="image/webp">
+                  <img class="card-img" :src="standardRtImg" alt="Standard Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -158,7 +170,10 @@
             <!-- Standard TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTB._id })">
-                <img class="card-img" :src="standardTbImg" alt="Standard Turn Based Game">
+                <picture style="display: contents">
+                  <source :srcset="standardTbImgWebp" type="image/webp">
+                  <img class="card-img" :src="standardTbImg" alt="Standard Turn Based Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-astronaut"></i>
@@ -182,7 +197,10 @@
             <!-- 1v1 -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })">
-                <img class="card-img" :src="duelRtImg" alt="1 vs. 1 Game">
+                <picture style="display: contents">
+                  <source :srcset="duelRtImgWebp" type="image/webp">
+                  <img class="card-img" :src="duelRtImg" alt="1 vs. 1 Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-friends"></i>
@@ -206,7 +224,10 @@
             <!-- 1v1 TB -->
             <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })">
-                <img class="card-img" :src="duelTbImg" alt="1 vs. 1 Turn Based Game">
+                <picture style="display: contents">
+                  <source :srcset="duelTbImgWebp" type="image/webp">
+                  <img class="card-img" :src="duelTbImg" alt="1 vs. 1 Turn Based Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h6 class="card-title standard-card-title">
                     <i class="fas fa-user-friends"></i>
@@ -230,7 +251,10 @@
             <!-- Standard team -->
             <div class="col-sm-6 col-md-6 col-lg-6" v-if="games.standardTeam">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.standardTeam._id })">
-                <img class="card-img" :src="standardTeamImg" alt="Standard Team Game">
+                <picture style="display: contents">
+                  <source :srcset="standardTeamImgWebp" type="image/webp">
+                  <img class="card-img" :src="standardTeamImg" alt="Standard Team Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-users"></i>
@@ -254,7 +278,10 @@
             <!-- 16 player relaxed -->
             <div class="col-sm-6 col-md-6 col-lg-6" v-if="games.sixteenPlayerRelaxed">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.sixteenPlayerRelaxed._id })">
-                <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
+                <picture style="display: contents">
+                  <source :srcset="relaxed16ImgWebp" type="image/webp">
+                  <img class="card-img" :src="relaxed16Img" alt="16 Player Relaxed Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-globe"></i>
@@ -279,7 +306,10 @@
             <!-- 32 Player -->
             <div class="col-sm-12 col-md-12 col-lg-12" v-if="games.thirtyTwoPlayerRT">
               <div class="card bg-dark text-white p-1" @click="routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })">
-                <img class="card-img" :src="large32Img" alt="32 Player Game">
+                <picture style="display: contents">
+                  <source :srcset="large32ImgWebp" type="image/webp">
+                  <img class="card-img" :src="large32Img" alt="32 Player Game">
+                </picture>
                 <div class="card-img-overlay">
                   <h5 class="card-title">
                     <i class="fas fa-globe"></i>
@@ -500,14 +530,23 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import featuredImg from '../../assets/screenshots/tiles/featured.jpg';
+import featuredImgWebp from '../../assets/screenshots/tiles/featured.webp';
 import newPlayerRtImg from '../../assets/screenshots/tiles/new_player_rt.jpg';
+import newPlayerRtImgWebp from '../../assets/screenshots/tiles/new_player_rt.webp';
 import standardRtImg from '../../assets/screenshots/tiles/standard_rt.jpg';
+import standardRtImgWebp from '../../assets/screenshots/tiles/standard_rt.webp';
 import standardTbImg from '../../assets/screenshots/tiles/standard_tb.jpg';
+import standardTbImgWebp from '../../assets/screenshots/tiles/standard_tb.webp';
 import duelRtImg from '../../assets/screenshots/tiles/1v1_rt.jpg';
+import duelRtImgWebp from '../../assets/screenshots/tiles/1v1_rt.webp';
 import duelTbImg from '../../assets/screenshots/tiles/1v1_tb.jpg';
+import duelTbImgWebp from '../../assets/screenshots/tiles/1v1_tb.webp';
 import large32Img from '../../assets/screenshots/tiles/32_player.jpg';
+import large32ImgWebp from '../../assets/screenshots/tiles/32_player.webp';
 import relaxed16Img from '../../assets/screenshots/tiles/16_player_relaxed.jpg';
+import relaxed16ImgWebp from '../../assets/screenshots/tiles/16_player_relaxed.webp';
 import standardTeamImg from '../../assets/screenshots/tiles/standard_team.jpg';
+import standardTeamImgWebp from '../../assets/screenshots/tiles/standard_team.webp';
 import router from '../../router'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 import ViewTitle from '../components/ViewTitle.vue'
@@ -553,6 +592,7 @@ const tutorialGames: Ref<Tutorial[]> = ref([]);
 const games: Ref<Games | null> = ref(null);
 
 const specialGameSrc = computed(() => games.value?.special && new URL(`../../assets/screenshots/tiles/${games.value.special.settings.general.type}.jpg`, import.meta.url).href);
+const specialGameWebpSrc = computed(() => games.value?.special && new URL(`../../assets/screenshots/tiles/${games.value.special.settings.general.type}.webp`, import.meta.url).href);
 
 const getGameTypeFriendlyText = (tp) => gameHelper.getGameTypeFriendlyText(tp);
 

@@ -1,6 +1,9 @@
 <template>
   <div class="badge-with-history-container">
-    <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+    <picture style="display: contents">
+      <source :srcset="badgeWebpSrc" type="image/webp">
+      <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+    </picture>
     <div class="badge-details text-center">
       <span class="badge-name" :title="badgeName">{{badgeName}}</span>
 
@@ -32,6 +35,7 @@ const props = defineProps<{
 const badgeName = computed(() => props.allBadges.find(b => b.key === props.badge.badge)?.name);
 
 const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.png`, import.meta.url).href)
+const badgeWebpSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.webp`, import.meta.url).href)
 
 const hasFullPlayerInfo = computed(() => Boolean(props.badge.playerAwarded && props.badge.awardedByName && props.badge.awardedInGameName && props.badge.time));
 const hasFullGameInfo = computed(() => Boolean(props.badge.awardedInGameName && props.badge.time));

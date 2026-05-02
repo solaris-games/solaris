@@ -1,6 +1,9 @@
 <template>
     <div v-if="badgeName" class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
-        <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+        <picture style="display: contents">
+          <source :srcset="badgeWebpSrc" type="image/webp">
+          <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
+        </picture>
         <span class="badge-label" :title="badgeName">{{badgeName}}</span>
     </div>
 </template>
@@ -25,6 +28,7 @@ const onOpenPurchasePlayerBadgeRequested = () => {
 const badgeName = computed(() => props.allBadges.find(b => b.key === props.badge.badge)?.name);
 
 const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.png`, import.meta.url).href)
+const badgeWebpSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.webp`, import.meta.url).href)
 </script>
 
 <style scoped>

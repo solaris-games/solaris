@@ -49,7 +49,10 @@
             </td>
             <td align="right" :class="getColumnClass('rank')">
               {{ player.achievements.rank }}
-              <img class="user-level-icon" :src="getLevelSrc(player)" :alt="player.achievements.level.toString()">
+              <picture style="display: contents">
+                <source :srcset="getLevelWebpSrc(player)" type="image/webp">
+                <img class="user-level-icon" :src="getLevelSrc(player)" :alt="player.achievements.level.toString()">
+              </picture>
             </td>
             <td align="right" :class="getColumnClass('victories')">{{ player.achievements.victories }}</td>
             <td align="right" :class="getColumnClass('renown')">{{ player.achievements.renown }}</td>
@@ -109,6 +112,10 @@ const sortLeaderboard = async (key: string) => {
 
 const getLevelSrc = (player) => {
   return new URL(`../../../../assets/levels/${player.achievements.level}.png`, import.meta.url).href
+}
+
+const getLevelWebpSrc = (player) => {
+  return new URL(`../../../../assets/levels/${player.achievements.level}.webp`, import.meta.url).href
 }
 
 onMounted(async () => {

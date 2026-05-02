@@ -1,6 +1,9 @@
 <template>
   <div @click="onClick" class="player-icon text-center bg-dark">
-    <img v-if="player.avatar" :src="avatarSrc" :class="{'defeated-player': player.defeated}">
+    <picture style="display: contents" v-if="player.avatar">
+      <source :srcset="avatarWebpSrc" type="image/webp">
+      <img :src="avatarSrc" :class="{'defeated-player': player.defeated}">
+    </picture>
     <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
     <span class="shapeIcon">
       <player-icon :playerId="player._id"/>
@@ -36,6 +39,10 @@ const leaderboard = computed(() => GameHelper.getSortedLeaderboardPlayerList(gam
 const showMedals = computed(() => GameHelper.isGameInProgress(game.value) || GameHelper.isGameFinished(game.value));
 
 const avatarSrc = computed(() => new URL(`../../../../assets/avatars/${props.player.avatar}`, import.meta.url).href);
+const avatarWebpSrc = computed(() => {
+  const base = props.player.avatar!.replace(/\.[^.]+$/, '');
+  return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url).href;
+});
 
 const isFirstPlace = () => leaderboard.value.indexOf(props.player) === 0;
 const isSecondPlace = () => leaderboard.value.indexOf(props.player) === 1;

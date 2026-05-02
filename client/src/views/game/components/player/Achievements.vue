@@ -3,12 +3,18 @@
     <div class="col text-center pt-2 pb-1 ps-1 pe-1 card">
         <h6>Rank</h6>
         <h3 v-if="!isSmallHeaders">
-          <img class="user-level-icon" :src="levelSrc" alt="rank">
+          <picture style="display: contents">
+            <source :srcset="levelWebpSrc" type="image/webp">
+            <img class="user-level-icon" :src="levelSrc" alt="rank">
+          </picture>
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h3>
         <h4 v-if="isSmallHeaders">
-          <img class="user-level-icon" :src="levelSrc" alt="rank">
+          <picture style="display: contents">
+            <source :srcset="levelWebpSrc" type="image/webp">
+            <img class="user-level-icon" :src="levelSrc" alt="rank">
+          </picture>
           <!-- <i class="fas fa-star text-info me-2"></i> -->
           {{ rank }}
         </h4>
@@ -57,6 +63,7 @@ const props = defineProps<{
 const isSmallHeaders = computed(() => props.victories >= 100 || props.rank >= 100 || props.renown >= 100);
 
 const levelSrc = computed(() => new URL(`../../../../assets/levels/${props.level}.png`, import.meta.url).href);
+const levelWebpSrc = computed(() => new URL(`../../../../assets/levels/${props.level}.webp`, import.meta.url).href);
 </script>
 
 <style scoped>

@@ -1,7 +1,10 @@
 <template>
   <div v-if="!isLoading">
     <div class="row avatar-container text-center">
-      <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
+      <picture style="display: contents" v-if="avatar != null">
+        <source :srcset="getAvatarWebpImage()" type="image/webp">
+        <img :src="getAvatarImage()" width="128" height="128">
+      </picture>
       <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
       <p v-if="avatar && !avatar.purchased" class="select-avatar-locked"><i class="fas fa-lock"></i></p>
     </div>
@@ -70,6 +73,17 @@ const onAvatarChanged = () => {
 const getAvatarImage = () => {
   try {
     return new URL(`../../../../assets/avatars/${avatar.value!.file}`, import.meta.url).href;
+  } catch (err) {
+    console.error(err);
+
+    return undefined;
+  }
+}
+
+const getAvatarWebpImage = () => {
+  try {
+    const base = avatar.value!.file.replace(/\.[^.]+$/, '');
+    return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url).href;
   } catch (err) {
     console.error(err);
 

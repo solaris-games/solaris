@@ -4,7 +4,10 @@
 
   <div class="row pt-0">
       <div class="col-auto text-center ps-0 pe-0">
-        <img v-if="player.avatar" :src="getAvatarImage()" :alt="player.alias">
+        <picture style="display: contents" v-if="player.avatar">
+          <source :srcset="getAvatarWebpImage()" type="image/webp">
+          <img :src="getAvatarImage()" :alt="player.alias">
+        </picture>
         <i v-if="!player.avatar" class="far fa-user me-2 mt-2 ms-2 mb-2" style="font-size:100px;"></i>
       </div>
       <div class="col bg-dark">
@@ -97,6 +100,11 @@ const conversation = ref<ConversationOverview<string> | null>(null);
 
 const getAvatarImage = () => {
   return new URL(`../../../../assets/avatars/${player.value.avatar}`, import.meta.url).href;
+};
+
+const getAvatarWebpImage = () => {
+  const base = player.value.avatar!.replace(/\.[^.]+$/, '');
+  return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url).href;
 };
 
 const loadConversation = async () => {

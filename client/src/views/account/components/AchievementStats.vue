@@ -12,6 +12,7 @@ const props = defineProps<{
 
 const user = computed(() => props.user);
 const levelSrc = computed(() => new URL(`../../../assets/levels/${user.value.achievements.level}.png`, import.meta.url).href);
+const levelWebpSrc = computed(() => new URL(`../../../assets/levels/${user.value.achievements.level}.webp`, import.meta.url).href);
 
 const pieChartOptions: ChartOptions<"pie"> = {
 };
@@ -269,7 +270,10 @@ onMounted(async () => {
         <tr>
           <td>Rank</td>
           <td class="text-end">
-            <img class="user-level-icon" :src="levelSrc">
+            <picture style="display: contents">
+              <source :srcset="levelWebpSrc" type="image/webp">
+              <img class="user-level-icon" :src="levelSrc">
+            </picture>
             {{ user.level.name }}
           </td>
         </tr>

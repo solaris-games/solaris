@@ -16,7 +16,10 @@
     <div v-if="avatars">
       <div class="row mb-4" v-for="avatar in sortedAvatars" :key="avatar.id">
         <div class="col-auto">
-          <img :src="getAvatarImage(avatar)" width="128" height="128">
+          <picture style="display: contents">
+            <source :srcset="getAvatarWebpImage(avatar)" type="image/webp">
+            <img :src="getAvatarImage(avatar)" width="128" height="128">
+          </picture>
         </div>
         <div class="col">
           <div class="row">
@@ -118,6 +121,17 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
 const getAvatarImage = (avatar: UserAvatar) => {
   try {
     return new URL(`../../assets/avatars/${avatar.file}`, import.meta.url).href;
+  } catch (err) {
+    console.error(err);
+
+    return undefined;
+  }
+}
+
+const getAvatarWebpImage = (avatar: UserAvatar) => {
+  try {
+    const base = avatar.file.replace(/\.[^.]+$/, '');
+    return new URL(`../../assets/avatars/${base}.webp`, import.meta.url).href;
   } catch (err) {
     console.error(err);
 
