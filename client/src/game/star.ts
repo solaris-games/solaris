@@ -147,6 +147,8 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     this.zoomPercent = 100
     this.showIgnoreBulkUpgradeInfrastructure = false
 
+    this.orbitPlanetsStep = this.orbitPlanetsStep.bind(this);
+
     /**
       Zoomdepth
       I'd make this an enum if I could...
@@ -1000,13 +1002,13 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
 
   subscribeToEvents () {
     if (this.container_planets) {
-      this.app.ticker.add(this.orbitPlanetsStep.bind(this))
+      this.app.ticker.add(this.orbitPlanetsStep)
     }
   }
 
   unsubscribeToEvents () {
     if (this.container_planets) {
-      this.app.ticker.remove(this.orbitPlanetsStep.bind(this))
+      this.app.ticker.remove(this.orbitPlanetsStep)
     }
   }
 

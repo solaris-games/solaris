@@ -448,7 +448,7 @@ export default class GameService extends EventEmitter {
 
     async resetQuitters(game: Game, userId: DBObjectId) {
         if (!await this.gameAuthService.isGameAdmin(game, userId)) {
-            throw new ValidationError('You do not have permission to force start this game.');
+            throw new ValidationError('You do not have permission to reset quitters for this game.');
         }
 
         game.quitters = [];
