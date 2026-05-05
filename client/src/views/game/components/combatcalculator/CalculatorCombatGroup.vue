@@ -96,8 +96,9 @@ const addCarrier = () => {
 
 .cg-box-objects {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: wrap;
-  align-items: flex-start;
+  justify-content: space-evenly;
+  gap: 4px;
 }
 </style>
