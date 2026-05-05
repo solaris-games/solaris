@@ -1,8 +1,13 @@
 <template>
-  <select class="form-select form-select-sm" v-model="model">
-    <option :value="null">None</option>
-    <option v-for="s in specialists" :key="s.id" :value="s.id">{{ s.name }}</option>
-  </select>
+  <div class="input-group mb-1">
+    <span class="input-group-text">
+      <i class="fas fa-user-astronaut"></i>
+    </span>
+    <select class="form-select form-select-sm" v-model="model">
+      <option :value="null">None</option>
+      <option v-for="s in specialists" :key="s.id" :value="s.id">{{ s.name }}</option>
+    </select>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';

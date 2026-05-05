@@ -1,5 +1,5 @@
 <template>
-  <div v-if="model" class="p-1 cg-weapons">
+  <div v-if="model" class="p-2 mb-1 cg-weapons">
     <p class="mb-1">Weapons</p>
     <div class="cg-weapons-inputs">
       <select class="form-control form-control-sm" v-model="model.kind">

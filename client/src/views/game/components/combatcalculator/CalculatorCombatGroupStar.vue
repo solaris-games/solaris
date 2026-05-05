@@ -1,12 +1,17 @@
 <template>
-<div class="cg-group-star" v-if="model">
-  <div class="cg-group-star-header">
-    <p>Star</p>
+<div class="cg-group-star p-2" v-if="model">
+  <div class="cg-group-star-header mb-1">
+    <span><i class="fas fa-star"></i></span>
     <button class="btn btn-sm btn-danger" @click="remove">
-      X
+      <i class="fas fa-times"></i>
     </button>
   </div>
-  <input type="number" class="form-control form-control-sm" v-model.number="model.ships" min="0" placeholder="Ships" />
+  <div class="input-group mb-1">
+    <span class="input-group-text">
+      <i class="fas fa-rocket"></i>
+    </span>
+    <input type="number" class="form-control form-control-sm" v-model.number="model.ships" min="0" placeholder="Ships" />
+  </div>
   <specialist-selection kind="star" v-model="model.specialistId" />
 </div>
 </template>
@@ -33,5 +38,6 @@ const remove = () => emit('onRemove');
 .cg-group-star-header {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 </style>

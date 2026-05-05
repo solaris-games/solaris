@@ -1,11 +1,9 @@
 <template>
-  <div class="cg-box p-1" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
+  <div class="cg-box p-2" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
     <p>Group {{ index }}</p>
-    <div>
-      <calculator-combat-weapons :players="availablePlayers" v-model="model.weapons" />
-    </div>
-    <div class="cg-box-objects">
-      <calculator-combat-group-star v-if="model.star" v-model="model.star" />
+    <calculator-combat-weapons :players="availablePlayers" v-model="model.weapons" />
+    <div class="cg-box-objects mb-1">
+      <calculator-combat-group-star v-if="model.star" v-model="model.star" @onRemove="removeStar" />
       <calculator-combat-group-carrier v-for="(carrier, idx) in model.carriers" :key="idx" v-model="model.carriers[idx]" />
     </div>
     <div class="cg-box-group">
@@ -56,6 +54,10 @@ const remove = () => emit('onGroupRemove', model.value!);
 
 const otherGroupHasStar = computed(() => Boolean(props.groups.find((g) => g !== model.value && g.star)));
 
+const removeStar = () => {
+  model.value!.star = undefined;
+};
+
 const addStar = () => {
   model.value!.star = {
     ships: 0,
@@ -89,6 +91,7 @@ const addCarrier = () => {
 .cg-box-group {
   display: flex;
   flex-direction: row;
+  gap: 4px;
 }
 
 .cg-box-objects {
