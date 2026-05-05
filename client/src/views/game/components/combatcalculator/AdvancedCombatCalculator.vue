@@ -30,24 +30,15 @@ import type {
 import CalculatorCombatResult from "@/views/game/components/combatcalculator/CalculatorCombatResult.vue";
 import {useGameStore} from "@/stores/game";
 import {useGameServices} from "@/util/gameServices";
-
-const emptyGroup = (): CombatGroup<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> => ({
-  originalShips: 0,
-  ships: 0,
-  isDefender: false,
-  attackAgainst: new Map(),
-  players: [],
-  carriers: [],
-  star: undefined,
-  shipsKilled: 0,
-});
-
-type CG = CombatGroup<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>>;
+import {type CCGroup, makeCombatGroups} from "@/views/game/components/combatcalculator/types";
+import type {Game} from "@/types/game";
 
 const store = useGameStore();
 const serviceProvider = useGameServices();
 
-const groups = ref<CG[]>([]);
+const game = computed<Game>(() => store.game!);
+
+const groups = ref<CCGroup[]>([]);
 const result = ref<DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> | null>(null);
 
 const errors = computed(() => {
@@ -58,22 +49,31 @@ const errors = computed(() => {
   return [];
 });
 
+const actualCombatGroups = computed<CombatGroup<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>>[]>(() => {
+  return makeCombatGroups(game.value, groups.value, serviceProvider.combatService);
+});
+
 const hasErrors = computed(() => errors.value.length > 0);
 
-const onGroupRemoved = (gr: CG) => {
+const onGroupRemoved = (gr: CCGroup) => {
   groups.value.splice(groups.value.indexOf(gr), 1);
 }
 
 const addGroup = () => {
-  groups.value.push(emptyGroup());
+  groups.value.push({
+    name: `Group ${groups.value.length + 1}`,
+    star: undefined,
+    carriers: [],
+    weapons: { kind: 'level', level: 1 },
+  });
+};
+
+const getErrors = (group: CCGroup) => {
+  return [];
 };
 
 const calculate = () => {
-  result.value = serviceProvider.combatService.computeGroups(groups.value);
-};
-
-const getErrors = (group: CG) => {
-  return [];
+  result.value = serviceProvider.combatService.computeGroups(actualCombatGroups.value);
 };
 </script>
 <style scoped>

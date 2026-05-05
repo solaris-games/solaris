@@ -308,7 +308,9 @@ export class CombatService<ID extends Id> {
         };
     }
 
-    private _computeGroupWeapons<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
+    computeGroupWeapons<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
+        this._sortGroups(groups);
+
         // siege breaker should apply a weapons bonus against ALL groups which contain a player that was targeted at launch
 
         for (let groupIdx = 0; groupIdx < groups.length; groupIdx++){
@@ -344,19 +346,7 @@ export class CombatService<ID extends Id> {
             }
         });
 
-        groups.sort((g1, g2) => {
-            if (g1.isDefender) {
-                return -1;
-            }
-
-            if (g2.isDefender) {
-                return 1;
-            }
-
-            return g2.originalShips - g1.originalShips;
-        });
-
-        this._computeGroupWeapons(game, groups, Boolean(star));
+        this.computeGroupWeapons(game, groups, Boolean(star));
 
         return groups;
     }
@@ -522,5 +512,19 @@ export class CombatService<ID extends Id> {
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, undefined, carriers, combatDiploGroups);
 
         return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups});
+    }
+
+    private _sortGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {
+        groups.sort((g1, g2) => {
+            if (g1.isDefender) {
+                return -1;
+            }
+
+            if (g2.isDefender) {
+                return 1;
+            }
+
+            return g2.originalShips - g1.originalShips;
+        });
     }
 }

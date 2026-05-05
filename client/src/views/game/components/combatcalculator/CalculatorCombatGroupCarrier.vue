@@ -7,13 +7,13 @@
 </div>
 </template>
 <script setup lang="ts">
-import type {CombatBaseCarrier} from "@solaris/common";
+import type {CCCarrier} from "@/views/game/components/combatcalculator/types";
 
 const emit = defineEmits<{
   onRemove: [],
 }>();
 
-const model = defineModel<CombatBaseCarrier<string>>({ required: true });
+const model = defineModel<CCCarrier>({ required: true });
 
 const remove = () => emit('onRemove');
 </script>

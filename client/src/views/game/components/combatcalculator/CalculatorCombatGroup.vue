@@ -23,23 +23,21 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import type {CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup} from "@solaris/common";
 import CalculatorCombatGroupStar from "@/views/game/components/combatcalculator/CalculatorCombatGroupStar.vue";
 import CalculatorCombatGroupCarrier from "@/views/game/components/combatcalculator/CalculatorCombatGroupCarrier.vue";
-
-type CG = CombatGroup<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>>;
+import type {CCGroup} from "@/views/game/components/combatcalculator/types.ts";
 
 const props = defineProps<{
   validationErrors: string[],
-  groups: CG[];
+  groups: CCGroup[];
   index: number;
 }>();
 
 const emit = defineEmits<{
-  onGroupRemove: [group: CG],
+  onGroupRemove: [group: CCGroup],
 }>();
 
-const model = defineModel<CG>({ required: true });
+const model = defineModel<CCGroup>({ required: true });
 
 const hasError = computed(() => props.validationErrors.length > 0);
 
@@ -49,22 +47,15 @@ const otherGroupHasStar = computed(() => Boolean(props.groups.find((g) => g !== 
 
 const addStar = () => {
   model.value!.star = {
-    _id: "star",
     ships: 0,
     specialistId: null,
-    ownedByPlayerId: null,
   };
 };
 
 const addCarrier = () => {
-  const idx = model.value!.carriers.length;
-
   model.value!.carriers.push({
-    _id: `carrier${idx}`,
     ships: 0,
     specialistId: null,
-    specialistTargetedPlayers: [],
-    ownedByPlayerId: null,
   });
 };
 </script>
