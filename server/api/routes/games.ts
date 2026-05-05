@@ -395,7 +395,7 @@ export default (router: SingleRouter, mw: MiddlewareContainer, validator: Expres
         controller.getStatistics);
 
     answer(routes.resetQuitters,
-        mw.auth.authenticate({ admin: true }),
+        mw.auth.authenticate(),
         mw.game.loadGame({
             lean: true,
             settings: true,
