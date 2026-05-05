@@ -73,6 +73,8 @@ const getErrors = (group: CCGroup) => {
 };
 
 const calculate = () => {
+  console.log(groups.value);
+
   result.value = serviceProvider.combatService.computeGroups(actualCombatGroups.value);
 };
 </script>

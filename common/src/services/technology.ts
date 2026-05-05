@@ -302,8 +302,12 @@ export class TechnologyService {
         }
     }
 
+    getBaseWeapons<ID extends Id, P extends CombatBasePlayer<ID>>(players: P[]) {
+        return maxBy(p => p.research.weapons.level, players);
+    }
+
     getEffectiveWeaponsDetail<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
-        const baseWeapons = maxBy(p => p.research.weapons.level, group.players);
+        const baseWeapons = this.getBaseWeapons(group.players);
 
         const buffs: Buff[] = group.carriers.map(c => {
             return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, group.isDefender, opponents.isDefender, group.players.length, c.specialistTargetedPlayers);

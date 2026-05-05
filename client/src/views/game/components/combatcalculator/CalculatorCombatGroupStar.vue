@@ -25,11 +25,13 @@ const remove = () => emit('onRemove');
 <style scoped>
 .cg-group-star {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  border: 1px white solid;
+  border-radius: 4px;
 }
 
 .cg-group-star-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
 </style>

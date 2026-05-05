@@ -1,12 +1,15 @@
 <template>
-  <div class="cg-box" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
+  <div class="cg-box p-1" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
     <p>Group {{ index }}</p>
+    <div>
+      <calculator-combat-weapons :players="availablePlayers" v-model="model.weapons" />
+    </div>
     <div class="cg-box-objects">
       <calculator-combat-group-star v-if="model.star" v-model="model.star" />
       <calculator-combat-group-carrier v-for="(carrier, idx) in model.carriers" :key="idx" v-model="model.carriers[idx]" />
     </div>
     <div class="cg-box-group">
-      <button class="btn btn-success" :disabled="otherGroupHasStar" @click="addStar">
+      <button class="btn btn-success" v-if="!model.star" :disabled="otherGroupHasStar" @click="addStar">
         Add Star
       </button>
       <button class="btn btn-success" @click="addCarrier">
@@ -25,7 +28,10 @@
 import { computed } from 'vue';
 import CalculatorCombatGroupStar from "@/views/game/components/combatcalculator/CalculatorCombatGroupStar.vue";
 import CalculatorCombatGroupCarrier from "@/views/game/components/combatcalculator/CalculatorCombatGroupCarrier.vue";
-import type {CCGroup} from "@/views/game/components/combatcalculator/types.ts";
+import type {CCGroup} from "@/views/game/components/combatcalculator/types";
+import CalculatorCombatWeapons from "@/views/game/components/combatcalculator/CalculatorCombatWeapons.vue";
+import {useGameStore} from "@/stores/game";
+import type {Game} from "@/types/game";
 
 const props = defineProps<{
   validationErrors: string[],
@@ -38,6 +44,11 @@ const emit = defineEmits<{
 }>();
 
 const model = defineModel<CCGroup>({ required: true });
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+
+const availablePlayers = computed(() => game.value.galaxy.players.filter(p => p.research.weapons.level));
 
 const hasError = computed(() => props.validationErrors.length > 0);
 
@@ -84,5 +95,6 @@ const addCarrier = () => {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 </style>
