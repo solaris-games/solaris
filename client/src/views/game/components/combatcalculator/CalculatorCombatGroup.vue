@@ -1,19 +1,19 @@
 <template>
   <div class="cg-box p-2" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
-    <p>Group {{ index }}</p>
+    <h6>Group {{ index }}</h6>
     <calculator-combat-weapons :players="availablePlayers" v-model="model.weapons" />
     <div class="cg-box-objects mb-1">
       <calculator-combat-group-star v-if="model.star" v-model="model.star" @onRemove="removeStar" />
       <calculator-combat-group-carrier v-for="(carrier, idx) in model.carriers" :key="idx" v-model="model.carriers[idx]" />
     </div>
     <div class="cg-box-group">
-      <button class="btn btn-success" v-if="!model.star" :disabled="otherGroupHasStar" @click="addStar">
+      <button class="btn btn-success btn-sm" :disabled="Boolean(model.star) || otherGroupHasStar" @click="addStar">
         Add Star
       </button>
-      <button class="btn btn-success" @click="addCarrier">
+      <button class="btn btn-success btn-sm" @click="addCarrier">
         Add Carrier
       </button>
-      <button class="btn btn-danger" @click="remove">
+      <button class="btn btn-danger btn-sm" @click="remove">
         Delete
       </button>
     </div>

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-2 row">
+  <div class="p-2 row cg-groups">
     <calculator-combat-group @onGroupRemove="onGroupRemoved" v-for="(group, index) in groups" :key="index" v-model="groups[index]" :index="index" :groups="groups" :validation-errors="getErrors(group)" />
   </div>
   <div class="p-2 row" v-if="result">
@@ -79,5 +79,7 @@ const calculate = () => {
 };
 </script>
 <style scoped>
-
+.cg-groups {
+  gap: 4px;
+}
 </style>

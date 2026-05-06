@@ -9,9 +9,9 @@
     </button>
   </div>
   <div class="input-group mb-1">
-  <span class="input-group-text">
-    <i class="fas fa-rocket"></i>
-  </span>
+    <span class="input-group-text">
+      <i class="fas fa-rocket"></i>
+    </span>
     <input type="number" class="form-control form-control-sm ships-input" v-model.number="model.ships" min="0" placeholder="Ships" />
   </div>
   <specialist-selection :kind="kind" v-model="model.specialistId" />
