@@ -1,8 +1,8 @@
 {
     "general": {
         "name": "[[[RANDOM]]]",
-        "description": "5v5 Player Team Game (Real Time)",
-        "createdFromTemplate": "10player_5v5_team_rt",
+        "description": "5v5 Player Team Game (Turn Based)",
+        "createdFromTemplate": "10player_5v5_team_tb",
         "type": "standard_team",
         "mode": "teamConquest",
         "password": null,
