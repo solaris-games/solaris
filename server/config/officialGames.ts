@@ -59,6 +59,7 @@ const officialGameSettings = [
     carouselGames('turnBased', 'sequential', [
         './game/settings/official/10tb/turnBased.json',
         './game/settings/official/10tb/turnBased_ultraDark.json',
+        './game/settings/official/10tb/10player_5v5_team_tb.json',
     ]),
     standardGame('./game/settings/official/1v1'),
     standardGame('./game/settings/official/1v1turnBased'),
