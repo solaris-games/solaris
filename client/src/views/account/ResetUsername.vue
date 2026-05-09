@@ -30,11 +30,11 @@ import FormErrorList from '../components/FormErrorList.vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updateUsername } from '@/services/typedapi/user'
 import { ref, inject } from 'vue';
-import {toastInjectionKey} from "@/util/keys";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 

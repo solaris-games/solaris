@@ -13,15 +13,15 @@ import type {PlayerScheduledActions} from "@solaris/common";
 import {toggleScheduledBulk} from "@/services/typedapi/star";
 import { inject } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   action: PlayerScheduledActions<string>,
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

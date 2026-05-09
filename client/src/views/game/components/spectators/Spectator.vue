@@ -23,8 +23,8 @@ import {uninviteSpectator} from "@/services/typedapi/spectator";
 
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {ref, inject, computed} from 'vue';
-import {toastInjectionKey} from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   spectator: GameSpectator<string>,
 }>();
@@ -35,7 +35,7 @@ const emit = defineEmits<{
 
 const store = useGameStore();
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isLoading = ref(false);
 

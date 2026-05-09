@@ -63,9 +63,9 @@ import type {Game} from "@/types/game";
 import type {Specialist} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {hireStar} from "@/services/typedapi/specialist";
-import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   starId: string,
 }>();
@@ -78,7 +78,7 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 const eventBus = inject(eventBusInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

@@ -40,9 +40,9 @@ import {eventBusInjectionKey} from "@/eventBus";
 import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
 import {getNotes, writeNotes} from "@/services/typedapi/game";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {useMentionStore} from "@/stores/mention.ts";
 
+import { useToast } from 'vue-toast-notification';
 const emit = defineEmits<{
   onCloseRequested: [e: Event],
   onOpenPlayerDetailRequested: [playerId: string]
@@ -50,7 +50,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const mentionStore = useMentionStore();

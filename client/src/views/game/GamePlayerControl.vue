@@ -21,10 +21,10 @@ import LoadingSpinner from '../components/LoadingSpinner.vue'
 import type { GameGalaxyDetail, Player } from '@solaris/common';
 import { computed, inject } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { toastInjectionKey } from '@/util/keys';
 import { useConfirm } from '@/hooks/confirm.ts';
 import { kick } from '@/services/typedapi/game';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   game: GameGalaxyDetail<string>,
 }>();
@@ -37,7 +37,7 @@ const store = useGameStore();
 const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const filledSlots = computed(() => props.game.galaxy.players.filter(p => !p.isOpenSlot));
 

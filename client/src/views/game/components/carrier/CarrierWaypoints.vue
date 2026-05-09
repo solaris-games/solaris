@@ -90,7 +90,6 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import MapEventBusEventNames from "@/eventBusEventNames/map";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {type Mode, ModeKind} from "@/game/map";
-import {toastInjectionKey} from "@/util/keys";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris/common";
@@ -100,6 +99,7 @@ import {useGameServices} from "@/util/gameServices";
 import Timer from "@/views/game/components/time/Timer.vue";
 import {saveWaypoints} from "@/views/game/components/carrier/action";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -112,7 +112,7 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();

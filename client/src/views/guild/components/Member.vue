@@ -55,7 +55,6 @@ import type {GuildWithUsers} from "@solaris/common";
 import type {GuildRole, GuildUser} from "@/views/guild/components/MemberList.vue";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {
   acceptGuildInviteForApplicant, deleteGuild,
   demoteGuildMember,
@@ -65,6 +64,7 @@ import {
 } from "@/services/typedapi/guild";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 type SortingKey = 'role' | 'rank' | 'victories' | 'renown';
 
 const props = defineProps<{
@@ -84,7 +84,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 const confirm = useConfirm();

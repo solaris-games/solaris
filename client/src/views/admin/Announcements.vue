@@ -27,11 +27,11 @@ import { ref, inject, type Ref, onMounted } from 'vue';
 import type { Announcement } from "@solaris/common";
 import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
 import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
-import { toastInjectionKey } from "@/util/keys";
 import { useConfirm } from "@/hooks/confirm";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const confirm = useConfirm();
 

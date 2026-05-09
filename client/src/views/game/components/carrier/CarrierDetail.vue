@@ -240,7 +240,6 @@ import {eventBusInjectionKey} from "../../../../eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris/common";
@@ -248,6 +247,7 @@ import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {useConfirm} from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -269,7 +269,7 @@ const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);

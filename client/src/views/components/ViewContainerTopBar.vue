@@ -57,14 +57,14 @@ import { ref, computed, inject } from 'vue';
 import type { UserRoles } from '@solaris/common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { endImpersonate } from '@/services/typedapi/admin';
-import { toastInjectionKey } from '@/util/keys';
 import {logout} from "@/services/typedapi/auth";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const userStore = useUserStore();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userId = computed(() => userStore.userId);
 const username = computed(() => userStore.username);

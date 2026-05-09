@@ -159,12 +159,12 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {BulkUpgradeReport, InfrastructureType, MapObject} from "@solaris/common";
 import {scheduleBulk, upgradeBulk, upgradeBulkCheck} from "@/services/typedapi/star";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
+import { useToast } from 'vue-toast-notification';
 type ScheduleStrategy =  'future' | 'cycle-start' | 'cycle-end' | 'now';
 
 const emit = defineEmits<{
@@ -173,7 +173,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useGameStore();

@@ -925,12 +925,12 @@ import { ref, onMounted, inject, type Ref, computed } from 'vue';
 import {GAME_CREATION_OPTIONS, type GameSettingsSpec, type SpecialistBans} from "@solaris/common";
 import {createGame, getDefaultSettings} from "@/services/typedapi/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 import ResearchCostProgression from "@/views/game/gameCreation/ResearchCostProgression.vue";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isCreatingGame = ref(false);
 const errors: Ref<string[]> = ref([]);

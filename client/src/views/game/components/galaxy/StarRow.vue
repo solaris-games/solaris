@@ -42,7 +42,6 @@ import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapComm
 import {eventBusInjectionKey} from "../../../../eventBus";
 import { ref, inject, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Star, Player} from "@solaris/common";
 
 import {useConfirm} from "@/hooks/confirm.ts";
@@ -50,6 +49,7 @@ import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustry
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {makeUpgrade} from "@/views/game/components/star/upgrade";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   star: Star<string>,
   allowUpgrades: boolean,
@@ -61,7 +61,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

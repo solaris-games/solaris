@@ -68,12 +68,12 @@ import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import { ref, computed, inject } from 'vue';
 
-import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {createReport} from "@/services/typedapi/report";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {ReportPlayerArgs} from "@/types/menu";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   args: ReportPlayerArgs,
 }>();
@@ -83,7 +83,7 @@ const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();

@@ -42,10 +42,10 @@ import FormErrorList from '../components/FormErrorList.vue'
 import { ref, inject, type Ref } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { updatePassword } from '@/services/typedapi/user'
-import {toastInjectionKey} from "@/util/keys";
+import { useToast } from 'vue-toast-notification'
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isLoading = ref(false);
 const errors: Ref<string[]> = ref([]);

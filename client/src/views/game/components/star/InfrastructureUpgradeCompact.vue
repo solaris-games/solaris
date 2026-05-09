@@ -42,7 +42,6 @@ import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import type {Star} from "@/types/game";
 import {httpInjectionKey} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {makeUpgrade, makeWarpgateActions} from "@/views/game/components/star/upgrade";
@@ -54,6 +53,7 @@ import {
 import { ref, computed, inject } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   star: Star,
   availableCredits: number,
@@ -68,7 +68,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

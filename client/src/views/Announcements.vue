@@ -33,10 +33,10 @@ import { ref, onMounted, inject, type Ref } from 'vue';
 import type {Announcement, AnnouncementState} from "@solaris/common";
 import {getAnnouncementState, getCurrentAnnouncements, markAsRead} from "@/services/typedapi/announcement";
 import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const announcements: Ref<Announcement<string>[] | null> = ref(null);
 const announcementState: Ref<AnnouncementState<string> | null> = ref(null);

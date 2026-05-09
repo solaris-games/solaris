@@ -43,7 +43,6 @@ import { withMessages } from "../../util/messages";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getSettings} from "@/services/typedapi/user";
-import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router';
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
@@ -53,6 +52,7 @@ import { useUserStore } from '@/stores/user';
 import { useColourStore } from '@/stores/colour';
 import {useGameStore} from "@/stores/game";
 
+import { useToast } from 'vue-toast-notification';
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
@@ -65,7 +65,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const playerClientSocketEmitter = inject(playerClientSocketEmitterInjectionKey)!;
 const userClientSockerEmitter = inject(userClientSocketEmitterInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const route = useRoute();
 

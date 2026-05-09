@@ -20,14 +20,14 @@ import router from '../../../../router';
 import GameHelper from '../../../../services/gameHelper';
 import AudioService from '../../../../game/audio';
 import { ref, computed, inject } from 'vue';
-import { toastInjectionKey } from '../../../../util/keys';
 import { useConfirm } from "@/hooks/confirm.ts";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type { Game } from '../../../../types/game';
 import { concedeDefeat } from '@/services/typedapi/game';
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

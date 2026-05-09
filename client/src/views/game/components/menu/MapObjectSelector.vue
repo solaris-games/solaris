@@ -52,7 +52,6 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
 import type {ObjectClicked} from "@/eventBusEventNames/map";
 import type {Player} from "@/types/game";
@@ -62,6 +61,7 @@ import SpecialistIcon from "@/views/game/components/specialist/SpecialistIcon.vu
 import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer";
 import {useConfirm} from "@/hooks/confirm.ts";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   mapObjects: readonly ObjectClicked[],
 }>();
@@ -74,7 +74,7 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();

@@ -14,8 +14,8 @@ import {trashBulk} from "@/services/typedapi/star";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import { inject } from 'vue';
 
-import {toastInjectionKey} from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   action: PlayerScheduledActions<string>,
 }>();
@@ -25,7 +25,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

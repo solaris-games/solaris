@@ -507,7 +507,6 @@ import {eventBusInjectionKey} from "@/eventBus";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {inject, ref, computed, type Ref} from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Carrier, Game, Player} from "@/types/game";
 import type {MapObject} from "@solaris/common";
 import {abandon} from "@/services/typedapi/star";
@@ -516,6 +515,7 @@ import {makeShipTransferActions} from "@/views/game/components/star/shipTransfer
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import StarWeaponsLevel from "@/views/game/components/star/StarWeaponsLevel.vue";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   starId: string,
 }>();
@@ -532,7 +532,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);

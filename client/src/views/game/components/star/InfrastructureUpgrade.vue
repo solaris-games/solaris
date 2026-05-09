@@ -33,13 +33,13 @@ import GameHelper from '../../../../services/gameHelper'
 import type {Star} from "@/types/game";
 import {httpInjectionKey} from "@/services/typedapi";
 
-import {toastInjectionKey} from "@/util/keys";
 import { ref, computed, inject } from 'vue';
 import { upgradeEconomy as upgradeEconomyReq, upgradeIndustry as upgradeIndustryReq, upgradeScience as upgradeScienceReq } from "@/services/typedapi/star";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {makeUpgrade} from "@/views/game/components/star/upgrade";
 import {eventBusInjectionKey} from "@/eventBus";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   star: Star,
   availableCredits: number,
@@ -50,7 +50,7 @@ const props = defineProps<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

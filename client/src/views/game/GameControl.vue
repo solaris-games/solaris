@@ -48,10 +48,10 @@ import router from "../../router";
 import {ref, inject, computed, type Ref} from 'vue';
 import type {GameInfoDetail, GameGalaxyDetail} from '@solaris/common';
 import {extractErrors, formatError, httpInjectionKey, isOk} from '@/services/typedapi';
-import {toastInjectionKey} from '@/util/keys';
 import {detailGalaxy, fastForward, forceStart, pause, deleteGame as delGame, resetQuitters as resetQuittersReq } from '@/services/typedapi/game';
 import {useConfirm} from '@/hooks/confirm.ts';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   game: GameInfoDetail<string>,
 }>();
@@ -61,7 +61,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

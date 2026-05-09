@@ -33,13 +33,13 @@ import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, ref, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Carrier, Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import type {MapObject} from "@solaris/common";
 import {rename} from "@/services/typedapi/carrier";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -53,7 +53,7 @@ const store = useGameStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const game = computed<Game>(() => store.game!);
 const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);

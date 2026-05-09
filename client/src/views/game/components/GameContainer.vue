@@ -8,7 +8,6 @@ import { eventBusInjectionKey } from '../../../eventBus'
 import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
-import { toastInjectionKey } from '../../../util/keys';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
 import {createGameContainer} from "@/game/container";
@@ -20,12 +19,13 @@ import { useUserStore } from '@/stores/user';
 import {useMentionStore} from "@/stores/mention";
 import {useGameStore} from "@/stores/game";
 
+import { useToast } from 'vue-toast-notification';
 const store = useGameStore();
 const userStore = useUserStore();
 const mentionStore = useMentionStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const toast: ToastPluginApi = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const serviceProvider = useGameServices();

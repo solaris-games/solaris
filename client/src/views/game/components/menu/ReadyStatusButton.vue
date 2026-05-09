@@ -18,18 +18,18 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
-import {toastInjectionKey} from "@/util/keys";
 import { inject, computed } from "vue";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {notReady, ready, readyToCycle} from "@/services/typedapi/game";
 import { useGameStore } from "@/stores/game";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   smallButtons: boolean
 }>();
 
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();

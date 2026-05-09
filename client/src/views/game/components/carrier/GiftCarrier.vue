@@ -23,12 +23,12 @@ import { inject, computed, ref } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Game, Carrier} from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {gift} from "@/services/typedapi/carrier";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -38,7 +38,7 @@ const confirm = useConfirm();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isGiftingCarrier = ref(false);
 

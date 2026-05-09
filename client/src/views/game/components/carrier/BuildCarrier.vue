@@ -103,11 +103,11 @@ import { ref, computed, inject } from 'vue';
 import { useConfirm } from '@/hooks/confirm.ts';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { buildCarrier } from '@/services/typedapi/star';
-import { toastInjectionKey } from '@/util/keys';
 import type { Star } from '@/types/game';
 import {useGameStore} from "@/stores/game";
 import { eventBusInjectionKey } from '@/eventBus';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   starId: string,
 }>();
@@ -120,7 +120,7 @@ const emit = defineEmits < {
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

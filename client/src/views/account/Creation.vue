@@ -103,10 +103,10 @@ import Parallax from '../components/Parallax.vue'
 import { inject, ref } from 'vue';
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createUser } from '@/services/typedapi/user';
-import {toastInjectionKey} from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);

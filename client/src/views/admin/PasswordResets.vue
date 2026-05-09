@@ -34,10 +34,10 @@ import AdministrationPage from "./AdministrationPage.vue";
 import type { ListPasswordReset } from "@solaris/common";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { getPasswordResets } from "@/services/typedapi/admin";
-import { toastInjectionKey } from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const passwordResets: Ref<ListPasswordReset<string>[] | null> = ref(null);
 

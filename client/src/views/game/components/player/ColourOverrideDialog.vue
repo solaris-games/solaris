@@ -34,11 +34,11 @@ import { useGameStore } from '@/stores/game';
 import { ref, inject, computed, onMounted } from 'vue';
 import gameHelper from "../../../../services/gameHelper";
 import type {Game} from "@/types/game";
-import {toastInjectionKey} from "@/util/keys.ts";
 import { useColourStore } from '@/stores/colour';
 import { eventBusInjectionKey } from '@/eventBus';
 import { httpInjectionKey } from '@/services/typedapi';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   playerId: string,
 }>();
@@ -48,7 +48,7 @@ const emit = defineEmits<{
   onColourOverrideConfirmed: [],
 }>();
 
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 

@@ -30,13 +30,13 @@ import FormErrorList from '../../../components/FormErrorList.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import { ref, inject, type Ref } from 'vue';
 import {useConfirm} from "@/hooks/confirm.ts";
-import {toastInjectionKey} from "@/util/keys";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {inviteSpectators} from "@/services/typedapi/spectator";
 
+import { useToast } from 'vue-toast-notification';
 const store = useGameStore();
 const confirm = useConfirm();
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
 const emit = defineEmits<{

@@ -60,13 +60,13 @@ import { ref, computed, onMounted, inject } from 'vue';
 import type {Game} from "@/types/game";
 import {updateResearchNow, updateResearchNext} from "@/services/typedapi/research";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {ResearchType} from "@solaris/common";
 import Timer from "@/views/game/components/time/Timer.vue";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);

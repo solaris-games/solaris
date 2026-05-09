@@ -32,10 +32,10 @@ import AdministrationPage from "./AdministrationPage.vue";
 import { inject, ref, onMounted, type Ref } from 'vue';
 import type { GetInsight } from "@solaris/common";
 import { getInsights } from "@/services/typedapi/admin";
-import { toastInjectionKey } from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const insights: Ref<GetInsight[] | null> = ref(null);
 

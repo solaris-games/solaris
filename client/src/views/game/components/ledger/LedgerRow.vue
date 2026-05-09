@@ -25,7 +25,6 @@ import type {LedgerType, PlayerLedgerDebt} from "@solaris/common";
 import type { Game } from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {
   forgiveLedgerCredits,
   forgiveLedgerSpecialistTokens,
@@ -35,6 +34,7 @@ import {
 import { useColourStore } from '@/stores/colour';
 import { useGameStore } from "@/stores/game";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   ledger: PlayerLedgerDebt<string>,
   ledgerType: LedgerType,
@@ -45,7 +45,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

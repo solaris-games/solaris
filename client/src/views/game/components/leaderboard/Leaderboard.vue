@@ -102,7 +102,6 @@ import HelpTooltip from '../../../components/HelpTooltip.vue'
 import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
 import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
 import { type Game, type Player } from '@solaris/common';
-import { toastInjectionKey } from '@/util/keys'
 import { useConfirm } from '@/hooks/confirm.ts'
 import { useIsHistoricalMode } from '@/util/reactiveHooks'
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
@@ -112,6 +111,7 @@ import { notReadyToQuit, quit, readyToQuit } from '@/services/typedapi/game'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getCountdownTimeStringByTicks, getCountdownTimeStringForTurnTimeout} from "@/util/time";
 
+import { useToast } from 'vue-toast-notification';
 const emit = defineEmits<{
   onCloseRequested: [],
   onOpenPlayerDetailRequested: [playerId: string],
@@ -122,7 +122,7 @@ const store = useGameStore();
 const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const activeTab: Ref<string | null> = ref(null);
 const players: Ref<Player<string>[] | null> = ref(null);

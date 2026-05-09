@@ -81,7 +81,6 @@ import UserEventBusEventNames from "../../../../eventBusEventNames/user";
 import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {getUnreadCount} from "@/services/typedapi/conversation";
-import {toastInjectionKey} from "@/util/keys";
 import type {TradeEventTechnology} from "@solaris/common";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Game} from "@/types/game";
@@ -91,13 +90,14 @@ import { useUserStore } from '@/stores/user';
 import { useGameStore } from "@/stores/game"
 import type {MenuState} from "@/types/menu.ts";
 
+import { useToast } from 'vue-toast-notification';
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string],
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const userStore = useUserStore();

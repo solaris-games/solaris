@@ -178,14 +178,14 @@ import { inject, onMounted, ref, computed, type Ref } from 'vue'
 import { formatError, httpInjectionKey, isOk, unwrapOk } from '@/services/typedapi'
 import { deleteUser, detailMe, updateEmailOtherPreference, updateEmailPreference, updateIsAnonymous } from '@/services/typedapi/user'
 import type { UserPrivate } from '@solaris/common'
-import { toastInjectionKey } from '@/util/keys'
 import { useConfirm } from '@/hooks/confirm'
 import { useRoute } from 'vue-router';
 import {unauthoriseDiscord} from "@/services/typedapi/auth";
 import {configInjectionKey} from "@/config";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const config = inject(configInjectionKey)!;
 
 const route = useRoute();

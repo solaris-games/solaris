@@ -14,14 +14,14 @@ import AdministrationPage from "./AdministrationPage.vue";
 import { useRoute } from 'vue-router';
 import { inject, onMounted, ref, computed, type Ref } from "vue";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { toastInjectionKey } from "@/util/keys";
 import type { ListUser, AdminSpecificUserInfo } from "@solaris/common";
 import { getUsers } from "@/services/typedapi/admin";
 import UserPanel from "@/views/admin/components/UserPanel.vue";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 

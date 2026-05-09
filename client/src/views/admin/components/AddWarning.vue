@@ -10,8 +10,8 @@
 import { ref, inject } from 'vue';
 import { addWarning } from '@/services/typedapi/admin';
 import { httpInjectionKey, isOk } from "@/services/typedapi";
-import { toastInjectionKey } from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   userId: string
 }>();
@@ -21,7 +21,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const warningText = ref('');
 

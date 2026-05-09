@@ -40,11 +40,11 @@ import { inject, computed } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 
 import type {InfrastructureType} from "@solaris/common";
 import { toggleBulkIgnore as toggleBulkIgnoreReq, toggleBulkIgnoreAll as toggleBulkIgnoreAllReq } from '@/services/typedapi/star';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   starId: string,
   highlightIgnoredInfrastructure?: InfrastructureType
@@ -56,7 +56,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

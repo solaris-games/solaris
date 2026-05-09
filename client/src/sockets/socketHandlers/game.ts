@@ -1,7 +1,7 @@
 import type { Socket } from "socket.io-client";
 import type { GameState } from "@solaris/common";
 import { GameSocketEventNames, type GameSocketEventType } from '@solaris/common';
-import type { ToastPluginApi } from "vue-toast-notification";
+import { useToast } from "vue-toast-notification";
 import type { EventBus } from "../../eventBus";
 import GameEventBusEventNames from "../../eventBusEventNames/game";
 import AudioService from '../../game/audio';
@@ -12,9 +12,10 @@ import type {GameStore} from "@/stores/game";
 export class GameClientSocketHandler extends ClientSocketHandler<GameSocketEventType> {
   constructor(socket: Socket,
               store: GameStore,
-              toast: ToastPluginApi,
               eventBus: EventBus) {
     super(socket);
+
+    const toast = useToast();
 
     this.on(GameSocketEventNames.GameStarted, (e: { state: GameState<string> }) => {
       store.socketMutations[GameMutationNames.GameStarted](e);

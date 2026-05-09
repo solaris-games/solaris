@@ -69,12 +69,12 @@ import type { AdminListGame } from '@solaris/common';
 import { httpInjectionKey, isOk, isError, formatError } from '@/services/typedapi';
 import { listGames, setGameFeatured, finishGame, setGameTimeMachine } from '@/services/typedapi/admin';
 import { resetQuitters as requestResetQuitters } from '@/services/typedapi/game';
-import { toastInjectionKey } from '@/util/keys';
 import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 const confirm = useConfirm();

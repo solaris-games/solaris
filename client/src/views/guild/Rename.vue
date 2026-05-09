@@ -48,12 +48,12 @@ import ViewTitle from '../components/ViewTitle.vue';
 import FormErrorList from '../components/FormErrorList.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm";
 import {renameGuild} from "@/services/typedapi/guild";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const confirm = useConfirm();
 

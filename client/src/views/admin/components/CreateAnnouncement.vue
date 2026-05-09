@@ -31,10 +31,10 @@ import FormErrorList from "../../components/FormErrorList.vue";
 import { ref, computed, inject, type Ref } from 'vue';
 import { httpInjectionKey, isError, formatError, extractErrors } from "@/services/typedapi";
 import { createAnnouncement } from "@/services/typedapi/admin";
-import { toastInjectionKey } from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const emit = defineEmits<{
   onAnnouncementCreated: [],

@@ -169,11 +169,11 @@ import { getCredits } from '@/services/typedapi/user';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { inject, ref, onMounted } from 'vue';
 import {purchaseGalacticCredits} from "@/services/typedapi/shopPurchase";
-import {toastInjectionKey} from "@/util/keys";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 

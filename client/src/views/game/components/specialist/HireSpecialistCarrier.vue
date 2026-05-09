@@ -66,7 +66,6 @@ import {computed, ref, inject} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import type {Specialist} from "@solaris/common";
@@ -74,6 +73,7 @@ import {useConfirm} from "@/hooks/confirm.ts";
 import {hireCarrier} from "@/services/typedapi/specialist";
 import {useGameServices} from "@/util/gameServices";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -85,7 +85,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const confirm = useConfirm();

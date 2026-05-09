@@ -8,16 +8,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject } from 'vue';
+import { ref, onMounted} from 'vue';
 import { useRoute } from 'vue-router';
-import { toastInjectionKey } from '@/util/keys';
 
+import { useToast } from 'vue-toast-notification';
 defineProps<{
     message?: string;
 }>();
 
 const route = useRoute();
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const fullRoute = ref('');
 

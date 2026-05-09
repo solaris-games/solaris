@@ -17,7 +17,6 @@ import { GameClientSocketHandler } from './sockets/socketHandlers/game'
 import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
 import { httpInjectionKey } from "./services/typedapi"
 import {createHttpClient} from "./util/http";
-import {toastInjectionKey} from "./util/keys";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
 import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
@@ -97,7 +96,7 @@ const init = (config: FrontendConfig) => {
   const gameStore = useGameStore();
 
   const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
-  const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, gameStore, app.config.globalProperties.$toast, eventBus);
+  const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, gameStore, eventBus);
   const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, gameStore, eventBus);
   const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, eventBus);
 
@@ -107,17 +106,7 @@ const init = (config: FrontendConfig) => {
 
   app.provide(httpInjectionKey, httpClient);
 
-  app.provide(toastInjectionKey, app.config.globalProperties.$toast);
-
   const clientHandler: ClientHandler = new ClientHandler(socket, gameStore, playerClientSocketEmitter, userClientSocketEmitter);
-
-  app.config.globalProperties.$isHistoricalMode = function() {
-    return this.$store.tick !== this.$store.game.state.tick
-  }
-
-  app.config.globalProperties.$isMobile = function () {
-    return window.matchMedia('only screen and (max-width: 576px)').matches
-  }
 
   app.directive('tooltip', function(el, binding) {
     new bootstrap.Tooltip($(el), {

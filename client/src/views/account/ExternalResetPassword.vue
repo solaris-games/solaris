@@ -36,11 +36,11 @@ import FormErrorList from '../components/FormErrorList.vue'
 import { inject, ref } from 'vue'
 import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import { resetPassword } from '@/services/typedapi/user'
-import {toastInjectionKey} from "@/util/keys";
 import { useRoute } from 'vue-router'
+import { useToast } from 'vue-toast-notification'
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const route = useRoute();
 const token = route.query.token!.toString();

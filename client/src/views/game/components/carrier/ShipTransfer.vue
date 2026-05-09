@@ -87,13 +87,13 @@ import MenuTitle from '../MenuTitle.vue';
 import StarLabel from '../star/StarLabel.vue';
 import { ref, computed, inject, watch, onMounted } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import type {Game, Star, Carrier} from "@/types/game";
 import {transferShips} from "@/services/typedapi/carrier";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";
 import {useGameStore} from "@/stores/game";
 import { eventBusInjectionKey } from '@/eventBus';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -106,7 +106,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);

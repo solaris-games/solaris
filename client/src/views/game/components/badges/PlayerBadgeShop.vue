@@ -36,7 +36,6 @@ import GameHelper from '../../../../services/gameHelper'
 import BadgeShopList from './BadgeShopList.vue'
 import { formatError, httpInjectionKey, isError, isOk } from "../../../../services/typedapi";
 import type { ToastPluginApi } from "vue-toast-notification";
-import { toastInjectionKey } from "../../../../util/keys";
 import type { Badge } from "@solaris/common";
 import type { Player } from "../../../../types/game";
 import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
@@ -45,6 +44,7 @@ import { useUserStore } from '../../../../stores/user';
 import { useBadgeStore } from '../../../../stores/badge';
 
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{ recipientPlayerId: string }>();
 
 const isLoading: Ref<boolean> = ref(true);
@@ -63,7 +63,7 @@ const badgeStore = useBadgeStore();
 
 const httpClient: Axios = inject(httpInjectionKey)!;
 
-const toast: ToastPluginApi = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const loadGalacticCredits = async () => {
   isLoading.value = true

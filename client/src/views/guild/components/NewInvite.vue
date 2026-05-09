@@ -28,8 +28,8 @@ import FormErrorList from '../../components/FormErrorList.vue'
 import LoadingSpinner from '../../components/LoadingSpinner.vue'
 import {inviteGuild} from "@/services/typedapi/guild";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   guildId: string
 }>();
@@ -39,7 +39,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);

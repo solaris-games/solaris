@@ -33,15 +33,15 @@ import type {AchievementsUser, GuildWithUsers} from "@solaris/common";
 import {detailMyGuild, inviteGuild} from "@/services/typedapi/guild";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {useConfirm} from "@/hooks/confirm";
-import {toastInjectionKey} from "@/util/keys";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   user: AchievementsUser<string>,
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 const confirm = useConfirm();

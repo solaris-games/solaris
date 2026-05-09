@@ -1,3 +1,4 @@
+import { useToast } from 'vue-toast-notification';
 <template>
   <div>
     <view-subtitle title="Notifications" class="mt-3" level="h5" />
@@ -182,10 +183,10 @@ import { onMounted, ref, type Ref, inject } from 'vue'
 import type { UserSubscriptions } from '@solaris/common'
 import { getSubscriptions, saveSubscriptions } from '@/services/typedapi/user'
 import { extractErrors, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi'
-import { toastInjectionKey } from '@/util/keys'
+import { useToast } from 'vue-toast-notification'
 
 const httpClient = inject(httpInjectionKey)!
-const toast = inject(toastInjectionKey)!
+const toast = useToast()
 
 const isSaving = ref(false);
 const errors: Ref<string[]> = ref([]);

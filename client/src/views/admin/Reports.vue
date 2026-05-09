@@ -43,11 +43,11 @@ import MessageReport from "./components/MessageReport.vue";
 import { type Report } from "@solaris/common";
 import { httpInjectionKey, isOk, formatError } from "@/services/typedapi";
 import { actionReport, listReports } from "@/services/typedapi/admin";
-import { toastInjectionKey } from "@/util/keys";
 import { useConfirm } from "@/hooks/confirm";
 
+import { useToast } from 'vue-toast-notification';
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const confirm = useConfirm();
 

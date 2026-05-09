@@ -65,7 +65,6 @@
 <script setup lang="ts">
 import AddWarning from "@/views/admin/components/AddWarning.vue";
 import {formatError, httpInjectionKey, isError, isOk, type ResponseResult} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {useConfirm} from "@/hooks/confirm.ts";
 import { inject, computed } from 'vue';
 import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris/common";
@@ -81,13 +80,14 @@ import router from "@/router";
 import { formatDistanceToNow } from "date-fns";
 import { useUserStore } from '@/stores/user';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   user: ListUser<string>,
   duplicateIPs: boolean,
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const userStore = useUserStore();
 const confirm = useConfirm();

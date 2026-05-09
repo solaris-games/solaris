@@ -582,8 +582,8 @@ import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import { extractErrors, formatError, httpInjectionKey, isOk, ResponseResultKind } from '@/services/typedapi';
 import {DEFAULT_SETTINGS, type UserGameSettings} from '@solaris/common';
 import { getSettings, saveSettings } from '@/services/typedapi/user';
-import { toastInjectionKey } from '@/util/keys';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   isInGame: boolean,
 }>();
@@ -594,7 +594,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 

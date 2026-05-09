@@ -34,10 +34,10 @@ import type {DiplomaticStatus} from "@solaris/common";
 import {useConfirm} from "@/hooks/confirm.ts";
 import type {Game} from "@/types/game";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {toastInjectionKey} from "@/util/keys";
 import {ally, enemy, neutral} from "@/services/typedapi/diplomacy";
 import { useColourStore } from '@/stores/colour';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   diplomaticStatus: DiplomaticStatus<string>,
 }>();
@@ -49,7 +49,7 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);

@@ -42,9 +42,9 @@ import { inject, onMounted, computed, useTemplateRef } from 'vue';
 import type {Conversation, ConversationMessage, MapObject} from "@solaris/common";
 import type {Game} from "@/types/game";
 import {isMobile} from "@/util/mobile";
-import {toastInjectionKey} from "@/util/keys";
 import { useColourStore } from '@/stores/colour';
 
+import { useToast } from 'vue-toast-notification';
 const props = defineProps<{
   conversation: Conversation<string>,
   message: ConversationMessage<string>
@@ -57,7 +57,7 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const messageElement = useTemplateRef("messageElement");
 
