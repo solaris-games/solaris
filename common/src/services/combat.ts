@@ -1,6 +1,6 @@
 import type {Id} from "../types/id";
 import type {CombatPlayerGrouping, CombatGroupService} from "./combatGroup";
-import type {Star} from "../types/common/star";
+import type {Star } from "../types/common/star";
 import type {Carrier} from "../types/common/carrier";
 import type {Game} from "../types/common/game";
 import {groupBy} from "../utilities/utils";
@@ -25,10 +25,14 @@ type CombatRoundState<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseSt
 
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
+
     getByIdCarrier(id: number): Specialist | null;
 }
 
-type MO<ID, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = { type: 'carrier', carrier: C } | { type: 'star', star: S };
+type MO<ID, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = { type: 'carrier', carrier: C } | {
+    type: 'star',
+    star: S
+};
 
 type CombatResultGrouped<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
     players: P[],
@@ -89,6 +93,16 @@ const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S ext
         round: oldState.round + 1,
         groups: newGroups,
     }
+}
+
+const mapToRecord = (map: Map<number, WeaponsDetail>): Record<string, WeaponsDetail> => {
+    const obj: Record<number, WeaponsDetail> = {};
+
+    for (let [k, v] of map) {
+        obj[k] = v;
+    }
+
+    return obj;
 }
 
 const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(group: CombatResultGrouped<ID, P, S, C>): DetailedCombatResultGroup<ID, P, S, C> => {
@@ -200,14 +214,14 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
         carriersLost: carriersLost.length,
         specialistsKilled: 0, // backfilled later
         specialistsLost: specialistsLost.length,
-        attackAgainst: group.attackAgainst,
+        attackAgainst: mapToRecord(group.attackAgainst),
     };
 }
 
 const computeKills = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: DetailedCombatResultGroup<ID, P, S, C>[]) => {
     const otherGroupsCount = groups.length - 1;
 
-    for (let i = 0; i < groups.length; i++){
+    for (let i = 0; i < groups.length; i++) {
         const group = groups[i];
         const carriersKilledInOtherGroups = groups.map((og, oI) => {
             if (oI === i) {
@@ -313,10 +327,10 @@ export class CombatService<ID extends Id> {
 
         // siege breaker should apply a weapons bonus against ALL groups which contain a player that was targeted at launch
 
-        for (let groupIdx = 0; groupIdx < groups.length; groupIdx++){
+        for (let groupIdx = 0; groupIdx < groups.length; groupIdx++) {
             const group = groups[groupIdx];
 
-            for (let otherGroupIdx = 0; otherGroupIdx < groups.length; otherGroupIdx++){
+            for (let otherGroupIdx = 0; otherGroupIdx < groups.length; otherGroupIdx++) {
                 const otherGroup = groups[otherGroupIdx];
 
                 if (group === otherGroup) {
@@ -359,7 +373,7 @@ export class CombatService<ID extends Id> {
         return combatResult.groups.find(g => (typeof g.shipsAfter === 'number' ? g.shipsAfter : 1) > 0); // if result is masked it is non-zero
     }
 
-    getWinnerDetailed(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>) {
+    getWinnerDetailed<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>) {
         return combatResult.groups.find(g => (typeof g.shipsAfter === 'number' ? g.shipsAfter : 1) > 0); // if result is masked it is non-zero
     }
 
@@ -458,7 +472,10 @@ export class CombatService<ID extends Id> {
             ];
         }
 
-        const result: DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> = combatLoop({ round: 0, groups });
+        const result: DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> = combatLoop({
+            round: 0,
+            groups
+        });
 
         const defenderGroup = findGroupDetailed(result, "defender")!;
         const attackerGroup = findGroupDetailed(result, "attacker")!;
@@ -483,7 +500,7 @@ export class CombatService<ID extends Id> {
     }
 
     computeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {
-        return combatLoop<ID, P, S, C>({ round: 0, groups });
+        return combatLoop<ID, P, S, C>({round: 0, groups});
     }
 
     computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {

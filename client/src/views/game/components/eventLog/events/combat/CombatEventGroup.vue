@@ -11,7 +11,7 @@
           </tr>
         </thead>
         <tbody>
-        <combat-group-attack :group="group" />
+        <combat-group-attack :attack-against="group.attackAgainst" />
         <template v-for="participant in playerGroupedObjects">
             <tr>
               <td colspan="4">

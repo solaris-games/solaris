@@ -8,14 +8,14 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import {type CombatResultGroup, groupBy, type WeaponsDetail} from "@solaris/common";
+import {groupBy, type WeaponsDetail} from "@solaris/common";
 
 const props = defineProps<{
-  group: CombatResultGroup<string>,
+  attackAgainst:  Record<number, WeaponsDetail>,
 }>();
 
 const groupedAttack = computed(() => {
-  return groupBy(Object.entries(props.group.attackAgainst), ([_n, wd]) => wd.total);
+  return groupBy(Object.entries(props.attackAgainst), ([_n, wd]) => wd.total);
 });
 
 const hasMultiple = computed(() => groupedAttack.value.size > 1);

@@ -54,7 +54,7 @@ export type DetailedCombatResultGroup<ID, P extends CombatBasePlayer<ID>, S exte
     players: P[],
     carriers: DetailedCombatResultCarrier<ID, C>[],
     star: DetailedCombatResultStar<ID, S> | undefined,
-    attackAgainst: Map<number, WeaponsDetail>,
+    attackAgainst: Record<string, WeaponsDetail>,
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
