@@ -47,10 +47,6 @@ type CombatResultGrouped<ID, P extends CombatBasePlayer<ID>, S extends CombatBas
     shipsLost: number,
 }
 
-type GroupedCombatResult<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
-    groups: CombatResultGrouped<ID, P, S, C>[],
-}
-
 type BasicSideSpec = {
     ships: number,
     weaponsLevel: number,
@@ -96,8 +92,15 @@ const applyDamages =  <ID extends Id, P extends CombatBasePlayer<ID>, S extends 
     });
 };
 
-const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(oldState: CombatRoundState<ID, P, S, C>): CombatRoundState<ID, P, S, C> => {
-    const groupsWithDamage = calculateIncomingDamages(oldState.groups, oldState.groups);
+const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(oldState: CombatRoundState<ID, P, S, C>, isCarrierToStarCombat: boolean): CombatRoundState<ID, P, S, C> => {
+    let groupsWithDamage : GroupsWithDamage<ID, P, S, C>;
+
+    if (isCarrierToStarCombat && oldState.round === 0) {
+        // special handling for defender attacking first
+        groupsWithDamage = calculateIncomingDamages(oldState.groups, oldState.groups.filter(g => g.isDefender));
+    } else {
+        groupsWithDamage = calculateIncomingDamages(oldState.groups, oldState.groups);
+    }
 
     const newGroups = applyDamages(groupsWithDamage);
 
@@ -281,7 +284,7 @@ const isCombatOver = <ID extends Id, P extends CombatBasePlayer<ID>, S extends C
     return state.groups.filter(g => g.ships > 0).length <= 1; // mutual destruction is possible
 }
 
-const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(initState: CombatRoundState<ID, P, S, C>): DetailedCombatResult<ID, P, S, C> => {
+const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(initState: CombatRoundState<ID, P, S, C>, isCarrierToStarCombat: boolean): DetailedCombatResult<ID, P, S, C> => {
     let state = initState;
 
     while (true) {
@@ -290,7 +293,7 @@ const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends Com
             break;
         }
 
-        state = performCombatRound(state);
+        state = performCombatRound(state, isCarrierToStarCombat);
     }
 
     return makeResult(state);
@@ -487,7 +490,7 @@ export class CombatService<ID extends Id> {
         const result: DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> = combatLoop({
             round: 0,
             groups
-        });
+        }, isCarrierToStarCombat);
 
         const defenderGroup = findGroupDetailed(result, "defender")!;
         const attackerGroup = findGroupDetailed(result, "attacker")!;
@@ -511,8 +514,8 @@ export class CombatService<ID extends Id> {
         };
     }
 
-    computeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {
-        return combatLoop<ID, P, S, C>({round: 0, groups});
+    computeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
+        return combatLoop<ID, P, S, C>({round: 0, groups}, isCarrierToStarCombat);
     }
 
     computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {
@@ -526,7 +529,7 @@ export class CombatService<ID extends Id> {
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, star, carriers, combatDiploGroups);
 
-        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups});
+        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, true);
     }
 
     computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {
@@ -540,7 +543,7 @@ export class CombatService<ID extends Id> {
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, undefined, carriers, combatDiploGroups);
 
-        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups});
+        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, false);
     }
 
     private _sortGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {

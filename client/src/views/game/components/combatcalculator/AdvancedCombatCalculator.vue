@@ -92,7 +92,7 @@ const reset = () => {
 const calculate = () => {
   console.log(groups.value);
 
-  result.value = serviceProvider.combatService.computeGroups(actualCombatGroups.value);
+  result.value = serviceProvider.combatService.computeGroups(actualCombatGroups.value, groups.value.some(g => Boolean(g.star)));
 };
 </script>
 <style scoped>
