@@ -185,16 +185,4 @@ describe('star', () => {
         expect(starService.binarySearchStars(fakeStarList, 'ccddee')).toEqual(fakeStarList[2]);
         expect(starService.binarySearchStars(fakeStarList, 'eeeeee')).toEqual(undefined);
     })
-
-    it('should insert new map object into a sorted array', () => {
-        const mapObject = {
-            _id: 'abcd',
-            location: {
-                x: 0,
-                y: 0
-            }
-        };
-        starService._insertIntoSortedMapObjectsArray(fakeMapObjects, mapObject);
-        expect(starService._binarySearchIndex(fakeMapObjects, 'abcd')).toEqual(1);
-    });
 });

@@ -1,9 +1,18 @@
 import GameListService from '../services/gameList';
 
+const fakeGames = [
+    { settings: { general: { type: 'official' } } },
+    { settings: { general: { type: 'official' } } },
+];
+
 const fakeGameModel = {
-    find() {
-        return 1;
+    async find() {
+        return fakeGames;
     }
+};
+
+const fakeGameService = {
+    maskState() {}
 };
 
 describe('game list', () => {
@@ -11,15 +20,14 @@ describe('game list', () => {
 
     beforeAll(() => {
         // @ts-ignore
-        gameListService = new GameListService(fakeGameModel);
+        gameListService = new GameListService(fakeGameModel, fakeGameService, {}, {}, {}, {});
     });
     
-    // Not really sure what's the point in testing this. Maybe there's a better way to mock
-    // and intercept calling of mongoose functions?
     it('should list official games', async () => {
         let result = await gameListService.listOfficialGames();
 
-        expect(result).toBe(1);
+        expect(result).toEqual(fakeGames);
     });
 
 });
+

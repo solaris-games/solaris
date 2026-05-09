@@ -25,6 +25,9 @@ describe('specialistHire - Star', () => {
             playerService: {} as any,
             playerCreditsService: {} as any,
             starService: {} as any,
+            starDataService: {
+                isDeadStar: () => { return false; }
+            },
             gameTypeService: {
                 isTutorialGame: () => { return false; }
             },
@@ -54,13 +57,14 @@ describe('specialistHire - Star', () => {
                 creditsSpecialists: 0
             },
             starId: new mongoose.Types.ObjectId(),
-            specialistId: 1
+            specialistId: 1,
+            statisticsService: {} as any,
         };
 
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService, obj.statisticsService, obj.starDataService);
 
         return obj;
     }
@@ -133,7 +137,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(starWithSpecialist(testObj, null));
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return true;
         };
 
@@ -153,7 +157,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(starWithSpecialist(testObj, null));
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -177,7 +181,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(starWithSpecialist(testObj, testObj.specialistId));
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -201,7 +205,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(starWithSpecialist(testObj, null));
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -234,7 +238,7 @@ describe('specialistHire - Star', () => {
 
         testObj.game.galaxy.stars.push(starWithSpecialist(testObj, null));
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -272,7 +276,7 @@ describe('specialistHire - Star', () => {
             return specialistBasic(testObj);
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 

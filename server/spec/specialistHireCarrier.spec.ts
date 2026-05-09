@@ -25,9 +25,11 @@ describe('specialistHire - Carrier', () => {
             playerService: {} as any,
             playerCreditsService: {} as any,
             starService: {
-                isOwnedByPlayer: () => { return true; },
                 getById: () => { return {} as any; },
-                isDeadStar: () => { return false; }
+            },
+            starDataService: {
+                isDeadStar: () => { return false; },
+                isOwnedByPlayer: () => { return true; },
             },
             gameTypeService: {
                 isTutorialGame: () => { return false; }
@@ -59,13 +61,14 @@ describe('specialistHire - Carrier', () => {
             },
             carrierId: new mongoose.Types.ObjectId(),
             starId: new mongoose.Types.ObjectId(),
+            statisticsService: {} as any,
             specialistId: 1
         };
 
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService);
+        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService, obj.statisticsService, obj.starDataService);
 
         return obj;
     }
@@ -201,7 +204,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return true;
         };
 
@@ -231,7 +234,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -261,7 +264,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -291,7 +294,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -330,7 +333,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 
@@ -370,7 +373,7 @@ describe('specialistHire - Carrier', () => {
             return star;
         };
 
-        testObj.starService.isDeadStar = () => {
+        testObj.starDataService.isDeadStar = () => {
             return false;
         };
 

@@ -23,6 +23,32 @@ describe('technology', () => {
         service = null;
     });
 
+    // Shim for getCarriersEffectiveWeaponsLevel, which was replaced by getEffectiveWeaponsDetail.
+    function getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, isAttacker = false) {
+        const group = {
+            players,
+            carriers,
+            isDefender: !isAttacker,
+            attackAgainst: new Map(),
+            star: undefined,
+            ships: 0,
+            originalShips: 0,
+            shipsKilled: 0,
+        };
+        const opponents = {
+            players: [],
+            carriers: [],
+            isDefender: isAttacker,
+            attackAgainst: new Map(),
+            star: undefined,
+            ships: 0,
+            originalShips: 0,
+            shipsKilled: 0,
+        };
+        // @ts-ignore
+        return service.getEffectiveWeaponsDetail(game, group, opponents, isCarrierToStarCombat).total;
+    }
+
     it('should get researchable technologies', () => {
         const game = {
             settings: {
@@ -337,7 +363,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+        const weapons = service.getStarOwnWeaponsDetail(game, players, star, carriersInOrbit).total;
 
         expect(weapons).toBe(1);
     });
@@ -376,7 +402,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+        const weapons = service.getStarOwnWeaponsDetail(game, players, star, carriersInOrbit).total;
 
         expect(weapons).toBe(2);
     });
@@ -406,7 +432,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+        const weapons = service.getStarOwnWeaponsDetail(game, players, star, carriersInOrbit).total;
 
         expect(weapons).toBe(2);
     });
@@ -444,7 +470,7 @@ describe('technology', () => {
 
         setup(specialist, null);
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+        const weapons = service.getStarOwnWeaponsDetail(game, players, star, carriersInOrbit).total;
 
         expect(weapons).toBe(2);
     });
@@ -486,7 +512,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = service.getStarEffectiveWeaponsLevel(game, players, star, carriersInOrbit);
+        const weapons = service.getStarOwnWeaponsDetail(game, players, star, carriersInOrbit).total;
 
         expect(weapons).toBe(2);
     });
@@ -502,7 +528,7 @@ describe('technology', () => {
 
         setup();
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(0);
     });
@@ -524,7 +550,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(1);
     });
@@ -550,7 +576,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(5);
     });
@@ -576,7 +602,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(0);
     });
@@ -600,7 +626,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(5);
     });
@@ -624,7 +650,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const buff = service.getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, true);
+        const buff = service._getCarrierWeaponsBuff(carrier, isCarrierToStarCombat, false, isCarrierToStarCombat, 1, [])?.amount ?? 0;
 
         expect(buff).toBe(0);
     });
@@ -654,7 +680,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
 
         expect(weapons).toBe(1);
     });
@@ -689,7 +715,7 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
 
         expect(weapons).toBe(2);
     });
@@ -725,7 +751,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
 
         expect(weapons).toBe(2);
     });
@@ -775,7 +801,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = service.getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
 
         expect(weapons).toBe(6);
     });
@@ -787,7 +813,7 @@ describe('technology', () => {
 
         setup();
 
-        const debuff = service.getCarriersWeaponsDebuff(carriers);
+        const debuff = service.getCarriersWeaponsDebuff(carriers)?.amount ?? 0;
 
         expect(debuff).toBe(0);
     });
@@ -809,7 +835,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const debuff = service.getCarriersWeaponsDebuff(carriers);
+        const debuff = service.getCarriersWeaponsDebuff(carriers)?.amount ?? 0;
 
         expect(debuff).toBe(1);
     });
@@ -831,7 +857,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const debuff = service.getCarriersWeaponsDebuff(carriers);
+        const debuff = service.getCarriersWeaponsDebuff(carriers)?.amount ?? 0;
 
         expect(debuff).toBe(0);
     });
@@ -845,7 +871,7 @@ describe('technology', () => {
 
         setup();
 
-        const buff = service.getStarWeaponsBuff(star);
+        const buff = service._getStarWeaponsBuff(star)?.amount ?? 0;
 
         expect(buff).toBe(0);
     });
@@ -865,7 +891,7 @@ describe('technology', () => {
 
         setup(specialist, null);
 
-        const buff = service.getStarWeaponsBuff(star);
+        const buff = service._getStarWeaponsBuff(star)?.amount ?? 0;
 
         expect(buff).toBe(1);
     });
