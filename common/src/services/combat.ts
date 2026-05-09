@@ -419,7 +419,7 @@ export class CombatService<ID extends Id> {
             return m;
         };
 
-        const carrierGroup = (id: string, weapons: number, ships: number) => {
+        const carrierGroup = (id: string, weapons: number, ships: number, ownId: number) => {
             return {
                 players: [
                     {
@@ -445,7 +445,7 @@ export class CombatService<ID extends Id> {
                 ],
                 star: undefined,
                 shipsKilled: 0,
-                attackAgainst: attackMap(0, weapons),
+                attackAgainst: attackMap(ownId === 0 ? 1 : 0, weapons),
             };
         };
 
@@ -481,12 +481,12 @@ export class CombatService<ID extends Id> {
         if (isCarrierToStarCombat) {
             groups = [
                 starGroup("defender", defender.weaponsLevel, defender.ships),
-                carrierGroup("attacker", attacker.weaponsLevel, attacker.ships),
+                carrierGroup("attacker", attacker.weaponsLevel, attacker.ships, 1),
             ];
         } else {
             groups = [
-                carrierGroup("defender", defender.weaponsLevel, defender.ships),
-                carrierGroup("attacker", attacker.weaponsLevel, attacker.ships),
+                carrierGroup("defender", defender.weaponsLevel, defender.ships, 0),
+                carrierGroup("attacker", attacker.weaponsLevel, attacker.ships, 1),
             ];
         }
 
