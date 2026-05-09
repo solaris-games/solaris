@@ -2,19 +2,16 @@
   <div class="p-2 row cg-groups">
     <calculator-combat-group @onGroupRemove="onGroupRemoved" v-for="(group, index) in groups" :key="index" v-model="groups[index]" :index="index" :groups="groups" :validation-errors="getErrors(group)" />
   </div>
+  <div class="p-2 row">
+    <p v-for="err of errors" class="text-danger">{{ err }}</p>
+  </div>
   <div class="p-2 row" v-if="result">
     <calculator-combat-result :result="result" />
   </div>
-  <div class="p-2 row">
-    <div class="col-6">
-      <button class="btn btn-success" @click="addGroup">Add Group</button>
-    </div>
-    <div class="col-6">
-      <button class="btn btn-primary" :disabled="hasErrors" @click="calculate">Calculate</button>
-    </div>
-  </div>
-  <div class="p-2 row">
-    <p v-for="err of errors" class="text-danger">{{ err }}</p>
+  <div class="p-2 cg-buttons">
+    <button class="btn btn-success" @click="addGroup">Add Group</button>
+    <button class="btn btn-primary" :disabled="hasErrors" @click="calculate">Calculate</button>
+    <button class="btn btn-warning" @click="reset">Reset</button>
   </div>
 </template>
 <script setup lang="ts">
@@ -69,8 +66,26 @@ const addGroup = () => {
 };
 
 const getErrors = (group: CCGroup) => {
-  return [];
+  const errors: string[] = [];
+
+  if (!group.star && !group.carriers.length) {
+    errors.push("Group needs at least 1 object");
+  }
+
+  if (group.weapons.kind === 'level' && group.weapons.level < 1) {
+    errors.push("Weapons level needs to be at least 1");
+  }
+
+  if (group.weapons.kind === 'players' && !group.weapons.players?.length) {
+    errors.push("At least one player needs to be selected for weapons level");
+  }
+
+  return errors;
 };
+
+const reset = () => {
+  groups.value = [];
+}
 
 const calculate = () => {
   console.log(groups.value);
@@ -80,6 +95,12 @@ const calculate = () => {
 </script>
 <style scoped>
 .cg-groups {
+  gap: 4px;
+}
+
+.cg-buttons {
+  display: flex;
+  flex-direction: row;
   gap: 4px;
 }
 </style>

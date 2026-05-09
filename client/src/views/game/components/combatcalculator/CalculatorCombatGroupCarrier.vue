@@ -10,12 +10,12 @@ import type {CCCarrier} from "@/views/game/components/combatcalculator/types";
 import CalculatorCombatGroupObject from "@/views/game/components/combatcalculator/CalculatorCombatGroupObject.vue";
 
 const emit = defineEmits<{
-  onRemove: [],
+  onRemove: [carrier: CCCarrier],
 }>();
 
 const model = defineModel<CCCarrier>({ required: true });
 
-const remove = () => emit('onRemove');
+const remove = () => emit('onRemove', model.value);
 </script>
 <style scoped>
 </style>

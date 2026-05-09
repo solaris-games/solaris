@@ -1,10 +1,10 @@
 <template>
   <div class="cg-box p-2" :class="hasError ? 'cg-box-error' : 'cg-box-ok'">
-    <h6>Group {{ index }}</h6>
+    <h5>Group {{ index }}</h5>
     <calculator-combat-weapons :players="availablePlayers" v-model="model.weapons" />
     <div class="cg-box-objects mb-1">
       <calculator-combat-group-star v-if="model.star" v-model="model.star" @onRemove="removeStar" />
-      <calculator-combat-group-carrier v-for="(carrier, idx) in model.carriers" :key="idx" v-model="model.carriers[idx]" />
+      <calculator-combat-group-carrier v-for="(carrier, idx) in model.carriers" :key="idx" v-model="model.carriers[idx]" @onRemove="removeCarrier" />
     </div>
     <div class="cg-box-group">
       <button class="btn btn-success btn-sm" :disabled="Boolean(model.star) || otherGroupHasStar" @click="addStar">
@@ -17,7 +17,7 @@
         Delete
       </button>
     </div>
-    <div class="cg-box-footer">
+    <div class="cg-box-footer mt-1" v-if="validationErrors.length">
       <p v-for="err of validationErrors" class="text-danger">{{ err }}</p>
     </div>
   </div>
@@ -26,7 +26,7 @@
 import { computed } from 'vue';
 import CalculatorCombatGroupStar from "@/views/game/components/combatcalculator/CalculatorCombatGroupStar.vue";
 import CalculatorCombatGroupCarrier from "@/views/game/components/combatcalculator/CalculatorCombatGroupCarrier.vue";
-import type {CCGroup} from "@/views/game/components/combatcalculator/types";
+import type {CCCarrier, CCGroup} from "@/views/game/components/combatcalculator/types";
 import CalculatorCombatWeapons from "@/views/game/components/combatcalculator/CalculatorCombatWeapons.vue";
 import {useGameStore} from "@/stores/game";
 import type {Game} from "@/types/game";
@@ -56,6 +56,10 @@ const otherGroupHasStar = computed(() => Boolean(props.groups.find((g) => g !== 
 
 const removeStar = () => {
   model.value!.star = undefined;
+};
+
+const removeCarrier = (c: CCCarrier) => {
+  model.value.carriers.splice(model.value.carriers.indexOf(c), 1);
 };
 
 const addStar = () => {

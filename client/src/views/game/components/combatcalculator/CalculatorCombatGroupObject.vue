@@ -43,6 +43,7 @@ const remove = () => emit('onRemove');
   border-radius: 4px;
   flex-basis: 160px;
   flex-grow: 1;
+  max-width: 220px;
 }
 
 .cg-group-object-header {
