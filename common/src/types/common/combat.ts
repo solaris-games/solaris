@@ -36,18 +36,18 @@ export type CombatGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBase
     shipsKilled: number,
 }
 
-export type DetailedCombatResultCarrier<ID, C extends CombatBaseCarrier<ID>> = {
-    carrier: C,
+export interface DetailedCombatResultObject {
     shipsBefore: number,
     shipsAfter: number,
     shipsLost: number,
 }
 
-export type DetailedCombatResultStar<ID, S extends CombatBaseStar<ID>> = {
-    star: S,
-    shipsBefore: number,
-    shipsAfter: number,
-    shipsLost: number,
+export interface DetailedCombatResultCarrier<ID, C extends CombatBaseCarrier<ID>> extends DetailedCombatResultObject {
+    carrier: C;
+}
+
+export interface DetailedCombatResultStar<ID, S extends CombatBaseStar<ID>> extends DetailedCombatResultObject {
+    star: S;
 }
 
 export type DetailedCombatResultGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {

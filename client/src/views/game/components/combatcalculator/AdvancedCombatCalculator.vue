@@ -5,6 +5,7 @@
   <div class="p-2 row">
     <p v-for="err of errors" class="text-danger">{{ err }}</p>
   </div>
+  <hr class="m-0" v-if="result" />
   <div class="p-2 row" v-if="result">
     <calculator-combat-result :result="result" />
   </div>
@@ -85,6 +86,7 @@ const getErrors = (group: CCGroup) => {
 
 const reset = () => {
   groups.value = [];
+  result.value = null;
 }
 
 const calculate = () => {
