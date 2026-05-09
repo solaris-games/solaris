@@ -101,7 +101,7 @@
       class="text-success">Defender</span> would need <span
       class="text-success">{{ result.defender.shipsNeeded }}</span> ship(s) to win.</small></p>
     <p class="col text-center mb-0" v-if="result?.attacker.shipsNeeded"><small><span class="text-danger">Attacker</span>
-      would need <span class="text-danger">{{ result.attacker.shipsNeeded }}</span> ship(s) to win.</small></p>
+      would need approx. <span class="text-danger">{{ result.attacker.shipsNeeded }}</span> ship(s) to win.</small></p>
   </div>
 </template>
 

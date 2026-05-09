@@ -308,7 +308,10 @@ const findGroup = <ID extends Id>(result: CombatResult<ID>, playerId: ID) => {
 }
 
 const estimateNeeded = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>) => {
-    return 0;
+    const otherShips = combatResult.groups.filter(g => g !== estimateForGroup).reduce((sum, g) => sum + g.shipsAfter, 0);
+    const ratio = estimateForGroup.shipsLost / estimateForGroup.shipsKilled;
+
+    return otherShips * ratio;
 }
 
 export class CombatService<ID extends Id> {

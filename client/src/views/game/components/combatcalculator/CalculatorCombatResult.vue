@@ -5,7 +5,7 @@
   </div>
 
   <p class="text-success m-0" v-if="winner && winnerName">{{ winnerName }} wins the battle!</p>
-  <p v-for="needed of neededForOthers" class="text-warning m-0">Group {{result.groups.indexOf(needed.group)}} needed {{needed.needed}} ships to win.</p>
+  <p v-for="needed of neededForOthers" class="text-warning m-0">Group {{result.groups.indexOf(needed.group)}} needed approx. {{needed.needed}} ships to win.</p>
 </div>
 </template>
 <script setup lang="ts">
