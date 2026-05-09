@@ -74,7 +74,7 @@ const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S ext
 
         return [{
             ...group,
-            ships: group.ships - totalDamage,
+            ships: Math.max(0, group.ships - totalDamage),
         }, damageFromGroups];
     });
 
