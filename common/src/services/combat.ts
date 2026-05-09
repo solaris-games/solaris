@@ -1,6 +1,6 @@
 import type {Id} from "../types/id";
-import type {CombatPlayerGrouping, CombatGroupService} from "./combatGroup";
-import type {Star } from "../types/common/star";
+import type {CombatGroupService, CombatPlayerGrouping} from "./combatGroup";
+import type {Star} from "../types/common/star";
 import type {Carrier} from "../types/common/carrier";
 import type {Game} from "../types/common/game";
 import {groupBy} from "../utilities/utils";
@@ -8,14 +8,16 @@ import type {Player} from "../types/common/player";
 import {TechnologyService, type WeaponsDetail} from "./technology";
 import type {Specialist} from "../types/common/specialist";
 import type {
+    BasicCombatResult,
+    CombatBaseCarrier,
+    CombatBasePlayer,
+    CombatBaseStar,
+    CombatGroup,
+    CombatResult,
     DetailedCombatResult,
+    DetailedCombatResultCarrier,
     DetailedCombatResultGroup,
     DetailedCombatResultStar,
-    DetailedCombatResultCarrier,
-    CombatGroup,
-    CombatBaseStar,
-    CombatBaseCarrier,
-    CombatBasePlayer, BasicCombatResult, CombatResult,
 } from "../types/common/combat";
 
 type CombatRoundState<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
@@ -54,9 +56,11 @@ type BasicSideSpec = {
     weaponsLevel: number,
 }
 
-const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(oldState: CombatRoundState<ID, P, S, C>): CombatRoundState<ID, P, S, C> => {
-    const groupsWithDamage: [CombatGroup<ID, P, S, C>, number[]][] = oldState.groups.map((group, groupIdx) => {
-        const damageFromGroups = oldState.groups.map((otherGroup, otherGroupIdx) => {
+type GroupsWithDamage<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = [CombatGroup<ID, P, S, C>, number[]][];
+
+const calculateIncomingDamages = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], attackingGroups: CombatGroup<ID, P, S, C>[]): GroupsWithDamage<ID, P, S, C> => {
+    return groups.map((group, groupIdx) => {
+        const damageFromGroups = attackingGroups.map((otherGroup, otherGroupIdx) => {
             if (groupIdx === otherGroupIdx) {
                 return 0;
             }
@@ -77,8 +81,10 @@ const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S ext
             ships: Math.max(0, group.ships - totalDamage),
         }, damageFromGroups];
     });
+};
 
-    const newGroups = groupsWithDamage.map(([group, _], groupIdx) => {
+const applyDamages =  <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groupsWithDamage: GroupsWithDamage<ID, P, S, C>) => {
+    return groupsWithDamage.map(([group, _], groupIdx) => {
         const damageDoneList = groupsWithDamage.map(([_, dd]) => dd[groupIdx]);
 
         const damageDone = damageDoneList.reduce((sum, d) => sum + d, 0);
@@ -88,6 +94,12 @@ const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S ext
             shipsKilled: damageDone,
         };
     });
+};
+
+const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(oldState: CombatRoundState<ID, P, S, C>): CombatRoundState<ID, P, S, C> => {
+    const groupsWithDamage = calculateIncomingDamages(oldState.groups, oldState.groups);
+
+    const newGroups = applyDamages(groupsWithDamage);
 
     return {
         round: oldState.round + 1,
