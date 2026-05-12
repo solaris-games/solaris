@@ -98,11 +98,9 @@ export default class CarrierCombatService {
 
         const positionGraph = this._getCarrierPositionGraph(carrierPositions);
 
-        for (let carrierPath in positionGraph) {
-            const positions: CarrierPosition[] = positionGraph.get(carrierPath)!;
-
+        for (let positions of positionGraph.values()) {
             if (positions.length <= 1) {
-                continue;
+                return;
             }
 
             const dualCollisions: DualCarrierCollision[] = this._getDualCollisionsInPath(positions);
