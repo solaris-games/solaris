@@ -448,7 +448,7 @@ export default class GameTickService extends EventEmitter {
         const combatStars: Star[] = [];
         let actionWaypoints: CarrierActionWaypoint[] = [];
 
-        const arrivals: CarrierMovementReport[] = new Array(100);
+        const arrivals: CarrierMovementReport[] = [];
 
         for (let i = 0; i < carriersInTransit.length; i++) {
             const carrierInTransit = carriersInTransit[i];
