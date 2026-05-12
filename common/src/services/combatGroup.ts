@@ -33,8 +33,12 @@ export class CombatGroupService<ID extends Id> {
         const mapping: Map<ID, number> = new Map();
 
         let groupIdx = 0;
-        while (queue.length > 0) {
-            const next = queue.pop()!;
+        while (true) {
+            const next = queue.pop();
+            if (!next) {
+                break;
+            }
+
             mapping.set(next._id, groupIdx);
             const group = [next];
 
