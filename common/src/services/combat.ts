@@ -362,13 +362,13 @@ export class CombatService<ID extends Id> {
     }
 
     private _makeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, star: S | undefined, carriers: C[], cgs: CombatPlayerGrouping<ID, P>): CombatGroup<ID, P, S, C>[] {
-        const carriersByPlayerId = groupBy(carriers, (c) => c.ownedByPlayerId!);
+        const carriersByPlayerId = groupBy(carriers, (c) => c.ownedByPlayerId!.toString());
 
         const groups: CombatGroup<ID, P, S, C>[] = cgs.groups.map((g) => {
-            const carriers = g.flatMap((p) => carriersByPlayerId.get(p._id)!);
+            const carriers = g.flatMap((p) => carriersByPlayerId.get(p._id.toString())!);
 
             if (star) {
-                if (g.find((p) => p._id === star?.ownedByPlayerId)) {
+                if (g.find((p) => p._id.toString() === star?.ownedByPlayerId?.toString())) {
                     return this._createGroup<P, S, C>(g, star, carriers);
                 } else {
                     return this._createGroup<P, S, C>(g, undefined, carriers);
@@ -526,7 +526,7 @@ export class CombatService<ID extends Id> {
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
 
-        const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id === p)!);
+        const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id.toString() === p.toString())!);
 
         const combatDiploGroups = this.combatGroupService.computeCombatGroups(game, players);
 
@@ -540,7 +540,7 @@ export class CombatService<ID extends Id> {
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
 
-        const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id === p)!);
+        const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id.toString() === p.toString())!);
 
         const combatDiploGroups = this.combatGroupService.computeCombatGroups(game, players);
 
