@@ -217,7 +217,7 @@ const actionCount = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const actualTerraformingLevel = computed(() => GameHelper.getUserPlayer(store.state.game)?.research?.terraforming?.level ?? 0);
+const actualTerraformingLevel = computed(() => GameHelper.getUserPlayer(store.game!)?.research?.terraforming?.level ?? 0);
 const isCustomTerraforming = computed(() => selectedScheduleStrategy.value === 'now' && terraforming.value !== actualTerraformingLevel.value);
 
 const checkText = computed(() => {
