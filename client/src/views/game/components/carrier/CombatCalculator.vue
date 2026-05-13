@@ -1,6 +1,8 @@
 <template>
     <div class="menu-page container">
-        <menu-title title="Combat Calculator" @onCloseRequested="onCloseRequested"/>
+        <menu-title title="Combat Calculator" @onCloseRequested="onCloseRequested">
+            <a :href="documentationUrl + '/combat.html'" target="_blank" class="btn btn-outline-info btn-sm" title="Documentation"><i class="far fa-question-circle"></i></a>
+        </menu-title>
 
         <div class="row">
             <div class="col-12">
@@ -126,6 +128,7 @@ const emit = defineEmits<{
   onCloseRequested: [e: Event],
 }>();
 
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 const store = useStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
