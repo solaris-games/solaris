@@ -943,7 +943,7 @@ export default class AIService {
         const shipsProduced = this.shipService.calculateStarShipsByTicks(techLevel.manufacturing, starToInvade.infrastructure.industry || 0, ticksToArrival, game.settings.galaxy.productionTicks);
         const shipsAtArrival = (starToInvade.shipsActual || 0) + shipsOnCarriers + shipsProduced;
 
-        return this.combatService.computeBasic({
+        return this.combatService.calculateBasic({
             ships: shipsAtArrival,
             weaponsLevel: techLevel.weapons,
         }, {
@@ -963,6 +963,10 @@ export default class AIService {
         const defenseCarriers = defenseCarriersAtStar.concat(defenseCarriersOnTheWay);
 
         const result = this.combatService.computeStar(game, defendingStar, attackingCarriers.concat(defenseCarriers));
+        if (!result) {
+            return 0;
+        }
+
         const defenderResult = this.combatService.getDefenderDetailed(result);
 
         if (defenderResult && defenderResult.shipsAfter <= 0) {

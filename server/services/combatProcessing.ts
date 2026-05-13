@@ -134,8 +134,8 @@ export default class CombatProcessingService extends EventEmitter {
         };
     }
 
-    async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>> {
-        let combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>;
+    async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>> | undefined> {
+        let combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>> | undefined;
 
         const isOwnedStar = Boolean(star?.ownedByPlayerId);
 
@@ -144,6 +144,11 @@ export default class CombatProcessingService extends EventEmitter {
             combatResult = this.combatService.computeStar(game, star!, carriers);
         } else {
             combatResult = this.combatService.computeCarrier(game, carriers);
+        }
+
+        // no combat happened because diplo
+        if (!combatResult) {
+            return undefined;
         }
 
         // Distribute damage evenly across all objects that are involved in combat.

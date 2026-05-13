@@ -407,7 +407,7 @@ export class CombatService<ID extends Id> {
         return estimateNeeded(combatResult, estimateForGroup);
     }
 
-    computeBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean): BasicCombatResult {
+    calculateBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean): BasicCombatResult {
         const attackMap = (group: number, level: number) => {
             const m = new Map<number, WeaponsDetail>();
             m.set(group, {
@@ -517,11 +517,12 @@ export class CombatService<ID extends Id> {
         };
     }
 
-    computeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
+    calculateGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
         return combatLoop<ID, P, S, C>({round: 0, groups}, isCarrierToStarCombat);
     }
 
-    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {
+    // returns undefined if no combat happens
+    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
         const playerIds = new Set<ID>([star.ownedByPlayerId!]);
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
@@ -529,13 +530,17 @@ export class CombatService<ID extends Id> {
         const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id.toString() === p.toString())!);
 
         const combatDiploGroups = this.combatGroupService.computeCombatGroups(game, players);
+        if (combatDiploGroups.groups.length < 2) {
+            return undefined;
+        }
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, star, carriers, combatDiploGroups);
 
         return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, true);
     }
 
-    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> {
+    // returns undefined if no combat happens
+    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
         const playerIds = new Set<ID>();
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
@@ -543,6 +548,9 @@ export class CombatService<ID extends Id> {
         const players = Array.from(playerIds, (p) => game.galaxy.players.find(pl => pl._id.toString() === p.toString())!);
 
         const combatDiploGroups = this.combatGroupService.computeCombatGroups(game, players);
+        if (combatDiploGroups.groups.length < 2) {
+            return undefined;
+        }
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, undefined, carriers, combatDiploGroups);
 

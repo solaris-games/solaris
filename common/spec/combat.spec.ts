@@ -110,7 +110,7 @@ describe('CombatService – computeBasic', () => {
             // Round 0 (defender first): D=10, A=9.
             // Rounds 1-9 (simultaneous, 1 dmg each side): D-=1, A-=1.
             // After round 9: D=1, A=0 → defender wins.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 1 },
                 { ships: 10, weaponsLevel: 1 },
                 true,
@@ -124,7 +124,7 @@ describe('CombatService – computeBasic', () => {
             // D=10 @ weps 1, A=50 @ weps 1.
             // Round 0: D=10, A=49.
             // 10 more rounds simultaneous: D reaches 0, A still has 39.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 1 },
                 { ships: 50, weaponsLevel: 1 },
                 true,
@@ -138,7 +138,7 @@ describe('CombatService – computeBasic', () => {
             // D=50 @ weps 1, A=10 @ weps 1.
             // Round 0: D=50, A=9.
             // 9 more rounds: D=41, A=0.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 50, weaponsLevel: 1 },
                 { ships: 10, weaponsLevel: 1 },
                 true,
@@ -152,7 +152,7 @@ describe('CombatService – computeBasic', () => {
             // D=10 @ weps 3, A=10 @ weps 1.
             // Round 0: D=10, A=7  (defender deals 3).
             // Round 1: D=9, A=4; Round 2: D=8, A=1; Round 3: D=7, A=0.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 3 },
                 { ships: 10, weaponsLevel: 1 },
                 true,
@@ -166,7 +166,7 @@ describe('CombatService – computeBasic', () => {
             // D=10 @ weps 1, A=10 @ weps 3.
             // Round 0: D=10, A=9.
             // Round 1: D=7, A=8; Round 2: D=4, A=7; Round 3: D=1, A=6; Round 4: D=0, A=5.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 1 },
                 { ships: 10, weaponsLevel: 3 },
                 true,
@@ -179,7 +179,7 @@ describe('CombatService – computeBasic', () => {
         it('mutual destruction – both sides reach zero', () => {
             // D=1 @ weps 1, A=2 @ weps 1.
             // Round 0: D=1, A=1.  Round 1: D=0, A=0.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 1, weaponsLevel: 1 },
                 { ships: 2, weaponsLevel: 1 },
                 true,
@@ -200,7 +200,7 @@ describe('CombatService – computeBasic', () => {
         it('equal ships, equal weapons – mutual destruction (no first-mover)', () => {
             // Both deal 1 damage simultaneously each round.
             // After 10 rounds: both at 0.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 1 },
                 { ships: 10, weaponsLevel: 1 },
                 false,
@@ -213,7 +213,7 @@ describe('CombatService – computeBasic', () => {
         it('attacker has more ships – attacker wins', () => {
             // D=5 @ weps 1, A=10 @ weps 1.
             // After 5 rounds: D=0, A=5.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 5, weaponsLevel: 1 },
                 { ships: 10, weaponsLevel: 1 },
                 false,
@@ -226,7 +226,7 @@ describe('CombatService – computeBasic', () => {
         it('defender has more ships – defender wins', () => {
             // D=10 @ weps 1, A=5 @ weps 1.
             // After 5 rounds: D=5, A=0.
-            const result = service.computeBasic(
+            const result = service.calculateBasic(
                 { ships: 10, weaponsLevel: 1 },
                 { ships: 5, weaponsLevel: 1 },
                 false,
@@ -243,7 +243,7 @@ describe('CombatService – computeBasic', () => {
     // -----------------------------------------------------------------------
 
     it('shipsBefore equals the original ship count for both sides', () => {
-        const result = service.computeBasic(
+        const result = service.calculateBasic(
             { ships: 17, weaponsLevel: 2 },
             { ships: 11, weaponsLevel: 3 },
             true,
@@ -254,7 +254,7 @@ describe('CombatService – computeBasic', () => {
     });
 
     it('shipsLost = shipsBefore - shipsAfter for both sides', () => {
-        const result = service.computeBasic(
+        const result = service.calculateBasic(
             { ships: 20, weaponsLevel: 1 },
             { ships: 15, weaponsLevel: 2 },
             true,
@@ -298,7 +298,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p1', 10, 1, false, [[0, 1]]),
             ];
 
-            const result = service.computeGroups(groups, true);
+            const result = service.calculateGroups(groups, true);
 
             expect(result.groups[0].shipsAfter).toBe(1);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -311,7 +311,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p1', 10, 1, false, [[0, 1]]),
             ];
 
-            const result = service.computeGroups(groups, false);
+            const result = service.calculateGroups(groups, false);
 
             expect(result.groups[0].shipsAfter).toBe(0);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -325,7 +325,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p1',  7, 1, false, [[0, 1]]),
             ];
 
-            const result = service.computeGroups(groups, false);
+            const result = service.calculateGroups(groups, false);
 
             expect(result.groups[0].shipsAfter).toBe(8);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -357,7 +357,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p2',  5, 1, false, [[0, 1], [1, 1]]),
             ];
 
-            const result = service.computeGroups(groups, false);
+            const result = service.calculateGroups(groups, false);
 
             expect(result.groups[0].shipsAfter).toBe(4);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -387,7 +387,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
             ];
 
-            const result = service.computeGroups(groups, true);
+            const result = service.calculateGroups(groups, true);
 
             expect(result.groups[0].shipsAfter).toBe(10);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -421,7 +421,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p2', 15, 1, false, [[0, 1], [1, 1]]),
             ];
 
-            const result = service.computeGroups(groups, true);
+            const result = service.calculateGroups(groups, true);
 
             expect(result.groups[0].shipsAfter).toBe(0);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -448,7 +448,7 @@ describe('CombatService – computeGroups', () => {
                 makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
             ];
 
-            const result = service.computeGroups(groups, false);
+            const result = service.calculateGroups(groups, false);
 
             expect(result.groups[0].shipsAfter).toBe(0);
             expect(result.groups[1].shipsAfter).toBe(0);
@@ -467,7 +467,7 @@ describe('CombatService – computeGroups', () => {
             makeGroup('p1', 12, 1, false, [[0, 1]]),
         ];
 
-        const result = service.computeGroups(groups, false);
+        const result = service.calculateGroups(groups, false);
 
         expect(result.groups[0].shipsBefore).toBe(25);
         expect(result.groups[1].shipsBefore).toBe(12);
@@ -480,7 +480,7 @@ describe('CombatService – computeGroups', () => {
             makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
         ];
 
-        const result = service.computeGroups(groups, false);
+        const result = service.calculateGroups(groups, false);
 
         for (const g of result.groups) {
             expect(g.shipsLost).toBe(g.shipsBefore - g.shipsAfter);
