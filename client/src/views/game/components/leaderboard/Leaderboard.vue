@@ -3,6 +3,7 @@
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
       <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary"
         @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+      <a :href="documentationUrl + '/rankings.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
     </menu-title>
 
     <div class="row">
@@ -110,8 +111,8 @@ import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
 import { notReadyToQuit, quit, readyToQuit } from '@/services/typedapi/game'
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getCountdownTimeStringByTicks, getCountdownTimeStringForTurnTimeout} from "@/util/time";
-
 import { useToast } from 'vue-toast-notification';
+
 const emit = defineEmits<{
   onCloseRequested: [],
   onOpenPlayerDetailRequested: [playerId: string],
@@ -134,6 +135,7 @@ const intervalFunction = ref(0);
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const game = computed<Game<string>>(() => store.game!);
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
 const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);

@@ -89,6 +89,7 @@ export interface PlayerScheduledActions<ID> {
     amount: number;
     repeat: boolean;
     tick: number;
+    active: boolean;
 }
 
 export type Player<ID> = {

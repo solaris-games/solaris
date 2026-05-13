@@ -1,6 +1,8 @@
 <template>
 <div class="menu-page container">
-    <menu-title title="Research" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Research" @onCloseRequested="onCloseRequested">
+        <a :href="documentationUrl + '/technology.html'" target="_blank" class="btn btn-outline-info btn-sm" title="Documentation"><i class="far fa-question-circle"></i></a>
+    </menu-title>
 
     <p><small>Each point of science on your stars contributes <span class="text-info">{{game.constants.research.sciencePointMultiplier}} point<span v-if="game.constants.research.sciencePointMultiplier > 1">s</span></span> of research every tick towards your chosen technology.</small></p>
 
@@ -28,6 +30,7 @@ const onCloseRequested = () => emit('onCloseRequested');
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
+const documentationUrl = computed(() => import.meta.env.VUE_APP_DOCUMENTATION_URL);
 </script>
 
 <style scoped>

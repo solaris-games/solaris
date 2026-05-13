@@ -66,6 +66,7 @@ export interface PlayerScheduledActions {
     amount: number;
     repeat: boolean;
     tick: number;
+    active: boolean;
 }
 
 export interface Player {

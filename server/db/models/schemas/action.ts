@@ -8,7 +8,8 @@ const schema = new Schema({
     buyType: {  type: Types.String, required: true },
     amount: { type: Types.Number, required: true, default: 0, min: 0 },
     repeat: { type: Types.Boolean, required: true, default: false },
-    tick: { type: Types.Number, required: true, default: 0, min: 0 }
+    tick: { type: Types.Number, required: true, default: 0, min: 0 },
+    active: { type: Types.Boolean, required: true, default: true },
 });
 
 export default schema;

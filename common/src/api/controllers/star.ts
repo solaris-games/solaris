@@ -16,6 +16,7 @@ export type BulkUpgradeReq = {
     upgradeStrategy: string;
     infrastructure: InfrastructureType;
     amount: number;
+    terraformingLevel?: number;
 };
 
 export type ScheduleBulkUpgradeReq = {

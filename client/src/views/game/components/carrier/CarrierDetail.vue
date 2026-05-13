@@ -7,6 +7,7 @@
       </modalButton>
       <button v-if="!isHistoricalMode && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
+      <a :href="documentationUrl + '/carriers.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
     </menu-title>
 
     <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
@@ -246,8 +247,8 @@ import type {CarrierWaypoint, MapObject, UserGameSettings} from "@solaris/common
 import {gift, loop, scuttle} from "@/services/typedapi/carrier";
 import {useConfirm} from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";
-
 import { useToast } from 'vue-toast-notification';
+
 const props = defineProps<{
   carrierId: string,
 }>();
@@ -274,6 +275,7 @@ const toast = useToast();
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 const settings = computed<UserGameSettings>(() => store.settings!);
 
 const game = computed<Game>(() => store.game!);
