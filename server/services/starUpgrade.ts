@@ -409,7 +409,7 @@ export default class StarUpgradeService extends EventEmitter {
         return report;
     }
 
-    _getStarsWithNextUpgradeCost(game: Game, player: Player, infrastructureType: InfrastructureType, includeIgnored: boolean = true): UpgradeStarContext {
+    _getStarsWithNextUpgradeCost(game: Game, player: Player, infrastructureType: InfrastructureType, includeIgnored: boolean = true, customTerraformingLevel?: number): UpgradeStarContext {
         let expenseConfig: number | null;
         let calculateCostFunction: (game: Game, expenseConfig: number | null, current: number, terraformedResources: number) => null | number;
 
@@ -446,7 +446,8 @@ export default class StarUpgradeService extends EventEmitter {
 
         const mapStarToUpgrade = (s: Star): UpgradeStar => {
             const effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, s);
-            const terraformedResources = this.starService.calculateTerraformedResource(s.naturalResources[infrastructureType], effectiveTechs.terraforming);
+            const terraformingLevel = customTerraformingLevel ?? effectiveTechs.terraforming;
+            const terraformedResources = this.starService.calculateTerraformedResource(s.naturalResources[infrastructureType], terraformingLevel);
             const infrastructureCost = calculateCostFunction(game, expenseConfig, s.infrastructure[infrastructureType]!, terraformedResources)!;
 
             return {
@@ -610,7 +611,7 @@ export default class StarUpgradeService extends EventEmitter {
         });
     }
 
-    generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {
+    generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, customTerraformingLevel?: number): BulkUpgradeReport {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
@@ -621,13 +622,13 @@ export default class StarUpgradeService extends EventEmitter {
 
         // Get all of the player stars and what the next upgrade cost will be.
         if (upgradeStrategy === 'totalCredits') {
-            return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount);
+            return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, amount, customTerraformingLevel);
         } else if (upgradeStrategy === 'percentageOfCredits') {
-            return this.generateUpgradeBulkReportPercentageOfCredits(game, player, infrastructureType, amount);
+            return this.generateUpgradeBulkReportPercentageOfCredits(game, player, infrastructureType, amount, customTerraformingLevel);
         } else if (upgradeStrategy === 'infrastructureAmount') {
-            return this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount);
+            return this.generateUpgradeBulkReportInfrastructureAmount(game, player, infrastructureType, amount, customTerraformingLevel);
         } else if (upgradeStrategy === 'belowPrice') {
-            return this.generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount);
+            return this.generateUpgradeBulkReportBelowPrice(game, player, infrastructureType, amount, customTerraformingLevel);
         }
 
         throw new Error(`Unsupported upgrade strategy: ${upgradeStrategy}`);
@@ -693,9 +694,9 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    generateUpgradeBulkReportBelowPrice(game: Game, player: Player, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {
+    generateUpgradeBulkReportBelowPrice(game: Game, player: Player, infrastructureType: InfrastructureType, amount: number, customTerraformingLevel?: number): BulkUpgradeReport {
         const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
-        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false, customTerraformingLevel);
 
         const upgradeSummary: BulkUpgradeReport = {
             budget: amount,
@@ -729,11 +730,11 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary
     }
 
-    generateUpgradeBulkReportInfrastructureAmount(game: Game, player: Player, infrastructureType: InfrastructureType, amount: number): BulkUpgradeReport {
+    generateUpgradeBulkReportInfrastructureAmount(game: Game, player: Player, infrastructureType: InfrastructureType, amount: number, customTerraformingLevel?: number): BulkUpgradeReport {
         //Enforce some max size constraint
         amount = Math.min(amount, 200);
         const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
-        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false, customTerraformingLevel);
 
         const upgradeSummary: BulkUpgradeReport = {
             budget: amount,
@@ -765,9 +766,9 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    generateUpgradeBulkReportTotalCredits(game: Game, player: Player, infrastructureType: InfrastructureType, budget: number): BulkUpgradeReport {
+    generateUpgradeBulkReportTotalCredits(game: Game, player: Player, infrastructureType: InfrastructureType, budget: number, customTerraformingLevel?: number): BulkUpgradeReport {
         const ignoredCount = this.starService.listStarsOwnedByPlayerBulkIgnored(game.galaxy.stars, player._id, infrastructureType).length;
-        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false);
+        const upgradeContext = this._getStarsWithNextUpgradeCost(game, player, infrastructureType, false, customTerraformingLevel);
 
         budget = Math.min(budget, player.credits + 10000); // Prevent players from generating reports for stupid amounts of credits
 
@@ -803,10 +804,10 @@ export default class StarUpgradeService extends EventEmitter {
         return upgradeSummary;
     }
 
-    generateUpgradeBulkReportPercentageOfCredits(game: Game, player: Player, infrastructureType: InfrastructureType, percentage: number): BulkUpgradeReport {
+    generateUpgradeBulkReportPercentageOfCredits(game: Game, player: Player, infrastructureType: InfrastructureType, percentage: number, customTerraformingLevel?: number): BulkUpgradeReport {
         percentage = Math.min(100, Math.max(0, percentage));
         const budget = Math.ceil(player.credits * percentage / 100);
-        return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget);
+        return this.generateUpgradeBulkReportTotalCredits(game, player, infrastructureType, budget, customTerraformingLevel);
     }
 
     calculateAverageTerraformedResources(terraformedResources: TerraformedResources) {

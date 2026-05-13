@@ -70,6 +70,21 @@
               <option value="cycle-end">End of cycle</option>
             </select>
           </div>
+          <div class="mb-2 col-3" v-if="selectedScheduleStrategy === 'now'">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-globe-europe"></i>
+              </span>
+              <input v-on:input="resetPreview"
+                     class="form-control"
+                     id="terraforming"
+                     v-model="terraforming"
+                     type="number"
+                     required
+                     :disabled="isChecking || isUpgrading"
+              />
+            </div>
+          </div>
         </div>
         <div class="row" v-if="selectedScheduleStrategy === 'future' || selectedScheduleStrategy === 'cycle-end' || selectedScheduleStrategy === 'cycle-start'">
           <div class="mb-2 input-group col" v-if="selectedScheduleStrategy === 'future'">
@@ -117,10 +132,12 @@
         </div>
         <div class="col-4 pt-2 ps-1">
           <div class="d-grid gap-2">
-            <button class="btn btn-success" v-on:click="upgrade"
-                    :disabled="isHistoricalMode || isUpgrading || isChecking || gameIsFinished()"><i
-              class="fas fa-check me-1"></i>Confirm
-            </button>
+            <span :title="isCustomTerraforming ? 'Preview used a custom terraforming level. Reset it to your actual level to confirm.' : undefined">
+              <button class="btn btn-success w-100" v-on:click="upgrade"
+                      :disabled="isHistoricalMode || isUpgrading || isChecking || gameIsFinished() || isCustomTerraforming"><i
+                class="fas fa-check me-1"></i>Confirm
+              </button>
+            </span>
           </div>
         </div>
         <div class="col-12" v-if="ignoredCount">
@@ -184,6 +201,7 @@ const errors: Ref<string[]> = ref([]);
 const isUpgrading = ref(false);
 const isChecking = ref(false);
 const hasChecked = ref(false);
+const terraforming: Ref<number> = ref(0);
 const upgradePreview: Ref<BulkUpgradeReport<string> | null> = ref(null);
 const amount = ref(0);
 const previewAmount = ref(0);
@@ -199,6 +217,9 @@ const types: Ref<{ key: InfrastructureType, name: string }[]> = ref([]);
 const actionCount = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
+
+const actualTerraformingLevel = computed(() => GameHelper.getUserPlayer(store.state.game)?.research?.terraforming?.level ?? 0);
+const isCustomTerraforming = computed(() => selectedScheduleStrategy.value === 'now' && terraforming.value !== actualTerraformingLevel.value);
 
 const checkText = computed(() => {
   if (selectedScheduleStrategy.value === 'future' || selectedScheduleStrategy.value === 'cycle-end' || selectedScheduleStrategy.value === 'cycle-start') {
@@ -263,7 +284,7 @@ const check = async () => {
   errors.value = [];
   upgradePreview.value = null;
 
-  if (!selectedType.value || amount.value <= 0 || (selectedUpgradeStrategy.value === 'percentageOfCredits' && amount.value > 100)) {
+  if (!selectedType.value || amount.value <= 0 || (selectedUpgradeStrategy.value === 'percentageOfCredits' && amount.value > 100) || terraforming.value < 1) {
     return;
   }
 
@@ -314,6 +335,7 @@ const check = async () => {
       infrastructure: selectedType.value!,
       upgradeStrategy: selectedUpgradeStrategy.value,
       amount: amount.value,
+      terraformingLevel: terraforming.value,
     });
 
     if (isOk(response)) {
@@ -379,6 +401,7 @@ onMounted(() => {
   const userPlayer = GameHelper.getUserPlayer(store.state.game)!;
   amount.value = userPlayer.credits;
   actionCount.value = userPlayer?.scheduledActions?.length || 0;
+  terraforming.value = userPlayer.research?.terraforming?.level ?? 0;
 
   setupInfrastructureTypes();
 });

@@ -85,7 +85,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.upgradeStrategy,
                     reqObj.infrastructure,
-                    +reqObj.amount);
+                    +reqObj.amount,
+                    reqObj.terraformingLevel);
     
                 res.status(200).json(summary);
                 return next();
