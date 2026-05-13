@@ -476,6 +476,8 @@ export type GameUserNotification = {
 	unreadEvents: number | null;
 	unread: number | null;
 	turnWaiting: boolean | null;
+	turnReadyCount: number | null;
+	turnTotalCount: number | null;
 	defeated: boolean | null;
 	afk: boolean | null;
 	position: number | null;
