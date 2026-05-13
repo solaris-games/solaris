@@ -146,41 +146,46 @@ export default class CombatProcessingService extends EventEmitter {
             combatResult = this.combatService.computeCarrier(game, carriers);
         }
 
-        // no combat happened because diplo
-        if (!combatResult) {
-            return undefined;
-        }
-
-        // Distribute damage evenly across all objects that are involved in combat.
-        this._distributeDamage(combatResult);
-
-        if (!this.gameTypeService.isTutorialGame(game)) {
-            await this._updatePlayersCombatAchievements(game, gameUsers, combatResult);
-        }
-
-        // Remove any carriers from the game that have been destroyed.
-        const destroyedCarriers = game.galaxy.carriers.filter(c => !c.ships || Math.floor(c.ships) === 0);
-
-        for (let carrier of destroyedCarriers) {
-            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
-        }
-
         let captureResult: StarCaptureResult<DBObjectId> | null = null;
 
-        if (star) {
-            if (star.ownedByPlayerId) {
-                // capture star because it may be owned by hostile player
-                captureResult = this._starDefeatedCheck(game, star, combatResult, gameUsers);
-            } else {
-                const winnerGroup = this.combatService.getWinnerDetailed(combatResult);
+        if (combatResult) {
+            // Distribute damage evenly across all objects that are involved in combat.
+            this._distributeDamage(combatResult);
 
-                // have to check because of mutual destruction
-                if (winnerGroup) {
-                    const claimingCarrier = maxOf(c => c.shipsAfter, winnerGroup.carriers)!;
+            if (!this.gameTypeService.isTutorialGame(game)) {
+                await this._updatePlayersCombatAchievements(game, gameUsers, combatResult);
+            }
 
-                    this.starService.claimUnownedStar(game, gameUsers, star, claimingCarrier.carrier);
+            // Remove any carriers from the game that have been destroyed.
+            const destroyedCarriers = game.galaxy.carriers.filter(c => !c.ships || Math.floor(c.ships) === 0);
+
+            for (let carrier of destroyedCarriers) {
+                game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(carrier), 1);
+            }
+
+            if (star) {
+                if (star.ownedByPlayerId) {
+                    // capture star because it may be owned by hostile player
+                    captureResult = this._starDefeatedCheck(game, star, combatResult, gameUsers);
+                } else {
+                    const winnerGroup = this.combatService.getWinnerDetailed(combatResult);
+
+                    // have to check because of mutual destruction
+                    if (winnerGroup) {
+                        const claimingCarrier = maxOf(c => c.shipsAfter, winnerGroup.carriers)!;
+
+                        this.starService.claimUnownedStar(game, gameUsers, star, claimingCarrier.carrier);
+                    }
                 }
             }
+        } else if (star && !star.ownedByPlayerId) {
+            const claimingCarrier = maxOf(c => c.ships || 0, carriers)!;
+
+            this.starService.claimUnownedStar(game, gameUsers, star, claimingCarrier);
+        }
+
+        if (!combatResult) {
+            return undefined;
         }
 
         await this._deductReputation(game, combatResult);
