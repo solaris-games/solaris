@@ -42,7 +42,7 @@ export default class ScheduleBuyService extends EventEmitter {
         for (let player of game.galaxy.players) {
             if (player.scheduledActions.length == 0) continue;
             const currentActions = player.scheduledActions
-                .filter(a => a.tick == game.state.tick) // Tick number that we just finished
+                .filter(a => a.tick == game.state.tick && a.active) // Tick number that we just finished
                 .sort((a, b) => {
                     // Take the defined priorities
                     // We sort in the order totalCredits, belowPrice, infrastructureAmount, percentageOfCredits
@@ -130,7 +130,8 @@ export default class ScheduleBuyService extends EventEmitter {
             buyType,
             amount,
             repeat,
-            tick
+            tick,
+            active: true
         }
 
         await this.gameRepo.updateOne({
@@ -149,13 +150,28 @@ export default class ScheduleBuyService extends EventEmitter {
         if (!action) {
             throw new ValidationError('Action does not exist');
         }
-        action.repeat = !action.repeat
+        
+        // Cycle through modes:
+        // 1. repeat && active = Repeat every cycle
+        // 2. repeat && !active = Paused, but repeat every cycle
+        // 3. !repeat && active = One time only
+        if (action.repeat) {
+            if (action.active) {
+                action.active = !action.active;
+            } else {
+                action.active = !action.active;
+                action.repeat = !action.repeat;
+            }
+        } else {
+            action.repeat = !action.repeat;
+        }
 
         await this.gameRepo.updateOne({
             _id: game._id,
         }, {
             $set: {
-                'galaxy.players.$[p].scheduledActions.$[a].repeat': action.repeat
+                'galaxy.players.$[p].scheduledActions.$[a].repeat': action.repeat,
+                'galaxy.players.$[p].scheduledActions.$[a].active': action.active
             }
         }, {
             arrayFilters: [
