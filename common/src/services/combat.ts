@@ -124,11 +124,19 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
     let shipsToKill = group.shipsLost;
 
     const groupObjects: MO<ID, S, C>[] = group.carriers.map(carrier => ({type: 'carrier', carrier}));
+
+    let starRes: DetailedCombatResultStar<ID, S> | undefined = undefined;
+
     if (group.star) {
         groupObjects.push({type: 'star', star: group.star});
-    }
 
-    let starRes: DetailedCombatResultStar<ID, S> | undefined;
+        starRes = {
+            star: group.star,
+            shipsBefore: group.star.ships || 0,
+            shipsLost: 0,
+            shipsAfter: (group.star.ships || 0),
+        };
+    }
     const carriersRes: DetailedCombatResultCarrier<ID, C>[] = [];
 
     const deductShips = (ships: number, obj: MO<ID, S, C>) => {
@@ -178,7 +186,7 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
         });
 
         if (objectsToDeduct.length === 0) {
-            break;
+            throw Error("No more objects to deduct damage from");
         }
 
         objectsToDeduct.sort((a, b) => {
