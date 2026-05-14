@@ -171,11 +171,15 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
     while (shipsToKill > 0) {
         const objectsToDeduct = groupObjects.filter(o => {
             if (o.type === 'carrier') {
-                return getShips(o) > 1; // carrier alive
+                return getShips(o) > 0; // carrier alive
             } else {
                 return getShips(o) > 0; // star alive
             }
         });
+
+        if (objectsToDeduct.length === 0) {
+            break;
+        }
 
         objectsToDeduct.sort((a, b) => {
             const specsIdA = a.type === 'carrier' ? a.carrier.specialistId : a.star.specialistId;
