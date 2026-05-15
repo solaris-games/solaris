@@ -2,25 +2,27 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "test": "ts-node -P tsconfig.json --files ../node_modules/jasmine/bin/jasmine",
-    "start-jobs:dev": "ts-node-dev --transpile-only --respawn --inspect=9230 jobs/index.ts",
+    "test": "tsx ../node_modules/jasmine/bin/jasmine",
+    "start-jobs:dev": "tsx watch --inspect=9230 jobs/index.ts",
     "start-jobs:prod": "node dist/server/jobs/index.js",
-    "start-api:dev": "ts-node-dev --transpile-only --respawn --inspect=9231 api/index.ts",
+    "start-api:dev": "tsx watch --inspect=9231 api/index.ts",
     "start-api:prod": "node dist/server/api/index.js",
-    "start-db-migrate:dev": "ts-node-dev --transpile-only --inspect=9235 tools/migrate.ts",
+    "start-db-migrate:dev": "tsx --inspect=9235 tools/migrate.ts",
     "start-db-migrate:prod": "node dist/server/tools/migrate.js",
-    "start-db-recalc-ranks:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateRankings.ts",
+    "start-db-recalc-ranks:dev": "tsx watch --inspect=9234 tools/recalculateRankings.ts",
     "start-db-recalc-ranks:prod": "node dist/server/tools/recalculateRankings.js",
-    "start-db-recalc-stats:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/recalculateStats.ts",
+    "start-db-recalc-stats:dev": "tsx watch --inspect=9234 tools/recalculateStats.ts",
     "start-db-recalc-stats:prod": "node dist/server/tools/recalculateStats.js",
-    "start-db-sync-indices:dev": "ts-node-dev --transpile-only --respawn --inspect=9234 tools/syncIndices.ts",
+    "start-db-sync-indices:dev": "tsx watch --inspect=9234 tools/syncIndices.ts",
     "start-db-sync-indices:prod": "node dist/server/tools/syncIndices.js",
-    "restore-game": "ts-node-dev --transpile-only tools/restoreGame.ts",
+    "restore-game": "tsx tools/restoreGame.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "mkdir -p ./dist/server/services/emailTemplates && cp -r services/emailTemplates/* ./dist/server/services/emailTemplates && cp .env ./dist | true",
-    "ts-node": "ts-node",
     "check": "tsc --noEmit"
   },
   "author": "",
@@ -56,9 +58,8 @@
     "@types/express-session": "1.17.10",
     "@types/jasmine": "5.1.5",
     "@types/compression": "1.8.1",
-    "@types/node": "17.0.17",
+    "@types/node": "^24",
     "jasmine": "5.5.0",
-    "ts-node": "10.9.2",
-    "ts-node-dev": "2.0.0"
+    "tsx": "^4.19.4"
   }
 }

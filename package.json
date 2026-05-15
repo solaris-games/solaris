@@ -10,6 +10,9 @@
         "client/",
         "server/"
     ],
+    "engines": {
+        "node": ">=24"
+    },
     "devDependencies": {
         "typescript": "5.9.3"
     }

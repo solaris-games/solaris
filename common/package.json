@@ -1,8 +1,9 @@
 {
   "name": "@solaris/common",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "test": "ts-node -P tsconfig.spec.json --files ../node_modules/jasmine/bin/jasmine",
+    "test": "tsx ../node_modules/jasmine/bin/jasmine",
     "check": "tsc",
     "build": "tsc"
   },
