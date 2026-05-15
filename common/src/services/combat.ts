@@ -217,8 +217,8 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
 
         const killPerObject = shipsToKill / objectsToDeduct.length;
 
-        for (let obj of objectsToDeduct) {
-            const killForObj = Math.floor(killPerObject);
+        for (let [idx, obj] of objectsToDeduct.entries()) {
+            const killForObj = idx === 0 ? Math.ceil(killPerObject) : Math.floor(killPerObject);
 
             const shipsRemain = getShips(obj);
 

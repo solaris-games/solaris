@@ -488,4 +488,88 @@ describe('CombatService – computeGroups', () => {
         }
     });
 
+    // -----------------------------------------------------------------------
+    // Multi-carrier damage distribution
+    //
+    // These tests exercise distributeDamage when a group has more than one
+    // carrier, specifically the case where shipsLost is not evenly divisible
+    // by the number of live carriers.  Without the Math.ceil fix the loop
+    // hangs because Math.floor(shipsToKill / carriers) rounds down to 0 for
+    // every carrier, so shipsToKill never decrements.
+    // -----------------------------------------------------------------------
+
+    it('multi-carrier group: odd shipsLost across two carriers does not hang', () => {
+        // G0 has two carriers (1 ship each, 2 total); G1 has 3 ships.
+        // C-to-C, simultaneous: G0 deals 1/round to G1, G1 deals 1/round to G0.
+        // After round 1: G0 ships=1 (lost 1), G1 ships=2.
+        // After round 2: G0 ships=0, G1 ships=1.
+        // G0 loses 2 ships total across 2 carriers (1 each) – evenly divisible.
+        // G1 loses 2 ships in its single carrier.
+        // The interesting case is a prior round result where G0 loses 1 ship
+        // across 2 carriers (shipsToKill=1, objectsToDeduct.length=2 → floor=0).
+        const multiCarrierGroup: TestGroup = {
+            id: 'p0',
+            originalShips: 2,
+            ships: 2,
+            isDefender: false,
+            attackAgainst: makeAttackMap([[1, 1]]),
+            players: [makePlayer('p0', 1)],
+            carriers: [
+                makeCarrier('p0-c1', 'p0', 1),
+                makeCarrier('p0-c2', 'p0', 1),
+            ],
+            star: undefined,
+            shipsKilled: 0,
+        };
+        const groups: TestGroup[] = [
+            multiCarrierGroup,
+            makeGroup('p1', 3, 1, false, [[0, 1]]),
+        ];
+
+        const result = service.calculateGroups(groups, false);
+
+        // G1 wins: G0 is destroyed after 2 rounds, G1 has 1 ship left.
+        expect(result.groups[0].shipsAfter).toBe(0);
+        expect(result.groups[1].shipsAfter).toBe(1);
+        // Total ships lost across G0's carriers must equal shipsLost.
+        const g0 = result.groups[0];
+        expect(g0.shipsLost).toBe(g0.shipsBefore - g0.shipsAfter);
+    });
+
+    it('multi-carrier group: shipsLost indivisible by three carriers does not hang', () => {
+        // G0 has three carriers (2 ships each, 6 total); G1 has 8 ships.
+        // G0 loses 2 ships per round; after 3 rounds G0 has 0 ships.
+        // shipsLost=6, carriers=3 → evenly divides, but intermediate rounds
+        // lose 2 ships across 3 carriers (floor(2/3)=0 per carrier without fix).
+        const multiCarrierGroup: TestGroup = {
+            id: 'p0',
+            originalShips: 6,
+            ships: 6,
+            isDefender: false,
+            attackAgainst: makeAttackMap([[1, 2]]),
+            players: [makePlayer('p0', 2)],
+            carriers: [
+                makeCarrier('p0-c1', 'p0', 2),
+                makeCarrier('p0-c2', 'p0', 2),
+                makeCarrier('p0-c3', 'p0', 2),
+            ],
+            star: undefined,
+            shipsKilled: 0,
+        };
+        const groups: TestGroup[] = [
+            multiCarrierGroup,
+            makeGroup('p1', 8, 1, false, [[0, 1]]),
+        ];
+
+        const result = service.calculateGroups(groups, false);
+
+        // G0 wins with 2 ships remaining.
+        expect(result.groups[0].shipsAfter).toBe(2);
+        expect(result.groups[1].shipsAfter).toBe(0);
+        // shipsLost consistency
+        for (const g of result.groups) {
+            expect(g.shipsLost).toBe(g.shipsBefore - g.shipsAfter);
+        }
+    });
+
 });
