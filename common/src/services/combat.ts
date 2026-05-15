@@ -52,25 +52,30 @@ type BasicSideSpec = {
     weaponsLevel: number,
 }
 
-type GroupsWithDamage<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = [CombatGroup<ID, P, S, C>, number[]][];
+type GroupsWithDamage<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = [CombatGroup<ID, P, S, C>, Map<string, number>][];
 
 const calculateIncomingDamages = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], attackingGroups: CombatGroup<ID, P, S, C>[]): GroupsWithDamage<ID, P, S, C> => {
     return groups.map((group, groupIdx) => {
-        const damageFromGroups = attackingGroups.map((otherGroup, otherGroupIdx) => {
-            if (groupIdx === otherGroupIdx) {
-                return 0;
+        const damageFromGroups = new Map<string, number>();
+        let totalDamage = 0;
+
+        attackingGroups.forEach((otherGroup) => {
+            if (group.id === otherGroup.id) {
+                return;
             }
 
             const dmgFromOther = otherGroup.attackAgainst.get(groupIdx)!;
 
+            let damage;
             if (otherGroup.ships < dmgFromOther.total) {
-                return otherGroup.ships;
+                damage = otherGroup.ships;
             } else {
-                return dmgFromOther.total;
+                damage = dmgFromOther.total;
             }
-        });
 
-        const totalDamage = damageFromGroups.reduce((sum, d) => sum + d, 0);
+            damageFromGroups.set(otherGroup.id, damage);
+            totalDamage += damage;
+        });
 
         return [{
             ...group,
@@ -80,8 +85,8 @@ const calculateIncomingDamages = <ID extends Id, P extends CombatBasePlayer<ID>,
 };
 
 const applyDamages =  <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groupsWithDamage: GroupsWithDamage<ID, P, S, C>) => {
-    return groupsWithDamage.map(([group, _], groupIdx) => {
-        const damageDoneList = groupsWithDamage.map(([_, dd]) => dd[groupIdx]);
+    return groupsWithDamage.map(([group, _]) => {
+        const damageDoneList = groupsWithDamage.map(([_, dd]) => dd.get(group.id) || 0);
 
         const damageDone = damageDoneList.reduce((sum, d) => sum + d, 0);
 
@@ -337,10 +342,11 @@ export class CombatService<ID extends Id> {
         this.specialistService = specialistService;
     }
 
-    private _createGroup<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(players: P[], star: S | undefined, carriers: C[]): CombatGroup<ID, P, S, C> {
+    private _createGroup<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(id: string, players: P[], star: S | undefined, carriers: C[]): CombatGroup<ID, P, S, C> {
         const totalShips = carriers.reduce((sum, c) => sum + (c.ships || 0), 0) + (star ? (star.ships || 0) : 0);
 
         return {
+            id,
             originalShips: totalShips,
             ships: totalShips,
             isDefender: Boolean(star),
@@ -363,7 +369,7 @@ export class CombatService<ID extends Id> {
             for (let otherGroupIdx = 0; otherGroupIdx < groups.length; otherGroupIdx++) {
                 const otherGroup = groups[otherGroupIdx];
 
-                if (group === otherGroup) {
+                if (group.id === otherGroup.id) {
                     continue;
                 }
 
@@ -376,19 +382,21 @@ export class CombatService<ID extends Id> {
     private _makeGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, star: S | undefined, carriers: C[], cgs: CombatPlayerGrouping<ID, P>): CombatGroup<ID, P, S, C>[] {
         const carriersByPlayerId = groupBy(carriers, (c) => c.ownedByPlayerId!.toString());
 
-        const groups: CombatGroup<ID, P, S, C>[] = cgs.groups.map((g) => {
+        const groups: CombatGroup<ID, P, S, C>[] = cgs.groups.map((g, idx) => {
             const carriers = g.flatMap((p) => {
                 return carriersByPlayerId.get(p._id.toString()) || [];
             });
 
+            const id = `Group ${idx}`;
+
             if (star) {
                 if (g.find((p) => p._id.toString() === star?.ownedByPlayerId?.toString())) {
-                    return this._createGroup<P, S, C>(g, star, carriers);
+                    return this._createGroup<P, S, C>(id, g, star, carriers);
                 } else {
-                    return this._createGroup<P, S, C>(g, undefined, carriers);
+                    return this._createGroup<P, S, C>(id, g, undefined, carriers);
                 }
             } else {
-                return this._createGroup<P, S, C>(g, undefined, carriers);
+                return this._createGroup<P, S, C>(id, g, undefined, carriers);
             }
         });
 
@@ -435,6 +443,7 @@ export class CombatService<ID extends Id> {
 
         const carrierGroup = (id: string, weapons: number, ships: number, ownId: number) => {
             return {
+                id,
                 players: [
                     {
                         _id: id,
@@ -465,6 +474,7 @@ export class CombatService<ID extends Id> {
 
         const starGroup = (id: string, weapons: number, ships: number) => {
             return {
+                id,
                 players: [
                     {
                         _id: id,

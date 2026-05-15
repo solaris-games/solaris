@@ -26,6 +26,7 @@ export interface CombatBasePlayer<ID> {
 }
 
 export type CombatGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+    id: string,
     originalShips: number,
     ships: number,
     isDefender: boolean,

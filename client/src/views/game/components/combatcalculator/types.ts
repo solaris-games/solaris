@@ -71,6 +71,7 @@ export const makeCombatGroups = (game: Game, gr: CCGroup[], combatService: Comba
     };
 
     return {
+      id: `Group ${idx}`,
       originalShips: totalShips,
       ships: totalShips,
       isDefender: Boolean(g.star),
