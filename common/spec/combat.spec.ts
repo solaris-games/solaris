@@ -70,6 +70,7 @@ function makeGroup(
     const carrier = makeCarrier(`${id}-carrier`, id, ships);
 
     return {
+        id,
         originalShips: ships,
         ships,
         isDefender,
