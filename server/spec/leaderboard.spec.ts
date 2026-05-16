@@ -142,7 +142,7 @@ describe('Leaderboard - Last man standing', () => {
         game.galaxy.players[1].userId = null;
         game.galaxy.players[2].userId = null;
 
-        playerAfkService.isAIControlled = (game: Game, player: Player, includePseudoAfk: boolean) => { return player._id.toString() !== game.galaxy.players[0]._id.toString(); }
+        playerAfkService.isAIControlled = (game: Game, player: Player) => { return player._id.toString() !== game.galaxy.players[0]._id.toString(); }
 
         const result = service.getLastManStanding(game, leaderboard);
 
@@ -154,7 +154,7 @@ describe('Leaderboard - Last man standing', () => {
         game.galaxy.players[1].userId = null;
         game.galaxy.players[2].userId = null;
 
-        playerAfkService.isAIControlled = (game: Game, player: Player, includePseudoAfk: boolean) => { return true; }
+        playerAfkService.isAIControlled = (game: Game, player: Player) => { return true; }
 
         const result = service.getLastManStanding(game, leaderboard);
 

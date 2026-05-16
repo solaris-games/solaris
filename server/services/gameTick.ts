@@ -890,7 +890,7 @@ export default class GameTickService extends EventEmitter {
             await this.statisticsService.closeStatsSlicesForGame(game);
 
             for (const player of game.galaxy.players) {
-                if (this.playerAfkService.isAIControlled(game, player, true)) {
+                if (this.playerAfkService.isAIControlled(game, player)) {
                     this.aiService.cleanupState(player);
                 }
             }
@@ -965,7 +965,7 @@ export default class GameTickService extends EventEmitter {
     }
 
     async _playAI(game: Game) {
-        for (let player of game.galaxy.players.filter(p => this.playerAfkService.isAIControlled(game, p, true))) {
+        for (let player of game.galaxy.players.filter(p => this.playerAfkService.isAIControlled(game, p))) {
             await this.aiService.play(game, player);
         }
     }
