@@ -1,6 +1,6 @@
 import { DBObjectId } from "../../services/types/DBObjectId";
 import { InfrastructureType } from "../../services/types/Star";
-import {boolean, numberAdv, object, string, stringEnumeration, Validator} from "solaris-common";
+import {boolean, maybeUndefined, numberAdv, object, string, stringEnumeration, Validator} from "solaris-common";
 import {objectId} from "../../utils/validation";
 
 export interface StarUpgradeInfrastructureRequest {
@@ -15,6 +15,7 @@ export interface StarUpgradeInfrastructureBulkRequest {
     upgradeStrategy: string;
     infrastructure: InfrastructureType;
     amount: number;
+    terraformingLevel?: number;
 };
 
 const infrastructureValidator = stringEnumeration<InfrastructureType, InfrastructureType[]>(['economy', 'industry', 'science']);
@@ -26,6 +27,10 @@ export const parseStarUpgradeInfrastructureBulkRequest: Validator<StarUpgradeInf
         integer: true,
         sign: 'positive',
     }),
+    terraformingLevel: maybeUndefined(numberAdv({
+        integer: true,
+        sign: 'positive',
+    })),
 });
 
 export interface ScheduledStarUpgradeInfrastructureBulkRequest {

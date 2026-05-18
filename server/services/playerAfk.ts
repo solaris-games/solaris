@@ -93,41 +93,9 @@ export default class PlayerAfkService extends EventEmitter {
     }
 
 
-    isAIControlled(game: Game, player: Player, includePseudoAfk: boolean) {
+    isAIControlled(game: Game, player: Player) {
         // Defeated players or players not controlled by a user are controlled by AI.
-        if (player.defeated || !player.userId) {
-            return true;
-        }
-
-        // Pseudo AFK players are players who haven't been online for a while but haven't yet reached the AFK timeout,
-        // we want these players to be controlled by AI until they come online or are kicked.
-        if (includePseudoAfk) {
-            return this.isPsuedoAfk(game, player);
-        }
-        
-        return false;
-    }
-
-    isPsuedoAfk(game: Game, player: Player) {
-        if (!this.gameStateService.isStarted(game)) {
-            return false;
-        }
-        
-        let startDate = moment(game.state.startDate).utc();
-        let startDatePlus12h = moment(game.state.startDate).add(12, 'hours');
-        let now = moment().utc();
-
-        // We want to give players at least a 12h from the start of the game.
-        if (now < startDatePlus12h) {
-            return false;
-        }
-
-        // If the player hasn't been seen since the start of the game then let the AI take over.
-        if (player.lastSeen == null || moment(player.lastSeen).utc() <= startDate) {
-            return true;
-        }
-        
-        return false;
+        return player.defeated || !player.userId;
     }
 
     isAfk(game: Game, player: Player) {
@@ -142,7 +110,7 @@ export default class PlayerAfkService extends EventEmitter {
 
         // If the player is AI controlled, then they are not AFK.
         // Note: Don't include pseudo afk, only legit actual afk players.
-        if (this.isAIControlled(game, player, false)) {
+        if (this.isAIControlled(game, player)) {
             return false;
         }
 

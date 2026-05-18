@@ -3,6 +3,7 @@
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
       <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary"
         @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
+      <a :href="documentationUrl + '/rankings.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
     </menu-title>
 
     <div class="row">
@@ -134,6 +135,7 @@ const intervalFunction = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 const game = computed<Game<string>>(() => store.state.game);
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));

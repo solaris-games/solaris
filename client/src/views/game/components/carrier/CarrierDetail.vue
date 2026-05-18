@@ -7,6 +7,7 @@
       </modalButton>
       <button v-if="!isHistoricalMode && isOwnedByUserPlayer" @click="onCarrierRenameRequested" class="btn btn-sm btn-outline-success ms-1"><i class="fas fa-pencil-alt"></i></button>
       <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
+      <a :href="documentationUrl + '/carriers.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
     </menu-title>
 
     <div class="row bg-dark" :class="{'bg-warning': carrier.isGift}">
@@ -268,6 +269,7 @@ const toast = inject(toastInjectionKey)!;
 const isLoopingWaypoints = ref(false);
 const isGiftingCarrier = ref(false);
 
+const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
 const settings = computed<UserGameSettings>(() => store.state.settings);
 
 const game = computed<Game>(() => store.state.game);
