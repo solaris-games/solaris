@@ -1,191 +1,132 @@
-import type {Location, UserGameSettings} from "@solaris/common";
-import gameHelper from "@/services/gameHelper";
-import type {Game} from "@/types/game";
-import type {DrawingContext} from "@/game/container";
+import type { UserGameSettings } from "@solaris/common";
+import type { Game } from "@/types/game";
+import type { DrawingContext } from "@/game/container";
 import { Container, Graphics } from 'pixi.js';
-import Voronoi from '../../voronoi/Javascript-Voronoi/rhill-voronoi-core.js';
-import {colorFromString} from "@/util/colour";
+import { Delaunay } from 'd3-delaunay';
+import { colorFromString } from "@/util/colour";
+import gameHelper from "@/services/gameHelper";
 
-const MAX_VORONOI_DISTANCE = 200
-
-type Site = {
-  x: number;
-  y: number;
-  playerID: string | null;
-}
-
-type Position = {
-  x: number;
-  y: number;
-}
-
-const _sanitizeVoronoiPoint = (site: Location, point: Location) => {
-  const distance = gameHelper.getDistanceBetweenLocations(site, point)
-  const angle = gameHelper.getAngleBetweenLocations(site, point)
-
-  if (distance > MAX_VORONOI_DISTANCE) {
-    return gameHelper.getPointFromLocation(site, angle, MAX_VORONOI_DISTANCE)
-  }
-
-  return point;
-}
+const MAX_VORONOI_DISTANCE = 50;
 
 export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSettings, context: DrawingContext, container: Container) => {
-  container.alpha = 1;
+    container.alpha = 1;
 
-  const voronoi = new Voronoi.Voronoi();
+    const stars = game.galaxy.stars;
+    if (stars.length === 0) return;
 
-  const minX = gameHelper.calculateMinStarX(game);
-  const minY = gameHelper.calculateMinStarY(game);
-  const maxX = gameHelper.calculateMaxStarX(game);
-  const maxY = gameHelper.calculateMaxStarY(game);
+    const minX = gameHelper.calculateMinStarX(game);
+    const minY = gameHelper.calculateMinStarY(game);
+    const maxX = gameHelper.calculateMaxStarX(game);
+    const maxY = gameHelper.calculateMaxStarY(game);
 
-  const boundingBox = {
-    xl: minX - MAX_VORONOI_DISTANCE,
-    xr: maxX + MAX_VORONOI_DISTANCE,
-    yt: minY - MAX_VORONOI_DISTANCE,
-    yb: maxY + MAX_VORONOI_DISTANCE
-  };
+    // Build flat coordinate array and player ID index
+    const coords = new Float64Array(stars.length * 2);
+    const playerIDs: (string | null)[] = new Array(stars.length);
 
-  let sites: Site[] = []
-
-  for (let star of game.galaxy.stars) {
-    sites.push({
-      x: star.location.x,
-      y: star.location.y,
-      playerID: star.ownedByPlayerId
-    })
-  }
-
-  let diagram = voronoi.compute(sites, boundingBox)
-
-  let borders: {
-    lSite: Site,
-    rSite: Site,
-    va: any,
-    vb: any
-  }[] = [
-  ];
-
-  for (let edge of diagram.edges) {
-    if (edge.lSite && edge.rSite) {
-      if (edge.lSite.playerID !== edge.rSite.playerID) {
-        borders.push(edge)
-      }
-    }
-  }
-
-  let borderWidth = +userSettings.map.voronoiCellBorderWidth
-
-  let allPoints = new Map()
-
-  const getPoint = (point) => {
-    return allPoints.get(point).reduce((pointA, pointB) => {
-      return { x: pointA.x + pointB.x / allPoints.get(point).length, y: pointA.y + pointB.y / allPoints.get(point).length }
-    }, { x: 0, y: 0 })
-  }
-
-  const endpointCheck = (cell, endpoint) => {
-    if (allPoints.has(endpoint)) {
-      let newPoint = _sanitizeVoronoiPoint(cell.site, endpoint)
-      let ListPoints = allPoints.get(endpoint)
-      if (ListPoints.every(point => point.x !== newPoint.x && point.y !== newPoint.y)) ListPoints.push(newPoint)
-    } else {
-      allPoints.set(endpoint, [_sanitizeVoronoiPoint(cell.site, endpoint)])
-    }
-  }
-
-  for (let cell of diagram.cells) {
-    for (let halfedge of cell.halfedges) {
-      endpointCheck(cell, halfedge.getStartpoint())
-      endpointCheck(cell, halfedge.getEndpoint())
-    }
-  }
-
-  // Draw the cells
-  for (let cell of diagram.cells) {
-    let star = game.galaxy.stars.find(s => s.location.x === cell.site.x && s.location.y === cell.site.y)!;
-
-    let colour = 0x000000
-
-    if (star.ownedByPlayerId) {
-      colour = colorFromString(context.getPlayerColour(star.ownedByPlayerId));
+    for (let i = 0; i < stars.length; i++) {
+        coords[i * 2]     = stars[i].location.x;
+        coords[i * 2 + 1] = stars[i].location.y;
+        playerIDs[i]      = stars[i].ownedByPlayerId ?? null;
     }
 
-    let points: Position[] = []
+    const delaunay = new Delaunay(coords);
+    const bounds: [number, number, number, number] = [
+        minX - MAX_VORONOI_DISTANCE,
+        minY - MAX_VORONOI_DISTANCE,
+        maxX + MAX_VORONOI_DISTANCE,
+        maxY + MAX_VORONOI_DISTANCE,
+    ];
+    const voronoi = delaunay.voronoi(bounds);
 
-    for (let halfedge of cell.halfedges) {
-      points.push(halfedge.getStartpoint())
-      points.push(halfedge.getEndpoint())
+    const alpha = userSettings.map.territoryOpacity;
+
+    for (let i = 0; i < stars.length; i++) {
+        const cell = voronoi.cellPolygon(i);
+        if (!cell || cell.length < 3) continue;
+
+        const colour = playerIDs[i]
+            ? colorFromString(context.getPlayerColour(playerIDs[i]!))
+            : 0x000000;
+
+        const g = new Graphics();
+        g.moveTo(cell[0][0], cell[0][1]);
+        for (let j = 1; j < cell.length; j++) {
+            g.lineTo(cell[j][0], cell[j][1]);
+        }
+        g.fill({ color: colour, alpha });
+        container.addChild(g);
     }
 
-    // Do not draw points that are more than X distance away from the star.
-    // let sanitizedPoints = points
-    let sanitizedPoints = points.map(getPoint)
+    const borderWidth = userSettings.map.voronoiTerritoryBorderWidth;
+    if (borderWidth <= 0) return;
 
-    if (sanitizedPoints.length) {
-      // Draw the graphic
-      let territoryGraphic = new Graphics()
-      territoryGraphic.moveTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+    const borderGraphics = new Graphics();
 
-      for (let point of sanitizedPoints) {
-        territoryGraphic.lineTo(point.x, point.y)
-      }
+    const cellPolys = stars.map((_, i) => voronoi.cellPolygon(i));
 
-      // Draw another line back to the origin.
-      territoryGraphic.lineTo(sanitizedPoints[0].x, sanitizedPoints[0].y)
+    for (let i = 0; i < stars.length; i++) {
+        const ci = cellPolys[i];
+        if (!ci) continue;
 
-      territoryGraphic.fill({
-        color: colour,
-        alpha: 0.3,
-      });
+        // Build an edge set for cell i: key "ax,ay,bx,by" for each directed edge a→b
+        const ciEdgeSet = new Set<string>();
+        for (let k = 0; k + 1 < ci.length; k++) {
+            const a = ci[k], b = ci[k + 1];
+            ciEdgeSet.add(`${a[0]},${a[1]},${b[0]},${b[1]}`);
+        }
 
-      container.addChild(territoryGraphic);
+        for (const j of delaunay.neighbors(i)) {
+            if (j <= i) continue; // process each pair once
+            if (playerIDs[i] === playerIDs[j]) continue;
+
+            const cj = cellPolys[j];
+            if (!cj) continue;
+
+            // The shared Voronoi edge appears as a→b in cell i and b→a in cell j.
+            // Iterate cell j edges (each b→a) and look for a→b in cell i's edge set.
+            let sharedA: [number, number] | null = null;
+            let sharedB: [number, number] | null = null;
+
+            for (let k = 0; k + 1 < cj.length; k++) {
+                const b = cj[k], a = cj[k + 1];
+                if (ciEdgeSet.has(`${a[0]},${a[1]},${b[0]},${b[1]}`)) {
+                    sharedA = a;
+                    sharedB = b;
+                    break;
+                }
+            }
+
+            if (!sharedA || !sharedB) continue;
+
+            const [ax, ay] = sharedA;
+            const [bx, by] = sharedB;
+
+            const angle = Math.atan2(by - ay, bx - ax);
+            const halfW = borderWidth / 2;
+            const leftAngle  = angle + Math.PI / 2;
+            const rightAngle = angle - Math.PI / 2;
+            const clx = Math.cos(leftAngle)  * halfW;
+            const cly = Math.sin(leftAngle)  * halfW;
+            const crx = Math.cos(rightAngle) * halfW;
+            const cry = Math.sin(rightAngle) * halfW;
+
+            // Left side of a→b is cell i's territory; right side is cell j's
+            const colourI = playerIDs[i]
+                ? colorFromString(context.getPlayerColour(playerIDs[i]!))
+                : 0x000000;
+            const colourJ = playerIDs[j]
+                ? colorFromString(context.getPlayerColour(playerIDs[j]!))
+                : 0x000000;
+
+            borderGraphics.moveTo(ax + clx, ay + cly);
+            borderGraphics.lineTo(bx + clx, by + cly);
+            borderGraphics.stroke({ width: borderWidth, color: colourI });
+
+            borderGraphics.moveTo(ax + crx, ay + cry);
+            borderGraphics.lineTo(bx + crx, by + cry);
+            borderGraphics.stroke({ width: borderWidth, color: colourJ });
+        }
     }
-  }
 
-  // Draw the cell territory borders
-  borderWidth = +userSettings.map.voronoiTerritoryBorderWidth
-
-  let borderGraphics = new Graphics()
-
-  for (let border of borders) {
-    let borderVA = getPoint(border.va)
-    let borderVB = getPoint(border.vb)
-    let leftNormalAngle = gameHelper.getAngleBetweenLocations(borderVA, borderVB) + Math.PI / 2.0
-    let leftVA = gameHelper.getPointFromLocation(borderVA, leftNormalAngle, borderWidth / 2.0)
-    let leftVB = gameHelper.getPointFromLocation(borderVB, leftNormalAngle, borderWidth / 2.0)
-
-    let rightNormalAngle = gameHelper.getAngleBetweenLocations(borderVA, borderVB) - Math.PI / 2.0
-    let rightVA = gameHelper.getPointFromLocation(borderVA, rightNormalAngle, borderWidth / 2.0)
-    let rightVB = gameHelper.getPointFromLocation(borderVB, rightNormalAngle, borderWidth / 2.0)
-
-    let colour = 0x000000
-
-    if (border.lSite.playerID) {
-      colour = colorFromString(context.getPlayerColour(border.lSite.playerID));
-    }
-
-    borderGraphics.moveTo(rightVA.x, rightVA.y)
-    borderGraphics.lineTo(rightVB.x, rightVB.y)
-    borderGraphics.stroke({
-      width: borderWidth,
-      color: colour,
-    });
-
-    colour = 0x000000
-
-    if (border.rSite.playerID) {
-      colour = colorFromString(context.getPlayerColour(border.rSite.playerID));
-    }
-
-    borderGraphics.moveTo(leftVA.x, leftVA.y)
-    borderGraphics.lineTo(leftVB.x, leftVB.y)
-    borderGraphics.stroke({
-      width: borderWidth,
-      color: colour,
-    });
-  }
-
-  container.addChild(borderGraphics);
+    container.addChild(borderGraphics);
 }

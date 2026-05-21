@@ -19,6 +19,7 @@
     "axios": "1.15.2",
     "bootstrap": "5.3.8",
     "chart.js": "4.5.1",
+    "d3-delaunay": "6.0.4",
     "date-fns": "4.1.0",
     "jquery": "3.6.0",
     "js-cookie": "3.0.5",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/random-seed": "0.3.5",
+    "@types/d3-delaunay": "6.0.4",
     "@vitejs/plugin-vue": "6.0.6",
     "@vue/tsconfig": "0.9.1",
     "less": "4.6.4",
