@@ -249,6 +249,7 @@ export default class CombatProcessingService extends EventEmitter {
             const owner = this.playerService.getById(game, star.ownedByPlayerId!)!;
             const ownerUser = this._findUser(gameUsers, owner);
             const attackerUsers = lastAliveGroup.players.map(p => this._findUser(gameUsers, p)).filter(notUndefined);
+
             return this.starCaptureService.captureStar(game, star, owner, ownerUser, lastAliveGroup.players, attackerUsers, lastAliveGroup.carriers.map(r => r.carrier));
         }
 

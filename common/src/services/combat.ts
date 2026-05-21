@@ -31,9 +31,11 @@ interface ISpecialistService {
     getByIdCarrier(id: number): Specialist | null;
 }
 
-type MO<ID, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = { type: 'carrier', carrier: C } | {
+type MO<ID, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> =
+    { type: 'carrier', carrier: DetailedCombatResultCarrier<ID, C> }
+    | {
     type: 'star',
-    star: S
+    star: DetailedCombatResultStar<ID, S>
 };
 
 type CombatResultGrouped<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
@@ -84,7 +86,7 @@ const calculateIncomingDamages = <ID extends Id, P extends CombatBasePlayer<ID>,
     });
 };
 
-const applyDamages =  <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groupsWithDamage: GroupsWithDamage<ID, P, S, C>) => {
+const applyDamages = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groupsWithDamage: GroupsWithDamage<ID, P, S, C>) => {
     return groupsWithDamage.map(([group, _]) => {
         const damageDoneList = groupsWithDamage.map(([_, dd]) => dd.get(group.id) || 0);
 
@@ -98,7 +100,7 @@ const applyDamages =  <ID extends Id, P extends CombatBasePlayer<ID>, S extends 
 };
 
 const performCombatRound = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(oldState: CombatRoundState<ID, P, S, C>, isCarrierToStarCombat: boolean): CombatRoundState<ID, P, S, C> => {
-    let groupsWithDamage : GroupsWithDamage<ID, P, S, C>;
+    let groupsWithDamage: GroupsWithDamage<ID, P, S, C>;
 
     if (isCarrierToStarCombat && oldState.round === 0) {
         // special handling for defender attacking first
@@ -128,56 +130,43 @@ const mapToRecord = (map: Map<number, WeaponsDetail>): Record<string, WeaponsDet
 const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(group: CombatResultGrouped<ID, P, S, C>): DetailedCombatResultGroup<ID, P, S, C> => {
     let shipsToKill = group.shipsLost;
 
-    const groupObjects: MO<ID, S, C>[] = group.carriers.map(carrier => ({type: 'carrier', carrier}));
-
-    let starRes: DetailedCombatResultStar<ID, S> | undefined = undefined;
+    const groupObjects: MO<ID, S, C>[] = group.carriers.map(carrier => {
+        return {
+            type: 'carrier', carrier: {
+                carrier,
+                shipsBefore: carrier.ships || 0,
+                shipsLost: 0,
+                shipsAfter: carrier.ships || 0,
+            }
+        };
+    });
 
     if (group.star) {
-        groupObjects.push({type: 'star', star: group.star});
-
-        starRes = {
-            star: group.star,
-            shipsBefore: group.star.ships || 0,
-            shipsLost: 0,
-            shipsAfter: (group.star.ships || 0),
-        };
+        groupObjects.push({
+            type: 'star', star: {
+                star: group.star,
+                shipsBefore: group.star.ships || 0,
+                shipsLost: 0,
+                shipsAfter: group.star.ships || 0,
+            }
+        });
     }
-    const carriersRes: DetailedCombatResultCarrier<ID, C>[] = [];
 
     const deductShips = (ships: number, obj: MO<ID, S, C>) => {
         if (obj.type === 'star') {
-            if (starRes) {
-                starRes.shipsLost += ships;
-                starRes.shipsAfter -= ships;
-            } else {
-                starRes = {
-                    star: obj.star,
-                    shipsBefore: obj.star.ships || 0,
-                    shipsLost: ships,
-                    shipsAfter: (obj.star.ships || 0) - ships,
-                }
-            }
+            obj.star.shipsLost += ships;
+            obj.star.shipsAfter -= ships;
         } else if (obj.type === 'carrier') {
-            const existingRes = carriersRes.find(c => c.carrier === obj.carrier);
-            if (existingRes) {
-                existingRes.shipsLost += ships;
-                existingRes.shipsAfter -= ships;
-            } else {
-                carriersRes.push({
-                    carrier: obj.carrier,
-                    shipsBefore: obj.carrier.ships || 0,
-                    shipsLost: ships,
-                    shipsAfter: (obj.carrier.ships || 0) - ships,
-                });
-            }
+            obj.carrier.shipsAfter -= ships;
+            obj.carrier.shipsLost += ships;
         }
     };
 
     const getShips = (obj: MO<ID, S, C>) => {
         if (obj.type === 'carrier') {
-            return carriersRes.find(c => c.carrier === obj.carrier)?.shipsAfter || obj.carrier.ships || 0;
+            return obj.carrier.shipsAfter;
         } else {
-            return starRes?.shipsAfter || obj.star.ships || 0;
+            return obj.star.shipsAfter;
         }
     };
 
@@ -195,8 +184,8 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
         }
 
         objectsToDeduct.sort((a, b) => {
-            const specsIdA = a.type === 'carrier' ? a.carrier.specialistId : a.star.specialistId;
-            const specsIdB = b.type === 'carrier' ? b.carrier.specialistId : b.star.specialistId;
+            const specsIdA = a.type === 'carrier' ? a.carrier.carrier.specialistId : a.star.star.specialistId;
+            const specsIdB = b.type === 'carrier' ? b.carrier.carrier.specialistId : b.star.star.specialistId;
 
             // Sort by specialist (kill objects without specialists first)
             if (specsIdA == null && specsIdB != null) {
@@ -230,9 +219,19 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
         }
     }
 
-    const carriersLost = carriersRes.filter(c => c.shipsAfter <= 0);
+    const carriersLost = groupObjects.filter(c => c.type === 'carrier' && c.carrier.shipsAfter <= 0);
 
-    const specialistsLost = carriersRes.filter(c => c.carrier.specialistId && c.carrier.specialistId !== 0);
+    const specialistsLost = groupObjects.filter(c => c.type === 'carrier' && c.carrier.carrier.specialistId && c.carrier.carrier.specialistId !== 0);
+
+    const carriersRes = groupObjects.flatMap(o => {
+        if (o.type === 'carrier') {
+            return [o.carrier];
+        } else {
+            return [];
+        }
+    });
+
+    const starRes = groupObjects.find(o => o.type === 'star')?.star;
 
     return {
         players: group.players,
@@ -301,10 +300,14 @@ const isCombatOver = <ID extends Id, P extends CombatBasePlayer<ID>, S extends C
     return state.groups.filter(g => g.ships > 0).length <= 1; // mutual destruction is possible
 }
 
-const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(initState: CombatRoundState<ID, P, S, C>, isCarrierToStarCombat: boolean): DetailedCombatResult<ID, P, S, C> => {
+const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(initState: CombatRoundState<ID, P, S, C>, isCarrierToStarCombat: boolean, callback?: (st: CombatRoundState<ID, P, S, C>) => void): DetailedCombatResult<ID, P, S, C> => {
     let state = initState;
 
     while (true) {
+        if (callback) {
+            callback(state);
+        }
+
         // check for dead
         if (isCombatOver(state)) {
             break;
@@ -541,12 +544,12 @@ export class CombatService<ID extends Id> {
         };
     }
 
-    calculateGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean) {
-        return combatLoop<ID, P, S, C>({round: 0, groups}, isCarrierToStarCombat);
+    calculateGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean, callback?: (st: CombatRoundState<ID, P, S, C>) => void) {
+        return combatLoop<ID, P, S, C>({round: 0, groups}, isCarrierToStarCombat, callback);
     }
 
     // returns undefined if no combat happens
-    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
+    computeStar(game: Game<ID>, star: Star<ID>, carriers: Carrier<ID>[], callback?: (st: CombatRoundState<ID, Player<ID>, Star<ID>, Carrier<ID>>) => void): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
         const playerIds = new Set<string>([star.ownedByPlayerId!.toString()]);
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!.toString()));
@@ -560,11 +563,11 @@ export class CombatService<ID extends Id> {
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, star, carriers, combatDiploGroups);
 
-        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, true);
+        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, true, callback);
     }
 
     // returns undefined if no combat happens
-    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[]): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
+    computeCarrier(game: Game<ID>, carriers: Carrier<ID>[], callback?: (st: CombatRoundState<ID, Player<ID>, Star<ID>, Carrier<ID>>) => void): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
         const playerIds = new Set<ID>();
 
         carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
@@ -578,7 +581,7 @@ export class CombatService<ID extends Id> {
 
         const combatGroups = this._makeGroups<Player<ID>, Star<ID>, Carrier<ID>>(game, undefined, carriers, combatDiploGroups);
 
-        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, false);
+        return combatLoop<ID, Player<ID>, Star<ID>, Carrier<ID>>({round: 0, groups: combatGroups}, false, callback);
     }
 
     private _sortGroups<P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(groups: CombatGroup<ID, P, S, C>[]) {

@@ -67,8 +67,6 @@ export default class StarCaptureService {
             return (a.distanceToDestination || 0) - (b.distanceToDestination || 0);
         })[0].ownedByPlayerId!;
 
-        // todo: handle case with multiple hostile attackers
-        const attackerPlayers = attackers.filter(p => p._id.toString() !== capturePlayerId.toString());
         const newStarPlayer = attackers.find(p => p._id.toString() === capturePlayerId.toString())!;
 
         // Capture the star.
