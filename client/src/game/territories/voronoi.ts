@@ -8,6 +8,72 @@ import gameHelper from "@/services/gameHelper";
 
 const MAX_VORONOI_DISTANCE = 50;
 
+const computeCommonEdges = (cell: Delaunay.Point[]) => {
+  // Build an edge set for cell i: key "ax,ay,bx,by" for each directed edge a→b
+  const ciEdgeSet = new Set<string>();
+  for (let k = 0; k + 1 < cell.length; k++) {
+    const a = cell[k], b = cell[k + 1];
+    ciEdgeSet.add(`${a[0]},${a[1]},${b[0]},${b[1]}`);
+  }
+  return ciEdgeSet;
+};
+
+const renderBorders = (cell: Delaunay.Point[], delaunay: Delaunay<unknown>, i: number, playerIDs: (string | null)[], starCells: Delaunay.Point[][], borderWidth: number, context: DrawingContext, borderGraphics) => {
+  const commonEdgeSet = computeCommonEdges(cell);
+
+  for (const j of delaunay.neighbors(i)) {
+    if (j <= i) continue; // process each pair once
+    if (playerIDs[i] === playerIDs[j]) continue;
+
+    const cj = starCells[j];
+    if (!cj) continue;
+
+    // The shared Voronoi edge appears as a→b in cell i and b→a in cell j.
+    // Iterate cell j edges (each b→a) and look for a→b in cell i's edge set.
+    let sharedA: [number, number] | null = null;
+    let sharedB: [number, number] | null = null;
+
+    for (let k = 0; k + 1 < cj.length; k++) {
+      const b = cj[k], a = cj[k + 1];
+      if (commonEdgeSet.has(`${a[0]},${a[1]},${b[0]},${b[1]}`)) {
+        sharedA = a;
+        sharedB = b;
+        break;
+      }
+    }
+
+    if (!sharedA || !sharedB) continue;
+
+    const [ax, ay] = sharedA;
+    const [bx, by] = sharedB;
+
+    const angle = Math.atan2(by - ay, bx - ax);
+    const halfW = borderWidth / 2;
+    const leftAngle = angle + Math.PI / 2;
+    const rightAngle = angle - Math.PI / 2;
+    const clx = Math.cos(leftAngle) * halfW;
+    const cly = Math.sin(leftAngle) * halfW;
+    const crx = Math.cos(rightAngle) * halfW;
+    const cry = Math.sin(rightAngle) * halfW;
+
+    // Left side of a→b is cell i's territory; right side is cell j's
+    const colourI = playerIDs[i]
+      ? colorFromString(context.getPlayerColour(playerIDs[i]!))
+      : 0x000000;
+    const colourJ = playerIDs[j]
+      ? colorFromString(context.getPlayerColour(playerIDs[j]!))
+      : 0x000000;
+
+    borderGraphics.moveTo(ax + clx, ay + cly);
+    borderGraphics.lineTo(bx + clx, by + cly);
+    borderGraphics.stroke({width: borderWidth, color: colourI});
+
+    borderGraphics.moveTo(ax + crx, ay + cry);
+    borderGraphics.lineTo(bx + crx, by + cry);
+    borderGraphics.stroke({width: borderWidth, color: colourJ});
+  }
+};
+
 export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSettings, context: DrawingContext, container: Container) => {
   container.alpha = 1;
 
@@ -63,64 +129,7 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
     g.fill({color: colour, alpha});
     container.addChild(g);
 
-    // Build an edge set for cell i: key "ax,ay,bx,by" for each directed edge a→b
-    const ciEdgeSet = new Set<string>();
-    for (let k = 0; k + 1 < cell.length; k++) {
-      const a = cell[k], b = cell[k + 1];
-      ciEdgeSet.add(`${a[0]},${a[1]},${b[0]},${b[1]}`);
-    }
-
-    for (const j of delaunay.neighbors(i)) {
-      if (j <= i) continue; // process each pair once
-      if (playerIDs[i] === playerIDs[j]) continue;
-
-      const cj = starCells[j];
-      if (!cj) continue;
-
-      // The shared Voronoi edge appears as a→b in cell i and b→a in cell j.
-      // Iterate cell j edges (each b→a) and look for a→b in cell i's edge set.
-      let sharedA: [number, number] | null = null;
-      let sharedB: [number, number] | null = null;
-
-      for (let k = 0; k + 1 < cj.length; k++) {
-        const b = cj[k], a = cj[k + 1];
-        if (ciEdgeSet.has(`${a[0]},${a[1]},${b[0]},${b[1]}`)) {
-          sharedA = a;
-          sharedB = b;
-          break;
-        }
-      }
-
-      if (!sharedA || !sharedB) continue;
-
-      const [ax, ay] = sharedA;
-      const [bx, by] = sharedB;
-
-      const angle = Math.atan2(by - ay, bx - ax);
-      const halfW = borderWidth / 2;
-      const leftAngle = angle + Math.PI / 2;
-      const rightAngle = angle - Math.PI / 2;
-      const clx = Math.cos(leftAngle) * halfW;
-      const cly = Math.sin(leftAngle) * halfW;
-      const crx = Math.cos(rightAngle) * halfW;
-      const cry = Math.sin(rightAngle) * halfW;
-
-      // Left side of a→b is cell i's territory; right side is cell j's
-      const colourI = playerIDs[i]
-        ? colorFromString(context.getPlayerColour(playerIDs[i]!))
-        : 0x000000;
-      const colourJ = playerIDs[j]
-        ? colorFromString(context.getPlayerColour(playerIDs[j]!))
-        : 0x000000;
-
-      borderGraphics.moveTo(ax + clx, ay + cly);
-      borderGraphics.lineTo(bx + clx, by + cly);
-      borderGraphics.stroke({width: borderWidth, color: colourI});
-
-      borderGraphics.moveTo(ax + crx, ay + cry);
-      borderGraphics.lineTo(bx + crx, by + cry);
-      borderGraphics.stroke({width: borderWidth, color: colourJ});
-    }
+    renderBorders(cell, delaunay, i, playerIDs, starCells, borderWidth, context, borderGraphics);
   }
 
   container.addChild(borderGraphics);
