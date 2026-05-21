@@ -43,7 +43,6 @@ function sleep(ms: number) {
 */
 
 export default class EmailService {
-
     TEMPLATES = {
         WELCOME: {
             fileName: 'welcomeEmail.html',
@@ -127,12 +126,7 @@ export default class EmailService {
 
         this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.sendGameStartedEmail(args));
         this.userService.on(UserServiceEvents.onUserCreated, (user) => this.sendWelcomeEmail(user));
-        this.playerReadyService.on(PlayerReadyServiceEvents.onGamePlayerReady, (data) => this.trySendLastPlayerTurnReminder(data.gameId));
-
-        this.gameTickService.on(GameTickServiceEvents.onGameTurnEnded, (args) => this.trySendNextTurnReminder(args.gameId));
-        this.gameTickService.on(GameTickServiceEvents.onPlayerAfk, (args) => this.sendGamePlayerAfkEmail(args));
         this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.sendGameFinishedEmail(args.gameId));
-        this.gameTickService.on(GameTickServiceEvents.onGameCycleEnded, (args) => this.sendGameCycleSummaryEmail(args.gameId));
     }
 
     isEnabled() {
@@ -251,158 +245,6 @@ export default class EmailService {
 
         for (let player of game.galaxy.players.filter(p => p.userId)) {
             await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_FINISHED, [
-                gameName,
-                gameUrl
-            ]);
-        }
-    }
-
-    async sendGameCycleSummaryEmail(gameId: DBObjectId) {      
-        let game = (await this.gameService.getById(gameId))!;
-        let leaderboard = this.leaderboardService.getGameLeaderboard(game).leaderboard;
-
-        let leaderboardHtml = '';
-
-        // Leaderboard is hidden for ultra dark mode games.
-        if (!this.gameTypeService.isDarkModeExtra(game)) {
-            leaderboardHtml = leaderboard.map(l => {
-                return `
-                    <tr>
-                        <td><span style="color:#F39C12">${l.player.alias}</span></td>
-                        <td>${l.stats.totalStars} Stars</td>
-                        <td>${l.stats.totalShips} Ships in ${l.stats.totalCarriers} Carriers</td>
-                    </tr>
-                `;
-            })
-            .join('');
-        }
-
-        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
-        let gameName = game.settings.general.name;
-
-        // Send the email only to undefeated players.
-        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && p.userId);
-        let winConditionText = '';
-
-        switch (game.settings.general.mode) {
-            case 'conquest':
-                switch (game.settings.conquest.victoryCondition) {
-                    case 'starPercentage':
-                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} of ${game.state.stars} stars</span>.`;
-                        break;
-                    case 'homeStarPercentage':
-                        winConditionText = `Winner will be the first to <span style="color:#3498DB;">capture ${game.state.starsForVictory} capital stars of ${game.settings.general.playerLimit} stars</span>.`;
-                        break;
-                    default:
-                        throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`);
-                }
-                break;
-            case 'battleRoyale':
-                winConditionText = 'Winner will be the <span style="color:#3498DB;">last man standing</span>.';
-                break;
-            case 'kingOfTheHill':
-                winConditionText = 'Winner will be the player who <span style="color:#3498DB;">captures and holds</span> the center star.';
-                break;
-        }
-
-        for (let player of undefeatedPlayers) {
-            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_CYCLE_SUMMARY, [
-                gameName,
-                gameUrl,
-                winConditionText,
-                leaderboardHtml
-            ]);
-        }
-    }
-
-    async trySendLastPlayerTurnReminder(gameId: DBObjectId) {
-        let game = (await this.gameService.getById(gameId))!;
-
-        if (!this.gameTypeService.isTurnBasedGame(game)) {
-            throw new Error('Cannot send a last turn reminder for non turn based games.');
-        }
-
-        if (!this.gameStateService.isInProgress(game)) {
-            return;
-        }
-
-        const undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && p.userId);
-
-        if (undefeatedPlayers.length <= 2) { // No need to send a turn reminder in a 2-player game
-            return;
-        }
-
-        const undefeatedUnreadyPlayers = undefeatedPlayers.filter(p => !p.ready);
-
-        if (undefeatedUnreadyPlayers.length === 1) {
-            let player = undefeatedUnreadyPlayers[0];
-
-            // If we have already sent a last turn reminder to this player then do not
-            // send one again, this prevents players from spamming ready/unready and sending
-            // the last player loads of emails.
-            if (player.hasSentTurnReminder) {
-                return;
-            }
-
-            await this.playerService.setHasSentTurnReminder(game, player, true);
-
-            let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
-            let gameName = game.settings.general.name;
-
-            await this._trySendEmailToPlayer(player, this.TEMPLATES.YOUR_TURN_REMINDER, [
-                gameName,
-                gameUrl
-            ]);
-        }
-    }
-
-    async trySendNextTurnReminder(gameId: DBObjectId) {
-        let game = (await this.gameService.getById(gameId))!;
-
-        // Only send the next turn reminder in TB games and if the game is in progress.
-        if (!this.gameTypeService.isTurnBasedGame(game) || !this.gameStateService.isInProgress(game) || this.gameTypeService.isTutorialGame(game)) {
-            return;
-        }
-        
-        let undefeatedPlayers = game.galaxy.players.filter((p: Player) => !p.defeated && !p.ready && p.userId);
-
-        let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
-        let gameName = game.settings.general.name;
-
-        for (let player of undefeatedPlayers) {
-            await this._trySendEmailToPlayer(player, this.TEMPLATES.NEXT_TURN_REMINDER, [
-                gameName,
-                gameUrl
-            ]);
-        }
-    }
-
-    async sendGameTimedOutEmail(gameId: DBObjectId) {
-        let game = (await this.gameService.getById(gameId))!;
-        let gameName = game.settings.general.name;
-
-        for (let player of game.galaxy.players.filter(p => p.userId)) {
-            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_TIMED_OUT, [
-                gameName
-            ]);
-        }
-    }
-
-    async sendGamePlayerAfkEmail(args: InternalGamePlayerAFKEvent) {
-        let game = (await this.gameService.getById(args.gameId))!;
-
-        // Don't bother sending AFK emails for tutorials.
-        if (this.gameTypeService.isTutorialGame(game)) {
-            return;
-        }
-
-        let player = this.playerService.getById(game, args.playerId!);
-        
-        if (player && player.userId) {
-            let gameUrl = `${this.config.clientUrl}/#/game?id=${game._id}`;
-            let gameName = game.settings.general.name;
-
-            await this._trySendEmailToPlayer(player, this.TEMPLATES.GAME_PLAYER_AFK, [
                 gameName,
                 gameUrl
             ]);
