@@ -70,7 +70,7 @@ describe('Player AFK Service', () => {
             player.defeated = true;
             player.userId = new mongoose.Types.ObjectId();
 
-            const result = service.isAIControlled(game, player, false);
+            const result = service.isAIControlled(game, player);
     
             expect(result).toBeTrue();
         });
@@ -79,7 +79,7 @@ describe('Player AFK Service', () => {
             player.defeated = false;
             player.userId = null;
 
-            const result = service.isAIControlled(game, player, false);
+            const result = service.isAIControlled(game, player);
     
             expect(result).toBeTrue();
         });
@@ -88,67 +88,7 @@ describe('Player AFK Service', () => {
             player.defeated = false;
             player.userId = new mongoose.Types.ObjectId();
 
-            const result = service.isAIControlled(game, player, false);
-    
-            expect(result).toBeFalse();
-        });
-    });
-
-    describe('Pseudo AFK', () => {
-        it('should return false if the game has not started yet', () => {
-            gameStateService.isStarted = (game: Game) => {
-                return false;
-            };
-
-            game.state.startDate = null;
-    
-            const result = service.isPsuedoAfk(game, player);
-    
-            expect(result).toBeFalse();
-        });
-    
-        it('should return false if the game has not been playing for 12 hours', () => {
-            const result = service.isPsuedoAfk(game, player);
-    
-            expect(result).toBeFalse();
-        });
-    
-        it('should return true if the player has not been seen at all', () => {
-            game.state.startDate = moment().utc().subtract(1, 'day').toDate();
-    
-            player.lastSeen = null;
-            
-            const result = service.isPsuedoAfk(game, player);
-    
-            expect(result).toBeTrue();
-        });
-    
-        it('should return true if the player has not been seen since the start of the game', () => {
-            game.state.startDate = moment().utc().subtract(1, 'day').toDate();
-            
-            player.lastSeen = game.state.startDate;
-            
-            const result = service.isPsuedoAfk(game, player);
-    
-            expect(result).toBeTrue();
-        });
-    
-        it('should return true if the player has not been seen since before the start of the game', () => {
-            game.state.startDate = moment().utc().subtract(1, 'day').toDate();
-            
-            player.lastSeen = moment().utc().subtract(2, 'days').toDate();
-            
-            const result = service.isPsuedoAfk(game, player);
-    
-            expect(result).toBeTrue();
-        });
-    
-        it('should return false if the player has been seen since the start of the game', () => {
-            game.state.startDate = moment().utc().subtract(1, 'day').toDate();
-            
-            player.lastSeen = moment().utc().toDate();
-            
-            const result = service.isPsuedoAfk(game, player);
+            const result = service.isAIControlled(game, player);
     
             expect(result).toBeFalse();
         });

@@ -217,7 +217,7 @@ export default class GameService extends EventEmitter {
             throw new ValidationError('Cannot concede defeat in a game that has finished.');
         }
 
-        const wasAI = this.playerAfkService.isAIControlled(game, player, false);
+        const wasAI = this.playerAfkService.isAIControlled(game, player);
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
@@ -481,7 +481,7 @@ export default class GameService extends EventEmitter {
     }
 
     isReadyToQuitOrDefeated(game: Game, player: Player) {
-        return player.readyToQuit || player.defeated || this.playerAfkService.isAIControlled(game, player, true);
+        return player.readyToQuit || player.defeated || this.playerAfkService.isAIControlled(game, player);
     }
 
     isReadyToQuitImmediateEnd(game: Game) {

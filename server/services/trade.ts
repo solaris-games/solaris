@@ -548,7 +548,7 @@ export default class TradeService extends EventEmitter {
 
     async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation) {
         // Note: Trade backs can only occur from AI to player
-        if (!this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
+        if (!this.playerAfkService.isAIControlled(game, fromPlayer)) {
             return;
         }
 

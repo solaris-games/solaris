@@ -255,6 +255,8 @@ export default class GameListService {
             unreadEvents: number | null = null,
             totalUnread: number | null = null,
             turnWaiting: boolean | null = null,
+            turnReadyCount: number | null = null,
+            turnTotalCount: number | null = null,
             position: number | null = null;
 
         // Note: The player may have gone afk and been replaced by another player so we need to
@@ -262,7 +264,12 @@ export default class GameListService {
         if (player) {
             if (includeUnreadConversastions) unreadConversations = this.conversationService.getUnreadCount(game, player._id);
             if (includeUnreadEvents) unreadEvents = await this.eventService.getUnreadCount(game, player._id);
-            if (includeTurnWaiting) turnWaiting = this.gameTypeService.isTurnBasedGame(game) && !player.ready;
+            if (includeTurnWaiting && this.gameTypeService.isTurnBasedGame(game)) {
+                turnWaiting = !player.ready;
+                const undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+                turnReadyCount = undefeatedPlayers.filter(p => p.ready).length;
+                turnTotalCount = undefeatedPlayers.length;
+            }
 
             totalUnread = (unreadConversations || 0) + (unreadEvents || 0);
 
@@ -280,6 +287,8 @@ export default class GameListService {
             unreadEvents,
             unread: totalUnread,
             turnWaiting,
+            turnReadyCount,
+            turnTotalCount,
             defeated: player?.defeated || null,
             afk: player?.afk || null,
             position

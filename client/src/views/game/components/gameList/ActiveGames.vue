@@ -37,6 +37,7 @@
                     <br/>
                     <span v-if="game.userNotifications.defeated && !game.userNotifications.afk" class="me-1 badge bg-danger">Defeated</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.turnWaiting" class="me-1 badge bg-danger">Turn Waiting</span>
+                    <span v-if="!game.userNotifications.defeated && game.userNotifications.turnTotalCount != null" class="me-1 badge bg-secondary">{{game.userNotifications.turnReadyCount}}/{{game.userNotifications.turnTotalCount}} Ready</span>
                     <span v-if="!game.userNotifications.defeated && game.userNotifications.unreadEvents" class="me-1 badge bg-warning">{{game.userNotifications.unreadEvents}} Events</span>
                     <span v-if="game.userNotifications.afk" class="me-1 badge bg-warning">AFK</span>
                     <span v-if="game.userNotifications.unreadConversations" class="me-1 badge bg-info">{{game.userNotifications.unreadConversations}} Messages</span>

@@ -613,7 +613,7 @@ export default class LeaderboardService {
 
         // If the remaining players alive are all AI then pick the player in 1st.
         // Note: Don't include pseudo afk, only legit actual afk players.
-        let undefeatedAI = undefeatedPlayers.filter(p => this.playerAfkService.isAIControlled(game, p, false));
+        let undefeatedAI = undefeatedPlayers.filter(p => this.playerAfkService.isAIControlled(game, p));
         
         if (undefeatedAI.length === undefeatedPlayers.length) {
             return this.getFirstPlacePlayer(leaderboard);

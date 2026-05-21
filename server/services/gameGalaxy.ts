@@ -623,9 +623,8 @@ export default class GameGalaxyService {
                 }
             }
 
-            // Calculate whether the user is AI controlled or not. If they are the current user
-            // then do not include psuedo afk. We only want to check that for other players.
-            p.isAIControlled = this.playerAfkService.isAIControlled(doc, p, !isCurrentUserPlayer);
+            // Calculate whether the user is AI controlled or not.
+            p.isAIControlled = this.playerAfkService.isAIControlled(doc, p);
 
             p.isInScanningRange = Boolean(scannedPlayerIdSet?.has(p._id)); // Return false if not scanned or scannedPlayerIds is undefined
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.

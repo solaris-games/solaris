@@ -77,7 +77,7 @@ export default class ReputationService extends EventEmitter {
             await this._updateReputation(game, fromPlayer, toPlayer, rep.reputation, rep.isNew);
         }
 
-        if (this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
+        if (this.playerAfkService.isAIControlled(game, fromPlayer)) {
             await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
 
@@ -100,7 +100,7 @@ export default class ReputationService extends EventEmitter {
             await this._updateReputation(game, fromPlayer, toPlayer, rep.reputation, rep.isNew);
         }
 
-        if (this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
+        if (this.playerAfkService.isAIControlled(game, fromPlayer)) {
             await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
 
@@ -184,7 +184,7 @@ export default class ReputationService extends EventEmitter {
     }
 
     async recalculateDiplomaticStatus(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, updateDatabase: boolean) {
-        if (!this.playerAfkService.isAIControlled(game, fromPlayer, true)) {
+        if (!this.playerAfkService.isAIControlled(game, fromPlayer)) {
             throw new Error(`Automatic diplomatic statuses are reserved for AI players only.`);
         }
 

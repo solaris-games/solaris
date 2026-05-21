@@ -196,7 +196,7 @@ export default class AIService {
     }
 
     async play(game: Game, player: Player) {
-        if (!this.playerAfkService.isAIControlled(game, player, true)) {
+        if (!this.playerAfkService.isAIControlled(game, player)) {
             throw new Error('The player is not under AI control.');
         }
 
