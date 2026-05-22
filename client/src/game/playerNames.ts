@@ -1,35 +1,33 @@
 import { Container, Text, TextStyle, Graphics } from 'pixi.js'
-import gameHelper from '../services/gameHelper'
 import type {Game} from "../types/game";
 import type {DrawingContext} from "./container";
-import type {UserGameSettings} from "@solaris/common";
+import {DistanceService, type UserGameSettings} from "@solaris/common";
+import helpers from "@/game/helpers.ts";
 
 class PlayerNames {
 
   static zoomLevel = 90
-
   container: Container;
   zoomPercent = 0;
 
   game: Game | undefined;
   context: DrawingContext | undefined;
+  distanceService: DistanceService;
 
-  constructor () {
-    this.container = new Container()
-  }
+  constructor (distanceService: DistanceService, game: Game, userSettings: UserGameSettings, context: DrawingContext) {
+    this.container = new Container();
+    this.distanceService = distanceService;
+    this.game = game;
 
-  setup (game: Game, userSettings: UserGameSettings, context: DrawingContext) {
-    this.game = game
-
-    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames
-    this.context = context
+    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
+    this.context = context;
   }
 
   draw () {
     this.container.removeChildren()
 
     for (let player of this.game!.galaxy.players) {
-      const empireCenter = gameHelper.getPlayerTerritoryCenter(this.game!, player)
+      const empireCenter = helpers.getPlayerTerritoryCenter(this.distanceService, this.game!, player);
 
       if (empireCenter == null) {
         continue
@@ -180,6 +178,10 @@ class PlayerNames {
     }
   }
 
+  update(game: Game, userSettings: UserGameSettings) {
+    this.game = game;
+    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
+  }
 }
 
 export default PlayerNames

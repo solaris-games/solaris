@@ -150,24 +150,6 @@ class GameHelper {
     }
   }
 
-  getClosestPlayerStar(stars: Star[], point: Location, player: Player) {
-    let closestStar = stars[0];
-    let smallerDistance = Number.MAX_VALUE;
-
-    const playerStars = this.getStarsOwnedByPlayer(player, stars);
-
-    for (let star of playerStars) {
-      const distance = this.getDistanceBetweenLocations(star.location, point);
-
-      if (distance < smallerDistance) {
-        smallerDistance = distance
-        closestStar = star
-      }
-    }
-
-    return closestStar
-  }
-
   getAngleBetweenLocations(loc1: Location, loc2: Location) {
     return Math.atan2(loc2.y - loc1.y, loc2.x - loc1.x)
   }
@@ -749,23 +731,6 @@ class GameHelper {
 
   getDateString(date: Date | string) {
     return format(new Date(date), "E do MMM HH mm");
-  }
-
-  // For placing items on a player territory (e.g. their name). Will return null if player has no territory
-  getPlayerTerritoryCenter(game: Game, player: Player) {
-    const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
-
-    if (!playerStars.length) {
-      return null
-    }
-
-    // Work out the center point of player stars
-    const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
-    const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
-
-    let closestStar = this.getClosestPlayerStar(game.galaxy.stars, { x: centerX, y: centerY }, player)
-
-    return closestStar.location
   }
 
   getGamePlayerShapesCount(game) {

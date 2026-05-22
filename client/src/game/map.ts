@@ -5,7 +5,6 @@ import Waypoints from './waypoints'
 import RulerPoints from './rulerPoints'
 import Territories from './territories'
 import PlayerNames from './playerNames'
-import gameHelper from '../services/gameHelper'
 import AnimationService from './animation'
 import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
@@ -29,7 +28,7 @@ import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
 import type {TempWaypoint} from "@/types/waypoint";
 import type {RulerPoint} from "@/types/ruler";
-import type {ServiceProvider} from "@/services/services";
+import helpers from "@/game/helpers";
 
 export enum ModeKind {
   Galaxy = 'galaxy',
@@ -193,8 +192,7 @@ export class Map {
 
     // -----------
     // Setup Player Names
-    this.playerNames = new PlayerNames()
-    this.playerNames.setup(game, userSettings, this.context)
+    this.playerNames = new PlayerNames(distanceService, game, userSettings, this.context);
 
     this.playerNamesContainer!.addChild(this.playerNames.container)
     this.playerNames.draw()
@@ -415,7 +413,7 @@ export class Map {
     // Check for stars that are no longer in scanning range.
     for (let i = 0; i < this.stars.length; i++) {
       const star = this.stars[i]
-      const gameStar = gameHelper.getStarById(game, star.data._id)
+      const gameStar = helpers.getStarById(game, star.data._id)
 
       if (!gameStar) {
         this._undrawStar(star)
@@ -426,7 +424,7 @@ export class Map {
     // Check for carriers that are no longer in scanning range or have been destroyed.
     for (let i = 0; i < this.carriers.length; i++) {
       const carrier = this.carriers[i]
-      const gameCarrier = gameHelper.getCarrierById(game, carrier.data!._id)
+      const gameCarrier = helpers.getCarrierById(game, carrier.data!._id)
 
       if (!gameCarrier) {
         this._undrawCarrier(carrier)
@@ -618,12 +616,12 @@ export class Map {
   }
 
   drawPlayerNames () {
-    this.playerNames.setup(this.game, this.userSettings, this.context)
+    this.playerNames.update(this.game, this.userSettings);
     this.playerNames.draw();
   }
 
   panToPlayer (game: Game, player: Player) {
-    const empireCenter = gameHelper.getPlayerTerritoryCenter(game, player);
+    const empireCenter = helpers.getPlayerTerritoryCenter(this.distanceService, game, player);
 
     if (empireCenter) {
       this.panToLocation(empireCenter);
@@ -777,7 +775,7 @@ export class Map {
       return;
     }
 
-    const owningPlayer = gameHelper.getStarOwningPlayer(this.game, dic.starData);
+    const owningPlayer = helpers.getStarOwningPlayer(this.game, dic.starData);
 
     this.eventBus.emit(MapEventBusEventNames.MapOnPreStarClicked, {
       star: dic.starData,
@@ -819,7 +817,7 @@ export class Map {
     const e = dic.starData
     if (dic.eventData && this.isDragMotion(dic.eventData.global)) { return }
 
-    const owningPlayer = gameHelper.getStarOwningPlayer(this.game!, dic.starData);
+    const owningPlayer = helpers.getStarOwningPlayer(this.game!, dic.starData);
 
     const click = () =>  {
       if (this.mode.mode === ModeKind.Galaxy) {

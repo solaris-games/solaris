@@ -1,7 +1,8 @@
 import seededRandom from 'random-seed'
-import type {Carrier, Game, Star} from "../types/game";
+import type {Carrier, Game, Player, Star} from "../types/game";
 import { Container } from 'pixi.js'
-import type { Location, UserGameSettings } from '@solaris/common';
+import {DistanceService, type Location, type UserGameSettings} from '@solaris/common';
+import type {RulerPoint} from "@/types/ruler.ts";
 
 export class Helpers {
   rotateCarrierTowardsWaypoint(carrier: Carrier, stars: Star[], graphics: Container) {
@@ -123,6 +124,61 @@ export class Helpers {
     if (!game.galaxy.carriers.length) { return 0 }
 
     return game.galaxy.carriers.sort((a, b) => b.location.y - a.location.y)[0].location.y
+  }
+
+  getStarById(game: Game, starId: string): Star | undefined {
+    return game.galaxy.stars.find(x => x._id === starId);
+  }
+
+  getCarrierById(game: Game, carrierId: string): Carrier | undefined {
+    return game.galaxy.carriers.find(x => x._id === carrierId);
+  }
+
+  getStarOwningPlayer(game: Game, star: Star) {
+    return game.galaxy.players.find(x => x._id === star.ownedByPlayerId);
+  }
+
+  getStarsOwnedByPlayer(player: Player, stars: Star[]) {
+    if (player == null) {
+      return [];
+    }
+
+    return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId === player._id)
+  }
+
+  getClosestPlayerStar(distanceService: DistanceService, stars: Star[], point: Location, player: Player) {
+    let closestStar = stars[0];
+    let smallerDistance = Number.MAX_VALUE;
+
+    const playerStars = this.getStarsOwnedByPlayer(player, stars);
+
+    for (let star of playerStars) {
+      const distance = distanceService.getDistanceBetweenLocations(star.location, point);
+
+      if (distance < smallerDistance) {
+        smallerDistance = distance
+        closestStar = star
+      }
+    }
+
+    return closestStar
+  }
+
+  // For placing items on a player territory (e.g. their name). Will return null if player has no territory
+  getPlayerTerritoryCenter(distanceService: DistanceService, game: Game, player: Player) {
+    const playerStars = this.getStarsOwnedByPlayer(player, game.galaxy.stars)
+
+    if (!playerStars.length) {
+      return null
+    }
+
+    // Work out the center point of player stars
+    const centerX = playerStars.reduce((sum, s) => sum + s.location.x, 0) / playerStars.length
+    const centerY = playerStars.reduce((sum, s) => sum + s.location.y, 0) / playerStars.length
+
+    let closestStar = this.getClosestPlayerStar(distanceService, game.galaxy.stars, { x: centerX, y: centerY }, player)
+
+    return closestStar.location
   }
 }
 
