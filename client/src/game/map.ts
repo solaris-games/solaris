@@ -13,7 +13,13 @@ import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import { type DrawingContext } from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
-import type {Location, MapObject, UserGameSettings} from "@solaris/common";
+import {
+  DistanceService,
+  type Location,
+  type MapObject,
+  PathfindingService,
+  type UserGameSettings
+} from "@solaris/common";
 import { Chunks } from './chunks'
 import Carrier, {type CarrierClickEvent} from "./carrier";
 import type { EventBus } from '@/eventBus'
@@ -91,18 +97,20 @@ export class Map {
   chunks: Chunks;
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
-  serviceProvider: ServiceProvider;
+  pathfindingService: PathfindingService<string>;
+  distanceService: DistanceService;
 
-  constructor (serviceProvider: ServiceProvider, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (pathfindingService: PathfindingService<string>, distanceService: DistanceService, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app;
     this.context = context;
     this.viewport = viewport;
     this.container = new PIXI.Container();
     this.container.sortableChildren = true;
     this.eventBus = eventBus;
-    this.serviceProvider = serviceProvider;
+    this.pathfindingService = pathfindingService;
+    this.distanceService = distanceService;
 
-    this.stars = []
+    this.stars = [];
 
     this.carriers = []
 
@@ -121,19 +129,19 @@ export class Map {
 
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
 
-    this.pathManager = new PathManager( game, userSettings, this )
+    this.pathManager = new PathManager(distanceService, game, userSettings, this);
 
-    this.backgroundContainer = new PIXI.Container()
+    this.backgroundContainer = new PIXI.Container();
     this.backgroundContainer.zIndex = 0;
-    this.territoryContainer = new PIXI.Container()
+    this.territoryContainer = new PIXI.Container();
     this.territoryContainer.zIndex = 1;
-    this.playerNamesContainer = new PIXI.Container()
+    this.playerNamesContainer = new PIXI.Container();
     this.playerNamesContainer.zIndex = 7;
-    this.orbitalContainer = new PIXI.Container()
+    this.orbitalContainer = new PIXI.Container();
     this.orbitalContainer.zIndex = 3;
-    this.wormHoleContainer = new PIXI.Container()
+    this.wormHoleContainer = new PIXI.Container();
     this.wormHoleContainer.zIndex = 5;
-    this.starContainer = new PIXI.Container()
+    this.starContainer = new PIXI.Container();
     this.starContainer.zIndex = 3;
     this.waypointContainer = new PIXI.Container()
     this.waypointContainer.zIndex = 2;
@@ -162,7 +170,7 @@ export class Map {
 
     this.chunks = new Chunks(game, this.stars, this.carriers);
 
-    this.waypoints = new Waypoints(serviceProvider);
+    this.waypoints = new Waypoints(pathfindingService);
     this.waypoints.setup(game, this.context, userSettings);
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
@@ -178,7 +186,7 @@ export class Map {
 
     // -----------
     // Setup Territories
-    this.territories = new Territories(this.context, game, userSettings);
+    this.territories = new Territories(this.distanceService, this.context, game, userSettings);
 
     this.territoryContainer.addChild(this.territories.container);
     this.territories.draw();
@@ -938,7 +946,7 @@ export class Map {
         return {
           ref: s,
           type: 'star',
-          distance: gameHelper.getDistanceBetweenLocations(location, s.data.location),
+          distance: this.distanceService.getDistanceBetweenLocations(location, s.data.location),
           data: s.data,
         }
       })
@@ -949,7 +957,7 @@ export class Map {
         return {
           ref: s,
           type: 'carrier',
-          distance: gameHelper.getDistanceBetweenLocations(location, s.data!.location),
+          distance: this.distanceService.getDistanceBetweenLocations(location, s.data!.location),
           data: s.data
         }
       })

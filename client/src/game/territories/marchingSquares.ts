@@ -1,8 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
-import type {UserGameSettings} from "@solaris/common";
+import {DistanceService, type UserGameSettings} from "@solaris/common";
 import type {Game, Player} from "@/types/game";
 import type {DrawingContext} from "@/game/container";
-import gameHelper from "@/services/gameHelper";
 import helpers from "@/game/helpers";
 
 type SamplePoint = {
@@ -27,7 +26,7 @@ type Position = {
 
 type VertexSpec = [VertexAction, Position[], Position[]];
 
-export const drawTerritoriesMarchingSquare = (game: Game, userSettings: UserGameSettings, context: DrawingContext, container: Container) => {
+export const drawTerritoriesMarchingSquare = (distanceService: DistanceService, game: Game, userSettings: UserGameSettings, context: DrawingContext, container: Container) => {
   container.alpha = 1;
 
   const CELL_SIZE = 5 * userSettings.map.marchingSquareGridSize;
@@ -137,7 +136,7 @@ export const drawTerritoriesMarchingSquare = (game: Game, userSettings: UserGame
 
       for (let iy = startIY; iy <= endIY; iy++) {
         const gridLocation = gridToCoord(ix, iy); // Get the location in x, y of the gridPoint we are currently looping through
-        const distance = gameHelper.getDistanceBetweenLocations(gridLocation, star.location); // Get the distance between the gridPoint and the star
+        const distance = distanceService.getDistanceBetweenLocations(gridLocation, star.location); // Get the distance between the gridPoint and the star
 
         if (samplePoints[ix][iy] && samplePoints[ix][iy].distance < distance) { // If the gridpoint has a value AND the distance currently logged (from a previous star) is smaller than the current one THEN don't log anything
           // Do nothing, because the grid already has a value from a star that is closer

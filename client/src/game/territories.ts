@@ -1,7 +1,7 @@
 import { Container } from 'pixi.js'
 import type {Game} from '../types/game';
 import type { DrawingContext } from './container';
-import type {UserGameSettings} from "@solaris/common";
+import {DistanceService, type UserGameSettings} from "@solaris/common";
 import {drawTerritoriesMarchingSquare} from "@/game/territories/marchingSquares";
 import {drawTerritoriesVoronoi} from "@/game/territories/voronoi";
 
@@ -11,13 +11,15 @@ export class Territories {
   zoomPercent: number;
   context: DrawingContext;
   userSettings: UserGameSettings;
+  distanceService: DistanceService;
 
-  constructor(context: DrawingContext, game: Game, userSettings: UserGameSettings) {
+  constructor(distanceService: DistanceService, context: DrawingContext, game: Game, userSettings: UserGameSettings) {
     this.container = new Container();
     this.game = game;
     this.context = context;
     this.zoomPercent = 0;
     this.userSettings = userSettings;
+    this.distanceService = distanceService;
   }
 
   update(game: Game, userSettings: UserGameSettings) {
@@ -34,7 +36,7 @@ export class Territories {
 
     switch (this.userSettings.map.territoryStyle) {
       case 'marching-square':
-        drawTerritoriesMarchingSquare(this.game, this.userSettings, this.context, this.container);
+        drawTerritoriesMarchingSquare(this.distanceService, this.game, this.userSettings, this.context, this.container);
         break;
       case 'voronoi':
         drawTerritoriesVoronoi(this.game, this.userSettings, this.context, this.container);

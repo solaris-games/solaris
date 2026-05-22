@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js'
-import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
 import type {Map} from './map';
-import type {UserGameSettings, MapObject as MapObjectData, Location} from "@solaris/common";
+import {type UserGameSettings, type MapObject as MapObjectData, type Location, DistanceService} from "@solaris/common";
 import type {Game, Carrier as CarrierData, Star} from "../types/game";
 import type Carrier from "./carrier";
 import type { MapObject } from './mapObject';
@@ -18,6 +17,7 @@ export type Path = {
 }
 
 export class PathManager {
+  distanceService: DistanceService;
   map: Map;
   zoomPercent: number;
   container: PIXI.Container;
@@ -39,7 +39,8 @@ export class PathManager {
   minScale: number = 0;
   maxScale: number = 0;
 
-  constructor ( game: Game, userSettings: UserGameSettings,  map: Map) {
+  constructor (distanceService: DistanceService, game: Game, userSettings: UserGameSettings,  map: Map) {
+    this.distanceService = distanceService;
     this.map = map
     this.game = game;
     this.userSettings = userSettings;
@@ -196,7 +197,7 @@ export class PathManager {
     this._updatePathScale(pathGraphics)
   }
 
-  onTick( zoomPercent: number, viewport, zoomChanging: boolean ) {
+  onTick(zoomPercent: number, viewport, zoomChanging: boolean) {
     this.setScale( zoomPercent, viewport, zoomChanging )
     this.zoomPercent = zoomPercent
   }
@@ -285,7 +286,7 @@ export class PathManager {
     const VOID_LENGTH = DASH_LENGTH/2.0
     const COMBINED_LENGTH = DASH_LENGTH+VOID_LENGTH
 
-    const pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+    const pathLength = this.distanceService.getDistanceBetweenLocations(pointA,pointB)
 
     const dashCount = Math.floor( pathLength/(DASH_LENGTH+VOID_LENGTH) )
     const endpointsLength =  pathLength - (dashCount*(DASH_LENGTH+VOID_LENGTH))
@@ -329,7 +330,7 @@ export class PathManager {
   _createSolidPathGraphics( lineAlpha: number, lineWidth: number, objectA: MapObjectData<string>, objectB: MapObjectData<string>, pathColour: string) {
     const pointA = objectA.location
     const pointB = objectB.location
-    const pathLength = gameHelper.getDistanceBetweenLocations(pointA,pointB)
+    const pathLength = this.distanceService.getDistanceBetweenLocations(pointA, pointB);
 
     const path = new PIXI.Graphics() as GraphicsWithChunk;
     path.moveTo(0, lineWidth)

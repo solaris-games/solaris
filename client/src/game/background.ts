@@ -1,7 +1,6 @@
 import { Container, Sprite, type BLEND_MODES } from 'pixi.js'
 import TextureService from './texture'
 import * as rng from 'random-seed'
-import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
 import type { Game } from '../types/game'
 import type { DrawingContext } from './container'

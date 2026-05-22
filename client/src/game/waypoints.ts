@@ -5,7 +5,7 @@ import type {Game, Carrier as CarrierData, Star as StarData} from '../types/game
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '@/types/waypoint';
 import { createStarHighlight } from './highlight';
-import type {Location, UserGameSettings} from "@solaris/common";
+import {type Location, PathfindingService, type UserGameSettings} from "@solaris/common";
 import { v7 as generateV7Uuid } from 'uuid';
 import type {ServiceProvider} from "@/services/services";
 
@@ -21,12 +21,12 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   lightYearDistance: number | undefined;
   carrier: CarrierData | undefined;
   settings: UserGameSettings | undefined;
-  serviceProvider: ServiceProvider;
+  pathfindingService: PathfindingService<string>;
 
-  constructor (serviceProvider: ServiceProvider) {
+  constructor (pathfindingService: PathfindingService<string>) {
     super();
 
-    this.serviceProvider = serviceProvider;
+    this.pathfindingService = pathfindingService;
     this.container = new PIXI.Container()
   }
 
@@ -226,7 +226,7 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   }
 
   _createWaypointRoute (sourceStarId: string, destinStarId: string) {
-    const route = this.serviceProvider.pathfindingService.calculateShortestRoute(this.game!, GameHelper.getUserPlayer(this.game!)!, this.carrier!, sourceStarId, destinStarId)
+    const route = this.pathfindingService.calculateShortestRoute(this.game!, GameHelper.getUserPlayer(this.game!)!, this.carrier!, sourceStarId, destinStarId)
 
     if (route.length > 1) {
       for (let i = 1; i < route.length; i++) {

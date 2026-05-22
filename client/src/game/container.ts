@@ -1,6 +1,5 @@
 import {Viewport} from 'pixi-viewport';
 import Map from './map';
-import gameHelper from '../services/gameHelper';
 import helpers from './helpers';
 import textureService from './texture';
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
@@ -86,7 +85,7 @@ export class GameContainer {
     this.game = game;
 
     // Add a new map to the viewport
-    this.map = new Map(serviceProvider, this.app, this.viewport, this.context, eventBus, this.game, userSettings);
+    this.map = new Map(serviceProvider.pathfindingService, serviceProvider.distanceService, this.app, this.viewport, this.context, eventBus, this.game, userSettings);
     this.viewport.addChild(this.map.container);
 
     this.subscribe();

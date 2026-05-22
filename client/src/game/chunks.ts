@@ -1,6 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
 import type { Game } from '../types/game';
-import gameHelper from '../services/gameHelper'
 import helpers from './helpers'
 import type Star from './star';
 import type Carrier from './carrier';
