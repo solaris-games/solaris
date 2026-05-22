@@ -7,6 +7,7 @@
     },
     "workspaces": [
         "common/",
+        "map-rendering/",
         "client/",
         "server/"
     ],
