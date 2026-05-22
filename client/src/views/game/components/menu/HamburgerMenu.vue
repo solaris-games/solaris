@@ -139,10 +139,12 @@ const zoomOut = () => {
 };
 
 const panToHomeStar = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
-
   if (userPlayer.value) {
     emit('onOpenPlayerDetailRequested', userPlayer.value._id);
+
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+      player: userPlayer.value,
+    });
   }
 };
 

@@ -11,7 +11,6 @@ const toEventName: <TData>(value: string) => MapCommandEventBusEventName<TData> 
 export default class MapCommandEventBusEventNames {
   private constructor() {};
 
-  public static readonly MapCommandPanToUser: MapCommandEventBusEventName<{}> = toEventName('panToUser');
   public static readonly MapCommandPanToObject: MapCommandEventBusEventName<{ object: MapObject<string> }> = toEventName('panToObject');
   public static readonly MapCommandPanToLocation: MapCommandEventBusEventName<{ location: Location }> = toEventName('panToLocation');
   public static readonly MapCommandPanToPlayer: MapCommandEventBusEventName<{ player: Player }> = toEventName('panToPlayer');

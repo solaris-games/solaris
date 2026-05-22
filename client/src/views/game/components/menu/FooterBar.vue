@@ -66,9 +66,11 @@ const setMenuState = (state: MenuState) => {
 };
 
 const panToHomeStar = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
-
   if (userPlayer.value) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+      player: GameHelper.getUserPlayer(store.game!),
+    });
+
     emit('onOpenPlayerDetailRequested', userPlayer.value._id);
   }
 };

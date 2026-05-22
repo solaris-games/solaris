@@ -130,29 +130,17 @@ const fitGalaxy = () => {
   eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
 };
 
-const zoomIn = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
-};
-
-const zoomOut = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
-};
-
 const goToMyGames = () => {
   router.push({ name: 'game-active-games' });
 };
 
-const goToMainMenu = () => {
-  router.push({ name: 'main-menu' });
-};
-
-const reloadPage = () => location.reload();
-
 const panToHomeStar = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
-
   if (userPlayer.value) {
     emit('onOpenPlayerDetailRequested', userPlayer.value._id);
+
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+      player: userPlayer.value,
+    });
   }
 };
 

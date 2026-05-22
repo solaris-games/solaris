@@ -20,6 +20,7 @@ import {useMentionStore} from "@/stores/mention";
 import {useGameStore} from "@/stores/game";
 
 import { useToast } from 'vue-toast-notification';
+import GameHelper from "@/services/gameHelper.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const mentionStore = useMentionStore();
@@ -65,7 +66,9 @@ onMounted(() => {
 
     const drawGame = () => {
       gameContainer.draw()
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
+      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+        player: GameHelper.getUserPlayer(store.game!),
+      });
     };
 
     const touchPlayer = async () => {

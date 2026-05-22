@@ -238,7 +238,6 @@ export class Map {
   subscribe() {
     const panToLocation = ({ location }: { location: Location }) => this.panToLocation(location);
     const panToObject = ({ object }: { object: MapObject<string> }) => this.panToObject(object);
-    const panToUser = () => this.panToUser(this.game!);
     const panToPlayer = ({ player }: { player: Player }) => this.panToPlayer(this.game!, player);
     const clearHighlightedLocations = () => this.clearHighlightedLocations();
     const highlightLocation = ({ location }: { location: Location }) => this.highlightLocation(location);
@@ -255,7 +254,6 @@ export class Map {
 
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
-    this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToUser, panToUser);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandPanToPlayer, panToPlayer);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, clearHighlightedLocations);
     this.eventBus.on(MapCommandEventBusEventNames.MapCommandHighlightLocation, highlightLocation);
@@ -273,7 +271,6 @@ export class Map {
     return () => {
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToLocation, panToLocation);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToObject, panToObject);
-      this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToUser, panToUser);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandPanToPlayer, panToPlayer);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandClearHighlightedLocations, clearHighlightedLocations);
       this.eventBus.off(MapCommandEventBusEventNames.MapCommandHighlightLocation, highlightLocation);
@@ -623,20 +620,6 @@ export class Map {
     if (empireCenter) {
       this.panToLocation(empireCenter);
     }
-  }
-
-  panToUser (game: Game) {
-    const player = gameHelper.getUserPlayer(game);
-
-    if (!player || gameHelper.getStarsOwnedByPlayer(player, game.galaxy.stars).length === 0) {
-      const galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
-      const galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
-
-      this.panToLocation({ x: galaxyCenterX, y: galaxyCenterY });
-      return;
-    }
-
-    this.panToPlayer(game, player);
   }
 
   panToObject(object: { location: Location }) {
