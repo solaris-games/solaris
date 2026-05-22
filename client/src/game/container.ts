@@ -10,7 +10,7 @@ import {
   PathfindingService, StarDataService,
   type UserGameSettings
 } from "@solaris/common";
-import type {Game, Star, Carrier} from "../types/game";
+import type {Game, Star, Carrier, Player} from "../types/game";
 import { DebugTools } from './debugTools';
 import type { EventBus } from '../eventBus';
 import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
@@ -20,11 +20,24 @@ export interface DrawingContext {
   getPlayerColour: (playerId: string) => string;
 }
 
+export type TooltipData = {
+  player: Player;
+  location: Location;
+  offset: Location & { relative: boolean };
+  detail: string[];
+}
+
+export interface TooltipService {
+  getStar(game: Game, star: Star): TooltipData | undefined;
+  getCarrier(game: Game, carrier: Carrier): TooltipData | undefined;
+}
+
 export interface Services {
   distanceService: DistanceService;
   pathfindingService: PathfindingService<string>;
   gameTypeService: GameTypeService;
   starDataService: StarDataService;
+  tooltips: TooltipService;
 }
 
 export const createGameContainer = async (services: Services, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {
@@ -51,6 +64,7 @@ export const createGameContainer = async (services: Services, drawingContext: Dr
 }
 
 export class GameContainer {
+  services: Services;
   app: Application;
   map: Map;
   context: DrawingContext;
@@ -67,6 +81,7 @@ export class GameContainer {
   reportGameError: ((err: string) => void);
 
   constructor (services: Services, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings, reportGameError: ((err: string) => void), eventBus: EventBus, app: Application) {
+    this.services = services;
     this.eventBus = eventBus;
     this.reportGameError = reportGameError;
     this.context = drawingContext;
@@ -97,7 +112,7 @@ export class GameContainer {
     this.game = game;
 
     // Add a new map to the viewport
-    this.map = new Map(services.pathfindingService, services.distanceService, services.starDataService, this.app, this.viewport, this.context, eventBus, this.game, userSettings);
+    this.map = new Map(services, this.app, this.viewport, this.context, eventBus, this.game, userSettings);
     this.viewport.addChild(this.map.container);
 
     this.subscribe();

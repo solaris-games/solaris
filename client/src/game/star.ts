@@ -1,6 +1,5 @@
 import {Application, BitmapText, Circle, Container, Graphics, Sprite, FederatedPointerEvent} from 'pixi.js';
 import TextureService from './texture'
-import gameHelper from '../services/gameHelper.js'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import { type MapObject } from './mapObject';

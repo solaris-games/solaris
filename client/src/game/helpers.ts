@@ -197,6 +197,10 @@ export class Helpers {
       .filter(x => x.orbiting === star._id)
       .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0));
   }
+
+  getPlayerById(game: Game, playerId: string) {
+    return game.galaxy.players.find(x => x._id === playerId);
+  }
 }
 
 export default new Helpers()

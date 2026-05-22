@@ -10,7 +10,7 @@ import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
-import {createGameContainer} from "@/game/container";
+import {createGameContainer, type Services} from "@/game/container";
 import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
@@ -21,6 +21,7 @@ import {useGameStore} from "@/stores/game";
 
 import { useToast } from 'vue-toast-notification';
 import GameHelper from "@/services/gameHelper.ts";
+import {GameTooltips} from "@/views/game/components/tooltips.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const mentionStore = useMentionStore();
@@ -45,7 +46,15 @@ const el: Ref<HTMLElement | null> = ref(null);
 onMounted(() => {
   let unsubscribe;
 
-  createGameContainer(serviceProvider, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+  const services: Services = {
+    starDataService: serviceProvider.starDataService,
+    gameTypeService: serviceProvider.gameTypeService,
+    distanceService: serviceProvider.distanceService,
+    pathfindingService: serviceProvider.pathfindingService,
+    tooltips: new GameTooltips(),
+  };
+
+  createGameContainer(services, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 

@@ -1,66 +1,63 @@
 import * as PIXI from 'pixi.js'
 import GameHelper from '../services/gameHelper'
-import type { Game } from '../types/game';
-import type { DrawingContext } from './container';
+import type {Carrier, Game, Star} from '../types/game';
+import type {DrawingContext, TooltipData, TooltipService} from './container';
 import {getCountdownTimeStringByTicks} from "@/util/time";
+import helpers from "@/game/helpers";
+
+const PADDING_X = 2;
+const PADDING_Y = 2;
 
 export default class {
-
   container: PIXI.Container;
-  game: Game | undefined;
-  context: DrawingContext | undefined;
+  game: Game;
+  context: DrawingContext;
   intervalDraw: number | null = null;
+  tooltipService: TooltipService;
 
-  constructor() {
-    this.container = new PIXI.Container()
-    this.container.eventMode = 'passive'
+  constructor(game: Game, context: DrawingContext, tooltipService: TooltipService) {
+    this.tooltipService = tooltipService;
+    this.game = game;
+    this.context = context;
+    this.container = new PIXI.Container();
+    this.container.eventMode = 'passive';
   }
 
-  setup(game, context) {
-    this.game = game
-    this.context = context
-  }
-
-  destroy() {
-    this.game = undefined;
-    this.clear();
+  update(game: Game, context: DrawingContext) {
+    this.game = game;
+    this.context = context;
   }
 
   clear() {
     if (this.intervalDraw) {
-      clearInterval(this.intervalDraw)
-      this.intervalDraw = null
+      clearInterval(this.intervalDraw);
+      this.intervalDraw = null;
     }
 
-    this.container.removeChildren()
+    this.container.removeChildren();
   }
 
-  _drawTooltip(tooltipData) {
-    this.container.removeChildren()
+  _drawTooltip(tooltipData: TooltipData) {
+    this.container.removeChildren();
 
     if (!this.game) {
       return;
     }
 
-    const player = GameHelper.getPlayerById(this.game!, tooltipData.playerId)!
+    const internalContainer = new PIXI.Container();
+    internalContainer.x = PADDING_X;
+    internalContainer.y = PADDING_Y;
 
-    const paddingX = 2
-    const paddingY = 2
-
-    const internalContainer = new PIXI.Container()
-    internalContainer.x = paddingX
-    internalContainer.y = paddingY
-
-    let textStyle = new PIXI.TextStyle({
+    const textStyle = new PIXI.TextStyle({
       fontFamily: `Chakra Petch,sans-serif;`,
       fill: 0xFFFFFF,
       fontSize: 6,
       fontWeight: 'bold'
-    })
+    });
 
     for (let i = 0; i < tooltipData.detail.length; i++) {
-      const text = new PIXI.Text(tooltipData.detail[i], textStyle)
-      text.resolution = 12
+      const text = new PIXI.Text(tooltipData.detail[i], textStyle);
+      text.resolution = 12;
 
       const prev = internalContainer.children[i - 1] as PIXI.Text;
 
@@ -74,7 +71,7 @@ export default class {
     }
 
     const graphics = new PIXI.Graphics()
-    graphics.roundRect(0, 0, internalContainer.width + (paddingX * 2), internalContainer.height + (paddingY * 2), 1)
+    graphics.roundRect(0, 0, internalContainer.width + (PADDING_X * 2), internalContainer.height + (PADDING_Y * 2), 1)
 
     graphics.fill({
       color: 0x000000,
@@ -82,7 +79,7 @@ export default class {
 
     graphics.stroke({
       width: 1,
-      color: this.context!.getPlayerColour(player._id),
+      color: this.context!.getPlayerColour(tooltipData.player._id),
     });
 
     this.container.addChild(graphics)
@@ -97,8 +94,8 @@ export default class {
     }
   }
 
-  drawTooltipCarrier(carrier) {
-    this.clear()
+  drawTooltipCarrier(carrier: Carrier) {
+    this.clear();
 
     // Note: We have to do this in order to account
     // for carrier ETAs in real time.
@@ -107,79 +104,19 @@ export default class {
         return;
       }
 
-      const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game, carrier)
-
-      const detail = [
-        `⏱️ ` + getCountdownTimeStringByTicks(this.game, carrier.ticksEta)
-      ]
-
-      if (isOwnedByUserPlayer) {
-        detail.push(`${carrier.waypointsLooped ? '🔄' : '📍'} ${carrier.waypoints.length} waypoint${carrier.waypoints.length !== 1 ? 's' : ''}`)
+      const tooltipData = this.tooltipService.getCarrier(this.game, carrier);
+      if (tooltipData) {
+        this._drawTooltip(tooltipData);
       }
+    };
 
-      this._drawTooltip({
-        playerId: carrier.ownedByPlayerId,
-        location: carrier.location,
-        detail,
-        offset: {
-          relative: true,
-          x: 6,
-          y: 2
-        }
-      })
-    }
-
-    this.intervalDraw = setInterval(redraw, 250)
-    redraw()
+    this.intervalDraw = setInterval(redraw, 250);
+    redraw();
   }
 
-  drawTooltipStar(star) {
-    this.clear()
+  drawTooltipStar(star: Star) {
+    this.clear();
 
-    const carriers = GameHelper.getCarriersOrbitingStar(this.game!, star);
 
-    if (!carriers.length) {
-      return
-    }
-
-    let detail: string[] = []
-
-    if (star.ships != null && star.ships > 0) {
-      detail.push(
-        `⭐ ${star.ships == null ? '???' : star.ships} garrisoned\n`
-      )
-    }
-
-    const carrierStrings = carriers.map(carrier => {
-      const isOwnedByUserPlayer = GameHelper.isOwnedByUserPlayer(this.game!, carrier)
-
-      let result = `\n${carrier.name}` +
-        `\n 🚀 ${carrier.ships || '???'} ship${carrier.ships !== 1 ? 's' : ''}`
-
-      if (isOwnedByUserPlayer) {
-        result += `\n ${carrier.waypointsLooped ? '🔄' : '📍'} ${carrier.waypoints.length} waypoint${carrier.waypoints.length !== 1 ? 's' : ''}`
-      }
-
-      if (carrier.specialist && carrier.specialist.name) {
-        result += `\n 🧑‍🚀 ${carrier.specialist.name}`
-      }
-
-      return result
-    })
-
-    carrierStrings[0] = carrierStrings[0].trim()
-
-    detail = detail.concat(carrierStrings)
-
-    this._drawTooltip({
-      playerId: star.ownedByPlayerId,
-      location: star.location,
-      detail,
-      offset: {
-        relative: false,
-        x: 0,
-        y: 6
-      }
-    })
   }
 }

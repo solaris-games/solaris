@@ -10,7 +10,7 @@ import PathManager from './PathManager'
 import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
-import { type DrawingContext } from "./container";
+import {type DrawingContext, type Services} from "./container";
 import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
 import {
   DistanceService,
@@ -96,20 +96,16 @@ export class Map {
   chunks: Chunks;
   galaxyCenterGraphics: PIXI.Graphics | undefined;
   unsubscribe: (() => void) | undefined;
-  pathfindingService: PathfindingService<string>;
-  distanceService: DistanceService;
-  starDataService: StarDataService;
+  services: Services;
 
-  constructor (pathfindingService: PathfindingService<string>, distanceService: DistanceService, starDataService: StarDataService, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (services: Services, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app;
     this.context = context;
     this.viewport = viewport;
     this.container = new PIXI.Container();
     this.container.sortableChildren = true;
     this.eventBus = eventBus;
-    this.pathfindingService = pathfindingService;
-    this.distanceService = distanceService;
-    this.starDataService = starDataService;
+    this.services = services;
 
     this.stars = [];
 
@@ -130,7 +126,7 @@ export class Map {
 
     this.app.ticker.maxFPS = userSettings.technical.fpsLimit || 60;
 
-    this.pathManager = new PathManager(distanceService, game, userSettings, this);
+    this.pathManager = new PathManager(services.distanceService, game, userSettings, this);
 
     this.backgroundContainer = new PIXI.Container();
     this.backgroundContainer.zIndex = 0;
@@ -144,24 +140,20 @@ export class Map {
     this.wormHoleContainer.zIndex = 5;
     this.starContainer = new PIXI.Container();
     this.starContainer.zIndex = 3;
-    this.waypointContainer = new PIXI.Container()
+    this.waypointContainer = new PIXI.Container();
     this.waypointContainer.zIndex = 2;
     this.waypointContainer.eventMode = 'none';
-    this.rulerPointContainer = new PIXI.Container()
+    this.rulerPointContainer = new PIXI.Container();
     this.rulerPointContainer.zIndex = 7;
-    this.highlightLocationsContainer = new PIXI.Container()
+    this.highlightLocationsContainer = new PIXI.Container();
     this.highlightLocationsContainer.zIndex = 6;
-    this.tooltipContainer = new PIXI.Container()
+    this.tooltipContainer = new PIXI.Container();
     this.tooltipContainer.zIndex = 8;
     this.pathManager!.container.zIndex = 7;
 
-    // Reset the canvas
-    this.stars = []
-    this.carriers = []
-
     // Add stars
     for (let i = 0; i < game.galaxy.stars.length; i++) {
-      this.setupStar(game, userSettings, game.galaxy.stars[i])
+      this.setupStar(game, userSettings, game.galaxy.stars[i]);
     }
 
     // Add carriers
@@ -171,7 +163,7 @@ export class Map {
 
     this.chunks = new Chunks(game, this.stars, this.carriers);
 
-    this.waypoints = new Waypoints(pathfindingService);
+    this.waypoints = new Waypoints(services.pathfindingService);
     this.waypoints.setup(game, this.context, userSettings);
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
@@ -187,14 +179,14 @@ export class Map {
 
     // -----------
     // Setup Territories
-    this.territories = new Territories(this.distanceService, this.context, game, userSettings);
+    this.territories = new Territories(services.distanceService, this.context, game, userSettings);
 
     this.territoryContainer.addChild(this.territories.container);
     this.territories.draw();
 
     // -----------
     // Setup Player Names
-    this.playerNames = new PlayerNames(distanceService, game, userSettings, this.context);
+    this.playerNames = new PlayerNames(services.distanceService, game, userSettings, this.context);
 
     this.playerNamesContainer!.addChild(this.playerNames.container)
     this.playerNames.draw()
@@ -222,8 +214,7 @@ export class Map {
       this.orbitalContainer!.addChild(this.orbitalLayer.container)
     }
 
-    this.tooltipLayer = new TooltipLayer()
-    this.tooltipLayer.setup(this.game, this.context)
+    this.tooltipLayer = new TooltipLayer(this.game, this.context, this.services.tooltips);
     this.tooltipContainer!.addChild(this.tooltipLayer.container)
 
     this.container.addChild(this.backgroundContainer)
@@ -301,14 +292,14 @@ export class Map {
     }
 
     this.unsubscribe = undefined;
-    this.tooltipLayer?.destroy();
+    this.tooltipLayer?.clear();
   }
 
   setupStar (game: Game, userSettings: UserGameSettings, starData: StarData) {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
-      star = new Star(this.starDataService, this.app, this.game, starData, userSettings, this.context);
+      star = new Star(this.services.starDataService, this.app, this.game, starData, userSettings, this.context);
       this.stars.push(star);
 
       this.starContainer!.addChild(star.fixedContainer);
@@ -473,7 +464,7 @@ export class Map {
     this.waypoints.setup(game, this.context, userSettings);
     this.waypoints.clear();
 
-    this.tooltipLayer.setup(game, this.context);
+    this.tooltipLayer.update(game, this.context);
 
     this.chunks.update(game, this.stars, this.carriers);
 
@@ -623,7 +614,7 @@ export class Map {
   }
 
   panToPlayer (game: Game, player: Player) {
-    const empireCenter = helpers.getPlayerTerritoryCenter(this.distanceService, game, player);
+    const empireCenter = helpers.getPlayerTerritoryCenter(this.services.distanceService, game, player);
 
     if (empireCenter) {
       this.panToLocation(empireCenter);
@@ -946,7 +937,7 @@ export class Map {
         return {
           ref: s,
           type: 'star',
-          distance: this.distanceService.getDistanceBetweenLocations(location, s.data.location),
+          distance: this.services.distanceService.getDistanceBetweenLocations(location, s.data.location),
           data: s.data,
         }
       })
@@ -957,7 +948,7 @@ export class Map {
         return {
           ref: s,
           type: 'carrier',
-          distance: this.distanceService.getDistanceBetweenLocations(location, s.data!.location),
+          distance: this.services.distanceService.getDistanceBetweenLocations(location, s.data!.location),
           data: s.data
         }
       })
