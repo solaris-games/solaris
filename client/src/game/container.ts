@@ -7,7 +7,7 @@ import {
   DEFAULT_SETTINGS,
   DistanceService, GameTypeService,
   type Location,
-  PathfindingService, StarDataService,
+  PathfindingService, StarDataService, TechnologyService,
   type UserGameSettings
 } from "@solaris/common";
 import type {Game, Star, Carrier, Player} from "../types/game";
@@ -38,6 +38,7 @@ export interface Services {
   gameTypeService: GameTypeService;
   starDataService: StarDataService;
   tooltips: TooltipService;
+  technologyService: TechnologyService;
 }
 
 export const createGameContainer = async (services: Services, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {

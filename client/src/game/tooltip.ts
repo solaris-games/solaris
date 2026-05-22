@@ -1,9 +1,6 @@
 import * as PIXI from 'pixi.js'
-import GameHelper from '../services/gameHelper'
 import type {Carrier, Game, Star} from '../types/game';
 import type {DrawingContext, TooltipData, TooltipService} from './container';
-import {getCountdownTimeStringByTicks} from "@/util/time";
-import helpers from "@/game/helpers";
 
 const PADDING_X = 2;
 const PADDING_Y = 2;

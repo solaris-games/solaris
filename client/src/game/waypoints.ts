@@ -1,12 +1,18 @@
 import * as PIXI from 'pixi.js'
-import GameHelper from '../services/gameHelper'
 import {EventEmitter} from "./eventEmitter";
 import type {Game, Carrier as CarrierData, Star as StarData} from '../types/game';
 import type { DrawingContext } from './container';
 import type { TempWaypoint } from '@/types/waypoint';
 import { createStarHighlight } from './highlight';
-import {type Location, PathfindingService, type UserGameSettings} from "@solaris/common";
+import {
+  DistanceService,
+  type Location,
+  PathfindingService,
+  TechnologyService,
+  type UserGameSettings
+} from "@solaris/common";
 import { v7 as generateV7Uuid } from 'uuid';
+import helpers from "@/game/helpers.ts";
 
 type Events = {
   onWaypointCreated: TempWaypoint,
@@ -15,21 +21,29 @@ type Events = {
 
 class Waypoints extends EventEmitter<keyof Events, Events> {
   container: PIXI.Container;
-  game: Game | undefined;
-  context: DrawingContext | undefined;
-  lightYearDistance: number | undefined;
+  game: Game;
+  context: DrawingContext;
+  lightYearDistance: number;
   carrier: CarrierData | undefined;
-  settings: UserGameSettings | undefined;
+  settings: UserGameSettings;
   pathfindingService: PathfindingService<string>;
+  distanceService: DistanceService;
+  technologyService: TechnologyService;
 
-  constructor (pathfindingService: PathfindingService<string>) {
+  constructor (distanceService: DistanceService, technologyService: TechnologyService, pathfindingService: PathfindingService<string>, game: Game, context: DrawingContext, settings: UserGameSettings) {
     super();
 
+    this.distanceService = distanceService;
+    this.technologyService = technologyService;
     this.pathfindingService = pathfindingService;
-    this.container = new PIXI.Container()
+    this.container = new PIXI.Container();
+    this.game = game;
+    this.context = context;
+    this.lightYearDistance = game.constants.distances.lightYear;
+    this.settings = settings;
   }
 
-  setup (game: Game, context: DrawingContext, settings: UserGameSettings) {
+  update (game: Game, context: DrawingContext, settings: UserGameSettings) {
     this.game = game;
     this.context = context;
     this.lightYearDistance = game.constants.distances.lightYear;
@@ -69,17 +83,25 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   }
 
   _drawNextWaypoints () {
+    if (!this.carrier) {
+      return;
+    }
+
     // Draw all of the available waypoints that the last waypoint can reach.
-    const lastLocation = this._getLastLocation()
-    const userPlayer = this.game!.galaxy.players.find(p => p.userId)!;
+    const lastLocation = this._getLastLocation();
+
+    if (!lastLocation) {
+      return;
+    }
 
     // Calculate which stars are in reach and draw highlights around them
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
+    const effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(this.game, this.carrier!);
+    const hyperspaceDistance = this.distanceService.getHyperspaceDistance(this.game, effectiveTechs.hyperspace);
 
     for (let i = 0; i < this.game!.galaxy.stars.length; i++) {
       let s = this.game!.galaxy.stars[i]
 
-      let distance = GameHelper.getDistanceBetweenLocations(lastLocation, s.location)
+      let distance = this.distanceService.getDistanceBetweenLocations(lastLocation, s.location);
 
       if (distance <= hyperspaceDistance) {
         this._highlightLocation(s.location, 0.5)
@@ -162,30 +184,30 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
     // If the selected star is inside of hyperspace range then
     // simply create a waypoint to it. Otherwise try to calculate the
     // shortest route to it.
-    const userPlayer = this.game!.galaxy.players.find(p => p.userId)
-    const hyperspaceDistance = GameHelper.getHyperspaceDistance(this.game, userPlayer, this.carrier)
+    const effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(this.game, this.carrier!);
+    const hyperspaceDistance = this.distanceService.getHyperspaceDistance(this.game, effectiveTechs.hyperspace);
 
-    const lastLocationStar = this._getLastLocationStar()
+    const lastLocationStar = this._getLastLocationStar();
     const lastLocation = lastLocationStar == null ? null : lastLocationStar.location
-    const distance = GameHelper.getDistanceBetweenLocations(lastLocation, e.location)
 
-    console.log({
-      hyperspaceDistance,
-      distance,
-    });
+    if (!lastLocation) {
+      return;
+    }
 
-    let canCreateWaypoint = distance <= hyperspaceDistance
+    const distance = this.distanceService.getDistanceBetweenLocations(lastLocation, e.location);
+
+    let canCreateWaypoint = distance <= hyperspaceDistance;
 
     if (!canCreateWaypoint && lastLocationStar && lastLocationStar.wormHoleToStarId) {
-      const wormHolePairStar = GameHelper.getStarById(this.game!, lastLocationStar.wormHoleToStarId)
+      const wormHolePairStar = helpers.getStarById(this.game!, lastLocationStar.wormHoleToStarId);
 
-      canCreateWaypoint = Boolean(wormHolePairStar && wormHolePairStar._id === e._id)
+      canCreateWaypoint = Boolean(wormHolePairStar && wormHolePairStar._id === e._id);
     }
 
     if (canCreateWaypoint) {
-      this._createWaypoint(e._id)
+      this._createWaypoint(e._id);
     } else {
-      this._createWaypointRoute(lastLocationStar!._id, e._id)
+      this._createWaypointRoute(lastLocationStar!._id, e._id);
     }
   }
 
@@ -225,16 +247,16 @@ class Waypoints extends EventEmitter<keyof Events, Events> {
   }
 
   _createWaypointRoute (sourceStarId: string, destinStarId: string) {
-    const route = this.pathfindingService.calculateShortestRoute(this.game!, GameHelper.getUserPlayer(this.game!)!, this.carrier!, sourceStarId, destinStarId)
+    const route = this.pathfindingService.calculateShortestRoute(this.game, helpers.getPlayerById(this.game, this.carrier!.ownedByPlayerId!)!, this.carrier!, sourceStarId, destinStarId)
 
     if (route.length > 1) {
       for (let i = 1; i < route.length; i++) {
         const waypointStar = route[i];
 
-        this._createWaypoint(waypointStar.id)
+        this._createWaypoint(waypointStar.id);
       }
     } else {
-      this.emit('onWaypointOutOfRange', null)
+      this.emit('onWaypointOutOfRange', null);
     }
   }
 

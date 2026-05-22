@@ -163,8 +163,7 @@ export class Map {
 
     this.chunks = new Chunks(game, this.stars, this.carriers);
 
-    this.waypoints = new Waypoints(services.pathfindingService);
-    this.waypoints.setup(game, this.context, userSettings);
+    this.waypoints = new Waypoints(services.distanceService, services.technologyService, services.pathfindingService, game, this.context, userSettings);
     this.waypoints.on('onWaypointCreated', this.onWaypointCreated.bind(this));
     this.waypoints.on('onWaypointOutOfRange', this.onWaypointOutOfRange.bind(this));
 
@@ -461,7 +460,7 @@ export class Map {
     this.background = new Background(game, userSettings, this.context);
     this.background.draw();
 
-    this.waypoints.setup(game, this.context, userSettings);
+    this.waypoints.update(game, this.context, userSettings);
     this.waypoints.clear();
 
     this.tooltipLayer.update(game, this.context);
@@ -474,41 +473,41 @@ export class Map {
 
   _disableCarriersInteractivity() {
     for (let i = 0; i < this.carriers.length; i++) {
-      let c = this.carriers[i]
+      const c = this.carriers[i]
 
-      c.disableInteractivity()
+      c.disableInteractivity();
     }
   }
 
   _enableCarriersInteractivity() {
     for (let i = 0; i < this.carriers.length; i++) {
-      let c = this.carriers[i]
+      const c = this.carriers[i];
 
-      c.enableInteractivity()
+      c.enableInteractivity();
     }
   }
 
   setMode (mode: Mode) {
-    let wasWaypoints = this.mode.mode === ModeKind.Waypoints;
+    const wasWaypoints = this.mode.mode === ModeKind.Waypoints;
 
     this.mode = mode;
 
-    this.unselectAllCarriers()
-    this.unselectAllStars()
-    this.clearWaypoints()
-    this.clearRulerPoints()
+    this.unselectAllCarriers();
+    this.unselectAllStars();
+    this.clearWaypoints();
+    this.clearRulerPoints();
 
     if (this.mode.mode === ModeKind.Waypoints) {
-      this._disableCarriersInteractivity()
+      this._disableCarriersInteractivity();
       this.drawWaypoints();
     }
 
     if (wasWaypoints) {
-      this._enableCarriersInteractivity()
+      this._enableCarriersInteractivity();
     }
 
     if (this.mode.mode === ModeKind.Ruler) {
-      this.drawRulerPoints()
+      this.drawRulerPoints();
     }
   }
 
@@ -519,7 +518,7 @@ export class Map {
   }
 
   removeLastRulerPoint () {
-    this.rulerPoints.removeLastRulerPoint()
+    this.rulerPoints.removeLastRulerPoint();
   }
 
   drawStars () {

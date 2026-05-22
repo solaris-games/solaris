@@ -52,6 +52,7 @@ onMounted(() => {
     distanceService: serviceProvider.distanceService,
     pathfindingService: serviceProvider.pathfindingService,
     tooltips: new GameTooltips(),
+    technologyService: serviceProvider.technologyService,
   };
 
   createGameContainer(services, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
