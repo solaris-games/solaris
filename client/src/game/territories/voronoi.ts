@@ -76,12 +76,11 @@ const renderBorders = (cell: Delaunay.Point[], delaunay: Delaunay<unknown>, i: n
   }
 };
 
-const computeConvexHull = (stars: Star[]): P[] => {
+const computeConvexHull = (points: P[]): P[] => {
   // Graham scan
 
   const stack: P[] = [];
 
-  const points: P[] = stars.map(s => [s.location.x, s.location.y]);
   points.sort((a, b) => {
     const d = a[1] - b[1];
 
@@ -197,6 +196,22 @@ const clip = (subjectPoly: P[], clipPoly: P[]): P[] => {
   return outList;
 }
 
+const SCALE = 1.1;
+
+const scalePoints = (points: P[]): P[] => {
+  const center = points.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1]], [0, 0]).map(c => c / points.length) as P;
+
+  return points.map((p) => {
+    const dx = p[0] - center[0];
+    const dy = p[1] - center[1];
+
+    const ndx = dx * SCALE;
+    const ndy = dy * SCALE;
+
+    return [center[0] + ndx, center[1] + ndy];
+  });
+};
+
 export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSettings, context: DrawingContext, container: Container) => {
   container.alpha = 1;
 
@@ -231,7 +246,11 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
 
   const starCellsUnclipped = stars.map((_, i) => voronoi.cellPolygon(i));
 
-  const hull = computeConvexHull(stars);
+  const hullPointsUnscaled: P[] = stars.map(s => [s.location.x, s.location.y]);
+
+  const hullPoints = scalePoints(hullPointsUnscaled);
+
+  const hull = computeConvexHull(hullPoints);
 
   const starCells = starCellsUnclipped.map(cell => clip(cell, hull));
 
