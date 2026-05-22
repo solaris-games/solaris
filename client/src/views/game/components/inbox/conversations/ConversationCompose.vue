@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
 import MentionHelper, {type Mention} from '../../../../../services/mentionHelper';
-import AudioService from '../../../../../game/audio';
+import AudioService from '../../../../../services/audio';
 import MentionBox from '../../shared/MentionBox.vue';
 import { inject, ref, computed } from 'vue';
 import {httpInjectionKey, isOk} from "@/services/typedapi";

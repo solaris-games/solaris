@@ -4,7 +4,7 @@ import { GameSocketEventNames, type GameSocketEventType } from '@solaris/common'
 import { useToast } from "vue-toast-notification";
 import type { EventBus } from "../../eventBus";
 import GameEventBusEventNames from "../../eventBusEventNames/game";
-import AudioService from '../../game/audio';
+import AudioService from '../../services/audio';
 import GameMutationNames from "../../mutationNames/gameMutationNames";
 import { ClientSocketHandler } from "./clientSocketHandler";
 import type {GameStore} from "@/stores/game";

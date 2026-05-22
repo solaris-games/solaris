@@ -1,6 +1,6 @@
 import type {InfrastructureType, InfrastructureUpgradeReport} from "@solaris/common";
 import {formatError, isOk, type ResponseResult} from "@/services/typedapi";
-import AudioService from "@/game/audio";
+import AudioService from "../../../../services/audio";
 
 import { type ToastPluginApi } from "vue-toast-notification"
 import {useConfirm} from "@/hooks/confirm.ts";

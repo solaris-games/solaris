@@ -233,7 +233,7 @@ import GiftCarrier from './GiftCarrier.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import ModalButton from '../../../components/modal/ModalButton.vue'
 import DialogModal from '../../../components/modal/DialogModal.vue'
-import AudioService from '../../../../game/audio'
+import AudioService from '../../../../services/audio'
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";

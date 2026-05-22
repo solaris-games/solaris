@@ -31,7 +31,7 @@ import GameContainer from './components/GameContainer.vue'
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameHelper from '../../services/gameHelper'
-import AudioService from '../../game/audio'
+import AudioService from '../../services/audio'
 import gameHelper from '../../services/gameHelper'
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '@/eventBus'

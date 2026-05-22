@@ -167,7 +167,7 @@ import { useGameStore } from '@/stores/game';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
-import AudioService from '../../../../game/audio'
+import AudioService from '../../../../services/audio'
 import { inject, ref, computed, onUnmounted, onMounted, type Ref } from 'vue';
 import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeScheduleTable.vue'
 import BulkInfrastructureUpgradeStarTable from './BulkInfrastructureUpgradeStarTable.vue'

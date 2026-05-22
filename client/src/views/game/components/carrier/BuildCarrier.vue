@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import AudioService from '../../../../game/audio';
+import AudioService from '../../../../services/audio';
 import GameHelper from '../../../../services/gameHelper';
 import MenuTitle from '../MenuTitle.vue';
 import { ref, computed, inject } from 'vue';

@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
-import AudioService from '../../../../game/audio'
+import AudioService from '../../../../services/audio'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'

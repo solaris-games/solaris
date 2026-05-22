@@ -18,7 +18,7 @@
 import { useGameStore } from '@/stores/game';
 import router from '../../../../router';
 import GameHelper from '../../../../services/gameHelper';
-import AudioService from '../../../../game/audio';
+import AudioService from '../../../../services/audio';
 import { ref, computed, inject } from 'vue';
 import { useConfirm } from "@/hooks/confirm.ts";
 import {httpInjectionKey, isOk} from "@/services/typedapi";

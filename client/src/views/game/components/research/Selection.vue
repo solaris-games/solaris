@@ -55,7 +55,7 @@
 import { useGameStore } from '@/stores/game';
 import GameHelper from '../../../../services/gameHelper'
 import TechnologyHelper from '../../../../services/technologyHelper'
-import AudioService from '../../../../game/audio'
+import AudioService from '../../../../services/audio'
 import { ref, computed, onMounted, inject } from 'vue';
 import type {Game} from "@/types/game";
 import {updateResearchNow, updateResearchNext} from "@/services/typedapi/research";
