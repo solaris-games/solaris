@@ -7,7 +7,6 @@ import type { TempWaypoint } from '@/types/waypoint';
 import { createStarHighlight } from './highlight';
 import {type Location, PathfindingService, type UserGameSettings} from "@solaris/common";
 import { v7 as generateV7Uuid } from 'uuid';
-import type {ServiceProvider} from "@/services/services";
 
 type Events = {
   onWaypointCreated: TempWaypoint,

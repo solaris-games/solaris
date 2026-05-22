@@ -5,9 +5,10 @@ import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import { type MapObject } from './mapObject';
 import type {Game, Star as StarData} from "../types/game";
-import type { Location, NaturalResources, UserGameSettings } from '@solaris/common';
+import {type Location, type NaturalResources, StarDataService, type UserGameSettings} from '@solaris/common';
 import type { DrawingContext } from './container';
 import {EventEmitter} from "./eventEmitter";
+import helpers from "./helpers";
 
 const NAME_SIZE = 4
 
@@ -96,9 +97,12 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
   text_ships_big: BitmapText | null = null;
   text_infrastructure: BitmapText | null = null;
   text_infrastructureBulkIgnored: BitmapText | null = null;
+  starDataService: StarDataService;
 
-  constructor (app: Application, game: Game, data: StarData, userSettings: UserGameSettings, context: DrawingContext) {
-    super()
+  constructor (starDataService: StarDataService, app: Application, game: Game, data: StarData, userSettings: UserGameSettings, context: DrawingContext) {
+    super();
+
+    this.starDataService = starDataService;
 
     this.game = game
     this.data = data
@@ -266,9 +270,9 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
       this.graphics_star.tint = 0xa0a0a0
     }
 
-    if (gameHelper.isCapitalEliminationCapital(this.game, this.data)) {
+    if (this.starDataService.isCapitalEliminationCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFF0000
-    } else if (gameHelper.isCapitalCaptureCapital(this.game, this.data)) {
+    } else if (this.starDataService.isCapitalCaptureCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFFA500
     }
 
@@ -421,9 +425,9 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
     this.specialistSprite.x = -5
     this.specialistSprite.y = -5
 
-    if (gameHelper.isCapitalEliminationCapital(this.game, this.data)) {
+    if (this.starDataService.isCapitalEliminationCapital(this.game, this.data)) {
       this.specialistSprite.tint = 0xFF0000;
-    } else if (gameHelper.isCapitalCaptureCapital(this.game, this.data)) {
+    } else if (this.starDataService.isCapitalCaptureCapital(this.game, this.data)) {
       this.graphics_star.tint = 0xFFA500;
     }
 
@@ -704,7 +708,7 @@ export class Star extends EventEmitter<keyof Events, Events> implements MapObjec
         shipsText += '/'
         shipsText += carrierCount.toString()
 
-        if (gameHelper.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
+        if (helpers.isStarHasMultiplePlayersInOrbit(this.game, this.data)) {
           shipsText += '+'
         }
       }

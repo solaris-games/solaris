@@ -16,7 +16,7 @@ import {
   DistanceService,
   type Location,
   type MapObject,
-  PathfindingService,
+  PathfindingService, StarDataService,
   type UserGameSettings
 } from "@solaris/common";
 import { Chunks } from './chunks'
@@ -98,8 +98,9 @@ export class Map {
   unsubscribe: (() => void) | undefined;
   pathfindingService: PathfindingService<string>;
   distanceService: DistanceService;
+  starDataService: StarDataService;
 
-  constructor (pathfindingService: PathfindingService<string>, distanceService: DistanceService, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
+  constructor (pathfindingService: PathfindingService<string>, distanceService: DistanceService, starDataService: StarDataService, app: PIXI.Application, viewport: Viewport, context: DrawingContext, eventBus: EventBus, game: Game, userSettings: UserGameSettings) {
     this.app = app;
     this.context = context;
     this.viewport = viewport;
@@ -108,10 +109,11 @@ export class Map {
     this.eventBus = eventBus;
     this.pathfindingService = pathfindingService;
     this.distanceService = distanceService;
+    this.starDataService = starDataService;
 
     this.stars = [];
 
-    this.carriers = []
+    this.carriers = [];
 
     this.zoomPercent = 0
 
@@ -306,7 +308,7 @@ export class Map {
     let star = this.stars.find(x => x.data._id === starData._id)
 
     if (!star) {
-      star = new Star(this.app, this.game, starData, userSettings, this.context);
+      star = new Star(this.starDataService, this.app, this.game, starData, userSettings, this.context);
       this.stars.push(star);
 
       this.starContainer!.addChild(star.fixedContainer);

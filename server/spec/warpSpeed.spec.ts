@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { CarrierTravelService } from '@solaris/common';
+import { CarrierTravelService, GameTypeService } from '@solaris/common';
 import {StarDataService} from "@solaris/common";
 
 let playerId,
@@ -43,7 +43,7 @@ diplomacyService = {
     }
 }
 
-starDataService = new StarDataService();
+starDataService = new StarDataService(new GameTypeService());
 
 describe('warp speed', () => {
     const service = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);

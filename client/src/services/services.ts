@@ -39,7 +39,7 @@ export const initialize = (starService: IStarService, specialistService: ISpecia
   const distanceService = new DistanceService();
   const starDistanceService = new StarDistanceService(distanceService);
   const technologyService = new TechnologyService(specialistService, gameTypeService);
-  const starDataService = new StarDataService();
+  const starDataService = new StarDataService(gameTypeService);
   const carrierTravelService = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);
 
   const waypointService = new WaypointService(starService, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService);

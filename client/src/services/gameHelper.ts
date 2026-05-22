@@ -92,12 +92,6 @@ class GameHelper {
     return game.galaxy.stars.find(x => x._id === carrier.orbiting) || null
   }
 
-  getCarriersOrbitingStar(game: Game, star: Star) {
-    return game.galaxy.carriers
-      .filter(x => x.orbiting === star._id)
-      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0))
-  }
-
   isCarrierInTransit(carrier: Carrier) {
     return carrier.orbiting == null;
   }
@@ -106,8 +100,14 @@ class GameHelper {
     return carrier.waypoints.indexOf(waypoint) === 0 && this.isCarrierInTransit(carrier)
   }
 
-  getStarTotalKnownShips(game, star) {
-    let carriers = this.getCarriersOrbitingStar(game, star)
+  getCarriersOrbitingStar(game: Game, star: Star) {
+    return game.galaxy.carriers
+      .filter(x => x.orbiting === star._id)
+      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0));
+  }
+
+  getStarTotalKnownShips(game: Game, star: Star) {
+    const carriers = this.getCarriersOrbitingStar(game, star);
 
     return (star.ships || 0) + carriers.reduce((sum, c) => sum + (c.ships || 0), 0)
   }
@@ -499,39 +499,8 @@ class GameHelper {
     return 'Unknown'
   }
 
-  isOwnerCapital(game, star) {
-    if (!star.homeStar || !star.ownedByPlayerId) {
-      return false;
-    }
-
-    const ownersHomeStarId = this.getPlayerById(game, star.ownedByPlayerId)!.homeStarId;
-
-    return ownersHomeStarId && ownersHomeStarId === star._id;
-  }
-
   getOriginalOwner(game, star) {
     return game.galaxy.players.find(player => player.homeStarId == star._id);
-  }
-
-  isCapitalCaptureCapital(game: Game, star: Star) {
-    if (!star.homeStar || !star.ownedByPlayerId) {
-      return false;
-    }
-
-    return this.isConquestHomeStars(game);
-  }
-
-  isCapitalEliminationCapital(game: Game, star: Star) {
-    if (!star.homeStar || !star.ownedByPlayerId) {
-      return false;
-    }
-
-    const player = this.getPlayerById(game, star.ownedByPlayerId)!
-    if (this.isCapitalElimination(game) && this.isOwnerCapital(game, star) && !player.defeated) {
-      return true;
-    }
-
-    return false;
   }
 
   playerHasLowestTechLevel(game: Game, techKey: ResearchTypeNotRandom, player: Player) {
@@ -925,17 +894,6 @@ class GameHelper {
     let creditsPerTickByScience = stars[0]?.specialist?.modifiers?.special?.creditsPerTickByScience ?? 0;
 
     return (stars.reduce((totalScience, star) => totalScience + (star.infrastructure?.science ?? 0), 0)) * creditsPerTickByScience;
-  }
-
-  isStarHasMultiplePlayersInOrbit(game, star) {
-    let carriersInOrbit = this.getCarriersOrbitingStar(game, star)
-    let playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))]
-
-    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
-      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1)
-    }
-
-    return playerIds.length
   }
 
   getGameTypeFriendlyText(game) {

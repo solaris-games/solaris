@@ -180,6 +180,23 @@ export class Helpers {
 
     return closestStar.location
   }
+
+  isStarHasMultiplePlayersInOrbit(game: Game, star: Star) {
+    const carriersInOrbit = this.getCarriersOrbitingStar(game, star);
+    const playerIds = [...new Set(carriersInOrbit.map(c => c.ownedByPlayerId))];
+
+    if (playerIds.indexOf(star.ownedByPlayerId) > -1) {
+      playerIds.splice(playerIds.indexOf(star.ownedByPlayerId), 1);
+    }
+
+    return playerIds.length;
+  }
+
+  getCarriersOrbitingStar(game: Game, star: Star) {
+    return game.galaxy.carriers
+      .filter(x => x.orbiting === star._id)
+      .sort((a, b) => (a.ticksEta || 0) - (b.ticksEta || 0));
+  }
 }
 
 export default new Helpers()

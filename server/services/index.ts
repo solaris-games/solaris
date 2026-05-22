@@ -197,7 +197,7 @@ export default (config: Config,
     const nameService = new NameService(gameNames, starNames, randomService);
     const starDistanceService = new StarDistanceService(distanceService);
     const technologyService = new TechnologyService(specialistService, gameTypeService);
-    const starDataService = new StarDataService();
+    const starDataService = new StarDataService(gameTypeService);
     const starService = new StarService(gameRepository, randomService, nameService, distanceService, starDistanceService, technologyService, specialistService, userService, gameTypeService, gameStateService, statisticsService, starDataService);
     const carrierService = new CarrierService(gameRepository, distanceService, starService, technologyService, specialistService);
     const shipService = new ShipService(starService, technologyService, carrierService);
