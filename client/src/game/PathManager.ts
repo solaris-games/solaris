@@ -76,10 +76,10 @@ export class PathManager {
     this.chunksContainer.removeChildren();
     this.chunklessContainer.removeChildren();
 
-    const minX = gameHelper.calculateMinStarX(this.game)
-    const minY = gameHelper.calculateMinStarY(this.game)
-    const maxX = gameHelper.calculateMaxStarX(this.game)
-    const maxY = gameHelper.calculateMaxStarY(this.game)
+    const minX = helpers.calculateMinStarX(this.game)
+    const minY = helpers.calculateMinStarY(this.game)
+    const maxX = helpers.calculateMaxStarX(this.game)
+    const maxY = helpers.calculateMaxStarY(this.game)
 
     this.firstChunkX = Math.floor(minX/this.chunkSize)
     this.firstChunkY = Math.floor(minY/this.chunkSize)

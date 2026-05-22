@@ -1,6 +1,7 @@
 import {Viewport} from 'pixi-viewport';
 import Map from './map';
 import gameHelper from '../services/gameHelper';
+import helpers from './helpers';
 import textureService from './texture';
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
 import {DEFAULT_SETTINGS, type Location, type UserGameSettings} from "@solaris/common";
@@ -168,10 +169,10 @@ export class GameContainer {
 
   _setupViewport () {
     const game = this.game;
-    this.starFieldLeft = gameHelper.calculateMinStarX(game) - 1500
-    this.starFieldRight = gameHelper.calculateMaxStarX(game) + 1500
-    this.starFieldTop = gameHelper.calculateMinStarY(game) - 750
-    this.starFieldBottom = gameHelper.calculateMaxStarY(game) + 750
+    this.starFieldLeft = helpers.calculateMinStarX(game) - 1500
+    this.starFieldRight = helpers.calculateMaxStarX(game) + 1500
+    this.starFieldTop = helpers.calculateMinStarY(game) - 750
+    this.starFieldBottom = helpers.calculateMaxStarY(game) + 750
 
     const maxWidth = 2 * Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
     const maxHeight = 2 * Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);

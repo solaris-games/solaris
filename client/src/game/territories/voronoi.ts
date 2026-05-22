@@ -5,6 +5,7 @@ import {Container, Graphics} from 'pixi.js';
 import {Delaunay} from 'd3-delaunay';
 import {colorFromString} from "@/util/colour";
 import gameHelper from "@/services/gameHelper";
+import helpers from "@/game/helpers";
 
 const MAX_VORONOI_DISTANCE = 50;
 
@@ -218,10 +219,10 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
   const stars = game.galaxy.stars;
   if (stars.length === 0) return;
 
-  const minX = gameHelper.calculateMinStarX(game);
-  const minY = gameHelper.calculateMinStarY(game);
-  const maxX = gameHelper.calculateMaxStarX(game);
-  const maxY = gameHelper.calculateMaxStarY(game);
+  const minX = helpers.calculateMinStarX(game);
+  const minY = helpers.calculateMinStarY(game);
+  const maxX = helpers.calculateMaxStarX(game);
+  const maxY = helpers.calculateMaxStarY(game);
 
   // Build flat coordinate array and player ID index
   const coords = new Float64Array(stars.length * 2);

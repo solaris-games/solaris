@@ -1,6 +1,7 @@
 import { Container, Graphics } from 'pixi.js';
 import type { Game } from '../types/game';
 import gameHelper from '../services/gameHelper'
+import helpers from './helpers'
 import type Star from './star';
 import type Carrier from './carrier';
 import type { MapObject } from './mapObject';
@@ -42,15 +43,15 @@ export class Chunks {
   update(game: Game, stars: Star[], carriers: Carrier[]) {
     this.chunksContainer.removeChildren();
 
-    const carrierMinX = gameHelper.calculateMinCarrierX(game)
-    const carrierMinY = gameHelper.calculateMinCarrierY(game)
-    const carrierMaxX = gameHelper.calculateMaxCarrierX(game)
-    const carrierMaxY = gameHelper.calculateMaxCarrierY(game)
+    const carrierMinX = helpers.calculateMinCarrierX(game)
+    const carrierMinY = helpers.calculateMinCarrierY(game)
+    const carrierMaxX = helpers.calculateMaxCarrierX(game)
+    const carrierMaxY = helpers.calculateMaxCarrierY(game)
 
-    const starMinX = gameHelper.calculateMinStarX(game)
-    const starMinY = gameHelper.calculateMinStarY(game)
-    const starMaxX = gameHelper.calculateMaxStarX(game)
-    const starMaxY = gameHelper.calculateMaxStarY(game)
+    const starMinX = helpers.calculateMinStarX(game)
+    const starMinY = helpers.calculateMinStarY(game)
+    const starMaxX = helpers.calculateMaxStarX(game)
+    const starMaxY = helpers.calculateMaxStarY(game)
 
     const minX = Math.min(carrierMinX, starMinX)
     const minY = Math.min(carrierMinY, starMinY)

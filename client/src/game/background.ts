@@ -2,6 +2,7 @@ import { Container, Sprite, type BLEND_MODES } from 'pixi.js'
 import TextureService from './texture'
 import * as rng from 'random-seed'
 import gameHelper from '../services/gameHelper'
+import helpers from './helpers'
 import type { Game } from '../types/game'
 import type { DrawingContext } from './container'
 import type { UserGameSettings } from '@solaris/common'
@@ -55,8 +56,8 @@ export class Background {
     this.userSettings = userSettings
     this.rng = rng.create(game._id)
 
-    this.galaxyCenterX = gameHelper.calculateGalaxyCenterX(game);
-    this.galaxyCenterY = gameHelper.calculateGalaxyCenterY(game);
+    this.galaxyCenterX = helpers.calculateGalaxyCenterX(game);
+    this.galaxyCenterY = helpers.calculateGalaxyCenterY(game);
 
     Background.zoomLevelDefinitions = userSettings.map.zoomLevels.background
     this.container.alpha = userSettings.map.background.nebulaOpacity
@@ -105,10 +106,10 @@ export class Background {
     const MINIMUM_STARS = 2 //chunks must have these many stars to be elegible to host a nebula
     const NEBULA_MAX_OFFSET = CHUNK_SIZE/4.0
 
-    const minX = gameHelper.calculateMinStarX(this.game!)
-    const minY = gameHelper.calculateMinStarY(this.game!)
-    const maxX = gameHelper.calculateMaxStarX(this.game!)
-    const maxY = gameHelper.calculateMaxStarY(this.game!)
+    const minX = helpers.calculateMinStarX(this.game!)
+    const minY = helpers.calculateMinStarY(this.game!)
+    const maxX = helpers.calculateMaxStarX(this.game!)
+    const maxY = helpers.calculateMaxStarY(this.game!)
 
     const firstChunkX = Math.floor(minX/CHUNK_SIZE)
     const firstChunkY = Math.floor(minY/CHUNK_SIZE)

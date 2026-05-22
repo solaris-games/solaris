@@ -3,6 +3,7 @@ import type {UserGameSettings} from "@solaris/common";
 import type {Game, Player} from "@/types/game";
 import type {DrawingContext} from "@/game/container";
 import gameHelper from "@/services/gameHelper";
+import helpers from "@/game/helpers";
 
 type SamplePoint = {
   distance: number;
@@ -87,10 +88,10 @@ export const drawTerritoriesMarchingSquare = (game: Game, userSettings: UserGame
     ],
   ];
 
-  let minX = gameHelper.calculateMinStarX(game);
-  let minY = gameHelper.calculateMinStarY(game);
-  let maxX = gameHelper.calculateMaxStarX(game);
-  let maxY = gameHelper.calculateMaxStarY(game);
+  let minX = helpers.calculateMinStarX(game);
+  let minY = helpers.calculateMinStarY(game);
+  let maxX = helpers.calculateMaxStarX(game);
+  let maxY = helpers.calculateMaxStarY(game);
 
   minX -= minX % CELL_SIZE;
   minX -= Math.floor(METABALL_RADIUS * 1.5 / CELL_SIZE) * CELL_SIZE;
