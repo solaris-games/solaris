@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import { ValidationError, ResearchType, ResearchTypeNotRandom } from "@solaris/common";
+import { ValidationError, ResearchType, ResearchTypeNotRandom, ResearchProgressService } from "@solaris/common";
 import Repository from './repository';
 import { Game } from './types/Game';
 import {Player, ResearchProgress } from './types/Player';
@@ -25,6 +25,7 @@ export default class ResearchService extends EventEmitter {
     userService: UserService;
     gameTypeService: GameTypeService;
     statisticsService: StatisticsService;
+    researchProgressService: ResearchProgressService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -35,6 +36,7 @@ export default class ResearchService extends EventEmitter {
         userService: UserService,
         gameTypeService: GameTypeService,
         statisticsService: StatisticsService,
+        researchProgressService: ResearchProgressService,
     ) {
         super();
         
@@ -46,6 +48,7 @@ export default class ResearchService extends EventEmitter {
         this.userService = userService;
         this.gameTypeService = gameTypeService;
         this.statisticsService = statisticsService;
+        this.researchProgressService = researchProgressService;
     }
 
     async updateResearchNow(game: Game, player: Player, preference: ResearchTypeNotRandom) {
@@ -123,7 +126,7 @@ export default class ResearchService extends EventEmitter {
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
+        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, techKey, tech.level);
 
         let levelUp = false;
 
@@ -131,7 +134,7 @@ export default class ResearchService extends EventEmitter {
             tech.level++;
             tech.progress! -= requiredProgress;
             
-            requiredProgress = this.getRequiredResearchProgress(game, techKey, tech.level);
+            requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, techKey, tech.level);
             levelUp = true
         }
 
@@ -173,21 +176,6 @@ export default class ResearchService extends EventEmitter {
             let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
             
             this.conductResearch(game, user, player);
-        }
-    }
-
-    getRequiredResearchProgress(game: Game, technologyKey: ResearchTypeNotRandom, technologyLevel: number) {
-        const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
-        const expenseCostConfig = game.constants.star.infrastructureExpenseMultipliers[researchCostConfig];
-        const progressMultiplierConfig = expenseCostConfig * game.constants.research.progressMultiplier;
-
-        const progression = game.settings.technology.researchCostProgressions[technologyKey];
-
-        if (progression.progression === "exponential") {
-            const growthFactor = game.constants.research.exponentialGrowthFactors[progression.growthFactor];
-            return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel - 1));
-        } else {
-            return technologyLevel * progressMultiplierConfig;
         }
     }
 
@@ -254,7 +242,7 @@ export default class ResearchService extends EventEmitter {
 
         // If the current progress is greater than the required progress
         // then increase the level and carry over the remainder.
-        let requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
+        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, tech.key, tech.technology.level);
 
         let levelUp = false;
         let researchingNext;
@@ -262,7 +250,7 @@ export default class ResearchService extends EventEmitter {
         while (tech.technology.progress! >= requiredProgress) {
             tech.technology.level++;
             tech.technology.progress -= requiredProgress;
-            requiredProgress = this.getRequiredResearchProgress(game, tech.key, tech.technology.level);
+            requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, tech.key, tech.technology.level);
             levelUp = true;
         }
 
@@ -352,7 +340,7 @@ export default class ResearchService extends EventEmitter {
 
         let tech = player.research[researchKey];
 
-        let requiredProgress = this.getRequiredResearchProgress(game, researchKey, tech.level);
+        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, researchKey, tech.level);
         let remainingPoints = requiredProgress - tech.progress!;
 
         return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
@@ -361,8 +349,8 @@ export default class ResearchService extends EventEmitter {
     calculateDoubleIdenticalResearchETAInTicks(game: Game, player: Player)  {        
         let tech = player.research[player.researchingNow];
         
-        let requiredProgress = this.getRequiredResearchProgress(game, player.researchingNow, tech.level) 
-                             + this.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
+        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level) 
+                             + this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
         let remainingPoints = requiredProgress - tech.progress!;
 
         return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);

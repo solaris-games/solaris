@@ -80,3 +80,4 @@ export * from "./services/waypoint";
 export * from "./services/pathfinding";
 export * from "./services/combatGroup";
 export * from "./services/combat";
+export * from "./services/researchProgress";
