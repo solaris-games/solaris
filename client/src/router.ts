@@ -11,7 +11,6 @@ import AccountResetUsername from './views/account/ResetUsername.vue'
 import AccountResetPassword from './views/account/ResetPassword.vue'
 import AccountExternalResetPassword from './views/account/ExternalResetPassword.vue'
 import AccountSettings from './views/account/Settings.vue'
-import Game from './views/game/Game.vue'
 import GameActiveGames from './views/game/ActiveGames.vue'
 import GameCreation from './views/game/Create.vue'
 import GameDetail from './views/game/Detail.vue'
@@ -25,14 +24,10 @@ import Avatars from './views/shop/Avatars.vue'
 import GalacticCreditsShop from './views/shop/GalacticCredits.vue'
 import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
 import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
-import Games from "./views/admin/Games.vue";
-import Users from "./views/admin/Users.vue";
-import Reports from "./views/admin/Reports.vue";
-import Insights from "./views/admin/Insights.vue";
-import PasswordResets from "./views/admin/PasswordResets.vue";
 import CommunityGuidelines from "./views/CommunityGuidelines.vue";
-import AdminAnnouncements from './views/admin/Announcements.vue';
 import Announcements from "./views/Announcements.vue";
+
+const Game = () => import('./views/game/Game.vue');
 
 export default createRouter({
   history: createWebHashHistory(),
@@ -146,32 +141,32 @@ export default createRouter({
     {
       path: '/administration/announcements',
       name: 'administration-announcements',
-      component: AdminAnnouncements
+      component: () => import('./views/admin/Announcements.vue')
     },
     {
       path: '/administration/games',
       name: 'administration-games',
-      component: Games
+      component: () => import('./views/admin/Games.vue')
     },
     {
       path: '/administration/users',
       name: 'administration-users',
-      component: Users
+      component: () => import('./views/admin/Users.vue')
     },
     {
       path: '/administration/reports',
       name: 'administration-reports',
-      component: Reports
+      component: () => import('./views/admin/Reports.vue')
     },
     {
       path: '/administration/insights',
       name: 'administration-insights',
-      component: Insights
+      component: () => import('./views/admin/Insights.vue')
     },
     {
       path: '/administration/passwordresets',
       name: 'administration-password-resets',
-      component: PasswordResets
+      component: () => import('./views/admin/PasswordResets.vue')
     },
     {
       path: '/avatars',

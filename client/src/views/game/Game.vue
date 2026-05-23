@@ -27,7 +27,10 @@
 <script setup lang="ts">
 import Logo from '../components/Logo.vue'
 import LoadingSpinner from '../components/LoadingSpinner.vue'
-import GameContainer from './components/GameContainer.vue'
+// GameContainer is lazy-loaded so the heavy @solaris/map-rendering / Pixi bundle
+// is split into its own chunk and only downloaded once the game view mounts.
+import { defineAsyncComponent } from 'vue';
+const GameContainer = defineAsyncComponent(() => import('./components/GameContainer.vue'));
 import MainBar from './components/menu/MainBar.vue'
 import Chat from './components/inbox/Chat.vue'
 import GameHelper from '../../services/gameHelper'
