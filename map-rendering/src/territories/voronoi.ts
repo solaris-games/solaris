@@ -254,12 +254,6 @@ export const drawTerritoriesVoronoi = (game: Game, userSettings: UserGameSetting
 
   const starCells = starCellsUnclipped.map(cell => clip(cell, hull));
 
-  console.warn({
-    starCellsUnclipped,
-    hull,
-    starCells,
-  });
-
   const borderWidth = userSettings.map.voronoiTerritoryBorderWidth;
   if (borderWidth <= 0) return;
 
