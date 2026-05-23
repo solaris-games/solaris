@@ -31,7 +31,8 @@ import {useGameStore} from "@/stores/game.ts";
 // DO NOT use top-level await since that silently breaks the bundle
 import('bootstrap/dist/js/bootstrap.bundle.js').then((mod) => window.bootstrap = mod);
 declare var bootstrap: any; // Hnnngh.
-import('../public/assets/js/app.min.js')
+// app.min.js is loaded via a <script> tag in index.html so it stays outside
+// the Rollup module graph entirely.
 
 
 window.$ = $;

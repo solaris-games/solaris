@@ -1,33 +1,15 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 import Home from './views/Home.vue'
 import MainMenu from './views/MainMenu.vue'
-import PrivacyPolicy from './views/PrivacyPolicy.vue'
-import AccountAchievements from './views/account/Achievements.vue'
-import AccountCreation from './views/account/Creation.vue'
-import AccountForgotPassword from './views/account/ForgotPassword.vue'
-import AccountForgotUsername from './views/account/ForgotUsername.vue'
-import AccountResetEmail from './views/account/ResetEmail.vue'
-import AccountResetUsername from './views/account/ResetUsername.vue'
-import AccountResetPassword from './views/account/ResetPassword.vue'
-import AccountExternalResetPassword from './views/account/ExternalResetPassword.vue'
-import AccountSettings from './views/account/Settings.vue'
-import GameActiveGames from './views/game/ActiveGames.vue'
-import GameCreation from './views/game/Create.vue'
-import GameDetail from './views/game/Detail.vue'
-import GameList from './views/game/List.vue'
-import Leaderboard from './views/game/Leaderboard.vue'
-import MyGuild from './views/guild/MyGuild.vue'
-import GuildCreate from './views/guild/Create.vue'
-import GuildRename from './views/guild/Rename.vue'
-import GuildDetails from './views/guild/Detail.vue'
-import Avatars from './views/shop/Avatars.vue'
-import GalacticCreditsShop from './views/shop/GalacticCredits.vue'
-import ShopPurchaseComplete from './views/shop/PurchaseComplete.vue'
-import ShopPurchaseFailed from './views/shop/PurchaseFailed.vue'
-import CommunityGuidelines from "./views/CommunityGuidelines.vue";
-import Announcements from "./views/Announcements.vue";
 
-const Game = () => import('./views/game/Game.vue');
+// Every route below this point is lazy-loaded. None of the component code
+// (or their transitive dependencies, e.g. Chart.js) will be included in the
+// initial bundle — it is only downloaded when the user first navigates to
+// that route.
+
+// Game is lazy-loaded so that the heavy @solaris/map-rendering / Pixi bundle
+// is only downloaded when the user actually enters a game.
+const Game = () => import('./views/game/Game.vue')
 
 export default createRouter({
   history: createWebHashHistory(),
@@ -35,47 +17,47 @@ export default createRouter({
     {
       path: '/account/achievements/:userId',
       name: 'account-achievements',
-      component: AccountAchievements
+      component: () => import('./views/account/Achievements.vue')
     },
     {
       path: '/account/create',
       name: 'account-creation',
-      component: AccountCreation
+      component: () => import('./views/account/Creation.vue')
     },
     {
       path: '/account/forgot-password',
       name: 'account-forgot-password',
-      component: AccountForgotPassword
+      component: () => import('./views/account/ForgotPassword.vue')
     },
     {
       path: '/account/forgot-username',
       name: 'account-forgot-username',
-      component: AccountForgotUsername
+      component: () => import('./views/account/ForgotUsername.vue')
     },
     {
       path: '/account/reset-email',
       name: 'account-reset-email',
-      component: AccountResetEmail
+      component: () => import('./views/account/ResetEmail.vue')
     },
     {
       path: '/account/reset-username',
       name: 'account-reset-username',
-      component: AccountResetUsername
+      component: () => import('./views/account/ResetUsername.vue')
     },
     {
       path: '/account/reset-password',
       name: 'account-reset-password',
-      component: AccountResetPassword
+      component: () => import('./views/account/ResetPassword.vue')
     },
     {
       path: '/account/reset-password-external',
       name: 'account-reset-password-external',
-      component: AccountExternalResetPassword
+      component: () => import('./views/account/ExternalResetPassword.vue')
     },
     {
       path: '/account/settings',
       name: 'account-settings',
-      component: AccountSettings
+      component: () => import('./views/account/Settings.vue')
     },
     {
       path: '/game',
@@ -85,22 +67,22 @@ export default createRouter({
     {
       path: '/game/active-games',
       name: 'game-active-games',
-      component: GameActiveGames
+      component: () => import('./views/game/ActiveGames.vue')
     },
     {
       path: '/game/create',
       name: 'game-creation',
-      component: GameCreation
+      component: () => import('./views/game/Create.vue')
     },
     {
       path: '/game/detail',
       name: 'game-detail',
-      component: GameDetail
+      component: () => import('./views/game/Detail.vue')
     },
     {
       path: '/game/list',
       name: 'game-list',
-      component: GameList
+      component: () => import('./views/game/List.vue')
     },
     {
       path: '/',
@@ -115,28 +97,27 @@ export default createRouter({
     {
       path: '/leaderboard',
       name: 'leaderboard',
-      component: Leaderboard
+      component: () => import('./views/game/Leaderboard.vue')
     },
     {
       path: '/guild/create',
       name: 'guild-create',
-      component: GuildCreate
+      component: () => import('./views/guild/Create.vue')
     },
     {
       path: '/guild/rename',
       name: 'guild-rename',
-      component: GuildRename
+      component: () => import('./views/guild/Rename.vue')
     },
     {
       path: '/guild',
       name: 'guild',
-      component: MyGuild
+      component: () => import('./views/guild/MyGuild.vue')
     },
     {
-
       path: '/guild/details/:guildId',
       name: 'guild-details',
-      component: GuildDetails
+      component: () => import('./views/guild/Detail.vue')
     },
     {
       path: '/administration/announcements',
@@ -171,37 +152,37 @@ export default createRouter({
     {
       path: '/avatars',
       name: 'avatars',
-      component: Avatars
+      component: () => import('./views/shop/Avatars.vue')
     },
     {
       path: '/shop',
       name: 'galactic-credits-shop',
-      component: GalacticCreditsShop
+      component: () => import('./views/shop/GalacticCredits.vue')
     },
     {
       path: '/shop/paymentcomplete',
       name: 'galactic-credits-shop-payment-complete',
-      component: ShopPurchaseComplete
+      component: () => import('./views/shop/PurchaseComplete.vue')
     },
     {
       path: '/shop/paymentfailed',
       name: 'galactic-credits-shop-payment-failed',
-      component: ShopPurchaseFailed
+      component: () => import('./views/shop/PurchaseFailed.vue')
     },
     {
       path: '/privacypolicy',
       name: 'privacy-policy',
-      component: PrivacyPolicy
+      component: () => import('./views/PrivacyPolicy.vue')
     },
     {
       path: '/guidelines',
       name: 'guidelines',
-      component: CommunityGuidelines
+      component: () => import('./views/CommunityGuidelines.vue')
     },
     {
       path: '/announcements',
       name: 'announcements',
-      component: Announcements
+      component: () => import('./views/Announcements.vue')
     }
   ]
 })
