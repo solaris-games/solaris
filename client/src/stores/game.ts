@@ -16,7 +16,7 @@ import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialis
 import {formatError, isOk} from "@/services/typedapi";
 import type { Axios } from "axios";
 import type {MenuState, MenuStateChat} from "@/types/menu";
-import {GameCommandEventBusEventNames} from "@solaris/map-rendering";
+import GameCommandEventBusEventNames from '@solaris/map-rendering/eventBusEventNames/gameCommand';
 
 type PlayerJoinedData = {
   playerId: string,

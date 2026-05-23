@@ -6,6 +6,7 @@
         "paths": {
             "@solaris/common": [ "../common/src/index.ts" ],
             "@solaris/map-rendering": [ "../map-rendering/src/index.ts" ],
+            "@solaris/map-rendering/*": [ "../map-rendering/src/*" ],
             "@/*": ["./src/*"]
         },
         "lib": [

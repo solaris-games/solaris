@@ -1,5 +1,5 @@
 import { computed, readonly, ref } from 'vue';
-import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
+import GameCommandEventBusEventNames from '@solaris/map-rendering/eventBusEventNames/gameCommand';
 import { defineStore } from 'pinia';
 import type { PlayerColour } from '@solaris/common';
 import { formatError, isOk } from '@/services/typedapi';
