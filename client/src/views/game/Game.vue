@@ -41,6 +41,11 @@ import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
 import { eventBusInjectionKey } from '@/eventBus'
 import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
 import { playerClientSocketEmitterInjectionKey } from '@/sockets/socketEmitters/player'
+import { socketInjectionKey } from '@/socket'
+import { DiplomacyClientSocketHandler } from '@/sockets/socketHandlers/diplomacy'
+import { GameClientSocketHandler } from '@/sockets/socketHandlers/game'
+import { PlayerClientSocketHandler } from '@/sockets/socketHandlers/player'
+import { GameRoomClientSocketHandler } from '@/sockets/socketHandlers/gameRoom'
 import GameEventBusEventNames from '../../eventBusEventNames/game'
 import router from '../../router'
 import { withMessages } from "../../util/messages";
@@ -68,6 +73,7 @@ const eventBus = inject(eventBusInjectionKey)!;
 const playerClientSocketEmitter = inject(playerClientSocketEmitterInjectionKey)!;
 const userClientSockerEmitter = inject(userClientSocketEmitterInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
+const socket = inject(socketInjectionKey)!;
 const toast = useToast();
 
 const route = useRoute();
@@ -75,6 +81,11 @@ const route = useRoute();
 const polling: Ref<number | null> = ref(null);
 const ticking = ref(false);
 const colourOverride: Ref<{ playerId: string } | null> = ref(null);
+
+let diplomacySocketHandler: DiplomacyClientSocketHandler | null = null;
+let gameSocketHandler: GameClientSocketHandler | null = null;
+let playerSocketHandler: PlayerClientSocketHandler | null = null;
+let gameRoomSocketHandler: GameRoomClientSocketHandler | null = null;
 
 const game = computed<Game>(() => store.game!);
 
@@ -261,6 +272,11 @@ store.clearGame();
 const GAME_BODY_CLASS = 'game-body';
 
 onMounted(async () => {
+  diplomacySocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
+  gameSocketHandler = new GameClientSocketHandler(socket, store, eventBus);
+  playerSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
+  gameRoomSocketHandler = new GameRoomClientSocketHandler(socket, store, playerClientSocketEmitter);
+
   attemptLogin();
 
   await reloadSettings();
@@ -309,6 +325,15 @@ onBeforeUnmount(() => {
 });
 
 onUnmounted(() => {
+  diplomacySocketHandler?.destroy();
+  gameSocketHandler?.destroy();
+  playerSocketHandler?.destroy();
+  gameRoomSocketHandler?.destroy();
+  diplomacySocketHandler = null;
+  gameSocketHandler = null;
+  playerSocketHandler = null;
+  gameRoomSocketHandler = null;
+
   const userPlayer = GameHelper.getUserPlayer(store.game!);
 
   if (userPlayer) {

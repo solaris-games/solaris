@@ -10,10 +10,8 @@ import { eventBusInjectionKey, type EventBus } from './eventBus'
 import router from './router'
 import { PlayerClientSocketEmitter, playerClientSocketEmitterInjectionKey } from './sockets/socketEmitters/player'
 import { ClientHandler } from "./sockets/socketHandlers/clientHandler"
-import { DiplomacyClientSocketHandler } from './sockets/socketHandlers/diplomacy'
-import { GameClientSocketHandler } from './sockets/socketHandlers/game'
-import { PlayerClientSocketHandler } from "./sockets/socketHandlers/player"
 import { httpInjectionKey } from "./services/typedapi"
+import { socketInjectionKey } from "./socket"
 import {createHttpClient} from "./util/http";
 import {UserClientSocketHandler} from "./sockets/socketHandlers/user";
 import {UserClientSocketEmitter} from "@/sockets/socketEmitters/user";
@@ -22,7 +20,6 @@ import type {FrontendConfig} from "@solaris/common";
 import {configInjectionKey} from "@/config";
 import { createPinia } from "pinia"
 import {useSocketStore} from "@/stores/socket.ts";
-import {useGameStore} from "@/stores/game.ts";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -92,20 +89,14 @@ const init = (config: FrontendConfig) => {
     socketStore.setSocketConnected(false);
   });
 
-  const gameStore = useGameStore();
-
-  const diplomacyClientSocketHandler: DiplomacyClientSocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
-  const gameClientSocketHandler: GameClientSocketHandler = new GameClientSocketHandler(socket, gameStore, eventBus);
-  const playerClientSocketHandler: PlayerClientSocketHandler = new PlayerClientSocketHandler(socket, gameStore, eventBus);
-  const userClientSocketHandler: UserClientSocketHandler = new UserClientSocketHandler(socket, eventBus);
-
+  app.provide(socketInjectionKey, socket);
   app.provide(userClientSocketEmitterInjectionKey, userClientSocketEmitter);
   app.provide(playerClientSocketEmitterInjectionKey, playerClientSocketEmitter);
   app.provide(eventBusInjectionKey, eventBus);
 
   app.provide(httpInjectionKey, httpClient);
 
-  const clientHandler: ClientHandler = new ClientHandler(socket, gameStore, playerClientSocketEmitter, userClientSocketEmitter);
+  const clientHandler: ClientHandler = new ClientHandler(socket, userClientSocketEmitter);
 
   app.directive('tooltip', function(el, binding) {
     new bootstrap.Tooltip($(el), {
