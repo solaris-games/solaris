@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
 import Overview from './Overview.vue'
 import Infrastructure from '../shared/Infrastructure.vue'
@@ -52,7 +53,6 @@ import EloRating from './EloRating.vue'
 import PlayerReport from './PlayerReport.vue'
 import GameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, ref, computed, type Ref, onMounted } from 'vue';
 import type { InGameUser, Player, UserPublic } from '@solaris/common'
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";

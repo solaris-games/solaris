@@ -1,8 +1,8 @@
 import { inject, type Ref } from 'vue';
+import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import {saveWaypoints as saveWaypointsReq} from "@/services/typedapi/carrier";
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import AudioService from "../../../../services/audio";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import type {Carrier, Game} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris/common";
 import {eventBusInjectionKey} from "@/eventBus";

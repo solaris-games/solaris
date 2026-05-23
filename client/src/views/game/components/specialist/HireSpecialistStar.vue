@@ -52,12 +52,12 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {inject, ref, computed} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game} from "@/types/game";
 import type {Specialist} from "@solaris/common";

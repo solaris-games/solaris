@@ -28,8 +28,8 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, ref, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

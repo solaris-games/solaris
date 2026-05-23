@@ -34,11 +34,11 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import AudioService from '../../../../services/audio'
 import gameHelper from '../../../../services/gameHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
-import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "../../../../eventBus";
 import { ref, inject, computed } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";

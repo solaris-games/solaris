@@ -144,6 +144,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { type ObjectClicked } from '@solaris/map-rendering';
 import PlayerList from './PlayerList.vue';
 import Leaderboard from '../leaderboard/Leaderboard.vue';
 import Player from '../player/Player.vue';
@@ -185,7 +186,6 @@ import GameStatistics from "@/views/game/components/statistics/GameStatistics.vu
 import {useUserStore} from "@/stores/user";
 import {useGameStore} from "@/stores/game";
 import type {MenuState, ReportPlayerArgs} from "@/types/menu";
-import type {ObjectClicked} from "@/eventBusEventNames/map";
 
 const emit = defineEmits<{
   onViewColourOverrideRequested: [playerId: string],

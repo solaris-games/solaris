@@ -5,12 +5,10 @@
 <script setup lang="ts">
 import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
 import { eventBusInjectionKey } from '../../../eventBus'
-import MapEventBusEventNames, { type ObjectClicked, type OnPreStarParams } from '../../../eventBusEventNames/map';
 import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
-import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
-import {createGameContainer, type Services} from "@solaris/map-rendering";
+import { createGameContainer, type Services, MapEventBusEventNames, type ObjectClicked, type OnPreStarParams, MapCommandEventBusEventNames } from '@solaris/map-rendering'
 import { mapTextureUrls } from './textureUrls';
 import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";

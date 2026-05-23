@@ -21,11 +21,11 @@
 
 <script setup lang="ts">
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import IgnoreBulkUpgrade from './IgnoreBulkUpgrade.vue'
 import StarResources from './StarResources.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type {Star} from "@/types/game";
 import type {InfrastructureType, MapObject} from "@solaris/common";
 

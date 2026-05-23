@@ -30,12 +30,12 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import MentionBox from '../shared/MentionBox.vue'
 import MentionHelper, {type Mention} from '@/services/mentionHelper';
 import GameHelper from "@/services/gameHelper";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
 import {getNotes, writeNotes} from "@/services/typedapi/game";

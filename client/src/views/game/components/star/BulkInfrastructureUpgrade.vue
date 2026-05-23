@@ -164,6 +164,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
 import FormErrorList from '../../../components/FormErrorList.vue'
 import GameHelper from '../../../../services/gameHelper'
@@ -173,7 +174,6 @@ import BulkInfrastructureUpgradeScheduleTable from './BulkInfrastructureUpgradeS
 import BulkInfrastructureUpgradeStarTable from './BulkInfrastructureUpgradeStarTable.vue'
 import LoadingSpinner from '../../../components/LoadingSpinner.vue'
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
 import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {BulkUpgradeReport, InfrastructureType, MapObject} from "@solaris/common";

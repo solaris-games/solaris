@@ -54,13 +54,13 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import TeamName from '@/views/game/components/shared/TeamName.vue';
 import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
 import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
 import GameHelper from '@/services/gameHelper';
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, computed } from 'vue';
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type { Player } from '@/types/game';
 
 import {useIsHistoricalMode} from "@/util/reactiveHooks";

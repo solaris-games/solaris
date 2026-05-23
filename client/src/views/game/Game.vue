@@ -26,6 +26,7 @@
 
 <script setup lang="ts">
 import Logo from '../components/Logo.vue'
+import { type ObjectClicked } from '@solaris/map-rendering';
 import LoadingSpinner from '../components/LoadingSpinner.vue'
 // GameContainer is lazy-loaded so the heavy @solaris/map-rendering / Pixi bundle
 // is split into its own chunk and only downloaded once the game view mounts.
@@ -47,7 +48,6 @@ import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/us
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
 import {getSettings} from "@/services/typedapi/user";
 import { useRoute } from 'vue-router';
-import type {ObjectClicked} from "@/eventBusEventNames/map";
 import {detailGalaxy, detailState} from "@/services/typedapi/game";
 import {createGameServices, gameServicesKey} from "@/util/gameServices";
 import type {Game} from "@/types/game";

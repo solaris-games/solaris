@@ -18,10 +18,10 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import GameHelper from '../../../../services/gameHelper'
 import { inject, computed, ref } from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game, Carrier} from "@/types/game";
 import {useConfirm} from "@/hooks/confirm.ts";

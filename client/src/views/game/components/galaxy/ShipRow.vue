@@ -14,10 +14,10 @@
 
 <script setup lang="ts">
 import { inject } from 'vue';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import PlayerIcon from '../player/PlayerIcon.vue'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type {MapObjectWithShips} from "@/views/game/components/galaxy/types";
 
 const props = defineProps<{

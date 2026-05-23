@@ -73,13 +73,13 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import {computed, inject, onMounted, onUnmounted, ref, watch} from 'vue';
 import MenuTitle from '../MenuTitle.vue';
 import GameHelper from '../../../../services/gameHelper';
 import gameHelper from '../../../../services/gameHelper';
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue';
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "../../../../eventBusEventNames/mapCommand";
 import type {CarrierWaypoint, CarrierWaypointActionType, MapObject, UserGameSettings} from "@solaris/common"
 import {httpInjectionKey} from "@/services/typedapi";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";

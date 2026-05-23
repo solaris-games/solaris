@@ -1,8 +1,7 @@
-import { type ConversationMessageSentResult } from "@solaris/common";
 import type { LedgerType } from "@solaris/common";
 import type { TradeEventTechnology } from "@solaris/common";
 import { makeCastFunc } from "@solaris/common";
-import { type EventBusEventName } from "./eventBusEventName";
+import type {EventBusEventName} from "@solaris/map-rendering";
 
 export type PlayerEventBusEventType = { playerEventBusEventType: 'playerEventBusEventType' };
 export type PlayerEventBusEventName<TData> = EventBusEventName<PlayerEventBusEventType, TData> & { playerEventBusEventName: 'playerEventBusEventName' }

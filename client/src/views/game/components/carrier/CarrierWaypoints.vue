@@ -87,9 +87,7 @@ import GameHelper from '../../../../services/gameHelper'
 import AudioService from '../../../../services/audio'
 import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
-import MapEventBusEventNames from "@/eventBusEventNames/map";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import {type Mode, ModeKind} from "@solaris/map-rendering";
+import { type Mode, ModeKind, MapEventBusEventNames, MapCommandEventBusEventNames } from '@solaris/map-rendering'
 import {httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player} from "@/types/game";
 import type {CarrierWaypoint} from "@solaris/common";

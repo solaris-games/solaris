@@ -224,6 +224,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames, GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import { inject, computed, ref, onMounted, onUnmounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
@@ -238,8 +239,6 @@ import OrbitalMechanicsETAWarning from '../shared/OrbitalMechanicsETAWarning.vue
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "../../../../eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";

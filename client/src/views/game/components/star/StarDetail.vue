@@ -488,6 +488,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import AudioService from '../../../../services/audio'
 import GameHelper from '../../../../services/gameHelper'
 import MenuTitle from '../MenuTitle.vue'
@@ -504,7 +505,6 @@ import StarIcon from './../star/StarIcon.vue'
 import HelpTooltip from '../../../components/HelpTooltip.vue'
 import {formatLocation} from "client/src/util/format";
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {inject, ref, computed, type Ref} from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Carrier, Game, Player} from "@/types/game";

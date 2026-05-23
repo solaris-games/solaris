@@ -85,11 +85,11 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import DiplomacyHelper from '../../../../services/diplomacyHelper'
 import router from '../../../../router'
 import {inject, computed} from 'vue';
 import {eventBusInjectionKey} from '@/eventBus'
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {configInjectionKey} from "@/config";
 import type {Game} from "@/types/game";
 import { useUserStore } from '@/stores/user';

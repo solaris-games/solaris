@@ -1,6 +1,6 @@
 import type { GameState } from "@solaris/common";
 import { makeCastFunc } from "@solaris/common";
-import type { EventBusEventName } from "./eventBusEventName";
+import type {EventBusEventName} from "@solaris/map-rendering";
 
 export type GameEventBusEventType = { gameEventBusEventType: 'gameEventBusEventType' };
 export type GameEventBusEventName<TData> = EventBusEventName<GameEventBusEventType, TData> & { gameEventBusEventName: 'gameEventBusEventName' }

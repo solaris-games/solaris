@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
+import { type OnPreStarParams } from '@solaris/map-rendering';
 import type {Player, Star} from "@/types/game";
 import { ref } from 'vue';
-import type {OnPreStarParams} from "@/eventBusEventNames/map.ts";
 
 export type MentionData = {
   element: HTMLTextAreaElement,

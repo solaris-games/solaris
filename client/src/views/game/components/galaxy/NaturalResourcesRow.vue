@@ -19,10 +19,10 @@
 
 <script setup lang="ts">
 import PlayerIcon from '../player/PlayerIcon.vue'
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import StarResources from '../star/StarResources.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import type {Star} from "@/types/game";
 import type {MapObject} from "@solaris/common";

@@ -12,11 +12,11 @@ import {
 import {type EventBus} from "@/eventBus";
 import {useColourStore} from "@/stores/colour";
 import GameHelper from "@/services/gameHelper";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
 import {formatError, isOk} from "@/services/typedapi";
 import type { Axios } from "axios";
 import type {MenuState, MenuStateChat} from "@/types/menu";
+import {GameCommandEventBusEventNames} from "@solaris/map-rendering";
 
 type PlayerJoinedData = {
   playerId: string,

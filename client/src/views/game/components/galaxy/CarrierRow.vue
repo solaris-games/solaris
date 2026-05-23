@@ -21,9 +21,9 @@
 
 <script setup lang="ts">
 import PlayerIcon from '../player/PlayerIcon.vue'
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {eventBusInjectionKey} from "../../../../eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import type {Carrier} from "@/types/game";
 import Timer from "@/views/game/components/time/Timer.vue";

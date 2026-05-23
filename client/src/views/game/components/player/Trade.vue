@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import { computed } from 'vue';
 import MenuTitle from '../MenuTitle.vue'
 import PlayerTitle from './PlayerTitle.vue'
@@ -30,7 +31,6 @@ import TradeHistory from './TradeHistory.vue'
 import GameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type {Game, Player} from "@/types/game";
 
 const props = defineProps<{

@@ -31,13 +31,13 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import GameHelper from '../../../../../services/gameHelper'
 import PlayerIcon from '../../player/PlayerIcon.vue'
 import ConversationMessagePin from './ConversationMessagePin.vue'
 import mentionHelper from '../../../../../services/mentionHelper'
 import ConversationMessageContextMenu from "./ConversationMessageContextMenu.vue";
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, onMounted, computed, useTemplateRef } from 'vue';
 import type {Conversation, ConversationMessage, MapObject} from "@solaris/common";
 import type {Game} from "@/types/game";

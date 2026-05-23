@@ -47,13 +47,12 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { type ObjectClicked, MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject } from 'vue';
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {distributeAllShips, garrisonAllShips} from "@/services/typedapi/star";
-import type {ObjectClicked} from "@/eventBusEventNames/map";
 import type {Player} from "@/types/game";
 import { useColourStore } from '@/stores/colour';
 import MenuTitle from "@/views/game/components/MenuTitle.vue";

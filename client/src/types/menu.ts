@@ -1,5 +1,5 @@
 import type {CarrierWaypoint} from "@solaris/common";
-import type {ObjectClicked} from "@/eventBusEventNames/map.ts";
+import { type ObjectClicked } from '@solaris/map-rendering';
 
 export type GalaxyMenuState =
   | 'empires'

@@ -1,11 +1,11 @@
 import { computed, readonly, ref } from 'vue';
+import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import { defineStore } from 'pinia';
 import type { PlayerColour } from '@solaris/common';
 import { formatError, isOk } from '@/services/typedapi';
 import { addColour, listColours } from '@/services/typedapi/colour';
 import type { Axios } from 'axios';
 import type { EventBus } from '@/eventBus';
-import GameCommandEventBusEventNames from '@/eventBusEventNames/gameCommand';
 import GameHelper from '@/services/gameHelper';
 import type { Game, Player } from '@/types/game';
 import type { UserGameSettings } from '@solaris/common';

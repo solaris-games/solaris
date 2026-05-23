@@ -16,11 +16,11 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import GameHelper from '../../../../services/gameHelper'
 import PlayerIcon from '../player/PlayerIcon.vue'
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject, computed } from 'vue';
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import type {Game, Player} from "@/types/game";
 import type {ResearchTypeNotRandom} from "@solaris/common";
 

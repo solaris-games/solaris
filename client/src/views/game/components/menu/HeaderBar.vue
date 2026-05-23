@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import GameHelper from '../../../../services/gameHelper'
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import router from '../../../../router'
 import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts'
 import ServerConnectionStatus from './ServerConnectionStatus.vue'
@@ -78,7 +79,6 @@ import { inject, ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import GameEventBusEventNames from '../../../../eventBusEventNames/game'
 import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
 import UserEventBusEventNames from "../../../../eventBusEventNames/user";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import {getUnreadCount} from "@/services/typedapi/conversation";
 import type {TradeEventTechnology} from "@solaris/common";

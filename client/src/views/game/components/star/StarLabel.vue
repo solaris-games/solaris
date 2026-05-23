@@ -4,9 +4,9 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import gameHelper from '../../../../services/gameHelper'
 import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import { inject, computed } from 'vue';
 import GameHelper from "../../../../services/gameHelper";
 import type {MapObject} from "@solaris/common";

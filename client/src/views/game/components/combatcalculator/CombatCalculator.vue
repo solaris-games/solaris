@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import {inject, ref, computed} from "vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
 import BasicCombatCalculator from "@/views/game/components/combatcalculator/BasicCombatCalculator.vue";

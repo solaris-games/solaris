@@ -59,12 +59,12 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { GameCommandEventBusEventNames } from '@solaris/map-rendering';
 import MenuTitle from '../MenuTitle.vue'
 import GameHelper from '../../../../services/gameHelper'
 import SpecialistIcon from '../specialist/SpecialistIcon.vue'
 import {computed, ref, inject} from 'vue';
 import {eventBusInjectionKey} from "@/eventBus";
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
 import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
 import type {Game} from "@/types/game";
 import {useIsHistoricalMode} from "@/util/reactiveHooks";

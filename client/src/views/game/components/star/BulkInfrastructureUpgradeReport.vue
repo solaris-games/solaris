@@ -30,10 +30,10 @@
 
 <script setup lang="ts">
 import { useGameStore } from '@/stores/game';
+import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
 import type {BulkUpgradeReport, MapObject} from "@solaris/common";
 import GameHelper from "@/services/gameHelper";
 
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
 import {eventBusInjectionKey} from "@/eventBus";
 import { inject } from 'vue';
 
