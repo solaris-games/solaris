@@ -2,8 +2,6 @@ import { Container } from 'pixi.js'
 import type {Game} from './types/game';
 import type { DrawingContext } from './container';
 import {DistanceService, type UserGameSettings} from "@solaris/common";
-import {drawTerritoriesMarchingSquare} from "./territories/marchingSquares";
-import {drawTerritoriesVoronoi} from "./territories/voronoi";
 
 export class Territories {
   container: Container;
@@ -20,14 +18,27 @@ export class Territories {
     this.zoomPercent = 0;
     this.userSettings = userSettings;
     this.distanceService = distanceService;
+    this._prefetchImplementation();
   }
 
   update(game: Game, userSettings: UserGameSettings) {
     this.game = game;
     this.userSettings = userSettings;
+    this._prefetchImplementation();
   }
 
-  draw() {
+  private _prefetchImplementation() {
+    switch (this.userSettings.map.territoryStyle) {
+      case 'marching-square':
+        import('./territories/marchingSquares');
+        break;
+      case 'voronoi':
+        import('./territories/voronoi');
+        break;
+    }
+  }
+
+  async draw() {
     this.container.removeChildren()
 
     if (!this.game.galaxy.stars?.length) {
@@ -35,12 +46,16 @@ export class Territories {
     }
 
     switch (this.userSettings.map.territoryStyle) {
-      case 'marching-square':
+      case 'marching-square': {
+        const { drawTerritoriesMarchingSquare } = await import('./territories/marchingSquares');
         drawTerritoriesMarchingSquare(this.distanceService, this.game, this.userSettings, this.context, this.container);
         break;
-      case 'voronoi':
+      }
+      case 'voronoi': {
+        const { drawTerritoriesVoronoi } = await import('./territories/voronoi');
         drawTerritoriesVoronoi(this.game, this.userSettings, this.context, this.container);
         break;
+      }
     }
 
     this.refreshZoom(this.zoomPercent || 0)

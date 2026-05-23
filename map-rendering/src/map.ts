@@ -179,7 +179,7 @@ export class Map {
         this.territories = new Territories(services.distanceService, this.context, game, userSettings);
 
         this.territoryContainer.addChild(this.territories.container);
-        this.territories.draw();
+        void this.territories.draw();
 
         // -----------
         // Setup Player Names
@@ -601,7 +601,7 @@ export class Map {
 
     drawTerritories(userSettings: UserGameSettings) {
         this.territories.update(this.game, userSettings);
-        this.territories.draw();
+        void this.territories.draw();
     }
 
     drawWormHoles() {
