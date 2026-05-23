@@ -71,13 +71,13 @@ onMounted(() => {
       }
     };
 
-    const handleResize = (e) => {
+    const handleResize = () => {
       gameContainer.resize();
     };
 
     const drawGame = () => {
       gameContainer.draw()
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+      eventBus.emit(MapCommandEventBusEventNames.MapCommandInitialPanForPlayer, {
         player: GameHelper.getUserPlayer(store.game!),
       });
     };
