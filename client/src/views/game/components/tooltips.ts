@@ -1,4 +1,4 @@
-import type {TooltipData, TooltipService} from "@/game/container";
+import type {TooltipData, TooltipService} from "@solaris/map-rendering";
 import type {Carrier, Game, Star} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {getCountdownTimeStringByTicks} from "@/util/time";

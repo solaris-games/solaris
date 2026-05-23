@@ -1,7 +1,5 @@
 import "@/assets/styles.css"
 import $ from 'jquery'
-import 'pixi-viewport'
-import 'pixi.js'
 import { Socket, io } from 'socket.io-client'
 import { createApp } from 'vue'
 import ToastPlugin from "vue-toast-notification"

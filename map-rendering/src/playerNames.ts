@@ -1,8 +1,8 @@
 import { Container, Text, TextStyle, Graphics } from 'pixi.js'
-import type {Game} from "../types/game";
+import type {Game} from "./types/game";
 import type {DrawingContext} from "./container";
 import {DistanceService, type UserGameSettings} from "@solaris/common";
-import helpers from "@/game/helpers.ts";
+import helpers from "./helpers";
 
 class PlayerNames {
 

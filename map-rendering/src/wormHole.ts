@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import type { Game } from '../types/game';
+import type { Game } from './types/game';
 
 class WormHoleLayer {
   container: PIXI.Container;

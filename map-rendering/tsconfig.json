@@ -1,10 +1,21 @@
 {
     "compilerOptions": {
-        "module": "nodenext",
+        "module": "esnext",
+        "moduleResolution": "bundler",
         "target": "es2024",
         "declaration": true,
         "outDir": "./dist",
-        "strict": true
+        "strict": true,
+        "noImplicitAny": false,
+        "skipLibCheck": true,
+        "lib": [
+            "es2024",
+            "DOM",
+            "DOM.Iterable"
+        ],
+        "paths": {
+            "@solaris/common": [ "../common/src/index.ts" ]
+        }
     },
     "include": [
         "src/**/*"

@@ -3,7 +3,7 @@ import TextureService from './texture'
 import seededRandom from 'random-seed'
 import Helpers from './helpers'
 import { type MapObject } from './mapObject';
-import type {Game, Star as StarData} from "../types/game";
+import type {Game, Star as StarData} from "./types/game";
 import {type Location, type NaturalResources, StarDataService, type UserGameSettings} from '@solaris/common';
 import type { DrawingContext } from './container';
 import {EventEmitter} from "./eventEmitter";

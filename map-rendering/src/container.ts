@@ -1,7 +1,7 @@
 import {Viewport} from 'pixi-viewport';
 import Map from './map';
 import helpers from './helpers';
-import textureService from './texture';
+import textureService, { type TextureUrls } from './texture';
 import {Application, isWebGLSupported, Ticker} from "pixi.js";
 import {
   DEFAULT_SETTINGS,
@@ -10,11 +10,11 @@ import {
   PathfindingService, StarDataService, TechnologyService,
   type UserGameSettings
 } from "@solaris/common";
-import type {Game, Star, Carrier, Player} from "../types/game";
+import type {Game, Star, Carrier, Player} from "./types/game";
 import { DebugTools } from './debugTools';
-import type { EventBus } from '../eventBus';
-import GameCommandEventBusEventNames from "@/eventBusEventNames/gameCommand";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+import type { EventBus } from './eventBus';
+import GameCommandEventBusEventNames from "./eventBusEventNames/gameCommand";
+import MapCommandEventBusEventNames from "./eventBusEventNames/mapCommand";
 
 export interface DrawingContext {
   getPlayerColour: (playerId: string) => string;
@@ -41,7 +41,7 @@ export interface Services {
   technologyService: TechnologyService;
 }
 
-export const createGameContainer = async (services: Services, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus) => {
+export const createGameContainer = async (services: Services, drawingContext: DrawingContext, game: Game, userSettings: UserGameSettings | null, reportGameError: ((err: string) => void), eventBus: EventBus, textureUrls: TextureUrls) => {
   const settings: UserGameSettings = userSettings || DEFAULT_SETTINGS;
   const antialiasing = settings.map.antiAliasing === 'enabled';
 
@@ -58,8 +58,8 @@ export const createGameContainer = async (services: Services, drawingContext: Dr
 
   await app.init(options);
 
-  await textureService.loadAssets();
-  textureService.initialize();
+  await textureService.loadAssets(textureUrls);
+  textureService.initialize(textureUrls);
 
   return new GameContainer(services, drawingContext, game, settings, reportGameError, eventBus, app);
 }

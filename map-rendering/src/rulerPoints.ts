@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import {EventEmitter} from "./eventEmitter";
-import type { Game } from '../types/game';
-import type { RulerPoint } from '@/types/ruler';
+import type { Game } from './types/game';
+import type { RulerPoint } from './types/ruler';
 
 type Events = {
   onRulerPointsCleared: undefined,

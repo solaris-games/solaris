@@ -1,8 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 import {DistanceService, type UserGameSettings} from "@solaris/common";
-import type {Game, Player} from "@/types/game";
-import type {DrawingContext} from "@/game/container";
-import helpers from "@/game/helpers";
+import type {Game, Player} from "../types/game";
+import type {DrawingContext} from "../container";
+import helpers from "../helpers";
 
 type SamplePoint = {
   distance: number;

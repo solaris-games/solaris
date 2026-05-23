@@ -10,7 +10,8 @@ import type { Carrier, Game, Star } from '../../../types/game';
 import type { ToastPluginApi } from 'vue-toast-notification';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
 import MapCommandEventBusEventNames from "../../../eventBusEventNames/mapCommand";
-import {createGameContainer, type Services} from "@/game/container";
+import {createGameContainer, type Services} from "@solaris/map-rendering";
+import { mapTextureUrls } from './textureUrls';
 import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
@@ -55,7 +56,7 @@ onMounted(() => {
     technologyService: serviceProvider.technologyService,
   };
 
-  createGameContainer(services, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus).then((gameContainer) => {
+  createGameContainer(services, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus, mapTextureUrls).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 

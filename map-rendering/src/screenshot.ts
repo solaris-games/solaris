@@ -1,4 +1,4 @@
-import type { Game } from "../types/game";
+import type { Game } from "./types/game";
 import { type GameContainer } from "./container";
 
 export const screenshot = (container: GameContainer, game: Game, reportGameError: (msg: string) => void) => {

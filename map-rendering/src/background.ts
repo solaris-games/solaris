@@ -2,7 +2,7 @@ import { Container, Sprite, type BLEND_MODES } from 'pixi.js'
 import TextureService from './texture'
 import * as rng from 'random-seed'
 import helpers from './helpers'
-import type { Game } from '../types/game'
+import type { Game } from './types/game'
 import type { DrawingContext } from './container'
 import type { UserGameSettings } from '@solaris/common'
 

@@ -1,8 +1,8 @@
 import * as PIXI from 'pixi.js'
 import {EventEmitter} from "./eventEmitter";
-import type {Game, Carrier as CarrierData, Star as StarData} from '../types/game';
+import type {Game, Carrier as CarrierData, Star as StarData} from './types/game';
 import type { DrawingContext } from './container';
-import type { TempWaypoint } from '@/types/waypoint';
+import type { TempWaypoint } from './types/waypoint';
 import { createStarHighlight } from './highlight';
 import {
   DistanceService,
@@ -12,7 +12,7 @@ import {
   type UserGameSettings
 } from "@solaris/common";
 import { v7 as generateV7Uuid } from 'uuid';
-import helpers from "@/game/helpers.ts";
+import helpers from "./helpers";
 
 type Events = {
   onWaypointCreated: TempWaypoint,

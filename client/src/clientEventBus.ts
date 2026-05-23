@@ -1,6 +1,5 @@
 import mitt, { type EventType, type Handler } from 'mitt';
-import type { EventBus } from './eventBus';
-import { type EventBusEventName } from './eventBusEventNames/eventBusEventName';
+import type { EventBus, EventBusEventName } from '@solaris/map-rendering';
 
 type Events<T> = Record<EventType, T>;
 

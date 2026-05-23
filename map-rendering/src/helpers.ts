@@ -1,8 +1,8 @@
 import seededRandom from 'random-seed'
-import type {Carrier, Game, Player, Star} from "../types/game";
+import type {Carrier, Game, Player, Star} from "./types/game";
 import { Container } from 'pixi.js'
 import {DistanceService, type Location, type UserGameSettings} from '@solaris/common';
-import type {RulerPoint} from "@/types/ruler.ts";
+import type {RulerPoint} from "./types/ruler";
 
 export class Helpers {
   rotateCarrierTowardsWaypoint(carrier: Carrier, stars: Star[], graphics: Container) {

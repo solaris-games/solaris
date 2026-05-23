@@ -8,7 +8,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL('./src', import.meta.url)),
-      "@solaris/common": fileURLToPath(new URL('../common/src', import.meta.url))
+      "@solaris/common": fileURLToPath(new URL('../common/src', import.meta.url)),
+      "@solaris/map-rendering": fileURLToPath(new URL('../map-rendering/src', import.meta.url))
     },
   },
   build: {

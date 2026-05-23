@@ -1,9 +1,9 @@
 import { Container } from 'pixi.js'
-import type {Game} from '../types/game';
+import type {Game} from './types/game';
 import type { DrawingContext } from './container';
 import {DistanceService, type UserGameSettings} from "@solaris/common";
-import {drawTerritoriesMarchingSquare} from "@/game/territories/marchingSquares";
-import {drawTerritoriesVoronoi} from "@/game/territories/voronoi";
+import {drawTerritoriesMarchingSquare} from "./territories/marchingSquares";
+import {drawTerritoriesVoronoi} from "./territories/voronoi";
 
 export class Territories {
   container: Container;

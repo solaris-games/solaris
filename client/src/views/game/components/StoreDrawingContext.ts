@@ -1,4 +1,4 @@
-import type { DrawingContext } from "@/game/container";
+import type { DrawingContext } from "@solaris/map-rendering";
 import { useColourStore } from '@/stores/colour';
 import type { GameStore } from '@/stores/game';
 

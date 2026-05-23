@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import type {Carrier, Game, Star} from '../types/game';
+import type {Carrier, Game, Star} from './types/game';
 import type {DrawingContext, TooltipData, TooltipService} from './container';
 
 const PADDING_X = 2;
@@ -107,7 +107,7 @@ export default class {
       }
     };
 
-    this.intervalDraw = setInterval(redraw, 250);
+    this.intervalDraw = setInterval(redraw, 250) as unknown as number;
     redraw();
   }
 

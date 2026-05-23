@@ -11,7 +11,7 @@ import OrbitalLocationLayer from './orbital'
 import WormHoleLayer from './wormHole'
 import TooltipLayer from './tooltip'
 import {type DrawingContext, type Services} from "./container";
-import type {Game, Player, Star as StarData, Carrier as CarrierData} from "../types/game";
+import type {Game, Player, Star as StarData, Carrier as CarrierData} from "./types/game";
 import {
   DistanceService,
   type Location,
@@ -21,14 +21,14 @@ import {
 } from "@solaris/common";
 import { Chunks } from './chunks'
 import Carrier, {type CarrierClickEvent} from "./carrier";
-import type { EventBus } from '@/eventBus'
-import MapEventBusEventNames from '../eventBusEventNames/map'
-import MapCommandEventBusEventNames from "../eventBusEventNames/mapCommand";
+import type { EventBus } from './eventBus'
+import MapEventBusEventNames from './eventBusEventNames/map'
+import MapCommandEventBusEventNames from "./eventBusEventNames/mapCommand";
 import { createStarHighlight } from './highlight'
 import {Viewport} from 'pixi-viewport'
-import type {TempWaypoint} from "@/types/waypoint";
-import type {RulerPoint} from "@/types/ruler";
-import helpers from "@/game/helpers";
+import type {TempWaypoint} from "./types/waypoint";
+import type {RulerPoint} from "./types/ruler";
+import helpers from "./helpers";
 
 export enum ModeKind {
   Galaxy = 'galaxy',

@@ -3,7 +3,7 @@ import TextureService from './texture'
 import Helpers from './helpers'
 import type PathManager from "./PathManager";
 import type { UserGameSettings, Location, MapObject as MapObjectData } from "@solaris/common";
-import type { Carrier as CarrierData, Game, Player as PlayerData } from "../types/game";
+import type { Carrier as CarrierData, Game, Player as PlayerData } from "./types/game";
 import type { DrawingContext } from "./container";
 import type { MapObject } from './mapObject';
 import { EventEmitter } from './eventEmitter';

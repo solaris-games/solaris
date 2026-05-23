@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Helpers from './helpers'
-import type {Carrier, Game} from "../types/game";
+import type {Carrier, Game} from "./types/game";
 
 class OrbitalLocationLayer {
   container: PIXI.Container;

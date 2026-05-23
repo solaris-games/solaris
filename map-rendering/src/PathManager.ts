@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import helpers from './helpers'
 import type {Map} from './map';
 import {type UserGameSettings, type MapObject as MapObjectData, type Location, DistanceService} from "@solaris/common";
-import type {Game, Carrier as CarrierData, Star} from "../types/game";
+import type {Game, Carrier as CarrierData, Star} from "./types/game";
 import type Carrier from "./carrier";
 import type { MapObject } from './mapObject';
 

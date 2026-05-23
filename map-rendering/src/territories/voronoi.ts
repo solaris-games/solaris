@@ -1,10 +1,10 @@
 import {type UserGameSettings} from "@solaris/common";
-import type {Game} from "@/types/game";
-import type {DrawingContext} from "@/game/container";
+import type {Game} from "../types/game";
+import type {DrawingContext} from "../container";
 import {Container, Graphics} from 'pixi.js';
 import {Delaunay} from 'd3-delaunay';
-import {colorFromString} from "@/util/colour";
-import helpers from "@/game/helpers";
+import {colorFromString} from "../util/colour";
+import helpers from "../helpers";
 
 const MAX_VORONOI_DISTANCE = 50;
 
