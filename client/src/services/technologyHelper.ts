@@ -36,6 +36,8 @@ class TechnologyHelper {
     if (progression.progression === "exponential") {
       const growthFactor = game.constants.research.exponentialGrowthFactors[progression.growthFactor];
       return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel - 1));
+    } else if (progression.progression === "cumulative") {
+      return 0; // TODO: implement cumulative research progression calculation
     } else {
       return technologyLevel * progressMultiplierConfig;
     }

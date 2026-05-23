@@ -174,36 +174,44 @@ const schema = new Schema({
 			},
             researchCostProgressions: {
                 terraforming: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null, min: 0, max: 2.0 },
                 },
                 experimentation: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 scanning: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 hyperspace: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 manufacturing: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 banking: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 weapons: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
                 specialists: {
-                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential'], default: 'standard' },
+                    progression: { type: Types.String, required: false, enum: ['standard', 'exponential', 'cumulative'], default: 'standard' },
                     growthFactor: { type: Types.String, required: false, validate: validateNullableEnum(['soft', 'medium', 'hard']), default: null },
+                    scalingFactor: { type: Types.Number, required: false, default: null },
                 },
             },
 			bankingReward: { type: Types.String, required: true, enum: ['standard', 'legacy'], default: 'standard' },
