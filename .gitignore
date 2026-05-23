@@ -32,3 +32,5 @@ yarn-error.log*
 # local db folder when using docker-compose
 database_data
 mise.toml
+
+stats.html

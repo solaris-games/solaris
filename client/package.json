@@ -12,6 +12,7 @@
     "dev:docker": "DEV_SERVER_URL=http://api:3000/ vite --host",
     "dev:network": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
+    "analyze": "ANALYZE=true vite build",
     "serve": "vite preview",
     "check": "vue-tsc --noEmit"
   },
@@ -38,6 +39,7 @@
     "@vitejs/plugin-vue": "6.0.6",
     "@vue/tsconfig": "0.9.1",
     "less": "4.6.4",
+    "rollup-plugin-visualizer": "^7.0.1",
     "vite": "8.0.10",
     "vue-tsc": "3.2.7"
   }
