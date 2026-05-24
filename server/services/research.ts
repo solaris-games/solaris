@@ -1,14 +1,19 @@
 import EventEmitter from "events";
-import { ValidationError, ResearchType, ResearchTypeNotRandom, ResearchProgressService } from "@solaris/common";
+import {
+    GameTypeService,
+    ResearchProgressService,
+    ResearchType,
+    ResearchTypeNotRandom,
+    TechnologyService,
+    ValidationError
+} from "@solaris/common";
 import Repository from './repository';
-import { Game } from './types/Game';
-import {Player, ResearchProgress } from './types/Player';
-import { User } from './types/User';
-import { GameTypeService } from '@solaris/common'
+import {Game} from './types/Game';
+import {Player, ResearchProgress} from './types/Player';
+import {User} from './types/User';
 import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';
-import { TechnologyService } from '@solaris/common';
 import UserService from './user';
 import StatisticsService from './statistics';
 
@@ -39,7 +44,7 @@ export default class ResearchService extends EventEmitter {
         researchProgressService: ResearchProgressService,
     ) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.technologyService = technologyService;
         this.randomService = randomService;
@@ -67,9 +72,9 @@ export default class ResearchService extends EventEmitter {
             }
         });
 
-        let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        let ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-        
+        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
+
         return {
             ticksEta,
             ticksNextEta
@@ -93,9 +98,9 @@ export default class ResearchService extends EventEmitter {
             }
         });
 
-        let ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        let ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-        
+        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
+
         return {
             ticksEta,
             ticksNextEta
@@ -103,17 +108,17 @@ export default class ResearchService extends EventEmitter {
     }
 
     conductResearch(game: Game, user: User | null, player: Player) {
-        let techKey = player.researchingNow;
-        let tech = player.research[techKey];
+        const techKey = player.researchingNow;
+        const tech = player.research[techKey];
 
         if (!this.technologyService.isTechnologyResearchable(game, techKey)) {
             return null;
         }
 
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
 
-        let totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
-        let progressIncrease = totalScience;
+        const totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
+        const progressIncrease = totalScience;
 
         tech.progress! += progressIncrease;
 
@@ -133,7 +138,7 @@ export default class ResearchService extends EventEmitter {
         while (tech.progress! >= requiredProgress) {
             tech.level++;
             tech.progress! -= requiredProgress;
-            
+
             requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, techKey, tech.level);
             levelUp = true
         }
@@ -152,29 +157,27 @@ export default class ResearchService extends EventEmitter {
             });
         }
 
-        let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        let nextResearchTicksEta = this.calculateNextResearchETAInTicks(game, player);
+        const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
+        const nextResearchTicksEta = this.calculateNextResearchETAInTicks(game, player);
 
-        let report = {
+        return {
             name: techKey,
             level: tech.level,
             progress: tech.progress,
             levelUp,
             currentResearchTicksEta,
             nextResearchTicksEta
-        }
-        
-        return report;
+        };
     }
 
     conductResearchAll(game: Game, gameUsers: User[]) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
-            let player = game.galaxy.players[i];
+            const player = game.galaxy.players[i];
 
-            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
-            
+            const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
+
             this.conductResearch(game, user, player);
         }
     }
@@ -219,10 +222,10 @@ export default class ResearchService extends EventEmitter {
         if (!tech) {
             return noExperimentation;
         }
-        
-        let techLevel = player.research.experimentation.level;
-        let progressMultiplier = game.constants.research.progressMultiplier;
-        let experimentationMultiplier = game.constants.research.experimentationMultiplier;
+
+        const techLevel = player.research.experimentation.level;
+        const progressMultiplier = game.constants.research.progressMultiplier;
+        const experimentationMultiplier = game.constants.research.experimentationMultiplier;
         let researchAmount;
 
         switch (game.settings.technology.experimentationReward) {
@@ -266,7 +269,7 @@ export default class ResearchService extends EventEmitter {
             level: tech.technology.level,
             amount: researchAmount,
             levelUp,
-            researchingNext 
+            researchingNext
         };
     }
 
@@ -276,7 +279,7 @@ export default class ResearchService extends EventEmitter {
         }
 
         if (player.researchingNext === 'random') {
-            let randomTech = this._getRandomTechnology(game, player);
+            const randomTech = this._getRandomTechnology(game, player);
 
             if (randomTech) {
                 player.researchingNow = randomTech.key;
@@ -288,7 +291,10 @@ export default class ResearchService extends EventEmitter {
         return player.researchingNow;
     }
 
-    _getRandomTechnology(game: Game, player: Player): { key: ResearchTypeNotRandom, technology: ResearchProgress } | null {
+    _getRandomTechnology(game: Game, player: Player): {
+        key: ResearchTypeNotRandom,
+        technology: ResearchProgress
+    } | null {
         let techs = Object.keys(player.research).filter(k => {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
@@ -316,12 +322,12 @@ export default class ResearchService extends EventEmitter {
 
     calculateNextResearchETAInTicks(game: Game, player: Player) {
         if (player.researchingNext === 'random') {
-          return null;
+            return null;
         }
 
         if (player.researchingNow !== player.researchingNext) {
-            let currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
-            let nextResearchTicksEta = this._calculateResearchETAInTicks(game, player, player.researchingNext);
+            const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
+            const nextResearchTicksEta = this._calculateResearchETAInTicks(game, player, player.researchingNext);
 
             if (currentResearchTicksEta == null || nextResearchTicksEta == null) {
                 return null;
@@ -331,40 +337,40 @@ export default class ResearchService extends EventEmitter {
         }
 
         return this.calculateDoubleIdenticalResearchETAInTicks(game, player)
-      }
+    }
 
     _calculateResearchETAInTicks(game: Game, player: Player, researchKey: ResearchType) {
         if (researchKey === 'random') {
             return null;
         }
 
-        let tech = player.research[researchKey];
+        const tech = player.research[researchKey];
 
-        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, researchKey, tech.level);
-        let remainingPoints = requiredProgress - tech.progress!;
+        const requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, researchKey, tech.level);
+        const remainingPoints = requiredProgress - tech.progress!;
 
         return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
     }
 
-    calculateDoubleIdenticalResearchETAInTicks(game: Game, player: Player)  {        
-        let tech = player.research[player.researchingNow];
-        
-        let requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level) 
-                             + this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
-        let remainingPoints = requiredProgress - tech.progress!;
+    calculateDoubleIdenticalResearchETAInTicks(game: Game, player: Player) {
+        const tech = player.research[player.researchingNow];
+
+        const requiredProgress = this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level)
+            + this.researchProgressService.getRequiredResearchProgress(game, player.researchingNow, tech.level + 1);
+        const remainingPoints = requiredProgress - tech.progress!;
 
         return this._calculateResearchETAInTicksByRemainingPoints(game, player, remainingPoints);
     }
 
     _calculateResearchETAInTicksByRemainingPoints(game: Game, player: Player, remainingPoints: number) {
-        let playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
-        let totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
-        
+        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const totalScience = this.playerStatisticsService.calculateTotalScience(game, playerStars);
+
         // If there is no science then there cannot be an end date to the research.
         if (totalScience === 0) {
             return null;
         }
-        
+
         return Math.ceil(remainingPoints / totalScience);
     }
 };
