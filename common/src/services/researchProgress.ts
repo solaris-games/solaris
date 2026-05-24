@@ -2,7 +2,6 @@ import type { Game } from "../types/common/game";
 import type { ResearchTypeNotRandom } from "../types/common/player";
 
 export class ResearchProgressService {
-
     getRequiredResearchProgress<ID>(game: Game<ID>, technologyKey: ResearchTypeNotRandom, technologyLevel: number): number {
         const researchCostConfig = game.settings.technology.researchCosts[technologyKey];
 
