@@ -1,5 +1,6 @@
 import { Model, QueryOptions, UpdateQuery } from "mongoose";
 import { DBObjectId } from "./types/DBObjectId";
+import {ActiveModel} from "./types/ActiveModel";
 
 export default class Repository<T> {
     model: Model<T>;
@@ -30,15 +31,15 @@ export default class Repository<T> {
         return result as T[];
     }
 
-    async findAsModels(query, select?, sort?, limit?: number, skip?: number): Promise<any[]> {
+    async findAsModels(query, select?, sort?, limit?: number, skip?: number): Promise<ActiveModel<T>[]> {
         return await this.model.find(query, select)
         .sort(sort)
         .skip(skip!) // We lie and say skip won't be null.  The reality is that skip() can accept null values just fine.
         .limit(limit!) // We lie and say limit won't be null.  The reality is that limit() can accept null values just fine.
-        .exec();
+        .exec() as ActiveModel<T>[];
     }
 
-    async findOrCreateAsModel(query, createValue: Omit<T, '_id'>): Promise<T> {
+    async findOrCreateAsModel(query, createValue: Omit<T, '_id'>): Promise<ActiveModel<T>> {
         const update: UpdateQuery<T> = {
             $setOnInsert: createValue,
         } as UpdateQuery<T>;
@@ -46,7 +47,7 @@ export default class Repository<T> {
         return await this.model.findOneAndUpdate(query, update, {
             upsert: true,
             new: true,
-        }).exec() as T;
+        }).exec() as ActiveModel<T>;
     }
 
     async findOne(query, select?, options?: QueryOptions): Promise<T | null> {

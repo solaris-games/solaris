@@ -7,6 +7,7 @@ import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User, UserSubscriptions } from './types/User';
 import moment from "moment";
+import {ActiveModel} from "./types/ActiveModel";
 
 function uuidv4(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -75,8 +76,8 @@ export default class UserService extends EventEmitter {
         return await this.userRepo.countAll();
     }
 
-    async getGameUsers(game: Game) {
-        return await this.userRepo.findAsModels({
+    async getGameUsers(game: Game): Promise<ActiveModel<User>[]> {
+        return this.userRepo.findAsModels({
             _id: {
                 $in: game.galaxy.players.map(p => p.userId)
             }

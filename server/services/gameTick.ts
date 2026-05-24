@@ -187,17 +187,7 @@ export default class GameTickService extends EventEmitter {
             throw new Error(`The game is not locked.`);
         }
 
-        /*
-            1. Buy scheduled infrastructure
-            2. Move all carriers
-            3. Perform combat at stars that have enemy carriers in orbit
-            4. Industry creates new ships
-            5. Players conduct research
-            6. If its the last tick in the galactic cycle, all players earn money and experimentation is done.
-            7. Check to see if anyone has won the game.
-        */
-
-        let startTime = process.hrtime();
+        const startTime = process.hrtime();
         log.info({
             gameId: game._id,
             gameName: game.settings.general.name
@@ -209,7 +199,7 @@ export default class GameTickService extends EventEmitter {
         let taskTime = process.hrtime();
         let taskTimeEnd: [number, number] | null = null;
 
-        let logTime = (taskName: string) => {
+        const logTime = (taskName: string) => {
             taskTimeEnd = process.hrtime(taskTime);
             taskTime = process.hrtime();
             log.info({
@@ -219,7 +209,7 @@ export default class GameTickService extends EventEmitter {
             }, `[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
-        let gameUsers = await this.userService.getGameUsers(game);
+        const gameUsers = await this.userService.getGameUsers(game);
         logTime('Loaded game users');
 
         let iterations = 1;
@@ -233,7 +223,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        let hasWinnerBeforeTick = await this._gameWinCheck(game, gameUsers);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, gameUsers);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,

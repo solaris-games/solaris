@@ -10,6 +10,7 @@ import {
 } from "@solaris/common";
 import {DBObjectId} from "../../services/types/DBObjectId";
 import {logger} from "../../utils/logging";
+import {ActiveModel} from "../../services/types/ActiveModel";
 
 interface OldCombatWeapons {
     defender: number;
@@ -80,7 +81,7 @@ interface OldPlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
 
 const log = logger("Migrate combat events");
 
-const processStarCombatEvent = async (oldEvent: OldPlayerCombatStarEvent<DBObjectId>) => {
+const processStarCombatEvent = async (oldEvent: ActiveModel<OldPlayerCombatStarEvent<DBObjectId>>) => {
     const mapCarrier = (oldC: OldCombatCarrier<DBObjectId>): CombatResultCarrier<DBObjectId> => {
         return {
             carrierId: oldC._id,
@@ -148,15 +149,13 @@ const processStarCombatEvent = async (oldEvent: OldPlayerCombatStarEvent<DBObjec
         groups: [defenderGroup, attackerGroup],
     };
 
-    const newEvent = oldEvent as any as PlayerCombatStarEvent<DBObjectId>;
+    const newEvent = oldEvent as any as ActiveModel<PlayerCombatStarEvent<DBObjectId>>;
     newEvent.data = newResult;
-    // @ts-ignore
     newEvent.markModified('data');
-    // @ts-ignore
     await newEvent.save();
 }
 
-const processCarrierCombatEvent = async (oldEvent: OldPlayerCombatCarrierEvent<DBObjectId>) => {
+const processCarrierCombatEvent = async (oldEvent: ActiveModel<OldPlayerCombatCarrierEvent<DBObjectId>>) => {
     const mapCarrier = (oldC: OldCombatCarrier<DBObjectId>): CombatResultCarrier<DBObjectId> => {
         return {
             carrierId: oldC._id,
@@ -210,15 +209,13 @@ const processCarrierCombatEvent = async (oldEvent: OldPlayerCombatCarrierEvent<D
         groups: [defenderGroup, attackerGroup],
     };
 
-    const newEvent = oldEvent as any as PlayerCombatCarrierEvent<DBObjectId>;
+    const newEvent = oldEvent as any as ActiveModel<PlayerCombatCarrierEvent<DBObjectId>>;
     newEvent.data = newResult;
-    // @ts-ignore
     newEvent.markModified('data');
-    // @ts-ignore
     await newEvent.save();
 }
 
-const migrateEvents = async <T>(ctx: JobParameters, process: (ev: T) => Promise<void>, type: string) => {
+const migrateEvents = async <T>(ctx: JobParameters, process: (ev: ActiveModel<T>) => Promise<void>, type: string) => {
     const QUERY = { type };
 
     log.info(`Migrating events of type: ${type}`);
@@ -231,7 +228,8 @@ const migrateEvents = async <T>(ctx: JobParameters, process: (ev: T) => Promise<
     let page = 0;
 
     do {
-        const events: T[] = await eventRepo.findAsModels(QUERY, {}, { _id: 1 }, pageSize, page * pageSize);
+        // @ts-ignore
+        const events: ActiveModel<T>[] = await eventRepo.findAsModels(QUERY, {}, { _id: 1 }, pageSize, page * pageSize) as ActiveModel<T>[];
 
         for (let event of events) {
             process(event);
