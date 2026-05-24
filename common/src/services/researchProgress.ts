@@ -18,7 +18,8 @@ export class ResearchProgressService {
             const growthFactor = game.constants.research.exponentialGrowthFactors[progression.growthFactor];
             return Math.floor(progressMultiplierConfig * Math.pow(growthFactor, technologyLevel - 1));
         } else if (progression.progression === "cumulative") {
-            return 0.5 * progressMultiplierConfig * progression.scalingFactor * (technologyLevel + (technologyLevel * technologyLevel)) + progressMultiplierConfig;
+            const rtl = technologyLevel - 1;
+            return 0.5 * progressMultiplierConfig * progression.scalingFactor * (rtl + (rtl * rtl)) + progressMultiplierConfig;
         } else {
             return technologyLevel * progressMultiplierConfig;
         }
