@@ -20,6 +20,7 @@
     "start-db-sync-indices:dev": "tsx watch --inspect=9234 tools/syncIndices.ts",
     "start-db-sync-indices:prod": "node dist/server/tools/syncIndices.js",
     "restore-game": "tsx tools/restoreGame.ts",
+    "research-progress-samples": "tsx tools/researchProgressSamples.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
     "postbuild": "mkdir -p ./dist/server/services/emailTemplates && cp -r services/emailTemplates/* ./dist/server/services/emailTemplates && cp .env ./dist | true",
