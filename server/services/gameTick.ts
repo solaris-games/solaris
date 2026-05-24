@@ -49,6 +49,7 @@ import EventEmitter from "events";
 import moment from "moment";
 import CarrierCombatService from "./carrierCombat";
 import CombatProcessingService from "./combatProcessing";
+import {GameTickContext} from "./gameProcessing/context";
 
 const log = logger("Game Tick Service");
 
@@ -209,8 +210,9 @@ export default class GameTickService extends EventEmitter {
             }, `[${game.settings.general.name}] - ${taskName}: %ds %dms'`, taskTimeEnd[0], taskTimeEnd[1] / 1000000);
         };
 
-        const gameUsers = await this.userService.getGameUsers(game);
         logTime('Loaded game users');
+
+        const context = await GameTickContext.load(this.userService, game);
 
         let iterations = 1;
 
@@ -223,7 +225,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, gameUsers);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers());
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -249,16 +251,16 @@ export default class GameTickService extends EventEmitter {
 
             await this._scuttleCarriers(game);
 
-            await this._captureAbandonedStars(game, gameUsers);
+            await this._captureAbandonedStars(game, context.getGameUsers());
             logTime('Capture abandoned stars');
 
-            this._transferGiftsInOrbit(game, gameUsers);
+            this._transferGiftsInOrbit(game, context.getGameUsers());
             logTime('Transfer gifts in orbit');
 
-            await this._combatCarriers(game, gameUsers);
+            await this._combatCarriers(game, context.getGameUsers());
             logTime('Combat carriers');
 
-            await this._moveCarriers(game, gameUsers);
+            await this._moveCarriers(game, context.getGameUsers());
             logTime('Move carriers and produce ships');
 
             const ticked = this._endOfGalacticCycleCheck(game);
@@ -268,13 +270,13 @@ export default class GameTickService extends EventEmitter {
                 hasProductionTicked = true;
             }
 
-            this._gameLoseCheck(game, gameUsers);
+            this._gameLoseCheck(game, context.getGameUsers());
             logTime('Game lose check');
 
             await this._playAI(game);
             logTime('AI controlled players turn');
             
-            this.researchService.conductResearchAll(game, gameUsers);
+            this.researchService.conductResearchAll(game, context.getGameUsers());
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -292,7 +294,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, gameUsers);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers());
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -305,7 +307,6 @@ export default class GameTickService extends EventEmitter {
             iterations--;
         }
 
-        // TODO: This has been moved out of _moveCarriers, see comment in there.
         this._sanitiseDarkModeCarrierWaypoints(game);
         logTime('Sanitise dark mode carrier waypoints');
 
@@ -318,16 +319,12 @@ export default class GameTickService extends EventEmitter {
         await game.save();
         logTime('Save game');
 
-        // Save user profile achievements if any have changed.
-        for (let user of gameUsers) {
-            await user.save();
-        }
-
-        logTime('Save users');
+        await context.save();
+        logTime('Save context');
 
         this._emitEvents(game);
 
-        let endTime = process.hrtime(startTime);
+        const endTime = process.hrtime(startTime);
 
         log.info({
             gameId: game._id,
