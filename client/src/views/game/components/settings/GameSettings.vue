@@ -643,6 +643,7 @@ const getFriendlyText = (option: string) => {
     'soft': 'Soft',
     'hard': 'Hard',
     'exponential': 'Exponential',
+    'cumulative': 'Cumulative',
     'winner': 'Winner',
     'top_n': 'Top N',
     'current_research': 'Current Research',

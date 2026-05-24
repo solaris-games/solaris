@@ -17,6 +17,15 @@
     </select>
   </div>
 
+  <div class="mb-2" v-if="researchProgression && researchProgression.progression === 'cumulative'">
+    <label :for="'researchProgressionScaling' + name" class="col-form-label">{{name}} Cumulative scaling factor <help-tooltip tooltip="Determines the scaling factor applied cumulatively per level"/></label>
+    <select class="form-control" :id="'researchProgressionScaling' + name" v-model="researchProgression.scalingFactor" :disabled="isCreatingGame">
+      <option v-for="opt in options.technology.researchCostProgressionScalingFactor" v-bind:key="opt.value" v-bind:value="opt.value">
+        {{ opt.text }}
+      </option>
+    </select>
+  </div>
+
 </template>
 <script setup lang="ts">
 import {GAME_CREATION_OPTIONS, type GameResearchProgression} from "@solaris/common";

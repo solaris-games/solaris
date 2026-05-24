@@ -271,7 +271,12 @@ export type GameResearchProgressionExponential = {
 	growthFactor: 'soft'|'medium'|'hard',
 }
 
-export type GameResearchProgression = GameResearchProgressionStandard | GameResearchProgressionExponential;
+export type GameResearchProgressionCumulative = {
+	progression: 'cumulative',
+	scalingFactor: number,
+}
+
+export type GameResearchProgression = GameResearchProgressionStandard | GameResearchProgressionExponential | GameResearchProgressionCumulative;
 
 export type GameFlux = {
 	id: number;

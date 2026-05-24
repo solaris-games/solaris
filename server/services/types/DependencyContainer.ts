@@ -22,7 +22,7 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
-import {CombatGroupService, CombatService, DistanceService, PathfindingService} from '@solaris/common';
+import {CombatGroupService, CombatService, DistanceService, PathfindingService, ResearchProgressService} from '@solaris/common';
 import EmailService from "../email";
 import EventService from "../event";
 import GameService from "../game";
@@ -143,6 +143,7 @@ export interface DependencyContainer {
     playerReadyService: PlayerReadyService,
     randomService: RandomService,
     researchService: ResearchService,
+    researchProgressService: ResearchProgressService,
     starService: StarService,
     starDistanceService: StarDistanceService,
     nameService: NameService,

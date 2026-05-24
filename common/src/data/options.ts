@@ -762,6 +762,28 @@ export const GAME_CREATION_OPTIONS = {
             {
                 "value": "exponential",
                 "text": "Exponential"
+            },
+            {
+                "value": "cumulative",
+                "text": "Cumulative"
+            }
+        ],
+        "researchCostProgressionScalingFactor": [
+            {
+                "value": 0.25,
+                "text": "x0.25 per level"
+            },
+            {
+                "value": 0.5,
+                "text": "x0.5 per level"
+            },
+            {
+                "value": 0.75,
+                "text": "x0.75 per level"
+            },
+            {
+                "value": 1,
+                "text": "x1 per level"
             }
         ],
         "researchCostProgressionGrowthFactor": [

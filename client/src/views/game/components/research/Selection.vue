@@ -65,16 +65,17 @@ import type {ResearchType} from "@solaris/common";
 import Timer from "@/views/game/components/time/Timer.vue";
 
 import { useToast } from 'vue-toast-notification';
+import {useGameServices} from "@/util/gameServices.ts";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
 const store = useGameStore();
+const services = useGameServices();
 const isHistoricalMode = useIsHistoricalMode(store);
+
 const game = computed<Game>(() => store.game!);
 const player = computed(() => GameHelper.getUserPlayer(game.value)!);
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
-
-const tick = computed(() => game.value.state.tick);
 
 type Option = { text: string, value: ResearchType };
 
@@ -95,10 +96,10 @@ const loadTechnologies = () => {
     {text: 'Specialists', value: 'specialists'}
   ];
 
-  optionsNow.value = options.filter(o => TechnologyHelper.isTechnologyEnabled(game.value, o.value)
-    && TechnologyHelper.isTechnologyResearchable(game.value, o.value));
-  optionsNext.value = options.filter(o => TechnologyHelper.isTechnologyEnabled(game.value, o.value)
-    && TechnologyHelper.isTechnologyResearchable(game.value, o.value));
+  optionsNow.value = options.filter(o => o.value !== 'random' && services.technologyService.isTechnologyEnabled(game.value, o.value)
+    && services.technologyService.isTechnologyResearchable(game.value, o.value));
+  optionsNext.value = options.filter(o => o.value !== 'random' && services.technologyService.isTechnologyEnabled(game.value, o.value)
+    && services.technologyService.isTechnologyResearchable(game.value, o.value));
 
   optionsNext.value.push({text: 'Random', value: 'random'});
 };

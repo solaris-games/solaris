@@ -41,7 +41,7 @@ import StarService from './star';
 import { StarDistanceService } from '@solaris/common';
 import NameService from './name';
 import StarUpgradeService from './starUpgrade';
-import { TechnologyService } from '@solaris/common';
+import { TechnologyService, ResearchProgressService } from '@solaris/common';
 import TradeService from './trade';
 import { WaypointService } from '@solaris/common';
 import ShipTransferService from './shipTransfer';
@@ -205,7 +205,8 @@ export default (config: Config,
     const playerCycleRewardsService = new PlayerCycleRewardsService(starService, technologyService, playerStatisticsService, specialistService, starDataService);
     const diplomacyUpkeepService = new DiplomacyUpkeepService(playerCreditsService, playerCycleRewardsService);
     const diplomacyService = new DiplomacyService(gameRepository, eventRepository, diplomacyUpkeepService)
-    const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService, statisticsService);
+    const researchProgressService = new ResearchProgressService();
+    const researchService = new ResearchService(gameRepository, technologyService, randomService, playerStatisticsService, starService, userService, gameTypeService, statisticsService, researchProgressService);
     const starUpgradeService = new StarUpgradeService(gameRepository, starService, carrierService, userAchievementService, researchService, technologyService, playerCreditsService, gameTypeService, shipService, statisticsService, starDataService);
     const starCaptureService = new StarCaptureService(specialistService, starService, gameTypeService, gameStateService, diplomacyService, technologyService, starUpgradeService, statisticsService);
     const starContestedService = new StarContestedService(diplomacyService);
@@ -323,6 +324,7 @@ export default (config: Config,
         playerReadyService,
         randomService,
         researchService,
+        researchProgressService,
         starService,
         starDistanceService,
         nameService,
