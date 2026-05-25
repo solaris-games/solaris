@@ -18,7 +18,7 @@ import { InternalGameEvent } from './types/internalEvents/InternalGameEvent';
 import { IEventService } from './types/IEventService';
 import RandomService from './random';
 import SpectatorService from './spectator';
-import NotificationService from './notification';
+import { INotificationService } from './types/INotificationService';
 
 export const GameJoinServiceEvents = {
     onPlayerJoined: 'onPlayerJoined',
@@ -66,7 +66,7 @@ export default class GameJoinService extends EventEmitter {
         this.spectatorService = spectatorService;
     }
 
-    async join(game: Game, userId: DBObjectId, playerId: DBObjectId | undefined, alias: string, avatar: number, password: string | undefined, eventService: IEventService, notificationService: NotificationService): Promise<{ gameIsFull: boolean, playerId: DBObjectId }> {
+    async join(game: Game, userId: DBObjectId, playerId: DBObjectId | undefined, alias: string, avatar: number, password: string | undefined, eventService: IEventService, notificationService: INotificationService): Promise<{ gameIsFull: boolean, playerId: DBObjectId }> {
         // The player cannot join the game if:
         // 1. The game has finished.
         // 2. They quit the game before the game started or they conceded defeat.

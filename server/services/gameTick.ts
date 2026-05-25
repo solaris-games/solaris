@@ -44,7 +44,7 @@ import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import { IStatisticsService } from './types/IStatisticsService';
 import { CarrierTravelService } from '@solaris/common';
-import NotificationService from "./notification";
+import { INotificationService } from "./types/INotificationService";
 
 import EventEmitter from "events";
 import moment from "moment";
@@ -99,7 +99,7 @@ export default class GameTickService extends EventEmitter {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierCombatService: CarrierCombatService;
     combatProcessingService: CombatProcessingService;
-    notificationService!: NotificationService;
+    notificationService!: INotificationService;
 
     constructor(
         distanceService: DistanceService,

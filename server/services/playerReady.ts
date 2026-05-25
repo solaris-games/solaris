@@ -4,7 +4,7 @@ import Repository from './repository';
 import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { GameTypeService } from '@solaris/common'
-import NotificationService from './notification';
+import { INotificationService } from './types/INotificationService';
 
 export const PlayerReadyServiceEvents = {
     onGamePlayerReady: 'onGamePlayerReady'
@@ -24,7 +24,7 @@ export default class PlayerReadyService extends EventEmitter {
         this.gameTypeService = gameTypeService
     }
 
-    async declareReady(game: Game, player: Player, notificationService: NotificationService) {
+    async declareReady(game: Game, player: Player, notificationService: INotificationService) {
         player.ready = true;
 
         await this.gameRepo.updateOne({
@@ -43,7 +43,7 @@ export default class PlayerReadyService extends EventEmitter {
         await notificationService.trySendLastPlayerTurnReminder(game._id);
     }
 
-    async declareReadyToCycle(game: Game, player: Player, notificationService: NotificationService) {
+    async declareReadyToCycle(game: Game, player: Player, notificationService: INotificationService) {
         player.ready = true;
         player.readyToCycle = true;
 

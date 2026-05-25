@@ -17,7 +17,7 @@ import StarService from './star';
 import UserService from './user';
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
-import NotificationService from './notification';
+import { INotificationService } from './types/INotificationService';
 export const ResearchServiceEvents = {
     onPlayerResearchCompleted: 'onPlayerResearchCompleted'
 }
@@ -105,7 +105,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         const techKey = player.researchingNow;
         const tech = player.research[techKey];
 
@@ -170,7 +170,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {

@@ -28,7 +28,7 @@ import ScanningService from "./scanning";
 import { DistanceService } from '@solaris/common';
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
-import NotificationService from './notification';
+import { INotificationService } from './types/INotificationService';
 
 export const TradeServiceEvents = {
     onPlayerCreditsReceived: 'onPlayerCreditsReceived',
@@ -107,7 +107,7 @@ export default class TradeService extends EventEmitter {
         return game.settings.player.tradeCost === 0;
     }
 
-    async sendCredits(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    async sendCredits(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         if (this.isTradingCreditsDisabled(game)) {
             throw new ValidationError(`Trading credits is disabled.`);
         }
@@ -186,7 +186,7 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    async sendCreditsSpecialists(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    async sendCreditsSpecialists(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         if (this.isTradingCreditsSpecialistsDisabled(game)) {
             throw new ValidationError(`Trading specialist tokens is disabled.`);
         }
@@ -266,7 +266,7 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    async sendRenown(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, notificationService: NotificationService) {
+    async sendRenown(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, amount: number, eventService: IEventService, notificationService: INotificationService) {
         // TODO: Maybe this validation needs to be in the middleware?
         if (!game.state.startDate) {
             throw new ValidationError(`Cannot award renown, the game has not started yet.`);
@@ -343,7 +343,7 @@ export default class TradeService extends EventEmitter {
         return eventObject;
     }
 
-    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchTypeNotRandom, techLevel: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    async sendTechnology(game: Game, fromPlayer: Player, toPlayerId: DBObjectId, technology: ResearchTypeNotRandom, techLevel: number, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         if (this.isTradingTechnologyDisabled(game)) {
             throw new ValidationError(`Trading technology is disabled.`);
         }
@@ -556,7 +556,7 @@ export default class TradeService extends EventEmitter {
         });
     }
 
-    async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
+    async tryTradeBack(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         // Note: Trade backs can only occur from AI to player
         if (!this.playerAfkService.isAIControlled(game, fromPlayer)) {
             return;

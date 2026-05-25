@@ -12,8 +12,9 @@ import InternalGameEndedEvent from './types/internalEvents/GameEnded';
 import InternalGameTurnEndedEvent from './types/internalEvents/GameTurnEnded';
 import InternalConversationMessageSentEvent from './types/internalEvents/ConversationMessageSent';
 import {logger} from "../utils/logging";
-import { GameTypeService } from '@solaris/common'
+import { GameTypeService, TradeEventTechnology } from '@solaris/common'
 import GameStateService from './gameState';
+import { INotificationService } from './types/INotificationService';
 
 const log = logger("Notification Service");
 
@@ -31,7 +32,7 @@ type SubscriptionEvent = 'gameStarted'|
     'playerRenownReceived'|
     'conversationMessageSent';
 
-export default class NotificationService {
+export default class NotificationService implements INotificationService {
     config: Config;
     userRepo: Repository<User>;
     gameRepo: Repository<Game>;
@@ -311,7 +312,7 @@ export default class NotificationService {
             });
     }
 
-    async onPlayerTechnologyReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, technology: any) {
+    async onPlayerTechnologyReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, technology: TradeEventTechnology) {
         if (!this.discordService.isConnected()) return;
         // Send the specialist tokens received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerTechnologyReceived', 
