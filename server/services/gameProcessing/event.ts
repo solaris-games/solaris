@@ -15,6 +15,7 @@ import { Star } from '../types/Star';
 import InternalGamePlayerQuitEvent from '../types/internalEvents/GamePlayerQuit';
 import { Carrier } from '../types/Carrier';
 import { BulkUpgradeReport } from '../types/InfrastructureUpgrade';
+import {logger} from "../../utils/logging";
 
 type ProcessingEvent =
     | ({ kind: 'creditsReceived'; gameId: DBObjectId; gameTick: number; fromPlayer: Player; toPlayer: Player; credits: number })
@@ -53,6 +54,8 @@ type ProcessingEvent =
     | ({ kind: 'starReignited'; gameId: DBObjectId; gameTick: number; playerId: DBObjectId; starId: DBObjectId; starName: string })
     | ({ kind: 'technologyReceived'; gameId: DBObjectId; gameTick: number; fromPlayer: Player; toPlayer: Player; technology: TradeEventTechnology })
     | ({ kind: 'technologySent'; gameId: DBObjectId; gameTick: number; fromPlayer: Player; toPlayer: Player; technology: TradeEventTechnology });
+
+const log = logger("Context: ProcessingEventService");
 
 export class ProcessingEventService implements IEventService {
     private _events: ProcessingEvent[] = [];
@@ -240,6 +243,8 @@ export class ProcessingEventService implements IEventService {
     async process(eventService: IEventService): Promise<void> {
         const events = this._events;
         this._events = [];
+
+        log.info(`Processing ${events.length} events`);
 
         for (const event of events) {
             switch (event.kind) {

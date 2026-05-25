@@ -7,6 +7,7 @@ import InternalGameEndedEvent from '../types/internalEvents/GameEnded';
 import { InternalGameEvent } from '../types/internalEvents/InternalGameEvent';
 import InternalGameTurnEndedEvent from '../types/internalEvents/GameTurnEnded';
 import InternalPlayerGalacticCycleCompleteEvent from '../types/internalEvents/PlayerGalacticCycleComplete';
+import {logger} from "../../utils/logging";
 
 type ProcessingNotification =
     | ({ kind: 'gameStarted' } & InternalGameEvent)
@@ -20,6 +21,8 @@ type ProcessingNotification =
     | ({ kind: 'playerTechnologyReceived'; gameId: DBObjectId; fromPlayer: Player; toPlayer: Player; technology: TradeEventTechnology })
     | ({ kind: 'playerRenownReceived'; gameId: DBObjectId; fromPlayer: Player; toPlayer: Player; amount: number })
     | ({ kind: 'conversationMessageSent' } & InternalConversationMessageSentEvent);
+
+const log = logger("Context: ProcessingNotificationService");
 
 export class ProcessingNotificationService implements INotificationService {
     private _notifications: ProcessingNotification[] = [];
@@ -82,6 +85,8 @@ export class ProcessingNotificationService implements INotificationService {
     async process(notificationService: INotificationService): Promise<void> {
         const notifications = this._notifications;
         this._notifications = [];
+
+        log.info(`Processing ${notifications.length} notifications`);
 
         for (const n of notifications) {
             switch (n.kind) {
