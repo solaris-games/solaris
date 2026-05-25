@@ -46,7 +46,7 @@ export default class Repository<T> {
 
         return await this.model.findOneAndUpdate(query, update, {
             upsert: true,
-            new: true,
+            returnDocument: 'after',
         }).exec() as ActiveModel<T>;
     }
 
