@@ -36,10 +36,6 @@ export default class PlayerReadyService extends EventEmitter {
             }
         });
 
-        this.emit(PlayerReadyServiceEvents.onGamePlayerReady, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-        });
         await notificationService.trySendLastPlayerTurnReminder(game._id);
     }
 
@@ -57,10 +53,6 @@ export default class PlayerReadyService extends EventEmitter {
             }
         });
 
-        this.emit(PlayerReadyServiceEvents.onGamePlayerReady, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-        });
         await notificationService.trySendLastPlayerTurnReminder(game._id);
     }
 

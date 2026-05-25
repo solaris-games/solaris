@@ -21,11 +21,6 @@ import StarService from "./star";
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
 
-export const CombatServiceEvents = {
-    onPlayerCombatStar: 'onPlayerCombatStar',
-    onPlayerCombatCarrier: 'onPlayerCombatCarrier',
-}
-
 export default class CombatProcessingService extends EventEmitter {
     combatService: CombatService<DBObjectId>;
     gameTypeService: GameTypeService;
@@ -195,18 +190,8 @@ export default class CombatProcessingService extends EventEmitter {
 
         // Log the combat event
         if (isOwnedStar) {
-            this.emit(CombatServiceEvents.onPlayerCombatStar, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                combatResult: eventResult,
-            });
             await eventService.createPlayerCombatStarEvent(game._id, game.state.tick, eventResult);
         } else {
-            this.emit(CombatServiceEvents.onPlayerCombatCarrier, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                combatResult: eventResult,
-            });
             await eventService.createPlayerCombatCarrierEvent(game._id, game.state.tick, eventResult);
         }
 

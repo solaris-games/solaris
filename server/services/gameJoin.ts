@@ -21,7 +21,6 @@ import SpectatorService from './spectator';
 import { INotificationService } from './types/INotificationService';
 
 export const GameJoinServiceEvents = {
-    onPlayerJoined: 'onPlayerJoined',
     onGameStarted: 'onGameStarted'
 }
 
@@ -211,7 +210,6 @@ export default class GameJoinService extends EventEmitter {
             playerAlias: player.alias
         };
 
-        this.emit(GameJoinServiceEvents.onPlayerJoined, playerJoinedEvent);
         await eventService.createPlayerJoinedEvent(playerJoinedEvent);
 
         if (gameIsFull) {

@@ -67,13 +67,6 @@ function getNewConversation(game: Game, playerId: DBObjectId | null, name: strin
     return newConvo;
 }
 
-export const ConversationServiceEvents = {
-    onConversationCreated: 'onConversationCreated',
-    onConversationInvited: 'onConversationInvited',
-    onConversationMessageSent: 'onConversationMessageSent',
-    onConversationLeft: 'onConversationLeft'
-}
-
 export default class ConversationService extends EventEmitter {
     gameRepo: Repository<Game>;
     tradeService: TradeService;
@@ -106,21 +99,9 @@ export default class ConversationService extends EventEmitter {
             }
         });
 
-        this.emit(ConversationServiceEvents.onConversationCreated, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            convo: newConvo,
-            playerId
-        });
         await eventService.createPlayerConversationCreated(game._id, game.state.tick, newConvo);
 
         for (let i = 1; i < newConvo.participants.length; i++) {
-            this.emit(ConversationServiceEvents.onConversationInvited, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                convo: newConvo,
-                playerId: newConvo.participants[i]
-            });
             await eventService.createPlayerConversationInvited(game._id, game.state.tick, newConvo, newConvo.participants[i]);
         }
 
@@ -335,7 +316,6 @@ export default class ConversationService extends EventEmitter {
             sentMessageResult
         };
 
-        this.emit(ConversationServiceEvents.onConversationMessageSent, e);
         await notificationService.onConversationMessageSent(e);
 
         this.broadcastService.gameMessageSent(game, sentMessageResult);
@@ -388,12 +368,6 @@ export default class ConversationService extends EventEmitter {
 
         // TODO: Delete the conversation if no longer any participants?
 
-        this.emit(ConversationServiceEvents.onConversationLeft, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            convo,
-            playerId
-        });
         await eventService.createPlayerConversationLeft(game._id, game.state.tick, convo, playerId);
 
         return convo;

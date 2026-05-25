@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import { DBObjectId } from './types/DBObjectId';
 import { ValidationError } from "@solaris/common";
 import Repository from './repository';
@@ -11,11 +10,6 @@ import DiplomacyService from './diplomacy';
 import EventEmitter from "events";
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
-
-export const CarrierGiftServiceEvents = {
-    onPlayerGiftReceived: 'onPlayerGiftReceived',
-    onPlayerGiftSent: 'onPlayerGiftSent'
-}
 
 export default class CarrierGiftService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -118,9 +112,7 @@ export default class CarrierGiftService extends EventEmitter {
                 carrier,
                 star
             };
-    
-            this.emit(CarrierGiftServiceEvents.onPlayerGiftReceived, eventObject);
-            this.emit(CarrierGiftServiceEvents.onPlayerGiftSent, eventObject);
+
             eventService.createGiftReceivedEvent(game._id, game.state.tick, carrierPlayer, starPlayer, carrier, star);
             eventService.createGiftSentEvent(game._id, game.state.tick, carrierPlayer, starPlayer, carrier, star);
 
