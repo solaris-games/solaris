@@ -8,7 +8,7 @@ import { Game } from './types/Game';
 import { User, UserSubscriptions } from './types/User';
 import moment from "moment";
 import {ActiveModel} from "./types/ActiveModel";
-import { IEmailService } from './types/IEmailService';
+import { EmailService } from "./email";
 
 function uuidv4(): string {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -215,7 +215,7 @@ export default class UserService extends EventEmitter {
         return user != null;
     }
 
-    async create(email: string, username: string, password: string, ipAddress: string, emailService: IEmailService) {
+    async create(email: string, username: string, password: string, ipAddress: string, emailService: EmailService) {
         let user = {
             username: username.trim(),
             email: email.trim().toLowerCase(),

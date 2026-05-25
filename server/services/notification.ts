@@ -32,7 +32,7 @@ type SubscriptionEvent = 'gameStarted'|
     'playerRenownReceived'|
     'conversationMessageSent';
 
-export default class NotificationService implements INotificationService {
+export class NotificationService implements INotificationService {
     config: Config;
     userRepo: Repository<User>;
     gameRepo: Repository<Game>;

@@ -55,7 +55,7 @@ import { Model } from "mongoose";
 import {CombatMaskingService} from "./combatMasking";
 import { IEventService } from "./types/IEventService";
 
-export default class EventService implements IEventService {
+export class EventService implements IEventService {
     eventModel: Model<GameEvent<DBObjectId>>;
     eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     broadcastService: BroadcastService;

@@ -23,7 +23,7 @@ import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
 import {CombatGroupService, CombatService, DistanceService, PathfindingService, ResearchProgressService} from '@solaris/common';
-import EmailService from "../email";
+import {EmailService} from "../email";
 import GameService from "../game";
 import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
@@ -45,7 +45,7 @@ import LeaderboardService from "../leaderboard";
 import LedgerService from "../ledger";
 import MapService from "../map";
 import NameService from "../name";
-import NotificationService from "../notification";
+import {NotificationService} from "../notification";
 import PasswordService from "../password";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
@@ -96,7 +96,7 @@ import { StarDataService } from "@solaris/common";
 import {DBObjectId} from "./DBObjectId";
 import CarrierCombatService from "../carrierCombat";
 import CombatProcessingService from "../combatProcessing";
-import EventService from "../event";
+import {EventService} from "../event";
 import StatisticsService from "../statistics";
 
 export interface DependencyContainer {
