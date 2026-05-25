@@ -4,6 +4,7 @@ import {DBObjectId} from "./types/DBObjectId";
 import {Game} from "./types/Game";
 import {logger} from "../utils/logging";
 import UserService from "./user";
+import {IStatisticsService} from "./types/IStatisticsService";
 
 const EMPTY_STATS: Statistics = {
     combat: {
@@ -59,7 +60,7 @@ const EMPTY_STATS: Statistics = {
 
 const log = logger("Statistics Service");
 
-export default class StatisticsService {
+export default class StatisticsService implements IStatisticsService {
     statsSliceRepository: Repository<StatsSlice<DBObjectId>>;
     userService: UserService;
 

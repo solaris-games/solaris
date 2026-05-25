@@ -12,8 +12,8 @@ import { ValidationError } from "@solaris/common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
 import { TechnologyService } from '@solaris/common';
-import StatisticsService from "./statistics";
 import CullWaypointsService from "./cullWaypoints";
+import { IStatisticsService } from './types/IStatisticsService';
 
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
@@ -25,7 +25,6 @@ export default class SpecialistHireService {
     gameTypeService: GameTypeService;
     specialistBanService: SpecialistBanService;
     technologyService: TechnologyService;
-    statisticsService: StatisticsService;
     starDataService: StarDataService;
 
     constructor(
@@ -38,7 +37,6 @@ export default class SpecialistHireService {
         gameTypeService: GameTypeService,
         specialistBanService: SpecialistBanService,
         technologyService: TechnologyService,
-        statisticsService: StatisticsService,
         starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
@@ -50,11 +48,10 @@ export default class SpecialistHireService {
         this.gameTypeService = gameTypeService;
         this.specialistBanService = specialistBanService;
         this.technologyService = technologyService;
-        this.statisticsService = statisticsService;
         this.starDataService = starDataService;
     }
 
-    async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
+    async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number, statisticsService: IStatisticsService) {
         if (game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -129,7 +126,7 @@ export default class SpecialistHireService {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure.specialistsHired += 1;
             });
         }
@@ -151,7 +148,7 @@ export default class SpecialistHireService {
         return result;
     }
 
-    async hireStarSpecialist(game: Game, player: Player, starId: DBObjectId, specialistId: number) {
+    async hireStarSpecialist(game: Game, player: Player, starId: DBObjectId, specialistId: number, statisticsService: IStatisticsService) {
         if (game.settings.specialGalaxy.specialistCost === 'none') {
             throw new ValidationError('The game settings has disabled the hiring of specialists.');
         }
@@ -229,7 +226,7 @@ export default class SpecialistHireService {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure.specialistsHired += 1;
             });
         }

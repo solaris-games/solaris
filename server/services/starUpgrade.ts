@@ -21,10 +21,10 @@ import StarService from './star';
 import { TechnologyService } from '@solaris/common';
 import PlayerCreditsService from './playerCredits';
 import ShipService from "./ship";
-import StatisticsService from "./statistics";
 import {GameInfrastructureExpenseMultiplier} from "@solaris/common";
 import { StarDataService } from "@solaris/common";
 import { IEventService } from './types/IEventService';
+import { IStatisticsService } from './types/IStatisticsService';
 
 const Heap = require('qheap');
 
@@ -54,7 +54,6 @@ export default class StarUpgradeService extends EventEmitter {
     playerCreditsService: PlayerCreditsService;
     gameTypeService: GameTypeService;
     shipService: ShipService;
-    statisticsService: StatisticsService;
     starDataService: StarDataService;
 
     constructor(
@@ -67,7 +66,6 @@ export default class StarUpgradeService extends EventEmitter {
         playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService,
         shipService: ShipService,
-        statisticsService: StatisticsService,
         starDataService: StarDataService,
     ) {
         super();
@@ -81,11 +79,10 @@ export default class StarUpgradeService extends EventEmitter {
         this.playerCreditsService = playerCreditsService;
         this.gameTypeService = gameTypeService;
         this.shipService = shipService;
-        this.statisticsService = statisticsService;
         this.starDataService = starDataService;
     }
 
-    async buildWarpGate(game: Game, player: Player, starId: DBObjectId) {
+    async buildWarpGate(game: Game, player: Player, starId: DBObjectId, statisticsService: IStatisticsService) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -127,7 +124,7 @@ export default class StarUpgradeService extends EventEmitter {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure.warpGates += 1;
             });
         }
@@ -138,7 +135,7 @@ export default class StarUpgradeService extends EventEmitter {
         };
     }
 
-    async destroyWarpGate(game: Game, player: Player, starId: DBObjectId) {
+    async destroyWarpGate(game: Game, player: Player, starId: DBObjectId, statisticsService: IStatisticsService) {
         // Get the star.
         let star = this.starService.getById(game, starId);
 
@@ -157,13 +154,13 @@ export default class StarUpgradeService extends EventEmitter {
         ]);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure.warpGatesDestroyed += 1;
             });
         }
     }
 
-    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true): Promise<{
+    async buildCarrier(game: Game, player: Player, starId: DBObjectId, ships: number, writeToDB: boolean = true, statisticsService: IStatisticsService): Promise<{
         carrier: Carrier,
         starShips: number
     }> {
@@ -249,7 +246,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure.carriers += 1;
             });
         }
@@ -278,7 +275,7 @@ export default class StarUpgradeService extends EventEmitter {
         return cost;
     }
 
-    async _upgradeInfrastructureUpdateDB(game: Game, player: Player, star: Star, cost: number, economyType: InfrastructureType) {
+    async _upgradeInfrastructureUpdateDB(game: Game, player: Player, star: Star, cost: number, economyType: InfrastructureType, statisticsService: IStatisticsService) {
         let dbWrites: any[] = [
             await this._getDeductPlayerCreditsDBWrite(game, player, cost)
         ];
@@ -335,13 +332,13 @@ export default class StarUpgradeService extends EventEmitter {
         await this.gameRepo.bulkWrite(dbWrites);
 
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure[economyType] += 1;
             });
         }
     }
 
-    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback, writeToDB: boolean = true): Promise<InfrastructureUpgradeReport> {
+    async _upgradeInfrastructure(game: Game, player: Player, starId: DBObjectId, expenseConfigKey: GameInfrastructureExpenseMultiplier, economyType: InfrastructureType, calculateCostCallback, writeToDB: boolean = true, statisticsService: IStatisticsService): Promise<InfrastructureUpgradeReport> {
         if (expenseConfigKey === 'none') {
             throw new ValidationError(`Cannot upgrade ${economyType} as it has been disabled.`);
         }
@@ -369,7 +366,7 @@ export default class StarUpgradeService extends EventEmitter {
         if (writeToDB) {
             player.credits -= cost;
 
-            await this._upgradeInfrastructureUpdateDB(game, player, star, cost, economyType);
+            await this._upgradeInfrastructureUpdateDB(game, player, star, cost, economyType, statisticsService);
         }
 
         let nextCost = this._calculateUpgradeInfrastructureCost(game, star, expenseConfigKey, economyType, calculateCostCallback);
@@ -385,12 +382,12 @@ export default class StarUpgradeService extends EventEmitter {
         };
     }
 
-    async upgradeEconomy(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
-        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this), writeToDB);
+    async upgradeEconomy(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true, statisticsService: IStatisticsService) {
+        return await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.economy, 'economy', this.calculateEconomyCost.bind(this), writeToDB, statisticsService);
     }
 
-    async upgradeIndustry(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
-        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this), writeToDB);
+    async upgradeIndustry(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true, statisticsService: IStatisticsService) {
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.industry, 'industry', this.calculateIndustryCost.bind(this), writeToDB, statisticsService);
 
         // Append the new manufacturing speed to the report.
         let star = this.starService.getById(game, starId);
@@ -401,8 +398,8 @@ export default class StarUpgradeService extends EventEmitter {
         return report;
     }
 
-    async upgradeScience(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true) {
-        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this), writeToDB);
+    async upgradeScience(game: Game, player: Player, starId: DBObjectId, writeToDB: boolean = true, statisticsService: IStatisticsService) {
+        let report = await this._upgradeInfrastructure(game, player, starId, game.settings.player.developmentCost.science, 'science', this.calculateScienceCost.bind(this), writeToDB, statisticsService);
 
         report.currentResearchTicksEta = this.researchService.calculateCurrentResearchETAInTicks(game, player);
         report.nextResearchTicksEta = this.researchService.calculateNextResearchETAInTicks(game, player);
@@ -478,7 +475,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true, eventService: IEventService) {
+    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true, eventService: IEventService, statisticsService: IStatisticsService) {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
@@ -561,11 +558,11 @@ export default class StarUpgradeService extends EventEmitter {
         }
 
         // make sure the game model is up to date for further calculations. This is ok since the game model is lean and these changes will not be committed to the database.
-        await this.executeBulkUpgradeReport(game, player, upgradeSummary, eventService);
+        await this.executeBulkUpgradeReport(game, player, upgradeSummary, eventService, statisticsService);
 
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure[infrastructureType] += upgradeSummary.upgraded;
             });
         }
@@ -579,7 +576,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     // this does not write directly to db
-    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, eventService: IEventService) {
+    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, eventService: IEventService, statisticsService: IStatisticsService) {
         upgradeSummary.stars.forEach(starUpgrade => {
             const star = this.starService.getById(game, starUpgrade.starId);
             switch (upgradeSummary.infrastructureType) {
@@ -599,7 +596,7 @@ export default class StarUpgradeService extends EventEmitter {
 
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            await statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.infrastructure[upgradeSummary.infrastructureType] += upgradeSummary.upgraded;
             });
         }

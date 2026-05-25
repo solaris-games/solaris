@@ -18,12 +18,11 @@ import { StarDistanceService } from '@solaris/common';
 import { TechnologyService } from '@solaris/common';
 import UserService from './user';
 import { MathRandomGen } from "../utils/randomGen";
-import StatisticsService from "./statistics";
 import { GameSettings } from "@solaris/common";
 import EventEmitter from "events";
 import { StarDataService } from "@solaris/common";
 import { IEventService } from './types/IEventService';
-
+import { IStatisticsService } from './types/IStatisticsService';
 const RNG = require('random-seed');
 
 export const StarServiceEvents = {
@@ -43,7 +42,6 @@ export default class StarService extends EventEmitter {
     userService: UserService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
-    statisticsService: StatisticsService;
     starDataService: StarDataService;
 
     constructor(
@@ -57,7 +55,6 @@ export default class StarService extends EventEmitter {
         userService: UserService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        statisticsService: StatisticsService,
         starDataService: StarDataService,
     ) {
         super();
@@ -72,7 +69,6 @@ export default class StarService extends EventEmitter {
         this.userService = userService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-        this.statisticsService = statisticsService;
         this.starDataService = starDataService;
     }
 
@@ -309,7 +305,7 @@ export default class StarService extends EventEmitter {
         return true;
     }
 
-    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier<DBObjectId>) {
+    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier<DBObjectId>, statisticsService: IStatisticsService) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }
@@ -327,7 +323,7 @@ export default class StarService extends EventEmitter {
         let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString()) || null;
 
         if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            this.statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
+            statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
                 stats.combat.stars.captured++;
 
                 if (star.homeStar) {

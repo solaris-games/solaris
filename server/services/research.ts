@@ -15,8 +15,8 @@ import PlayerStatisticsService from './playerStatistics';
 import RandomService from './random';
 import StarService from './star';
 import UserService from './user';
-import StatisticsService from './statistics';
 import { IEventService } from './types/IEventService';
+import { IStatisticsService } from './types/IStatisticsService';
 
 export const ResearchServiceEvents = {
     onPlayerResearchCompleted: 'onPlayerResearchCompleted'
@@ -30,7 +30,6 @@ export default class ResearchService extends EventEmitter {
     starService: StarService;
     userService: UserService;
     gameTypeService: GameTypeService;
-    statisticsService: StatisticsService;
     researchProgressService: ResearchProgressService;
 
     constructor(
@@ -41,7 +40,6 @@ export default class ResearchService extends EventEmitter {
         starService: StarService,
         userService: UserService,
         gameTypeService: GameTypeService,
-        statisticsService: StatisticsService,
         researchProgressService: ResearchProgressService,
     ) {
         super();
@@ -53,7 +51,6 @@ export default class ResearchService extends EventEmitter {
         this.starService = starService;
         this.userService = userService;
         this.gameTypeService = gameTypeService;
-        this.statisticsService = statisticsService;
         this.researchProgressService = researchProgressService;
     }
 
@@ -108,7 +105,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService) {
+    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService) {
         const techKey = player.researchingNow;
         const tech = player.research[techKey];
 
@@ -125,7 +122,7 @@ export default class ResearchService extends EventEmitter {
 
         // If the player isn't being controlled by AI then increment achievements.
         if (user && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            this.statisticsService.modifyStats(game._id, player._id, (stats) => {
+            statisticsService.modifyStats(game._id, player._id, (stats) => {
                 stats.research[techKey] += progressIncrease;
             });
         }
@@ -172,7 +169,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService) {
+    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -180,7 +177,7 @@ export default class ResearchService extends EventEmitter {
 
             const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
 
-            this.conductResearch(game, user, player, eventService);
+            this.conductResearch(game, user, player, eventService, statisticsService);
         }
     }
 

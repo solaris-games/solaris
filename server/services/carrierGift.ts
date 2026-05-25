@@ -8,9 +8,9 @@ import { Player } from './types/Player';
 import { Star } from './types/Star';
 import { User } from './types/User';
 import DiplomacyService from './diplomacy';
-import StatisticsService from './statistics';
 import EventEmitter from "events";
 import { IEventService } from './types/IEventService';
+import { IStatisticsService } from './types/IStatisticsService';
 
 export const CarrierGiftServiceEvents = {
     onPlayerGiftReceived: 'onPlayerGiftReceived',
@@ -20,18 +20,15 @@ export const CarrierGiftServiceEvents = {
 export default class CarrierGiftService extends EventEmitter {
     gameRepo: Repository<Game>;
     diplomacyService: DiplomacyService;
-    statisticsService: StatisticsService;
 
     constructor(
         gameRepo: Repository<Game>,
         diplomacyService: DiplomacyService,
-        statisticsService: StatisticsService,
     ) {
         super();
 
         this.gameRepo = gameRepo;
         this.diplomacyService = diplomacyService;
-        this.statisticsService = statisticsService;
     }
 
     async convertToGift(game: Game, player: Player, carrierId: DBObjectId) {
@@ -79,7 +76,7 @@ export default class CarrierGiftService extends EventEmitter {
         });
     }
 
-    transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier, eventService: IEventService) {
+    transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier, eventService: IEventService, statisticsService: IStatisticsService) {
         if (!star.ownedByPlayerId) {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
@@ -95,13 +92,13 @@ export default class CarrierGiftService extends EventEmitter {
         if (!isSamePlayer) {
             // If the star is not owned by the same player then increment player achievements.
             if (starUser && !starPlayer.defeated) {
-                this.statisticsService.modifyStats(game._id, starPlayer._id, (stats) => {
+                statisticsService.modifyStats(game._id, starPlayer._id, (stats) => {
                     stats.trade.giftsReceived += carrier.ships!;
                 });
             }
     
             if (carrierUser && !carrierPlayer.defeated) {
-                this.statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
+                statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
                     stats.trade.giftsSent += carrier.ships!;
                 });
             }

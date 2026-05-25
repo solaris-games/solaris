@@ -87,7 +87,7 @@ import { WaypointService } from '@solaris/common';
 import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
-import StatisticsService from "../statistics";
+import {IStatisticsService} from "./IStatisticsService";
 import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
@@ -195,7 +195,7 @@ export interface DependencyContainer {
     gameMaskingService: GameMaskingService,
     sessionService: SessionService,
     starCaptureService: StarCaptureService,
-    statisticsService: StatisticsService,
+    statisticsService: IStatisticsService,
     initialGameStateService: InitialGameStateService,
     waypointActionService: WaypointActionService,
     saveWaypointsService: SaveWaypointsService,

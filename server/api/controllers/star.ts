@@ -21,7 +21,9 @@ export default (container: DependencyContainer) => {
                 let report = await container.starUpgradeService.upgradeEconomy(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    true,
+                    container.statisticsService);
     
                 res.status(200).json(report);
                 return next();
@@ -36,7 +38,9 @@ export default (container: DependencyContainer) => {
                 let report = await container.starUpgradeService.upgradeIndustry(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    true,
+                    container.statisticsService);
     
                 res.status(200).json(report);
                 return next();
@@ -51,7 +55,9 @@ export default (container: DependencyContainer) => {
                 let report = await container.starUpgradeService.upgradeScience(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    true,
+                    container.statisticsService);
     
                 res.status(200).json(report);
                 return next();
@@ -70,7 +76,8 @@ export default (container: DependencyContainer) => {
                     reqObj.infrastructure,
                     +reqObj.amount,
                     true,
-                    container.eventService);
+                    container.eventService,
+                    container.statisticsService);
     
                 res.status(200).json(summary);
                 return next();
@@ -152,7 +159,8 @@ export default (container: DependencyContainer) => {
                 let report = await container.starUpgradeService.buildWarpGate(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    container.statisticsService);
     
                 res.status(200).json(report);
                 return next();
@@ -167,7 +175,8 @@ export default (container: DependencyContainer) => {
                 await container.starUpgradeService.destroyWarpGate(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    container.statisticsService);
     
                 res.sendStatus(200);
                 return next();
@@ -183,7 +192,9 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     reqObj.starId,
-                    reqObj.ships);
+                    reqObj.ships,
+                    true,
+                    container.statisticsService);
     
                 res.status(200).json(report);
                 return next();

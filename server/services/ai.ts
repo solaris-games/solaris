@@ -25,6 +25,7 @@ import SaveWaypointsService from "./saveWaypoints";
 import { TechnologyService } from '@solaris/common';
 import { StarDataService } from "@solaris/common";
 import {IEventService} from "./types/IEventService";
+import { IStatisticsService } from './types/IStatisticsService';
 
 const Heap = require('qheap');
 
@@ -151,6 +152,7 @@ export default class AIService {
     pathfindingService: PathfindingService<DBObjectId>;
     saveWaypointService: SaveWaypointsService;
     starDataService: StarDataService;
+    statisticsService: IStatisticsService;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -171,6 +173,7 @@ export default class AIService {
         pathfindingService: PathfindingService<DBObjectId>,
         saveWaypointService: SaveWaypointsService,
         starDataService: StarDataService,
+        statisticsService: IStatisticsService,
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -190,6 +193,7 @@ export default class AIService {
         this.pathfindingService = pathfindingService;
         this.saveWaypointService = saveWaypointService;
         this.starDataService = starDataService;
+        this.statisticsService = statisticsService;
     }
 
     isAIControlled(player: Player) {
@@ -291,7 +295,7 @@ export default class AIService {
         let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
 
         if (creditsToSpendEco && game.settings.player.developmentCost.economy !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false, eventService);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false, eventService, this.statisticsService);
         }
     }
 
@@ -306,11 +310,11 @@ export default class AIService {
         let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
 
         if (creditsToSpendSci && game.settings.player.developmentCost.science !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false, eventService);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false, eventService, this.statisticsService);
         }
 
         if (creditsToSpendInd && game.settings.player.developmentCost.industry !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false, eventService);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false, eventService, this.statisticsService);
         }
     }
 
@@ -713,7 +717,7 @@ export default class AIService {
         } else if (this.starDataService.isDeadStar(assignment.star)) {
             return;
         } else {
-            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false);
+            const buildResult = await this.starUpgradeService.buildCarrier(game, player, starId, 1, false, this.statisticsService);
             carrier = this.carrierService.getById(game, buildResult.carrier._id);
             shipsToTransfer -= 1;
             assignment.totalShips -= 1;
@@ -1267,7 +1271,7 @@ export default class AIService {
                 const isUnimportantLogistics = ticksStockpile < ticksStockpileAllowed;
 
                 if (!isUnimportantLogistics && this._canAffordCarrier(context, game, player, false)) {
-                    const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false);
+                    const buildResult = await this.starUpgradeService.buildCarrier(game, player, movement.from._id, 1, false, this.statisticsService);
                     // Get the carrier again since the above-returned is not tracked by the db
                     carrier = this.carrierService.getById(game, buildResult.carrier._id);
                 }

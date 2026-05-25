@@ -3,13 +3,14 @@ import {User} from "../services/types/User";
 import {StatsSlice} from "@solaris/common";
 import {DBObjectId, objectIdFromString} from "../services/types/DBObjectId";
 import {groupBy} from "@solaris/common";
+import StatisticsService from "../services/statistics";
 
 const dbQuery = {
     closed: true,
 };
 
 const job = makeJob("Recalculate stats", async ({log, container, mongo}) => {
-    const statisticsService = container.statisticsService;
+    const statisticsService = container.statisticsService as StatisticsService;
     const gameService = container.gameService;
     const statsSliceRepository = statisticsService.statsSliceRepository;
 

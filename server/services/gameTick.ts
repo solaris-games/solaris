@@ -40,9 +40,9 @@ import ScheduleBuyService from "./scheduleBuy";
 import {Moment} from "moment";
 import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
-import StatisticsService from "./statistics";
 import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
+import { IStatisticsService } from './types/IStatisticsService';
 import { CarrierTravelService } from '@solaris/common';
 
 import EventEmitter from "events";
@@ -93,7 +93,6 @@ export default class GameTickService extends EventEmitter {
     shipService: ShipService;
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
-    statisticsService: StatisticsService;
     waypointActionService: WaypointActionService;
     cullWaypointsService: CullWaypointsService;
     carrierTravelService: CarrierTravelService<DBObjectId>;
@@ -130,7 +129,6 @@ export default class GameTickService extends EventEmitter {
         shipService: ShipService,
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
-        statisticsService: StatisticsService,
         waypointActionService: WaypointActionService,
         cullWaypointsService: CullWaypointsService,
         carrierTravelService: CarrierTravelService<DBObjectId>,
@@ -168,7 +166,6 @@ export default class GameTickService extends EventEmitter {
         this.shipService = shipService;
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
-        this.statisticsService = statisticsService;
         this.waypointActionService = waypointActionService;
         this.cullWaypointsService = cullWaypointsService;
         this.carrierTravelService = carrierTravelService;
@@ -176,7 +173,7 @@ export default class GameTickService extends EventEmitter {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async tick(gameId: DBObjectId, eventService: IEventService) {
+    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService) {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
@@ -226,7 +223,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -243,7 +240,7 @@ export default class GameTickService extends EventEmitter {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
 
-            await this.scheduleBuyService.buyScheduledInfrastructure(game, eventService);
+            await this.scheduleBuyService.buyScheduledInfrastructure(game, eventService, statisticsService);
             logTime('Buy scheduled infrastructure')
 
             game.state.tick++;
@@ -252,16 +249,16 @@ export default class GameTickService extends EventEmitter {
 
             await this._scuttleCarriers(game);
 
-            await this._captureAbandonedStars(game, context.getGameUsers());
+            await this._captureAbandonedStars(game, context.getGameUsers(), statisticsService);
             logTime('Capture abandoned stars');
 
-            this._transferGiftsInOrbit(game, context.getGameUsers(), eventService);
+            this._transferGiftsInOrbit(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Transfer gifts in orbit');
 
-            await this._combatCarriers(game, context.getGameUsers(), eventService);
+            await this._combatCarriers(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Combat carriers');
 
-            await this._moveCarriers(game, context.getGameUsers(), eventService);
+            await this._moveCarriers(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Move carriers and produce ships');
 
             const ticked = await this._endOfGalacticCycleCheck(game, eventService);
@@ -277,7 +274,7 @@ export default class GameTickService extends EventEmitter {
             await this._playAI(eventService, game);
             logTime('AI controlled players turn');
             
-            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService);
+            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -295,7 +292,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -375,15 +372,15 @@ export default class GameTickService extends EventEmitter {
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
-    async _combatCarriers(game: Game, gameUsers: User[], eventService: IEventService) {
+    async _combatCarriers(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
 
-        await this.carrierCombatService.combatCarriers(game, gameUsers, eventService);
+        await this.carrierCombatService.combatCarriers(game, gameUsers, eventService, statisticsService);
     }
 
-    async _moveCarriers(game: Game, gameUsers: User[], eventService: IEventService) {
+    async _moveCarriers(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -441,7 +438,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < carriersInTransit.length; i++) {
             const carrierInTransit = carriersInTransit[i];
         
-            const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit, eventService);
+            const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit, eventService, statisticsService);
 
             if (!carrierMovementReport) {
                 continue;
@@ -485,7 +482,7 @@ export default class GameTickService extends EventEmitter {
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
             // properly handle combat at unclaimed stars!
-            await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar, eventService);
+            await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar, eventService, statisticsService);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -508,7 +505,7 @@ export default class GameTickService extends EventEmitter {
         this.waypointActionService.performWaypointActionsGarrisons(game, actionWaypoints);
     }
 
-    async _captureAbandonedStars(game: Game, gameUsers: User[]) {
+    async _captureAbandonedStars(game: Game, gameUsers: User[], statisticsService: IStatisticsService) {
         // Note: Capturing abandoned stars in this way is only possible in the scenario
         // where a player has abandoned a star for an ally to capture who is already in orbit.
         if (!this.diplomacyService.isFormalAlliancesEnabled(game)) {
@@ -524,7 +521,7 @@ export default class GameTickService extends EventEmitter {
             const carrier = contestedStar.carriersInOrbit
                 .sort((a: Carrier, b: Carrier) => b.ships! - a.ships!)[0];
 
-            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier);
+            this.starService.claimUnownedStar(game, gameUsers, contestedStar.star, carrier, statisticsService);
         }
     }
 
@@ -675,7 +672,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService) {
+    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -709,7 +706,7 @@ export default class GameTickService extends EventEmitter {
         if (winner) {
             this.gameStateService.finishGame(game, winner);
 
-            await this.statisticsService.closeStatsSlicesForGame(game);
+            await statisticsService.closeStatsSlicesForGame(game);
 
             for (const player of game.galaxy.players) {
                 if (this.playerAfkService.isAIControlled(game, player)) {
@@ -819,13 +816,13 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _transferGiftsInOrbit(game: Game, gameUsers: User[], eventService: IEventService) {
+    _transferGiftsInOrbit(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
         const carriers = this.carrierService.listGiftCarriersInOrbit(game);
 
         for (let carrier of carriers) {
             const star = this.starService.getById(game, carrier.orbiting!);
 
-            this.carrierGiftService.transferGift(game, gameUsers, star, carrier, eventService);
+            this.carrierGiftService.transferGift(game, gameUsers, star, carrier, eventService, statisticsService);
         }
     }
 

@@ -9,8 +9,8 @@ import GameStateService from "./gameState";
 import DiplomacyService from "./diplomacy";
 import { TechnologyService } from '@solaris/common';
 import StarUpgradeService from "./starUpgrade";
-import StatisticsService from "./statistics";
 import {DBObjectId} from "./types/DBObjectId";
+import { IStatisticsService } from './types/IStatisticsService';
 
 export default class StarCaptureService {
     specialistService: SpecialistService;
@@ -20,7 +20,6 @@ export default class StarCaptureService {
     diplomacyService: DiplomacyService;
     technologyService: TechnologyService;
     starUpgradeService: StarUpgradeService;
-    statisticsService: StatisticsService;
 
     constructor(
         specialistService: SpecialistService,
@@ -30,7 +29,6 @@ export default class StarCaptureService {
         diplomacyService: DiplomacyService,
         technologyService: TechnologyService,
         starUpgradeService: StarUpgradeService,
-        statisticsService: StatisticsService,
     ) {
         this.specialistService = specialistService;
         this.starService = starService;
@@ -39,10 +37,9 @@ export default class StarCaptureService {
         this.diplomacyService = diplomacyService;
         this.technologyService = technologyService;
         this.starUpgradeService = starUpgradeService;
-        this.statisticsService = statisticsService;
     }
 
-    captureStar(game: Game, star: Star, owner: Player, ownerUser: User | undefined, attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier<DBObjectId>[]): StarCaptureResult {
+    captureStar(game: Game, star: Star, owner: Player, ownerUser: User | undefined, attackers: Player[], attackerUsers: User[], attackerCarriers: Carrier<DBObjectId>[], statisticsService: IStatisticsService): StarCaptureResult {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
         const specialist = this.specialistService.getByIdStar(star.specialistId);
@@ -94,7 +91,7 @@ export default class StarCaptureService {
 
         if (!isTutorialGame) {
             if (ownerUser && !owner.defeated) {
-                this.statisticsService.modifyStats(game._id, owner._id, (stats) => {
+                statisticsService.modifyStats(game._id, owner._id, (stats) => {
                     stats.combat.stars.lost += 1;
 
                     if (star.homeStar) {
@@ -104,7 +101,7 @@ export default class StarCaptureService {
             }
 
             if (newStarUser && !newStarPlayer.defeated) {
-                this.statisticsService.modifyStats(game._id, newStarPlayer._id, (stats) => {
+                statisticsService.modifyStats(game._id, newStarPlayer._id, (stats) => {
                     stats.combat.stars.captured++;
 
                     if (star.homeStar) {

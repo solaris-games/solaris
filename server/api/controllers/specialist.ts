@@ -65,7 +65,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.carrierId,
-                    +req.params.specialistId);
+                    +req.params.specialistId,
+                    container.statisticsService);
     
                 await container.eventService.createPlayerCarrierSpecialistHired(
                     req.game._id,
@@ -90,7 +91,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.starId,
-                    +req.params.specialistId);
+                    +req.params.specialistId,
+                    container.statisticsService);
     
                 await container.eventService.createPlayerStarSpecialistHired(
                     req.game._id,
