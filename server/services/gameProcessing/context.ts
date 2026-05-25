@@ -11,6 +11,8 @@ import {IEventService} from "../types/IEventService";
 import {INotificationService} from "../types/INotificationService";
 import {IStatisticsService} from "../types/IStatisticsService";
 import {ProcessingEventService} from "./event";
+import {ProcessingEmailService} from "./email";
+import {ProcessingNotificationService} from "./notification";
 
 export class GameTickContext {
     private game: Game;
@@ -21,6 +23,8 @@ export class GameTickContext {
     private statisticsService: StatisticsService;
 
     private processingEventService: ProcessingEventService;
+    private processingEmailService: ProcessingEmailService;
+    private processingNotificationService: ProcessingNotificationService;
 
     static async load(userService: UserService, game: Game, emailService: EmailService, notificationService: NotificationService, eventService: EventService, statisticsService: StatisticsService) {
         const gameUsers = await userService.getGameUsers(game);
@@ -36,6 +40,8 @@ export class GameTickContext {
         this.eventService = eventService;
         this.statisticsService = statisticsService;
         this.processingEventService = new ProcessingEventService();
+        this.processingEmailService = new ProcessingEmailService();
+        this.processingNotificationService = new ProcessingNotificationService();
     }
 
     async save() {
@@ -44,6 +50,8 @@ export class GameTickContext {
         }
 
         await this.processingEventService.process(this.eventService);
+        await this.processingEmailService.process(this.emailService);
+        await this.processingNotificationService.process(this.notificationService);
     }
 
     getGameUsers(): ActiveModel<User>[] {
@@ -51,11 +59,11 @@ export class GameTickContext {
     }
 
     getEmailService(): IEmailService {
-        return this.emailService;
+        return this.processingEmailService;
     }
 
     getNotificationService(): INotificationService {
-        return this.notificationService;
+        return this.processingNotificationService;
     }
 
     getEventService(): IEventService {
