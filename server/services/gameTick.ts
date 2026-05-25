@@ -56,12 +56,7 @@ import { IEventService } from './types/IEventService';
 const log = logger("Game Tick Service");
 
 export const GameTickServiceEvents = {
-    onPlayerGalacticCycleCompleted: 'onPlayerGalacticCycleCompleted',
-    onGameCycleEnded: 'onGameCycleEnded',
-    onPlayerAfk: 'onPlayerAfk',
-    onPlayerDefeated: 'onPlayerDefeated',
     onGameEnded: 'onGameEnded',
-    onGameTurnEnded: 'onGameTurnEnded'
 }
 
 export default class GameTickService extends EventEmitter {
@@ -322,7 +317,7 @@ export default class GameTickService extends EventEmitter {
         await context.save();
         logTime('Save context');
 
-        this._emitEvents(game, eventService);
+        await this._emitEvents(game);
 
         const endTime = process.hrtime(startTime);
 
@@ -575,7 +570,6 @@ export default class GameTickService extends EventEmitter {
                         allianceUpkeep: allianceUpkeepResult
                     };
 
-                    this.emit(GameTickServiceEvents.onPlayerGalacticCycleCompleted, e);
                     await eventService.createPlayerGalacticCycleCompleteEvent(e);
                     await this.notificationService.onPlayerGalacticCycleCompleted(e);
                 }
@@ -590,10 +584,6 @@ export default class GameTickService extends EventEmitter {
             for (const star of game.galaxy.stars) {
                 star.canBeLooted = true;
             }
-
-            this.emit(GameTickServiceEvents.onGameCycleEnded, {
-                gameId: game._id
-            });
         }
 
         return hasProductionTicked;
@@ -646,7 +636,6 @@ export default class GameTickService extends EventEmitter {
                         playerAlias: player.alias
                     };
 
-                    this.emit(GameTickServiceEvents.onPlayerAfk, e);
                     await eventService.createPlayerAfkEvent(e);
                 }
                 else {
@@ -666,7 +655,6 @@ export default class GameTickService extends EventEmitter {
                         openSlot: false
                     };
                     
-                    this.emit(GameTickServiceEvents.onPlayerDefeated, e);
                     await eventService.createPlayerDefeatedEvent(e);
                 }
             }
@@ -830,12 +818,9 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _emitEvents(game: Game, eventService: IEventService) {
+    async _emitEvents(game: Game) {
         if (this.gameTypeService.isTurnBasedGame(game)) {
-            this.emit(GameTickServiceEvents.onGameTurnEnded, {
-                gameId: game._id
-            });
-            this.notificationService.onGameTurnEnded({ gameId: game._id, gameTick: game.state.tick });
+            await this.notificationService.onGameTurnEnded({ gameId: game._id, gameTick: game.state.tick });
         }
     }
 

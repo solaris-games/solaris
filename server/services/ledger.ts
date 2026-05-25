@@ -10,12 +10,6 @@ import { Player, PlayerLedgerDebt } from "./types/Player";
 import EventEmitter from "events";
 import { IEventService } from "./types/IEventService";
 
-export const LedgerServiceEvents = {
-    onDebtAdded: 'onDebtAdded',
-    onDebtSettled: 'onDebtSettled',
-    onDebtForgiven: 'onDebtForgiven'
-}
-
 export default class LedgerService extends EventEmitter {
     gameRepo: Repository<Game>;
     playerService: PlayerService;
@@ -73,15 +67,7 @@ export default class LedgerService extends EventEmitter {
 
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
-        
-        this.emit(LedgerServiceEvents.onDebtAdded, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debt,
-            ledgerType: type
-        });
+
         await eventService.createDebtAddedEvent(game._id, game.state.tick, debtor._id, creditor._id, debt, type);
 
         return ledgerCreditor;
@@ -123,14 +109,6 @@ export default class LedgerService extends EventEmitter {
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
 
-        this.emit(LedgerServiceEvents.onDebtSettled, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debtAmount,
-            ledgerType: type
-        });
         await eventService.createDebtSettledEvent(game._id, game.state.tick, debtor._id, creditor._id, debtAmount, type);
 
         return ledgerDebtor;
@@ -155,14 +133,6 @@ export default class LedgerService extends EventEmitter {
         await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
         await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
 
-        this.emit(LedgerServiceEvents.onDebtForgiven, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debtAmount,
-            ledgerType: type
-        });
         await eventService.createDebtForgivenEvent(game._id, game.state.tick, debtor._id, creditor._id, debtAmount, type);
 
         return ledgerCreditor;

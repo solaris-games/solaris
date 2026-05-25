@@ -26,12 +26,6 @@ import GameAuthService from "./gameAuth";
 import PlayerAfkService from "./playerAfk";
 import { INotificationService } from "./types/INotificationService";
 
-export const GameServiceEvents = {
-    onPlayerQuit: 'onPlayerQuit',
-    onPlayerDefeated: 'onPlayerDefeated',
-    onGameDeleted: 'onGameDeleted'
-}
-
 export default class GameService extends EventEmitter {
     gameRepo: Repository<Game>;
     userService: UserService;
@@ -201,7 +195,6 @@ export default class GameService extends EventEmitter {
             playerAlias: alias
         };
 
-        this.emit(GameServiceEvents.onPlayerQuit, e);
         await eventService.createPlayerQuitEvent(e);
 
         return player;
@@ -259,7 +252,6 @@ export default class GameService extends EventEmitter {
             openSlot
         };
 
-        this.emit(GameServiceEvents.onPlayerDefeated, e);
         await eventService.createPlayerDefeatedEvent(e);
     }
 
@@ -406,10 +398,6 @@ export default class GameService extends EventEmitter {
 
         await this.gameRepo.deleteOne({ 
             _id: game._id 
-        });
-
-        this.emit(GameServiceEvents.onGameDeleted, {
-            gameId: game._id
         });
 
         await eventService.deleteByGameId(game._id);

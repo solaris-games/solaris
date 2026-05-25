@@ -10,10 +10,9 @@ import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
 import UserService, { UserServiceEvents } from "./user";
 import { Player } from "./types/Player";
-import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
 import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
-import PlayerReadyService, { PlayerReadyServiceEvents } from "./playerReady";
+import PlayerReadyService from "./playerReady";
 import {logger} from "../utils/logging";
 
 const nodemailer = require('nodemailer');

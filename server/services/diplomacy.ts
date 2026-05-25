@@ -17,12 +17,6 @@ import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/Game
 import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
 import {IEventService} from "./types/IEventService";
 
-export const DiplomacyServiceEvents = {
-    onDiplomacyStatusChanged: 'onDiplomacyStatusChanged',
-    onDiplomacyPeaceDeclared: 'onDiplomacyPeaceDeclared',
-    onDiplomacyWarDeclared: 'onDiplomacyWarDeclared'
-}
-
 export default class DiplomacyService extends EventEmitter {
     gameRepo: Repository<Game>;
     eventRepo: Repository<BaseGameEvent<DBObjectId>>;
@@ -296,11 +290,6 @@ export default class DiplomacyService extends EventEmitter {
         const isAllied = newStatus.actualStatus === 'allies';
         const isFriendly = isAllied || newStatus.actualStatus === 'neutral';
 
-        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            status: newStatus
-        });
         await eventService.createPlayerDiplomacyStatusChanged(game._id, game.state.tick, newStatus);
 
         // Create a global event for peace reached
@@ -311,7 +300,6 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
 
-            this.emit(DiplomacyServiceEvents.onDiplomacyPeaceDeclared, e);
             await eventService.createGameDiplomacyPeaceDeclared(e);
         }
 
@@ -337,11 +325,6 @@ export default class DiplomacyService extends EventEmitter {
 
         const newStatus = this.getDiplomaticStatusToPlayer(game, playerId, playerIdTarget);
 
-        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            status: newStatus
-        });
         await eventService.createPlayerDiplomacyStatusChanged(game._id, game.state.tick, newStatus);
 
         // Create a global event for enemy declaration.
@@ -352,7 +335,6 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
             
-            this.emit(DiplomacyServiceEvents.onDiplomacyWarDeclared, e);
             await eventService.createGameDiplomacyWarDeclared(e);
         }
 
@@ -384,11 +366,6 @@ export default class DiplomacyService extends EventEmitter {
 
         let isNeutral = newStatus.actualStatus === 'neutral';
 
-        this.emit(DiplomacyServiceEvents.onDiplomacyStatusChanged, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            status: newStatus
-        });
         await eventService.createPlayerDiplomacyStatusChanged(game._id, game.state.tick, newStatus);
 
         // Create a global event for peace reached if both players were at war.
@@ -399,7 +376,6 @@ export default class DiplomacyService extends EventEmitter {
                 status: newStatus
             };
 
-            this.emit(DiplomacyServiceEvents.onDiplomacyPeaceDeclared, e);
             await eventService.createGameDiplomacyPeaceDeclared(e);
         }
 

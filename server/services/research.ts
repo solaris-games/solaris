@@ -18,9 +18,6 @@ import UserService from './user';
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
 import { INotificationService } from './types/INotificationService';
-export const ResearchServiceEvents = {
-    onPlayerResearchCompleted: 'onPlayerResearchCompleted'
-}
 
 export default class ResearchService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -105,7 +102,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
+    async conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         const techKey = player.researchingNow;
         const tech = player.research[techKey];
 
@@ -144,17 +141,8 @@ export default class ResearchService extends EventEmitter {
         if (levelUp) {
             this._setNextResearch(game, player);
 
-            this.emit(ResearchServiceEvents.onPlayerResearchCompleted, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                playerId: player._id,
-                technologyKey: techKey,
-                technologyLevel: tech.level,
-                technologyKeyNext: player.researchingNow,
-                technologyLevelNext: player.research[player.researchingNow].level + 1
-            });
-            eventService.createResearchCompleteEvent(game._id, game.state.tick, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
-            notificationService.onPlayerResearchCompleted(game._id, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
+            await eventService.createResearchCompleteEvent(game._id, game.state.tick, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
+            await notificationService.onPlayerResearchCompleted(game._id, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
         }
 
         const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);

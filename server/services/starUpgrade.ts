@@ -40,10 +40,6 @@ type UpgradeStarContext = {
     readonly upgradeStar: (star: UpgradeStar) => UpgradeStar;
 }
 
-export const StarUpgradeServiceEvents = {
-    onPlayerInfrastructureBulkUpgraded: 'onPlayerInfrastructureBulkUpgraded'
-};
-
 export default class StarUpgradeService extends EventEmitter {
     gameRepo: Repository<Game>;
     starService: StarService;
@@ -601,12 +597,6 @@ export default class StarUpgradeService extends EventEmitter {
             });
         }
 
-        this.emit(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            upgradeSummary
-        });
         await eventService.createInfrastructureBulkUpgraded(game._id, game.state.tick, player, upgradeSummary);
     }
 

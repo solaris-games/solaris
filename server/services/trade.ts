@@ -30,17 +30,6 @@ import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
 import { INotificationService } from './types/INotificationService';
 
-export const TradeServiceEvents = {
-    onPlayerCreditsReceived: 'onPlayerCreditsReceived',
-    onPlayerCreditsSent: 'onPlayerCreditsSent',
-    onPlayerCreditsSpecialistsReceived: 'onPlayerCreditsSpecialistsReceived',
-    onPlayerCreditsSpecialistsSent: 'onPlayerCreditsSpecialistsSent',
-    onPlayerRenownReceived: 'onPlayerRenownReceived',
-    onPlayerRenownSent: 'onPlayerRenownSent',
-    onPlayerTechnologyReceived: 'onPlayerTechnologyReceived',
-    onPlayerTechnologySent: 'onPlayerTechnologySent'
-}
-
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
     eventRepo: Repository<BaseGameEvent<DBObjectId>>;
@@ -177,8 +166,6 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit(TradeServiceEvents.onPlayerCreditsReceived, eventObject);
-        this.emit(TradeServiceEvents.onPlayerCreditsSent, eventObject);
         await eventService.createCreditsReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await eventService.createCreditsSentEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await notificationService.onPlayerCreditsReceived(game._id, fromPlayer, toPlayer, amount);
@@ -257,8 +244,6 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, eventObject);
-        this.emit(TradeServiceEvents.onPlayerCreditsSpecialistsSent, eventObject);
         await eventService.createCreditsSpecialistsReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await eventService.createCreditsSpecialistsSentEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await notificationService.onPlayerCreditsSpecialistsReceived(game._id, fromPlayer, toPlayer, amount);
@@ -334,8 +319,6 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit(TradeServiceEvents.onPlayerRenownReceived, eventObject);
-        this.emit(TradeServiceEvents.onPlayerRenownSent, eventObject);
         await eventService.createRenownReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await eventService.createRenownSentEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
         await notificationService.onPlayerRenownReceived(game._id, fromPlayer, toPlayer, amount);
@@ -446,8 +429,6 @@ export default class TradeService extends EventEmitter {
             date: moment().utc()
         };
 
-        this.emit(TradeServiceEvents.onPlayerTechnologyReceived, eventObject);
-        this.emit(TradeServiceEvents.onPlayerTechnologySent, eventObject);
         await eventService.createTechnologyReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, eventTechnology);
         await eventService.createTechnologySentEvent(game._id, game.state.tick, fromPlayer, toPlayer, eventTechnology);
         await notificationService.onPlayerTechnologyReceived(game._id, fromPlayer, toPlayer, eventTechnology);

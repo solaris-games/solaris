@@ -25,12 +25,6 @@ import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
 const RNG = require('random-seed');
 
-export const StarServiceEvents = {
-    onPlayerStarAbandoned: 'onPlayerStarAbandoned',
-    onPlayerStarDied: 'onPlayerStarDied',
-    onPlayerStarReignited: 'onPlayerStarReignited'
-}
-
 export default class StarService extends EventEmitter {
     gameRepo: Repository<Game>;
     randomService: RandomService;
@@ -270,12 +264,6 @@ export default class StarService extends EventEmitter {
 
         await game.save();
 
-        this.emit(StarServiceEvents.onPlayerStarAbandoned, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            player,
-            star
-        });
         await eventService.createStarAbandonedEvent(game._id, game.state.tick, player, star);
     }
 
@@ -353,7 +341,7 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    addNaturalResources(game: Game, star: Star, amount: number, eventService: IEventService) {
+    async addNaturalResources(game: Game, star: Star, amount: number, eventService: IEventService) {
         let wasDeadStar = this.starDataService.isDeadStar(star);
 
         if (this.gameTypeService.isSplitResources(game)) {
@@ -390,30 +378,16 @@ export default class StarService extends EventEmitter {
             star.infrastructure.science = 0;
 
             if (star.ownedByPlayerId) {
-                this.emit(StarServiceEvents.onPlayerStarDied, {
-                    gameId: game._id,
-                    gameTick: game.state.tick,
-                    playerId: star.ownedByPlayerId,
-                    starId: star._id,
-                    starName: star.name
-                });
-                eventService.createStarDiedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
+                await eventService.createStarDiedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
             }
         }
         // If it was a dead star but is now not a dead star then it has been reignited.
         else if (wasDeadStar && star.ownedByPlayerId) {
-            this.emit(StarServiceEvents.onPlayerStarReignited, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                playerId: star.ownedByPlayerId,
-                starId: star._id,
-                starName: star.name
-            });
-            eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
+            await eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
         }
     }
 
-    reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources, eventService: IEventService) {
+    async reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources, eventService: IEventService) {
         if (!this.starDataService.isDeadStar(star)) {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
@@ -421,14 +395,7 @@ export default class StarService extends EventEmitter {
         star.naturalResources = naturalResources;
 
         if (star.ownedByPlayerId) {
-            this.emit(StarServiceEvents.onPlayerStarReignited, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                playerId: star.ownedByPlayerId,
-                starId: star._id,
-                starName: star.name
-            });
-            eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
+            await eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
         }
     }
 

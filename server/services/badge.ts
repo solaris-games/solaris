@@ -12,10 +12,6 @@ import GameStateService from "./gameState";
 import EventEmitter from "events";
 import { IEventService } from './types/IEventService';
 
-export const BadgeServiceEvents = {
-    onGamePlayerBadgePurchased: 'onGamePlayerBadgePurchased'
-}
-
 export default class BadgeService extends EventEmitter {
     userRepo: Repository<User>;
     userService: UserService;
@@ -162,7 +158,6 @@ export default class BadgeService extends EventEmitter {
             badgeName: badge.name
         };
 
-        this.emit(BadgeServiceEvents.onGamePlayerBadgePurchased, e);
         await eventService.createGamePlayerBadgePurchased(e);
     }
 

@@ -218,7 +218,6 @@ export default class GameJoinService extends EventEmitter {
                 gameTick: game.state.tick
             };
 
-            this.emit(GameJoinServiceEvents.onGameStarted, e);
             await notificationService.onGameStarted(e);
         }
 
