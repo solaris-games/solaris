@@ -207,8 +207,12 @@ export default class GameTickService extends EventEmitter {
 
         logTime('Loaded game users');
 
-        const context = await GameTickContext.load(this.userService, game);
+        const context = await GameTickContext.load(this.userService, game, emailService, notificationService, eventService, statisticsService);
 
+        await this._processTick(game, context, logTime, startTime);
+    }
+
+    private async _processTick(game: Game, context: GameTickContext, logTime: (msg: string) => void, startTime: [number, number]) {
         let iterations = 1;
 
         // If we are in turn based mode, we need to repeat the tick X number of times.
@@ -220,7 +224,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService, emailService);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService, context.emailService);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -237,7 +241,7 @@ export default class GameTickService extends EventEmitter {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
 
-            await this.scheduleBuyService.buyScheduledInfrastructure(game, eventService, statisticsService);
+            await this.scheduleBuyService.buyScheduledInfrastructure(game, context.eventService, context.statisticsService);
             logTime('Buy scheduled infrastructure')
 
             game.state.tick++;
@@ -246,32 +250,32 @@ export default class GameTickService extends EventEmitter {
 
             await this._scuttleCarriers(game);
 
-            await this._captureAbandonedStars(game, context.getGameUsers(), statisticsService);
+            await this._captureAbandonedStars(game, context.getGameUsers(), context.statisticsService);
             logTime('Capture abandoned stars');
 
-            this._transferGiftsInOrbit(game, context.getGameUsers(), eventService, statisticsService);
+            this._transferGiftsInOrbit(game, context.getGameUsers(), context.eventService, context.statisticsService);
             logTime('Transfer gifts in orbit');
 
-            await this._combatCarriers(game, context.getGameUsers(), eventService, statisticsService);
+            await this._combatCarriers(game, context.getGameUsers(), context.eventService, context.statisticsService);
             logTime('Combat carriers');
 
-            await this._moveCarriers(game, context.getGameUsers(), eventService, statisticsService);
+            await this._moveCarriers(game, context.getGameUsers(), context.eventService, context.statisticsService);
             logTime('Move carriers and produce ships');
 
-            const ticked = await this._endOfGalacticCycleCheck(game, eventService, notificationService);
+            const ticked = await this._endOfGalacticCycleCheck(game, context.eventService, context.notificationService);
             logTime('Galactic cycle check');
 
             if (ticked && !hasProductionTicked) {
                 hasProductionTicked = true;
             }
 
-            await this._gameLoseCheck(game, context.getGameUsers(), eventService);
+            await this._gameLoseCheck(game, context.getGameUsers(), context.eventService);
             logTime('Game lose check');
 
-            await this._playAI(eventService, game);
+            await this._playAI(context.eventService, game);
             logTime('AI controlled players turn');
-            
-            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService, notificationService);
+
+            this.researchService.conductResearchAll(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -280,7 +284,7 @@ export default class GameTickService extends EventEmitter {
             this.cullWaypointsService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
-            this._applyTickBasedSpecialistEffects(game, eventService);
+            this._applyTickBasedSpecialistEffects(game, context.eventService);
             logTime('Apply tick effects of specialists');
 
             this._clearExpiredSpecialists(game);
@@ -289,7 +293,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService, emailService);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService, context.emailService);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -317,7 +321,7 @@ export default class GameTickService extends EventEmitter {
         await context.save();
         logTime('Save context');
 
-        await this._emitEvents(game, notificationService);
+        await this._emitEvents(game, context.notificationService);
 
         const endTime = process.hrtime(startTime);
 
