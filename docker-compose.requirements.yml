@@ -1,7 +1,6 @@
 services:
-
   mongo:
-    image: mongo:7.0.34
+    image: mongo:8.3.2
     ports:
     - "27017:27017"
     volumes:
