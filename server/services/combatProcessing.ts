@@ -19,6 +19,7 @@ import PlayerService from "./player";
 import StatisticsService from "./statistics";
 import SpecialistService from "./specialist";
 import StarService from "./star";
+import { IEventService } from './types/IEventService';
 
 export const CombatServiceEvents = {
     onPlayerCombatStar: 'onPlayerCombatStar',
@@ -134,7 +135,7 @@ export default class CombatProcessingService extends EventEmitter {
         };
     }
 
-    async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[]): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>> | undefined> {
+    async performCombat(game: Game, gameUsers: User[], star: Star<DBObjectId> | null, carriers: Carrier<DBObjectId>[], eventService: IEventService): Promise<DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>> | undefined> {
         let combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>> | undefined;
 
         const isOwnedStar = Boolean(star?.ownedByPlayerId);
@@ -199,12 +200,14 @@ export default class CombatProcessingService extends EventEmitter {
                 gameTick: game.state.tick,
                 combatResult: eventResult,
             });
+            await eventService.createPlayerCombatStarEvent(game._id, game.state.tick, eventResult);
         } else {
             this.emit(CombatServiceEvents.onPlayerCombatCarrier, {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 combatResult: eventResult,
             });
+            await eventService.createPlayerCombatCarrierEvent(game._id, game.state.tick, eventResult);
         }
 
         return combatResult;

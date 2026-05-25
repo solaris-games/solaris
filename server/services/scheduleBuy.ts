@@ -21,6 +21,7 @@ const buyTypeToPriority = {
 }
 
 import EventEmitter from "events";
+import { IEventService } from './types/IEventService';
 
 const log = logger("Schedule Buy Service");
 
@@ -38,7 +39,7 @@ export default class ScheduleBuyService extends EventEmitter {
         this.starUpgradeService = starUpgradeService
     }
 
-    async buyScheduledInfrastructure(game: Game) {
+    async buyScheduledInfrastructure(game: Game, eventService: IEventService) {
         for (let player of game.galaxy.players) {
             if (player.scheduledActions.length == 0) continue;
             const currentActions = player.scheduledActions
@@ -73,7 +74,7 @@ export default class ScheduleBuyService extends EventEmitter {
                         continue;
                     }
 
-                    await this.starUpgradeService.executeBulkUpgradeReport(game, player, report);
+                    await this.starUpgradeService.executeBulkUpgradeReport(game, player, report, eventService);
                 } catch (e) {
                     log.error(e)
                 }
@@ -83,7 +84,7 @@ export default class ScheduleBuyService extends EventEmitter {
                 // We want to make sure that all percentage actions are dealt with with the same starting value.
                 const percentageActions = currentActions.filter(a => a.buyType == 'percentageOfCredits');
                 const totalPercentage = percentageActions.reduce((total, cur) => total + cur.amount, 0);
-                await this._executePercentageAction(game, player, percentageActions, totalPercentage);
+                await this._executePercentageAction(game, player, percentageActions, totalPercentage, eventService);
             } catch (e) {
                 log.error(e)
             }
@@ -93,7 +94,7 @@ export default class ScheduleBuyService extends EventEmitter {
         }
     }
 
-    async _executePercentageAction(game: Game, player: Player, percentageActions: PlayerScheduledActions[], totalPercentage: number) {
+    async _executePercentageAction(game: Game, player: Player, percentageActions: PlayerScheduledActions[], totalPercentage: number, eventService: IEventService) {
         for (let action of percentageActions) {
             const percentageToCredits = Math.floor((action.amount / Math.max(totalPercentage, 100)) * player.credits);
 
@@ -104,8 +105,7 @@ export default class ScheduleBuyService extends EventEmitter {
                 continue;
             }
 
-            await this.starUpgradeService.executeBulkUpgradeReport(game, player, report);        }
-    }
+            await this.starUpgradeService.executeBulkUpgradeReport(game, player, report, eventService);        }    }
 
     _repeatOrRemoveAction(game: Game, actions: PlayerScheduledActions[]) {
         const tick = game.state.tick;

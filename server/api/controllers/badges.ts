@@ -37,7 +37,7 @@ export default (container: DependencyContainer) => {
             try {
                 const body = parseBadgesPurchaseRequest(req.body);
 
-                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, body.badgeKey);
+                await container.badgeService.purchaseBadgeForPlayer(req.game, req.session.userId, req.params.playerId, body.badgeKey, container.eventService);
                 
                 res.sendStatus(200);
                 return next();

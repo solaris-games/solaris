@@ -242,7 +242,8 @@ export default (container: DependencyContainer) => {
                     reqObj.playerId,
                     reqObj.alias,
                     reqObj.avatar,
-                    reqObj.password);
+                    reqObj.password,
+                    container.eventService);
     
                 res.sendStatus(200);
     
@@ -261,7 +262,8 @@ export default (container: DependencyContainer) => {
             try {
                 let player = await container.gameService.quit(
                     req.game,
-                    req.player);
+                    req.player,
+                    container.eventService);
     
                 res.sendStatus(200);
                     
@@ -281,7 +283,8 @@ export default (container: DependencyContainer) => {
                 await container.gameService.concedeDefeat(
                     req.game,
                     req.player,
-                    reqObj.openSlot);
+                    reqObj.openSlot,
+                    container.eventService);
                     
                 res.sendStatus(200);
 
@@ -401,7 +404,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.gameService.delete(
                     req.game,
-                    req.session.userId);
+                    req.session.userId,
+                    container.eventService);
                     
                 res.sendStatus(200);
                 return next();
@@ -452,7 +456,7 @@ export default (container: DependencyContainer) => {
             try {
                 const params = parseKickPlayerRequest(req.body);
 
-                await container.gameService.kickPlayer(req.game, req.session.userId, params.playerId);
+                await container.gameService.kickPlayer(req.game, req.session.userId, params.playerId, container.eventService);
 
                 res.sendStatus(200);
                 return next();

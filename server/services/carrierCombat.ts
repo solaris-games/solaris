@@ -11,6 +11,7 @@ import {CarrierCollision, DualCarrierCollision} from "./types/CarrierCollision";
 import {CarrierTravelService, DistanceService} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 import CombatProcessingService from "./combatProcessing";
+import { IEventService } from './types/IEventService';
 
 const EPSILON = 10**-10;
 
@@ -43,7 +44,7 @@ export default class CarrierCombatService {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async combatCarriers(game: Game, gameUsers: User[]) {
+    async combatCarriers(game: Game, gameUsers: User[], eventService: IEventService) {
         // Get all carriers that are in transit, their current locations
         // and where they will be moving to.
         const carrierPositions: CarrierPosition[] = game.galaxy.carriers
@@ -121,13 +122,13 @@ export default class CarrierCombatService {
                     continue;
                 }
 
-                await this._performCarrierCombat(game, gameUsers, collision)
+                await this._performCarrierCombat(game, gameUsers, collision, eventService)
             }
         }
     }
 
-    async _performCarrierCombat(game: Game, gameUsers: User[], collision: CarrierCollision) {
-        await this.combatProcessingService.performCombat(game, gameUsers, null, collision.carriers);
+    async _performCarrierCombat(game: Game, gameUsers: User[], collision: CarrierCollision, eventService: IEventService) {
+        await this.combatProcessingService.performCombat(game, gameUsers, null, collision.carriers, eventService);
     }
 
     _getCarrierPositionGraph(carrierPositions: CarrierPosition[]) {

@@ -19,6 +19,7 @@ import StarService from './star';
 import {logger} from "../utils/logging";
 import {DBObjectId} from "./types/DBObjectId";
 import PlayerService from "./player";
+import { IEventService } from './types/IEventService';
 
 export type CarrierMovementReport = {
     carrier: Carrier;
@@ -78,7 +79,7 @@ export default class CarrierMovementService {
         carrier.location = this.distanceService.getNextLocationTowardsLocation(carrier.location, destinationStar.location, distancePerTick);
     }
 
-    private _arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star) {
+    private _arriveAtStar(game: Game, gameUsers: User[], carrier: Carrier, destinationStar: Star, eventService: IEventService) {
         // Remove the current waypoint as we have arrived at the destination.
         const currentWaypoint = carrier.waypoints.splice(0, 1)[0];
 
@@ -109,7 +110,7 @@ export default class CarrierMovementService {
                 science: reigniteSpecialistNaturalResources.science * modifier
             };
             
-            this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources);
+            this.starService.reigniteDeadStar(game, destinationStar, reigniteNaturalResources, eventService);
 
             carrier.specialistId = null;
         }
@@ -119,7 +120,7 @@ export default class CarrierMovementService {
             report.combatRequiredStar = true;
         } else if (destinationStar.ownedByPlayerId !== carrier.ownedByPlayerId!) {
             if (carrier.isGift) {
-                this.carrierGiftService.transferGift(game, gameUsers, destinationStar, carrier);
+                this.carrierGiftService.transferGift(game, gameUsers, destinationStar, carrier, eventService);
             } else {
                 report.combatRequiredStar = true;
             }
@@ -148,7 +149,7 @@ export default class CarrierMovementService {
         }
     }
 
-    moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier): CarrierMovementReport | null {
+    moveCarrier(game: Game, gameUsers: User[], carrierInTransit: Carrier, eventService: IEventService): CarrierMovementReport | null {
         let waypoint: CarrierWaypoint<DBObjectId> = carrierInTransit.waypoints[0];
 
         if (waypoint.delayTicks) {
@@ -202,7 +203,7 @@ export default class CarrierMovementService {
         };
 
         if (instantSpeed || (distancePerTick && (carrierInTransit.distanceToDestination || 0) <= distancePerTick)) {
-            const starArrivalReport = this._arriveAtStar(game, gameUsers, carrierInTransit, destinationStar);
+            const starArrivalReport = this._arriveAtStar(game, gameUsers, carrierInTransit, destinationStar, eventService);
 
             carrierMovementReport.waypoint = starArrivalReport.waypoint;
             carrierMovementReport.combatRequiredStar = starArrivalReport.combatRequiredStar;

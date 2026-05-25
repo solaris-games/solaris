@@ -63,7 +63,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id,
                     reqObj.name,
-                    reqObj.participants);
+                    reqObj.participants,
+                    container.eventService);
 
                 res.status(200).json(convo);
                 return next();
@@ -138,7 +139,8 @@ export default (container: DependencyContainer) => {
                 let convo = await container.conversationService.leave(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
+                    req.params.conversationId,
+                    container.eventService);
     
                 container.broadcastService.gameConversationLeft(req.game, convo, req.player._id);
     

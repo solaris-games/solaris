@@ -50,6 +50,7 @@ import moment from "moment";
 import CarrierCombatService from "./carrierCombat";
 import CombatProcessingService from "./combatProcessing";
 import {GameTickContext} from "./gameProcessing/context";
+import { IEventService } from './types/IEventService';
 
 const log = logger("Game Tick Service");
 
@@ -175,7 +176,7 @@ export default class GameTickService extends EventEmitter {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async tick(gameId: DBObjectId) {
+    async tick(gameId: DBObjectId, eventService: IEventService) {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
@@ -225,7 +226,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers());
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -242,7 +243,7 @@ export default class GameTickService extends EventEmitter {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
 
-            await this.scheduleBuyService.buyScheduledInfrastructure(game);
+            await this.scheduleBuyService.buyScheduledInfrastructure(game, eventService);
             logTime('Buy scheduled infrastructure')
 
             game.state.tick++;
@@ -254,29 +255,29 @@ export default class GameTickService extends EventEmitter {
             await this._captureAbandonedStars(game, context.getGameUsers());
             logTime('Capture abandoned stars');
 
-            this._transferGiftsInOrbit(game, context.getGameUsers());
+            this._transferGiftsInOrbit(game, context.getGameUsers(), eventService);
             logTime('Transfer gifts in orbit');
 
-            await this._combatCarriers(game, context.getGameUsers());
+            await this._combatCarriers(game, context.getGameUsers(), eventService);
             logTime('Combat carriers');
 
-            await this._moveCarriers(game, context.getGameUsers());
+            await this._moveCarriers(game, context.getGameUsers(), eventService);
             logTime('Move carriers and produce ships');
 
-            const ticked = this._endOfGalacticCycleCheck(game);
+            const ticked = await this._endOfGalacticCycleCheck(game, eventService);
             logTime('Galactic cycle check');
 
             if (ticked && !hasProductionTicked) {
                 hasProductionTicked = true;
             }
 
-            this._gameLoseCheck(game, context.getGameUsers());
+            await this._gameLoseCheck(game, context.getGameUsers(), eventService);
             logTime('Game lose check');
 
             await this._playAI(game);
             logTime('AI controlled players turn');
             
-            this.researchService.conductResearchAll(game, context.getGameUsers());
+            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -285,7 +286,7 @@ export default class GameTickService extends EventEmitter {
             this.cullWaypointsService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
-            this._applyTickBasedSpecialistEffects(game);
+            this._applyTickBasedSpecialistEffects(game, eventService);
             logTime('Apply tick effects of specialists');
 
             this._clearExpiredSpecialists(game);
@@ -294,7 +295,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers());
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -322,7 +323,7 @@ export default class GameTickService extends EventEmitter {
         await context.save();
         logTime('Save context');
 
-        this._emitEvents(game);
+        this._emitEvents(game, eventService);
 
         const endTime = process.hrtime(startTime);
 
@@ -374,15 +375,15 @@ export default class GameTickService extends EventEmitter {
         return nextTick.diff(moment().utc(), 'seconds') <= 0;
     }
 
-    async _combatCarriers(game: Game, gameUsers: User[]) {
+    async _combatCarriers(game: Game, gameUsers: User[], eventService: IEventService) {
         if (game.settings.specialGalaxy.carrierToCarrierCombat !== 'enabled') {
             return;
         }
 
-        await this.carrierCombatService.combatCarriers(game, gameUsers);
+        await this.carrierCombatService.combatCarriers(game, gameUsers, eventService);
     }
 
-    async _moveCarriers(game: Game, gameUsers: User[]) {
+    async _moveCarriers(game: Game, gameUsers: User[], eventService: IEventService) {
         // 1. Get all carriers that have waypoints ordered by the distance
         // they need to travel.
         // Note, we order by distance ascending for 2 reasons:
@@ -440,7 +441,7 @@ export default class GameTickService extends EventEmitter {
         for (let i = 0; i < carriersInTransit.length; i++) {
             const carrierInTransit = carriersInTransit[i];
         
-            const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit);
+            const carrierMovementReport = this.carrierMovementService.moveCarrier(game, gameUsers, carrierInTransit, eventService);
 
             if (!carrierMovementReport) {
                 continue;
@@ -484,7 +485,7 @@ export default class GameTickService extends EventEmitter {
             const carriersAtStar = game.galaxy.carriers.filter(c => c.orbiting && c.orbiting.toString() === combatStar._id.toString());
 
             // properly handle combat at unclaimed stars!
-            await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar);
+            await this.combatProcessingService.performCombat(game, gameUsers, combatStar, carriersAtStar, eventService);
         }
 
         // There may be carriers in the waypoint list that do not have any remaining ships or have been rerouted, filter them out.
@@ -533,7 +534,7 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _endOfGalacticCycleCheck(game: Game): boolean {
+    async _endOfGalacticCycleCheck(game: Game, eventService: IEventService): Promise<boolean> {
         let hasProductionTicked: boolean = game.state.tick % game.settings.galaxy.productionTicks === 0;
 
         // Check if we have reached the production tick.
@@ -576,6 +577,7 @@ export default class GameTickService extends EventEmitter {
                     };
 
                     this.emit(GameTickServiceEvents.onPlayerGalacticCycleCompleted, e);
+                    await eventService.createPlayerGalacticCycleCompleteEvent(e);
                 }
             }
 
@@ -601,7 +603,7 @@ export default class GameTickService extends EventEmitter {
         await this.historyService.log(game);
     }
 
-    _gameLoseCheck(game: Game, gameUsers: User[]) {
+    async _gameLoseCheck(game: Game, gameUsers: User[], eventService: IEventService) {
         // Check to see if anyone has been defeated.
         // A player is defeated if they have no stars and no carriers remaining.
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
@@ -645,6 +647,7 @@ export default class GameTickService extends EventEmitter {
                     };
 
                     this.emit(GameTickServiceEvents.onPlayerAfk, e);
+                    await eventService.createPlayerAfkEvent(e);
                 }
                 else {
                     if (user && !isTutorialGame) {
@@ -664,6 +667,7 @@ export default class GameTickService extends EventEmitter {
                     };
                     
                     this.emit(GameTickServiceEvents.onPlayerDefeated, e);
+                    await eventService.createPlayerDefeatedEvent(e);
                 }
             }
         }
@@ -671,7 +675,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    async _gameWinCheck(game: Game, gameUsers: User[]) {
+    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -731,6 +735,7 @@ export default class GameTickService extends EventEmitter {
                 };
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
+                await eventService.createGameEndedEvent(e);
             } else if (winner.kind === 'player') { // game is tutorial
                 const userId = winner.player.userId
                 const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());
@@ -788,8 +793,8 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _applyTickBasedSpecialistEffects(game: Game) {
-        this.starService.applyStarSpecialistSpecialModifiers(game);
+    _applyTickBasedSpecialistEffects(game: Game, eventService: IEventService) {
+        this.starService.applyStarSpecialistSpecialModifiers(game, eventService);
         this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
         this.starService.pairWormHoleConstructors(game);
@@ -814,17 +819,17 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    _transferGiftsInOrbit(game: Game, gameUsers: User[]) {
+    _transferGiftsInOrbit(game: Game, gameUsers: User[], eventService: IEventService) {
         const carriers = this.carrierService.listGiftCarriersInOrbit(game);
 
         for (let carrier of carriers) {
             const star = this.starService.getById(game, carrier.orbiting!);
 
-            this.carrierGiftService.transferGift(game, gameUsers, star, carrier);
+            this.carrierGiftService.transferGift(game, gameUsers, star, carrier, eventService);
         }
     }
 
-    _emitEvents(game: Game) {
+    _emitEvents(game: Game, eventService: IEventService) {
         if (this.gameTypeService.isTurnBasedGame(game)) {
             this.emit(GameTickServiceEvents.onGameTurnEnded, {
                 gameId: game._id

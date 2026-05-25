@@ -24,7 +24,6 @@ import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
 import {CombatGroupService, CombatService, DistanceService, PathfindingService, ResearchProgressService} from '@solaris/common';
 import EmailService from "../email";
-import EventService from "../event";
 import GameService from "../game";
 import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
@@ -98,6 +97,7 @@ import { StarDataService } from "@solaris/common";
 import {DBObjectId} from "./DBObjectId";
 import CarrierCombatService from "../carrierCombat";
 import CombatProcessingService from "../combatProcessing";
+import EventService from "../event";
 
 export interface DependencyContainer {
     config: Config,

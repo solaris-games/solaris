@@ -12,7 +12,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     reqObj.toPlayerId,
-                    reqObj.amount);
+                    reqObj.amount,
+                    container.eventService);
                 
                 res.status(200).json({
                     reputation: trade.reputation
@@ -32,7 +33,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     reqObj.toPlayerId,
-                    reqObj.amount);
+                    reqObj.amount,
+                    container.eventService);
                 
                 res.status(200).json({
                     reputation: trade.reputation
@@ -52,7 +54,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     reqObj.toPlayerId,
-                    reqObj.amount);
+                    reqObj.amount,
+                    container.eventService);
 
                 res.sendStatus(200);
     
@@ -71,7 +74,8 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.toPlayerId,
                     reqObj.technology,
-                    reqObj.level);
+                    reqObj.level,
+                    container.eventService);
     
                 res.status(200).json({
                     reputation: trade.reputation

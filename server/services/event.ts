@@ -31,21 +31,8 @@ import {
     Conversation, CombatResult
 } from '@solaris/common';
 import { ValidationError } from "@solaris/common";
-import BadgeService, { BadgeServiceEvents } from "./badge";
 import BroadcastService from "./broadcast";
-import CarrierGiftService, { CarrierGiftServiceEvents } from "./carrierGift";
-import ConversationService, { ConversationServiceEvents } from "./conversation";
-import DiplomacyService, { DiplomacyServiceEvents } from "./diplomacy";
-import GameService, { GameServiceEvents } from "./game";
-import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
-import GameTickService, { GameTickServiceEvents } from "./gameTick";
-import LedgerService, { LedgerServiceEvents } from "./ledger";
 import Repository from "./repository";
-import ResearchService, { ResearchServiceEvents } from "./research";
-import SpecialistService from "./specialist";
-import StarService, { StarServiceEvents } from "./star";
-import StarUpgradeService, { StarUpgradeServiceEvents } from "./starUpgrade";
-import TradeService, { TradeServiceEvents } from "./trade";
 import { Carrier } from "./types/Carrier";
 import { DBObjectId } from "./types/DBObjectId";
 import { DiplomaticStatus } from "@solaris/common";
@@ -53,7 +40,7 @@ import { Game } from "./types/Game";
 import { BulkUpgradeReport } from "./types/InfrastructureUpgrade";
 import { Player } from "./types/Player";
 import { Specialist } from '@solaris/common';
-import { Star, StarCaptureResult } from "./types/Star";
+import { Star } from "./types/Star";
 import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import InternalGameDiplomacyPeaceDeclaredEvent from "./types/internalEvents/GameDiplomacyPeaceDeclared";
 import InternalGameDiplomacyWarDeclaredEvent from "./types/internalEvents/GameDiplomacyWarDeclared";
@@ -66,117 +53,24 @@ import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
 import InternalPlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
 import { Model } from "mongoose";
 import {CombatMaskingService} from "./combatMasking";
-import CombatProcessingService, {CombatServiceEvents} from "./combatProcessing";
+import { IEventService } from "./types/IEventService";
 
-export default class EventService {
+export default class EventService implements IEventService {
     eventModel: Model<GameEvent<DBObjectId>>;
     eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     broadcastService: BroadcastService;
-    gameService: GameService;
-    gameJoinService: GameJoinService;
-    gameTickService: GameTickService;
-    researchService: ResearchService;
-    starService: StarService;
-    starUpgradeService: StarUpgradeService;
-    tradeService: TradeService;
-    ledgerService: LedgerService;
-    conversationService: ConversationService;
-    combatProcessingService: CombatProcessingService;
-    specialistService: SpecialistService
-    badgeService: BadgeService;
-    carrierGiftService: CarrierGiftService;
-    diplomacyService: DiplomacyService;
     combatMaskingService: CombatMaskingService;
 
     constructor(
         eventModel,
         eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         broadcastService: BroadcastService,
-        gameService: GameService,
-        gameJoinService: GameJoinService,
-        gameTickService: GameTickService,
-        researchService: ResearchService,
-        starService: StarService,
-        starUpgradeService: StarUpgradeService,
-        tradeService: TradeService,
-        ledgerService: LedgerService,
-        conversationService: ConversationService,
-        combatProcessingService: CombatProcessingService,
-        specialistService: SpecialistService,
-        badgeService: BadgeService,
-        carrierGiftService: CarrierGiftService,
-        diplomacyService: DiplomacyService,
         combatMaskingService: CombatMaskingService,
     ) {
         this.eventModel = eventModel;
         this.eventRepo = eventRepo;
         this.broadcastService = broadcastService;
-        this.gameService = gameService;
-        this.gameJoinService = gameJoinService;
-        this.gameTickService = gameTickService;
-        this.researchService = researchService;
-        this.starService = starService;
-        this.starUpgradeService = starUpgradeService;
-        this.tradeService = tradeService;
-        this.ledgerService = ledgerService;
-        this.conversationService = conversationService;
-        this.combatProcessingService = combatProcessingService;
-        this.specialistService = specialistService;
-        this.badgeService = badgeService;
-        this.carrierGiftService = carrierGiftService;
-        this.diplomacyService = diplomacyService;
         this.combatMaskingService = combatMaskingService;
-
-        this.gameJoinService.on(GameJoinServiceEvents.onPlayerJoined, (args) => this.createPlayerJoinedEvent(args));
-        this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.createGameStartedEvent(args));
-        
-        this.gameService.on(GameServiceEvents.onGameDeleted, (args) => this.deleteByGameId(args.gameId));
-        this.gameService.on(GameServiceEvents.onPlayerQuit, (args) => this.createPlayerQuitEvent(args));
-        this.gameService.on(GameServiceEvents.onPlayerDefeated, (args) => this.createPlayerDefeatedEvent(args));
-        
-        this.combatProcessingService.on(CombatServiceEvents.onPlayerCombatStar, (args) => this.createPlayerCombatStarEvent(
-            args.gameId, args.gameTick, args.combatResult));
-        this.combatProcessingService.on(CombatServiceEvents.onPlayerCombatCarrier, (args) => this.createPlayerCombatCarrierEvent(
-            args.gameId, args.gameTick, args.combatResult));
-        
-        this.gameTickService.on(GameTickServiceEvents.onPlayerGalacticCycleCompleted, (args) => this.createPlayerGalacticCycleCompleteEvent(args));
-        this.gameTickService.on(GameTickServiceEvents.onPlayerAfk, (args) => this.createPlayerAfkEvent(args));
-        this.gameTickService.on(GameTickServiceEvents.onPlayerDefeated, (args) => this.createPlayerDefeatedEvent(args));
-        this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.createGameEndedEvent(args));
-
-        this.researchService.on(ResearchServiceEvents.onPlayerResearchCompleted, (args) => this.createResearchCompleteEvent(args.gameId, args.gameTick, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
-
-        this.starService.on(StarServiceEvents.onPlayerStarAbandoned, (args) => this.createStarAbandonedEvent(args.gameId, args.gameTick, args.player, args.star));
-        this.starService.on(StarServiceEvents.onPlayerStarDied, (args) => this.createStarDiedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
-        this.starService.on(StarServiceEvents.onPlayerStarReignited, (args) => this.createStarReignitedEvent(args.gameId, args.gameTick, args.playerId, args.starId, args.starName));
-        
-        this.starUpgradeService.on(StarUpgradeServiceEvents.onPlayerInfrastructureBulkUpgraded, (args) => this.createInfrastructureBulkUpgraded(args.gameId, args.gameTick, args.player, args.upgradeSummary));
-
-        this.tradeService.on(TradeServiceEvents.onPlayerCreditsReceived, (args) => this.createCreditsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerCreditsSent, (args) => this.createCreditsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, (args) => this.createCreditsSpecialistsReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsSent, (args) => this.createCreditsSpecialistsSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.createRenownReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerRenownSent, (args) => this.createRenownSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.amount));
-        this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.createTechnologyReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
-        this.tradeService.on(TradeServiceEvents.onPlayerTechnologySent, (args) => this.createTechnologySentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.technology));
-
-        this.carrierGiftService.on(CarrierGiftServiceEvents.onPlayerGiftReceived, (args) => this.createGiftReceivedEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
-        this.carrierGiftService.on(CarrierGiftServiceEvents.onPlayerGiftSent, (args) => this.createGiftSentEvent(args.gameId, args.gameTick, args.fromPlayer, args.toPlayer, args.carrier, args.star));
-
-        this.ledgerService.on(LedgerServiceEvents.onDebtAdded, (args) => this.createDebtAddedEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
-        this.ledgerService.on(LedgerServiceEvents.onDebtSettled, (args) => this.createDebtSettledEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
-        this.ledgerService.on(LedgerServiceEvents.onDebtForgiven, (args) => this.createDebtForgivenEvent(args.gameId, args.gameTick, args.debtor, args.creditor, args.amount, args.ledgerType));
-
-        this.conversationService.on(ConversationServiceEvents.onConversationCreated, (args) => this.createPlayerConversationCreated(args.gameId, args.gameTick, args.convo));
-        this.conversationService.on(ConversationServiceEvents.onConversationInvited, (args) => this.createPlayerConversationInvited(args.gameId, args.gameTick, args.convo, args.playerId));
-        this.conversationService.on(ConversationServiceEvents.onConversationLeft, (args) => this.createPlayerConversationLeft(args.gameId, args.gameTick, args.convo, args.playerId));
-
-        this.badgeService.on(BadgeServiceEvents.onGamePlayerBadgePurchased, (args) => this.createGamePlayerBadgePurchased(args));
-
-        this.diplomacyService.on(DiplomacyServiceEvents.onDiplomacyPeaceDeclared, (args) => this.createGameDiplomacyPeaceDeclared(args));
-        this.diplomacyService.on(DiplomacyServiceEvents.onDiplomacyWarDeclared, (args) => this.createGameDiplomacyWarDeclared(args));
-        this.diplomacyService.on(DiplomacyServiceEvents.onDiplomacyStatusChanged, (args) => this.createPlayerDiplomacyStatusChanged(args.gameId, args.gameTick, args.status));
     }
 
     async deleteByGameId(gameId: DBObjectId) {

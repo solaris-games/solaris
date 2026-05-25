@@ -19,7 +19,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.playerId,
-                    LedgerType.Credits);
+                    LedgerType.Credits,
+                    container.eventService);
     
                 res.status(200).json(newLedger);
                 return next();
@@ -33,7 +34,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.playerId,
-                    LedgerType.Credits);
+                    LedgerType.Credits,
+                    container.eventService);
     
                 res.status(200).json(newLedger);
                 return next();
@@ -57,7 +59,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.playerId,
-                    LedgerType.CreditsSpecialists);
+                    LedgerType.CreditsSpecialists,
+                    container.eventService);
     
                 res.status(200).json(newLedger);
                 return next();
@@ -71,7 +74,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.playerId,
-                    LedgerType.CreditsSpecialists);
+                    LedgerType.CreditsSpecialists,
+                    container.eventService);
     
                 res.status(200).json(newLedger);
                 return next();

@@ -19,6 +19,7 @@ import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
 import InternalGamePlayerQuitEvent from './types/internalEvents/GamePlayerQuit';
 import InternalGamePlayerDefeatedEvent from './types/internalEvents/GamePlayerDefeated';
+import { IEventService } from './types/IEventService';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
@@ -162,7 +163,7 @@ export default class GameService extends EventEmitter {
         game.state.readyToQuitCount = undefined;
     }
 
-    async quit(game: Game, player: Player) {    
+    async quit(game: Game, player: Player, eventService: IEventService) {    
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
         }
@@ -173,7 +174,7 @@ export default class GameService extends EventEmitter {
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
-            await this.delete(game);
+            await this.delete(game, undefined, eventService);
 
             return null;
         }
@@ -200,11 +201,12 @@ export default class GameService extends EventEmitter {
         };
 
         this.emit(GameServiceEvents.onPlayerQuit, e);
+        await eventService.createPlayerQuitEvent(e);
 
         return player;
     }
 
-    async concedeDefeat(game: Game, player: Player, openSlot: boolean) {
+    async concedeDefeat(game: Game, player: Player, openSlot: boolean, eventService: IEventService) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }
@@ -221,7 +223,7 @@ export default class GameService extends EventEmitter {
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
-            return this.delete(game);
+            return this.delete(game, undefined, eventService);
         }
 
         game.quitters.push(player.userId!); // We need to track this to ensure that they don't try to rejoin in another open slot.
@@ -257,6 +259,7 @@ export default class GameService extends EventEmitter {
         };
 
         this.emit(GameServiceEvents.onPlayerDefeated, e);
+        await eventService.createPlayerDefeatedEvent(e);
     }
 
     async fastForward(game: Game, fastForwardUserId: DBObjectId) {
@@ -281,7 +284,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
+    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId, eventService: IEventService) {
         if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
             throw new ValidationError('You do not have permission to kick a player in this game.');
         }
@@ -298,10 +301,10 @@ export default class GameService extends EventEmitter {
                 player.isOpenSlot = true;
                 await game.save();
             } else {
-                await this.concedeDefeat(game, player, true);
+                await this.concedeDefeat(game, player, true, eventService);
             }
         } else {
-            await this.quit(game, player);
+            await this.quit(game, player, eventService);
         }
     }
 
@@ -376,7 +379,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async delete(game: Game, deletedByUserId?: DBObjectId) {
+    async delete(game: Game, deletedByUserId?: DBObjectId, eventService?: IEventService) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
@@ -407,6 +410,10 @@ export default class GameService extends EventEmitter {
         this.emit(GameServiceEvents.onGameDeleted, {
             gameId: game._id
         });
+
+        if (eventService) {
+            await eventService.deleteByGameId(game._id);
+        }
 
         // TODO: Cleanup any orphaned docs
     }
@@ -516,7 +523,7 @@ export default class GameService extends EventEmitter {
     }
     
     // TODO: Should be in a player service?
-    async quitAllActiveGames(userId: DBObjectId) {
+    async quitAllActiveGames(userId: DBObjectId, eventService: IEventService) {
         let allGames = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 
@@ -535,10 +542,10 @@ export default class GameService extends EventEmitter {
             let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
-                await this.concedeDefeat(game, player, false);
+                await this.concedeDefeat(game, player, false, eventService);
             }
             else {
-                await this.quit(game, player);
+                await this.quit(game, player, eventService);
             }
         }
     }

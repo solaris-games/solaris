@@ -22,6 +22,7 @@ import StatisticsService from "./statistics";
 import { GameSettings } from "@solaris/common";
 import EventEmitter from "events";
 import { StarDataService } from "@solaris/common";
+import { IEventService } from './types/IEventService';
 
 const RNG = require('random-seed');
 
@@ -239,7 +240,7 @@ export default class StarService extends EventEmitter {
         return Math.floor(naturalResource + (5 * terraforming));
     }
 
-    async abandonStar(game: Game, player: Player, starId: DBObjectId) {
+    async abandonStar(game: Game, player: Player, starId: DBObjectId, eventService: IEventService) {
         if (game.settings.player.allowAbandonStars === 'disabled') {
             throw new ValidationError(`Abandoning stars has been disabled in this game.`);
         }
@@ -279,6 +280,7 @@ export default class StarService extends EventEmitter {
             player,
             star
         });
+        await eventService.createStarAbandonedEvent(game._id, game.state.tick, player, star);
     }
 
     canPlayersSeeStarShips(star: Star, playerIds: DBObjectId[]) {
@@ -335,7 +337,7 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    applyStarSpecialistSpecialModifiers(game: Game) {
+    applyStarSpecialistSpecialModifiers(game: Game, eventService: IEventService) {
         // NOTE: Specialist modifiers that affect stars on tick only apply
         // to stars that are owned by players. i.e NOT abandoned stars.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
@@ -347,7 +349,7 @@ export default class StarService extends EventEmitter {
 
                     if (specialist && specialist.modifiers.special) {
                         if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick);
+                            this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick, eventService);
                         }
                     }
                 }
@@ -355,7 +357,7 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    addNaturalResources(game: Game, star: Star, amount: number) {
+    addNaturalResources(game: Game, star: Star, amount: number, eventService: IEventService) {
         let wasDeadStar = this.starDataService.isDeadStar(star);
 
         if (this.gameTypeService.isSplitResources(game)) {
@@ -399,6 +401,7 @@ export default class StarService extends EventEmitter {
                     starId: star._id,
                     starName: star.name
                 });
+                eventService.createStarDiedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
             }
         }
         // If it was a dead star but is now not a dead star then it has been reignited.
@@ -410,10 +413,11 @@ export default class StarService extends EventEmitter {
                 starId: star._id,
                 starName: star.name
             });
+            eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
         }
     }
 
-    reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources) {
+    reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources, eventService: IEventService) {
         if (!this.starDataService.isDeadStar(star)) {
             throw new Error('The star cannot be reignited, it is not dead.');
         }
@@ -428,6 +432,7 @@ export default class StarService extends EventEmitter {
                 starId: star._id,
                 starName: star.name
             });
+            eventService.createStarReignitedEvent(game._id, game.state.tick, star.ownedByPlayerId, star._id, star.name);
         }
     }
 

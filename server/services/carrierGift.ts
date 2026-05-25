@@ -10,6 +10,7 @@ import { User } from './types/User';
 import DiplomacyService from './diplomacy';
 import StatisticsService from './statistics';
 import EventEmitter from "events";
+import { IEventService } from './types/IEventService';
 
 export const CarrierGiftServiceEvents = {
     onPlayerGiftReceived: 'onPlayerGiftReceived',
@@ -78,7 +79,7 @@ export default class CarrierGiftService extends EventEmitter {
         });
     }
 
-    transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    transferGift(game: Game, gameUsers: User[], star: Star, carrier: Carrier, eventService: IEventService) {
         if (!star.ownedByPlayerId) {
             throw new ValidationError(`Cannot transfer ownership of a gifted carrier to this star, no player owns the star.`);
         }
@@ -123,6 +124,8 @@ export default class CarrierGiftService extends EventEmitter {
     
             this.emit(CarrierGiftServiceEvents.onPlayerGiftReceived, eventObject);
             this.emit(CarrierGiftServiceEvents.onPlayerGiftSent, eventObject);
+            eventService.createGiftReceivedEvent(game._id, game.state.tick, carrierPlayer, starPlayer, carrier, star);
+            eventService.createGiftSentEvent(game._id, game.state.tick, carrierPlayer, starPlayer, carrier, star);
 
             carrier.isGift = false;
         } else if (!carrier.waypoints.length) {

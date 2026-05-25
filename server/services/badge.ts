@@ -10,6 +10,7 @@ import InternalGamePlayerBadgePurchasedEvent from './types/internalEvents/GamePl
 import { GameTypeService } from '@solaris/common'
 import GameStateService from "./gameState";
 import EventEmitter from "events";
+import { IEventService } from './types/IEventService';
 
 export const BadgeServiceEvents = {
     onGamePlayerBadgePurchased: 'onGamePlayerBadgePurchased'
@@ -88,7 +89,7 @@ export default class BadgeService extends EventEmitter {
         return await this.listBadgesByUser(player.userId);
     }
 
-    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string) {
+    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string, eventService: IEventService) {
         let buyer = this.playerService.getByUserId(game, purchasedByUserId)!;
         let recipient = this.playerService.getById(game, purchasedForPlayerId);
 
@@ -162,6 +163,7 @@ export default class BadgeService extends EventEmitter {
         };
 
         this.emit(BadgeServiceEvents.onGamePlayerBadgePurchased, e);
+        await eventService.createGamePlayerBadgePurchased(e);
     }
 
     awardBadgeForUser(user: User, badgeKey: string, game: Game, date: Date): void {

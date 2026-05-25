@@ -33,7 +33,9 @@ export default (container: DependencyContainer) => {
                 let newStatus = await container.diplomacyService.declareAlly(
                     req.game,
                     req.player._id,
-                    new mongoose.Types.ObjectId(req.params.playerId));
+                    new mongoose.Types.ObjectId(req.params.playerId),
+                    true,
+                    container.eventService);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -48,7 +50,9 @@ export default (container: DependencyContainer) => {
                 let newStatus = await container.diplomacyService.declareEnemy(
                     req.game,
                     req.player._id,
-                    new mongoose.Types.ObjectId(req.params.playerId));
+                    new mongoose.Types.ObjectId(req.params.playerId),
+                    true,
+                    container.eventService);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -63,7 +67,9 @@ export default (container: DependencyContainer) => {
                 let newStatus = await container.diplomacyService.declareNeutral(
                     req.game,
                     req.player._id,
-                    new mongoose.Types.ObjectId(req.params.playerId));
+                    new mongoose.Types.ObjectId(req.params.playerId),
+                    true,
+                    container.eventService);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     

@@ -300,7 +300,7 @@ export default (container: DependencyContainer) => {
         },
         delete: async (req, res, next) => {
             try {
-                await container.gameService.quitAllActiveGames(req.session.userId);
+                await container.gameService.quitAllActiveGames(req.session.userId, container.eventService);
                 await container.guildService.tryLeave(req.session.userId);
                 await container.guildService.declineAllInvitations(req.session.userId);
                 await container.userService.closeAccount(req.session.userId);

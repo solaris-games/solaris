@@ -2,7 +2,7 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game, GameUserNotification } from "./types/Game";
 import ConversationService from "./conversation";
-import EventService from "./event";
+import { IEventService } from "./types/IEventService";
 import GameService from "./game";
 import { GameTypeService } from '@solaris/common'
 import LeaderboardService from "./leaderboard";
@@ -13,7 +13,7 @@ export default class GameListService {
     gameRepo: Repository<Game>;
     gameService: GameService;
     conversationService: ConversationService;
-    eventService: EventService;
+    eventService: IEventService;
     gameTypeService: GameTypeService;
     leaderboardService: LeaderboardService;
     
@@ -21,7 +21,7 @@ export default class GameListService {
         gameRepo: Repository<Game>,
         gameService: GameService,
         conversationService: ConversationService,
-        eventService: EventService,
+        eventService: IEventService,
         gameTypeService: GameTypeService,
         leaderboardService: LeaderboardService
     ) {

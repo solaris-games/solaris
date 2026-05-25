@@ -24,6 +24,7 @@ import ShipService from "./ship";
 import StatisticsService from "./statistics";
 import {GameInfrastructureExpenseMultiplier} from "@solaris/common";
 import { StarDataService } from "@solaris/common";
+import { IEventService } from './types/IEventService';
 
 const Heap = require('qheap');
 
@@ -477,7 +478,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true) {
+    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true, eventService?: IEventService) {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
@@ -560,7 +561,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
 
         // make sure the game model is up to date for further calculations. This is ok since the game model is lean and these changes will not be committed to the database.
-        await this.executeBulkUpgradeReport(game, player, upgradeSummary);
+        await this.executeBulkUpgradeReport(game, player, upgradeSummary, eventService);
 
         // Check for AI control.
         if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
@@ -578,7 +579,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     // this does not write directly to db
-    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport) {
+    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, eventService?: IEventService) {
         upgradeSummary.stars.forEach(starUpgrade => {
             const star = this.starService.getById(game, starUpgrade.starId);
             switch (upgradeSummary.infrastructureType) {
@@ -609,6 +610,9 @@ export default class StarUpgradeService extends EventEmitter {
             player,
             upgradeSummary
         });
+        if (eventService) {
+            await eventService.createInfrastructureBulkUpgraded(game._id, game.state.tick, player, upgradeSummary);
+        }
     }
 
     generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, customTerraformingLevel?: number): BulkUpgradeReport {

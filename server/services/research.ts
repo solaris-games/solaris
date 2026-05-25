@@ -16,6 +16,7 @@ import RandomService from './random';
 import StarService from './star';
 import UserService from './user';
 import StatisticsService from './statistics';
+import { IEventService } from './types/IEventService';
 
 export const ResearchServiceEvents = {
     onPlayerResearchCompleted: 'onPlayerResearchCompleted'
@@ -107,7 +108,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearch(game: Game, user: User | null, player: Player) {
+    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService) {
         const techKey = player.researchingNow;
         const tech = player.research[techKey];
 
@@ -155,6 +156,7 @@ export default class ResearchService extends EventEmitter {
                 technologyKeyNext: player.researchingNow,
                 technologyLevelNext: player.research[player.researchingNow].level + 1
             });
+            eventService.createResearchCompleteEvent(game._id, game.state.tick, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
         }
 
         const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
@@ -170,7 +172,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearchAll(game: Game, gameUsers: User[]) {
+    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -178,7 +180,7 @@ export default class ResearchService extends EventEmitter {
 
             const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
 
-            this.conductResearch(game, user, player);
+            this.conductResearch(game, user, player, eventService);
         }
     }
 

@@ -68,7 +68,9 @@ export default (container: DependencyContainer) => {
                     req.player,
                     reqObj.upgradeStrategy,
                     reqObj.infrastructure,
-                    +reqObj.amount);
+                    +reqObj.amount,
+                    true,
+                    container.eventService);
     
                 res.status(200).json(summary);
                 return next();
@@ -222,7 +224,8 @@ export default (container: DependencyContainer) => {
                 await container.starService.abandonStar(
                     req.game,
                     req.player,
-                    reqObj.starId);
+                    reqObj.starId,
+                    container.eventService);
     
                 res.sendStatus(200);
                 return next();

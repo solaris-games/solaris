@@ -12,6 +12,7 @@ import InternalConversationMessageSentEvent from './types/internalEvents/Convers
 import DiplomacyService from './diplomacy';
 import mongoose from 'mongoose';
 import EventEmitter from "events";
+import { IEventService } from './types/IEventService';
 
 function arrayIsEqual(a, b): boolean {
     if (a.length !== b.length) return false;
@@ -92,7 +93,7 @@ export default class ConversationService extends EventEmitter {
         this.broadcastService = broadcastService;
     }
 
-    async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[]): Promise<Conversation<DBObjectId>> {
+    async create(game: Game, playerId: DBObjectId, name: string, participantIds: DBObjectId[], eventService: IEventService): Promise<Conversation<DBObjectId>> {
         const newConvo = getNewConversation(game, playerId, name, participantIds);
 
         // Create the convo.
@@ -110,6 +111,7 @@ export default class ConversationService extends EventEmitter {
             convo: newConvo,
             playerId
         });
+        await eventService.createPlayerConversationCreated(game._id, game.state.tick, newConvo);
 
         for (let i = 1; i < newConvo.participants.length; i++) {
             this.emit(ConversationServiceEvents.onConversationInvited, {
@@ -118,6 +120,7 @@ export default class ConversationService extends EventEmitter {
                 convo: newConvo,
                 playerId: newConvo.participants[i]
             });
+            await eventService.createPlayerConversationInvited(game._id, game.state.tick, newConvo, newConvo.participants[i]);
         }
 
         return newConvo;
@@ -266,8 +269,7 @@ export default class ConversationService extends EventEmitter {
         return await this._pushMessage(game, conversation, toPlayerIds, newMessage);
     }
 
-    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {
-        message = message.trim()
+    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {        message = message.trim()
 
         if (message === '') {
             throw new ValidationError(`Message must not be empty.`);
@@ -366,7 +368,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async leave(game: Game, playerId: DBObjectId, conversationId: DBObjectId) {
+    async leave(game: Game, playerId: DBObjectId, conversationId: DBObjectId, eventService: IEventService) {
         let convo = this._getConversationForPlayer(game, conversationId, playerId);
 
         if (convo.createdBy == null) {
@@ -390,6 +392,7 @@ export default class ConversationService extends EventEmitter {
             convo,
             playerId
         });
+        await eventService.createPlayerConversationLeft(game._id, game.state.tick, convo, playerId);
 
         return convo;
     }

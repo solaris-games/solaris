@@ -8,6 +8,7 @@ import { Game } from "./types/Game";
 import { Player, PlayerLedgerDebt } from "./types/Player";
 
 import EventEmitter from "events";
+import { IEventService } from "./types/IEventService";
 
 export const LedgerServiceEvents = {
     onDebtAdded: 'onDebtAdded',
@@ -62,7 +63,7 @@ export default class LedgerService extends EventEmitter {
         };
     }
 
-    async addDebt(game: Game, creditor: Player, debtor: Player, debt: number, type: LedgerType) {
+    async addDebt(game: Game, creditor: Player, debtor: Player, debt: number, type: LedgerType, eventService: IEventService) {
         // Get both of the ledgers between the two players.
         let ledgerCreditor = this.getLedgerForPlayer(creditor, debtor._id, type);
         let ledgerDebtor = this.getLedgerForPlayer(debtor, creditor._id, type);
@@ -81,11 +82,12 @@ export default class LedgerService extends EventEmitter {
             amount: debt,
             ledgerType: type
         });
+        await eventService.createDebtAddedEvent(game._id, game.state.tick, debtor._id, creditor._id, debt, type);
 
         return ledgerCreditor;
     }
 
-    async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId, type: LedgerType) {
+    async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId, type: LedgerType, eventService: IEventService) {
         let creditor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
@@ -129,11 +131,12 @@ export default class LedgerService extends EventEmitter {
             amount: debtAmount,
             ledgerType: type
         });
+        await eventService.createDebtSettledEvent(game._id, game.state.tick, debtor._id, creditor._id, debtAmount, type);
 
         return ledgerDebtor;
     }
 
-    async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId, type: LedgerType) {
+    async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId, type: LedgerType, eventService: IEventService) {
         let debtor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
@@ -160,6 +163,7 @@ export default class LedgerService extends EventEmitter {
             amount: debtAmount,
             ledgerType: type
         });
+        await eventService.createDebtForgivenEvent(game._id, game.state.tick, debtor._id, creditor._id, debtAmount, type);
 
         return ledgerCreditor;
     }
