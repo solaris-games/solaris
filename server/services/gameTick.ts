@@ -45,6 +45,7 @@ import CullWaypointsService from "./cullWaypoints";
 import { IStatisticsService } from './types/IStatisticsService';
 import { CarrierTravelService } from '@solaris/common';
 import { INotificationService } from "./types/INotificationService";
+import { IEmailService } from "./types/IEmailService";
 
 import EventEmitter from "events";
 import moment from "moment";
@@ -169,7 +170,7 @@ export default class GameTickService extends EventEmitter {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
+    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService, emailService: IEmailService) {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
@@ -219,7 +220,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService, emailService);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -288,7 +289,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService, emailService);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -662,7 +663,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
+    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService, emailService: IEmailService) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -724,6 +725,7 @@ export default class GameTickService extends EventEmitter {
                 this.emit(GameTickServiceEvents.onGameEnded, e);
                 await eventService.createGameEndedEvent(e);
                 await notificationService.onGameEnded(e);
+                await emailService.sendGameFinishedEmail(e.gameId);
             } else if (winner.kind === 'player') { // game is tutorial
                 const userId = winner.player.userId
                 const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());

@@ -244,7 +244,8 @@ export default (container: DependencyContainer) => {
                     reqObj.avatar,
                     reqObj.password,
                     container.eventService,
-                    container.notificationService);
+                    container.notificationService,
+                    container.emailService);
     
                 res.sendStatus(200);
     

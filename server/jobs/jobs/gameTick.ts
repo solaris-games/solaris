@@ -33,7 +33,7 @@ const tryTickGame = async (container: DependencyContainer, gameId: DBObjectId, s
                     await container.gameLockService.lock(gameId, false);
                 });
                 await container.gameLockService.lock(gameId, true);
-                await container.gameTickService.tick(gameId, container.eventService, container.statisticsService, container.notificationService);
+                await container.gameTickService.tick(gameId, container.eventService, container.statisticsService, container.notificationService, container.emailService);
             } catch (e) {
                 log.error(e, `Error in game ${game.settings.general.name} (${game._id})`);
             } finally {

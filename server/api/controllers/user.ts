@@ -59,7 +59,7 @@ export default (container: DependencyContainer) => {
                     throw new ValidationError('An account with this username already exists');
                 }
     
-                const userId = await container.userService.create(email, username, reqObj.password, ip);
+                const userId = await container.userService.create(email, username, reqObj.password, ip, container.emailService);
     
                 res.status(201).json({ id: userId });
                 return next();

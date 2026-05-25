@@ -4,16 +4,15 @@ import { EmailTemplate } from "./types/Email";
 import { User } from "./types/User";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import GameTickService, { GameTickServiceEvents } from "./gameTick";
 import { GameTypeService } from '@solaris/common'
 import LeaderboardService from "./leaderboard";
 import PlayerService from "./player";
-import UserService, { UserServiceEvents } from "./user";
+import UserService from "./user";
 import { Player } from "./types/Player";
 import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
-import GameJoinService, { GameJoinServiceEvents } from "./gameJoin";
 import PlayerReadyService from "./playerReady";
 import {logger} from "../utils/logging";
+import { IEmailService } from "./types/IEmailService";
 
 const nodemailer = require('nodemailer');
 const fs = require('fs');
@@ -41,7 +40,7 @@ function sleep(ms: number) {
     See here: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-postfix-as-a-send-only-smtp-server-on-ubuntu-14-04
 */
 
-export default class EmailService {
+export default class EmailService implements IEmailService {
     TEMPLATES = {
         WELCOME: {
             fileName: 'welcomeEmail.html',
@@ -91,41 +90,31 @@ export default class EmailService {
 
     config: Config;
     gameService: GameService;
-    gameJoinService: GameJoinService;
     userService: UserService;
     leaderboardService: LeaderboardService;
     playerService: PlayerService;
     playerReadyService: PlayerReadyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
-    gameTickService: GameTickService;
 
     constructor(
         config: Config,
         gameService: GameService,
-        gameJoinService: GameJoinService,
         userService: UserService,
         leaderboardService: LeaderboardService,
         playerService: PlayerService,
         playerReadyService: PlayerReadyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        gameTickService: GameTickService
     ) {
         this.config = config;
         this.gameService = gameService;
-        this.gameJoinService = gameJoinService;
         this.userService = userService;
         this.leaderboardService = leaderboardService;
         this.playerService = playerService;
         this.playerReadyService = playerReadyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-        this.gameTickService = gameTickService;
-
-        this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.sendGameStartedEmail(args));
-        this.userService.on(UserServiceEvents.onUserCreated, (user) => this.sendWelcomeEmail(user));
-        this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.sendGameFinishedEmail(args.gameId));
     }
 
     isEnabled() {
