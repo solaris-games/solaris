@@ -13,6 +13,7 @@ import DiplomacyService from './diplomacy';
 import mongoose from 'mongoose';
 import EventEmitter from "events";
 import { IEventService } from './types/IEventService';
+import NotificationService from './notification';
 
 function arrayIsEqual(a, b): boolean {
     if (a.length !== b.length) return false;
@@ -251,7 +252,7 @@ export default class ConversationService extends EventEmitter {
         return convo;
     }
 
-    async sendSystemMessage(game: Game, conversation: Conversation<DBObjectId>, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {
+    async sendSystemMessage(game: Game, conversation: Conversation<DBObjectId>, message: string, notificationService: NotificationService): Promise<ConversationMessageSentResult<DBObjectId>> {
         message = message.trim()
 
         const newMessage: ConversationMessage<DBObjectId> = {
@@ -266,10 +267,10 @@ export default class ConversationService extends EventEmitter {
 
         const toPlayerIds = conversation.participants;
 
-        return await this._pushMessage(game, conversation, toPlayerIds, newMessage);
+        return await this._pushMessage(game, conversation, toPlayerIds, newMessage, notificationService);
     }
 
-    async send(game: Game, player: Player, conversationId: DBObjectId, message: string): Promise<ConversationMessageSentResult<DBObjectId>> {        message = message.trim()
+    async send(game: Game, player: Player, conversationId: DBObjectId, message: string, notificationService: NotificationService): Promise<ConversationMessageSentResult<DBObjectId>> {        message = message.trim()
 
         if (message === '') {
             throw new ValidationError(`Message must not be empty.`);
@@ -303,10 +304,10 @@ export default class ConversationService extends EventEmitter {
 
         const toPlayerIds = convo.participants.filter(p => p.toString() !== player._id.toString());
 
-        return await this._pushMessage(game, convo, toPlayerIds, newMessage);
+        return await this._pushMessage(game, convo, toPlayerIds, newMessage, notificationService);
     }
 
-    async _pushMessage(game: Game, conversation: Conversation<DBObjectId>, toPlayerIds: DBObjectId[], newMessage: ConversationMessage<DBObjectId>) {
+    async _pushMessage(game: Game, conversation: Conversation<DBObjectId>, toPlayerIds: DBObjectId[], newMessage: ConversationMessage<DBObjectId>, notificationService: NotificationService) {
         // Push a new message into the conversation messages array.
         await this.gameRepo.updateOne({
             _id: game._id,
@@ -335,6 +336,7 @@ export default class ConversationService extends EventEmitter {
         };
 
         this.emit(ConversationServiceEvents.onConversationMessageSent, e);
+        await notificationService.onConversationMessageSent(e);
 
         this.broadcastService.gameMessageSent(game, sentMessageResult);
 

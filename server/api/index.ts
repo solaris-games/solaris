@@ -50,7 +50,6 @@ async function startServer() {
   });
 
   await container.discordService.initialize();
-  container.notificationService.initialize();
 }
 
 process.on('SIGINT', async () => {

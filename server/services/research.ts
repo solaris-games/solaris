@@ -17,7 +17,7 @@ import StarService from './star';
 import UserService from './user';
 import { IEventService } from './types/IEventService';
 import { IStatisticsService } from './types/IStatisticsService';
-
+import NotificationService from './notification';
 export const ResearchServiceEvents = {
     onPlayerResearchCompleted: 'onPlayerResearchCompleted'
 }
@@ -105,7 +105,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService) {
+    conductResearch(game: Game, user: User | null, player: Player, eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
         const techKey = player.researchingNow;
         const tech = player.research[techKey];
 
@@ -154,6 +154,7 @@ export default class ResearchService extends EventEmitter {
                 technologyLevelNext: player.research[player.researchingNow].level + 1
             });
             eventService.createResearchCompleteEvent(game._id, game.state.tick, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
+            notificationService.onPlayerResearchCompleted(game._id, player._id, techKey, tech.level, player.researchingNow, player.research[player.researchingNow].level + 1);
         }
 
         const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(game, player);
@@ -169,7 +170,7 @@ export default class ResearchService extends EventEmitter {
         };
     }
 
-    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
+    conductResearchAll(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: NotificationService) {
         // Add the current level of experimentation to the current 
         // tech being researched.
         for (let i = 0; i < game.galaxy.players.length; i++) {
@@ -177,7 +178,7 @@ export default class ResearchService extends EventEmitter {
 
             const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString()) || null;
 
-            this.conductResearch(game, user, player, eventService, statisticsService);
+            this.conductResearch(game, user, player, eventService, statisticsService, notificationService);
         }
     }
 

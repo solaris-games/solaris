@@ -41,7 +41,6 @@ async function startup() {
     });
 
     await container.discordService.initialize();
-    container.notificationService.initialize();
     
     // ------------------------------
     // Jobs that run every time the server restarts.

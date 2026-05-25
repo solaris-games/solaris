@@ -5,19 +5,13 @@ import { Game } from './types/Game';
 import { Player } from './types/Player';
 import { User } from './types/User';
 import DiscordService from './discord';
-import ConversationService, { ConversationServiceEvents } from './conversation';
 import GameService from './game';
-import GameTickService, { GameTickServiceEvents } from './gameTick';
-import ResearchService, { ResearchServiceEvents } from './research';
-import TradeService, { TradeServiceEvents } from './trade';
 import PlayerGalacticCycleCompletedEvent from './types/internalEvents/PlayerGalacticCycleComplete';
 import { InternalGameEvent } from './types/internalEvents/InternalGameEvent';
 import InternalGameEndedEvent from './types/internalEvents/GameEnded';
 import InternalGameTurnEndedEvent from './types/internalEvents/GameTurnEnded';
 import InternalConversationMessageSentEvent from './types/internalEvents/ConversationMessageSent';
-import GameJoinService, { GameJoinServiceEvents } from './gameJoin';
 import {logger} from "../utils/logging";
-import PlayerReadyService, { PlayerReadyServiceEvents } from './playerReady';
 import { GameTypeService } from '@solaris/common'
 import GameStateService from './gameState';
 
@@ -42,13 +36,7 @@ export default class NotificationService {
     userRepo: Repository<User>;
     gameRepo: Repository<Game>;
     discordService: DiscordService;
-    conversationService: ConversationService;
     gameService: GameService;
-    gameJoinService: GameJoinService;
-    gameTickService: GameTickService;
-    researchService: ResearchService;
-    tradeService: TradeService;
-    playerReadyService: PlayerReadyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
 
@@ -57,13 +45,7 @@ export default class NotificationService {
         userRepo: Repository<User>,
         gameRepo: Repository<Game>,
         discordService: DiscordService,
-        conversationService: ConversationService,
         gameService: GameService,
-        gameJoinService: GameJoinService,
-        gameTickService: GameTickService,
-        researchService: ResearchService,
-        tradeService: TradeService,
-        playerReadyService: PlayerReadyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
     ) {
@@ -71,35 +53,9 @@ export default class NotificationService {
         this.userRepo = userRepo;
         this.gameRepo = gameRepo;
         this.discordService = discordService;
-        this.conversationService = conversationService;
         this.gameService = gameService;
-        this.gameJoinService = gameJoinService;
-        this.gameTickService = gameTickService;
-        this.researchService = researchService;
-        this.tradeService = tradeService;
-        this.playerReadyService = playerReadyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-    }
-
-    initialize() {
-        if (this.discordService.isConnected()) { // Don't initialize the notification service if there's no token configured.
-            this.conversationService.on(ConversationServiceEvents.onConversationMessageSent, (args) => this.onConversationMessageSent(args));
-
-            this.gameJoinService.on(GameJoinServiceEvents.onGameStarted, (args) => this.onGameStarted(args));
-            this.gameTickService.on(GameTickServiceEvents.onGameEnded, (args) => this.onGameEnded(args));
-            this.gameTickService.on(GameTickServiceEvents.onGameTurnEnded, (args) => this.onGameTurnEnded(args));
-            this.gameTickService.on(GameTickServiceEvents.onPlayerGalacticCycleCompleted, (args) => this.onPlayerGalacticCycleCompleted(args));
-            this.researchService.on(ResearchServiceEvents.onPlayerResearchCompleted, (args) => this.onPlayerResearchCompleted(args.gameId, args.playerId, args.technologyKey, args.technologyLevel, args.technologyKeyNext, args.technologyLevelNext));
-            this.tradeService.on(TradeServiceEvents.onPlayerCreditsReceived, (args) => this.onPlayerCreditsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on(TradeServiceEvents.onPlayerCreditsSpecialistsReceived, (args) => this.onPlayerCreditsSpecialistsReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on(TradeServiceEvents.onPlayerRenownReceived, (args) => this.onPlayerRenownReceived(args.gameId, args.fromPlayer, args.toPlayer, args.amount));
-            this.tradeService.on(TradeServiceEvents.onPlayerTechnologyReceived, (args) => this.onPlayerTechnologyReceived(args.gameId, args.fromPlayer, args.toPlayer, args.technology));
-
-            this.playerReadyService.on(PlayerReadyServiceEvents.onGamePlayerReady, (data) => this.trySendLastPlayerTurnReminder(data.gameId));
-
-            log.info('Notifications initialized.')
-        }
     }
 
     async _getNotificationContext(gameId: DBObjectId, playerIds: string[] | null) {
@@ -176,6 +132,7 @@ export default class NotificationService {
     }
 
     async onGameStarted(args: InternalGameEvent) {
+        if (!this.discordService.isConnected()) return;
         // Send the game started notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameStarted',
             async (game: Game, user: User) => {
@@ -186,6 +143,7 @@ export default class NotificationService {
     }
 
     async onGameEnded(args: InternalGameEndedEvent) {
+        if (!this.discordService.isConnected()) return;
         // Send the game ended notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameEnded', 
             async (game: Game, user: User) => {
@@ -196,6 +154,7 @@ export default class NotificationService {
     }
 
     async onGameTurnEnded(args: InternalGameTurnEndedEvent) {
+        if (!this.discordService.isConnected()) return;
         // Send the game turn ended notification for Discord subscription to all players.
         await this._trySendNotifications(args.gameId, null, 'discord', 'gameTurnEnded', 
             async (game: Game, user: User) => {
@@ -206,6 +165,7 @@ export default class NotificationService {
     }
 
     async trySendLastPlayerTurnReminder(gameId: DBObjectId) {
+        if (!this.discordService.isConnected()) return;
         // TODO: Partially duplicate with email functionality, refactor!
         let game = (await this.gameService.getById(gameId))!;
 
@@ -240,6 +200,7 @@ export default class NotificationService {
     }
 
     async onPlayerGalacticCycleCompleted(args: PlayerGalacticCycleCompletedEvent) {
+        if (!this.discordService.isConnected()) return;
         // Send the galactic cycle completed notification for Discord subscription to the player.
         await this._trySendNotifications(args.gameId, [args.playerId!.toString()], 'discord', 'playerGalacticCycleComplete', 
             async (game: Game, user: User) => {
@@ -306,6 +267,7 @@ export default class NotificationService {
     }
 
     async onPlayerResearchCompleted(gameId: DBObjectId, playerId: DBObjectId, technologyKey: string, technologyLevel: number, technologyKeyNext: string, technologyLevelNext: number) {
+        if (!this.discordService.isConnected()) return;
         // Send the research completed notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [playerId.toString()], 'discord', 'playerResearchComplete', 
             async (game: Game, user: User) => {
@@ -328,6 +290,7 @@ export default class NotificationService {
     }
 
     async onPlayerCreditsReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, amount: number) {
+        if (!this.discordService.isConnected()) return;
         // Send the credits received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerCreditsReceived', 
             async (game: Game, user: User) => {
@@ -338,6 +301,7 @@ export default class NotificationService {
     }
 
     async onPlayerCreditsSpecialistsReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, amount: number) {
+        if (!this.discordService.isConnected()) return;
         // Send the specialist tokens received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerCreditsSpecialistsReceived', 
             async (game: Game, user: User) => {
@@ -348,6 +312,7 @@ export default class NotificationService {
     }
 
     async onPlayerTechnologyReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, technology: any) {
+        if (!this.discordService.isConnected()) return;
         // Send the specialist tokens received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerTechnologyReceived', 
             async (game: Game, user: User) => {
@@ -358,6 +323,7 @@ export default class NotificationService {
     }
 
     async onPlayerRenownReceived(gameId: DBObjectId, fromPlayer: Player, toPlayer: Player, amount: number) {
+        if (!this.discordService.isConnected()) return;
         // Send the renown received notification for Discord subscription to the player.
         await this._trySendNotifications(gameId, [toPlayer._id.toString()], 'discord', 'playerRenownReceived', 
             async (game: Game, user: User) => {
@@ -368,6 +334,7 @@ export default class NotificationService {
     }
 
     async onConversationMessageSent(args: InternalConversationMessageSentEvent) {
+        if (!this.discordService.isConnected()) return;
         const toPlayerIds = args.sentMessageResult.toPlayerIds.map(id => id.toString());
         const readBy = args.sentMessageResult.readBy.map(id => id.toString());
 

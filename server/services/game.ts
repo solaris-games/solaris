@@ -24,6 +24,7 @@ import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
 import PlayerAfkService from "./playerAfk";
+import NotificationService from "./notification";
 
 export const GameServiceEvents = {
     onPlayerQuit: 'onPlayerQuit',
@@ -338,7 +339,7 @@ export default class GameService extends EventEmitter {
         await game.save();
     }
 
-    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
+    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId, notificationService: NotificationService) {
         if (!await this.gameAuthService.isGameAdmin(game, pausingUserId)) {
             throw new ValidationError('You do not have permission to pause/unpause this game.');
         }
@@ -375,7 +376,7 @@ export default class GameService extends EventEmitter {
         const generalChat = this.conversationService.getGeneralConversation(game);
 
         if (generalChat) {
-            await this.conversationService.sendSystemMessage(game, generalChat, `The game has been ${pauseState ? 'paused' : 'resumed'}.`);
+            await this.conversationService.sendSystemMessage(game, generalChat, `The game has been ${pauseState ? 'paused' : 'resumed'}.`, notificationService);
         }
     }
 

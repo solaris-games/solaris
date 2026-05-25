@@ -80,7 +80,8 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player,
                     req.params.conversationId,
-                    reqObj.message);
+                    reqObj.message,
+                    container.notificationService);
 
                 res.status(200).send(message);
                 return next();

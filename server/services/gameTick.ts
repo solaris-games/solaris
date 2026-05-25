@@ -44,6 +44,7 @@ import WaypointActionService from "./waypointAction";
 import CullWaypointsService from "./cullWaypoints";
 import { IStatisticsService } from './types/IStatisticsService';
 import { CarrierTravelService } from '@solaris/common';
+import NotificationService from "./notification";
 
 import EventEmitter from "events";
 import moment from "moment";
@@ -98,6 +99,7 @@ export default class GameTickService extends EventEmitter {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierCombatService: CarrierCombatService;
     combatProcessingService: CombatProcessingService;
+    notificationService!: NotificationService;
 
     constructor(
         distanceService: DistanceService,
@@ -274,7 +276,7 @@ export default class GameTickService extends EventEmitter {
             await this._playAI(eventService, game);
             logTime('AI controlled players turn');
             
-            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService);
+            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService, this.notificationService);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -575,6 +577,7 @@ export default class GameTickService extends EventEmitter {
 
                     this.emit(GameTickServiceEvents.onPlayerGalacticCycleCompleted, e);
                     await eventService.createPlayerGalacticCycleCompleteEvent(e);
+                    await this.notificationService.onPlayerGalacticCycleCompleted(e);
                 }
             }
 
@@ -733,6 +736,7 @@ export default class GameTickService extends EventEmitter {
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
                 await eventService.createGameEndedEvent(e);
+                await this.notificationService.onGameEnded(e);
             } else if (winner.kind === 'player') { // game is tutorial
                 const userId = winner.player.userId
                 const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());
@@ -831,6 +835,7 @@ export default class GameTickService extends EventEmitter {
             this.emit(GameTickServiceEvents.onGameTurnEnded, {
                 gameId: game._id
             });
+            this.notificationService.onGameTurnEnded({ gameId: game._id, gameTick: game.state.tick });
         }
     }
 

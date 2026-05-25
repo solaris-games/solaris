@@ -243,7 +243,8 @@ export default (container: DependencyContainer) => {
                     reqObj.alias,
                     reqObj.avatar,
                     reqObj.password,
-                    container.eventService);
+                    container.eventService,
+                    container.notificationService);
     
                 res.sendStatus(200);
     
@@ -299,7 +300,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.declareReady(
                     req.game,
-                    req.player);
+                    req.player,
+                    container.notificationService);
                 
                 res.sendStatus(200);
     
@@ -314,7 +316,8 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.declareReadyToCycle(
                     req.game,
-                    req.player);
+                    req.player,
+                    container.notificationService);
                 
                 res.sendStatus(200);
     
@@ -424,7 +427,8 @@ export default (container: DependencyContainer) => {
                 await container.gameService.setPauseState(
                     req.game,
                     doPause,
-                    req.session.userId);
+                    req.session.userId,
+                    container.notificationService);
 
                 res.sendStatus(200);
                 return next();
