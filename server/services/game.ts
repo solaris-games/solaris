@@ -19,12 +19,12 @@ import ConversationService from './conversation';
 import PlayerReadyService from './playerReady';
 import InternalGamePlayerQuitEvent from './types/internalEvents/GamePlayerQuit';
 import InternalGamePlayerDefeatedEvent from './types/internalEvents/GamePlayerDefeated';
-import { IEventService } from './types/IEventService';
 import {LeaderboardPlayer} from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
 import PlayerAfkService from "./playerAfk";
 import { INotificationService } from "./types/INotificationService";
+import {EventService} from "./event";
 
 export default class GameService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -158,7 +158,7 @@ export default class GameService extends EventEmitter {
         game.state.readyToQuitCount = undefined;
     }
 
-    async quit(game: Game, player: Player, eventService: IEventService) {    
+    async quit(game: Game, player: Player, eventService: EventService) {
         if (game.state.startDate) {
             throw new ValidationError('Cannot quit a game that has started.');
         }
@@ -200,7 +200,7 @@ export default class GameService extends EventEmitter {
         return player;
     }
 
-    async concedeDefeat(game: Game, player: Player, openSlot: boolean, eventService: IEventService) {
+    async concedeDefeat(game: Game, player: Player, openSlot: boolean, eventService: EventService) {
         if (player.defeated) {
             throw new ValidationError('The player has already been defeated.');
         }
@@ -277,7 +277,7 @@ export default class GameService extends EventEmitter {
         });
     }
 
-    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId, eventService: IEventService) {
+    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId, eventService: EventService) {
         if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
             throw new ValidationError('You do not have permission to kick a player in this game.');
         }
@@ -372,7 +372,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async delete(game: Game, deletedByUserId: DBObjectId | undefined, eventService: IEventService) {
+    async delete(game: Game, deletedByUserId: DBObjectId | undefined, eventService: EventService) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
@@ -510,7 +510,7 @@ export default class GameService extends EventEmitter {
     }
     
     // TODO: Should be in a player service?
-    async quitAllActiveGames(userId: DBObjectId, eventService: IEventService) {
+    async quitAllActiveGames(userId: DBObjectId, eventService: EventService) {
         let allGames = await this.gameRepo.findAsModels({
             'galaxy.players': {
                 $elemMatch: { 

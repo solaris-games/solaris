@@ -20,17 +20,6 @@ import { TradeEventTechnology, BaseGameEvent } from '@solaris/common';
 import Repository from '../repository';
 
 export interface IEventService {
-    // Direct repo access (used by migration tools)
-    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
-
-    // Query methods
-    getPlayerEvents(gameId: DBObjectId, player: Player, page: number, pageSize: number, category: string | null): Promise<{ count: number, events: BaseGameEvent<DBObjectId>[] }>;
-    markAllEventsAsRead(game: Game, playerId: DBObjectId): Promise<void>;
-    markEventAsRead(game: Game, playerId: DBObjectId, eventId: DBObjectId): Promise<void>;
-    getUnreadCount(game: Game, playerId: DBObjectId): Promise<number>;
-
-    deleteByGameId(gameId: DBObjectId): Promise<void>;
-
     // Game-level events
     createPlayerJoinedEvent(args: InternalGamePlayerJoinedEvent): Promise<void>;
     createPlayerQuitEvent(args: InternalGamePlayerQuitEvent): Promise<void>;
