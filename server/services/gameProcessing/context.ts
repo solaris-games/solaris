@@ -13,6 +13,7 @@ import {IStatisticsService} from "../types/IStatisticsService";
 import {ProcessingEventService} from "./event";
 import {ProcessingEmailService} from "./email";
 import {ProcessingNotificationService} from "./notification";
+import {ProcessingStatisticsService} from "./statistics";
 
 export class GameTickContext {
     private game: Game;
@@ -25,6 +26,7 @@ export class GameTickContext {
     private processingEventService: ProcessingEventService;
     private processingEmailService: ProcessingEmailService;
     private processingNotificationService: ProcessingNotificationService;
+    private processingStatisticsService: ProcessingStatisticsService;
 
     static async load(userService: UserService, game: Game, emailService: EmailService, notificationService: NotificationService, eventService: EventService, statisticsService: StatisticsService) {
         const gameUsers = await userService.getGameUsers(game);
@@ -42,6 +44,7 @@ export class GameTickContext {
         this.processingEventService = new ProcessingEventService();
         this.processingEmailService = new ProcessingEmailService();
         this.processingNotificationService = new ProcessingNotificationService();
+        this.processingStatisticsService = new ProcessingStatisticsService();
     }
 
     async save() {
@@ -52,6 +55,7 @@ export class GameTickContext {
         await this.processingEventService.process(this.eventService);
         await this.processingEmailService.process(this.emailService);
         await this.processingNotificationService.process(this.notificationService);
+        await this.processingStatisticsService.process(this.statisticsService);
     }
 
     getGameUsers(): ActiveModel<User>[] {
@@ -71,6 +75,6 @@ export class GameTickContext {
     }
 
     getStatisticsService(): IStatisticsService {
-        return this.statisticsService;
+        return this.processingStatisticsService;
     }
 }
