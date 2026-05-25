@@ -35,6 +35,7 @@ export default class CombatProcessingService extends EventEmitter {
     statisticsService: StatisticsService;
     specialistService: SpecialistService;
     starService: StarService;
+    eventService: IEventService;
 
     constructor(
         combatService: CombatService<DBObjectId>,
@@ -45,6 +46,7 @@ export default class CombatProcessingService extends EventEmitter {
         statisticsService: StatisticsService,
         specialistService: SpecialistService,
         starService: StarService,
+        eventService: IEventService,
     ) {
         super();
 
@@ -56,6 +58,7 @@ export default class CombatProcessingService extends EventEmitter {
         this.statisticsService = statisticsService;
         this.specialistService = specialistService;
         this.starService = starService;
+        this.eventService = eventService;
     }
 
     _distributeDamage(combatResult: DetailedCombatResult<DBObjectId, Player, Star<DBObjectId>, Carrier<DBObjectId>>) {
@@ -227,8 +230,8 @@ export default class CombatProcessingService extends EventEmitter {
 
             for (const defender of defenderGroup.players) {
                 for (const attacker of attackerPlayers) {
-                    await this.reputationService.decreaseReputation(game, defender, attacker, false);
-                    await this.reputationService.decreaseReputation(game, attacker, defender, false);
+                    await this.reputationService.decreaseReputation(this.eventService, game, defender, attacker, false);
+                    await this.reputationService.decreaseReputation(this.eventService, game, attacker, defender, false);
                 }
             }
         }

@@ -6,6 +6,7 @@ import PlayerStatisticsService from "./playerStatistics";
 import PlayerAfkService from "./playerAfk";
 
 import EventEmitter from "events";
+import {IEventService} from "./types/IEventService";
 
 const MAX_REPUTATION = 8;
 const MIN_REPUTATION = -8;
@@ -65,7 +66,7 @@ export default class ReputationService extends EventEmitter {
         };
     }
 
-    async increaseReputation(game: Game, fromPlayer: Player, toPlayer: Player, amount: number = 1, updateDatabase: boolean) {
+    async increaseReputation(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, amount: number = 1, updateDatabase: boolean) {
         let rep = this.getReputation(fromPlayer, toPlayer);
 
         if (rep.reputation.score < MAX_REPUTATION) {
@@ -78,13 +79,13 @@ export default class ReputationService extends EventEmitter {
         }
 
         if (this.playerAfkService.isAIControlled(game, fromPlayer)) {
-            await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
+            await this.recalculateDiplomaticStatus(eventService, game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
 
         return rep;
     }
 
-    async decreaseReputation(game: Game, fromPlayer: Player, toPlayer: Player, updateDatabase: boolean) {
+    async decreaseReputation(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, updateDatabase: boolean) {
         let rep = this.getReputation(fromPlayer, toPlayer);
 
         if (rep.reputation.score > MIN_REPUTATION) {
@@ -101,7 +102,7 @@ export default class ReputationService extends EventEmitter {
         }
 
         if (this.playerAfkService.isAIControlled(game, fromPlayer)) {
-            await this.recalculateDiplomaticStatus(game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
+            await this.recalculateDiplomaticStatus(eventService, game, fromPlayer, toPlayer, rep.reputation, updateDatabase);
         }
 
         // For ACTIVE players, any decrease in reputation is considered an act of war.
@@ -109,7 +110,7 @@ export default class ReputationService extends EventEmitter {
         // so it is imperitive that declarations of war do not affect alliances.
         else if (this.diplomacyService.isFormalAlliancesEnabled(game) && 
             this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayer._id).actualStatus === 'neutral') {
-            this.diplomacyService.declareEnemy(game, fromPlayer._id, toPlayer._id, false);
+            await this.diplomacyService.declareEnemy(eventService, game, fromPlayer._id, toPlayer._id, false);
         }
 
         return rep;
@@ -145,13 +146,13 @@ export default class ReputationService extends EventEmitter {
         }
     }
 
-    async tryIncreaseReputationCredits(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
+    async tryIncreaseReputationCredits(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
         let playerStats = this.playerStatisticsService.getStats(game, fromPlayer);
         let creditsRequired = playerStats.totalEconomy * 10 / 2;
         let increased = amount >= creditsRequired;
 
         if (increased) {
-            await this.increaseReputation(game, fromPlayer, toPlayer, REPUTATION_INCREMENT, true);
+            await this.increaseReputation(eventService, game, fromPlayer, toPlayer, REPUTATION_INCREMENT, true);
         }
 
         return {
@@ -160,12 +161,12 @@ export default class ReputationService extends EventEmitter {
         };
     }
 
-    async tryIncreaseReputationCreditsSpecialists(game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
+    async tryIncreaseReputationCreditsSpecialists(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, amount: number) {
         let creditsRequired = Math.round(fromPlayer.research.specialists.level / 2);
         let increased = amount >= creditsRequired;
 
         if (increased) {
-            await this.increaseReputation(game, fromPlayer, toPlayer, REPUTATION_INCREMENT, true);
+            await this.increaseReputation(eventService, game, fromPlayer, toPlayer, REPUTATION_INCREMENT, true);
         }
 
         return {
@@ -174,8 +175,8 @@ export default class ReputationService extends EventEmitter {
         };
     }
 
-    async tryIncreaseReputationTechnology(game: Game, fromPlayer: Player, toPlayer: Player, technology) { // TODO: Technology type
-        await this.increaseReputation(game, fromPlayer, toPlayer, technology.difference, true);
+    async tryIncreaseReputationTechnology(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, technology) { // TODO: Technology type
+        await this.increaseReputation(eventService, game, fromPlayer, toPlayer, technology.difference, true);
 
         return {
             increased: true,
@@ -183,7 +184,7 @@ export default class ReputationService extends EventEmitter {
         };
     }
 
-    async recalculateDiplomaticStatus(game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, updateDatabase: boolean) {
+    async recalculateDiplomaticStatus(eventService: IEventService, game: Game, fromPlayer: Player, toPlayer: Player, reputation: PlayerReputation, updateDatabase: boolean) {
         if (!this.playerAfkService.isAIControlled(game, fromPlayer)) {
             throw new Error(`Automatic diplomatic statuses are reserved for AI players only.`);
         }
@@ -197,13 +198,13 @@ export default class ReputationService extends EventEmitter {
         const status = this.diplomacyService.getDiplomaticStatusToPlayer(game, fromPlayer._id, toPlayer._id);
 
         if (reputation.score >= ALLY_REPUTATION_THRESHOLD && status.statusTo !== "allies") {
-            await this.diplomacyService.declareAlly(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareAlly(eventService, game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
         else if (reputation.score <= ENEMY_REPUTATION_THRESHOLD && status.statusTo !== "enemies") {
-            await this.diplomacyService.declareEnemy(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareEnemy(eventService, game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
         else if (reputation.score > ENEMY_REPUTATION_THRESHOLD && reputation.score < ALLY_REPUTATION_THRESHOLD && status.statusTo !== "neutral") {
-            await this.diplomacyService.declareNeutral(game, fromPlayer._id, toPlayer._id, updateDatabase);
+            await this.diplomacyService.declareNeutral(eventService, game, fromPlayer._id, toPlayer._id, updateDatabase);
         }
     }
 

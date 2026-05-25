@@ -31,6 +31,7 @@ import {
     GameSettingsSpecialGalaxyBase
 } from "@solaris/common";
 import InitialGameStateService from "./initialGameState";
+import {IEventService} from "./types/IEventService";
 
 const GAME_MASTER_LIMIT = 5;
 
@@ -122,7 +123,7 @@ export default class GameCreateService {
         this.initialGameStateService = initialGameStateService;
     }
 
-    async create(settingsReq: GameSettingsReq, userId: DBObjectId | null) {
+    async create(eventService: IEventService, settingsReq: GameSettingsReq, userId: DBObjectId | null) {
         const isTutorial = settingsReq.general.type === 'tutorial';
         const isCustomGalaxy = settingsReq.galaxy.galaxyType === 'custom';
         const isAdvancedCustomGalaxy = isCustomGalaxy && settingsReq.galaxy.advancedCustomGalaxyEnabled === 'enabled';
@@ -230,7 +231,7 @@ export default class GameCreateService {
             game.state.ticksToEnd = null;
         }
 
-        await this.teamService.setDiplomacyStates(game);
+        await this.teamService.setDiplomacyStates(eventService, game);
 
         let gameObject;
         try {

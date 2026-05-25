@@ -33,7 +33,7 @@ export default (container: DependencyContainer) => {
             try {
                 const settings = parseGameSettingsReq(req.body);
 
-                const game = await container.gameCreateService.create(settings, req.session.userId);
+                const game = await container.gameCreateService.create(container.eventService, settings, req.session.userId);
     
                 res.status(201).json({
                     gameId: game._id,
@@ -53,7 +53,7 @@ export default (container: DependencyContainer) => {
                     const raw = require(path);
                     const settings = parseGameSettingsReq(raw);
 
-                    game = await container.gameCreateService.create(settings, req.session.userId);
+                    game = await container.gameCreateService.create(container.eventService, settings, req.session.userId);
                 }
     
                 res.status(201).json({

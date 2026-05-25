@@ -3,6 +3,7 @@ import {Game, Team} from "./types/Game";
 import {Player} from "./types/Player";
 import mongoose from "mongoose";
 import DiplomacyService from "./diplomacy";
+import {IEventService} from "./types/IEventService";
 
 export type TeamAssignments = Record<number, number>;
 
@@ -36,7 +37,7 @@ export default class TeamService {
         return assignments;
     }
 
-    async setDiplomacyStates(game: Game) {
+    async setDiplomacyStates(eventService: IEventService, game: Game) {
         if (game.settings.general.mode !== 'teamConquest') {
             return;
         }
@@ -55,7 +56,7 @@ export default class TeamService {
                         continue;
                     }
 
-                    await this.diplomacyService.declareAlly(game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
+                    await this.diplomacyService.declareAlly(eventService, game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
                 }
             }
         }

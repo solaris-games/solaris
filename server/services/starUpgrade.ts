@@ -478,7 +478,7 @@ export default class StarUpgradeService extends EventEmitter {
         }
     }
 
-    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true, eventService?: IEventService) {
+    async upgradeBulk(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, writeToDB: boolean = true, eventService: IEventService) {
         if (!amount || amount <= 0) {
             throw new ValidationError(`Invalid upgrade amount given`);
         }
@@ -579,7 +579,7 @@ export default class StarUpgradeService extends EventEmitter {
     }
 
     // this does not write directly to db
-    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, eventService?: IEventService) {
+    async executeBulkUpgradeReport(game: Game, player: Player, upgradeSummary: BulkUpgradeReport, eventService: IEventService) {
         upgradeSummary.stars.forEach(starUpgrade => {
             const star = this.starService.getById(game, starUpgrade.starId);
             switch (upgradeSummary.infrastructureType) {
@@ -610,9 +610,7 @@ export default class StarUpgradeService extends EventEmitter {
             player,
             upgradeSummary
         });
-        if (eventService) {
-            await eventService.createInfrastructureBulkUpgraded(game._id, game.state.tick, player, upgradeSummary);
-        }
+        await eventService.createInfrastructureBulkUpgraded(game._id, game.state.tick, player, upgradeSummary);
     }
 
     generateUpgradeBulkReport(game: Game, player: Player, upgradeStrategy: string, infrastructureType: InfrastructureType, amount: number, customTerraformingLevel?: number): BulkUpgradeReport {

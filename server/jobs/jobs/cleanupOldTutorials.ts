@@ -11,7 +11,7 @@ export const cleanupOldTutorialsJob = (container: DependencyContainer) => async 
             const game = games[i];
 
             try {
-                await container.gameService.delete(game);
+                await container.gameService.delete(game, undefined, container.eventService);
             } catch (e) {
                 log.error(e);
             }

@@ -16,7 +16,7 @@ export const cleanupGamesTimedOutJob = (container: DependencyContainer) => async
             }
 
             try {
-                await container.gameService.delete(game);
+                await container.gameService.delete(game, undefined, container.eventService);
             } catch (e) {
                 log.error(e);
             }

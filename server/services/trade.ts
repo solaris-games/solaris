@@ -26,7 +26,6 @@ import {User} from './types/User';
 import UserService from './user';
 import StatisticsService from './statistics';
 import ScanningService from "./scanning";
-import { KDTree } from "../utils/kdTree";
 import { DistanceService } from '@solaris/common';
 import { IEventService } from './types/IEventService';
 
@@ -164,7 +163,7 @@ export default class TradeService extends EventEmitter {
                 });}
         }
 
-        let reputationResult = await this.reputationService.tryIncreaseReputationCredits(game, toPlayer, fromPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCredits(eventService, game, toPlayer, fromPlayer, amount);
 
         if (reputationResult.increased) {
             await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation, eventService);
@@ -243,7 +242,7 @@ export default class TradeService extends EventEmitter {
             }
         }
 
-        let reputationResult = await this.reputationService.tryIncreaseReputationCreditsSpecialists(game, toPlayer, fromPlayer, amount);
+        let reputationResult = await this.reputationService.tryIncreaseReputationCreditsSpecialists(eventService, game, toPlayer, fromPlayer, amount);
 
         if (reputationResult.increased) {
             await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation, eventService);
@@ -430,7 +429,7 @@ export default class TradeService extends EventEmitter {
             difference: levelDifference
         };
 
-        const reputationResult = await this.reputationService.tryIncreaseReputationTechnology(game, toPlayer, fromPlayer, eventTechnology);
+        const reputationResult = await this.reputationService.tryIncreaseReputationTechnology(eventService, game, toPlayer, fromPlayer, eventTechnology);
 
         if (reputationResult.increased) {
             await this.tryTradeBack(game, toPlayer, fromPlayer, reputationResult.rep.reputation, eventService);

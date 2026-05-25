@@ -379,7 +379,7 @@ export default class GameService extends EventEmitter {
         }
     }
 
-    async delete(game: Game, deletedByUserId?: DBObjectId, eventService?: IEventService) {
+    async delete(game: Game, deletedByUserId: DBObjectId | undefined, eventService: IEventService) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
             throw new ValidationError('Cannot delete games that are in progress or completed.');
@@ -411,9 +411,7 @@ export default class GameService extends EventEmitter {
             gameId: game._id
         });
 
-        if (eventService) {
-            await eventService.deleteByGameId(game._id);
-        }
+        await eventService.deleteByGameId(game._id);
 
         // TODO: Cleanup any orphaned docs
     }

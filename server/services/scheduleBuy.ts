@@ -54,7 +54,6 @@ export default class ScheduleBuyService extends EventEmitter {
 
             // Loop through all actions to execute them.
             for (let action of currentActions) {
-                // TODO: Better error handling
                 try {
                     if (action.buyType === 'percentageOfCredits') {
                         // As this is sorted, all next ones will also be of this type
@@ -68,7 +67,7 @@ export default class ScheduleBuyService extends EventEmitter {
                         amount = player.credits
                     }
 
-                    const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, amount);
+                    const report = this.starUpgradeService.generateUpgradeBulkReport(game, player, action.buyType, action.infrastructureType, amount);
 
                     if (report.cost > player.credits) {
                         continue;
@@ -90,7 +89,7 @@ export default class ScheduleBuyService extends EventEmitter {
             }
 
             // Only keep actions that are repeated or in the future
-            this._repeatOrRemoveAction(game, player.scheduledActions)
+            this._repeatOrRemoveAction(game, player.scheduledActions);
         }
     }
 
@@ -99,13 +98,15 @@ export default class ScheduleBuyService extends EventEmitter {
             const percentageToCredits = Math.floor((action.amount / Math.max(totalPercentage, 100)) * player.credits);
 
             // pass as total credits since percentage was already calculated
-            const report = await this.starUpgradeService.generateUpgradeBulkReport(game, player, 'totalCredits', action.infrastructureType, percentageToCredits);
+            const report = this.starUpgradeService.generateUpgradeBulkReport(game, player, 'totalCredits', action.infrastructureType, percentageToCredits);
 
             if (report.cost > player.credits) {
                 continue;
             }
 
-            await this.starUpgradeService.executeBulkUpgradeReport(game, player, report, eventService);        }    }
+            await this.starUpgradeService.executeBulkUpgradeReport(game, player, report, eventService);
+        }
+    }
 
     _repeatOrRemoveAction(game: Game, actions: PlayerScheduledActions[]) {
         const tick = game.state.tick;

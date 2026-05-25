@@ -5,7 +5,7 @@ export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
             try {
-                let diplomaticStatuses = await container.diplomacyService.getDiplomaticStatusToAllPlayers(
+                const diplomaticStatuses = await container.diplomacyService.getDiplomaticStatusToAllPlayers(
                     req.game,
                     req.player);
     
@@ -17,7 +17,7 @@ export default (container: DependencyContainer) => {
         },
         detail: async (req, res, next) => {
             try {
-                let diplomaticStatus = await container.diplomacyService.getDiplomaticStatusToPlayer(
+                const diplomaticStatus = await container.diplomacyService.getDiplomaticStatusToPlayer(
                     req.game,
                     req.player._id,
                     req.params.toPlayerId);
@@ -30,12 +30,12 @@ export default (container: DependencyContainer) => {
         },
         declareAlly: async (req, res, next) => {
             try {
-                let newStatus = await container.diplomacyService.declareAlly(
+                const newStatus = await container.diplomacyService.declareAlly(
+                    container.eventService,
                     req.game,
                     req.player._id,
                     new mongoose.Types.ObjectId(req.params.playerId),
-                    true,
-                    container.eventService);
+                    true);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -47,12 +47,12 @@ export default (container: DependencyContainer) => {
         },
         declareEnemy: async (req, res, next) => {
             try {
-                let newStatus = await container.diplomacyService.declareEnemy(
+                const newStatus = await container.diplomacyService.declareEnemy(
+                    container.eventService,
                     req.game,
                     req.player._id,
                     new mongoose.Types.ObjectId(req.params.playerId),
-                    true,
-                    container.eventService);
+                    true);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     
@@ -64,12 +64,12 @@ export default (container: DependencyContainer) => {
         },
         declareNeutral: async (req, res, next) => {
             try {
-                let newStatus = await container.diplomacyService.declareNeutral(
+                const newStatus = await container.diplomacyService.declareNeutral(
+                    container.eventService,
                     req.game,
                     req.player._id,
                     new mongoose.Types.ObjectId(req.params.playerId),
-                    true,
-                    container.eventService);
+                    true);
     
                 await container.broadcastService.gamePlayerDiplomaticStatusChanged(req.player._id, req.params.playerId, newStatus);
     

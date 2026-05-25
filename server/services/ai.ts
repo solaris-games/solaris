@@ -24,6 +24,7 @@ import mongoose from 'mongoose';
 import SaveWaypointsService from "./saveWaypoints";
 import { TechnologyService } from '@solaris/common';
 import { StarDataService } from "@solaris/common";
+import {IEventService} from "./types/IEventService";
 
 const Heap = require('qheap');
 
@@ -195,7 +196,7 @@ export default class AIService {
         return player.defeated || !player.userId; // Note: Null user IDs is considered AI as there is not a user controlling it.
     }
 
-    async play(game: Game, player: Player) {
+    async play(eventService: IEventService, game: Game, player: Player) {
         if (!this.playerAfkService.isAIControlled(game, player)) {
             throw new Error('The player is not under AI control.');
         }
@@ -207,16 +208,16 @@ export default class AIService {
         // it's better to catch any possible errors and have the game continue with dysfunctional AI than to break the game tick logic.
         try {
             if (game.settings.general.advancedAI === 'enabled') {
-                await this._doAdvancedLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
+                await this._doAdvancedLogic(eventService, game, player, isFirstTickOfCycle, isLastTickOfCycle);
             } else {
-                await this.basicAIService._doBasicLogic(game, player, isFirstTickOfCycle, isLastTickOfCycle);
+                await this.basicAIService._doBasicLogic(eventService, game, player, isFirstTickOfCycle, isLastTickOfCycle);
             }
         } catch (e) {
             log.error(e, `Error in game ${game.settings.general.name} (${game._id.toString()})`);
         }
     }
 
-    async _doAdvancedLogic(game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
+    async _doAdvancedLogic(eventService: IEventService, game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
         const context = this._createContext(game, player);
 
         if (context == null) {
@@ -232,12 +233,12 @@ export default class AIService {
 
         if (isFirstTickOfCycle) {
             this._handleBulkUpgradeStates(game, player, context);
-            await this._playFirstTick(game, player);
+            await this._playFirstTick(eventService, game, player);
         }
 
         if (isLastTickOfCycle) {
             this._handleBulkUpgradeStates(game, player, context);
-            await this._playLastTick(game, player);
+            await this._playLastTick(eventService, game, player);
         }
 
         const orders = this._gatherOrders(game, player, context);
@@ -280,7 +281,7 @@ export default class AIService {
         }
     }
 
-    async _playLastTick(game: Game, player: Player) {
+    async _playLastTick(eventService: IEventService, game: Game, player: Player) {
         if (!player.credits || player.credits <= 0) {
             return
         }
@@ -290,11 +291,11 @@ export default class AIService {
         let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
 
         if (creditsToSpendEco && game.settings.player.developmentCost.economy !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false, eventService);
         }
     }
 
-    async _playFirstTick(game: Game, player: Player) {
+    async _playFirstTick(eventService: IEventService, game: Game, player: Player) {
         if (!player.credits || player.credits < 0) {
             return
         }
@@ -305,11 +306,11 @@ export default class AIService {
         let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
 
         if (creditsToSpendSci && game.settings.player.developmentCost.science !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false, eventService);
         }
 
         if (creditsToSpendInd && game.settings.player.developmentCost.industry !== "none") {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false, eventService);
         }
     }
 

@@ -274,7 +274,7 @@ export default class GameTickService extends EventEmitter {
             await this._gameLoseCheck(game, context.getGameUsers(), eventService);
             logTime('Game lose check');
 
-            await this._playAI(game);
+            await this._playAI(eventService, game);
             logTime('AI controlled players turn');
             
             this.researchService.conductResearchAll(game, context.getGameUsers(), eventService);
@@ -787,9 +787,9 @@ export default class GameTickService extends EventEmitter {
         return rankingResult;
     }
 
-    async _playAI(game: Game) {
+    async _playAI(eventService: IEventService, game: Game) {
         for (let player of game.galaxy.players.filter(p => this.playerAfkService.isAIControlled(game, p))) {
-            await this.aiService.play(game, player);
+            await this.aiService.play(eventService, game, player);
         }
     }
 

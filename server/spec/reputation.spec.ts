@@ -4,6 +4,7 @@ describe('reputation', () => {
 
     const fakeGameRepo: any = {};
     const fakePlayerStatisticsService: any = {};
+    const fakeEventService: any = {};
     const fakeDiplomacyService: any = {
         isFormalAlliancesEnabled() { return false },
         getDiplomaticStatusToPlayer() { },
@@ -86,7 +87,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(1);
@@ -97,7 +98,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(8);
@@ -111,7 +112,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(-1);
@@ -122,7 +123,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(-8);
@@ -133,7 +134,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(0);
@@ -144,7 +145,7 @@ describe('reputation', () => {
         const playerA = game.galaxy.players[0];
         const playerB = game.galaxy.players[1];
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(result.reputation.playerId).toEqual(playerB._id);
         expect(result.reputation.score).toEqual(-2);
@@ -173,7 +174,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(declaredAlly).toBeTrue();
     });
@@ -196,7 +197,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(declaredAlly).toBeFalse();
     });
@@ -221,7 +222,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(declaredEnemy).toBeTrue();
     });
@@ -244,7 +245,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(declaredEnemy).toBeFalse();
     });
@@ -269,7 +270,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(declaredNeutral).toBeTrue();
     });
@@ -292,7 +293,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.increaseReputation(game, playerA, playerB, 1, false);
+        let result = await service.increaseReputation(fakeEventService, game, playerA, playerB, 1, false);
 
         expect(declaredNeutral).toBeFalse();
     });
@@ -315,7 +316,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(declaredNeutral).toBeTrue();
     });
@@ -338,7 +339,7 @@ describe('reputation', () => {
 
         playerA.defeated = true;
 
-        let result = await service.decreaseReputation(game, playerA, playerB, false);
+        let result = await service.decreaseReputation(fakeEventService, game, playerA, playerB, false);
 
         expect(declaredNeutral).toBeFalse();
     });

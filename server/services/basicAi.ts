@@ -1,6 +1,7 @@
 import {Game} from "./types/Game";
 import {Player} from "./types/Player";
 import StarUpgradeService from "./starUpgrade";
+import {IEventService} from "./types/IEventService";
 
 const FIRST_TICK_BULK_UPGRADE_SCI_PERCENTAGE = 20;
 const FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE = 30;
@@ -13,11 +14,11 @@ export default class BasicAIService {
         this.starUpgradeService = starUpgradeService;
     }
 
-    async _doBasicLogic(game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
+    async _doBasicLogic(eventService: IEventService, game: Game, player: Player, isFirstTickOfCycle: boolean, isLastTickOfCycle: boolean) {
         if (isFirstTickOfCycle) {
-            await this._playFirstTick(game, player);
+            await this._playFirstTick(eventService, game, player);
         } else if (isLastTickOfCycle) {
-            await this._playLastTick(game, player);
+            await this._playLastTick(eventService, game, player);
         }
 
         // TODO: Not sure if this is an issue but there was an occassion during debugging
@@ -26,7 +27,7 @@ export default class BasicAIService {
         player.credits = Math.max(0, player.credits);
     }
 
-    async _playFirstTick(game: Game, player: Player) {
+    async _playFirstTick(eventService: IEventService, game: Game, player: Player) {
         if (!player.credits || player.credits < 0) {
             return
         }
@@ -37,15 +38,15 @@ export default class BasicAIService {
         let creditsToSpendInd = Math.floor(player.credits / 100 * FIRST_TICK_BULK_UPGRADE_IND_PERCENTAGE);
 
         if (creditsToSpendSci) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'science', creditsToSpendSci, false, eventService);
         }
 
         if (creditsToSpendInd) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'industry', creditsToSpendInd, false, eventService);
         }
     }
 
-    async _playLastTick(game: Game, player: Player) {
+    async _playLastTick(eventService: IEventService, game: Game, player: Player) {
         if (!player.credits || player.credits <= 0) {
             return
         }
@@ -55,7 +56,7 @@ export default class BasicAIService {
         let creditsToSpendEco = Math.floor(player.credits / 100 * LAST_TICK_BULK_UPGRADE_ECO_PERCENTAGE);
 
         if (creditsToSpendEco) {
-            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false);
+            await this.starUpgradeService.upgradeBulk(game, player, 'totalCredits', 'economy', creditsToSpendEco, false, eventService);
         }
     }
 }
