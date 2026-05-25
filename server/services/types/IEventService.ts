@@ -1,7 +1,6 @@
 import { CombatResult, Conversation, DiplomaticStatus, LedgerType } from '@solaris/common';
 import { BulkUpgradeReport } from './InfrastructureUpgrade';
 import { DBObjectId } from './DBObjectId';
-import { Game } from './Game';
 import { Player } from './Player';
 import { Carrier } from './Carrier';
 import { Specialist } from '@solaris/common';
@@ -16,8 +15,7 @@ import InternalGamePlayerJoinedEvent from './internalEvents/GamePlayerJoined';
 import InternalGamePlayerQuitEvent from './internalEvents/GamePlayerQuit';
 import InternalPlayerGalacticCycleCompletedEvent from './internalEvents/PlayerGalacticCycleComplete';
 import { InternalGameEvent } from './internalEvents/InternalGameEvent';
-import { TradeEventTechnology, BaseGameEvent } from '@solaris/common';
-import Repository from '../repository';
+import { TradeEventTechnology } from '@solaris/common';
 
 export interface IEventService {
     // Game-level events

@@ -53,6 +53,10 @@ import CarrierCombatService from "./carrierCombat";
 import CombatProcessingService from "./combatProcessing";
 import {GameTickContext} from "./gameProcessing/context";
 import { IEventService } from './types/IEventService';
+import {EventService} from "./event";
+import StatisticsService from "./statistics";
+import {NotificationService} from "./notification";
+import {EmailService} from "./email";
 
 const log = logger("Game Tick Service");
 
@@ -170,7 +174,7 @@ export default class GameTickService extends EventEmitter {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService, emailService: IEmailService) {
+    async tick(gameId: DBObjectId, eventService: EventService, statisticsService: StatisticsService, notificationService: NotificationService, emailService: EmailService) {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
@@ -224,7 +228,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService, context.emailService);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService(), context.getNotificationService(), context.getEmailService());
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -241,7 +245,7 @@ export default class GameTickService extends EventEmitter {
                 throw new Error(`The game was not locked after game processing, concurrency issue?`);
             }
 
-            await this.scheduleBuyService.buyScheduledInfrastructure(game, context.eventService, context.statisticsService);
+            await this.scheduleBuyService.buyScheduledInfrastructure(game, context.getEventService(), context.getStatisticsService());
             logTime('Buy scheduled infrastructure')
 
             game.state.tick++;
@@ -250,32 +254,32 @@ export default class GameTickService extends EventEmitter {
 
             await this._scuttleCarriers(game);
 
-            await this._captureAbandonedStars(game, context.getGameUsers(), context.statisticsService);
+            await this._captureAbandonedStars(game, context.getGameUsers(), context.getStatisticsService());
             logTime('Capture abandoned stars');
 
-            this._transferGiftsInOrbit(game, context.getGameUsers(), context.eventService, context.statisticsService);
+            this._transferGiftsInOrbit(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService());
             logTime('Transfer gifts in orbit');
 
-            await this._combatCarriers(game, context.getGameUsers(), context.eventService, context.statisticsService);
+            await this._combatCarriers(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService());
             logTime('Combat carriers');
 
-            await this._moveCarriers(game, context.getGameUsers(), context.eventService, context.statisticsService);
+            await this._moveCarriers(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService());
             logTime('Move carriers and produce ships');
 
-            const ticked = await this._endOfGalacticCycleCheck(game, context.eventService, context.notificationService);
+            const ticked = await this._endOfGalacticCycleCheck(game, context.getEventService(), context.getNotificationService());
             logTime('Galactic cycle check');
 
             if (ticked && !hasProductionTicked) {
                 hasProductionTicked = true;
             }
 
-            await this._gameLoseCheck(game, context.getGameUsers(), context.eventService);
+            await this._gameLoseCheck(game, context.getGameUsers(), context.getEventService());
             logTime('Game lose check');
 
-            await this._playAI(context.eventService, game);
+            await this._playAI(context.getEventService(), game);
             logTime('AI controlled players turn');
 
-            this.researchService.conductResearchAll(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService);
+            this.researchService.conductResearchAll(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService(), context.getNotificationService());
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -284,7 +288,7 @@ export default class GameTickService extends EventEmitter {
             this.cullWaypointsService.cullAllWaypointsByHyperspaceRange(game);
             logTime('Sanitise all carrier waypoints');
 
-            this._applyTickBasedSpecialistEffects(game, context.eventService);
+            this._applyTickBasedSpecialistEffects(game, context.getEventService());
             logTime('Apply tick effects of specialists');
 
             this._clearExpiredSpecialists(game);
@@ -293,7 +297,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), context.eventService, context.statisticsService, context.notificationService, context.emailService);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), context.getEventService(), context.getStatisticsService(), context.getNotificationService(), context.getEmailService());
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -321,7 +325,7 @@ export default class GameTickService extends EventEmitter {
         await context.save();
         logTime('Save context');
 
-        await this._emitEvents(game, context.notificationService);
+        await this._emitEvents(game, context.getNotificationService());
 
         const endTime = process.hrtime(startTime);
 
