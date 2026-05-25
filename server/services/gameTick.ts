@@ -94,7 +94,6 @@ export default class GameTickService extends EventEmitter {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     carrierCombatService: CarrierCombatService;
     combatProcessingService: CombatProcessingService;
-    notificationService!: INotificationService;
 
     constructor(
         distanceService: DistanceService,
@@ -170,7 +169,7 @@ export default class GameTickService extends EventEmitter {
         this.combatProcessingService = combatProcessingService;
     }
 
-    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService) {
+    async tick(gameId: DBObjectId, eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         const game = (await this.gameService.getByIdAll(gameId));
 
         if (!game) {
@@ -220,7 +219,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Check if win condition was reached before the tick (for example due to RTQ)
-        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService);
+        const hasWinnerBeforeTick = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService);
         if (hasWinnerBeforeTick) {
             log.info({
                 gameId: game._id,
@@ -258,7 +257,7 @@ export default class GameTickService extends EventEmitter {
             await this._moveCarriers(game, context.getGameUsers(), eventService, statisticsService);
             logTime('Move carriers and produce ships');
 
-            const ticked = await this._endOfGalacticCycleCheck(game, eventService);
+            const ticked = await this._endOfGalacticCycleCheck(game, eventService, notificationService);
             logTime('Galactic cycle check');
 
             if (ticked && !hasProductionTicked) {
@@ -271,7 +270,7 @@ export default class GameTickService extends EventEmitter {
             await this._playAI(eventService, game);
             logTime('AI controlled players turn');
             
-            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService, this.notificationService);
+            this.researchService.conductResearchAll(game, context.getGameUsers(), eventService, statisticsService, notificationService);
             logTime('Conduct research');
 
             this._orbitGalaxy(game);
@@ -289,7 +288,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime('Countdown to end check');
 
-            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService);
+            let hasWinner = await this._gameWinCheck(game, context.getGameUsers(), eventService, statisticsService, notificationService);
             logTime('Game win check');
 
             await this._logHistory(game);
@@ -317,7 +316,7 @@ export default class GameTickService extends EventEmitter {
         await context.save();
         logTime('Save context');
 
-        await this._emitEvents(game);
+        await this._emitEvents(game, notificationService);
 
         const endTime = process.hrtime(startTime);
 
@@ -528,7 +527,7 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    async _endOfGalacticCycleCheck(game: Game, eventService: IEventService): Promise<boolean> {
+    async _endOfGalacticCycleCheck(game: Game, eventService: IEventService, notificationService: INotificationService): Promise<boolean> {
         let hasProductionTicked: boolean = game.state.tick % game.settings.galaxy.productionTicks === 0;
 
         // Check if we have reached the production tick.
@@ -571,7 +570,7 @@ export default class GameTickService extends EventEmitter {
                     };
 
                     await eventService.createPlayerGalacticCycleCompleteEvent(e);
-                    await this.notificationService.onPlayerGalacticCycleCompleted(e);
+                    await notificationService.onPlayerGalacticCycleCompleted(e);
                 }
             }
 
@@ -663,7 +662,7 @@ export default class GameTickService extends EventEmitter {
         this.gameStateService.updateStatePlayerCount(game);
     }
 
-    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {
+    async _gameWinCheck(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService, notificationService: INotificationService) {
         const isTutorialGame = this.gameTypeService.isTutorialGame(game);
 
 
@@ -724,7 +723,7 @@ export default class GameTickService extends EventEmitter {
 
                 this.emit(GameTickServiceEvents.onGameEnded, e);
                 await eventService.createGameEndedEvent(e);
-                await this.notificationService.onGameEnded(e);
+                await notificationService.onGameEnded(e);
             } else if (winner.kind === 'player') { // game is tutorial
                 const userId = winner.player.userId
                 const user = gameUsers.find(u => userId && u._id.toString() === userId.toString());
@@ -818,9 +817,9 @@ export default class GameTickService extends EventEmitter {
         }
     }
 
-    async _emitEvents(game: Game) {
+    async _emitEvents(game: Game, notificationService: INotificationService) {
         if (this.gameTypeService.isTurnBasedGame(game)) {
-            await this.notificationService.onGameTurnEnded({ gameId: game._id, gameTick: game.state.tick });
+            await notificationService.onGameTurnEnded({ gameId: game._id, gameTick: game.state.tick });
         }
     }
 

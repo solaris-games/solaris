@@ -87,7 +87,6 @@ import { WaypointService } from '@solaris/common';
 import StarCaptureService from "../starCapture";
 import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
 import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
-import {IStatisticsService} from "./IStatisticsService";
 import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
@@ -98,6 +97,7 @@ import {DBObjectId} from "./DBObjectId";
 import CarrierCombatService from "../carrierCombat";
 import CombatProcessingService from "../combatProcessing";
 import EventService from "../event";
+import StatisticsService from "../statistics";
 
 export interface DependencyContainer {
     config: Config,
@@ -195,7 +195,7 @@ export interface DependencyContainer {
     gameMaskingService: GameMaskingService,
     sessionService: SessionService,
     starCaptureService: StarCaptureService,
-    statisticsService: IStatisticsService,
+    statisticsService: StatisticsService,
     initialGameStateService: InitialGameStateService,
     waypointActionService: WaypointActionService,
     saveWaypointsService: SaveWaypointsService,

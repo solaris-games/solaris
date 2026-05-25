@@ -270,7 +270,6 @@ export default (config: Config,
     const reportService = new ReportService(ReportModel, reportRepository, playerService, conversationService, userService, gameListService, gameService);
 
     const notificationService = new NotificationService(config, userRepository, gameRepository, discordService, gameService, gameTypeService, gameStateService);
-    gameTickService.notificationService = notificationService;
     const tutorialService = new TutorialService(userService);
 
     const gamePlayerMutexService = new GamePlayerMutexService();
