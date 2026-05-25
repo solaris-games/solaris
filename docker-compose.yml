@@ -36,7 +36,7 @@ services:
       - database
 
   database:
-    image: mongo:8.3.2
+    image: mongo:8.0
     volumes:
       - "dbdata:/data/db"
     ports:
