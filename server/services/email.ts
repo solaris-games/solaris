@@ -25,7 +25,7 @@ import gameTimedOutHtml from "./emailTemplates/gameTimedOut.js";
 import gamePlayerAfkHtml from "./emailTemplates/gamePlayerAfk.js";
 import reviewReminderHtml from "./emailTemplates/reviewReminder.js";
 
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const log = logger("Email Service");
 
@@ -139,7 +139,11 @@ export class EmailService implements IEmailService {
                 port: this.config.smtp.port,
                 tls: {
                       rejectUnauthorized: false
-                }
+                },
+                auth: {
+                    user: this.config.smtp.username,
+                    password: this.config.smtp.password,
+                },
             });
         } else {
             return getFakeTransport();

@@ -18,6 +18,8 @@ export interface Config {
         host?: string;
         port?: string;
         from?: string;
+        username?: string;
+        password?: string;
     },
     paypal: {
         environment: string;

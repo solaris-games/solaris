@@ -24,7 +24,9 @@ const config: Config = {
         enabled: process.env.SMTP_ENABLED == "true",
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
-        from: process.env.SMTP_FROM
+        from: process.env.SMTP_FROM,
+        username: process.env.SMTP_USERNAME,
+        password: process.env.SMTP_PASSWORD,
     },
     paypal: {
         environment: process.env.PAYPAL_ENVIRONMENT || 'sandbox',
