@@ -1,6 +1,13 @@
 import {Config, LoggingType} from "./types/Config";
 
-require('dotenv').config();
+import dotenv from "dotenv";
+
+// load configurable file so that we can load docker secrets
+const envFiles = process.env.ENV_FILE
+    ? [process.env.ENV_FILE, ".env"]
+    : [".env"];
+
+dotenv.config({ path: envFiles });
 
 const config: Config = {
     port: process.env.PORT,
