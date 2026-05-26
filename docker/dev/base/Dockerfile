@@ -7,6 +7,7 @@ WORKDIR /solaris
 ADD package.json package.json
 ADD package-lock.json package-lock.json
 ADD client/ client/
+ADD map-rendering/ map-rendering/
 ADD common/ common/
 ADD server/ server/
 
