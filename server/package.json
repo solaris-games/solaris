@@ -23,7 +23,6 @@
     "research-progress-samples": "tsx tools/researchProgressSamples.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "postbuild": "cp .env ./dist | true",
     "check": "tsc --noEmit"
   },
   "author": "",
