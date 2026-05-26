@@ -4,13 +4,6 @@
 
     <community-guidelines-bar />
 
-    <div class="row bg-warning p-2 mb-4" title="Email notifications deprecation notice">
-      <span>
-      Email notifications will be deprecated in the upcoming months for technical reasons.
-      Please review your notification settings in your <router-link :to="{ name: 'account-settings' }" tag="a">Account Settings</router-link>.
-      </span>
-    </div>
-
     <flux-bar class="mb-2"/>
 
     <ul class="nav nav-tabs">
