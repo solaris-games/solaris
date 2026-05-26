@@ -1,4 +1,4 @@
-FROM ghcr.io/solaris-games/solaris-command-base-prod AS build
+FROM ghcr.io/solaris-games/solaris-base-prod AS build
 
 FROM nginx:1.29.7-alpine as client
 
