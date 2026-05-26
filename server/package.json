@@ -23,7 +23,7 @@
     "research-progress-samples": "tsx tools/researchProgressSamples.ts",
     "prebuild": "rm -rf ./dist",
     "build": "tsc",
-    "postbuild": "mkdir -p ./dist/server/services/emailTemplates && cp -r services/emailTemplates/* ./dist/server/services/emailTemplates && cp .env ./dist | true",
+    "postbuild": "cp .env ./dist | true",
     "check": "tsc --noEmit"
   },
   "author": "",

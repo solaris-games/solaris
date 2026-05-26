@@ -1,4 +1,4 @@
-<!doctype html>
+const welcomeEmailHtml = `<!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width">
@@ -162,4 +162,6 @@
       </tr>
     </table>
   </body>
-</html>
+</html>`;
+
+export default welcomeEmailHtml;

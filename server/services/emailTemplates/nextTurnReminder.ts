@@ -1,4 +1,4 @@
-<!doctype html>
+const nextTurnReminderHtml = `<!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width">
@@ -112,10 +112,10 @@
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Greetings Commander,</p>
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
-                          The game <span style="color:#F39C12;">[{0}]</span> did not receive enough players has been removed from the pool.
+                          A turn has finished in <span style="color:#F39C12;">[{0}]</span>, it is now your turn to play!
                         </p>
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
-                          For custom games and special games, the game must be full within 7 days to help keep games filled with active players. Please join another game or create a new one and be sure to send an invite link to your friends to fill up the game quickly!
+                          We're waiting on you to make your move.
                         </p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
                           <tbody>
@@ -125,7 +125,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center;"> 
-                                        <a href="[{solaris_url_gamelist}]" target="_blank" style="display: inline-block; color: #ffffff; background-color: #375a7f; border: 0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize;">Play Now</a> 
+                                        <a href="[{1}]" target="_blank" style="display: inline-block; color: #ffffff; background-color: #375a7f; border: 0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize;">View Game</a> 
                                     </td>
                                     </tr>
                                   </tbody>
@@ -134,7 +134,6 @@
                             </tr>
                           </tbody>
                         </table>
-                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Good luck and have fun!</p>
                       </td>
                     </tr>
                   </table>
@@ -164,4 +163,6 @@
       </tr>
     </table>
   </body>
-</html>
+</html>`;
+
+export default nextTurnReminderHtml;

@@ -18,7 +18,6 @@
     "include": [
         "**/*.ts",
         "db/migrations/*.js",
-        "config/**/*.json",
-        "services/emailTemplates/*.html"
+        "config/**/*.json"
     ]
 }

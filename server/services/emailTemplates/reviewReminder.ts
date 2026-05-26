@@ -1,9 +1,9 @@
-<!doctype html>
+const reviewReminderHtml = `<!doctype html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Reset Solaris Password</title>
+    <title>Solaris</title>
     <style>
     /* -------------------------------------
         INLINED WITH htmlemail.io/inline
@@ -112,10 +112,14 @@
                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top;">
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Greetings Commander,</p>
                         <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
-                            You have requested a password reset, please click on the button below to reset your password.
+                            You recently signed up to play <span style="color:#F39C12;">Solaris</span>! How did we do? <strong>We'd love to hear your feedback.</strong>
                         </p>
-                        <p style="font-family: sans-serif; font-size: 11  px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
-                            For security reasons, if you did not request a password reset please contact an administrator and change your password.
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+                          <span style="color:#F39C12;">Solaris</span> is free, open-source and community driven. We need your help to improve the game, <strong>please consider leaving a review</strong>
+                          on <a href="https://store.steampowered.com/app/1623930/Solaris/" style="color:#F39C12;">Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" style="color:#F39C12;">Google Play Store</a>. Thank you.
+                        </p>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">
+                            There has never been a better time to jump into another game of <span style="color:#F39C12;">Solaris</span> than right now! We're continuously delivering new updates and features for our passionate community of players.
                         </p>
                         <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;">
                           <tbody>
@@ -125,7 +129,7 @@
                                   <tbody>
                                     <tr>
                                       <td style="font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center;"> 
-                                        <a href="[{solaris_url_resetpassword}]?token=[{0}]" target="_blank" style="display: inline-block; color: #ffffff; background-color: #375a7f; border: 0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize;">Reset Password</a> 
+                                        <a href="[{solaris_url}]" target="_blank" style="display: inline-block; color: #ffffff; background-color: #375a7f; border: 0; border-radius: 5px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 25px; text-transform: capitalize;">Play Now</a> 
                                     </td>
                                     </tr>
                                   </tbody>
@@ -134,6 +138,8 @@
                             </tr>
                           </tbody>
                         </table>
+                        <p style="font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0; Margin-bottom: 15px;">Thank you, <b>[{0}]</b>.</p>
+                        <img src="https://raw.githubusercontent.com/solaris-games/solaris/master/client/src/assets/screenshots/game1.png" style="max-width:580px;" />
                       </td>
                     </tr>
                   </table>
@@ -163,4 +169,6 @@
       </tr>
     </table>
   </body>
-</html>
+</html>`;
+
+export default reviewReminderHtml;

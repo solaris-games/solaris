@@ -13,10 +13,19 @@ import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import PlayerReadyService from "./playerReady";
 import {logger} from "../utils/logging";
 import { IEmailService } from "./types/IEmailService";
+import welcomeEmailHtml from "./emailTemplates/welcomeEmail.js";
+import resetPasswordHtml from "./emailTemplates/resetPassword.js";
+import forgotUsernameHtml from "./emailTemplates/forgotUsername.js";
+import gameWelcomeHtml from "./emailTemplates/gameWelcome.js";
+import gameFinishedHtml from "./emailTemplates/gameFinished.js";
+import gameCycleSummaryHtml from "./emailTemplates/gameCycleSummary.js";
+import yourTurnReminderHtml from "./emailTemplates/yourTurnReminder.js";
+import nextTurnReminderHtml from "./emailTemplates/nextTurnReminder.js";
+import gameTimedOutHtml from "./emailTemplates/gameTimedOut.js";
+import gamePlayerAfkHtml from "./emailTemplates/gamePlayerAfk.js";
+import reviewReminderHtml from "./emailTemplates/reviewReminder.js";
 
 const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
 
 const log = logger("Email Service");
 
@@ -43,47 +52,47 @@ function sleep(ms: number) {
 export class EmailService implements IEmailService {
     TEMPLATES = {
         WELCOME: {
-            fileName: 'welcomeEmail.html',
+            html: welcomeEmailHtml,
             subject: 'Welcome to Solaris'
         },
         RESET_PASSWORD: {
-            fileName: 'resetPassword.html',
+            html: resetPasswordHtml,
             subject: 'Reset your Solaris password'
         },
         FORGOT_USERNAME: {
-            fileName: 'forgotUsername.html',
+            html: forgotUsernameHtml,
             subject: 'Your Solaris username'
         },
         GAME_WELCOME: {
-            fileName: 'gameWelcome.html',
+            html: gameWelcomeHtml,
             subject: 'Your Solaris game starts soon!'
         },
         GAME_FINISHED: {
-            fileName: 'gameFinished.html',
+            html: gameFinishedHtml,
             subject: 'Your Solaris game has ended!'
         },
         GAME_CYCLE_SUMMARY: {
-            fileName: 'gameCycleSummary.html',
+            html: gameCycleSummaryHtml,
             subject: 'A galactic cycle has ended - Upgrade your empire!'
         },
         YOUR_TURN_REMINDER: {
-            fileName: 'yourTurnReminder.html',
+            html: yourTurnReminderHtml,
             subject: 'Solaris - It\'s your turn to play!'
         },
         NEXT_TURN_REMINDER: {
-            fileName: 'nextTurnReminder.html',
+            html: nextTurnReminderHtml,
             subject: 'Solaris - Turn finished, it\'s your turn to play!'
         },
         GAME_TIMED_OUT: {
-            fileName: 'gameTimedOut.html',
+            html: gameTimedOutHtml,
             subject: 'Solaris - Your game did not start'
         },
         GAME_PLAYER_AFK: {
-            fileName: 'gamePlayerAfk.html',
+            html: gamePlayerAfkHtml,
             subject: 'Solaris - You\'ve gone AFK'
         },
         REVIEW_REMINDER_30_DAYS: {
-            fileName: 'reviewReminder.html',
+            html: reviewReminderHtml,
             subject: 'Solaris - How did we do?'
         }
     };
@@ -170,19 +179,14 @@ export class EmailService implements IEmailService {
     async sendTemplate(toEmail: string, template: EmailTemplate, parameters) {
         parameters = parameters || [];
 
-        const filePath = path.join(__dirname, './emailTemplates/', template.fileName);
-
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`Could not find email template with path: ${filePath}`);
-        }
-
-        let html = fs.readFileSync(filePath, { encoding: 'UTF8' });
+        let html = template.html;
 
         // Replace the default parameters in the file
         // TODO: These should be environment variables.
-        html = html.replace('[{solaris_url}]', this.config.clientUrl);
-        html = html.replace('[{solaris_url_gamelist}]', `${this.config.clientUrl}/#/game/list`);
-        html = html.replace('[{solaris_url_resetpassword}]', `${this.config.clientUrl}/#/account/reset-password-external`);
+        const clientUrl = this.config.clientUrl ?? '';
+        html = html.replace('[{solaris_url}]', clientUrl);
+        html = html.replace('[{solaris_url_gamelist}]', `${clientUrl}/#/game/list`);
+        html = html.replace('[{solaris_url_resetpassword}]', `${clientUrl}/#/account/reset-password-external`);
         html = html.replace('[{source_code_url}]', 'https://github.com/solaris-games/solaris');
 
         // Replace the parameters in the file
