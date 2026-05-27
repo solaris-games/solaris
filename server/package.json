@@ -57,6 +57,7 @@
     "@types/express": "^5.0.6",
     "@types/express-session": "1.17.10",
     "@types/jasmine": "5.1.5",
+    "@types/nodemailer": "8.0.0",
     "@types/compression": "1.8.1",
     "@types/node": "^24",
     "jasmine": "5.5.0",
