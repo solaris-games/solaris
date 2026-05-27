@@ -34,7 +34,7 @@
     "connect-mongo": "6.0.0",
     "cookie": "1.1.1",
     "cookie-parser": "1.4.7",
-    "discord.js": "14.26.4",
+    "discord.js": "12.5.3",
     "dotenv": "17.4.2",
     "elo-rating": "1.0.1",
     "express": "^5.2.1",
