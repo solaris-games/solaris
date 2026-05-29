@@ -38,12 +38,6 @@ const sortBy = (key: K) => emit('sortingRequested', key);
 
 <!-- This is deliberately not scoped, scoping is done by using the .leaderboard-table selector. Scoping would break the styling for nested components. -->
 <style>
-.leaderboard-table th {
-  border-radius: 8px 8px 0 0;
-}
-.leaderboard-table tr:last-of-type td {
-  border-radius: 0 0 8px 8px;
-}
 .leaderboard-table .sortable-header {
   cursor: pointer;
 }
