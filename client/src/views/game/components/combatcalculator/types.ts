@@ -57,6 +57,8 @@ export const makeCombatGroups = (game: Game, gr: CCGroup[], combatService: Comba
         ships: star.ships,
         specialistId: star.specialistId,
         ownedByPlayerId: firstPlayer._id,
+        homeStar: false,
+        isAsteroidField: false,
       };
     };
 

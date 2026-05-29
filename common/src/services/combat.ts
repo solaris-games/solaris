@@ -497,6 +497,8 @@ export class CombatService<ID extends Id> {
                     ships,
                     specialistId: null,
                     ownedByPlayerId: id,
+                    homeStar: false,
+                    isAsteroidField: false,
                 },
                 shipsKilled: 0,
                 attackAgainst: attackMap(1, weapons),

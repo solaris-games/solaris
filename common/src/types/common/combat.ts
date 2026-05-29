@@ -6,6 +6,8 @@ export interface CombatBaseStar<ID> {
     ships: number | null; // annoying, but for weird compat reasons
     specialistId: number | null;
     ownedByPlayerId: ID | null;
+    isAsteroidField: boolean;
+    homeStar: boolean;
 }
 
 export interface CombatBaseCarrier<ID> {

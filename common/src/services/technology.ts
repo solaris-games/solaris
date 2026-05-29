@@ -35,10 +35,7 @@ export type WeaponsDetail = {
     appliedBuffs: Buff[],
     weaponsBuff: number,
     weaponsLevel: number,
-}
-
-type StarWeaponsDetail = WeaponsDetail & {
-    defenderBonus: number,
+    defenderBonus?: number,
 }
 
 export class TechnologyService {
@@ -278,7 +275,7 @@ export class TechnologyService {
         return maxOf(b => b.amount, allBuffs);
     }
 
-    getStarOwnWeaponsDetail<ID extends Id>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): StarWeaponsDetail {
+    getStarOwnWeaponsDetail<ID extends Id>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): WeaponsDetail {
         const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
         const defenderBonus = this.getDefenderBonus(game, star);
 
@@ -309,11 +306,16 @@ export class TechnologyService {
     getEffectiveWeaponsDetail<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
         const baseWeapons = this.getBaseWeapons(group.players);
 
+        let defenderBonus: number | undefined = undefined;
+        if (group.isDefender) {
+            defenderBonus = this.getDefenderBonus(game, group.star!);
+        }
+
         const buffs: Buff[] = group.carriers.map(c => {
             return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, group.isDefender, opponents.isDefender, group.players.length, c.specialistTargetedPlayers);
         }).filter(notUndefined);
 
-        const buff = this._calculateActualWeaponsBuff(baseWeapons, buffs, 0);;
+        const buff = this._calculateActualWeaponsBuff(baseWeapons, buffs, defenderBonus || 0);
 
         const opponentDebuff = this.getCarriersWeaponsDebuff(opponents.carriers);
 
@@ -327,6 +329,7 @@ export class TechnologyService {
                 appliedBuffs,
                 weaponsBuff: buff.weaponsBuff - opponentDebuff.amount,
                 total: buff.total - opponentDebuff.amount,
+                defenderBonus,
             }
         } else {
             return {
@@ -334,6 +337,7 @@ export class TechnologyService {
                 appliedBuffs,
                 weaponsBuff: buff.weaponsBuff,
                 total: buff.total,
+                defenderBonus,
             }
         }
     }
@@ -367,7 +371,7 @@ export class TechnologyService {
         }
     }   
 
-    getDefenderBonus<ID>(game: Game<ID>, star: Star<ID>) {
+    getDefenderBonus<ID>(game: Game<ID>, star: CombatBaseStar<ID>) {
         let bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
 
         if (star.isAsteroidField) {
