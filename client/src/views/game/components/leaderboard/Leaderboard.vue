@@ -1,7 +1,7 @@
 <template>
   <div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary"
+      <button title="View Settings" class="btn btn-sm btn-outline-primary"
         @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
       <a :href="documentationUrl + '/rankings.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
     </menu-title>

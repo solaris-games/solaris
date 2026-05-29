@@ -231,7 +231,7 @@ const onCarrierRenameRequested = (e: string) => changeMenuState({ state: 'carrie
 
 const onViewCarrierCombatCalculatorRequested = (e: string | undefined) => changeMenuState({ state: 'combatCalculator', carrierId: e });
 
-const onViewSettingsRequested = () => changeMenuState({ state: 'options' });
+const onViewSettingsRequested = () => changeMenuState({ state: 'settings' });
 
 const onOpenPurchasePlayerBadgeRequested = (e: string) => changeMenuState({ state: "playerBadgeShop", recipientPlayerId: e });
 
