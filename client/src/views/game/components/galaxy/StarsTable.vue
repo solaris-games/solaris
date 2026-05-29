@@ -86,6 +86,7 @@ const sortInfo = useLocalStorage(SORT_INFO_KEY, defaultSortInfo);
 
 const showAll = ref(false);
 const searchFilter = ref('');
+const allowUpgrades = ref(store.settings!.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 const tableData = computed(() => game.value.galaxy.stars);
@@ -94,7 +95,6 @@ const isEconomyEnabled = computed(() => game.value.settings.player.developmentCo
 const isIndustryEnabled = computed(() => game.value.settings.player.developmentCost.industry !== 'none');
 const isScienceEnabled = computed(() => game.value.settings.player.developmentCost.science !== 'none');
 const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
-const allowUpgrades = computed(() => store.settings!.interface.galaxyScreenUpgrades === 'enabled' && !isGameFinished.value);
 
 const filter = (s: Star) => s.name.toLowerCase().includes(searchFilter.value.toLowerCase());
 
