@@ -13,19 +13,20 @@ import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
 import PlayerReadyService from "./playerReady";
 import {logger} from "../utils/logging";
 import { IEmailService } from "./types/IEmailService";
-import welcomeEmailHtml from "./emailTemplates/welcomeEmail.js";
-import resetPasswordHtml from "./emailTemplates/resetPassword.js";
-import forgotUsernameHtml from "./emailTemplates/forgotUsername.js";
-import gameWelcomeHtml from "./emailTemplates/gameWelcome.js";
-import gameFinishedHtml from "./emailTemplates/gameFinished.js";
-import gameCycleSummaryHtml from "./emailTemplates/gameCycleSummary.js";
-import yourTurnReminderHtml from "./emailTemplates/yourTurnReminder.js";
-import nextTurnReminderHtml from "./emailTemplates/nextTurnReminder.js";
-import gameTimedOutHtml from "./emailTemplates/gameTimedOut.js";
-import gamePlayerAfkHtml from "./emailTemplates/gamePlayerAfk.js";
-import reviewReminderHtml from "./emailTemplates/reviewReminder.js";
+import welcomeEmailHtml from "./emailTemplates/welcomeEmail";
+import resetPasswordHtml from "./emailTemplates/resetPassword";
+import forgotUsernameHtml from "./emailTemplates/forgotUsername";
+import gameWelcomeHtml from "./emailTemplates/gameWelcome";
+import gameFinishedHtml from "./emailTemplates/gameFinished";
+import gameCycleSummaryHtml from "./emailTemplates/gameCycleSummary";
+import yourTurnReminderHtml from "./emailTemplates/yourTurnReminder";
+import nextTurnReminderHtml from "./emailTemplates/nextTurnReminder";
+import gameTimedOutHtml from "./emailTemplates/gameTimedOut";
+import gamePlayerAfkHtml from "./emailTemplates/gamePlayerAfk";
+import reviewReminderHtml from "./emailTemplates/reviewReminder";
 
 import nodemailer from 'nodemailer';
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 const log = logger("Email Service");
 
@@ -134,17 +135,18 @@ export class EmailService implements IEmailService {
         // If emails are disabled, return a fake transport which
         //outputs the message to the console.
         if (this.isEnabled()) {
-            return nodemailer.createTransport({
-                host: this.config.smtp.host,
-                port: this.config.smtp.port,
+            const smtpOptions: SMTPTransport.Options = {
+                host: this.config.smtp.host!,
+                port: Number.parseInt(this.config.smtp.port!),
                 tls: {
-                      rejectUnauthorized: false
+                    rejectUnauthorized: false
                 },
                 auth: {
                     user: this.config.smtp.username,
-                    password: this.config.smtp.password,
+                    pass: this.config.smtp.password,
                 },
-            });
+            };
+            return nodemailer.createTransport(smtpOptions);
         } else {
             return getFakeTransport();
         }
