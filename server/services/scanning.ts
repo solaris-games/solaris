@@ -177,16 +177,6 @@ export default class ScanningService {
         return this.starService.listStarsOwnedOrInOrbitByPlayers(game, playerIds).filter(s => !this.starDataService.isDeadStar(s));
     }
 
-    calculateScanningMap(game: Game, players: Player[], kdTree: KDTree) {
-        const scanningMap = new Map<Player, Set<Star>>();
-
-        for (const player of players) {
-            scanningMap.set(player, this.getStarSetByScanningRange(game, [player], kdTree));
-        }
-
-        return scanningMap;
-    }
-
     isObjectWithinScanningRangeOfStars(object: MapObject, starTreesWithRadius: [number, KDTree][]) {
         for (const starTreeWithRadius of starTreesWithRadius) {
             if (starTreeWithRadius[1].isWithinRadiusOfAny(object.location, starTreeWithRadius[0])) return true;

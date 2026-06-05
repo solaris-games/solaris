@@ -479,7 +479,7 @@ export default class GameGalaxyService {
                 }
 
                 // visibleStarSet may include connected wormholes, which aren't actually in scanning range, so we need to check for that too.
-                s.isInScanningRange = (isFinished || Boolean(visibleStarSet?.has(s) && !unscannedWormHoles?.has(s._id))
+                s.isInScanningRange = (isFinished || Boolean(visibleStarSet?.has(s) && !unscannedWormHoles?.has(s))
                     || (this.scanningService.isStarAlwaysVisible(s) && this.gameStateService.isStarted(doc)));
 
                 // If it's in range then its all good, send the star back as is.
@@ -540,7 +540,7 @@ export default class GameGalaxyService {
             }) as any;
     }
 
-    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint, scannedCarrierIdSet?: Set<Carrier>) {
+    _setCarrierInfoDetailed(doc: Game, viewpoint: Viewpoint, scannedCarrierSet?: Set<Carrier>) {
         const isFinished = this.gameStateService.isFinished(doc)
         const isOrbital = this.gameTypeService.isOrbitalMode(doc);
 
@@ -549,8 +549,8 @@ export default class GameGalaxyService {
             const perspectivePlayers = viewpoint.kind === ViewpointKind.Perspectives ? viewpoint.perspectives : [];
             
             const playerCarriers = this.carrierService.listCarriersOwnedByPlayers(doc.galaxy.carriers, perspectivePlayers.map(p => p._id));
-            playerCarriers.forEach(p => scannedCarrierIdSet!.add(p));
-            doc.galaxy.carriers = Array.from(scannedCarrierIdSet!);
+            playerCarriers.forEach(p => scannedCarrierSet!.add(p));
+            doc.galaxy.carriers = Array.from(scannedCarrierSet!);
 
             // Remove all waypoints (except those in transit) for all carriers that do not belong
             // to the player.
