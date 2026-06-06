@@ -95,6 +95,10 @@ export default class CarrierMovementService {
         // If the carrier waypoints are looped then append the
         // carrier waypoint back onto the waypoint stack.
         if (carrier.waypointsLooped) {
+            // Set the source of the appended waypoint as the destination of the last
+            // waypoint to ensure a valid state in case the source was not part of the loop.
+            const lastLoopWaypoint = carrier.waypoints[carrier.waypoints.length - 1];
+            currentWaypoint.source = lastLoopWaypoint.destination;
             carrier.waypoints.push(currentWaypoint);
         }
 
