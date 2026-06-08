@@ -134,6 +134,7 @@ onMounted(() => {
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
+  z-index: 4;
 }
 
 .has-unread {
