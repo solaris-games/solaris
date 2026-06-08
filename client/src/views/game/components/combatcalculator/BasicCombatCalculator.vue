@@ -35,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div class="mb-2 row" v-if="hasDefenderBonus">
+        <div class="mb-2 row" v-if="isCarrierToStar && hasDefenderBonus">
           <div class="col-8">
             <div class="form-check">
               <input class="form-check-input" type="checkbox" v-model="includeDefenderBonus" id="chkDefenderBonus">
