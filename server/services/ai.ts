@@ -938,8 +938,6 @@ export default class AIService {
     }
 
     _calculateRequiredShipsForAttack(game: Game, player: Player, context: Context, starToInvade: Star, ticksToArrival: number) {
-        const invadedPlayer = starToInvade.ownedByPlayerId!;
-
         const starId = starToInvade._id.toString();
         const defendingCarriers = context.carriersOrbiting.get(starId) || [];
 
@@ -954,7 +952,7 @@ export default class AIService {
         }, {
             ships: 1,
             weaponsLevel: player.research.weapons.level,
-        }, true).attacker.shipsNeeded;
+        }, true, game.settings.specialGalaxy.defenderBonus === 'enabled').attacker.shipsNeeded;
     }
 
     _calculateRequiredShipsForDefense(game: Game, player: Player, context: Context, attackData: KnownAttack, attackingCarriers: Carrier[], defendingStar: Star) {
@@ -975,7 +973,7 @@ export default class AIService {
         const defenderResult = this.combatService.getDefenderDetailed(result);
 
         if (defenderResult && defenderResult.shipsAfter <= 0) {
-            return 20; // TODO
+            return this.combatService.estimateNeeded(result, defenderResult);
         }
 
         return 0;

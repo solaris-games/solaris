@@ -5,7 +5,7 @@
   </div>
 
   <p class="text-success m-0" v-if="winner && winnerName">{{ winnerName }} wins the battle!</p>
-  <p v-for="needed of neededForOthers" class="text-warning m-0">Group {{result.groups.indexOf(needed.group)}} needed approx. {{needed.needed}} ships to win.</p>
+  <p v-for="needed of neededForOthers" class="text-warning m-0">Group {{result.groups.indexOf(needed.group)}} needed {{needed.needed}} ships to win.</p>
 </div>
 </template>
 <script setup lang="ts">
@@ -26,9 +26,11 @@ const winnerName = computed(() => winner.value && `Group ${props.result.groups.i
 const neededForOthers = computed(() => {
   return props.result.groups.flatMap(g => {
     if (g !== winner.value) {
+      const needed = serviceProvider.combatService.estimateNeeded(props.result, g);
+
       return [{
         group: g,
-        needed: 0,
+        needed,
       }];
     }
 

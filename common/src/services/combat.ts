@@ -478,6 +478,10 @@ export class CombatService<ID extends Id> {
         return combatResult.groups.find(g => g.star);
     }
 
+    estimateNeeded<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>) {
+        return estimateNeeded(combatResult, estimateForGroup, combatResult.combatGroups);
+    }
+
     calculateBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean, includeDefenderBonus: boolean): BasicCombatResult {
         const attackMap = (group: number, level: number) => {
             const m = new Map<number, WeaponsDetail>();
