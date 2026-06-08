@@ -1,6 +1,7 @@
 import {CombatResult} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 import SpecialistService from "./specialist";
+import {CombatResultGroup} from "../../common/src";
 
 export class CombatMaskingService {
     specialistService: SpecialistService;
@@ -10,23 +11,25 @@ export class CombatMaskingService {
     }
 
     maskCombatResult(combatResult: CombatResult<DBObjectId>, playerId: DBObjectId): CombatResult<DBObjectId> {
-        const result: CombatResult<DBObjectId> = Object.assign({}, combatResult);
-
-        const groups = result.groups.map((g) => {
-            const group = Object.assign({}, g);
+        const groups: CombatResultGroup<DBObjectId>[] = combatResult.groups.map((g) => {
+            const group = {
+                ...g,
+                star: g.star && { ...g.star },
+                carriers: g.carriers.map(c => ({ ...c })),
+            };
 
             let scrambled = false;
 
-            if (g.star) {
-                const isPlayerObj = g.star.ownedByPlayerId.toString() === playerId.toString();
+            if (group.star) {
+                const isPlayerObj = group.star.ownedByPlayerId!.toString() === playerId.toString();
 
-                if (!isPlayerObj && g.star.hasScrambler) {
-                    g.star.shipsLost = '???';
-                    g.star.shipsBefore = '???';
+                if (!isPlayerObj && group.star.hasScrambler) {
+                    group.star.shipsLost = '???';
+                    group.star.shipsBefore = '???';
                     scrambled = true;
 
-                    if (typeof g.star.shipsAfter === 'number' && g.star.shipsAfter > 0) {
-                        g.star.shipsAfter = '???';
+                    if (typeof group.star.shipsAfter === 'number' && group.star.shipsAfter > 0) {
+                        group.star.shipsAfter = '???';
                     }
                 }
             }
@@ -46,9 +49,9 @@ export class CombatMaskingService {
             }
 
             if (scrambled) {
-                g.shipsLost = '???';
-                g.shipsBefore = '???';
-                g.shipsAfter = '???';
+                group.shipsLost = '???';
+                group.shipsBefore = '???';
+                group.shipsAfter = '???';
             }
 
             return group;
