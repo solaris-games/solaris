@@ -2,7 +2,7 @@
     <tr>
       <td>{{header}}</td>
       <td class="text-end" :title="isPlayerStatUncertain ? scanningRangeTooltip : undefined">{{formatValue(player, playerStat)}}{{ isPlayerStatUncertain ? '?' : ''}}</td>
-      <td class="text-end" v-if="userIsInGame && !isUserPlayer && userPlayerStat && userPlayer"
+      <td class="text-end" v-if="userIsInGame && !isUserPlayer && userPlayerStat !== null && userPlayerStat !== undefined && userPlayer"
         :class="{'text-danger': playerStat > userPlayerStat,
                   'text-success': playerStat < userPlayerStat}">{{formatValue(userPlayer, userPlayerStat)}}</td>
     </tr>
