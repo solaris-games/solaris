@@ -243,7 +243,7 @@ const calculate = async (e: Event) => {
     return;
   }
 
-  result.value = serviceProvider.combatService.calculateBasic(defender.value, attacker.value, isCarrierToStar.value);
+  result.value = serviceProvider.combatService.calculateBasic(defender.value, attacker.value, isCarrierToStar.value, includeDefenderBonus.value);
 }
 
 onMounted(async () => {

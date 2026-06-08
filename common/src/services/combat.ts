@@ -368,7 +368,7 @@ const estimateNeeded = <ID extends Id, P extends CombatBasePlayer<ID>, S extends
         });
 
         const newResult = combatLoop({ round: 0, groups: modifiedGroups }, combatResult.isCarrierToStarCombat);
-        
+
         const groupInNew = newResult.groups.find(g => g.id === estimateForGroup.id);
         if (groupInNew!.shipsAfter > 0) {
             break;
@@ -478,7 +478,7 @@ export class CombatService<ID extends Id> {
         return combatResult.groups.find(g => g.star);
     }
 
-    calculateBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean): BasicCombatResult {
+    calculateBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean, includeDefenderBonus: boolean): BasicCombatResult {
         const attackMap = (group: number, level: number) => {
             const m = new Map<number, WeaponsDetail>();
             m.set(group, {
@@ -555,7 +555,7 @@ export class CombatService<ID extends Id> {
 
         if (isCarrierToStarCombat) {
             groups = [
-                starGroup("defender", defender.weaponsLevel, defender.ships),
+                starGroup("defender", defender.weaponsLevel + (includeDefenderBonus ? 1 : 0), defender.ships),
                 carrierGroup("attacker", attacker.weaponsLevel, attacker.ships, 1),
             ];
         } else {
