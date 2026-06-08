@@ -28,7 +28,7 @@ const neededForOthers = computed(() => {
     if (g !== winner.value) {
       return [{
         group: g,
-        needed: serviceProvider.combatService.estimateNeeded(props.result, g),
+        needed: 0,
       }];
     }
 

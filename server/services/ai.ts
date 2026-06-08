@@ -975,7 +975,7 @@ export default class AIService {
         const defenderResult = this.combatService.getDefenderDetailed(result);
 
         if (defenderResult && defenderResult.shipsAfter <= 0) {
-            return this.combatService.estimateNeeded(result, defenderResult);
+            return 20; // TODO
         }
 
         return 0;

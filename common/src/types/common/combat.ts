@@ -54,6 +54,7 @@ export interface DetailedCombatResultStar<ID, S extends CombatBaseStar<ID>> exte
 }
 
 export type DetailedCombatResultGroup<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+    id: string;
     players: P[],
     carriers: DetailedCombatResultCarrier<ID, C>[],
     star: DetailedCombatResultStar<ID, S> | undefined,
@@ -70,6 +71,8 @@ export type DetailedCombatResultGroup<ID, P extends CombatBasePlayer<ID>, S exte
 
 export type DetailedCombatResult<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
     groups: DetailedCombatResultGroup<ID, P, S, C>[],
+    combatGroups: CombatGroup<ID, P, S, C>[],
+    isCarrierToStarCombat: boolean,
 }
 
 // Suitable for events etc.

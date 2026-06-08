@@ -39,6 +39,7 @@ type MO<ID, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> =
 };
 
 type CombatResultGrouped<ID, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>> = {
+    id: string;
     players: P[],
     carriers: C[],
     star: S | undefined,
@@ -234,6 +235,7 @@ const distributeDamage = <ID extends Id, P extends CombatBasePlayer<ID>, S exten
     const starRes = groupObjects.find(o => o.type === 'star')?.star;
 
     return {
+        id: group.id,
         players: group.players,
         carriers: carriersRes,
         star: starRes,
@@ -275,9 +277,10 @@ const computeKills = <ID extends Id, P extends CombatBasePlayer<ID>, S extends C
     }
 }
 
-const makeResult = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(state: CombatRoundState<ID, P, S, C>): DetailedCombatResult<ID, P, S, C> => {
+const makeResult = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(state: CombatRoundState<ID, P, S, C>, originalCombatGroups: CombatGroup<ID, P, S, C>[], isCarrierToStarCombat: boolean): DetailedCombatResult<ID, P, S, C> => {
     const groups: DetailedCombatResultGroup<ID, P, S, C>[] = state.groups.map((g) => {
         return distributeDamage({
+            id: g.id,
             players: g.players,
             star: g.star,
             carriers: g.carriers,
@@ -292,6 +295,8 @@ const makeResult = <ID extends Id, P extends CombatBasePlayer<ID>, S extends Com
     computeKills(groups);
 
     return {
+        combatGroups: originalCombatGroups,
+        isCarrierToStarCombat,
         groups,
     }
 }
@@ -316,7 +321,7 @@ const combatLoop = <ID extends Id, P extends CombatBasePlayer<ID>, S extends Com
         state = performCombatRound(state, isCarrierToStarCombat);
     }
 
-    return makeResult(state);
+    return makeResult(state, initState.groups, isCarrierToStarCombat);
 }
 
 const findGroupDetailed = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(result: DetailedCombatResult<ID, P, S, C>, playerId: ID) => {
@@ -327,11 +332,56 @@ const findGroup = <ID extends Id>(result: CombatResult<ID>, playerId: ID) => {
     return result.groups.find(g => g.playerIds.find(id => id.toString() === playerId.toString()));
 }
 
-const estimateNeeded = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>) => {
-    const otherShips = combatResult.groups.filter(g => g !== estimateForGroup).reduce((sum, g) => sum + g.shipsAfter, 0);
-    const ratio = estimateForGroup.shipsLost / estimateForGroup.shipsKilled;
+const estimateNeeded = <ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>, originalGroups: CombatGroup<ID, P, S, C>[]) => {
+    const originalShips = estimateForGroup.shipsBefore;
 
-    return otherShips * ratio;
+    if (estimateForGroup.shipsAfter > 0) {
+        return originalShips;
+    }
+
+    let shipsNeeded = originalShips + 1;
+
+    while (true) {
+        const modifiedGroups = originalGroups.map((gr) => {
+            if (gr.id === estimateForGroup.id) {
+                const newGr = {
+                    ...gr,
+                    originalShips: shipsNeeded,
+                    ships: shipsNeeded,
+                    shipsKilled: 0,
+                };
+                if (newGr.star) {
+                    newGr.star = {
+                        ...newGr.star,
+                        ships: newGr.star.ships! + (shipsNeeded - originalShips),
+                    };
+                } else {
+                    newGr.carriers[0] = {
+                        ...newGr.carriers[0],
+                        ships: newGr.carriers[0].ships! + (shipsNeeded - originalShips),
+                    };
+                }
+                return newGr;
+            } else {
+                return gr;
+            }
+        });
+
+        const newResult = combatLoop({ round: 0, groups: modifiedGroups }, combatResult.isCarrierToStarCombat);
+        
+        const groupInNew = newResult.groups.find(g => g.id === estimateForGroup.id);
+        if (groupInNew!.shipsAfter > 0) {
+            break;
+        }
+
+        if (shipsNeeded > 1000) {
+            break;
+        }
+
+        shipsNeeded++;
+    }
+
+    return shipsNeeded;
 }
 
 export class CombatService<ID extends Id> {
@@ -426,10 +476,6 @@ export class CombatService<ID extends Id> {
 
     getDefenderDetailed(combatResult: DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>>) {
         return combatResult.groups.find(g => g.star);
-    }
-
-    estimateNeeded<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(combatResult: DetailedCombatResult<ID, P, S, C>, estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>) {
-        return estimateNeeded(combatResult, estimateForGroup);
     }
 
     calculateBasic(defender: BasicSideSpec, attacker: BasicSideSpec, isCarrierToStarCombat: boolean): BasicCombatResult {
@@ -527,8 +573,8 @@ export class CombatService<ID extends Id> {
         const defenderGroup = findGroupDetailed(result, "defender")!;
         const attackerGroup = findGroupDetailed(result, "attacker")!;
 
-        const defenderNeeded = estimateNeeded(result, defenderGroup);
-        const attackerNeeded = estimateNeeded(result, attackerGroup);
+        const defenderNeeded = estimateNeeded(result, defenderGroup, groups);
+        const attackerNeeded = estimateNeeded(result, attackerGroup, groups);
 
         return {
             defender: {
