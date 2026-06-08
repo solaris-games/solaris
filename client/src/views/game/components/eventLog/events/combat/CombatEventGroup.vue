@@ -4,7 +4,8 @@
       <table class="table table-sm">
         <thead>
           <tr>
-            <th>Group {{ groupIndex }}: {{title }}</th>
+            <th v-if="title">Group {{ groupIndex }}: {{ title }}</th>
+            <th v-else>Group {{ groupIndex }}</th>
             <th>Before</th>
             <th>Lost</th>
             <th>After</th>
@@ -63,7 +64,7 @@ type Participant = {
 }
 
 const props = defineProps<{
-  title: string,
+  title: string | undefined,
   group: CombatResultGroup<string>,
   groupIndex: number,
 }>();

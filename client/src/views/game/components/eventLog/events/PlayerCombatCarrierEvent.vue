@@ -4,7 +4,7 @@
             Your forces have engaged the enemy in <span class="text-warning">carrier-to-carrier</span> combat.
         </p>
 
-      <combat-event-group v-for="(group, groupIndex) of event.data.groups" :title="getTitle(group, groupIndex)" :group="group" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" :groupIndex="groupIndex" />
+      <combat-event-group v-for="(group, groupIndex) of event.data.groups" :title="undefined" :group="group" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" :groupIndex="groupIndex" />
     </div>
 </template>
 
@@ -19,10 +19,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string]
 }>();
-
-const getTitle = (group: CombatResultGroup<string>, groupIndex: number) => {
-  return `Group ${groupIndex}`;
-};
 
 const requestOpenPlayerDetail = (playerId: string) => {
   emit('onOpenPlayerDetailRequested', playerId);
