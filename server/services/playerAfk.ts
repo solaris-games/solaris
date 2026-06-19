@@ -1,6 +1,6 @@
 import {User} from "./types/User";
 
-import moment from "moment";
+import { DateTime } from "luxon";
 import EventEmitter from "events";
 import Repository from './repository';
 import { Game } from './types/Game';
@@ -43,7 +43,7 @@ export default class PlayerAfkService extends EventEmitter {
         // Even better would be to look only at recent games, but there is no data for that at the moment
         const hasHighAfkRate = (user.achievements.afk / user.achievements.joined) > 0.4;
         const hasJoinedSeveralGames = user.achievements.joined > 2;
-        const hasRecentAfkWarning = user.warnings.find(w => w.text === 'Frequent AFK' && moment(w.date).isAfter(moment().subtract(1, 'month')));
+        const hasRecentAfkWarning = user.warnings.find(w => w.text === 'Frequent AFK' && DateTime.fromJSDate(w.date) > DateTime.utc().minus({ months: 1 }));
 
         if (hasHighAfkRate && hasJoinedSeveralGames && !hasRecentAfkWarning) {
             user.warnings.push({
@@ -119,7 +119,7 @@ export default class PlayerAfkService extends EventEmitter {
             return false;
         }
 
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() <= moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
+        let lastSeenMoreThanXDaysAgo = DateTime.fromJSDate(player.lastSeen!).toUTC() <= DateTime.utc().minus({ days: game.settings.gameTime.afk.lastSeenTimeout });
 
         if (lastSeenMoreThanXDaysAgo) {
             return true;
@@ -131,7 +131,7 @@ export default class PlayerAfkService extends EventEmitter {
 
         let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
         let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
-        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() <= moment().utc().subtract(secondsToAfk, 'seconds');
+        let lastSeenMoreThanXSecondsAgo = DateTime.fromJSDate(player.lastSeen!).toUTC() <= DateTime.utc().minus({ seconds: secondsToAfk });
 
         return lastSeenMoreThanXSecondsAgo;
     }

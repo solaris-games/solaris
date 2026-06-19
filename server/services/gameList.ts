@@ -5,7 +5,7 @@ import ConversationService from "./conversation";
 import GameService from "./game";
 import { GameTypeService } from '@solaris/common'
 import LeaderboardService from "./leaderboard";
-import moment from "moment";
+import { DateTime } from "luxon";
 import {EventService} from "./event";
 
 export default class GameListService {
@@ -297,7 +297,7 @@ export default class GameListService {
     }
 
     async listOldCompletedGamesNotCleaned(months: number = 1) {
-        let date = moment().subtract(months, 'month');
+        let date = DateTime.utc().minus({ months });
 
         let query = {
             $and: [
@@ -318,7 +318,7 @@ export default class GameListService {
     }
 
     async listGamesTimedOutWaitingForPlayers() {
-        let date = moment().subtract(7, 'day');
+        let date = DateTime.utc().minus({ days: 7 });
 
         let games = await this.gameRepo.find({
             'settings.general.type': { 
@@ -345,7 +345,7 @@ export default class GameListService {
         });
         
         return games.filter(g => {
-            return moment(g._id.getTimestamp()) <= date;
+            return DateTime.fromJSDate(g._id.getTimestamp()) <= date;
         });
     }
 
@@ -418,7 +418,7 @@ export default class GameListService {
     }
 
     async listCompletedTutorials() {
-        let date = moment().subtract(1, 'day');
+        let date = DateTime.utc().minus({ days: 1 });
 
         let games = await this.gameRepo.find({
             'settings.general.type': 'tutorial',
@@ -429,7 +429,7 @@ export default class GameListService {
         });
         
         return games.filter(g => {
-            return moment(g._id.getTimestamp()) <= date;
+            return DateTime.fromJSDate(g._id.getTimestamp()) <= date;
         });
     }
 

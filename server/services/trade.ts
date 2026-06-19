@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import moment from "moment";
+import { DateTime } from "luxon";
 import {
     BaseGameEvent,
     GameTypeService,
@@ -163,7 +163,7 @@ export default class TradeService extends EventEmitter {
             toPlayer,
             amount,
             reputation: reputationResult.rep.reputation,
-            date: moment().utc()
+            date: DateTime.utc().toJSDate()
         };
 
         await eventService.createCreditsReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
@@ -241,7 +241,7 @@ export default class TradeService extends EventEmitter {
             toPlayer,
             amount,
             reputation: reputationResult.rep.reputation,
-            date: moment().utc()
+            date: DateTime.utc().toJSDate()
         };
 
         await eventService.createCreditsSpecialistsReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
@@ -316,7 +316,7 @@ export default class TradeService extends EventEmitter {
             fromPlayer,
             toPlayer,
             amount,
-            date: moment().utc()
+            date: DateTime.utc().toJSDate()
         };
 
         await eventService.createRenownReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, amount);
@@ -426,7 +426,7 @@ export default class TradeService extends EventEmitter {
             toPlayer,
             technology: eventTechnology,
             reputation: reputationResult.rep.reputation,
-            date: moment().utc()
+            date: DateTime.utc().toJSDate()
         };
 
         await eventService.createTechnologyReceivedEvent(game._id, game.state.tick, fromPlayer, toPlayer, eventTechnology);
@@ -532,7 +532,7 @@ export default class TradeService extends EventEmitter {
         .map(ev => {
             return {
                 ...ev,
-                sentDate: moment(ev._id.getTimestamp()).toDate(),
+                sentDate: ev._id.getTimestamp(),
             } as TradeEvent<DBObjectId>;
         });
     }

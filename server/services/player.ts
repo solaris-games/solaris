@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import moment from "moment";
+import { DateTime } from "luxon";
 import EventEmitter from "events";
 import Repository from './repository';
 import { DBObjectId } from './types/DBObjectId';
@@ -493,7 +493,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     updateLastSeen(game: Game, player: Player, date?: Date) {
-        player.lastSeen = date || moment().utc().toDate();
+        player.lastSeen = date || DateTime.utc().toJSDate();
     }
 
     async updateLastSeenLean(gameId: DBObjectId, userId: DBObjectId, ipAddress: string) {
@@ -502,7 +502,7 @@ export default class PlayerService extends EventEmitter {
             'galaxy.players.userId': userId
         }, {
             $set: {
-                'galaxy.players.$.lastSeen': moment().utc(),
+                'galaxy.players.$.lastSeen': DateTime.utc().toJSDate(),
                 'galaxy.players.$.lastSeenIP': ipAddress
             }
         });
@@ -593,7 +593,7 @@ export default class PlayerService extends EventEmitter {
     setPlayerAsDefeated(game: Game, player: Player, openSlot: boolean) {
         player.isOpenSlot = openSlot;
         player.defeated = true;
-        player.defeatedDate = moment().utc().toDate();
+        player.defeatedDate = DateTime.utc().toJSDate();
 
         player.researchingNext = 'random'; // Set up the AI for random research.
 

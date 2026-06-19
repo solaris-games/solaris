@@ -1,4 +1,4 @@
-import moment from "moment/moment";
+import { DateTime } from "luxon";
 
 import EventEmitter from "events";
 import { DBObjectId } from './types/DBObjectId';
@@ -348,7 +348,7 @@ export default class GameService extends EventEmitter {
                 _id: game._id,
             }, {
                 $set: {
-                    'galaxy.players.$[].lastSeen': moment().utc(),
+                    'galaxy.players.$[].lastSeen': DateTime.utc().toJSDate(),
                 }
             }, {
                 arrayFilters: [

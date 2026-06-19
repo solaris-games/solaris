@@ -1,7 +1,7 @@
 import { SpecialStar } from "@solaris/common";
 
 const RNG = require('random-seed');
-import moment from "moment";
+import { DateTime } from "luxon";
 
 const specialStars = require('../config/game/specialStars.json') as SpecialStar[];
 
@@ -18,8 +18,8 @@ export default class SpecialStarBanService {
             return stars;
         }
 
-        const now = moment().utc();
-        const seed = now.format('YYYYMM');
+        const now = DateTime.utc();
+        const seed = now.toFormat('yyyyMM');
         const rng = RNG.create(seed);
 
         const bans: SpecialStar[] = [];

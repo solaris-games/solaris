@@ -5,7 +5,7 @@ import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User } from './types/User';
 
-import moment from "moment";
+import { DateTime } from "luxon";
 
 export default class AdminService {
 
@@ -17,7 +17,7 @@ export default class AdminService {
     async addWarning(userId: DBObjectId, text: string) {
         const newWarning = {
             text,
-            date: moment().utc()
+            date: DateTime.utc().toJSDate()
         }
 
         await this.userRepo.updateOne({
@@ -256,10 +256,10 @@ export default class AdminService {
     }
 
     async getInsights() {
-        const oneDayAgo = moment().utc().add(-1, 'days').toDate();
-        const twoDaysAgo = moment().utc().add(-2, 'days').toDate();
-        const oneWeekAgo = moment().utc().add(-7, 'days').toDate();
-        const twoWeeksAgo = moment().utc().add(-14, 'days').toDate();
+        const oneDayAgo = DateTime.utc().minus({ days: 1 }).toJSDate();
+        const twoDaysAgo = DateTime.utc().minus({ days: 2 }).toJSDate();
+        const oneWeekAgo = DateTime.utc().minus({ days: 7 }).toJSDate();
+        const twoWeeksAgo = DateTime.utc().minus({ days: 14 }).toJSDate();
 
         const oneDayAgoId = this.userRepo.objectIdFromDate(oneDayAgo);
         const twoDaysAgoId = this.userRepo.objectIdFromDate(twoDaysAgo);

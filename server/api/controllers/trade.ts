@@ -21,7 +21,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
     
-                container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
+                container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
                 return next();
             } catch (err) {
                 return next(err);
@@ -44,7 +44,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
     
-                container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
+                container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
                 return next();
             } catch (err) {
                 return next(err);
@@ -64,7 +64,7 @@ export default (container: DependencyContainer) => {
 
                 res.sendStatus(200);
     
-                container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date.toDate());
+                container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
                 return next();
             } catch (err) {
                 return next(err);
@@ -88,7 +88,7 @@ export default (container: DependencyContainer) => {
                     reputation: trade.reputation
                 });
                 
-                container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date.toDate());
+                container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date);
                 return next();
             } catch (err) {
                 return next(err);

@@ -37,7 +37,7 @@ import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import ShipService from "./ship";
 import ScheduleBuyService from "./scheduleBuy";
-import {Moment} from "moment";
+import {DateTime} from "luxon";
 import GameLockService from "./gameLock";
 import {logger} from "../utils/logging";
 import WaypointActionService from "./waypointAction";
@@ -48,7 +48,6 @@ import { INotificationService } from "./types/INotificationService";
 import { IEmailService } from "./types/IEmailService";
 
 import EventEmitter from "events";
-import moment from "moment";
 import CarrierCombatService from "./carrierCombat";
 import CombatProcessingService from "./combatProcessing";
 import {GameTickContext} from "./gameProcessing/context";
@@ -193,7 +192,7 @@ export default class GameTickService extends EventEmitter {
             gameName: game.settings.general.name
         }, `[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`);
 
-        game.state.lastTickDate = moment().utc().toDate();
+        game.state.lastTickDate = DateTime.utc().toJSDate();
         game.state.forceTick = false;
 
         let taskTime = process.hrtime();
@@ -342,7 +341,7 @@ export default class GameTickService extends EventEmitter {
         }
 
         // Cannot perform a game tick as this game has not yet started.
-        if (moment(game.state.startDate).utc().diff(moment().utc()) > 0) {
+        if (DateTime.fromJSDate(game.state.startDate!).toUTC().diff(DateTime.utc()).milliseconds > 0) {
             return false;
         }
 
@@ -354,12 +353,12 @@ export default class GameTickService extends EventEmitter {
             return true;
         }
 
-        let lastTick = moment(game.state.lastTickDate).utc();
-        let nextTick: Moment;
+        let lastTick = DateTime.fromJSDate(game.state.lastTickDate!).toUTC();
+        let nextTick: DateTime;
         
         if (this.gameTypeService.isRealTimeGame(game)) {
             // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.speed, 'seconds');
+            nextTick = lastTick.plus({ seconds: game.settings.gameTime.speed });
         } else if (this.gameTypeService.isTurnBasedGame(game)) {
             // If in turn based mode, then check if all undefeated players are ready
             // OR the max time wait limit has been reached.
@@ -369,12 +368,12 @@ export default class GameTickService extends EventEmitter {
                 return true;
             }
 
-            nextTick = moment(lastTick).utc().add(game.settings.gameTime.maxTurnWait, 'minutes');
+            nextTick = lastTick.plus({ minutes: game.settings.gameTime.maxTurnWait });
         } else {
             throw new Error(`Unsupported game type.`);
         }
     
-        return nextTick.diff(moment().utc(), 'seconds') <= 0;
+        return nextTick.diff(DateTime.utc(), 'seconds').seconds <= 0;
     }
 
     async _combatCarriers(game: Game, gameUsers: User[], eventService: IEventService, statisticsService: IStatisticsService) {

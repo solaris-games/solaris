@@ -1,7 +1,6 @@
 import { Flux } from "@solaris/common";
 import { Game } from "./types/Game";
-
-import moment from "moment";
+import { DateTime } from "luxon";
 const fluxes = require('../config/game/flux.json') as Flux[];
 
 export default class GameFluxService {
@@ -25,7 +24,7 @@ export default class GameFluxService {
     ];
 
     getCurrentFlux(): Flux | null {
-        return this.getFluxById(moment().utc().month() + 1);
+        return this.getFluxById(DateTime.utc().month);
     }
 
     getFluxById(fluxId: number | null): Flux | null {
@@ -37,7 +36,7 @@ export default class GameFluxService {
     }
 
     applyCurrentFlux(game: Game) {
-        const fluxId = moment().utc().month();
+        const fluxId = DateTime.utc().month - 1;
         const applyFlux = this.FLUX[fluxId];
 
         applyFlux(game);
@@ -109,6 +108,6 @@ export default class GameFluxService {
     }
 
     getThisMonthSpecialistBanAmount() {
-        return moment().utc().month() === 9 ? this.SPECIALIST_BANS_FLUX : this.SPECIALIST_BANS_STANDARD;
+        return DateTime.utc().month === 10 ? this.SPECIALIST_BANS_FLUX : this.SPECIALIST_BANS_STANDARD;
     }
 }

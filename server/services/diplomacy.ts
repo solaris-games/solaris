@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import moment from 'moment';
+
 import {DBObjectId} from "./types/DBObjectId";
 import {
     BaseGameEvent,
@@ -403,7 +403,7 @@ export default class DiplomacyService extends EventEmitter {
                 // TODO
                 //@ts-ignore
                 data: ev.data,
-                sentDate: moment(ev._id.getTimestamp()).toDate(),
+                sentDate: ev._id.getTimestamp(),
                 sentTick: ev.tick
             }
         });

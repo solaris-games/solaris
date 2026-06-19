@@ -2,7 +2,7 @@ import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import {GameWinner} from "./leaderboard";
 
-import moment from "moment";
+import { DateTime } from "luxon";
 
 export default class GameStateService {
 
@@ -32,7 +32,7 @@ export default class GameStateService {
 
     finishGame(game: Game, winner: GameWinner) {
         game.state.paused = true;
-        game.state.endDate = moment().utc().toDate();
+        game.state.endDate = DateTime.utc().toJSDate();
 
         if (winner.kind === 'player') {
             game.state.winner = winner.player._id;

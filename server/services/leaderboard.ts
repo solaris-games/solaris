@@ -17,8 +17,6 @@ import TeamService from "./team";
 import {DBObjectId} from "./types/DBObjectId";
 import {isSpecialGameMode} from "./officialGames";
 
-import moment from "moment";
-
 export enum GameWinnerKind {
     Player = 'player',
     Team = 'team'
@@ -174,8 +172,8 @@ export default class LeaderboardService {
 
             // Then by defeated date descending
             if (a.player.defeated && b.player.defeated) {
-                if (moment(a.player.defeatedDate) > moment(b.player.defeatedDate)) return -1;
-                if (moment(a.player.defeatedDate) < moment(b.player.defeatedDate)) return 1;
+                if (a.player.defeatedDate! > b.player.defeatedDate!) return -1;
+                if (a.player.defeatedDate! < b.player.defeatedDate!) return 1;
             }
 
             // Sort defeated players last.

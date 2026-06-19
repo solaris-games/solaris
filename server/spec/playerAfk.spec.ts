@@ -1,4 +1,4 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 import CarrierService from "../services/carrier";
 import GameStateService from "../services/gameState";
 import { GameTypeService } from '@solaris/common'
@@ -37,7 +37,7 @@ describe('Player AFK Service', () => {
 
         game = {
             state: {
-                startDate: moment().utc().toDate()
+                startDate: DateTime.utc().toJSDate()
             },
             settings: {
                 galaxy: {
@@ -104,7 +104,7 @@ describe('Player AFK Service', () => {
         });
 
         it('should return true if the player has not been seen for the last seen timeout', () => {
-            player.lastSeen = moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days').toDate();
+            player.lastSeen = DateTime.utc().minus({ days: game.settings.gameTime.afk.lastSeenTimeout }).toJSDate();
             
             const result = service.isAfk(game, player);
     
@@ -114,7 +114,7 @@ describe('Player AFK Service', () => {
         it('should return true if the player has missed too many turns', () => {
             gameTypeService.isTurnBasedGame = ((game: Game) => { return true; }) as any;
 
-            player.lastSeen = moment().utc().toDate();
+            player.lastSeen = DateTime.utc().toJSDate();
             player.missedTurns = game.settings.gameTime.afk.turnTimeout;
             
             const result = service.isAfk(game, player);
@@ -125,10 +125,10 @@ describe('Player AFK Service', () => {
         it('should return true if the player has missed too many cycles', () => {
             const seconds = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
 
-            player.lastSeen = moment().utc().subtract(seconds, 'seconds').toDate();
+            player.lastSeen = DateTime.utc().minus({ seconds }).toJSDate();
             
             const result = service.isAfk(game, player);
-
+    
             expect(result).toBeTrue();
         });
 
@@ -139,7 +139,7 @@ describe('Player AFK Service', () => {
 
             const seconds = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
 
-            player.lastSeen = moment().utc().subtract(seconds, 'seconds').toDate();
+            player.lastSeen = DateTime.utc().minus({ seconds }).toJSDate();
             
             const result = service.isAfk(game, player);
 

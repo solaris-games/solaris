@@ -6,7 +6,7 @@ import SessionService from './session';
 import { DBObjectId } from './types/DBObjectId';
 import { Game } from './types/Game';
 import { User, UserSubscriptions } from './types/User';
-import moment from "moment";
+import { DateTime } from "luxon";
 import {ActiveModel} from "./types/ActiveModel";
 import { EmailService } from "./email";
 
@@ -47,7 +47,7 @@ export default class UserService extends EventEmitter {
 
         if (user) {
             user.warnings = user.warnings.filter(warning => {
-                return moment().diff(warning.date, 'months') < 1;
+                return DateTime.utc().diff(DateTime.fromJSDate(warning.date), 'months').months < 1;
             });
         }
 
@@ -219,8 +219,8 @@ export default class UserService extends EventEmitter {
         let user = {
             username: username.trim(),
             email: email.trim().toLowerCase(),
-            signupDate: moment().utc(),
-            lastSeen: moment().utc(),
+            signupDate: DateTime.utc().toJSDate(),
+            lastSeen: DateTime.utc().toJSDate(),
             lastSeenIP: ipAddress,
         };
 
@@ -494,7 +494,7 @@ export default class UserService extends EventEmitter {
             _id: userId
         }, {
             $set: {
-                'lastSeen': moment().utc(),
+                'lastSeen': DateTime.utc().toJSDate(),
                 'lastSeenIP': ipAddress
             }
         });
@@ -595,7 +595,7 @@ export default class UserService extends EventEmitter {
     }
 
     async listUsersEligibleForReviewReminder(limit: number) {
-        const date = moment().utc().add(-30, 'days').toDate();
+        const date = DateTime.utc().minus({ days: 30 }).toJSDate();
         const ltId = this.userRepo.objectIdFromDate(date);
 
         return await this.userRepo.find({

@@ -2,7 +2,7 @@ import { Game } from "./types/Game";
 import { Specialist } from '@solaris/common';
 import SpecialistService from "./specialist";
 const RNG = require('random-seed');
-import moment from "moment";
+import { DateTime } from "luxon";
 
 export default class SpecialistBanService {
     specialistService: SpecialistService;
@@ -30,8 +30,8 @@ export default class SpecialistBanService {
             return specialistIds;
         }
 
-        const now = moment().utc();
-        const seed = now.format('YYYYMM');
+        const now = DateTime.utc();
+        const seed = now.toFormat('yyyyMM');
         const rng = RNG.create(seed);
 
         const bans: number[] = [];
