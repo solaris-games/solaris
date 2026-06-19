@@ -29,7 +29,7 @@ export const useConversationStore = defineStore('conversation', () => {
   };
 
   return {
-    currentConversation: readonly(currentConversation),
+    currentConversation,
     openConversation,
     closeConversation,
     updateCurrentConversationText,
