@@ -23,7 +23,7 @@ import { TechnologyService } from '@solaris/common';
 import UserService from "./user";
 import { CarrierActionWaypoint } from "./types/GameTick";
 import { Star } from "./types/Star";
-import { GameRankingResult } from "../../common/src/types/common/rating";
+import { GameRankingResult } from "@solaris/common";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import CarrierGiftService from "./carrierGift";
 import CarrierMovementService, {CarrierMovementReport} from "./carrierMovement";

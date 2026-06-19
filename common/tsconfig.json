@@ -4,6 +4,8 @@
         "target": "es2024",
         "declaration": true,
         "outDir": "./dist",
+        "rootDir": "./src",
+        "types": [],
         "strict": true
     },
     "include": [

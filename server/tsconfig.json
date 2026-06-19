@@ -13,7 +13,8 @@
         "noImplicitThis": true,
         "useDefineForClassFields": true,
         "skipLibCheck": true,
-        "allowJs": true
+        "allowJs": true,
+        "types": ["node", "jasmine"]
     },
     "include": [
         "**/*.ts",

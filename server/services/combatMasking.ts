@@ -1,7 +1,6 @@
-import {CombatResult} from "@solaris/common";
+import {CombatResult, CombatResultGroup} from "@solaris/common";
 import {DBObjectId} from "./types/DBObjectId";
 import SpecialistService from "./specialist";
-import {CombatResultGroup} from "../../common/src";
 
 export class CombatMaskingService {
     specialistService: SpecialistService;
