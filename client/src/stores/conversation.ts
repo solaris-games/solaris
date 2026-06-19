@@ -1,4 +1,4 @@
-import { ref, readonly } from 'vue';
+import { ref } from 'vue';
 import { defineStore } from "pinia";
 
 export const useConversationStore = defineStore('conversation', () => {

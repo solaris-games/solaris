@@ -128,7 +128,6 @@ onMounted(() => {
 #window {
   position: absolute;
   right: 0;
-  bottom: 100px;
   width: min(100%, 473px);
   top: 45px;
   overflow: auto;
