@@ -5,5 +5,7 @@ services:
     - "27017:27017"
     volumes:
     - "dbdata:/data/db"
+    environment:
+    - GLIBC_TUNABLES=glibc.pthread.rseq=1
 volumes:
   dbdata:

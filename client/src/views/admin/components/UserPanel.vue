@@ -77,7 +77,7 @@ import {
   setRoleDeveloper, setRoleGameMaster, unban
 } from "@/services/typedapi/admin";
 import router from "@/router";
-import { formatDistanceToNow } from "date-fns";
+import { DateTime } from "luxon";
 import { useUserStore } from '@/stores/user';
 
 import { useToast } from 'vue-toast-notification';
@@ -101,7 +101,7 @@ const getLastSeenString = (lastSeen: Date) => {
     return ''
   }
 
-  formatDistanceToNow(lastSeen, { addSuffix: true });
+  return DateTime.fromJSDate(lastSeen).toRelative();
 };
 
 const onWarningAdded = (warning: string) => {

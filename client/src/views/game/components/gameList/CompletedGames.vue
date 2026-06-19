@@ -51,14 +51,14 @@ import { ref, inject, type Ref, onMounted } from 'vue';
 import type { ListGame, UserActiveListGame } from '@solaris/common';
 import { listMyCompleted } from '@/services/typedapi/game';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { formatDistanceToNow } from "date-fns";
+import { DateTime } from "luxon";
 
 const httpClient = inject(httpInjectionKey)!;
 
 const isLoading = ref(false);
 const completedGames: Ref<UserActiveListGame<string>[]> = ref([]);
 
-const getEndDateFromNow = (game: ListGame<string>) => formatDistanceToNow(game.state.endDate!, { addSuffix: true });
+const getEndDateFromNow = (game: ListGame<string>) => DateTime.fromJSDate(game.state.endDate!).toRelative();
 
 onMounted(async () => {
   isLoading.value = true;

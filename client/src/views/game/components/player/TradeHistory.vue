@@ -100,7 +100,6 @@ import { ref, computed, inject, onMounted } from 'vue';
 import GameHelper from '../../../../services/gameHelper';
 import TechnologyHelper from '../../../../services/technologyHelper';
 import LoadingSpinner from '../../../components/LoadingSpinner.vue';
-import { compareAsc } from 'date-fns';
 import type {Game} from "@/types/game";
 import {type BasePlayerDebtEvent, type ResearchTypeNotRandom, type TradeEvent} from "@solaris/common";
 import {listTradeEvents} from "@/services/typedapi/trade";
@@ -145,7 +144,7 @@ const loadTradeEvents = async () => {
 
   const response = await listTradeEvents(httpClient)(game.value._id, props.toPlayerId);
   if (isOk(response)) {
-    tradeEvents.value = response.data.sort((a, b) => compareAsc(a.sentDate, b.sentDate));
+    tradeEvents.value = response.data.sort((a, b) => a.sentDate.valueOf() - b.sentDate.valueOf());
   } else {
     console.error(formatError(response));
   }

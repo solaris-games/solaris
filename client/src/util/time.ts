@@ -1,4 +1,4 @@
-import { add } from 'date-fns';
+import { DateTime } from 'luxon';
 import type {Game} from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {
@@ -24,7 +24,7 @@ type TGame = {
 }
 
 export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo: Date): Date => {
-  return add(relativeTo, { seconds: ticks * speedInSeconds });
+  return DateTime.fromJSDate(relativeTo).plus({ seconds: ticks * speedInSeconds }).toJSDate();
 };
 
 // for non-started or paused games we want the current time as base
@@ -118,7 +118,7 @@ export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string
 
 export const getTurnTimeoutTime = (game: TGame): Date | null => {
   if (game.settings.gameTime.gameType === 'turnBased' && game.state.lastTickDate && !GameHelper.isGameFinished(game)) {
-    return add(game.state.lastTickDate, { minutes: game.settings.gameTime.maxTurnWait });
+    return DateTime.fromJSDate(game.state.lastTickDate).plus({ minutes: game.settings.gameTime.maxTurnWait }).toJSDate();
   }
 
   return null;

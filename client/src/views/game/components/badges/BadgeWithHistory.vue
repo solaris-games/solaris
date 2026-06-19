@@ -23,7 +23,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { format } from 'date-fns';
+import { DateTime } from 'luxon';
 import { computed } from 'vue';
 import type {AwardedBadge, Badge as BadgeData} from "@solaris/common";
 
@@ -40,7 +40,7 @@ const badgeWebpSrc = computed(() => new URL(`../../../../assets/badges/${props.b
 const hasFullPlayerInfo = computed(() => Boolean(props.badge.playerAwarded && props.badge.awardedByName && props.badge.awardedInGameName && props.badge.time));
 const hasFullGameInfo = computed(() => Boolean(props.badge.awardedInGameName && props.badge.time));
 
-const awardedDate = computed(() => props.badge.time && format(props.badge.time, "P"));
+const awardedDate = computed(() => props.badge.time && DateTime.fromJSDate(props.badge.time).toLocaleString(DateTime.DATE_SHORT));
 </script>
 <style scoped>
 .badge-with-history-container {

@@ -554,7 +554,7 @@ import { ref, computed, inject, onMounted, type Ref } from 'vue';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { createTutorial, listSummary, listTutorials } from '@/services/typedapi/game';
 import gameHelper from '@/services/gameHelper';
-import { formatDistanceToNow } from "date-fns";
+import { DateTime } from "luxon";
 import { useTutorialStore } from '@/stores/tutorial';
 
 type Games = {
@@ -627,7 +627,7 @@ const getSpecialGame = () => {
 };
 
 const getFriendlyDate = (date: Date) => {
-  return formatDistanceToNow(date, { addSuffix: true });;
+  return DateTime.fromJSDate(date).toRelative();
 };
 
 const startTutorial = async (tutorialKey: string) => {

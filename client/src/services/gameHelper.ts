@@ -9,7 +9,7 @@ import {
 } from '@solaris/common';
 import type {RulerPoint} from '@/types/ruler';
 import type {TeamLeaderboardData} from "@/types/leaderboard";
-import {add, compareAsc, format, formatDistanceToNow, isAfter, isBefore } from "date-fns";
+import { DateTime } from "luxon";
 
 class GameHelper {
   getUserPlayer(game: Game): Player | undefined {
@@ -408,7 +408,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) &&
       !this.isGamePaused(game) &&
       game.state.startDate != null &&
-      !isBefore(new Date(), game.state.startDate) &&
+      !(DateTime.now() < DateTime.fromJSDate(game.state.startDate)) &&
       !game.state.endDate;
   }
 
@@ -416,7 +416,7 @@ class GameHelper {
     return !this.isGameWaitingForPlayers(game) &&
       !this.isGamePaused(game) &&
       game.state.startDate != null &&
-      isBefore(Date.now(), game.state.startDate);
+      DateTime.now() < DateTime.fromJSDate(game.state.startDate);
   }
 
   isGameFinished(game: { state: GameInfoState<string> }) {
@@ -625,8 +625,8 @@ class GameHelper {
 
       // Then by defeated date descending
       if (a.defeated && b.defeated) {
-        if (compareAsc(a.defeatedDate, b.defeatedDate) === 1) return -1;
-        if (compareAsc(a.defeatedDate, b.defeatedDate) === -1) return 1;
+        if (a.defeatedDate > b.defeatedDate) return -1;
+        if (a.defeatedDate < b.defeatedDate) return 1;
       }
 
       // Sort defeated players last.
@@ -678,7 +678,7 @@ class GameHelper {
       return 'Online Now'
     }
     else {
-      return formatDistanceToNow(player.lastSeen, { addSuffix: true });
+      return DateTime.fromJSDate(player.lastSeen).toRelative() ?? '';
     }
   }
 
@@ -699,7 +699,7 @@ class GameHelper {
   }
 
   getDateString(date: Date | string) {
-    return format(new Date(date), "E do MMM HH mm");
+    return DateTime.fromJSDate(new Date(date)).toFormat("ccc d LLL HH mm");
   }
 
   getGamePlayerShapesCount(game) {
@@ -764,7 +764,7 @@ class GameHelper {
 
     if (this.isRealTimeGame(game)) {
       // If in real time mode, then calculate when the next tick will be and work out if we have reached that tick.
-      nextTick = add(lastTick!, { seconds: game.settings.gameTime.speed });
+      nextTick = DateTime.fromJSDate(lastTick!).plus({ seconds: game.settings.gameTime.speed }).toJSDate();
     } else if (this.isTurnBasedGame(game)) {
       const isAllPlayersReady = this.isAllUndefeatedPlayersReady(game);
 
@@ -772,12 +772,12 @@ class GameHelper {
         return true;
       }
 
-      nextTick = add(lastTick!, { seconds: game.settings.gameTime.maxTurnWait });
+      nextTick = DateTime.fromJSDate(lastTick!).plus({ seconds: game.settings.gameTime.maxTurnWait }).toJSDate();
     } else {
       throw new Error(`Unsupported game type.`);
     }
 
-    return isBefore(nextTick, new Date());
+    return DateTime.fromJSDate(nextTick) < DateTime.now();
   }
 
   starInfrastructureUpgraded(game: Game, data: InfrastructureUpgradeReport<string> & { type: keyof Star["infrastructure"] }) {

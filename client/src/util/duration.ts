@@ -1,5 +1,3 @@
-import { compareDesc } from "date-fns";
-
 // We do not account for anything longer than weeks because after that things get messy
 export type Duration = {
   weeks?: number;
