@@ -772,7 +772,7 @@ class GameHelper {
         return true;
       }
 
-      nextTick = DateTime.fromJSDate(lastTick!).plus({ seconds: game.settings.gameTime.maxTurnWait }).toJSDate();
+      nextTick = DateTime.fromJSDate(lastTick!).plus({ minutes: game.settings.gameTime.maxTurnWait }).toJSDate();
     } else {
       throw new Error(`Unsupported game type.`);
     }
