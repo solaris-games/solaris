@@ -27,7 +27,6 @@ export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo
   return DateTime.fromJSDate(relativeTo).plus({ seconds: ticks * speedInSeconds }).toJSDate();
 };
 
-// for non-started or paused games we want the current time as base
 const getLastTickDate = (game: TGame) => {
   if (!game.state.lastTickDate) {
     return null;
@@ -35,12 +34,8 @@ const getLastTickDate = (game: TGame) => {
 
   const isBehind = game.state.lastTickDate.getTime() + (game.settings.gameTime.speed * 1000) < Date.now();
 
-  if (isBehind) {
-    return null;
-  } else if (GameHelper.isGameInProgress(game)) {
+  if (!isBehind && GameHelper.isGameInProgress(game)) {
     return game.state.lastTickDate;
-  } else if (GameHelper.isGamePaused(game)) {
-    return new Date();
   }
 
   return null;
