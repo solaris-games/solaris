@@ -658,7 +658,7 @@ describe('technology', () => {
     /* CARRIER ARRAY */
 
     it('should calculate carrier effective weapons level - Single player - Single carrier - Carrier to star combat', () => {
-        const game = { };
+        const game = { settings: { specialGalaxy: { defenderBonus: 'disabled' } } };
 
         const players = [
             {
@@ -680,13 +680,13 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
 
         expect(weapons).toBe(1);
     });
 
     it('should calculate carrier effective weapons level - Multi player - Single carrier - Carrier to star combat', () => {
-        const game = { };
+        const game = { settings: { specialGalaxy: { defenderBonus: 'disabled' } } };
 
         const players = [
             {
@@ -715,13 +715,13 @@ describe('technology', () => {
 
         setup();
 
-        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
 
         expect(weapons).toBe(2);
     });
 
     it('should calculate carrier effective weapons level - Single player - Multi carrier - Carrier to star combat', () => {
-        const game = { };
+        const game = { settings: { specialGalaxy: { defenderBonus: 'disabled' } } };
 
         const players = [
             {
@@ -751,7 +751,7 @@ describe('technology', () => {
 
         setup(null, specialist);
 
-        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat);
+        const weapons = getCarriersEffectiveWeaponsLevel(game, players, carriers, isCarrierToStarCombat, true);
 
         expect(weapons).toBe(2);
     });
