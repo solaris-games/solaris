@@ -10,9 +10,9 @@
       <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId"
         @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
 
-      <game-container @onStarClicked="onStarClicked" @onStarRightClicked="onStarRightClicked"
-        @onCarrierClicked="onCarrierClicked" @onCarrierRightClicked="onCarrierRightClicked"
-        @onObjectsClicked="onObjectsClicked" />
+      <game-container @onStarSelected="onStarSelected" @onStarRightSelected="onStarRightSelected"
+                      @onCarrierSelected="onCarrierSelected" @onCarrierRightSelected="onCarrierRightSelected"
+                      @onObjectsClicked="onObjectsClicked" />
 
       <main-bar @onPlayerSelected="onPlayerSelected" @onReloadGameRequested="reloadGame"
         @onViewColourOverrideRequested="onViewColourOverrideRequested" />
@@ -112,7 +112,7 @@ const onViewColourOverrideRequested = (e: string) => {
   colourOverride.value = { playerId: e };
 };
 
-const onStarClicked = (starId: string) => {
+const onStarSelected = (starId: string) => {
   store.setMenuState({
     state: 'starDetail',
     starId,
@@ -121,7 +121,7 @@ const onStarClicked = (starId: string) => {
   AudioService.click();
 };
 
-const onStarRightClicked = (starId: string) => {
+const onStarRightSelected = (starId: string) => {
   const star = GameHelper.getStarById(store.game!, starId)!;
   const owningPlayer = GameHelper.getStarOwningPlayer(store.game!, star);
 
@@ -132,7 +132,7 @@ const onStarRightClicked = (starId: string) => {
   AudioService.click();
 };
 
-const onCarrierClicked = (carrierId: string) => {
+const onCarrierSelected = (carrierId: string) => {
   store.setMenuState({
     state: 'carrierDetail',
     carrierId,
@@ -141,7 +141,7 @@ const onCarrierClicked = (carrierId: string) => {
   AudioService.click();
 };
 
-const onCarrierRightClicked = (carrierId: string) => {
+const onCarrierRightSelected = (carrierId: string) => {
   const carrier = GameHelper.getCarrierById(store.game!, carrierId)!;
   const owningPlayer = GameHelper.getCarrierOwningPlayer(store.game!, carrier);
 

@@ -34,12 +34,12 @@ export type OnPreStarParams = {
 export default class MapEventBusEventNames {
     private constructor() {};
 
-    public static readonly MapOnStarClicked: MapEventBusEventName<{ star: Star }> = toEventName('onStarClicked');
-    public static readonly MapOnStarRightClicked: MapEventBusEventName<{ star: Star }> = toEventName("onStarRightClicked");
-    public static readonly MapOnPreStarClicked: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarClicked");
-    public static readonly MapOnPreStarRightClicked: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarRightClicked");
-    public static readonly MapOnCarrierClicked: MapEventBusEventName<{ carrier: Carrier }> = toEventName('onCarrierClicked');
-    public static readonly MapOnCarrierRightClicked: MapEventBusEventName<{ carrier: Carrier }> = toEventName("onCarrierRightClicked");
+    public static readonly MapOnStarSelected: MapEventBusEventName<{ star: Star }> = toEventName('onStarClicked');
+    public static readonly MapOnStarRightSelected: MapEventBusEventName<{ star: Star }> = toEventName("onStarRightClicked");
+    public static readonly MapOnStarClickDispatched: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarClicked");
+    public static readonly MapOnStarRightClickDispatched: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarRightClicked");
+    public static readonly MapOnCarrierSelected: MapEventBusEventName<{ carrier: Carrier }> = toEventName('onCarrierClicked');
+    public static readonly MapOnCarrierRightSelected: MapEventBusEventName<{ carrier: Carrier }> = toEventName("onCarrierRightClicked");
     public static readonly MapOnWaypointCreated: MapEventBusEventName<{ waypoint: TempWaypoint }> = toEventName("onWaypointCreated");
     public static readonly MapOnObjectsClicked: MapEventBusEventName<{ objects: ObjectClicked[] }> = toEventName("onObjectsClicked");
     public static readonly MapOnWaypointOutOfRange: MapEventBusEventName<{}> = toEventName("onWaypointOutOfRange");

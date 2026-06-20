@@ -786,7 +786,7 @@ export class Map {
 
         const owningPlayer = helpers.getStarOwningPlayer(this.game, dic.starData);
 
-        this.eventBus.emit(MapEventBusEventNames.MapOnPreStarClicked, {
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarClickDispatched, {
             star: dic.starData,
             owningPlayer,
             defaultCallback: click,
@@ -803,7 +803,7 @@ export class Map {
 
             if (!dic.tryMultiSelect || !this.tryMultiSelect(e.location)) {
                 selectedStar?.toggleSelected()
-                this.eventBus.emit(MapEventBusEventNames.MapOnStarClicked, {star: e})
+                this.eventBus.emit(MapEventBusEventNames.MapOnStarSelected, {star: e})
             }
         } else if (this.mode.mode === ModeKind.Waypoints) {
             this.waypoints!.onStarClicked(e)
@@ -834,7 +834,7 @@ export class Map {
 
         const click = () => {
             if (this.mode.mode === ModeKind.Galaxy) {
-                this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClicked, {star: e})
+                this.eventBus.emit(MapEventBusEventNames.MapOnStarRightSelected, {star: e})
             }
         };
 
@@ -844,7 +844,7 @@ export class Map {
             return;
         }
 
-        this.eventBus.emit(MapEventBusEventNames.MapOnPreStarRightClicked, {
+        this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClickDispatched, {
             star: dic.starData,
             owningPlayer,
             defaultCallback: click,
@@ -876,7 +876,7 @@ export class Map {
             }
 
             if (!ev.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-                this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClicked, {carrier: e})
+                this.eventBus.emit(MapEventBusEventNames.MapOnCarrierSelected, {carrier: e})
             } else {
                 selectedCarrier!.unselect()
             }
@@ -889,7 +889,7 @@ export class Map {
 
     onCarrierRightClicked(carrier: CarrierData) {
         if (this.mode.mode === ModeKind.Galaxy) {
-            this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClicked, {carrier});
+            this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightSelected, {carrier});
         }
     }
 

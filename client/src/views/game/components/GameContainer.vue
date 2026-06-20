@@ -32,10 +32,10 @@ const httpClient = inject(httpInjectionKey)!;
 const serviceProvider = useGameServices();
 
 const emit = defineEmits<{
-  onStarClicked: [starId: string],
-  onStarRightClicked: [starId: string],
-  onCarrierClicked: [carrierId: string],
-  onCarrierRightClicked: [carrierId: string],
+  onStarSelected: [starId: string],
+  onStarRightSelected: [starId: string],
+  onCarrierSelected: [carrierId: string],
+  onCarrierRightSelected: [carrierId: string],
   onObjectsClicked: [objects: ObjectClicked[]]
 }>();
 
@@ -100,28 +100,28 @@ onMounted(() => {
       }
     };
 
-    const onStarClickedHandler = ({ star }: { star: Star }) => {
-      emit("onStarClicked", star._id);
+    const onStarSelectedHandler = ({ star }: { star: Star }) => {
+      emit("onStarSelected", star._id);
     };
 
-    const onPreStarClickedHandler = (params: OnPreStarParams) => {
+    const onStarClickDispatchHandler = (params: OnPreStarParams) => {
       mentionStore.starClicked(params);
     };
 
-    const onPreStarRightClickedHandler = (params: OnPreStarParams) => {
+    const onStarRightClickDispatchHandler = (params: OnPreStarParams) => {
       mentionStore.starRightClicked(params);
     };
 
-    const onStarRightClickedHandler = ({ star }: { star: Star }) => {
-      emit("onStarRightClicked", star._id);
+    const onStarRightSelected = ({ star }: { star: Star }) => {
+      emit("onStarRightSelected", star._id);
     };
 
-    const onCarrierClickedHandler = ({ carrier }: { carrier: Carrier }) => {
-      emit("onCarrierClicked", carrier._id);
+    const onCarrierSelectedHandler = ({ carrier }: { carrier: Carrier }) => {
+      emit("onCarrierSelected", carrier._id);
     };
 
-    const onCarrierRightClickedHandler = ({ carrier }: { carrier: Carrier }) => {
-      emit("onCarrierRightClicked", carrier._id);
+    const onCarrierRightSelectedHandler = ({ carrier }: { carrier: Carrier }) => {
+      emit("onCarrierRightSelected", carrier._id);
     };
 
     const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
@@ -143,12 +143,12 @@ onMounted(() => {
     const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
     attachEventDeduplication(gameRoot, canvas);
 
-    eventBus.on(MapEventBusEventNames.MapOnPreStarClicked, onPreStarClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnPreStarRightClicked, onPreStarRightClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnStarClickDispatched, onStarClickDispatchHandler);
+    eventBus.on(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
+    eventBus.on(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
     eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
 
     if (userStore.userId) {
@@ -165,12 +165,12 @@ onMounted(() => {
 
       gameContainer.destroy();
 
-      eventBus.off(MapEventBusEventNames.MapOnPreStarClicked, onPreStarClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnStarClicked, onStarClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnPreStarRightClicked, onPreStarRightClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnStarRightClicked, onStarRightClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierClicked, onCarrierClickedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierRightClicked, onCarrierRightClickedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarClickDispatched, onStarClickDispatchHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
+      eventBus.off(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
       eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
     };
   });
