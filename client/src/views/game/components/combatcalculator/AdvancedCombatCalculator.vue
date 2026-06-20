@@ -17,6 +17,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { storeToRefs } from 'pinia';
 import CalculatorCombatGroup from "@/views/game/components/combatcalculator/CalculatorCombatGroup.vue";
 import type {
   CombatBaseCarrier,
@@ -30,13 +31,15 @@ import {useGameStore} from "@/stores/game";
 import {useGameServices} from "@/util/gameServices";
 import {type CCGroup, makeCombatGroups} from "@/views/game/components/combatcalculator/types";
 import type {Game} from "@/types/game";
+import {useCombatCalculatorStore} from "@/stores/combatCalculator";
 
 const store = useGameStore();
 const serviceProvider = useGameServices();
+const combatCalculatorStore = useCombatCalculatorStore();
 
 const game = computed<Game>(() => store.game!);
 
-const groups = ref<CCGroup[]>([]);
+const { groups } = storeToRefs(combatCalculatorStore);
 const result = ref<DetailedCombatResult<string, CombatBasePlayer<string>, CombatBaseStar<string>, CombatBaseCarrier<string>> | null>(null);
 
 const errors = computed(() => {
@@ -54,16 +57,11 @@ const actualCombatGroups = computed<CombatGroup<string, CombatBasePlayer<string>
 const hasErrors = computed(() => errors.value.length > 0);
 
 const onGroupRemoved = (gr: CCGroup) => {
-  groups.value.splice(groups.value.indexOf(gr), 1);
-}
+  combatCalculatorStore.removeGroup(gr);
+};
 
 const addGroup = () => {
-  groups.value.push({
-    name: `Group ${groups.value.length + 1}`,
-    star: undefined,
-    carriers: [],
-    weapons: { kind: 'level', level: 1 },
-  });
+  combatCalculatorStore.addGroup();
 };
 
 const getErrors = (group: CCGroup) => {
@@ -85,9 +83,9 @@ const getErrors = (group: CCGroup) => {
 };
 
 const reset = () => {
-  groups.value = [];
+  combatCalculatorStore.reset();
   result.value = null;
-}
+};
 
 const calculate = () => {
   result.value = serviceProvider.combatService.calculateGroups(actualCombatGroups.value, groups.value.some(g => Boolean(g.star)));
