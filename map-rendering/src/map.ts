@@ -841,19 +841,23 @@ export class Map {
     private _onCarrierClicked(ev: CarrierClickEvent) {
         // ignore clicks if its a drag motion
         if (ev.eventData && this._isDragMotion(ev.eventData.global)) {
-            return
+            return;
         }
 
-        const e = ev.carrierData
+        this._selectCarrier(ev);
+    }
+
+    private _selectCarrier(ev: CarrierClickEvent) {
+        const e = ev.carrierData;
         // Clicking carriers should only raise events to the UI if in galaxy mode.
         if (this.mode.mode === ModeKind.Galaxy) {
 
             const selectedCarrier = this.carriers.find(x => x.data!._id === e._id)
 
-            this.unselectAllStars()
-            selectedCarrier && this.unselectAllCarriersExcept(selectedCarrier)
+            this.unselectAllStars();
+            selectedCarrier && this.unselectAllCarriersExcept(selectedCarrier);
 
-            selectedCarrier!.toggleSelected()
+            selectedCarrier?.toggleSelected();
 
             //highlight carrier path if selected
             if (selectedCarrier?.isSelected) {
@@ -863,18 +867,26 @@ export class Map {
             }
 
             if (!ev.tryMultiSelect || !this.tryMultiSelect(e.location)) {
-                this.eventBus.emit(MapEventBusEventNames.MapOnCarrierSelected, {carrier: e})
+                this.eventBus.emit(MapEventBusEventNames.MapOnCarrierSelected, {carrier: e});
             } else {
-                selectedCarrier!.unselect()
+                selectedCarrier!.unselect();
             }
         } else if (this.mode.mode === ModeKind.Ruler) {
-            this.rulerPoints.onCarrierClicked(e)
+            this.rulerPoints.onCarrierClicked(e);
         }
 
-        AnimationService.drawSelectedCircle(this.app, this.container, e.location)
+        AnimationService.drawSelectedCircle(this.app, this.container, e.location);
     }
 
-    private _onCarrierRightClicked(carrier: CarrierData) {
+    private _onCarrierRightClicked(ev: CarrierClickEvent) {
+        if (ev.eventData && this._isDragMotion(ev.eventData.global)) {
+            return;
+        }
+
+        this._rightSelectCarrier(ev.carrierData);
+    }
+
+    private _rightSelectCarrier(carrier: CarrierData) {
         if (this.mode.mode === ModeKind.Galaxy) {
             this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightSelected, {carrier});
         }
