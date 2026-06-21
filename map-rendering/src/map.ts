@@ -304,9 +304,9 @@ export class Map {
 
             this.starContainer!.addChild(star.fixedContainer);
 
-            star.on('onStarClicked', this.onStarClicked.bind(this));
-            star.on('onStarRightClicked', this.onStarRightClicked.bind(this));
-            star.on('onStarDefaultClicked', this.onStarDefaultClicked.bind(this));
+            star.on('onStarClicked', this._onStarClicked.bind(this));
+            star.on('onStarRightClicked', this._onStarRightClicked.bind(this));
+            star.on('onStarDefaultClicked', this._onStarDefaultClicked.bind(this));
             star.on('onStarMouseOver', this.onStarMouseOver.bind(this));
             star.on('onStarMouseOut', this.onStarMouseOut.bind(this));
             star.on('onSelected', this.onStarSelected.bind(this));
@@ -325,10 +325,10 @@ export class Map {
             carrier = new Carrier(game, carrierData, userSettings, this.context, this.pathManager);
             this.carriers.push(carrier);
 
-            carrier.on('onCarrierClicked', this.onCarrierClicked.bind(this))
-            carrier.on('onCarrierRightClicked', this.onCarrierRightClicked.bind(this))
-            carrier.on('onCarrierMouseOver', this.onCarrierMouseOver.bind(this))
-            carrier.on('onCarrierMouseOut', this.onCarrierMouseOut.bind(this))
+            carrier.on('onCarrierClicked', this._onCarrierClicked.bind(this))
+            carrier.on('onCarrierRightClicked', this._onCarrierRightClicked.bind(this))
+            carrier.on('onCarrierMouseOver', this._onCarrierMouseOver.bind(this))
+            carrier.on('onCarrierMouseOut', this._onCarrierMouseOut.bind(this))
             carrier.on('onSelected', this.onCarrierSelected.bind(this))
             carrier.on('onUnselected', this.onCarrierUnselected.bind(this))
         }
@@ -755,7 +755,7 @@ export class Map {
     }
 
     //not sure where to put this func
-    isDragMotion(position: Location) {
+    private _isDragMotion(position: Location) {
         const DRAG_THRESHOLD = 8 //max distance in pixels
         const dxSquared = Math.pow(Math.abs(this.lastPointerDownPosition!.x - position.x), 2)
         const dySquared = Math.pow(Math.abs(this.lastPointerDownPosition!.y - position.y), 2)
@@ -764,10 +764,10 @@ export class Map {
         return (distance > DRAG_THRESHOLD)
     }
 
-    onStarClicked(dic: StarClickEvent) {
+    private _onStarClicked(dic: StarClickEvent) {
         // ignore clicks if its a drag motion
         const e = dic.starData
-        if (dic.eventData && this.isDragMotion(dic.eventData.global)) {
+        if (dic.eventData && this._isDragMotion(dic.eventData.global)) {
             return;
         }
 
@@ -776,13 +776,6 @@ export class Map {
 
             this.selectStar(e, dic);
         };
-
-        const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
-
-        if (doNormalClick) {
-            click();
-            return;
-        }
 
         const owningPlayer = helpers.getStarOwningPlayer(this.game, dic.starData);
 
@@ -813,20 +806,20 @@ export class Map {
         AnimationService.drawSelectedCircle(this.app, this.container, e.location)
     }
 
-    onStarDefaultClicked(dic: BasicStarClickEvent) {
+    private _onStarDefaultClicked(dic: BasicStarClickEvent) {
         // ignore clicks if its a drag motion
         let e = dic.starData
-        if (dic.eventData && this.isDragMotion(dic.eventData.global)) {
+        if (dic.eventData && this._isDragMotion(dic.eventData.global)) {
             return
         }
 
         this.selectStar(e, dic);
     }
 
-    onStarRightClicked(dic: BasicStarClickEvent) {
+    private _onStarRightClicked(dic: BasicStarClickEvent) {
         // ignore clicks if its a drag motion
         const e = dic.starData
-        if (dic.eventData && this.isDragMotion(dic.eventData.global)) {
+        if (dic.eventData && this._isDragMotion(dic.eventData.global)) {
             return
         }
 
@@ -838,12 +831,6 @@ export class Map {
             }
         };
 
-        const doNormalClick = this.userSettings.interface.shiftKeyMentions === 'enabled' && !dic.eventData?.shiftKey;
-        if (doNormalClick) {
-            click();
-            return;
-        }
-
         this.eventBus.emit(MapEventBusEventNames.MapOnStarRightClickDispatched, {
             star: dic.starData,
             owningPlayer,
@@ -851,9 +838,9 @@ export class Map {
         });
     }
 
-    onCarrierClicked(ev: CarrierClickEvent) {
+    private _onCarrierClicked(ev: CarrierClickEvent) {
         // ignore clicks if its a drag motion
-        if (ev.eventData && this.isDragMotion(ev.eventData.global)) {
+        if (ev.eventData && this._isDragMotion(ev.eventData.global)) {
             return
         }
 
@@ -887,13 +874,13 @@ export class Map {
         AnimationService.drawSelectedCircle(this.app, this.container, e.location)
     }
 
-    onCarrierRightClicked(carrier: CarrierData) {
+    private _onCarrierRightClicked(carrier: CarrierData) {
         if (this.mode.mode === ModeKind.Galaxy) {
             this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightSelected, {carrier});
         }
     }
 
-    onCarrierMouseOver(carrier: CarrierData) {
+    private _onCarrierMouseOver(carrier: CarrierData) {
         // If the carrier is orbiting something then send the mouse over event
         // to the star.
         if (carrier.orbiting) {
@@ -904,7 +891,7 @@ export class Map {
         this.tooltipLayer!.drawTooltipCarrier(carrier);
     }
 
-    onCarrierMouseOut(carrier: CarrierData) {
+    private _onCarrierMouseOut(carrier: CarrierData) {
         // If the carrier is orbiting something then send the mouse over event
         // to the star.
         if (carrier.orbiting) {
