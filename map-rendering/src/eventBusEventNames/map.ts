@@ -25,7 +25,7 @@ export type ObjectClicked = {
     distance: number,
 } & ObjectClickedData;
 
-export type OnPreStarParams = {
+export type StarClickDispatchArgs = {
     star: Star,
     owningPlayer: Player | undefined,
     defaultCallback: () => void,
@@ -36,8 +36,8 @@ export default class MapEventBusEventNames {
 
     public static readonly MapOnStarSelected: MapEventBusEventName<{ star: Star }> = toEventName('onStarClicked');
     public static readonly MapOnStarRightSelected: MapEventBusEventName<{ star: Star }> = toEventName("onStarRightClicked");
-    public static readonly MapOnStarClickDispatched: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarClicked");
-    public static readonly MapOnStarRightClickDispatched: MapEventBusEventName<OnPreStarParams> = toEventName("onPreStarRightClicked");
+    public static readonly MapOnStarClickDispatched: MapEventBusEventName<StarClickDispatchArgs> = toEventName("onPreStarClicked");
+    public static readonly MapOnStarRightClickDispatched: MapEventBusEventName<StarClickDispatchArgs> = toEventName("onPreStarRightClicked");
     public static readonly MapOnCarrierSelected: MapEventBusEventName<{ carrier: Carrier }> = toEventName('onCarrierClicked');
     public static readonly MapOnCarrierRightSelected: MapEventBusEventName<{ carrier: Carrier }> = toEventName("onCarrierRightClicked");
     public static readonly MapOnWaypointCreated: MapEventBusEventName<{ waypoint: TempWaypoint }> = toEventName("onWaypointCreated");

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type OnPreStarParams } from '@solaris/map-rendering';
+import { type StarClickDispatchArgs } from '@solaris/map-rendering';
 import type {Player, Star} from "@/types/game";
 import { ref } from 'vue';
 
@@ -40,7 +40,7 @@ export const useMentionStore = defineStore('mentions', () => {
     }
   };
 
-  const starClicked = (data: OnPreStarParams) => {
+  const starClicked = (data: StarClickDispatchArgs) => {
     if (mentionCallbacks.value && mentionCallbacks.value.star) {
       mentionCallbacks.value.star(data.star);
     } else {
@@ -48,7 +48,7 @@ export const useMentionStore = defineStore('mentions', () => {
     }
   };
 
-  const starRightClicked = (data: OnPreStarParams) => {
+  const starRightClicked = (data: StarClickDispatchArgs) => {
     if (mentionCallbacks.value && mentionCallbacks.value.player && data.owningPlayer) {
       mentionCallbacks.value.player(data.owningPlayer);
     } else {

@@ -6,9 +6,8 @@
 import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
 import { eventBusInjectionKey } from '../../../eventBus'
 import type { Carrier, Game, Star } from '../../../types/game';
-import type { ToastPluginApi } from 'vue-toast-notification';
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
-import { createGameContainer, type Services, MapEventBusEventNames, type ObjectClicked, type OnPreStarParams, MapCommandEventBusEventNames } from '@solaris/map-rendering'
+import { createGameContainer, type Services, MapEventBusEventNames, type ObjectClicked, type StarClickDispatchArgs, MapCommandEventBusEventNames } from '@solaris/map-rendering'
 import { mapTextureUrls } from './textureUrls';
 import { StoreDrawingContext } from './StoreDrawingContext';
 import {touch} from "@/services/typedapi/game";
@@ -104,11 +103,11 @@ onMounted(() => {
       emit("onStarSelected", star._id);
     };
 
-    const onStarClickDispatchHandler = (params: OnPreStarParams) => {
+    const onStarClickDispatchHandler = (params: StarClickDispatchArgs) => {
       mentionStore.starClicked(params);
     };
 
-    const onStarRightClickDispatchHandler = (params: OnPreStarParams) => {
+    const onStarRightClickDispatchHandler = (params: StarClickDispatchArgs) => {
       mentionStore.starRightClicked(params);
     };
 

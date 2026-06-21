@@ -15,7 +15,7 @@ export { default as MapCommandEventBusEventNames } from './eventBusEventNames/ma
 export { default as GameCommandEventBusEventNames } from './eventBusEventNames/gameCommand';
 
 // Event payload types
-export type { ObjectClicked, OnPreStarParams } from './eventBusEventNames/map';
+export type { ObjectClicked, StarClickDispatchArgs } from './eventBusEventNames/map';
 
 // Domain types used in event payloads and public API
 export type { Game, Player, Star, Carrier } from './types/game';
