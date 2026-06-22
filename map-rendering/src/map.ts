@@ -844,7 +844,37 @@ export class Map {
             return;
         }
 
-        this._selectCarrier(ev);
+        const owningPlayer = helpers.getCarrierOwningPlayer(this.game!, ev.carrierData);
+
+        const click = () => {
+            this._selectCarrier(ev);
+        };
+
+        this.eventBus.emit(MapEventBusEventNames.MapOnCarrierClickDispatched, {
+            carrier: ev.carrierData,
+            owningPlayer,
+            defaultCallback: click,
+        });
+    }
+
+    private _onCarrierRightClicked(ev: CarrierClickEvent) {
+        // ignore clicks if its a drag motion
+        if (ev.eventData && this._isDragMotion(ev.eventData.global)) {
+            return;
+        }
+
+        const owningPlayer = helpers.getCarrierOwningPlayer(this.game!, ev.carrierData);
+
+        const click = () => {
+            this._rightSelectCarrier(ev.carrierData);
+        };
+
+        this.eventBus.emit(MapEventBusEventNames.MapOnCarrierRightClickDispatched, {
+            carrier: ev.carrierData,
+            owningPlayer,
+            defaultCallback: click,
+        });
+
     }
 
     private _selectCarrier(ev: CarrierClickEvent) {
@@ -876,14 +906,6 @@ export class Map {
         }
 
         AnimationService.drawSelectedCircle(this.app, this.container, e.location);
-    }
-
-    private _onCarrierRightClicked(ev: CarrierClickEvent) {
-        if (ev.eventData && this._isDragMotion(ev.eventData.global)) {
-            return;
-        }
-
-        this._rightSelectCarrier(ev.carrierData);
     }
 
     private _rightSelectCarrier(carrier: CarrierData) {

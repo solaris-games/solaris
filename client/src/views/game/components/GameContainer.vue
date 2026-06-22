@@ -14,15 +14,16 @@ import {touch} from "@/services/typedapi/game";
 import {httpInjectionKey, isError} from "@/services/typedapi";
 import {useGameServices} from "@/util/gameServices";
 import { useUserStore } from '@/stores/user';
-import {useMentionStore} from "@/stores/mention";
 import {useGameStore} from "@/stores/game";
 
 import { useToast } from 'vue-toast-notification';
 import GameHelper from "@/services/gameHelper.ts";
 import {GameTooltips} from "@/views/game/components/tooltips.ts";
+import type {CarrierClickDispatchArgs} from "@solaris/map-rendering";
+import {useMapClickStore} from "@/stores/mapClick.ts";
 const store = useGameStore();
 const userStore = useUserStore();
-const mentionStore = useMentionStore();
+const mapClickStore = useMapClickStore();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast = useToast();
@@ -103,12 +104,20 @@ onMounted(() => {
       emit("onStarSelected", star._id);
     };
 
-    const onStarClickDispatchHandler = (params: StarClickDispatchArgs) => {
-      mentionStore.starClicked(params);
+    const onStarClickDispatchHandler = (args: StarClickDispatchArgs) => {
+      mapClickStore.onStarClick(args);
     };
 
-    const onStarRightClickDispatchHandler = (params: StarClickDispatchArgs) => {
-      mentionStore.starRightClicked(params);
+    const onStarRightClickDispatchHandler = (args: StarClickDispatchArgs) => {
+      mapClickStore.onStarRightClick(args);
+    };
+
+    const onCarrierClickDispatchHandler = (args: CarrierClickDispatchArgs) => {
+      mapClickStore.onCarrierClick(args);
+    };
+
+    const onCarrierRightClickDispatchHandler = (args: CarrierClickDispatchArgs) => {
+      mapClickStore.onCarrierRightClick(args);
     };
 
     const onStarRightSelected = ({ star }: { star: Star }) => {
@@ -146,6 +155,8 @@ onMounted(() => {
     eventBus.on(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
     eventBus.on(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
     eventBus.on(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierClickDispatched, onCarrierClickDispatchHandler);
+    eventBus.on(MapEventBusEventNames.MapOnCarrierRightClickDispatched, onCarrierRightClickDispatchHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
     eventBus.on(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
     eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
@@ -168,6 +179,8 @@ onMounted(() => {
       eventBus.off(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
       eventBus.off(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
       eventBus.off(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierClickDispatched, onCarrierClickDispatchHandler);
+      eventBus.off(MapEventBusEventNames.MapOnCarrierRightClickDispatched, onCarrierRightClickDispatchHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
       eventBus.off(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
       eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
