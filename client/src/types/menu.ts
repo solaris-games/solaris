@@ -26,7 +26,7 @@ export type MenuState =
   | { state: 'options' }
   | { state: 'eventLog' }
   | { state: 'mapObjectSelector', objects: ObjectClicked[] }
-  | { state: 'combatCalculator', carrierId?: string }
+  | { state: 'combatCalculator', advanced: boolean, carrierId?: string }
   | { state: 'player', playerId: string }
   | { state: 'trade', playerId: string }
   | { state: 'starDetail', starId: string }

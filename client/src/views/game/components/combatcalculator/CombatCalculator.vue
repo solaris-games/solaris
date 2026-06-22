@@ -26,6 +26,7 @@ import AdvancedCombatCalculator from "@/views/game/components/combatcalculator/A
 
 const props = defineProps<{
   carrierId?: string,
+  advanced: boolean,
 }>();
 
 const emit = defineEmits<{
@@ -34,7 +35,7 @@ const emit = defineEmits<{
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-const isAdvanced = ref(false);
+const isAdvanced = ref(props.advanced);
 
 const documentationUrl = computed(() => import.meta.env.VUE_APP_DOCUMENTATION_URL);
 

@@ -17,7 +17,7 @@
         <sidebar-menu-item :menuState="{state: 'gameNotes'}" tooltip="Notes (N)" iconClass="fas fa-book-open" />
       </div>
       <div v-if="isLoggedIn">
-        <sidebar-menu-item :menuState="{state: 'combatCalculator'}" tooltip="Calculator (C)" iconClass="fas fa-calculator" />
+        <sidebar-menu-item :menuState="{state: 'combatCalculator', advanced: false}" tooltip="Calculator (C)" iconClass="fas fa-calculator" />
         <sidebar-menu-item :menuState="{state: 'ruler'}" tooltip="Ruler (V)" iconClass="fas fa-ruler" />
         <sidebar-menu-item v-if="!isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)"
                            :menuState="{state: 'intel'}" tooltip="Intel (I)" iconClass="fas fa-chart-line" />

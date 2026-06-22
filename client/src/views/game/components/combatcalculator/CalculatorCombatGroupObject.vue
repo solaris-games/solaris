@@ -4,9 +4,12 @@
     <span>
       <slot name="icon"></slot>
     </span>
-    <button class="btn btn-sm btn-danger" @click="remove">
-      <i class="fas fa-times"></i>
-    </button>
+    <div>
+      <slot name="header"></slot>
+      <button class="btn btn-sm btn-danger" @click="remove">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
   </div>
   <div class="input-group mb-1">
     <span class="input-group-text">

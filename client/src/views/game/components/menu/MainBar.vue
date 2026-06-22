@@ -71,6 +71,7 @@
         :carrierId="menuState.carrierId" />
       <combat-calculator v-if="menuState.state == 'combatCalculator'"
         :carrierId="menuState.carrierId"
+        :advanced="menuState.advanced"
         @onCloseRequested="onCloseRequested"/>
       <ship-transfer v-if="menuState.state == 'shipTransfer'"
         @onCloseRequested="onCloseRequested"
@@ -231,7 +232,7 @@ const onBuildCarrierRequested = (e: string) => changeMenuState({ state: 'buildCa
 
 const onCarrierRenameRequested = (e: string) => changeMenuState({ state: 'carrierRename', carrierId: e });
 
-const onViewCarrierCombatCalculatorRequested = (e: string | undefined) => changeMenuState({ state: 'combatCalculator', carrierId: e });
+const onViewCarrierCombatCalculatorRequested = (e: string | undefined) => changeMenuState({ state: 'combatCalculator', carrierId: e, advanced: false });
 
 const onViewSettingsRequested = () => changeMenuState({ state: 'settings' });
 

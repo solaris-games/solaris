@@ -16,7 +16,7 @@
           class="fas fa-home"></i></button>
         <div>
           <button v-if="isLoggedIn" class="btn btn-primary btn-sm me-1 mb-1"
-                  @click="setMenuState({ state: 'combatCalculator' })" title="Calculator (C)"><i
+                  @click="setMenuState({ state: 'combatCalculator', advanced: false })" title="Calculator (C)"><i
             class="fas fa-calculator"></i></button>
           <button v-if="isLoggedIn" class="btn btn-primary btn-sm me-1 mb-1" @click="setMenuState({ state: 'ruler' })"
                   title="Ruler (V)"><i class="fas fa-ruler"></i></button>
