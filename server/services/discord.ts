@@ -1,10 +1,9 @@
 import { ValidationError } from "@solaris/common";
+import { Client, GatewayIntentBits, Partials, TextChannel } from 'discord.js';
 import Repository from './repository';
 import { Config } from '../config/types/Config';
 import { User } from './types/User';
 import {logger} from "../utils/logging";
-
-const Discord = require('discord.js');
 
 const log = logger("Discord Service");
 
@@ -12,7 +11,7 @@ export default class DiscordService {
     config: Config;
     userRepo: Repository<User>;
 
-    client: any = null;
+    client: Client | null = null;
     
     constructor(
         config: Config,
@@ -23,11 +22,26 @@ export default class DiscordService {
     }
 
     async initialize() {
-        if (this.config.discord.botToken) { // Don't initialize the service if there's no token configured.
-            this.client = new Discord.Client()
+        if (!this.config.discord.botToken) {
+            return; // Don't initialize the service if there's no token configured.
+        }
+
+        try {
+            this.client = new Client({
+                intents: [
+                    GatewayIntentBits.Guilds,
+                    GatewayIntentBits.GuildMembers,
+                    GatewayIntentBits.DirectMessages,
+                ],
+                partials: [Partials.Channel],
+            });
+
             await this.client.login(this.config.discord.botToken);
 
             log.info('Discord Initialized');
+        } catch (err) {
+            log.error(err, 'Failed to initialize Discord — Discord notifications will be unavailable');
+            this.client = null;
         }
     }
 
@@ -36,10 +50,15 @@ export default class DiscordService {
     }
 
     async isServerMember(discordUserId: string) {
-        let guild = await this.client.guilds.fetch(this.config.discord.serverId);
-        let guildMember = await guild.members.resolveID(discordUserId);
+        const guild = await this.client!.guilds.fetch(this.config.discord.serverId!);
 
-        return guildMember != null;
+        try {
+            const guildMember = await guild.members.fetch(discordUserId);
+            return guildMember != null;
+        } catch {
+            // fetch() throws DiscordAPIError (404) when the member is not in the guild
+            return false;
+        }
     }
 
     async updateOAuth(userId, discordUserId, oauth) {
@@ -70,9 +89,9 @@ export default class DiscordService {
             }
         });
 
-        const user = await this.client.users.fetch(discordUserId);
+        const user = await this.client!.users.fetch(discordUserId);
 
-        user.send(`Hello there, you've just connected your Solaris account to Discord!\r\n\r\nWe'll start sending notifications to you for in-game events. To change your subscriptions, head over to your user account page.`);
+        await user.send(`Hello there, you've just connected your Solaris account to Discord!\r\n\r\nWe'll start sending notifications to you for in-game events. To change your subscriptions, head over to your user account page.`);
     }
 
     async clearOAuth(userId) {
@@ -86,7 +105,7 @@ export default class DiscordService {
     }
 
     async sendMessageByUserId(discordUserId: string, messageTemplate: any) {
-        const duser = await this.client.users.fetch(discordUserId);
+        const duser = await this.client!.users.fetch(discordUserId);
 
         if (!duser) {
             return;
@@ -102,7 +121,7 @@ export default class DiscordService {
 
         try {
             await duser.send({
-                embed: messageTemplate
+                embeds: [messageTemplate]
             });
         } catch (err) {
             log.error(err);
@@ -118,15 +137,15 @@ export default class DiscordService {
     }
 
     async sendMessageByChannel(channelId: string, messageTemplate: any) {
-        const channel = await this.client.channels.fetch(channelId);
+        const channel = await this.client!.channels.fetch(channelId);
 
-        if (!channel) {
+        if (!channel || !(channel instanceof TextChannel)) {
             return;
         }
 
         try {
             await channel.send({
-                embed: messageTemplate
+                embeds: [messageTemplate]
             });
         } catch (err) {
             log.error(err);
