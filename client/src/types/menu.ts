@@ -1,5 +1,6 @@
 import type {CarrierWaypoint} from "@solaris/common";
 import { type ObjectClicked } from '@solaris/map-rendering';
+import type {Carrier, Star} from "@/types/game.ts";
 
 export type GalaxyMenuState =
   | 'empires'
@@ -46,7 +47,9 @@ export type MenuState =
   | { state: 'playerBadgeShop', recipientPlayerId: string }
   | { state: 'reportPlayer', args: ReportPlayerArgs }
   | { state: 'spectators' }
-  | { state: 'statistics' };
+  | { state: 'statistics' }
+  | { state: 'selectStar', callback: (star: Star | undefined) => void }
+  | { state: 'selectCarrier', callback: (carrier: Carrier | undefined) => void };
 
 export type MenuStateKey = MenuState['state'];
 

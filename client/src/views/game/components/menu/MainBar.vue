@@ -132,6 +132,7 @@
         @onCloseRequested="onCloseRequested"/>
       <game-statistics v-if="menuState.state == 'statistics'"
         @onCloseRequested="onCloseRequested" />
+      <select-star v-if="menuState.state === 'selectStar'" :callback="menuState.callback" />
     </div>
 
     <div class="spacing-footer d-block d-sm-none"></div>
@@ -186,6 +187,7 @@ import GameStatistics from "@/views/game/components/statistics/GameStatistics.vu
 import {useUserStore} from "@/stores/user";
 import {useGameStore} from "@/stores/game";
 import type {MenuState, ReportPlayerArgs} from "@/types/menu";
+import SelectStar from "@/views/game/components/select/SelectStar.vue";
 
 const emit = defineEmits<{
   onViewColourOverrideRequested: [playerId: string],
