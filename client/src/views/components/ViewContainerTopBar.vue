@@ -1,35 +1,33 @@
 <template>
-<div id="header" class="app-header">
-  <div class="brand">
-    <a href="javascript:;" class="brand-logo" @click="goHome">
-      <span class="brand-img"></span>
-      <span class="brand-text">SOLARIS</span>
-    </a>
-  </div>
+<header class="solaris-header">
+  <a href="javascript:;" class="solaris-header-el logo-link" @click="goHome">
+    <img class="solaris-logo" alt="Solaris Logo" :src="solarisLogo" />
+    <span class="solaris-name">SOLARIS</span>
+  </a>
 
-  <div class="menu" v-if="userId">
+  <nav class="solaris-header-el" v-if="userId">
     <button v-if="userIsImpersonated" @click="doEndImpersonate()" class="btn btn-success">
       End Impersonation
     </button>
-    <div class="menu-item dropdown dropdown-mobile-full">
+    <div class="solaris-menu-item">
       <router-link :to="{ name: 'administration-games'}" v-if="userHasAdminRole" class="menu-link">
         <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">Admin</div>
       </router-link>
     </div>
-    <div class="menu-item dropdown dropdown-mobile-full">
+    <div class="solaris-menu-item">
       <router-link :to="{ name: 'galactic-credits-shop'}" class="menu-link">
         <div class="menu-icon"><i class="fas fa-coins"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">{{userCredits}} Credit{{userCredits === 1 ? '' : 's'}}</div>
       </router-link>
     </div>
-    <div class="menu-item dropdown dropdown-mobile-full">
+    <div class="solaris-menu-item">
       <router-link :to="{ name: 'avatars'}" class="menu-link">
         <div class="menu-icon"><i class="fas fa-shopping-basket"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">Shop</div>
       </router-link>
     </div>
-    <div class="menu-item dropdown dropdown-mobile-full">
+    <div class="solaris-menu-item dropdown">
       <a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
         <div class="menu-icon"><i class="fas fa-user"></i></div>
         <div class="menu-text d-sm-block d-none ms-1">{{username}}</div>
@@ -47,20 +45,21 @@
         </a>
       </div>
     </div>
-  </div>
-</div>
+  </nav>
+</header>
 </template>
 
 <script setup lang="ts">
-import router from '../../router'
+import solarisLogo from '../../assets/solaris_logo_small.png';
+import router from '../../router';
 import { ref, computed, inject } from 'vue';
 import type { UserRoles } from '@solaris/common';
 import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
 import { endImpersonate } from '@/services/typedapi/admin';
 import {logout} from "@/services/typedapi/auth";
 import { useUserStore } from '@/stores/user';
-
 import { useToast } from 'vue-toast-notification';
+
 const userStore = useUserStore();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -119,11 +118,47 @@ const doLogout = async () => {
 </script>
 
 <style scoped>
-.row {
-  padding-bottom: 15px;
+.solaris-header {
+  flex-shrink: 0;
+  background-color: rgba(29,40,53,.95);
+  display: flex;
+  flex-direction: row;
+  height: 3.25rem;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.container {
-  font-size: 20px;
+.solaris-menu-item {
+  .menu-icon {
+    color: #FFFFFF;
+    font-size: 1.25rem;
+  }
+}
+
+.solaris-header-el {
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-link {
+  text-decoration: none;
+}
+
+.solaris-name {
+  color: #FFFFFF;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  text-decoration: none;
+}
+
+.solaris-logo {
+  height: 2rem;
+  width: 2rem;
 }
 </style>
