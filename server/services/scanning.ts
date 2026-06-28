@@ -256,7 +256,7 @@ export default class ScanningService {
 
     calculateViewpointScanning(game: Game, players: Player[]) {
         const scannedStarSet = new Set<Star>();
-        const scannedPlayerIdSet = new Set<DBObjectId>();
+        const scannedPlayerIdSet = new Set<String>();
         const scannedCarrierSet = new Set<Carrier>();
         const unscannedWormholeSet = new Set<Star>();
 
@@ -277,8 +277,8 @@ export default class ScanningService {
                 for (const scannedStar of starsInRange) {
                     scannedStarSet.add(scannedStar);
 
-                    if (star.ownedByPlayerId != null) {
-                        scannedPlayerIdSet.add(star.ownedByPlayerId);
+                    if (scannedStar.ownedByPlayerId != null) {
+                        scannedPlayerIdSet.add(scannedStar.ownedByPlayerId.toString());
                     }
                 }
             }
@@ -294,7 +294,7 @@ export default class ScanningService {
                         scannedStarSet.add(star);
 
                         if (star.ownedByPlayerId != null) {
-                            scannedPlayerIdSet.add(star.ownedByPlayerId);
+                            scannedPlayerIdSet.add(star.ownedByPlayerId.toString());
                         }
 
                         break;

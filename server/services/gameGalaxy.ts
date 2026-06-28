@@ -213,7 +213,7 @@ export default class GameGalaxyService {
 
         let scanned: {
             stars: Set<Star>;
-            playerIds: Set<DBObjectId>;
+            playerIds: Set<String>;
             carriers: Set<Carrier>;
             unscannedWormHoles: Set<Star>;
         } | undefined;
@@ -581,7 +581,7 @@ export default class GameGalaxyService {
             });
     }
 
-    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedPlayerIdSet?: Set<DBObjectId>) {
+    async _setPlayerInfoBasic(doc: Game, userPlayer: Player | null, viewpoint: Viewpoint, scannedPlayerIdSet?: Set<String>) {
         const avatars = this.avatarService.listAllAvatars();
 
         const isFinished = this.gameStateService.isFinished(doc);
@@ -629,7 +629,7 @@ export default class GameGalaxyService {
             // Calculate whether the user is AI controlled or not.
             p.isAIControlled = this.playerAfkService.isAIControlled(doc, p);
 
-            p.isInScanningRange = Boolean(scannedPlayerIdSet?.has(p._id)); // Return false if not scanned or scannedPlayerIds is undefined
+            p.isInScanningRange = Boolean(scannedPlayerIdSet?.has(p._id.toString())); // Return false if not scanned or scannedPlayerIds is undefined
             p.shape = p.shape || 'circle'; // TODO: I don't know why the shape isn't being returned by mongoose defaults.
             p.avatar = p.avatar ? avatars.find(a => a.id.toString() === p.avatar!.toString())!.file : null; // TODO: We should made the ID a number and not a string as it is an ID.
 
