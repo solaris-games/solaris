@@ -1,0 +1,5 @@
+.github/
+client/public
+client/src/assets
+*.yml
+*.md

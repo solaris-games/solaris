@@ -1,12 +1,16 @@
-import { DependencyContainer } from '../../services/types/DependencyContainer';
-import {parseGuildCreateRequest, parseGuildInviteUserRequest, parseGuildRenameRequest} from '../requests/guild';
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {
+    parseGuildCreateRequest,
+    parseGuildInviteUserRequest,
+    parseGuildRenameRequest,
+} from "../requests/guild";
 
 export default (container: DependencyContainer) => {
     return {
         list: async (req, res, next) => {
             try {
                 let result = await container.guildService.list();
-                    
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -15,8 +19,11 @@ export default (container: DependencyContainer) => {
         },
         detailMine: async (req, res, next) => {
             try {
-                let result = await container.guildService.detailMyGuild(req.session.userId, true);
-                    
+                let result = await container.guildService.detailMyGuild(
+                    req.session.userId,
+                    true,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -27,8 +34,11 @@ export default (container: DependencyContainer) => {
             try {
                 let limit = +req.query.limit || null;
                 let sortingKey = req.query.sortingKey || null;
-                let result = await container.guildService.getLeaderboard(limit, sortingKey);
-                    
+                let result = await container.guildService.getLeaderboard(
+                    limit,
+                    sortingKey,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -37,8 +47,10 @@ export default (container: DependencyContainer) => {
         },
         listMyInvites: async (req, res, next) => {
             try {
-                let result = await container.guildService.listInvitations(req.session.userId);
-                    
+                let result = await container.guildService.listInvitations(
+                    req.session.userId,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -47,8 +59,10 @@ export default (container: DependencyContainer) => {
         },
         listMyApplications: async (req, res, next) => {
             try {
-                let result = await container.guildService.listApplications(req.session.userId);
-                    
+                let result = await container.guildService.listApplications(
+                    req.session.userId,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -57,8 +71,11 @@ export default (container: DependencyContainer) => {
         },
         detail: async (req, res, next) => {
             try {
-                const result = await container.guildService.detailWithUserInfo(req.params.guildId, false);
-    
+                const result = await container.guildService.detailWithUserInfo(
+                    req.params.guildId,
+                    false,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -69,8 +86,12 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseGuildCreateRequest(req.body);
 
-                let result = await container.guildService.create(req.session.userId, reqObj.name, reqObj.tag);
-                    
+                let result = await container.guildService.create(
+                    req.session.userId,
+                    reqObj.name,
+                    reqObj.tag,
+                );
+
                 res.status(201).json(result);
                 return next();
             } catch (err) {
@@ -80,9 +101,13 @@ export default (container: DependencyContainer) => {
         rename: async (req, res, next) => {
             try {
                 const reqObj = parseGuildRenameRequest(req.body);
-                
-                await container.guildService.rename(req.session.userId, reqObj.name, reqObj.tag);
-                    
+
+                await container.guildService.rename(
+                    req.session.userId,
+                    reqObj.name,
+                    reqObj.tag,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -91,8 +116,11 @@ export default (container: DependencyContainer) => {
         },
         delete: async (req, res, next) => {
             try {
-                await container.guildService.delete(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.delete(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -102,9 +130,13 @@ export default (container: DependencyContainer) => {
         invite: async (req, res, next) => {
             try {
                 const reqObj = parseGuildInviteUserRequest(req.body);
-                
-                let result = await container.guildService.invite(reqObj.username, req.params.guildId, req.session.userId);
-                    
+
+                let result = await container.guildService.invite(
+                    reqObj.username,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -113,8 +145,12 @@ export default (container: DependencyContainer) => {
         },
         uninvite: async (req, res, next) => {
             try {
-                await container.guildService.uninvite(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.uninvite(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -123,8 +159,12 @@ export default (container: DependencyContainer) => {
         },
         acceptInviteForApplicant: async (req, res, next) => {
             try {
-                await container.guildService.accept(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.accept(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -133,8 +173,11 @@ export default (container: DependencyContainer) => {
         },
         acceptInvite: async (req, res, next) => {
             try {
-                await container.guildService.join(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.join(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -143,8 +186,11 @@ export default (container: DependencyContainer) => {
         },
         declineInvite: async (req, res, next) => {
             try {
-                await container.guildService.decline(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.decline(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -153,8 +199,11 @@ export default (container: DependencyContainer) => {
         },
         apply: async (req, res, next) => {
             try {
-                await container.guildService.apply(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.apply(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -163,8 +212,11 @@ export default (container: DependencyContainer) => {
         },
         withdraw: async (req, res, next) => {
             try {
-                await container.guildService.withdraw(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.withdraw(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -173,8 +225,12 @@ export default (container: DependencyContainer) => {
         },
         reject: async (req, res, next) => {
             try {
-                await container.guildService.reject(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.reject(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -183,8 +239,11 @@ export default (container: DependencyContainer) => {
         },
         leave: async (req, res, next) => {
             try {
-                await container.guildService.leave(req.session.userId, req.params.guildId);
-                    
+                await container.guildService.leave(
+                    req.session.userId,
+                    req.params.guildId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -193,8 +252,12 @@ export default (container: DependencyContainer) => {
         },
         promote: async (req, res, next) => {
             try {
-                await container.guildService.promote(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.promote(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -203,8 +266,12 @@ export default (container: DependencyContainer) => {
         },
         demote: async (req, res, next) => {
             try {
-                await container.guildService.demote(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.demote(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -213,13 +280,17 @@ export default (container: DependencyContainer) => {
         },
         kick: async (req, res, next) => {
             try {
-                await container.guildService.kick(req.params.userId, req.params.guildId, req.session.userId);
-                    
+                await container.guildService.kick(
+                    req.params.userId,
+                    req.params.guildId,
+                    req.session.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);
             }
-        }
-    }
+        },
+    };
 };

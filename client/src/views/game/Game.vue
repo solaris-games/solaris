@@ -7,70 +7,95 @@
     <div v-if="hasGame">
       <span class="d-none">{{ gameId }}</span>
 
-      <colour-override-dialog v-if="colourOverride" :playerId="colourOverride.playerId"
-        @onColourOverrideCancelled="onColourOverrideCancelled" @onColourOverrideConfirmed="onColourOverrideConfirmed" />
+      <colour-override-dialog
+        v-if="colourOverride"
+        :playerId="colourOverride.playerId"
+        @onColourOverrideCancelled="onColourOverrideCancelled"
+        @onColourOverrideConfirmed="onColourOverrideConfirmed"
+      />
 
-      <game-container @onStarSelected="onStarSelected" @onStarRightSelected="onStarRightSelected"
-                      @onCarrierSelected="onCarrierSelected" @onCarrierRightSelected="onCarrierRightSelected"
-                      @onObjectsClicked="onObjectsClicked" />
+      <game-container
+        @onStarSelected="onStarSelected"
+        @onStarRightSelected="onStarRightSelected"
+        @onCarrierSelected="onCarrierSelected"
+        @onCarrierRightSelected="onCarrierRightSelected"
+        @onObjectsClicked="onObjectsClicked"
+      />
 
-      <main-bar @onPlayerSelected="onPlayerSelected" @onReloadGameRequested="reloadGame"
-        @onViewColourOverrideRequested="onViewColourOverrideRequested" />
+      <main-bar
+        @onPlayerSelected="onPlayerSelected"
+        @onReloadGameRequested="reloadGame"
+        @onViewColourOverrideRequested="onViewColourOverrideRequested"
+      />
 
-      <chat @onOpenPlayerDetailRequested="onPlayerSelected"
-        @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
-
+      <chat
+        @onOpenPlayerDetailRequested="onPlayerSelected"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Logo from '../components/Logo.vue'
-import { type ObjectClicked } from '@solaris/map-rendering';
-import LoadingSpinner from '../components/LoadingSpinner.vue'
+import Logo from "../components/Logo.vue";
+import { type ObjectClicked } from "@solaris/map-rendering";
+import LoadingSpinner from "../components/LoadingSpinner.vue";
 // GameContainer is lazy-loaded so the heavy @solaris/map-rendering / Pixi bundle
 // is split into its own chunk and only downloaded once the game view mounts.
-import { defineAsyncComponent } from 'vue';
-const GameContainer = defineAsyncComponent(() => import('./components/GameContainer.vue'));
-import MainBar from './components/menu/MainBar.vue'
-import Chat from './components/inbox/Chat.vue'
-import GameHelper from '../../services/gameHelper'
-import AudioService from '../../services/audio'
-import gameHelper from '../../services/gameHelper'
+import { defineAsyncComponent } from "vue";
+const GameContainer = defineAsyncComponent(
+  () => import("./components/GameContainer.vue"),
+);
+import MainBar from "./components/menu/MainBar.vue";
+import Chat from "./components/inbox/Chat.vue";
+import GameHelper from "../../services/gameHelper";
+import AudioService from "../../services/audio";
+import gameHelper from "../../services/gameHelper";
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
-import { eventBusInjectionKey } from '@/eventBus'
-import { inject, ref, computed, onMounted, onUnmounted, onBeforeUnmount, provide, type Ref } from 'vue';
-import { playerClientSocketEmitterInjectionKey } from '@/sockets/socketEmitters/player'
-import { socketInjectionKey } from '@/socket'
-import { DiplomacyClientSocketHandler } from '@/sockets/socketHandlers/diplomacy'
-import { GameClientSocketHandler } from '@/sockets/socketHandlers/game'
-import { PlayerClientSocketHandler } from '@/sockets/socketHandlers/player'
-import { GameRoomClientSocketHandler } from '@/sockets/socketHandlers/gameRoom'
-import GameEventBusEventNames from '../../eventBusEventNames/game'
-import router from '../../router'
+import { eventBusInjectionKey } from "@/eventBus";
+import {
+  inject,
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  onBeforeUnmount,
+  provide,
+  type Ref,
+} from "vue";
+import { playerClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/player";
+import { socketInjectionKey } from "@/socket";
+import { DiplomacyClientSocketHandler } from "@/sockets/socketHandlers/diplomacy";
+import { GameClientSocketHandler } from "@/sockets/socketHandlers/game";
+import { PlayerClientSocketHandler } from "@/sockets/socketHandlers/player";
+import { GameRoomClientSocketHandler } from "@/sockets/socketHandlers/gameRoom";
+import GameEventBusEventNames from "../../eventBusEventNames/game";
+import router from "../../router";
 import { withMessages } from "../../util/messages";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
-import {getSettings} from "@/services/typedapi/user";
-import { useRoute } from 'vue-router';
-import {detailGalaxy, detailState} from "@/services/typedapi/game";
-import {createGameServices, gameServicesKey} from "@/util/gameServices";
-import type {Game} from "@/types/game";
-import { useUserStore } from '@/stores/user';
-import { useColourStore } from '@/stores/colour';
-import {useGameStore} from "@/stores/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getSettings } from "@/services/typedapi/user";
+import { useRoute } from "vue-router";
+import { detailGalaxy, detailState } from "@/services/typedapi/game";
+import { createGameServices, gameServicesKey } from "@/util/gameServices";
+import type { Game } from "@/types/game";
+import { useUserStore } from "@/stores/user";
+import { useColourStore } from "@/stores/colour";
+import { useGameStore } from "@/stores/game";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
 
 const emit = defineEmits<{
-  onPlayerSelected: [playerId: string],
+  onPlayerSelected: [playerId: string];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const playerClientSocketEmitter = inject(playerClientSocketEmitterInjectionKey)!;
+const playerClientSocketEmitter = inject(
+  playerClientSocketEmitterInjectionKey,
+)!;
 const userClientSockerEmitter = inject(userClientSocketEmitterInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 const socket = inject(socketInjectionKey)!;
@@ -114,7 +139,7 @@ const onViewColourOverrideRequested = (e: string) => {
 
 const onStarSelected = (starId: string) => {
   store.setMenuState({
-    state: 'starDetail',
+    state: "starDetail",
     starId,
   });
 
@@ -134,7 +159,7 @@ const onStarRightSelected = (starId: string) => {
 
 const onCarrierSelected = (carrierId: string) => {
   store.setMenuState({
-    state: 'carrierDetail',
+    state: "carrierDetail",
     carrierId,
   });
 
@@ -154,7 +179,7 @@ const onCarrierRightSelected = (carrierId: string) => {
 
 const onObjectsClicked = (e: ObjectClicked[]) => {
   store.setMenuState({
-    state: 'mapObjectSelector',
+    state: "mapObjectSelector",
     objects: e,
   });
 
@@ -163,16 +188,16 @@ const onObjectsClicked = (e: ObjectClicked[]) => {
 
 const onPlayerSelected = (playerId: string) => {
   store.setMenuState({
-    state: 'player',
+    state: "player",
     playerId,
   });
 
-  emit('onPlayerSelected', playerId);
+  emit("onPlayerSelected", playerId);
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {
   store.setMenuState({
-    state: 'reportPlayer',
+    state: "reportPlayer",
     args: { playerId: e.playerId },
   });
 };
@@ -204,14 +229,14 @@ const reloadGame = async () => {
       store.setTick(response.data.state.tick);
       store.setProductionTick(response.data.state.productionTick);
 
-      document.title = response.data.settings.general.name + ' - Solaris';
+      document.title = response.data.settings.general.name + " - Solaris";
     }
   } else {
     console.error(formatError(response));
 
-    toast.error('Game failed to load');
+    toast.error("Game failed to load");
 
-    router.push({ name: 'main-menu' });
+    router.push({ name: "main-menu" });
   }
 };
 
@@ -222,7 +247,9 @@ const reloadGameCheck = async () => {
 
   // Check if the next tick date has passed, if so check if the server has finished the game tick.
   // Alternatively if the game is set to 10s ticks then always check.
-  const canTick = store.game!.settings.gameTime.speed <= 10 || gameHelper.canTick(store.game!);
+  const canTick =
+    store.game!.settings.gameTime.speed <= 10 ||
+    gameHelper.canTick(store.game!);
 
   if (canTick) {
     ticking.value = true;
@@ -234,7 +261,9 @@ const reloadGameCheck = async () => {
         return;
       }
 
-      const hasEnded = !GameHelper.isGameFinished(game.value) && Boolean(response.data.state.endDate);
+      const hasEnded =
+        !GameHelper.isGameFinished(game.value) &&
+        Boolean(response.data.state.endDate);
 
       if (store.tick < response.data.state.tick || hasEnded) {
         // If the user is currently using the time machine then only set the state variables.
@@ -251,7 +280,9 @@ const reloadGameCheck = async () => {
         if (hasEnded) {
           toast.success(`The game has ended!`);
         } else {
-          toast.success(`The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`);
+          toast.success(
+            `The game has ticked. Cycle ${response.data.state.productionTick}, Tick ${response.data.state.tick}.`,
+          );
         }
 
         AudioService.download();
@@ -269,13 +300,17 @@ AudioService.loadStore(store);
 store.clearGame();
 
 //A CSS class that will load only on the game screen to prevent drag-bounce behavior
-const GAME_BODY_CLASS = 'game-body';
+const GAME_BODY_CLASS = "game-body";
 
 onMounted(async () => {
   diplomacySocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
   gameSocketHandler = new GameClientSocketHandler(socket, store, eventBus);
   playerSocketHandler = new PlayerClientSocketHandler(socket, store, eventBus);
-  gameRoomSocketHandler = new GameRoomClientSocketHandler(socket, store, playerClientSocketEmitter);
+  gameRoomSocketHandler = new GameRoomClientSocketHandler(
+    socket,
+    store,
+    playerClientSocketEmitter,
+  );
 
   attemptLogin();
 
@@ -289,27 +324,27 @@ onMounted(async () => {
 
     playerClientSocketEmitter.emitGameRoomJoined({
       gameId: store.game!._id,
-      playerId: userPlayer?._id
+      playerId: userPlayer?._id,
     });
   }
 
   //Remove scroll-bounce effect from the game screen
   document.body.classList.add(GAME_BODY_CLASS);
 
-// If the user is in the game then display the leaderboard.
-// Otherwise show the welcome screen if there are empty slots.
+  // If the user is in the game then display the leaderboard.
+  // Otherwise show the welcome screen if there are empty slots.
 
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
-      store.setMenuState({ state: 'tutorial' })
+      store.setMenuState({ state: "tutorial" });
     } else {
-      store.setMenuState({ state: 'leaderboard' })
+      store.setMenuState({ state: "leaderboard" });
     }
   } else {
     if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.setMenuState({ state: 'welcome' })
+      store.setMenuState({ state: "welcome" });
     } else {
-      store.setMenuState({ state: 'leaderboard' }) // Assume the user is spectating.
+      store.setMenuState({ state: "leaderboard" }); // Assume the user is spectating.
     }
   }
 
@@ -339,17 +374,21 @@ onUnmounted(() => {
   if (userPlayer) {
     playerClientSocketEmitter.emitGameRoomLeft({
       gameId: store.game!._id,
-      playerId: userPlayer?._id
+      playerId: userPlayer?._id,
     });
   }
 
   store.clearGame();
 
-  document.title = 'Solaris';
+  document.title = "Solaris";
 
   document.body.classList.remove(GAME_BODY_CLASS);
 });
 </script>
 
 <style scoped></style>
-<style> .game-body { overscroll-behavior: none;} </style>
+<style>
+.game-body {
+  overscroll-behavior: none;
+}
+</style>

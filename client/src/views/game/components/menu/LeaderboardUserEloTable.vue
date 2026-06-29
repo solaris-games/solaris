@@ -2,7 +2,9 @@
   <div class="tab-pane fade show" id="elos">
     <loading-spinner :loading="isLoading" />
     <h4 class="mb-1">Top {{ limit }} Players by ELO</h4>
-    <small class="text-warning">Improve your ELO by participating in 1v1's</small>
+    <small class="text-warning"
+      >Improve your ELO by participating in 1v1's</small
+    >
     <div class="table-responsive mt-2">
       <table class="table table-striped table-hover leaderboard-table">
         <thead class="table-dark">
@@ -15,27 +17,58 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="player of leaderboard" :key="player._id" :class="{ 'bg-primary': userStore.userId === player._id }">
+          <tr
+            v-for="player of leaderboard"
+            :key="player._id"
+            :class="{ 'bg-primary': userStore.userId === player._id }"
+          >
             <td>{{ player.position }}</td>
             <td>
-              <router-link :to="{ name: 'account-achievements', params: { userId: player._id } }">
+              <router-link
+                :to="{
+                  name: 'account-achievements',
+                  params: { userId: player._id },
+                }"
+              >
                 <span>{{ player.username }}</span>
               </router-link>
-              <i class="fas fa-hands-helping ms-1" title="This player is a contributor"
-                v-if="player.roles && player.roles.contributor"></i>
-              <i class="fas fa-code ms-1" title="This player is an active developer"
-                v-if="player.roles && player.roles.developer"></i>
-              <i class="fas fa-user-friends ms-1" title="This player is an active community manager"
-                v-if="player.roles && player.roles.communityManager"></i>
-              <i class="fas fa-dice ms-1" title="This player is an active game master"
-                v-if="player.roles && player.roles.gameMaster"></i>
+              <i
+                class="fas fa-hands-helping ms-1"
+                title="This player is a contributor"
+                v-if="player.roles && player.roles.contributor"
+              ></i>
+              <i
+                class="fas fa-code ms-1"
+                title="This player is an active developer"
+                v-if="player.roles && player.roles.developer"
+              ></i>
+              <i
+                class="fas fa-user-friends ms-1"
+                title="This player is an active community manager"
+                v-if="player.roles && player.roles.communityManager"
+              ></i>
+              <i
+                class="fas fa-dice ms-1"
+                title="This player is an active game master"
+                v-if="player.roles && player.roles.gameMaster"
+              ></i>
             </td>
             <td class="d-none d-md-table-cell">
-              <router-link v-if="player.guild" :to="{ name: 'guild-details', params: { guildId: player.guild._id } }">
+              <router-link
+                v-if="player.guild"
+                :to="{
+                  name: 'guild-details',
+                  params: { guildId: player.guild._id },
+                }"
+              >
                 <span>{{ player.guild.name }} [{{ player.guild.tag }}]</span>
               </router-link>
             </td>
-            <td align="right">{{ player.achievements.victories1v1 }}/{{ player.achievements.defeated1v1 }}</td>
+            <td align="right">
+              {{ player.achievements.victories1v1 }}/{{
+                player.achievements.defeated1v1
+              }}
+            </td>
             <td align="right">{{ player.achievements.eloRating }}</td>
           </tr>
         </tbody>
@@ -45,24 +78,24 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import LoadingSpinner from '../../../components/LoadingSpinner.vue';
-import { computed, inject, onMounted, ref } from 'vue';
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { getLeaderboard } from '@/services/typedapi/user';
+import { useGameStore } from "@/stores/game";
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import { computed, inject, onMounted, ref } from "vue";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getLeaderboard } from "@/services/typedapi/user";
 
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from "@/stores/user";
 
 const httpClient = inject(httpInjectionKey)!;
 const store = useGameStore();
 const userStore = useUserStore();
 
 const props = defineProps<{
-  limit: number
+  limit: number;
 }>();
 
 const isLoading = ref(false);
-const sortingKey = ref('elo-rating');
+const sortingKey = ref("elo-rating");
 const leaderboards = ref({});
 const totalPlayers = ref(0);
 
@@ -84,7 +117,7 @@ const loadLeaderboard = async (key: string) => {
   }
 
   isLoading.value = false;
-}
+};
 
 onMounted(async () => {
   await loadLeaderboard(sortingKey.value);

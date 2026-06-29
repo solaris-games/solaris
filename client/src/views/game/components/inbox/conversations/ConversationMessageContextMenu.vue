@@ -1,36 +1,51 @@
 <template>
   <div class="col-auto" v-if="message.fromPlayerId && !isFromUserPlayer">
     <div class="dropdown-container">
-      <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <button
+        class="btn btn-sm"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
         <i class="fas fa-ellipsis"></i>
       </button>
       <div class="dropdown-menu dropdown-menu-right">
-        <button class="btn btn-small dropdown-item" @click="onViewConversationRequested(message.fromPlayerId)"
-                v-if="conversation.participants.length > 2 && canCreateConversation">Direct Message</button>
-        <button class="btn btn-small dropdown-item" @click="reportMessage">Report</button>
+        <button
+          class="btn btn-small dropdown-item"
+          @click="onViewConversationRequested(message.fromPlayerId)"
+          v-if="conversation.participants.length > 2 && canCreateConversation"
+        >
+          Direct Message
+        </button>
+        <button class="btn btn-small dropdown-item" @click="reportMessage">
+          Report
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
+import { useGameStore } from "@/stores/game";
 import gameHelper from "../../../../../services/gameHelper";
 import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
-import type {ConversationMessage, Conversation} from "@solaris/common";
-import type {Game, Player} from "@/types/game";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {listPrivate} from "@/services/typedapi/conversation";
+import type { ConversationMessage, Conversation } from "@solaris/common";
+import type { Game, Player } from "@/types/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listPrivate } from "@/services/typedapi/conversation";
 
 const props = defineProps<{
-  message: ConversationMessage<string>,
-  conversation: Conversation<string>,
-  userPlayer: Player,
+  message: ConversationMessage<string>;
+  conversation: Conversation<string>;
+  userPlayer: Player;
 }>();
 
 const emit = defineEmits<{
-  onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
+  onOpenReportPlayerRequested: [
+    { playerId: string; messageId: string; conversationId: string },
+  ];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -39,8 +54,14 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
 
-const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
-const isFromUserPlayer = computed(() => props.message.fromPlayerId === props.userPlayer._id);
+const canCreateConversation = computed(
+  () =>
+    game.value.settings.general.playerLimit > 2 &&
+    !gameHelper.isTutorialGame(game.value),
+);
+const isFromUserPlayer = computed(
+  () => props.message.fromPlayerId === props.userPlayer._id,
+);
 
 const loadConversation = async (playerId: string) => {
   if (props.userPlayer && props.userPlayer._id !== playerId) {
@@ -56,25 +77,26 @@ const loadConversation = async (playerId: string) => {
 };
 
 const reportMessage = () => {
-  emit('onOpenReportPlayerRequested', {
+  emit("onOpenReportPlayerRequested", {
     playerId: props.message.fromPlayerId!,
     messageId: props.message._id!,
     conversationId: props.conversation._id,
-  })
+  });
 };
 
 const onViewConversationRequested = async (playerId: string) => {
   const conversation = await loadConversation(playerId);
 
   if (conversation) {
-    store.setMenuStateChat({ state: 'conversation', conversationId: conversation._id });
+    store.setMenuStateChat({
+      state: "conversation",
+      conversationId: conversation._id,
+    });
   } else {
     // todo: select participants
-    store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
+    store.setMenuStateChat({ state: "createConversation", participantIds: [] });
   }
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

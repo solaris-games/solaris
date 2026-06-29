@@ -1,29 +1,29 @@
 <template>
-    <span>{{currentText}}</span>
+  <span>{{ currentText }}</span>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import {between, formatDuration, toSeconds} from "@/util/duration";
+import { ref, onMounted, onUnmounted } from "vue";
+import { between, formatDuration, toSeconds } from "@/util/duration";
 
 const props = defineProps<{
-  endDate?: Date,
-  afterEndText?: string,
-  active: boolean,
+  endDate?: Date;
+  afterEndText?: string;
+  active: boolean;
 }>();
 
-const currentText = ref('');
+const currentText = ref("");
 
 const recalculateTime = () => {
   if (!props.endDate || !props.active) {
-    currentText.value = props.afterEndText || '';
+    currentText.value = props.afterEndText || "";
     return;
   }
 
   const current = new Date();
   const delta = between(current, props.endDate);
 
-  if (toSeconds(delta) <= 0)  {
-    currentText.value = props.afterEndText || '';
+  if (toSeconds(delta) <= 0) {
+    currentText.value = props.afterEndText || "";
   } else {
     currentText.value = formatDuration(delta);
   }
@@ -38,5 +38,4 @@ onMounted(() => {
   });
 });
 </script>
-<style>
-</style>
+<style></style>

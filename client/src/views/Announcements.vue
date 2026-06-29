@@ -1,17 +1,19 @@
 <template>
   <view-container :hideTopBar="true" :is-auth-page="true">
-    <view-title
-      title="Announcements"
-      :showSocialLinks="true"
-    />
+    <view-title title="Announcements" :showSocialLinks="true" />
 
     <loading-spinner :loading="!announcementState || !announcements" />
 
     <div v-if="announcements">
       <p>
-        <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" style="text-decoration: none;">
-          Join the Discord
-        </a>to stay up-to-date, discuss the game and chat with the community!
+        <a
+          href="https://discord.com/invite/v7PD33d"
+          target="_blank"
+          title="Discord"
+          style="text-decoration: none"
+        >
+          Join the Discord </a
+        >to stay up-to-date, discuss the game and chat with the community!
       </p>
 
       <announcement-panel
@@ -29,12 +31,21 @@ import ViewContainer from "./components/ViewContainer.vue";
 import ViewTitle from "./components/ViewTitle.vue";
 import LoadingSpinner from "./components/LoadingSpinner.vue";
 import AnnouncementPanel from "./components/Announcement.vue";
-import { ref, onMounted, inject, type Ref } from 'vue';
-import type {Announcement, AnnouncementState} from "@solaris/common";
-import {getAnnouncementState, getCurrentAnnouncements, markAsRead} from "@/services/typedapi/announcement";
-import {formatError, httpInjectionKey, isError, isOk} from "@/services/typedapi";
+import { ref, onMounted, inject, type Ref } from "vue";
+import type { Announcement, AnnouncementState } from "@solaris/common";
+import {
+  getAnnouncementState,
+  getCurrentAnnouncements,
+  markAsRead,
+} from "@/services/typedapi/announcement";
+import {
+  formatError,
+  httpInjectionKey,
+  isError,
+  isOk,
+} from "@/services/typedapi";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
@@ -76,6 +87,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

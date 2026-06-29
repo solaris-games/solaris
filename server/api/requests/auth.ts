@@ -1,11 +1,11 @@
-import {object, string, Validator} from "@solaris/common";
+import { object, string, Validator } from "@solaris/common";
 
 export type AuthLoginRequest = {
-    email: string,
-    password: string,
-}
+    email: string;
+    password: string;
+};
 
-export const parseAuthLoginRequest : Validator<AuthLoginRequest> = object({
+export const parseAuthLoginRequest: Validator<AuthLoginRequest> = object({
     email: string,
     password: string,
 });

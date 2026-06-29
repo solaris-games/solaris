@@ -1,187 +1,207 @@
-import { Container, Text, TextStyle, Graphics } from 'pixi.js'
-import type {Game} from "./types/game";
-import type {DrawingContext} from "./container";
-import {DistanceService, type UserGameSettings} from "@solaris/common";
+import { Container, Text, TextStyle, Graphics } from "pixi.js";
+import type { Game } from "./types/game";
+import type { DrawingContext } from "./container";
+import { DistanceService, type UserGameSettings } from "@solaris/common";
 import helpers from "./helpers";
 
 class PlayerNames {
+    static zoomLevel = 90;
+    container: Container;
+    zoomPercent = 0;
 
-  static zoomLevel = 90
-  container: Container;
-  zoomPercent = 0;
+    game: Game | undefined;
+    context: DrawingContext | undefined;
+    distanceService: DistanceService;
 
-  game: Game | undefined;
-  context: DrawingContext | undefined;
-  distanceService: DistanceService;
+    constructor(
+        distanceService: DistanceService,
+        game: Game,
+        userSettings: UserGameSettings,
+        context: DrawingContext,
+    ) {
+        this.container = new Container();
+        this.distanceService = distanceService;
+        this.game = game;
 
-  constructor (distanceService: DistanceService, game: Game, userSettings: UserGameSettings, context: DrawingContext) {
-    this.container = new Container();
-    this.distanceService = distanceService;
-    this.game = game;
-
-    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
-    this.context = context;
-  }
-
-  draw () {
-    this.container.removeChildren()
-
-    for (let player of this.game!.galaxy.players) {
-      const empireCenter = helpers.getPlayerTerritoryCenter(this.distanceService, this.game!, player);
-
-      if (empireCenter == null) {
-        continue
-      }
-
-      const style = new TextStyle({
-        fontFamily: `Chakra Petch,sans-serif;`,
-        fill: 0xFFFFFF,
-        padding: 3,
-        fontSize: 50
-      })
-
-      const textContainer = new Container()
-
-      const text_name = new Text({
-        text: player.alias,
-        style
-      });
-      text_name.resolution = 2
-      text_name.zIndex = 10
-
-      let graphics = new Graphics()
-      graphics.roundRect(-10, -10, text_name.width + 20, text_name.height + 20, 10)
-      graphics.fill({
-        color: this.context!.getPlayerColour(player._id),
-        alpha: 0.7
-      });
-
-      textContainer.x = empireCenter.x - (text_name.width / 2)
-      textContainer.y = empireCenter.y - (text_name.height / 2)
-
-      textContainer.addChild(graphics)
-      textContainer.addChild(text_name)
-
-      this.container.addChild(textContainer)
+        PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
+        this.context = context;
     }
 
-    this.separate()
+    draw() {
+        this.container.removeChildren();
 
-    this.refreshZoom(this.zoomPercent || 0)
-  }
+        for (let player of this.game!.galaxy.players) {
+            const empireCenter = helpers.getPlayerTerritoryCenter(
+                this.distanceService,
+                this.game!,
+                player,
+            );
 
-  separate () {
-    const rects = this.container.children as Container[];
+            if (empireCenter == null) {
+                continue;
+            }
 
-    const hasOverlap = (rectA, rectB) => {
-      // a left >= b right or b left >= a right
-      if (rectA.x >= rectB.x + rectB.width || rectB.x >= rectA.x + rectA.width) {
-        return false
-      }
+            const style = new TextStyle({
+                fontFamily: `Chakra Petch,sans-serif;`,
+                fill: 0xffffff,
+                padding: 3,
+                fontSize: 50,
+            });
 
-      // a top >= b bottom or b top >= a bottom
-      if (rectA.y >= rectB.y + rectB.height || rectB.y >= rectA.y + rectA.height) {
-        return false
-      }
+            const textContainer = new Container();
 
-      return true
-    }
+            const text_name = new Text({
+                text: player.alias,
+                style,
+            });
+            text_name.resolution = 2;
+            text_name.zIndex = 10;
 
-    const hasOverlaps = () => {
-      for (let i = 0; i < rects.length - 1; i++) {
-        for (let ii = 0; ii < rects.length - 1; ii++) {
-          if (i === ii) {
-            continue
-          }
+            let graphics = new Graphics();
+            graphics.roundRect(
+                -10,
+                -10,
+                text_name.width + 20,
+                text_name.height + 20,
+                10,
+            );
+            graphics.fill({
+                color: this.context!.getPlayerColour(player._id),
+                alpha: 0.7,
+            });
 
-          if (hasOverlap(rects[i], rects[ii])) {
-            return true
-          }
-        }
-      }
+            textContainer.x = empireCenter.x - text_name.width / 2;
+            textContainer.y = empireCenter.y - text_name.height / 2;
 
-      return false
-    }
+            textContainer.addChild(graphics);
+            textContainer.addChild(text_name);
 
-    const translate = (rect, index) => {
-      const overlapVector = {
-        x: 0,
-        y: 0
-      }
-
-      for (let i = 0; i < rects.length - 1; i++) {
-        if (i === index) {
-          continue
+            this.container.addChild(textContainer);
         }
 
-        const otherRect = rects[i]
+        this.separate();
 
-        if (hasOverlap(rect, otherRect)) {
-          const rectMidVec = {
-            x: (rect.x + rect.x + rect.width) / 2,
-            y: (rect.y + rect.y + rect.height) / 2
-          }
+        this.refreshZoom(this.zoomPercent || 0);
+    }
 
-          const otherMidVec = {
-            x: (otherRect.x + otherRect.x + otherRect.width) / 2,
-            y: (otherRect.y + otherRect.y + otherRect.height) / 2
-          }
+    separate() {
+        const rects = this.container.children as Container[];
 
-          overlapVector.x += rectMidVec.x - otherMidVec.x
-          overlapVector.y += rectMidVec.y - otherMidVec.y
+        const hasOverlap = (rectA, rectB) => {
+            // a left >= b right or b left >= a right
+            if (
+                rectA.x >= rectB.x + rectB.width ||
+                rectB.x >= rectA.x + rectA.width
+            ) {
+                return false;
+            }
+
+            // a top >= b bottom or b top >= a bottom
+            if (
+                rectA.y >= rectB.y + rectB.height ||
+                rectB.y >= rectA.y + rectA.height
+            ) {
+                return false;
+            }
+
+            return true;
+        };
+
+        const hasOverlaps = () => {
+            for (let i = 0; i < rects.length - 1; i++) {
+                for (let ii = 0; ii < rects.length - 1; ii++) {
+                    if (i === ii) {
+                        continue;
+                    }
+
+                    if (hasOverlap(rects[i], rects[ii])) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        };
+
+        const translate = (rect, index) => {
+            const overlapVector = {
+                x: 0,
+                y: 0,
+            };
+
+            for (let i = 0; i < rects.length - 1; i++) {
+                if (i === index) {
+                    continue;
+                }
+
+                const otherRect = rects[i];
+
+                if (hasOverlap(rect, otherRect)) {
+                    const rectMidVec = {
+                        x: (rect.x + rect.x + rect.width) / 2,
+                        y: (rect.y + rect.y + rect.height) / 2,
+                    };
+
+                    const otherMidVec = {
+                        x: (otherRect.x + otherRect.x + otherRect.width) / 2,
+                        y: (otherRect.y + otherRect.y + otherRect.height) / 2,
+                    };
+
+                    overlapVector.x += rectMidVec.x - otherMidVec.x;
+                    overlapVector.y += rectMidVec.y - otherMidVec.y;
+                }
+            }
+
+            return overlapVector;
+        };
+
+        const normalize = (vector) => {
+            const mag = Math.sqrt(vector.x ** 2 + vector.y ** 2);
+
+            if (mag === 0) {
+                return;
+            }
+
+            vector.x = vector.x / mag;
+            vector.y = vector.y / mag;
+        };
+
+        while (hasOverlaps()) {
+            for (let i = 0; i < rects.length - 1; i++) {
+                const rect = rects[i];
+
+                const newVector = translate(rect, i);
+
+                normalize(newVector);
+
+                rect.x += newVector.x;
+                rect.y += newVector.y;
+            }
         }
-      }
-
-      return overlapVector
     }
 
-    const normalize = (vector) => {
-      const mag = Math.sqrt(vector.x ** 2 + vector.y ** 2)
+    onTick(zoomPercent, zoomChanging) {
+        this.zoomPercent = zoomPercent;
 
-      if (mag === 0) {
-        return
-      }
-
-      vector.x = vector.x / mag
-      vector.y = vector.y / mag
+        if (zoomChanging) {
+            if (this.container) {
+                this.container.visible = zoomPercent <= PlayerNames.zoomLevel;
+            }
+        }
     }
 
-    while (hasOverlaps()) {
-      for (let i = 0; i < rects.length - 1; i++) {
-        const rect = rects[i]
+    refreshZoom(zoomPercent: number) {
+        this.zoomPercent = zoomPercent;
 
-        const newVector = translate(rect, i)
-
-        normalize(newVector)
-
-        rect.x += newVector.x
-        rect.y += newVector.y
-      }
+        if (this.container) {
+            this.container.visible = zoomPercent <= PlayerNames.zoomLevel;
+        }
     }
-  }
 
-  onTick( zoomPercent, zoomChanging ) {
-    this.zoomPercent = zoomPercent
-
-    if( zoomChanging ) {
-      if (this.container) {
-        this.container.visible = zoomPercent <= PlayerNames.zoomLevel
-      }
+    update(game: Game, userSettings: UserGameSettings) {
+        this.game = game;
+        PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
     }
-  }
-
-  refreshZoom (zoomPercent: number) {
-    this.zoomPercent = zoomPercent
-
-    if (this.container) {
-      this.container.visible = zoomPercent <= PlayerNames.zoomLevel
-    }
-  }
-
-  update(game: Game, userSettings: UserGameSettings) {
-    this.game = game;
-    PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
-  }
 }
 
-export default PlayerNames
+export default PlayerNames;

@@ -1,23 +1,28 @@
 <template>
   <div>
-    <loading-spinner :loading="isLoading"/>
+    <loading-spinner :loading="isLoading" />
 
     <div class="pt-3 pb-3 badges" v-if="!isLoading && badges.length">
-      <badge-with-history v-for="badge in badges" :key="badge.badge" :badge="badge" :allBadges="allBadges" />
+      <badge-with-history
+        v-for="badge in badges"
+        :key="badge.badge"
+        :badge="badge"
+        :allBadges="allBadges"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import {ref, onMounted, type Ref, inject, watch} from 'vue';
-import type {Axios} from 'axios';
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import type {AwardedBadge, Badge as TBadge} from "@solaris/common";
-import {getBadgesForUser} from "../../../../services/typedapi/badge";
-import {httpInjectionKey, isOk} from "../../../../services/typedapi";
+import { useGameStore } from "@/stores/game";
+import { ref, onMounted, type Ref, inject, watch } from "vue";
+import type { Axios } from "axios";
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import type { AwardedBadge, Badge as TBadge } from "@solaris/common";
+import { getBadgesForUser } from "../../../../services/typedapi/badge";
+import { httpInjectionKey, isOk } from "../../../../services/typedapi";
 import BadgeWithHistory from "@/views/game/components/badges/BadgeWithHistory.vue";
-import { useBadgeStore } from '../../../../stores/badge';
+import { useBadgeStore } from "../../../../stores/badge";
 
 const props = defineProps<{ userId: string }>();
 
@@ -33,7 +38,7 @@ const badgeStore = useBadgeStore();
 const httpClient: Axios = inject(httpInjectionKey)!;
 
 const loadBadges = async () => {
-  const response = await getBadgesForUser(httpClient)(props.userId)
+  const response = await getBadgesForUser(httpClient)(props.userId);
 
   if (isOk(response)) {
     badges.value = response.data.sort((a, b) => {
@@ -55,10 +60,11 @@ watch(
   () => props.userId,
   (_newId, _oldId) => {
     loadBadges();
-  });
+  },
+);
 
 onMounted(async () => {
-  isLoading.value = true
+  isLoading.value = true;
 
   await badgeStore.loadBadges(httpClient);
   allBadges.value = [...badgeStore.badges];

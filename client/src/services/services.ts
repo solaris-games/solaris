@@ -1,11 +1,18 @@
 import {
-  CarrierTravelService, CombatGroupService, CombatService,
+  CarrierTravelService,
+  CombatGroupService,
+  CombatService,
   DistanceService,
-  type Game, GameTypeService, PathfindingService, ResearchProgressService, type Specialist,
-  type Star, StarDataService,
+  type Game,
+  GameTypeService,
+  PathfindingService,
+  ResearchProgressService,
+  type Specialist,
+  type Star,
+  StarDataService,
   StarDistanceService,
   TechnologyService,
-  WaypointService
+  WaypointService,
 } from "@solaris/common";
 
 export type ServiceProvider = {
@@ -19,7 +26,7 @@ export type ServiceProvider = {
   pathfindingService: PathfindingService<string>;
   combatService: CombatService<string>;
   researchProgressService: ResearchProgressService;
-}
+};
 
 interface IStarService {
   getById(game: Game<string>, id: string): Star<string>;
@@ -32,23 +39,57 @@ interface ISpecialistService {
 
 interface IDiplomacyService {
   isFormalAlliancesEnabled(game: Game<string>): boolean;
-  isDiplomaticStatusToPlayersAllied(game: Game<string>, playerId: string, otherPlayerIds: string[]): boolean;
+  isDiplomaticStatusToPlayersAllied(
+    game: Game<string>,
+    playerId: string,
+    otherPlayerIds: string[],
+  ): boolean;
 }
 
-export const initialize = (starService: IStarService, specialistService: ISpecialistService, diplomacyService: IDiplomacyService): ServiceProvider => {
+export const initialize = (
+  starService: IStarService,
+  specialistService: ISpecialistService,
+  diplomacyService: IDiplomacyService,
+): ServiceProvider => {
   const gameTypeService = new GameTypeService();
   const distanceService = new DistanceService();
   const starDistanceService = new StarDistanceService(distanceService);
-  const technologyService = new TechnologyService(specialistService, gameTypeService);
+  const technologyService = new TechnologyService(
+    specialistService,
+    gameTypeService,
+  );
   const starDataService = new StarDataService(gameTypeService);
   const researchProgressService = new ResearchProgressService();
-  const carrierTravelService = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);
+  const carrierTravelService = new CarrierTravelService(
+    specialistService,
+    technologyService,
+    distanceService,
+    starDistanceService,
+    diplomacyService,
+    starDataService,
+  );
 
-  const waypointService = new WaypointService(starService, distanceService, starDistanceService, technologyService, carrierTravelService, starDataService);
+  const waypointService = new WaypointService(
+    starService,
+    distanceService,
+    starDistanceService,
+    technologyService,
+    carrierTravelService,
+    starDataService,
+  );
 
-  const pathfindingService = new PathfindingService(distanceService, waypointService, starDataService, technologyService);
+  const pathfindingService = new PathfindingService(
+    distanceService,
+    waypointService,
+    starDataService,
+    technologyService,
+  );
 
-  const combatService = new CombatService(new CombatGroupService(diplomacyService), technologyService, specialistService);
+  const combatService = new CombatService(
+    new CombatGroupService(diplomacyService),
+    technologyService,
+    specialistService,
+  );
 
   return {
     starDataService,
@@ -61,5 +102,5 @@ export const initialize = (starService: IStarService, specialistService: ISpecia
     pathfindingService,
     combatService,
     researchProgressService,
-  }
-}
+  };
+};

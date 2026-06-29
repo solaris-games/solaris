@@ -4,40 +4,76 @@
       <h5 class="panel-title">
         {{ user.username }}
         <span v-if="isAdministrator">
-              <i class="fas fa-hands-helping clickable" :class="{'disabled-role':!userA.roles.contributor}"
-                 @click="toggleRole(user, 'contributor')" title="Toggle Contributor Role"></i>
-              <i class="fas fa-code ms-1 clickable" :class="{'disabled-role':!userA.roles.developer}"
-                 @click="toggleRole(user, 'developer')" title="Toggle Developer Role"></i>
-              <i class="fas fa-user-friends ms-1 clickable" :class="{'disabled-role':!userA.roles.communityManager}"
-                 @click="toggleRole(user, 'communityManager')" title="Toggle Community Manager Role"></i>
-              <i class="fas fa-dice ms-1 clickable" :class="{'disabled-role':!userA.roles.gameMaster}"
-                 @click="toggleRole(user, 'gameMaster')" title="Toggle Game Master Role"></i>
-            </span>
+          <i
+            class="fas fa-hands-helping clickable"
+            :class="{ 'disabled-role': !userA.roles.contributor }"
+            @click="toggleRole(user, 'contributor')"
+            title="Toggle Contributor Role"
+          ></i>
+          <i
+            class="fas fa-code ms-1 clickable"
+            :class="{ 'disabled-role': !userA.roles.developer }"
+            @click="toggleRole(user, 'developer')"
+            title="Toggle Developer Role"
+          ></i>
+          <i
+            class="fas fa-user-friends ms-1 clickable"
+            :class="{ 'disabled-role': !userA.roles.communityManager }"
+            @click="toggleRole(user, 'communityManager')"
+            title="Toggle Community Manager Role"
+          ></i>
+          <i
+            class="fas fa-dice ms-1 clickable"
+            :class="{ 'disabled-role': !userA.roles.gameMaster }"
+            @click="toggleRole(user, 'gameMaster')"
+            title="Toggle Game Master Role"
+          ></i>
+        </span>
       </h5>
     </div>
     <div class="panel-body">
       <p v-if="isAdministrator">Email: {{ userA.email }}</p>
       <p v-if="isAdministrator">Email enabled: {{ userA.emailEnabled }}</p>
-      <p v-if="isAdministrator">Last seen: {{ getLastSeenString(userA.lastSeen) }}</p>
-      <p v-if="isAdministrator" :class="{'text-warning':duplicateIPs}">Last seen IP:
-        {{ userA.lastSeenIP }}</p>
+      <p v-if="isAdministrator">
+        Last seen: {{ getLastSeenString(userA.lastSeen) }}
+      </p>
+      <p v-if="isAdministrator" :class="{ 'text-warning': duplicateIPs }">
+        Last seen IP: {{ userA.lastSeenIP }}
+      </p>
 
       <p>
         Established Player: {{ user.isEstablishedPlayer }}
 
-        <i v-if="isCommunityManager && !user.isEstablishedPlayer" class="fas fa-user-check clickable text-danger"
-           @click="doPromoteToEstablishedPlayer(user)" title="Promote to Established Player"></i>
+        <i
+          v-if="isCommunityManager && !user.isEstablishedPlayer"
+          class="fas fa-user-check clickable text-danger"
+          @click="doPromoteToEstablishedPlayer(user)"
+          title="Promote to Established Player"
+        ></i>
 
-        <i v-if="user.isEstablishedPlayer" class="fas fa-user-check clickable text-success"></i>
+        <i
+          v-if="user.isEstablishedPlayer"
+          class="fas fa-user-check clickable text-success"
+        ></i>
       </p>
 
       <p v-if="isAdministrator">
-        <i :style="[userA.credits <= 0 ? { 'visibility': 'hidden' } : { 'visibility': 'unset' }]"
-           class="fas fa-minus clickable text-danger" @click="doSetCredits(user, userA.credits - 1)"
-           title="Deduct Credits"></i>
+        <i
+          :style="[
+            userA.credits <= 0
+              ? { visibility: 'hidden' }
+              : { visibility: 'unset' },
+          ]"
+          class="fas fa-minus clickable text-danger"
+          @click="doSetCredits(user, userA.credits - 1)"
+          title="Deduct Credits"
+        ></i>
         {{ userA.credits }}
-        <i class="fas fa-plus clickable text-success" @click="doSetCredits(user, userA.credits + 1)"
-           title="Add Credits"></i>
+        <i
+          class="fas fa-plus clickable text-success"
+          @click="doSetCredits(user, userA.credits + 1)"
+          title="Add Credits"
+        ></i>
       </p>
 
       <div v-if="user.warnings && user.warnings.length">
@@ -50,40 +86,75 @@
     </div>
     <div class="panel-footer">
       <div class="actions">
-        <i v-if="isCommunityManager && user._id !== userStore.userId" class="fas fa-hammer clickable text-danger" :class="{'disabled-role':!user.banned}"
-           @click="toggleBan(user)" title="Toggle Banned"></i>
-        <i v-if="isAdministrator" class="fas fa-eraser clickable text-warning ms-1" @click="doResetAchievements(user)"
-           title="Reset Achievements"></i>
-        <i v-if="isAdministrator && user._id !== userStore.userId && !userStore.isImpersonating" class="fas fa-user clickable text-info ms-1" @click="doImpersonate(user._id)"
-           title="Impersonate User"></i>
+        <i
+          v-if="isCommunityManager && user._id !== userStore.userId"
+          class="fas fa-hammer clickable text-danger"
+          :class="{ 'disabled-role': !user.banned }"
+          @click="toggleBan(user)"
+          title="Toggle Banned"
+        ></i>
+        <i
+          v-if="isAdministrator"
+          class="fas fa-eraser clickable text-warning ms-1"
+          @click="doResetAchievements(user)"
+          title="Reset Achievements"
+        ></i>
+        <i
+          v-if="
+            isAdministrator &&
+            user._id !== userStore.userId &&
+            !userStore.isImpersonating
+          "
+          class="fas fa-user clickable text-info ms-1"
+          @click="doImpersonate(user._id)"
+          title="Impersonate User"
+        ></i>
 
-        <add-warning v-if="isCommunityManager" :user-id="user._id" @onWarningAdded="onWarningAdded" />
+        <add-warning
+          v-if="isCommunityManager"
+          :user-id="user._id"
+          @onWarningAdded="onWarningAdded"
+        />
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import AddWarning from "@/views/admin/components/AddWarning.vue";
-import {formatError, httpInjectionKey, isError, isOk, type ResponseResult} from "@/services/typedapi";
-import {useConfirm} from "@/hooks/confirm.ts";
-import { inject, computed } from 'vue';
-import type {AdminSpecificUserInfo, ListUser, UserRoleKinds} from "@solaris/common";
+import {
+  formatError,
+  httpInjectionKey,
+  isError,
+  isOk,
+  type ResponseResult,
+} from "@/services/typedapi";
+import { useConfirm } from "@/hooks/confirm.ts";
+import { inject, computed } from "vue";
+import type {
+  AdminSpecificUserInfo,
+  ListUser,
+  UserRoleKinds,
+} from "@solaris/common";
 import {
   ban,
   impersonate,
-  promoteToEstablishedPlayer, resetAchievements, setCredits,
+  promoteToEstablishedPlayer,
+  resetAchievements,
+  setCredits,
   setRoleCommunityManager,
   setRoleContributor,
-  setRoleDeveloper, setRoleGameMaster, unban
+  setRoleDeveloper,
+  setRoleGameMaster,
+  unban,
 } from "@/services/typedapi/admin";
 import router from "@/router";
 import { DateTime } from "luxon";
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from "@/stores/user";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const props = defineProps<{
-  user: ListUser<string>,
-  duplicateIPs: boolean,
+  user: ListUser<string>;
+  duplicateIPs: boolean;
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -93,12 +164,16 @@ const userStore = useUserStore();
 const confirm = useConfirm();
 
 const isAdministrator = computed(() => userStore.roles?.administrator);
-const isCommunityManager = computed(() => userStore.roles?.communityManager || userStore.roles?.administrator);
-const userA = computed(() => props.user as ListUser<string> & AdminSpecificUserInfo);
+const isCommunityManager = computed(
+  () => userStore.roles?.communityManager || userStore.roles?.administrator,
+);
+const userA = computed(
+  () => props.user as ListUser<string> & AdminSpecificUserInfo,
+);
 
 const getLastSeenString = (lastSeen: Date) => {
   if (!lastSeen) {
-    return ''
+    return "";
   }
 
   return DateTime.fromJSDate(lastSeen).toRelative();
@@ -116,7 +191,12 @@ const doPromoteToEstablishedPlayer = async (user: ListUser<string>) => {
     return;
   }
 
-  if (!await confirm('Promote to Established Player', 'Are you sure you want to promote this player to an established player?')) {
+  if (
+    !(await confirm(
+      "Promote to Established Player",
+      "Are you sure you want to promote this player to an established player?",
+    ))
+  ) {
     return;
   }
 
@@ -140,7 +220,7 @@ const doImpersonate = async (userId: string) => {
     userStore.setCredits(response.data.credits);
     userStore.setIsImpersonating(response.data.isImpersonating);
 
-    router.push({name: 'home'});
+    router.push({ name: "home" });
   } else {
     console.error(formatError(response));
     toast.error("Failed to impersonate");
@@ -157,17 +237,26 @@ const toggleRole = async (user: ListUser<string>, role: UserRoleKinds) => {
   let request: Promise<ResponseResult<null>>;
 
   switch (role) {
-    case 'contributor':
-      request = setRoleContributor(httpClient)(userI._id, !userI.roles.contributor);
+    case "contributor":
+      request = setRoleContributor(httpClient)(
+        userI._id,
+        !userI.roles.contributor,
+      );
       break;
-    case 'developer':
+    case "developer":
       request = setRoleDeveloper(httpClient)(userI._id, !userI.roles.developer);
       break;
-    case 'communityManager':
-      request = setRoleCommunityManager(httpClient)(userI._id, !userI.roles.communityManager);
+    case "communityManager":
+      request = setRoleCommunityManager(httpClient)(
+        userI._id,
+        !userI.roles.communityManager,
+      );
       break;
-    case 'gameMaster':
-      request = setRoleGameMaster(httpClient)(userI._id, !userI.roles.gameMaster);
+    case "gameMaster":
+      request = setRoleGameMaster(httpClient)(
+        userI._id,
+        !userI.roles.gameMaster,
+      );
       break;
     default:
       throw new Error(`Role ${role} not recongnized`);
@@ -188,7 +277,12 @@ const toggleRole = async (user: ListUser<string>, role: UserRoleKinds) => {
 };
 
 const doResetAchievements = async (user: ListUser<string>) => {
-  if (!await confirm('Reset Achievements', 'Are you sure you want to reset this players achievements?')) {
+  if (
+    !(await confirm(
+      "Reset Achievements",
+      "Are you sure you want to reset this players achievements?",
+    ))
+  ) {
     return;
   }
 
@@ -217,7 +311,12 @@ const doSetCredits = async (user: ListUser<string>, credits: number) => {
 };
 
 const toggleBan = async (user: ListUser<string>) => {
-  if (!await confirm('Ban/Unban', 'Are you sure you want to ban/unban this player?')) {
+  if (
+    !(await confirm(
+      "Ban/Unban",
+      "Are you sure you want to ban/unban this player?",
+    ))
+  ) {
     return;
   }
 
@@ -238,17 +337,16 @@ const toggleBan = async (user: ListUser<string>) => {
     toast.error("Error banning user");
   }
 };
-
 </script>
 <style scoped>
 .panel-footer {
-  border-top: 1px solid rgba(255, 255, 255, .3);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
   padding-top: 8px;
 }
 
 .user-element {
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, .3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin: 8px;
   padding: 8px;
 }
@@ -267,7 +365,7 @@ const toggleBan = async (user: ListUser<string>) => {
 }
 
 .disabled-role {
-  opacity: 0.2
+  opacity: 0.2;
 }
 
 .clickable {

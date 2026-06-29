@@ -1,46 +1,46 @@
-import MapService from '../services/map';
-import CircularMapService from '../services/maps/circular';
-import RandomService from '../services/random';
-import { Game } from '../services/types/Game';
-import { Star } from '../services/types/Star';
-import { SeededRandomGen } from '../utils/randomGen';
-import { RandomGen } from '@solaris/common';
+import MapService from "../services/map";
+import CircularMapService from "../services/maps/circular";
+import RandomService from "../services/random";
+import { Game } from "../services/types/Game";
+import { Star } from "../services/types/Star";
+import { SeededRandomGen } from "../utils/randomGen";
+import { RandomGen } from "@solaris/common";
 
 const game: Game = {
     settings: {
         galaxy: {
-            galaxyType: 'circular'
+            galaxyType: "circular",
         },
         specialGalaxy: {
-            resourceDistribution: 'random'
-        }
+            resourceDistribution: "random",
+        },
     },
     constants: {
         distances: {
-            maxDistanceBetweenStars: 300
+            maxDistanceBetweenStars: 300,
         },
         star: {
             resources: {
                 minNaturalResources: 10,
-                maxNaturalResources: 50
-            }
-        }
-    }
+                maxNaturalResources: 50,
+            },
+        },
+    },
 } as unknown as Game;
 
 const fakeStarService = {
     generateUnownedStar(name: string, location) {
         return {
             name,
-            location
-        }
+            location,
+        };
     },
     generateStarPosition(game, x: number, y: number) {
         return {
             x: 10,
-            y: 10
-        }
-    }
+            y: 10,
+        };
+    },
 };
 
 const fakeStarDistanceService = {
@@ -55,7 +55,7 @@ const fakeStarDistanceService = {
     },
     isLocationTooClose(game, location, locations) {
         return false;
-    }
+    },
 };
 
 const fakeDistanceService = {
@@ -64,7 +64,7 @@ const fakeDistanceService = {
     },
     getDistanceBetweenLocations() {
         return 2;
-    }
+    },
 };
 
 const fakeStarNameService = {
@@ -74,21 +74,22 @@ const fakeStarNameService = {
         for (let i = 0; i < count; i++) {
             names.push(`Star ${i}`);
         }
-        
+
         return names;
-    }
+    },
 };
 
 const fakeResourceService = {
-    distribute() { }
+    distribute() {},
 };
 
 const fakeGameTypeService = {
-    isKingOfTheHillMode() { return false; }
+    isKingOfTheHillMode() {
+        return false;
+    },
 };
 
-describe('map', () => {
-
+describe("map", () => {
     const starCount = 10;
     const playerCount = 2;
     let randGen: RandomGen;
@@ -101,22 +102,45 @@ describe('map', () => {
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
         // @ts-ignore
-        starMapService = new CircularMapService(randomService, fakeStarService, fakeStarDistanceService, fakeDistanceService, fakeResourceService, fakeGameTypeService);
+        starMapService = new CircularMapService(
+            randomService,
+            fakeStarService,
+            fakeStarDistanceService,
+            fakeDistanceService,
+            fakeResourceService,
+            fakeGameTypeService,
+        );
         // @ts-ignore
-        mapService = new MapService(randomService, fakeStarService, fakeStarDistanceService, fakeStarNameService, starMapService);
+        mapService = new MapService(
+            randomService,
+            fakeStarService,
+            fakeStarDistanceService,
+            fakeStarNameService,
+            starMapService,
+        );
     });
 
-    it('should generate a given number of stars', () => {
-        const stars = mapService.generateStars(randGen, game, starCount, playerCount).stars;
-        
+    it("should generate a given number of stars", () => {
+        const stars = mapService.generateStars(
+            randGen,
+            game,
+            starCount,
+            playerCount,
+        ).stars;
+
         expect(stars).toBeTruthy();
         expect(stars.length).toEqual(starCount);
     });
 
-    it('should generate stars with no duplicate names.', () => {
-        const stars: Star[] = mapService.generateStars(randGen, game, starCount, playerCount).stars;
-                
-        for(let i = 0; i < stars.length; i++) {
+    it("should generate stars with no duplicate names.", () => {
+        const stars: Star[] = mapService.generateStars(
+            randGen,
+            game,
+            starCount,
+            playerCount,
+        ).stars;
+
+        for (let i = 0; i < stars.length; i++) {
             let star: Star = stars[i];
 
             let duplicates = stars.filter((s) => s.name === star.name);
@@ -147,5 +171,4 @@ describe('map', () => {
 
     //     expect(result).toBeTruthy();
     // });
-
 });

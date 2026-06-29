@@ -1,5 +1,8 @@
-import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToConversationCreateConversationRequest, mapToConversationSendMessageRequest } from '../requests/conversation';
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {
+    mapToConversationCreateConversationRequest,
+    mapToConversationSendMessageRequest,
+} from "../requests/conversation";
 
 export default (container: DependencyContainer) => {
     return {
@@ -7,8 +10,9 @@ export default (container: DependencyContainer) => {
             try {
                 let result = await container.conversationService.list(
                     req.game,
-                    req.player._id);
-    
+                    req.player._id,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -17,11 +21,13 @@ export default (container: DependencyContainer) => {
         },
         listPrivate: async (req, res, next) => {
             try {
-                let result = await container.conversationService.privateChatSummary(
-                    req.game,
-                    req.player._id,
-                    req.params.withPlayerId);
-    
+                let result =
+                    await container.conversationService.privateChatSummary(
+                        req.game,
+                        req.player._id,
+                        req.params.withPlayerId,
+                    );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -32,10 +38,11 @@ export default (container: DependencyContainer) => {
             try {
                 let result = container.conversationService.getUnreadCount(
                     req.game,
-                    req.player._id);
-    
+                    req.player._id,
+                );
+
                 res.status(200).json({
-                    unread: result
+                    unread: result,
                 });
                 return next();
             } catch (err) {
@@ -47,8 +54,9 @@ export default (container: DependencyContainer) => {
                 let result = await container.conversationService.detail(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
-    
+                    req.params.conversationId,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -57,14 +65,17 @@ export default (container: DependencyContainer) => {
         },
         create: async (req, res, next) => {
             try {
-                const reqObj = mapToConversationCreateConversationRequest(req.body);
+                const reqObj = mapToConversationCreateConversationRequest(
+                    req.body,
+                );
 
                 const convo = await container.conversationService.create(
                     req.game,
                     req.player._id,
                     reqObj.name,
                     reqObj.participants,
-                    container.eventService);
+                    container.eventService,
+                );
 
                 res.status(200).json(convo);
                 return next();
@@ -73,15 +84,16 @@ export default (container: DependencyContainer) => {
             }
         },
         sendMessage: async (req, res, next) => {
-            try {    
+            try {
                 const reqObj = mapToConversationSendMessageRequest(req.body);
-    
+
                 let message = await container.conversationService.send(
                     req.game,
                     req.player,
                     req.params.conversationId,
                     reqObj.message,
-                    container.notificationService);
+                    container.notificationService,
+                );
 
                 res.status(200).send(message);
                 return next();
@@ -94,15 +106,21 @@ export default (container: DependencyContainer) => {
                 res.sendStatus(200);
                 return next();
             }
-    
-            try {
-                let convo = await container.conversationService.markConversationAsRead(
-                    req.game,
-                    req.player._id,
-                    req.params.conversationId);
 
-                container.broadcastService.gameConversationRead(req.game, convo, req.player._id);
-    
+            try {
+                let convo =
+                    await container.conversationService.markConversationAsRead(
+                        req.game,
+                        req.player._id,
+                        req.params.conversationId,
+                    );
+
+                container.broadcastService.gameConversationRead(
+                    req.game,
+                    convo,
+                    req.player._id,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -114,8 +132,9 @@ export default (container: DependencyContainer) => {
                 await container.conversationService.mute(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
-    
+                    req.params.conversationId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -127,8 +146,9 @@ export default (container: DependencyContainer) => {
                 await container.conversationService.unmute(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
-    
+                    req.params.conversationId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -141,10 +161,15 @@ export default (container: DependencyContainer) => {
                     req.game,
                     req.player._id,
                     req.params.conversationId,
-                    container.eventService);
-    
-                container.broadcastService.gameConversationLeft(req.game, convo, req.player._id);
-    
+                    container.eventService,
+                );
+
+                container.broadcastService.gameConversationLeft(
+                    req.game,
+                    convo,
+                    req.player._id,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -156,15 +181,21 @@ export default (container: DependencyContainer) => {
                 await container.conversationService.pinMessage(
                     req.game,
                     req.params.conversationId,
-                    req.params.messageId);
-    
+                    req.params.messageId,
+                );
+
                 let convo = await container.conversationService.detail(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
-        
-                container.broadcastService.gameConversationMessagePinned(req.game, convo, req.params.messageId);
-    
+                    req.params.conversationId,
+                );
+
+                container.broadcastService.gameConversationMessagePinned(
+                    req.game,
+                    convo,
+                    req.params.messageId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -176,20 +207,26 @@ export default (container: DependencyContainer) => {
                 await container.conversationService.unpinMessage(
                     req.game,
                     req.params.conversationId,
-                    req.params.messageId);
-    
+                    req.params.messageId,
+                );
+
                 let convo = await container.conversationService.detail(
                     req.game,
                     req.player._id,
-                    req.params.conversationId);
-    
-                container.broadcastService.gameConversationMessageUnpinned(req.game, convo, req.params.messageId);
-    
+                    req.params.conversationId,
+                );
+
+                container.broadcastService.gameConversationMessageUnpinned(
+                    req.game,
+                    convo,
+                    req.params.messageId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);
             }
-        }
-    }
+        },
+    };
 };

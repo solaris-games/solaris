@@ -1,4 +1,4 @@
-export type SpecialistType = 'star'|'carrier';
+export type SpecialistType = "star" | "carrier";
 
 export interface Specialist {
     id: number;
@@ -8,7 +8,7 @@ export interface Specialist {
     active: {
         official: boolean;
         custom: boolean;
-    },
+    };
     baseCostCredits: number;
     baseCostCreditsSpecialists: number;
     oneShot: boolean;
@@ -23,21 +23,21 @@ export interface Specialist {
             terraforming?: number;
             carrierToCarrierCombat?: {
                 weapons?: number;
-            }
+            };
             carrierToStarCombat?: {
-                captureTargetedPlayers?: boolean,
+                captureTargetedPlayers?: boolean;
                 attacker: {
                     weapons?: number;
                     perAlly?: {
-                        weapons: number,
-                        maxAllies: number,
+                        weapons: number;
+                        maxAllies: number;
                     };
-                }
+                };
                 defender: {
                     weapons?: number;
-                }
-            }
-        },
+                };
+            };
+        };
         special?: {
             hideShips?: boolean;
             deductEnemyWeapons?: number;
@@ -49,7 +49,7 @@ export interface Specialist {
                 economy: number;
                 industry: number;
                 science: number;
-            },
+            };
             lockWarpGates?: boolean;
             addNaturalResourcesOnTick?: number;
             destroyInfrastructureOnLoss?: boolean;
@@ -60,6 +60,6 @@ export interface Specialist {
             combatSwapWeaponsTechnology?: boolean;
             defenderBonus?: number;
             wormHoleConstructor?: boolean;
-        }
-    }
-};
+        };
+    };
+}

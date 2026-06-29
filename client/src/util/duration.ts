@@ -5,7 +5,7 @@ export type Duration = {
   hours?: number;
   minutes?: number;
   seconds?: number;
-}
+};
 
 const MINUTE_SECONDS = 60;
 const HOUR_SECONDS = 60 * MINUTE_SECONDS;
@@ -13,12 +13,14 @@ const DAY_SECONDS = 24 * HOUR_SECONDS;
 const WEEK_SECONDS = 7 * DAY_SECONDS;
 
 export const toSeconds = (duration: Duration) => {
-  return ((duration.weeks || 0) * WEEK_SECONDS) +
-    ((duration.days || 0) * DAY_SECONDS) +
-    ((duration.hours || 0) * HOUR_SECONDS) +
-    ((duration.minutes || 0) * MINUTE_SECONDS) +
-    ((duration.seconds || 0));
-}
+  return (
+    (duration.weeks || 0) * WEEK_SECONDS +
+    (duration.days || 0) * DAY_SECONDS +
+    (duration.hours || 0) * HOUR_SECONDS +
+    (duration.minutes || 0) * MINUTE_SECONDS +
+    (duration.seconds || 0)
+  );
+};
 
 export const normalize = (duration: Duration): Duration => {
   let seconds = toSeconds(duration);
@@ -55,7 +57,7 @@ export const betweenAbs = (date1: Date, date2: Date): Duration => {
 };
 
 export const formatDuration = (duration: Duration): string => {
-  const val2 = (v: number | undefined) => (v || 0).toString().padStart(2, '0');
+  const val2 = (v: number | undefined) => (v || 0).toString().padStart(2, "0");
 
   let str = `${val2(duration.hours)}:${val2(duration.minutes)}:${val2(duration.seconds)}`;
 

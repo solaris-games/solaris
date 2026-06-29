@@ -1,15 +1,13 @@
 <template>
-  <a @click="setMenuState()"
-     :title="tooltip"
-     :class="{'active': isActive}">
+  <a @click="setMenuState()" :title="tooltip" :class="{ active: isActive }">
     <i :class="iconClass"></i>
   </a>
 </template>
 
 <script setup lang="ts">
-import {useGameStore} from '@/stores/game';
-import {computed} from 'vue';
-import type {MenuState} from "@/types/menu";
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import type { MenuState } from "@/types/menu";
 
 const props = defineProps<{
   menuState?: MenuState;

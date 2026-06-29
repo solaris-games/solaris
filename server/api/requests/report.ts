@@ -1,8 +1,16 @@
-import {boolean, maybeUndefined, object, ReportCreateReportRequest, Validator} from "@solaris/common";
+import {
+    boolean,
+    maybeUndefined,
+    object,
+    ReportCreateReportRequest,
+    Validator,
+} from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import {objectId} from "../../utils/validation";
+import { objectId } from "../../utils/validation";
 
-export const parseReportCreateReportRequest: Validator<ReportCreateReportRequest<DBObjectId>> = object({
+export const parseReportCreateReportRequest: Validator<
+    ReportCreateReportRequest<DBObjectId>
+> = object({
     playerId: objectId,
     reasons: object({
         abuse: boolean,
@@ -10,8 +18,10 @@ export const parseReportCreateReportRequest: Validator<ReportCreateReportRequest
         multiboxing: boolean,
         inappropriateAlias: boolean,
     }),
-    conversation: maybeUndefined(object({
-        conversationId: objectId,
-        messageId: objectId,
-    })),
+    conversation: maybeUndefined(
+        object({
+            conversationId: objectId,
+            messageId: objectId,
+        }),
+    ),
 });

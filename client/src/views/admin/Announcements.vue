@@ -1,16 +1,25 @@
 <template>
   <administration-page title="Announcements" name="announcements">
-    <loading-spinner :loading="!announcements"/>
+    <loading-spinner :loading="!announcements" />
 
     <div v-if="announcements">
       <create-announcement @onAnnouncementCreated="updateAnnouncements" />
 
       <h4>Announcements</h4>
 
-      <div class="announcement-list" v-for="announcement in announcements" :key="announcement._id">
+      <div
+        class="announcement-list"
+        v-for="announcement in announcements"
+        :key="announcement._id"
+      >
         <announcement-tile :announcement="announcement" :highlighted="false">
           <template v-slot:context-actions>
-            <button class="btn btn-outline-danger btn-sm" @click="removeAnnouncement(announcement)">Delete</button>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              @click="removeAnnouncement(announcement)"
+            >
+              Delete
+            </button>
           </template>
         </announcement-tile>
       </div>
@@ -23,13 +32,16 @@ import AdministrationPage from "./AdministrationPage.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import CreateAnnouncement from "./components/CreateAnnouncement.vue";
 import AnnouncementTile from "../components/Announcement.vue";
-import { ref, inject, type Ref, onMounted } from 'vue';
+import { ref, inject, type Ref, onMounted } from "vue";
 import type { Announcement } from "@solaris/common";
-import { getAllAnnouncements, deleteAnnouncement } from "@/services/typedapi/admin";
+import {
+  getAllAnnouncements,
+  deleteAnnouncement,
+} from "@/services/typedapi/admin";
 import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
 import { useConfirm } from "@/hooks/confirm";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
@@ -50,14 +62,19 @@ const updateAnnouncements = async () => {
 };
 
 const removeAnnouncement = async (announcement: Announcement<string>) => {
-  if (await confirm("Delete announcement", `Are you sure you want to delete the announcement "${announcement.title}"?`)) {
+  if (
+    await confirm(
+      "Delete announcement",
+      `Are you sure you want to delete the announcement "${announcement.title}"?`,
+    )
+  ) {
     const response = await deleteAnnouncement(httpClient)(announcement._id);
 
     if (isOk(response)) {
-      toast.success('Announcement deleted');
+      toast.success("Announcement deleted");
     } else {
       console.error(formatError(response));
-      toast.error('Failed to delete announcement');
+      toast.error("Failed to delete announcement");
     }
 
     await updateAnnouncements();
@@ -69,6 +86,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

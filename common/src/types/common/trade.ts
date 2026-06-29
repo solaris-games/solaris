@@ -1,19 +1,25 @@
 import type { ResearchTypeNotRandom } from "./player";
 import type {
-    PlayerCreditsReceivedEvent, PlayerCreditsSentEvent,
+    PlayerCreditsReceivedEvent,
+    PlayerCreditsSentEvent,
     PlayerDebtEventData,
     PlayerDebtForgivenEvent,
     PlayerDebtSettledEvent,
     PlayerGiftReceivedEvent,
-    PlayerGiftSentEvent, PlayerRenownReceivedEvent, PlayerRenownSentEvent, PlayerSpecialistTokensReceivedEvent,
-    PlayerSpecialistTokensSentEvent, PlayerTechnologyReceivedEvent, PlayerTechnologySentEvent
+    PlayerGiftSentEvent,
+    PlayerRenownReceivedEvent,
+    PlayerRenownSentEvent,
+    PlayerSpecialistTokensReceivedEvent,
+    PlayerSpecialistTokensSentEvent,
+    PlayerTechnologyReceivedEvent,
+    PlayerTechnologySentEvent,
 } from "./events/player";
 
 export interface TradeTechnology {
     name: ResearchTypeNotRandom;
     level: number;
     cost: number;
-};
+}
 
 export type BaseTradeEvent<ID> =
     | PlayerDebtForgivenEvent<ID>
@@ -29,22 +35,22 @@ export type BaseTradeEvent<ID> =
     | PlayerGiftReceivedEvent<ID>
     | PlayerGiftSentEvent<ID>;
 
-export type BaseTradeEventTypes = BaseTradeEvent<string>['type'];
+export type BaseTradeEventTypes = BaseTradeEvent<string>["type"];
 
 export const TRADE_EVENT_TYPES: BaseTradeEventTypes[] = [
-    'playerDebtForgiven',
-    'playerDebtSettled',
-    'playerCreditsReceived',
-    'playerCreditsSent',
-    'playerRenownReceived',
-    'playerRenownSent',
-    'playerCreditsSpecialistsReceived',
-    'playerCreditsSpecialistsSent',
-    'playerTechnologySent',
-    'playerTechnologyReceived',
-    'playerGiftReceived',
-    'playerGiftSent',
-]
+    "playerDebtForgiven",
+    "playerDebtSettled",
+    "playerCreditsReceived",
+    "playerCreditsSent",
+    "playerRenownReceived",
+    "playerRenownSent",
+    "playerCreditsSpecialistsReceived",
+    "playerCreditsSpecialistsSent",
+    "playerTechnologySent",
+    "playerTechnologyReceived",
+    "playerGiftReceived",
+    "playerGiftSent",
+];
 
 export type TradeEvent<ID> = { sentDate: Date } & BaseTradeEvent<ID>;
 
@@ -52,4 +58,4 @@ export interface TradeEventTechnology {
     name: string;
     level: number;
     difference: number;
-};
+}

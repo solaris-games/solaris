@@ -1,51 +1,51 @@
 <template>
-<tr>
-    <td class="sm-padding text-center">{{action.tick}}</td>
-    <td class="sm-padding">{{getFriendlyText(action.infrastructureType)}}</td>
-    <td class="sm-padding">{{getFriendlyText(action.buyType)}}</td>
-    <td class="sm-padding">{{action.amount}}</td>
+  <tr>
+    <td class="sm-padding text-center">{{ action.tick }}</td>
+    <td class="sm-padding">{{ getFriendlyText(action.infrastructureType) }}</td>
+    <td class="sm-padding">{{ getFriendlyText(action.buyType) }}</td>
+    <td class="sm-padding">{{ action.amount }}</td>
     <td class="sm-padding">
-      <repeat-bulk-upgrade :action="action"/>
+      <repeat-bulk-upgrade :action="action" />
     </td>
     <td class="last">
-      <trash-bulk-upgrade :action="action" @bulkScheduleTrashed="onTrashed"/>
+      <trash-bulk-upgrade :action="action" @bulkScheduleTrashed="onTrashed" />
     </td>
-</tr>
+  </tr>
 </template>
 
 <script setup lang="ts">
-import RepeatBulkUpgrade from './RepeatBulkUpgrade.vue'
-import TrashBulkUpgrade from './TrashBulkUpgrade.vue'
-import type {PlayerScheduledActions} from "@solaris/common";
+import RepeatBulkUpgrade from "./RepeatBulkUpgrade.vue";
+import TrashBulkUpgrade from "./TrashBulkUpgrade.vue";
+import type { PlayerScheduledActions } from "@solaris/common";
 
 const props = defineProps<{
-  action: PlayerScheduledActions<string>,
+  action: PlayerScheduledActions<string>;
 }>();
 
 const emit = defineEmits<{
-  bulkScheduleTrashed: [actionId: string],
+  bulkScheduleTrashed: [actionId: string];
 }>();
 
-const onTrashed = (actionId: string) => emit('bulkScheduleTrashed', actionId);
+const onTrashed = (actionId: string) => emit("bulkScheduleTrashed", actionId);
 
 const getFriendlyText = (string: string) => {
   switch (string) {
-    case 'economy':
-      return 'Economy';
-    case 'industry':
-      return 'Industry';
-    case 'science':
-      return 'Science';
-    case 'totalCredits':
-      return 'Total Credits';
-    case 'percentageOfCredits':
-      return 'Percentage';
-    case 'infrastructureAmount':
-      return 'Infrastructure Amount';
-    case 'belowPrice':
-      return 'Below Price';
+    case "economy":
+      return "Economy";
+    case "industry":
+      return "Industry";
+    case "science":
+      return "Science";
+    case "totalCredits":
+      return "Total Credits";
+    case "percentageOfCredits":
+      return "Percentage";
+    case "infrastructureAmount":
+      return "Infrastructure Amount";
+    case "belowPrice":
+      return "Below Price";
     default:
-      return ''
+      return "";
   }
 };
 </script>
@@ -64,7 +64,7 @@ td.sm-padding {
 }
 
 td.last {
-    width: 1px;
-    white-space: nowrap;
+  width: 1px;
+  white-space: nowrap;
 }
 </style>

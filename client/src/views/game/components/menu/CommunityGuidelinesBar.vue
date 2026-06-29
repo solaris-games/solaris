@@ -1,13 +1,15 @@
 <template>
   <div class="row bg-primary mb-0 p-1" title="Community Guidelines">
     <p class="guidelines-text">
-      By playing Solaris, you agree to the <router-link class="guidelines-link" :to="{ name: 'guidelines' }">Community Guidelines</router-link>
+      By playing Solaris, you agree to the
+      <router-link class="guidelines-link" :to="{ name: 'guidelines' }"
+        >Community Guidelines</router-link
+      >
     </p>
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
 .guidelines-text {

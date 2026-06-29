@@ -1,6 +1,6 @@
 <template>
-<div>
-    <loading-spinner :loading="isLoading"/>
+  <div>
+    <loading-spinner :loading="isLoading" />
 
     <div v-if="!isLoading" class="row">
       <div class="table-responsive p-0" v-if="ledgers.length">
@@ -11,34 +11,40 @@
               :key="ledger.playerId"
               :ledger="ledger"
               :ledgerType="ledgerType"
-              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+            />
           </tbody>
         </table>
       </div>
 
-      <p v-if="!ledgers.length" class="col text-warning">You have not traded with any other player and have no debts or credits.</p>
+      <p v-if="!ledgers.length" class="col text-warning">
+        You have not traded with any other player and have no debts or credits.
+      </p>
     </div>
-</div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from '../../../components/LoadingSpinner.vue';
-import LedgerRow from './LedgerRow.vue';
-import { inject, ref, computed, onMounted, onUnmounted } from 'vue';
-import { eventBusInjectionKey } from '@/eventBus';
-import PlayerEventBusEventNames from '../../../../eventBusEventNames/player';
-import {LedgerType, type PlayerLedgerDebt} from "@solaris/common";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {detailLedgerCredits, detailLedgerSpecialistTokens} from "@/services/typedapi/ledger";
-import type {Game} from "@/types/game";
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import LedgerRow from "./LedgerRow.vue";
+import { inject, ref, computed, onMounted, onUnmounted } from "vue";
+import { eventBusInjectionKey } from "@/eventBus";
+import PlayerEventBusEventNames from "../../../../eventBusEventNames/player";
+import { LedgerType, type PlayerLedgerDebt } from "@solaris/common";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import {
+  detailLedgerCredits,
+  detailLedgerSpecialistTokens,
+} from "@/services/typedapi/ledger";
+import type { Game } from "@/types/game";
 import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
-  ledgerType: LedgerType,
+  ledgerType: LedgerType;
 }>();
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -50,14 +56,16 @@ const game = computed<Game>(() => store.game!);
 const isLoading = ref(false);
 const ledgers = ref<PlayerLedgerDebt<string>[]>([]);
 
-const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+const onOpenPlayerDetailRequested = (playerId: string) =>
+  emit("onOpenPlayerDetailRequested", playerId);
 
 const loadLedger = async () => {
   isLoading.value = true;
 
-  const response = props.ledgerType === 'credits' ?
-    await detailLedgerCredits(httpClient)(game.value._id) :
-    await detailLedgerSpecialistTokens(httpClient)(game.value._id);
+  const response =
+    props.ledgerType === "credits"
+      ? await detailLedgerCredits(httpClient)(game.value._id)
+      : await detailLedgerSpecialistTokens(httpClient)(game.value._id);
 
   if (isOk(response)) {
     ledgers.value = response.data;
@@ -99,8 +107,8 @@ table tr {
 
 .table td.fit,
 .table th.fit {
-    white-space: nowrap;
-    width: 1%;
+  white-space: nowrap;
+  width: 1%;
 }
 
 @media screen and (max-width: 576px) {

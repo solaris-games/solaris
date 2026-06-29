@@ -1,33 +1,38 @@
-import GameListService from '../services/gameList';
+import GameListService from "../services/gameList";
 
 const fakeGames = [
-    { settings: { general: { type: 'official' } } },
-    { settings: { general: { type: 'official' } } },
+    { settings: { general: { type: "official" } } },
+    { settings: { general: { type: "official" } } },
 ];
 
 const fakeGameModel = {
     async find() {
         return fakeGames;
-    }
+    },
 };
 
 const fakeGameService = {
-    maskState() {}
+    maskState() {},
 };
 
-describe('game list', () => {
+describe("game list", () => {
     let gameListService;
 
     beforeAll(() => {
         // @ts-ignore
-        gameListService = new GameListService(fakeGameModel, fakeGameService, {}, {}, {}, {});
+        gameListService = new GameListService(
+            fakeGameModel,
+            fakeGameService,
+            {},
+            {},
+            {},
+            {},
+        );
     });
-    
-    it('should list official games', async () => {
+
+    it("should list official games", async () => {
         let result = await gameListService.listOfficialGames();
 
         expect(result).toEqual(fakeGames);
     });
-
 });
-

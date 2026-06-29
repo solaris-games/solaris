@@ -1,11 +1,8 @@
-import mongoose from 'mongoose';
-import { CarrierTravelService, GameTypeService } from '@solaris/common';
-import {StarDataService} from "@solaris/common";
+import mongoose from "mongoose";
+import { CarrierTravelService, GameTypeService } from "@solaris/common";
+import { StarDataService } from "@solaris/common";
 
-let playerId,
-    carrierId,
-    sourceStarId,
-    destinationStarId;
+let playerId, carrierId, sourceStarId, destinationStarId;
 
 let game,
     player,
@@ -17,8 +14,8 @@ let game,
     isFormalAlliancesEnabled,
     isDiplomaticStatusToPlayersAllied;
 
-let gameRepo, 
-    distanceService, 
+let gameRepo,
+    distanceService,
     specialistService,
     diplomacyService,
     starDistanceService,
@@ -31,8 +28,8 @@ specialistService = {
     },
     getByIdCarrier() {
         return carrierSpecialist;
-    }
-}
+    },
+};
 
 diplomacyService = {
     isFormalAlliancesEnabled() {
@@ -40,13 +37,20 @@ diplomacyService = {
     },
     isDiplomaticStatusToPlayersAllied() {
         return isDiplomaticStatusToPlayersAllied;
-    }
-}
+    },
+};
 
 starDataService = new StarDataService(new GameTypeService());
 
-describe('warp speed', () => {
-    const service = new CarrierTravelService(specialistService, technologyService, distanceService, starDistanceService, diplomacyService, starDataService);
+describe("warp speed", () => {
+    const service = new CarrierTravelService(
+        specialistService,
+        technologyService,
+        distanceService,
+        starDistanceService,
+        diplomacyService,
+        starDataService,
+    );
 
     beforeEach(() => {
         // Default values:
@@ -58,108 +62,162 @@ describe('warp speed', () => {
         isFormalAlliancesEnabled = false;
         isDiplomaticStatusToPlayersAllied = false;
 
-        game = { };
+        game = {};
 
         player = {
-            _id: playerId
+            _id: playerId,
         };
 
         carrier = {
             _id: carrierId,
             specialistId: null,
-            ownedByPlayerId: playerId
+            ownedByPlayerId: playerId,
         };
 
         sourceStar = {
             _id: sourceStarId,
             ownedByPlayerId: playerId,
             warpGate: true,
-            specialistId: null
+            specialistId: null,
         };
 
         destinationStar = {
             _id: destinationStarId,
             ownedByPlayerId: playerId,
             warpGate: true,
-            specialistId: null
+            specialistId: null,
         };
 
         starSpecialist = null;
     });
 
-    it('should not travel at warp speed if source or destination are not warp gates - source star', async () => {
+    it("should not travel at warp speed if source or destination are not warp gates - source star", async () => {
         sourceStar.warpGate = false;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source or destination are not warp gates - destination star', async () => {
+    it("should not travel at warp speed if source or destination are not warp gates - destination star", async () => {
         destinationStar.warpGate = false;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source or destination are not warp gates - both stars', async () => {
+    it("should not travel at warp speed if source or destination are not warp gates - both stars", async () => {
         sourceStar.warpGate = false;
         destinationStar.warpGate = false;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source or destination are not owned by a player - source star', async () => {
+    it("should not travel at warp speed if source or destination are not owned by a player - source star", async () => {
         sourceStar.ownedByPlayerId = null;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source or destination are not owned by a player - destination star', async () => {
+    it("should not travel at warp speed if source or destination are not owned by a player - destination star", async () => {
         destinationStar.ownedByPlayerId = null;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source or destination are not owned by a player - both stars', async () => {
+    it("should not travel at warp speed if source or destination are not owned by a player - both stars", async () => {
         sourceStar.ownedByPlayerId = null;
         destinationStar.ownedByPlayerId = null;
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should travel at warp speed if source and destination are owned by the same player', async () => {
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+    it("should travel at warp speed if source and destination are owned by the same player", async () => {
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination are not owned by the same player - source star', async () => {
+    it("should travel at warp speed if source and destination are not owned by the same player - source star", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination are not owned by the same player - destination star', async () => {
+    it("should travel at warp speed if source and destination are not owned by the same player - destination star", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should not travel at warp speed if source and destination are not owned by the same player and source is warp scrambler', async () => {
+    it("should not travel at warp speed if source and destination are not owned by the same player and source is warp scrambler", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -167,17 +225,23 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source and destination are not owned by the same player and destination is warp scrambler', async () => {
+    it("should not travel at warp speed if source and destination are not owned by the same player and destination is warp scrambler", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -185,34 +249,46 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should not travel at warp speed if source is owned by the player and destination is not owned by the same player and destination is warp scrambler', async () => {
+    it("should not travel at warp speed if source is owned by the player and destination is not owned by the same player and destination is warp scrambler", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         destinationStar.specialistId = 1;
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should travel at warp speed if source and destination are not owned by the same player and source is not a warp scrambler', async () => {
+    it("should travel at warp speed if source and destination are not owned by the same player and source is not a warp scrambler", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -220,17 +296,23 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: false
-                }
-            }
+                    lockWarpGates: false,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination are not owned by the same player and destination is not a warp scrambler', async () => {
+    it("should travel at warp speed if source and destination are not owned by the same player and destination is not a warp scrambler", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -238,17 +320,23 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: false
-                }
-            }
+                    lockWarpGates: false,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination are not owned by the same player carrier unlocks warp gates', async () => {
+    it("should travel at warp speed if source and destination are not owned by the same player carrier unlocks warp gates", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -256,27 +344,33 @@ describe('warp speed', () => {
         carrierSpecialist = {
             modifiers: {
                 special: {
-                    unlockWarpGates: true
-                }
-            }
+                    unlockWarpGates: true,
+                },
+            },
         };
-        
+
         destinationStar.specialistId = 1;
         sourceStar.specialistId = 1;
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should not travel at warp speed if source and destination are not owned by the same player carrier does not unlock warp gates', async () => {
+    it("should not travel at warp speed if source and destination are not owned by the same player carrier does not unlock warp gates", async () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
@@ -284,27 +378,33 @@ describe('warp speed', () => {
         carrierSpecialist = {
             modifiers: {
                 special: {
-                    unlockWarpGates: false
-                }
-            }
+                    unlockWarpGates: false,
+                },
+            },
         };
-        
+
         destinationStar.specialistId = 1;
         sourceStar.specialistId = 1;
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should travel at warp speed if source and destination allied', async () => {
+    it("should travel at warp speed if source and destination allied", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         isFormalAlliancesEnabled = true;
@@ -313,26 +413,38 @@ describe('warp speed', () => {
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination enemies', async () => {
+    it("should travel at warp speed if source and destination enemies", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         isFormalAlliancesEnabled = true;
         isDiplomaticStatusToPlayersAllied = false;
-        
+
         sourceStar.ownedByPlayerId = new mongoose.Types.ObjectId();
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should travel at warp speed if source and destination allied and warp scrambled', async () => {
+    it("should travel at warp speed if source and destination allied and warp scrambled", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         isFormalAlliancesEnabled = true;
@@ -346,17 +458,23 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
 
-    it('should not travel at warp speed if source and destination enemies and warp scrambled', async () => {
+    it("should not travel at warp speed if source and destination enemies and warp scrambled", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         isFormalAlliancesEnabled = true;
@@ -370,17 +488,23 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeFalsy();
     });
 
-    it('should travel at warp speed if source and destination enemies and warp scrambled but carrier unlocks warp gates', async () => {
+    it("should travel at warp speed if source and destination enemies and warp scrambled but carrier unlocks warp gates", async () => {
         destinationStar.ownedByPlayerId = new mongoose.Types.ObjectId();
 
         isFormalAlliancesEnabled = true;
@@ -393,9 +517,9 @@ describe('warp speed', () => {
         carrierSpecialist = {
             modifiers: {
                 special: {
-                    unlockWarpGates: true
-                }
-            }
+                    unlockWarpGates: true,
+                },
+            },
         };
 
         destinationStar.specialistId = 1;
@@ -403,14 +527,19 @@ describe('warp speed', () => {
         starSpecialist = {
             modifiers: {
                 special: {
-                    lockWarpGates: true
-                }
-            }
+                    lockWarpGates: true,
+                },
+            },
         };
 
-        const warpSpeed = service.canTravelAtWarpSpeed(game, player, carrier, sourceStar, destinationStar);
-        
+        const warpSpeed = service.canTravelAtWarpSpeed(
+            game,
+            player,
+            carrier,
+            sourceStar,
+            destinationStar,
+        );
+
         expect(warpSpeed).toBeTruthy();
     });
-
 });

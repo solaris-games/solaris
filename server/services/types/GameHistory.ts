@@ -20,7 +20,7 @@ export interface GameHistoryPlayer {
         totalCarrierSpecialists: number;
         newShips: number;
         warpgates: number;
-    },
+    };
     alias: string;
     avatar: string | null;
     researchingNow: ResearchTypeNotRandom;
@@ -33,28 +33,28 @@ export interface GameHistoryPlayer {
     afk: boolean;
     ready: boolean;
     readyToQuit: boolean;
-    research: PlayerResearch,
-};
+    research: PlayerResearch;
+}
 
 export interface GameHistoryStar {
     starId: DBObjectId;
     ownedByPlayerId: DBObjectId | null;
-    naturalResources: NaturalResources,
+    naturalResources: NaturalResources;
     ships: number;
     shipsActual: number;
     specialistId: number | null;
     homeStar: boolean;
     warpGate: boolean;
-    ignoreBulkUpgrade: IgnoreBulkUpgrade,
-    infrastructure: Infrastructure,
-    location: Location,
-    wormHoleToStarId: DBObjectId | null,
-};
+    ignoreBulkUpgrade: IgnoreBulkUpgrade;
+    infrastructure: Infrastructure;
+    location: Location;
+    wormHoleToStarId: DBObjectId | null;
+}
 
 export interface GameHistoryCarrierWaypoint {
     source: DBObjectId;
     destination: DBObjectId;
-};
+}
 
 export interface GameHistoryCarrier {
     carrierId: DBObjectId;
@@ -64,16 +64,16 @@ export interface GameHistoryCarrier {
     ships: number;
     specialistId: number | null;
     isGift: boolean;
-    location: Location,
-    waypoints: GameHistoryCarrierWaypoint[]
-};
+    location: Location;
+    waypoints: GameHistoryCarrierWaypoint[];
+}
 
 export interface GameHistory {
     _id?: DBObjectId;
     gameId: DBObjectId;
     tick: number;
     productionTick: number;
-    players: GameHistoryPlayer[],
-    stars: GameHistoryStar[],
-    carriers: GameHistoryCarrier[]
-};
+    players: GameHistoryPlayer[];
+    stars: GameHistoryStar[];
+    carriers: GameHistoryCarrier[];
+}

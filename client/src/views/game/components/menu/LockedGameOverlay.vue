@@ -1,56 +1,66 @@
 <template>
-    <div class="locked-game-overlay" v-if="!userCanJoinGame" title="Finish a 'New Player Game' to unlock this game mode">
-        <div class="locked-game-overlay-container text-center">
-            <i class="fas fa-lock"></i>
-            <p class="lock-text ps-2 pe-2 pt-3"><small>Finish a New Player Game to unlock</small></p>
-        </div>
+  <div
+    class="locked-game-overlay"
+    v-if="!userCanJoinGame"
+    title="Finish a 'New Player Game' to unlock this game mode"
+  >
+    <div class="locked-game-overlay-container text-center">
+      <i class="fas fa-lock"></i>
+      <p class="lock-text ps-2 pe-2 pt-3">
+        <small>Finish a New Player Game to unlock</small>
+      </p>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { computed } from 'vue';
-import type {ListGame} from "@solaris/common";
-import { useUserStore } from '@/stores/user';
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import type { ListGame } from "@solaris/common";
+import { useUserStore } from "@/stores/user";
 
 const props = defineProps<{
-  game: ListGame<string>,
+  game: ListGame<string>;
 }>();
 
 const store = useGameStore();
 const userStore = useUserStore();
 
-const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer)
+const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer);
 
-const userCanJoinGame = computed(() => userIsEstablishedPlayer.value || props.game.settings.general.playerType === 'all');
+const userCanJoinGame = computed(
+  () =>
+    userIsEstablishedPlayer.value ||
+    props.game.settings.general.playerType === "all",
+);
 </script>
 
 <style scoped>
 .locked-game-overlay {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0,0,0,0.5);
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .fa-lock {
-    font-size: 35px;
+  font-size: 35px;
 }
 
 .lock-text {
-    display: none;
+  display: none;
 }
 
 .locked-game-overlay:hover .lock-text {
-    display: block;
+  display: block;
 }
 
 .locked-game-overlay:hover .fa-lock {
-    display: none;
+  display: none;
 }
 </style>

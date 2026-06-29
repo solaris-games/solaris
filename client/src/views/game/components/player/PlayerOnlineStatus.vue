@@ -1,24 +1,24 @@
 <template>
-<div v-if="player && !isOnline && onlineStatus" class="row bg-dark">
-  <div class="col pt-1 pb-1 mt-0 mb-0">
-    <p class="mb-0 mt-0">
-      <small><i class="fas fa-eye"></i> Online {{onlineStatus}}</small>
-    </p>
+  <div v-if="player && !isOnline && onlineStatus" class="row bg-dark">
+    <div class="col pt-1 pb-1 mt-0 mb-0">
+      <p class="mb-0 mt-0">
+        <small><i class="fas fa-eye"></i> Online {{ onlineStatus }}</small>
+      </p>
+    </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import GameHelper from '../../../../services/gameHelper'
-import type {Player} from "@/types/game";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import GameHelper from "../../../../services/gameHelper";
+import type { Player } from "@/types/game";
 
 const props = defineProps<{
-  player: Player
+  player: Player;
 }>();
 
 const isOnline = ref(false);
-const onlineStatus = ref('');
+const onlineStatus = ref("");
 
 const recalculateOnlineStatus = () => {
   isOnline.value = GameHelper.isPlayerOnline(props.player);
@@ -35,6 +35,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

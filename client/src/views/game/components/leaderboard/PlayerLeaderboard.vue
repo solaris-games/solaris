@@ -3,7 +3,13 @@
     <div class="table-responsive p-0">
       <table class="table table-sm table-striped">
         <tbody>
-          <leaderboard-row v-for="player in sortedPlayers" :key="player._id" :player="player" :show-team-names="true" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+          <leaderboard-row
+            v-for="player in sortedPlayers"
+            :key="player._id"
+            :player="player"
+            :show-team-names="true"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          />
         </tbody>
       </table>
     </div>
@@ -11,21 +17,24 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { computed } from 'vue';
-import GameHelper from '../../../../services/gameHelper'
-import LeaderboardRow from './LeaderboardRow.vue';
-import type {Game} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import GameHelper from "../../../../services/gameHelper";
+import LeaderboardRow from "./LeaderboardRow.vue";
+import type { Game } from "@/types/game";
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
-const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
+const onOpenPlayerDetailRequested = (e: string) =>
+  emit("onOpenPlayerDetailRequested", e);
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
-const sortedPlayers = computed(() => GameHelper.getSortedLeaderboardPlayerList(game.value));
+const sortedPlayers = computed(() =>
+  GameHelper.getSortedLeaderboardPlayerList(game.value),
+);
 </script>
 
 <style scoped>

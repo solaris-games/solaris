@@ -6,8 +6,5 @@
         "noEmit": true,
         "declaration": false
     },
-    "include": [
-        "src/**/*",
-        "spec/**/*"
-    ]
+    "include": ["src/**/*", "spec/**/*"]
 }

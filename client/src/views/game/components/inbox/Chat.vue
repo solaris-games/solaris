@@ -1,77 +1,108 @@
 <template>
   <div class="d-lg-block" v-if="isUserInGame && !isTutorialGame">
-    <div id="toggle" class="d-none d-lg-flex chat-toggle" :class="{'bg-success has-read': !unreadMessages, 'bg-warning has-unread pulse': unreadMessages}" @click="toggle" title="Inbox (M)">
-      <span><i class="fas fa-comments me-1"></i>{{unreadMessages ? unreadMessages : ''}}</span>
+    <div
+      id="toggle"
+      class="d-none d-lg-flex chat-toggle"
+      :class="{
+        'bg-success has-read': !unreadMessages,
+        'bg-warning has-unread pulse': unreadMessages,
+      }"
+      @click="toggle"
+      title="Inbox (M)"
+    >
+      <span
+        ><i class="fas fa-comments me-1"></i
+        >{{ unreadMessages ? unreadMessages : "" }}</span
+      >
     </div>
 
     <div id="window" v-if="isExpanded" class="header-bar-bg">
-      <conversation-create v-if="store.menuStateChat.state === 'createConversation'"
+      <conversation-create
+        v-if="store.menuStateChat.state === 'createConversation'"
         :participantIds="store.menuStateChat.participantIds"
-        @onCloseRequested="toggle"/>
-      <conversation-detail v-if="store.menuStateChat.state === 'conversation'"
+        @onCloseRequested="toggle"
+      />
+      <conversation-detail
+        v-if="store.menuStateChat.state === 'conversation'"
         :conversationId="store.menuStateChat.conversationId"
         @onCloseRequested="toggle"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        @onOpenReportPlayerRequested="onOpenReportPlayerRequested" />
-      <inbox v-if="store.menuStateChat.state == 'inbox'"
-             @onCloseRequested="toggle"
-             @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+      />
+      <inbox
+        v-if="store.menuStateChat.state == 'inbox'"
+        @onCloseRequested="toggle"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import KEYBOARD_SHORTCUTS from '../../../../services/data/keyboardShortcuts';
-import GameHelper from '../../../../services/gameHelper';
-import ConversationCreate from './conversations/ConversationCreate.vue';
-import ConversationDetail from './conversations/ConversationDetail.vue';
-import { computed, onMounted, onUnmounted } from 'vue';
-import type {Game} from "@/types/game";
-import { useUserStore } from '@/stores/user';
+import { useGameStore } from "@/stores/game";
+import KEYBOARD_SHORTCUTS from "../../../../services/data/keyboardShortcuts";
+import GameHelper from "../../../../services/gameHelper";
+import ConversationCreate from "./conversations/ConversationCreate.vue";
+import ConversationDetail from "./conversations/ConversationDetail.vue";
+import { computed, onMounted, onUnmounted } from "vue";
+import type { Game } from "@/types/game";
+import { useUserStore } from "@/stores/user";
 import Inbox from "@/views/game/components/inbox/Inbox.vue";
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string],
-  onOpenReportPlayerRequested: [{ playerId: string, messageId: string, conversationId: string }],
+  onOpenPlayerDetailRequested: [playerId: string];
+  onOpenReportPlayerRequested: [
+    { playerId: string; messageId: string; conversationId: string },
+  ];
 }>();
 
 const store = useGameStore();
 const userStore = useUserStore();
 
-const onOpenPlayerDetailRequested = (e: string) => emit('onOpenPlayerDetailRequested', e);
+const onOpenPlayerDetailRequested = (e: string) =>
+  emit("onOpenPlayerDetailRequested", e);
 
-const onOpenReportPlayerRequested = (e: { playerId: string, messageId: string, conversationId: string }) => emit('onOpenReportPlayerRequested', e);
+const onOpenReportPlayerRequested = (e: {
+  playerId: string;
+  messageId: string;
+  conversationId: string;
+}) => emit("onOpenReportPlayerRequested", e);
 
 const game = computed<Game>(() => store.game!);
 
 const unreadMessages = computed<number | null>(() => store.unreadMessages);
 
-const isUserInGame = computed(() => Boolean(GameHelper.getUserPlayer(game.value)));
+const isUserInGame = computed(() =>
+  Boolean(GameHelper.getUserPlayer(game.value)),
+);
 
 const isTutorialGame = computed(() => GameHelper.isTutorialGame(game.value));
 
-const isExpanded = computed(() => store.menuStateChat.state !== 'none');
+const isExpanded = computed(() => store.menuStateChat.state !== "none");
 
 const toggle = () => {
-  if (store.menuStateChat.state === 'none') {
-    store.setMenuStateChat({ state: 'inbox' });
+  if (store.menuStateChat.state === "none") {
+    store.setMenuStateChat({ state: "inbox" });
   } else {
     store.setMenuStateChat(store.menuStateChat);
   }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-// Note: We only care about the INBOX key here.
-  if (/^(?:input|textarea|select|button)$/i.test((e.target as HTMLElement)?.tagName)) {
+  // Note: We only care about the INBOX key here.
+  if (
+    /^(?:input|textarea|select|button)$/i.test(
+      (e.target as HTMLElement)?.tagName,
+    )
+  ) {
     return;
   }
 
-  const key = e.key
+  const key = e.key;
 
   // Check for modifier keys and ignore the keypress if there is one.
   if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
-    return
+    return;
   }
 
   const isLoggedIn = userStore.isLoggedIn;
@@ -81,7 +112,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     return;
   }
 
-  let menuState = KEYBOARD_SHORTCUTS.all[key]
+  let menuState = KEYBOARD_SHORTCUTS.all[key];
 
   if (menuState === null && isExpanded.value) {
     return toggle();
@@ -100,14 +131,14 @@ const handleKeyDown = (e: KeyboardEvent) => {
 
   store.setMenuStateChat({ state: menuState });
 
-  toggle()
+  toggle();
 };
 
 onMounted(() => {
-  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener("keydown", handleKeyDown);
 
   onUnmounted(() => {
-    document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener("keydown", handleKeyDown);
   });
 });
 </script>
@@ -158,7 +189,7 @@ onMounted(() => {
   }
   50% {
     opacity: 1;
-    transform: scale(1.1)
+    transform: scale(1.1);
   }
   100% {
     opacity: 0.5;

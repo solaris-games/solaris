@@ -1,13 +1,16 @@
 <template>
-  <span>{{timeString}}</span>
+  <span>{{ timeString }}</span>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import type {Game} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import type { Game } from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import {getCountdownTimeStringByTicks, getCountdownTimeStringWithETA} from "@/util/time";
+import {
+  getCountdownTimeStringByTicks,
+  getCountdownTimeStringWithETA,
+} from "@/util/time";
 
 const props = defineProps<{
   ticks: number;
@@ -17,7 +20,7 @@ const props = defineProps<{
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
 
-const timeString = ref('');
+const timeString = ref("");
 
 const recalculateTime = () => {
   if (props.showETA) {
@@ -30,7 +33,10 @@ const recalculateTime = () => {
 onMounted(() => {
   let handler: number | undefined = undefined;
 
-  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+  if (
+    GameHelper.isGameInProgress(game.value) ||
+    GameHelper.isGamePendingStart(game.value)
+  ) {
     handler = setInterval(recalculateTime, 1000);
   }
 
@@ -42,6 +48,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

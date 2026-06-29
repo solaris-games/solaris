@@ -1,13 +1,19 @@
 import { defineStore } from "pinia";
-import type {Carrier, Player, Star} from "@/types/game.ts";
+import type { Carrier, Player, Star } from "@/types/game.ts";
 import { ref } from "vue";
-import type {StarClickDispatchArgs} from "@solaris/map-rendering";
-import type {CarrierClickDispatchArgs} from "@solaris/map-rendering/eventBusEventNames/map.ts";
+import type { StarClickDispatchArgs } from "@solaris/map-rendering";
+import type { CarrierClickDispatchArgs } from "@solaris/map-rendering/eventBusEventNames/map.ts";
 
-export type StarClickCallback = (star: Star, owningPlayer: Player | undefined) => void;
-export type CarrierClickCallback = (carrier: Carrier, owningPlayer: Player | undefined) => void;
+export type StarClickCallback = (
+  star: Star,
+  owningPlayer: Player | undefined,
+) => void;
+export type CarrierClickCallback = (
+  carrier: Carrier,
+  owningPlayer: Player | undefined,
+) => void;
 
-export const useMapClickStore = defineStore('mapClick', () => {
+export const useMapClickStore = defineStore("mapClick", () => {
   const starClickCallback = ref<StarClickCallback | null>(null);
   const starRightClickCallback = ref<StarClickCallback | null>(null);
   const carrierClickCallback = ref<CarrierClickCallback | null>(null);

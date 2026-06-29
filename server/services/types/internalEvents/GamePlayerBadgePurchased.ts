@@ -8,4 +8,4 @@ export default interface InternalGamePlayerBadgePurchasedEvent extends InternalG
     purchasedForPlayerAlias: string;
     badgeKey: string;
     badgeName: string;
-};
+}

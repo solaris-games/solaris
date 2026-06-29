@@ -1,6 +1,6 @@
 import { Game } from "./types/Game";
 import { Star } from "./types/Star";
-import { GameTypeService } from '@solaris/common'
+import { GameTypeService } from "@solaris/common";
 import CircularMapService from "./maps/circular";
 import CircularBalancedMapService from "./maps/circularBalanced";
 import DoughnutMapService from "./maps/doughnut";
@@ -9,7 +9,7 @@ import SpiralMapService from "./maps/spiral";
 import NameService from "./name";
 import RandomService from "./random";
 import StarService from "./star";
-import { StarDistanceService } from '@solaris/common';
+import { StarDistanceService } from "@solaris/common";
 import { ValidationError } from "@solaris/common";
 import { shuffle, RandomGen } from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
@@ -56,7 +56,13 @@ export default class MapService {
         this.starDataService = starDataService;
     }
 
-    generateStars(rand: RandomGen, game: Game, starCount: number, playerLimit: number, customSeed?: string | null) {
+    generateStars(
+        rand: RandomGen,
+        game: Game,
+        starCount: number,
+        playerLimit: number,
+        customSeed?: string | null,
+    ) {
         const stars: Star[] = [];
         const homeStarIds: DBObjectId[] = [];
         const linkedStarIds: DBObjectId[][] = [];
@@ -70,28 +76,55 @@ export default class MapService {
         // TODO: Use randGen for all generators
 
         switch (game.settings.galaxy.galaxyType) {
-            case 'circular':
-                starLocations = this.circularMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+            case "circular":
+                starLocations = this.circularMapService.generateLocations(
+                    game,
+                    starCount,
+                    game.settings.specialGalaxy.resourceDistribution,
+                );
                 break;
-            case 'spiral':
-                starLocations = this.spiralMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+            case "spiral":
+                starLocations = this.spiralMapService.generateLocations(
+                    game,
+                    starCount,
+                    game.settings.specialGalaxy.resourceDistribution,
+                );
                 break;
-            case 'doughnut':
-                starLocations = this.doughnutMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution);
+            case "doughnut":
+                starLocations = this.doughnutMapService.generateLocations(
+                    game,
+                    starCount,
+                    game.settings.specialGalaxy.resourceDistribution,
+                );
                 break;
-            case 'circular-balanced':
-                starLocations = this.circularBalancedMapService.generateLocations(game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit);
+            case "circular-balanced":
+                starLocations =
+                    this.circularBalancedMapService.generateLocations(
+                        game,
+                        starCount,
+                        game.settings.specialGalaxy.resourceDistribution,
+                        playerLimit,
+                    );
                 break;
-            case 'irregular':
-                starLocations = this.irregularMapService.generateLocations(rand, game, starCount, game.settings.specialGalaxy.resourceDistribution, playerLimit, customSeed);
+            case "irregular":
+                starLocations = this.irregularMapService.generateLocations(
+                    rand,
+                    game,
+                    starCount,
+                    game.settings.specialGalaxy.resourceDistribution,
+                    playerLimit,
+                    customSeed,
+                );
                 break;
             default:
-                throw new ValidationError(`Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`);
+                throw new ValidationError(
+                    `Galaxy type ${game.settings.galaxy.galaxyType} is not supported or has been disabled.`,
+                );
         }
 
         let starNamesIndex = 0;
 
-        let unlinkedStars = starLocations.filter(l => !l.linked);
+        let unlinkedStars = starLocations.filter((l) => !l.linked);
 
         // Create a star for all locations returned by the map generator
         for (let i = 0; i < unlinkedStars.length; i++) {
@@ -100,7 +133,11 @@ export default class MapService {
             let star;
             let starName = starNames[starNamesIndex++];
 
-            star = this.starService.generateUnownedStar(starName, starLocation, starLocation.resources);
+            star = this.starService.generateUnownedStar(
+                starName,
+                starLocation,
+                starLocation.resources,
+            );
 
             stars.push(star);
 
@@ -111,13 +148,17 @@ export default class MapService {
                     let linkedStar;
                     let linkedStarName = starNames[starNamesIndex++];
 
-                    linkedStar = this.starService.generateUnownedStar(linkedStarName, linkedLocation, linkedLocation.resources);
+                    linkedStar = this.starService.generateUnownedStar(
+                        linkedStarName,
+                        linkedLocation,
+                        linkedLocation.resources,
+                    );
 
                     stars.push(linkedStar);
                     locLinkedStars.push(linkedStar._id);
                 }
 
-                homeStarIds.push(star._id)
+                homeStarIds.push(star._id);
                 linkedStarIds.push(locLinkedStars);
             }
         }
@@ -126,7 +167,7 @@ export default class MapService {
             stars,
             homeStarIds,
             linkedStarIds,
-            starLocations
+            starLocations,
         };
     }
 
@@ -135,8 +176,14 @@ export default class MapService {
             return;
         }
 
-        const offsetX = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
-        const offsetY = this.randomService.getRandomNumberBetween(-OFFSET, OFFSET);
+        const offsetX = this.randomService.getRandomNumberBetween(
+            -OFFSET,
+            OFFSET,
+        );
+        const offsetY = this.randomService.getRandomNumberBetween(
+            -OFFSET,
+            OFFSET,
+        );
 
         for (let star of game.galaxy.stars) {
             star.location.x += offsetX;
@@ -149,44 +196,97 @@ export default class MapService {
 
         // If warp gates are enabled, assign random stars to start as warp gates.
         if (game.settings.specialGalaxy.randomWarpGates) {
-            this._generateGates(rand, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWarpGates);
+            this._generateGates(
+                rand,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomWarpGates,
+            );
         }
 
         // If worm holes are enabled, assign random warp gates to start as worm hole pairs
         if (game.settings.specialGalaxy.randomWormHoles) {
-            this._generateWormHoles(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomWormHoles);
+            this._generateWormHoles(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomWormHoles,
+            );
         }
 
         // If nebulas are enabled, assign random nebulas to start
         if (game.settings.specialGalaxy.randomNebulas) {
-            this._generateNebulas(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomNebulas);
+            this._generateNebulas(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomNebulas,
+            );
         }
 
         // If asteroid fields are enabled, assign random asteroid fields to start
         if (game.settings.specialGalaxy.randomAsteroidFields) {
-            this._generateAsteroidFields(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomAsteroidFields);
+            this._generateAsteroidFields(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomAsteroidFields,
+            );
         }
 
         // If binary stars are enabled, assign random binary stars to start
         if (game.settings.specialGalaxy.randomBinaryStars) {
-            this._generateBinaryStars(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBinaryStars);
+            this._generateBinaryStars(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomBinaryStars,
+            );
         }
 
         // If black holes are enabled, assign random black holes to start
         if (game.settings.specialGalaxy.randomBlackHoles) {
-            this._generateBlackHoles(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomBlackHoles);
+            this._generateBlackHoles(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomBlackHoles,
+            );
         }
 
         // If pulsars are enabled, assign random pulsars to start
         if (game.settings.specialGalaxy.randomPulsars) {
-            this._generatePulsars(rand, game, game.galaxy.stars, playerCount, game.settings.specialGalaxy.randomPulsars);
+            this._generatePulsars(
+                rand,
+                game,
+                game.galaxy.stars,
+                playerCount,
+                game.settings.specialGalaxy.randomPulsars,
+            );
         }
     }
 
-    _generateGates(rand: RandomGen, stars: Star[], playerCount: number, percentage: number) {
-        const gateCount = Math.floor((stars.length - playerCount) / 100 * percentage);
+    _generateGates(
+        rand: RandomGen,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const gateCount = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.warpGate && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.warpGate &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const warpGateStars = applicableStars.slice(0, gateCount);
@@ -196,10 +296,23 @@ export default class MapService {
         }
     }
 
-    _generateWormHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const wormHoleCount = Math.floor((stars.length - playerCount) / 2 / 100 * percentage); // Wormholes come in pairs so its half of stars
+    _generateWormHoles(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const wormHoleCount = Math.floor(
+            ((stars.length - playerCount) / 2 / 100) * percentage,
+        ); // Wormholes come in pairs so its half of stars
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.wormHoleToStarId && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.wormHoleToStarId &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const wormHoleStars = applicableStars.slice(0, wormHoleCount * 2);
@@ -212,10 +325,23 @@ export default class MapService {
         }
     }
 
-    _generateNebulas(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+    _generateNebulas(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const count = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isNebula && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.isNebula &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const nebulaStars = applicableStars.slice(0, count);
@@ -225,18 +351,37 @@ export default class MapService {
 
             // Overwrite natural resources if splitResources
             if (this.gameTypeService.isSplitResources(game)) {
-                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+                let minResources =
+                    game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources =
+                    game.constants.star.resources.maxNaturalResources * 3;
 
-                nebulaStar.naturalResources.science = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                nebulaStar.naturalResources.science =
+                    this.randomService.getRandomNumberBetween(
+                        minResources,
+                        maxResources,
+                    );
             }
         }
     }
 
-    _generateAsteroidFields(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+    _generateAsteroidFields(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const count = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isAsteroidField && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.isAsteroidField &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const asteroidFieldStars = applicableStars.slice(0, count);
@@ -246,21 +391,42 @@ export default class MapService {
 
             // Overwrite natural resources if splitResources
             if (this.gameTypeService.isSplitResources(game)) {
-                let minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-                let maxResources = game.constants.star.resources.maxNaturalResources * 3;
+                let minResources =
+                    game.constants.star.resources.maxNaturalResources * 1.5;
+                let maxResources =
+                    game.constants.star.resources.maxNaturalResources * 3;
 
-                asteroidFieldStar.naturalResources.economy = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                asteroidFieldStar.naturalResources.economy =
+                    this.randomService.getRandomNumberBetween(
+                        minResources,
+                        maxResources,
+                    );
             }
         }
     }
 
-    _generateBinaryStars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const minResources = game.constants.star.resources.maxNaturalResources * 1.5;
-        const maxResources = game.constants.star.resources.maxNaturalResources * 3;
+    _generateBinaryStars(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const minResources =
+            game.constants.star.resources.maxNaturalResources * 1.5;
+        const maxResources =
+            game.constants.star.resources.maxNaturalResources * 3;
 
-        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+        const count = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isBinaryStar && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.isBinaryStar &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const binaryStars = applicableStars.slice(0, count);
@@ -270,23 +436,43 @@ export default class MapService {
 
             // Overwrite natural resources
             if (this.gameTypeService.isSplitResources(game)) {
-                binaryStar.naturalResources.industry = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                binaryStar.naturalResources.industry =
+                    this.randomService.getRandomNumberBetween(
+                        minResources,
+                        maxResources,
+                    );
             } else {
-                let resources = this.randomService.getRandomNumberBetween(minResources, maxResources);
+                let resources = this.randomService.getRandomNumberBetween(
+                    minResources,
+                    maxResources,
+                );
 
                 binaryStar.naturalResources = {
                     economy: resources,
                     industry: resources,
-                    science: resources
+                    science: resources,
                 };
             }
         }
     }
 
-    _generateBlackHoles(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+    _generateBlackHoles(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const count = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isBlackHole && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.isBlackHole &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const blackHoleStars = applicableStars.slice(0, count);
@@ -295,16 +481,35 @@ export default class MapService {
             blackHoleStar.isBlackHole = true;
 
             // Overwrite the natural resources
-            blackHoleStar.naturalResources.economy = Math.ceil(blackHoleStar.naturalResources.economy * 0.2);
-            blackHoleStar.naturalResources.industry = Math.ceil(blackHoleStar.naturalResources.industry * 0.2);
-            blackHoleStar.naturalResources.science = Math.ceil(blackHoleStar.naturalResources.science * 0.2);
+            blackHoleStar.naturalResources.economy = Math.ceil(
+                blackHoleStar.naturalResources.economy * 0.2,
+            );
+            blackHoleStar.naturalResources.industry = Math.ceil(
+                blackHoleStar.naturalResources.industry * 0.2,
+            );
+            blackHoleStar.naturalResources.science = Math.ceil(
+                blackHoleStar.naturalResources.science * 0.2,
+            );
         }
     }
 
-    _generatePulsars(rand: RandomGen, game: Game, stars: Star[], playerCount: number, percentage: number) {
-        const count = Math.floor((stars.length - playerCount) / 100 * percentage);
+    _generatePulsars(
+        rand: RandomGen,
+        game: Game,
+        stars: Star[],
+        playerCount: number,
+        percentage: number,
+    ) {
+        const count = Math.floor(
+            ((stars.length - playerCount) / 100) * percentage,
+        );
 
-        const applicableStars = stars.filter(s => !s.homeStar && !s.isPulsar && !this.starDataService.isDeadStar(s));
+        const applicableStars = stars.filter(
+            (s) =>
+                !s.homeStar &&
+                !s.isPulsar &&
+                !this.starDataService.isDeadStar(s),
+        );
         shuffle(rand, applicableStars);
 
         const pulsarStars = applicableStars.slice(0, count);
@@ -313,5 +518,4 @@ export default class MapService {
             pulsarStar.isPulsar = true;
         }
     }
-
-};
+}

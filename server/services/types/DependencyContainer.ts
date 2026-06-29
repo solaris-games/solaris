@@ -22,8 +22,14 @@ import ConversationService from "../conversation";
 import DiplomacyService from "../diplomacy";
 import DiplomacyUpkeepService from "../diplomacyUpkeep";
 import DiscordService from "../discord";
-import {CombatGroupService, CombatService, DistanceService, PathfindingService, ResearchProgressService} from '@solaris/common';
-import {EmailService} from "../email";
+import {
+    CombatGroupService,
+    CombatService,
+    DistanceService,
+    PathfindingService,
+    ResearchProgressService,
+} from "@solaris/common";
+import { EmailService } from "../email";
 import GameService from "../game";
 import GameAuthService from "../gameAuth";
 import GameCreateService from "../gameCreate";
@@ -37,7 +43,7 @@ import GameMutexService from "../gameMutex";
 import GamePlayerMutexService from "../gamePlayerMutex";
 import GameStateService from "../gameState";
 import GameTickService from "../gameTick";
-import { GameTypeService } from '@solaris/common'
+import { GameTypeService } from "@solaris/common";
 import GuildService from "../guild";
 import UserGuildService from "../guildUser";
 import HistoryService from "../history";
@@ -45,11 +51,11 @@ import LeaderboardService from "../leaderboard";
 import LedgerService from "../ledger";
 import MapService from "../map";
 import NameService from "../name";
-import {NotificationService} from "../notification";
+import { NotificationService } from "../notification";
 import PasswordService from "../password";
 import PaypalService from "../paypal";
 import PlayerService from "../player";
-import PlayerAfkService from '../playerAfk';
+import PlayerAfkService from "../playerAfk";
 import PlayerColourService from "../playerColour";
 import PlayerCreditsService from "../playerCredits";
 import PlayerCycleRewardsService from "../playerCycleRewards";
@@ -73,134 +79,134 @@ import SpecialistHireService from "../specialistHire";
 import SpectatorService from "../spectator";
 import StarService from "../star";
 import StarContestedService from "../starContested";
-import { StarDistanceService } from '@solaris/common';
+import { StarDistanceService } from "@solaris/common";
 import StarMovementService from "../starMovement";
 import StarUpgradeService from "../starUpgrade";
 import TeamService from "../team";
-import { TechnologyService } from '@solaris/common';
+import { TechnologyService } from "@solaris/common";
 import TradeService from "../trade";
 import TutorialService from "../tutorial";
 import UserService from "../user";
 import UserLeaderboardService from "../userLeaderboard";
 import UserLevelService from "../userLevel";
-import { WaypointService } from '@solaris/common';
+import { WaypointService } from "@solaris/common";
 import StarCaptureService from "../starCapture";
-import {UserServerSocketEmitter} from "../../sockets/socketEmitters/user";
-import {UserServerSocketHandler} from "../../sockets/socketHandlers/user";
+import { UserServerSocketEmitter } from "../../sockets/socketEmitters/user";
+import { UserServerSocketHandler } from "../../sockets/socketHandlers/user";
 import InitialGameStateService from "../initialGameState";
 import WaypointActionService from "../waypointAction";
 import SaveWaypointsService from "../saveWaypoints";
 import CullWaypointsService from "../cullWaypoints";
-import { CarrierTravelService } from '@solaris/common';
+import { CarrierTravelService } from "@solaris/common";
 import { StarDataService } from "@solaris/common";
-import {DBObjectId} from "./DBObjectId";
+import { DBObjectId } from "./DBObjectId";
 import CarrierCombatService from "../carrierCombat";
 import CombatProcessingService from "../combatProcessing";
-import {EventService} from "../event";
+import { EventService } from "../event";
 import StatisticsService from "../statistics";
 
 export interface DependencyContainer {
-    config: Config,
-    adminService: AdminService,
-    passwordService: PasswordService,
-    authService: AuthService,
-    discordService: DiscordService,
-    broadcastService: BroadcastService,
-    socketService: SocketService,
-    gameServerSocketEmitter: GameServerSocketEmitter,
-    playerServerSocketEmitter: PlayerServerSocketEmitter,
-    diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter,
-    userServerSocketEmitter: UserServerSocketEmitter,
-    carrierService: CarrierService,
-    combatService: CombatService<DBObjectId>,
-    combatGroupService: CombatGroupService<DBObjectId>,
-    combatProcessingService: CombatProcessingService,
-    carrierCombatService: CarrierCombatService,
-    distanceService: DistanceService,
-    emailService: EmailService,
-    eventService: EventService,
-    leaderboardService: LeaderboardService,
-    userLeaderboardService: UserLeaderboardService,
-    gameService: GameService,
-    serverHandler: ServerHandler,
-    playerServerSocketHandler: PlayerServerSocketHandler,
-    userServerSocketHandler: UserServerSocketHandler,
-    gameAuthService: GameAuthService,
-    gameLockService: GameLockService,
-    gameJoinService: GameJoinService,
-    gameCreateService: GameCreateService,
-    gameGalaxyService: GameGalaxyService,
-    gameListService: GameListService,
-    gameTickService: GameTickService,
-    gameTypeService: GameTypeService,
-    gameStateService: GameStateService,
-    guildService: GuildService,
-    guildUserService: UserGuildService,
-    mapService: MapService,
-    playerService: PlayerService,
-    playerAfkService: PlayerAfkService,
-    userLevelService: UserLevelService,
-    playerReadyService: PlayerReadyService,
-    randomService: RandomService,
-    researchService: ResearchService,
-    researchProgressService: ResearchProgressService,
-    starService: StarService,
-    starDistanceService: StarDistanceService,
-    nameService: NameService,
-    starUpgradeService: StarUpgradeService,
-    technologyService: TechnologyService,
-    tradeService: TradeService,
-    userService: UserService,
-    waypointService: WaypointService<DBObjectId>,
-    shipTransferService: ShipTransferService,
-    historyService: HistoryService,
-    ledgerService: LedgerService,
-    specialistService: SpecialistService,
-    specialistBanService: SpecialistBanService,
-    specialistHireService: SpecialistHireService,
+    config: Config;
+    adminService: AdminService;
+    passwordService: PasswordService;
+    authService: AuthService;
+    discordService: DiscordService;
+    broadcastService: BroadcastService;
+    socketService: SocketService;
+    gameServerSocketEmitter: GameServerSocketEmitter;
+    playerServerSocketEmitter: PlayerServerSocketEmitter;
+    diplomacyServerSocketEmitter: DiplomacyServerSocketEmitter;
+    userServerSocketEmitter: UserServerSocketEmitter;
+    carrierService: CarrierService;
+    combatService: CombatService<DBObjectId>;
+    combatGroupService: CombatGroupService<DBObjectId>;
+    combatProcessingService: CombatProcessingService;
+    carrierCombatService: CarrierCombatService;
+    distanceService: DistanceService;
+    emailService: EmailService;
+    eventService: EventService;
+    leaderboardService: LeaderboardService;
+    userLeaderboardService: UserLeaderboardService;
+    gameService: GameService;
+    serverHandler: ServerHandler;
+    playerServerSocketHandler: PlayerServerSocketHandler;
+    userServerSocketHandler: UserServerSocketHandler;
+    gameAuthService: GameAuthService;
+    gameLockService: GameLockService;
+    gameJoinService: GameJoinService;
+    gameCreateService: GameCreateService;
+    gameGalaxyService: GameGalaxyService;
+    gameListService: GameListService;
+    gameTickService: GameTickService;
+    gameTypeService: GameTypeService;
+    gameStateService: GameStateService;
+    guildService: GuildService;
+    guildUserService: UserGuildService;
+    mapService: MapService;
+    playerService: PlayerService;
+    playerAfkService: PlayerAfkService;
+    userLevelService: UserLevelService;
+    playerReadyService: PlayerReadyService;
+    randomService: RandomService;
+    researchService: ResearchService;
+    researchProgressService: ResearchProgressService;
+    starService: StarService;
+    starDistanceService: StarDistanceService;
+    nameService: NameService;
+    starUpgradeService: StarUpgradeService;
+    technologyService: TechnologyService;
+    tradeService: TradeService;
+    userService: UserService;
+    waypointService: WaypointService<DBObjectId>;
+    shipTransferService: ShipTransferService;
+    historyService: HistoryService;
+    ledgerService: LedgerService;
+    specialistService: SpecialistService;
+    specialistBanService: SpecialistBanService;
+    specialistHireService: SpecialistHireService;
     specialStarBanService: SpecialStarBanService;
-    userAchievementService: UserAchievementService,
-    conversationService: ConversationService,
-    reputationService: ReputationService,
-    aiService: AIService,
-    basicAIService: BasicAIService,
-    battleRoyaleService: BattleRoyaleService,
-    starMovementService: StarMovementService,
-    cacheService: CacheService,
-    ratingService: RatingService,
-    diplomacyService: DiplomacyService,
-    avatarService: AvatarService,
-    paypalService: PaypalService,
-    badgeService: BadgeService,
-    reportService: ReportService,
-    playerStatisticsService: PlayerStatisticsService,
-    playerCreditsService: PlayerCreditsService,
-    diplomacyUpkeepService: DiplomacyUpkeepService,
-    carrierGiftService: CarrierGiftService,
-    carrierMovementService: CarrierMovementService,
-    playerCycleRewardsService: PlayerCycleRewardsService,
-    starContestedService: StarContestedService,
-    gameFluxService: GameFluxService,
-    notificationService: NotificationService,
-    shipService: ShipService,
-    spectatorService: SpectatorService,
-    teamService: TeamService,
-    pathfindingService: PathfindingService<DBObjectId>,
-    scheduleBuyService: ScheduleBuyService,
-    gamePlayerMutexService: GamePlayerMutexService,
-    gameMutexService: GameMutexService,
-    announcementService: AnnouncementService,
-    tutorialService: TutorialService,
-    playerColourService: PlayerColourService,
-    gameMaskingService: GameMaskingService,
-    sessionService: SessionService,
-    starCaptureService: StarCaptureService,
-    statisticsService: StatisticsService,
-    initialGameStateService: InitialGameStateService,
-    waypointActionService: WaypointActionService,
-    saveWaypointsService: SaveWaypointsService,
-    cullWaypointsService: CullWaypointsService,
-    carrierTravelService: CarrierTravelService<DBObjectId>,
-    starDataService: StarDataService,
-    scanningService: ScanningService,
-};
+    userAchievementService: UserAchievementService;
+    conversationService: ConversationService;
+    reputationService: ReputationService;
+    aiService: AIService;
+    basicAIService: BasicAIService;
+    battleRoyaleService: BattleRoyaleService;
+    starMovementService: StarMovementService;
+    cacheService: CacheService;
+    ratingService: RatingService;
+    diplomacyService: DiplomacyService;
+    avatarService: AvatarService;
+    paypalService: PaypalService;
+    badgeService: BadgeService;
+    reportService: ReportService;
+    playerStatisticsService: PlayerStatisticsService;
+    playerCreditsService: PlayerCreditsService;
+    diplomacyUpkeepService: DiplomacyUpkeepService;
+    carrierGiftService: CarrierGiftService;
+    carrierMovementService: CarrierMovementService;
+    playerCycleRewardsService: PlayerCycleRewardsService;
+    starContestedService: StarContestedService;
+    gameFluxService: GameFluxService;
+    notificationService: NotificationService;
+    shipService: ShipService;
+    spectatorService: SpectatorService;
+    teamService: TeamService;
+    pathfindingService: PathfindingService<DBObjectId>;
+    scheduleBuyService: ScheduleBuyService;
+    gamePlayerMutexService: GamePlayerMutexService;
+    gameMutexService: GameMutexService;
+    announcementService: AnnouncementService;
+    tutorialService: TutorialService;
+    playerColourService: PlayerColourService;
+    gameMaskingService: GameMaskingService;
+    sessionService: SessionService;
+    starCaptureService: StarCaptureService;
+    statisticsService: StatisticsService;
+    initialGameStateService: InitialGameStateService;
+    waypointActionService: WaypointActionService;
+    saveWaypointsService: SaveWaypointsService;
+    cullWaypointsService: CullWaypointsService;
+    carrierTravelService: CarrierTravelService<DBObjectId>;
+    starDataService: StarDataService;
+    scanningService: ScanningService;
+}

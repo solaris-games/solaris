@@ -16,9 +16,5 @@
         "allowJs": true,
         "types": ["node", "jasmine"]
     },
-    "include": [
-        "**/*.ts",
-        "db/migrations/*.js",
-        "config/**/*.json"
-    ]
+    "include": ["**/*.ts", "db/migrations/*.js", "config/**/*.json"]
 }

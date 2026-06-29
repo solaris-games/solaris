@@ -1,14 +1,14 @@
-import { ref } from 'vue';
+import { ref } from "vue";
 import { defineStore } from "pinia";
 
-export const useConversationStore = defineStore('conversation', () => {
+export const useConversationStore = defineStore("conversation", () => {
   const cachedConversationComposeMessages = ref<Record<string, string>>({});
-  const currentConversation = ref<{id: string, text: string} | null>(null);
+  const currentConversation = ref<{ id: string; text: string } | null>(null);
 
   const openConversation = (id: string) => {
     currentConversation.value = {
       id,
-      text: cachedConversationComposeMessages[id] || '',
+      text: cachedConversationComposeMessages[id] || "",
     };
   };
 
@@ -25,7 +25,7 @@ export const useConversationStore = defineStore('conversation', () => {
   };
 
   const resetCurrentConversationText = () => {
-    currentConversation.value!.text = '';
+    currentConversation.value!.text = "";
   };
 
   return {

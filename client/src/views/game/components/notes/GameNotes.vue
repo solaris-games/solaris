@@ -1,26 +1,42 @@
 <template>
   <div class="menu-page container">
-    <menu-title title="Notes" @onCloseRequested="onCloseRequested"/>
+    <menu-title title="Notes" @onCloseRequested="onCloseRequested" />
 
-    <loading-spinner :loading="isLoadingNotes"/>
+    <loading-spinner :loading="isLoadingNotes" />
 
     <div class="row" v-show="!isLoadingNotes">
       <div class="col-12">
-        <p v-show="!isEditing" ref="notesReadonlyElement" class="notes-readonly"></p>
-        <mention-box v-if="isEditing" placeholder="Write your notes here" :rows="15" v-model="notes"
-                     @onSetMessageElement="onSetMessageElement" @onReplaceInMessage="onReplaceInMessage"
-                     @onFinish="updateGameNotes"/>
+        <p
+          v-show="!isEditing"
+          ref="notesReadonlyElement"
+          class="notes-readonly"
+        ></p>
+        <mention-box
+          v-if="isEditing"
+          placeholder="Write your notes here"
+          :rows="15"
+          v-model="notes"
+          @onSetMessageElement="onSetMessageElement"
+          @onReplaceInMessage="onReplaceInMessage"
+          @onFinish="updateGameNotes"
+        />
       </div>
 
       <div class="col">
-        <span v-if="isEditing" :class="{'text-danger':isExceededMaxLength}">{{ noteLength }}/5000</span>
+        <span v-if="isEditing" :class="{ 'text-danger': isExceededMaxLength }"
+          >{{ noteLength }}/5000</span
+        >
       </div>
       <div class="col-auto mt-2 mb-2">
         <button v-if="!isEditing" class="btn btn-primary" @click="beginEditing">
           <i class="fas fa-edit"></i> Edit Notes
         </button>
-        <button v-if="isEditing" class="btn btn-success" :disabled="isSavingNotes || isExceededMaxLength"
-                @click="updateGameNotes">
+        <button
+          v-if="isEditing"
+          class="btn btn-success"
+          :disabled="isSavingNotes || isExceededMaxLength"
+          @click="updateGameNotes"
+        >
           <i class="fas fa-save"></i> Save Notes
         </button>
       </div>
@@ -29,23 +45,30 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
-import MenuTitle from '../MenuTitle.vue'
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import MentionBox from '../shared/MentionBox.vue'
-import MentionHelper, {type Mention} from '@/services/mentionHelper';
+import { useGameStore } from "@/stores/game";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import MenuTitle from "../MenuTitle.vue";
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import MentionBox from "../shared/MentionBox.vue";
+import MentionHelper, { type Mention } from "@/services/mentionHelper";
 import GameHelper from "@/services/gameHelper";
-import {eventBusInjectionKey} from "@/eventBus";
-import { ref, computed, inject, onMounted, useTemplateRef, onUnmounted } from 'vue';
-import {getNotes, writeNotes} from "@/services/typedapi/game";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {useMentionStore} from "@/stores/mention.ts";
+import { eventBusInjectionKey } from "@/eventBus";
+import {
+  ref,
+  computed,
+  inject,
+  onMounted,
+  useTemplateRef,
+  onUnmounted,
+} from "vue";
+import { getNotes, writeNotes } from "@/services/typedapi/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { useMentionStore } from "@/stores/mention.ts";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const emit = defineEmits<{
-  onCloseRequested: [e: Event],
-  onOpenPlayerDetailRequested: [playerId: string]
+  onCloseRequested: [e: Event];
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -58,26 +81,29 @@ const mentionStore = useMentionStore();
 const isLoadingNotes = ref(false);
 const isSavingNotes = ref(false);
 const isEditing = ref(false);
-const readonlyNotes = ref('');
-const notes = ref('');
+const readonlyNotes = ref("");
+const notes = ref("");
 
-const notesReadonlyElement = useTemplateRef('notesReadonlyElement');
+const notesReadonlyElement = useTemplateRef("notesReadonlyElement");
 
 const noteLength = computed(() => {
   if (notes.value == null) {
-    return 0
+    return 0;
   }
 
-  const staticText = MentionHelper.makeMentionsStatic(store.game!, notes.value)
+  const staticText = MentionHelper.makeMentionsStatic(store.game!, notes.value);
 
-  return staticText.length
+  return staticText.length;
 });
 
 const isExceededMaxLength = computed(() => noteLength.value > 5000);
 
 const beginEditing = () => {
-  isEditing.value = true
-  notes.value = MentionHelper.makeMentionsEditable(store.game!, readonlyNotes.value);
+  isEditing.value = true;
+  notes.value = MentionHelper.makeMentionsEditable(
+    store.game!,
+    readonlyNotes.value,
+  );
 };
 
 const onSetMessageElement = (element: HTMLTextAreaElement) => {
@@ -85,21 +111,35 @@ const onSetMessageElement = (element: HTMLTextAreaElement) => {
     element,
     callbacks: {
       player: (player) => {
-        notes.value = MentionHelper.addMention(notes.value, mentionStore.mentionReceivingElement!, 'player', player.alias)
+        notes.value = MentionHelper.addMention(
+          notes.value,
+          mentionStore.mentionReceivingElement!,
+          "player",
+          player.alias,
+        );
       },
       star: (star) => {
-        notes.value = MentionHelper.addMention(notes.value, mentionStore.mentionReceivingElement!, 'star', star.name)
-      }
-    }
+        notes.value = MentionHelper.addMention(
+          notes.value,
+          mentionStore.mentionReceivingElement!,
+          "star",
+          star.name,
+        );
+      },
+    },
   });
 };
 
 const onCloseRequested = (e: Event) => {
-  emit('onCloseRequested', e)
+  emit("onCloseRequested", e);
 };
 
-const onReplaceInMessage = (data: { mention: Mention, text: string }) => {
-  notes.value = MentionHelper.useSuggestion(notes.value, mentionStore.mentionReceivingElement!, data);
+const onReplaceInMessage = (data: { mention: Mention; text: string }) => {
+  notes.value = MentionHelper.useSuggestion(
+    notes.value,
+    mentionStore.mentionReceivingElement!,
+    data,
+  );
 };
 
 const updateGameNotes = async () => {
@@ -110,28 +150,35 @@ const updateGameNotes = async () => {
   const response = await writeNotes(httpClient)(store.game!._id, newNotes);
 
   if (isOk(response)) {
-    setReadonlyNotes(newNotes)
+    setReadonlyNotes(newNotes);
     // @ts-ignore
-    toast.success(`Game notes updated.`)
+    toast.success(`Game notes updated.`);
   } else {
     console.error(formatError(response));
   }
 
-  isSavingNotes.value = false
+  isSavingNotes.value = false;
 };
 
 const setReadonlyNotes = (notesParam: string) => {
   MentionHelper.resetMessageElement(notesReadonlyElement.value!);
-  readonlyNotes.value = notesParam || ''
-  MentionHelper.renderMessageWithMentionsAndLinks(notesReadonlyElement.value!, readonlyNotes.value, onStarClicked, onPlayerClicked);
+  readonlyNotes.value = notesParam || "";
+  MentionHelper.renderMessageWithMentionsAndLinks(
+    notesReadonlyElement.value!,
+    readonlyNotes.value,
+    onStarClicked,
+    onPlayerClicked,
+  );
 };
 
 const panToStar = (id: string) => {
   const star = GameHelper.getStarById(store.game!, id);
   if (star) {
-    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, { location: star.location });
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToLocation, {
+      location: star.location,
+    });
   } else {
-    toast.error(`The location of the star is unknown.`)
+    toast.error(`The location of the star is unknown.`);
   }
 };
 
@@ -140,21 +187,20 @@ const onStarClicked = (id: string) => {
 };
 
 const onPlayerClicked = (id: string) => {
-  emit('onOpenPlayerDetailRequested', id)
+  emit("onOpenPlayerDetailRequested", id);
 };
-
 
 const loadGameNotes = async () => {
   isLoadingNotes.value = true;
 
   const response = await getNotes(httpClient)(store.game!._id);
   if (isOk(response)) {
-    setReadonlyNotes(response.data.notes || '')
+    setReadonlyNotes(response.data.notes || "");
   } else {
     console.error(formatError(response));
   }
 
-  isLoadingNotes.value = false
+  isLoadingNotes.value = false;
 };
 
 onMounted(async () => {

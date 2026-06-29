@@ -1,12 +1,12 @@
 import { SpecialStar } from "@solaris/common";
 
-const RNG = require('random-seed');
+const RNG = require("random-seed");
 import { DateTime } from "luxon";
 
-const specialStars = require('../config/game/specialStars.json') as SpecialStar[];
+const specialStars =
+    require("../config/game/specialStars.json") as SpecialStar[];
 
 export default class SpecialStarBanService {
-
     BAN_AMOUNT: number = 2;
 
     _getCurrentMonthBans(stars: SpecialStar[], amount: number): SpecialStar[] {
@@ -19,7 +19,7 @@ export default class SpecialStarBanService {
         }
 
         const now = DateTime.utc();
-        const seed = now.toFormat('yyyyMM');
+        const seed = now.toFormat("yyyyMM");
         const rng = RNG.create(seed);
 
         const bans: SpecialStar[] = [];
@@ -40,8 +40,7 @@ export default class SpecialStarBanService {
         const bans = this._getCurrentMonthBans(stars, this.BAN_AMOUNT);
 
         return {
-            specialStar: bans
+            specialStar: bans,
         };
     }
-
-};
+}

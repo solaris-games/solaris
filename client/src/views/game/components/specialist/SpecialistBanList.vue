@@ -24,24 +24,30 @@
       />
     </div>
 
-    <button class="btn btn-primary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePanel"
-            aria-expanded="false" aria-controls="collapsePanel">
+    <button
+      class="btn btn-primary mb-2"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#collapsePanel"
+      aria-expanded="false"
+      aria-controls="collapsePanel"
+    >
       Toggle Ban List
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import SpecialistBanListTable from './SpecialistBanListTable.vue'
-import { ref, onMounted, inject } from 'vue';
-import type {GameSettings, Specialist} from '@solaris/common';
-import {listCarrier, listStar} from "@/services/typedapi/specialist";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import SpecialistBanListTable from "./SpecialistBanListTable.vue";
+import { ref, onMounted, inject } from "vue";
+import type { GameSettings, Specialist } from "@solaris/common";
+import { listCarrier, listStar } from "@/services/typedapi/specialist";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 
 const props = defineProps<{
   game: {
-    settings: GameSettings<string>,
-  },
+    settings: GameSettings<string>;
+  };
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -53,10 +59,7 @@ const carrierSpecialists = ref<Specialist[]>([]);
 const loadSpecialists = async () => {
   isLoading.value = true;
 
-  const requests = [
-    listCarrier(httpClient)(),
-    listStar(httpClient)(),
-  ];
+  const requests = [listCarrier(httpClient)(), listStar(httpClient)()];
 
   const [carrierResponse, starResponse] = await Promise.all(requests);
 
@@ -73,13 +76,11 @@ const loadSpecialists = async () => {
   }
 
   isLoading.value = false;
-}
+};
 
 onMounted(async () => {
   await loadSpecialists();
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

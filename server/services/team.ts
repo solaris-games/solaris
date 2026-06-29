@@ -1,9 +1,9 @@
-import {DBObjectId} from "./types/DBObjectId";
-import {Game, Team} from "./types/Game";
-import {Player} from "./types/Player";
+import { DBObjectId } from "./types/DBObjectId";
+import { Game, Team } from "./types/Game";
+import { Player } from "./types/Player";
 import mongoose from "mongoose";
 import DiplomacyService from "./diplomacy";
-import {IEventService} from "./types/IEventService";
+import { IEventService } from "./types/IEventService";
 
 export type TeamAssignments = Record<number, number>;
 
@@ -15,13 +15,20 @@ export default class TeamService {
     }
 
     getById(game: Game, id: DBObjectId): Team | null {
-        return game.galaxy?.teams?.find(team => team._id.toString() === id.toString()) || null;
+        return (
+            game.galaxy?.teams?.find(
+                (team) => team._id.toString() === id.toString(),
+            ) || null
+        );
     }
 
-    generateTeamAssignments(playerLimit: number, teamCount: number): TeamAssignments {
+    generateTeamAssignments(
+        playerLimit: number,
+        teamCount: number,
+    ): TeamAssignments {
         const assignments = {};
 
-        const playerNumbers = Array.from({length: playerLimit}, (_, i) => i);
+        const playerNumbers = Array.from({ length: playerLimit }, (_, i) => i);
 
         // TODO: Shuffle if needed
 
@@ -38,7 +45,7 @@ export default class TeamService {
     }
 
     async setDiplomacyStates(eventService: IEventService, game: Game) {
-        if (game.settings.general.mode !== 'teamConquest') {
+        if (game.settings.general.mode !== "teamConquest") {
             return;
         }
 
@@ -48,7 +55,11 @@ export default class TeamService {
 
         for (let ti = 0; ti < teamsNumber; ti++) {
             const team = teams[ti];
-            const playersForTeam = team.players.map(pid => game.galaxy.players.find(p => p._id.toString() === pid.toString())!);
+            const playersForTeam = team.players.map((pid) =>
+                game.galaxy.players.find(
+                    (p) => p._id.toString() === pid.toString(),
+                )!,
+            );
 
             for (let pi1 = 0; pi1 < playersForTeam.length; pi1++) {
                 for (let pi2 = 0; pi2 < playersForTeam.length; pi2++) {
@@ -56,7 +67,13 @@ export default class TeamService {
                         continue;
                     }
 
-                    await this.diplomacyService.declareAlly(eventService, game, playersForTeam[pi1]._id, playersForTeam[pi2]._id, false);
+                    await this.diplomacyService.declareAlly(
+                        eventService,
+                        game,
+                        playersForTeam[pi1]._id,
+                        playersForTeam[pi2]._id,
+                        false,
+                    );
                 }
             }
         }

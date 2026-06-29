@@ -4,16 +4,12 @@
         "noImplicitAny": false,
         "noUncheckedIndexedAccess": false,
         "paths": {
-            "@solaris/common": [ "../common/src/index.ts" ],
-            "@solaris/map-rendering": [ "../map-rendering/src/index.ts" ],
-            "@solaris/map-rendering/*": [ "../map-rendering/src/*" ],
+            "@solaris/common": ["../common/src/index.ts"],
+            "@solaris/map-rendering": ["../map-rendering/src/index.ts"],
+            "@solaris/map-rendering/*": ["../map-rendering/src/*"],
             "@/*": ["./src/*"]
         },
-        "lib": [
-            "es2024",
-            "DOM",
-            "DOM.Iterable"
-        ]
+        "lib": ["es2024", "DOM", "DOM.Iterable"]
     },
     "extends": "@vue/tsconfig/tsconfig.dom.json"
 }

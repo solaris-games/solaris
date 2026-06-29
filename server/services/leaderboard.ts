@@ -1,81 +1,91 @@
-import {Game, Team} from "./types/Game";
-import {PlayerLeaderboard, LeaderboardPlayer, TeamLeaderboard, LeaderboardTeam, PlayerStatistics} from "./types/Leaderboard";
+import { Game, Team } from "./types/Game";
+import {
+    PlayerLeaderboard,
+    LeaderboardPlayer,
+    TeamLeaderboard,
+    LeaderboardTeam,
+    PlayerStatistics,
+} from "./types/Leaderboard";
 import { Player } from "./types/Player";
-import {EloRatingChangeResult, GameRanking, GameRankingResult} from "@solaris/common";
+import {
+    EloRatingChangeResult,
+    GameRanking,
+    GameRankingResult,
+} from "@solaris/common";
 import { User } from "./types/User";
 import BadgeService from "./badge";
 import GameService from "./game";
 import GameStateService from "./gameState";
-import { GameTypeService } from '@solaris/common'
+import { GameTypeService } from "@solaris/common";
 import PlayerService from "./player";
 import PlayerStatisticsService from "./playerStatistics";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
-import { reverseSort, sorterByProperty} from "@solaris/common";
+import { reverseSort, sorterByProperty } from "@solaris/common";
 import TeamService from "./team";
-import {DBObjectId} from "./types/DBObjectId";
-import {isSpecialGameMode} from "./officialGames";
+import { DBObjectId } from "./types/DBObjectId";
+import { isSpecialGameMode } from "./officialGames";
 
 export enum GameWinnerKind {
-    Player = 'player',
-    Team = 'team'
+    Player = "player",
+    Team = "team",
 }
 
 export type GameWinnerPlayer = {
-    kind: GameWinnerKind.Player,
-    player: Player
-}
+    kind: GameWinnerKind.Player;
+    player: Player;
+};
 
 export type GameWinnerTeam = {
-    kind: GameWinnerKind.Team,
-    team: Team
-}
+    kind: GameWinnerKind.Team;
+    team: Team;
+};
 
 export type GameWinner = GameWinnerPlayer | GameWinnerTeam;
 
 const playerWinner = (player: Player): GameWinner => {
     return {
         kind: GameWinnerKind.Player,
-        player
+        player,
     };
-}
+};
 
 const teamWinner = (team: Team): GameWinner => {
-    return  {
+    return {
         kind: GameWinnerKind.Team,
-        team
-    }
-}
+        team,
+    };
+};
 
 type PlayerAndStats = {
-    player: Player,
-    isKingOfTheHill: boolean,
-    stats: PlayerStatistics,
-}
+    player: Player;
+    isKingOfTheHill: boolean;
+    stats: PlayerStatistics;
+};
 
 export default class LeaderboardService {
     static LOCALSORTERS = {
-        stars: 'stats.totalStars',
-        carriers: 'stats.totalCarriers',
-        ships: 'stats.totalShips',
-        economy: 'stats.totalEconomy',
-        industry: 'stats.totalIndustry',
-        science: 'stats.totalScience',
-        newShips: 'stats.newShips',
-        warpgates: 'stats.warpgates',
-        starSpecialists: 'stats.totalStarSpecialists',
-        carrierSpecialists: 'stats.totalCarrierSpecialists',
-        totalSpecialists: 'stats.totalSpecialists',
-        scanning: 'player.research.scanning.level',
-        hyperspace: 'player.research.hyperspace.level',
-        terraforming: 'player.research.terraforming.level',
-        experimentation: 'player.research.experimentation.level',
-        weapons: 'player.research.weapons.level',
-        banking: 'player.research.banking.level',
-        manufacturing: 'player.research.manufacturing.level',
-        specialists: 'player.research.specialists.level'
-    }
+        stars: "stats.totalStars",
+        carriers: "stats.totalCarriers",
+        ships: "stats.totalShips",
+        economy: "stats.totalEconomy",
+        industry: "stats.totalIndustry",
+        science: "stats.totalScience",
+        newShips: "stats.newShips",
+        warpgates: "stats.warpgates",
+        starSpecialists: "stats.totalStarSpecialists",
+        carrierSpecialists: "stats.totalCarrierSpecialists",
+        totalSpecialists: "stats.totalSpecialists",
+        scanning: "player.research.scanning.level",
+        hyperspace: "player.research.hyperspace.level",
+        terraforming: "player.research.terraforming.level",
+        experimentation: "player.research.experimentation.level",
+        weapons: "player.research.weapons.level",
+        banking: "player.research.banking.level",
+        manufacturing: "player.research.manufacturing.level",
+        specialists: "player.research.specialists.level",
+    };
 
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
@@ -98,7 +108,7 @@ export default class LeaderboardService {
         gameStateService: GameStateService,
         badgeService: BadgeService,
         playerStatisticsService: PlayerStatisticsService,
-        teamService: TeamService
+        teamService: TeamService,
     ) {
         this.playerService = playerService;
         this.playerAfkService = playerAfkService;
@@ -118,42 +128,62 @@ export default class LeaderboardService {
         let kingOfTheHillPlayer: Player | null = null;
 
         if (this.gameTypeService.isKingOfTheHillMode(game)) {
-            kingOfTheHillPlayer = this.playerService.getKingOfTheHillPlayer(game);
+            kingOfTheHillPlayer =
+                this.playerService.getKingOfTheHillPlayer(game);
         }
 
-        const playerStats = game.galaxy.players.map(p => {
-            const isKingOfTheHill = kingOfTheHillPlayer != null && p._id.toString() === kingOfTheHillPlayer._id.toString();
-            const stats = p.stats ?? this.playerStatisticsService.getStats(game, p);
+        const playerStats = game.galaxy.players.map((p) => {
+            const isKingOfTheHill =
+                kingOfTheHillPlayer != null &&
+                p._id.toString() === kingOfTheHillPlayer._id.toString();
+            const stats =
+                p.stats ?? this.playerStatisticsService.getStats(game, p);
 
             const playerAndStats: PlayerAndStats = {
                 player: p,
                 isKingOfTheHill,
-                stats
+                stats,
             };
 
             return playerAndStats;
         });
 
         const getNestedObject = (nestedObj, pathArr: string[]) => {
-            return pathArr.reduce((obj, key) =>
-                (obj && obj[key] !== 'undefined') ? obj[key] : -1, nestedObj)
-        }
+            return pathArr.reduce(
+                (obj, key) => (obj && obj[key] !== "undefined" ? obj[key] : -1),
+                nestedObj,
+            );
+        };
 
         function sortPlayers(a: PlayerAndStats, b: PlayerAndStats) {
             if (sortingKey) {
-                if (getNestedObject(a, SORTERS[sortingKey].split('.')) > getNestedObject(b, SORTERS[sortingKey].split('.'))) return -1;
-                if (getNestedObject(a, SORTERS[sortingKey].split('.')) < getNestedObject(b, SORTERS[sortingKey].split('.'))) return 1;
+                if (
+                    getNestedObject(a, SORTERS[sortingKey].split(".")) >
+                    getNestedObject(b, SORTERS[sortingKey].split("."))
+                )
+                    return -1;
+                if (
+                    getNestedObject(a, SORTERS[sortingKey].split(".")) <
+                    getNestedObject(b, SORTERS[sortingKey].split("."))
+                )
+                    return 1;
             }
 
             // If its a conquest and home star victory then sort by home stars first, then by total stars.
-            const isHomeStarVictory = game.settings.general.mode === 'conquest' && game.settings.conquest.victoryCondition === 'homeStarPercentage';
+            const isHomeStarVictory =
+                game.settings.general.mode === "conquest" &&
+                game.settings.conquest.victoryCondition ===
+                    "homeStarPercentage";
 
             if (isHomeStarVictory) {
                 if (a.stats.totalHomeStars > b.stats.totalHomeStars) return -1;
                 if (a.stats.totalHomeStars < b.stats.totalHomeStars) return 1;
             }
 
-            if (game.settings.general.mode === 'kingOfTheHill' && a.isKingOfTheHill !== b.isKingOfTheHill) {
+            if (
+                game.settings.general.mode === "kingOfTheHill" &&
+                a.isKingOfTheHill !== b.isKingOfTheHill
+            ) {
                 if (a.isKingOfTheHill) return -1;
                 if (b.isKingOfTheHill) return 1;
             }
@@ -177,17 +207,21 @@ export default class LeaderboardService {
             }
 
             // Sort defeated players last.
-            return (a.player.defeated === b.player.defeated) ? 0 : a.player.defeated ? 1 : -1;
+            return a.player.defeated === b.player.defeated
+                ? 0
+                : a.player.defeated
+                  ? 1
+                  : -1;
         }
 
         // Sort the undefeated players first.
         const undefeatedLeaderboard = playerStats
-            .filter(x => !x.player.defeated)
+            .filter((x) => !x.player.defeated)
             .sort(sortPlayers);
 
         // Sort the defeated players next.
         const defeatedLeaderboard = playerStats
-            .filter(x => x.player.defeated)
+            .filter((x) => x.player.defeated)
             .sort(sortPlayers);
 
         // Join both sorted arrays together to produce the leaderboard.
@@ -195,7 +229,7 @@ export default class LeaderboardService {
 
         return {
             leaderboard,
-            fullKey: sortingKey ? SORTERS[sortingKey] : null
+            fullKey: sortingKey ? SORTERS[sortingKey] : null,
         };
     }
 
@@ -211,19 +245,26 @@ export default class LeaderboardService {
                 return false;
             }
 
-            return team.players.every(pId => {
+            return team.players.every((pId) => {
                 const player = this.playerService.getById(game, pId);
                 return player && player.defeated;
             });
-        }
+        };
 
         const playerId = player._id.toString();
 
-        return game.state.teamLeaderboard.filter(t => !teamDefeated(t)).findIndex(tId => {
-            const team = this.teamService.getById(game, tId);
+        return (
+            game.state.teamLeaderboard
+                .filter((t) => !teamDefeated(t))
+                .findIndex((tId) => {
+                    const team = this.teamService.getById(game, tId);
 
-            return team && team.players.find(pId => pId.toString() === playerId);
-        }) + 1;
+                    return (
+                        team &&
+                        team.players.find((pId) => pId.toString() === playerId)
+                    );
+                }) + 1
+        );
     }
 
     getGameLeaderboardPosition(game: Game, player: Player) {
@@ -234,17 +275,24 @@ export default class LeaderboardService {
         const playerDefeated = (pId: DBObjectId) => {
             const player = this.playerService.getById(game, pId);
             return player && player.defeated;
-        }
+        };
 
-        return game.state.leaderboard.filter(pId => !playerDefeated(pId)).findIndex(l => l.toString() === player._id.toString()) + 1;
+        return (
+            game.state.leaderboard
+                .filter((pId) => !playerDefeated(pId))
+                .findIndex((l) => l.toString() === player._id.toString()) + 1
+        );
     }
 
     getTeamLeaderboard(game: Game): TeamLeaderboard | null {
-        if (!this.gameTypeService.isTeamConquestGame(game) || !game.galaxy.teams) {
+        if (
+            !this.gameTypeService.isTeamConquestGame(game) ||
+            !game.galaxy.teams
+        ) {
             return null;
         }
 
-        const leaderboard = game.galaxy.teams.map(t => {
+        const leaderboard = game.galaxy.teams.map((t) => {
             let starCount = 0;
             let capitalCount = 0;
 
@@ -255,7 +303,9 @@ export default class LeaderboardService {
                     continue;
                 }
 
-                const stats = player.stats || this.playerStatisticsService.getStats(game, player);
+                const stats =
+                    player.stats ||
+                    this.playerStatisticsService.getStats(game, player);
                 starCount += stats.totalStars;
                 capitalCount += stats.totalHomeStars;
             }
@@ -263,85 +313,111 @@ export default class LeaderboardService {
             return {
                 team: t,
                 starCount,
-                capitalCount
-            }
+                capitalCount,
+            };
         });
 
-        const sorterProperty = game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'capitalCount' : 'starCount';
+        const sorterProperty =
+            game.settings.conquest.victoryCondition === "homeStarPercentage"
+                ? "capitalCount"
+                : "starCount";
         leaderboard.sort(reverseSort(sorterByProperty(sorterProperty)));
 
         return {
-            leaderboard
+            leaderboard,
         };
     }
 
-    addTeamRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardTeam[]): GameRankingResult<DBObjectId> {
+    addTeamRankings(
+        game: Game,
+        gameUsers: User[],
+        leaderboard: LeaderboardTeam[],
+    ): GameRankingResult<DBObjectId> {
         // Get first team that is not defeated
-        const leadingTeam = leaderboard.find(team => {
-            return team.team.players.map(pId => this.playerService.getById(game, pId)!).filter(p => !p.defeated).length > 0;
+        const leadingTeam = leaderboard.find((team) => {
+            return (
+                team.team.players
+                    .map((pId) => this.playerService.getById(game, pId)!)
+                    .filter((p) => !p.defeated).length > 0
+            );
         });
 
         if (!leadingTeam) {
             return {
                 ranks: [],
-                eloRating: null
+                eloRating: null,
             };
         }
 
-        const nonAfkInLeadingTeam = leadingTeam.team.players
-            .flatMap(pId => {
-                const player = this.playerService.getById(game, pId);
-                if (player && !player.afk) {
-                    return [player];
-                } else {
-                    return [];
-                }
-            });
+        const nonAfkInLeadingTeam = leadingTeam.team.players.flatMap((pId) => {
+            const player = this.playerService.getById(game, pId);
+            if (player && !player.afk) {
+                return [player];
+            } else {
+                return [];
+            }
+        });
 
         const rankToAward = game.settings.general.playerLimit * 2;
-        const rankPerPlayer = Math.floor(rankToAward / nonAfkInLeadingTeam.length);
+        const rankPerPlayer = Math.floor(
+            rankToAward / nonAfkInLeadingTeam.length,
+        );
 
         const ranks: GameRanking<DBObjectId>[] = [];
 
         for (let player of nonAfkInLeadingTeam) {
-            const user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+            const user = gameUsers.find(
+                (u) =>
+                    player.userId &&
+                    u._id.toString() === player.userId.toString(),
+            );
 
             if (!user) {
                 continue;
             }
 
-            const rankIncrease = rankPerPlayer * game.constants.player.rankRewardMultiplier;
+            const rankIncrease =
+                rankPerPlayer * game.constants.player.rankRewardMultiplier;
             const currentRank = user.achievements.rank;
             const newRank = currentRank + rankIncrease;
 
             user.achievements.rank = newRank;
-            user.achievements.level = this.userLevelService.getByRankPoints(newRank).id;
+            user.achievements.level =
+                this.userLevelService.getByRankPoints(newRank).id;
 
             ranks.push({
                 playerId: player._id,
                 current: currentRank,
-                new: newRank
+                new: newRank,
             });
         }
 
         return {
             ranks,
-            eloRating: null
+            eloRating: null,
         };
     }
 
-    addGameRankings(game: Game, gameUsers: User[], leaderboard: LeaderboardPlayer[]): GameRankingResult<DBObjectId> {
+    addGameRankings(
+        game: Game,
+        gameUsers: User[],
+        leaderboard: LeaderboardPlayer[],
+    ): GameRankingResult<DBObjectId> {
         let result: GameRankingResult<DBObjectId> = {
             ranks: [],
             eloRating: null,
         };
 
-        let leaderboardPlayers = leaderboard.map(x => x.player);
+        let leaderboardPlayers = leaderboard.map((x) => x.player);
 
         for (let i = 0; i < leaderboardPlayers.length; i++) {
             let player = leaderboardPlayers[i];
 
-            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+            let user = gameUsers.find(
+                (u) =>
+                    player.userId &&
+                    u._id.toString() === player.userId.toString(),
+            );
 
             // Double check user isn't deleted.
             if (!user) {
@@ -361,15 +437,18 @@ export default class LeaderboardService {
             if (i == 0) {
                 rankIncrease = leaderboard.length; // Note: Using leaderboard length as this includes ALL players (including afk)
             } else {
-                if (game.settings.general.awardRankTo === 'all') {
+                if (game.settings.general.awardRankTo === "all") {
                     rankIncrease = Math.round(leaderboard.length / 2 - i);
-                } else if (game.settings.general.awardRankTo === 'top_n') {
+                } else if (game.settings.general.awardRankTo === "top_n") {
                     const topN = game.settings.general.awardRankToTopN || 1;
                     if (i < topN || i >= leaderboard.length - topN) {
                         rankIncrease = Math.round(leaderboard.length / 2 - i);
                     }
-                } else if (game.settings.general.awardRankTo === 'noRankLoss') {
-                    rankIncrease = Math.max(0, Math.round(leaderboard.length / 2 - i));
+                } else if (game.settings.general.awardRankTo === "noRankLoss") {
+                    rankIncrease = Math.max(
+                        0,
+                        Math.round(leaderboard.length / 2 - i),
+                    );
                 }
             }
 
@@ -389,9 +468,12 @@ export default class LeaderboardService {
             if (rankIncrease > 0 && isSpecialGameMode(game)) {
                 rankIncrease *= 2;
             }
-            
+
             // Apply any additional rank multiplier at the end. Rank losses are not as steep as rank gains.
-            const rankRewardMultiplier = rankIncrease < 0 ? Math.min(1, game.constants.player.rankRewardMultiplier) : game.constants.player.rankRewardMultiplier;
+            const rankRewardMultiplier =
+                rankIncrease < 0
+                    ? Math.min(1, game.constants.player.rankRewardMultiplier)
+                    : game.constants.player.rankRewardMultiplier;
 
             rankIncrease *= rankRewardMultiplier;
 
@@ -399,13 +481,14 @@ export default class LeaderboardService {
             let newRank = Math.max(user.achievements.rank + rankIncrease, 0); // Cannot go less than 0.
 
             user.achievements.rank = newRank;
-            user.achievements.level = this.userLevelService.getByRankPoints(newRank).id;
+            user.achievements.level =
+                this.userLevelService.getByRankPoints(newRank).id;
 
             // Append the rank adjustment to the results.
             result.ranks.push({
                 playerId: player._id,
                 current: currentRank,
-                new: newRank
+                new: newRank,
             });
         }
 
@@ -414,8 +497,16 @@ export default class LeaderboardService {
         return result;
     }
 
-    incrementGameWinnerAchievements(game: Game, gameUsers: User[], winner: Player, awardCredits: boolean) {
-        const user = gameUsers.find(u => winner.userId && u._id.toString() === winner.userId.toString());
+    incrementGameWinnerAchievements(
+        game: Game,
+        gameUsers: User[],
+        winner: Player,
+        awardCredits: boolean,
+    ) {
+        const user = gameUsers.find(
+            (u) =>
+                winner.userId && u._id.toString() === winner.userId.toString(),
+        );
 
         // Double check user isn't deleted.
         if (!user) {
@@ -423,7 +514,7 @@ export default class LeaderboardService {
         }
 
         user.achievements.victories++; // Increase the winner's victory count
-        
+
         // Note: We don't really care if its official or not, award a badge for any 32p games.
         if (this.gameTypeService.is32PlayerGame(game)) {
             this.badgeService.awardBadgeForUserVictor32PlayerGame(user, game);
@@ -439,16 +530,31 @@ export default class LeaderboardService {
         }
     }
 
-    addUserRatingCheck(game: Game, gameUsers: User[]): EloRatingChangeResult<DBObjectId> | null {
+    addUserRatingCheck(
+        game: Game,
+        gameUsers: User[],
+    ): EloRatingChangeResult<DBObjectId> | null {
         if (!this.gameTypeService.is1v1Game(game)) {
             return null;
         }
-        
-        const winningPlayer: Player = game.galaxy.players.find(p => p._id.toString() === game.state.winner!.toString())!;
-        const losingPlayer: Player = game.galaxy.players.find(p => p._id.toString() !== game.state.winner!.toString())!;
 
-        const winningUser: User | undefined = gameUsers.find(u => winningPlayer.userId && u._id.toString() === winningPlayer.userId.toString());
-        const losingUser: User | undefined = gameUsers.find(u => losingPlayer.userId && u._id.toString() === losingPlayer.userId.toString());
+        const winningPlayer: Player = game.galaxy.players.find(
+            (p) => p._id.toString() === game.state.winner!.toString(),
+        )!;
+        const losingPlayer: Player = game.galaxy.players.find(
+            (p) => p._id.toString() !== game.state.winner!.toString(),
+        )!;
+
+        const winningUser: User | undefined = gameUsers.find(
+            (u) =>
+                winningPlayer.userId &&
+                u._id.toString() === winningPlayer.userId.toString(),
+        );
+        const losingUser: User | undefined = gameUsers.find(
+            (u) =>
+                losingPlayer.userId &&
+                u._id.toString() === losingPlayer.userId.toString(),
+        );
 
         let winningUserOldRating = 1200;
         let losingUserOldRating = 1200;
@@ -470,32 +576,48 @@ export default class LeaderboardService {
         return {
             winner: {
                 _id: winningPlayer._id,
-                newRating: winningUser ? winningUser.achievements.eloRating! : 1200,
-                oldRating: winningUserOldRating
+                newRating: winningUser
+                    ? winningUser.achievements.eloRating!
+                    : 1200,
+                oldRating: winningUserOldRating,
             },
             loser: {
                 _id: losingPlayer._id,
-                newRating: losingUser ? losingUser.achievements.eloRating! : 1200,
-                oldRating: losingUserOldRating
-            }
+                newRating: losingUser
+                    ? losingUser.achievements.eloRating!
+                    : 1200,
+                oldRating: losingUserOldRating,
+            },
         };
     }
 
-    getGameWinnerTeam(game: Game, leaderboard: LeaderboardTeam[]): GameWinner | null {
-        let isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
+    getGameWinnerTeam(
+        game: Game,
+        leaderboard: LeaderboardTeam[],
+    ): GameWinner | null {
+        let isAllUndefeatedPlayersReadyToQuit =
+            this.gameService.isReadyToQuitImmediateEnd(game);
 
-        const key = game.settings.conquest.victoryCondition === 'starPercentage' ? 'starCount' : 'capitalCount';
+        const key =
+            game.settings.conquest.victoryCondition === "starPercentage"
+                ? "starCount"
+                : "capitalCount";
         leaderboard.sort(reverseSort(sorterByProperty(key)));
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             return teamWinner(leaderboard[0].team);
         }
 
-        if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
+        if (
+            this.gameStateService.isCountingDownToEnd(game) &&
+            this.gameStateService.hasReachedCountdownEnd(game)
+        ) {
             return teamWinner(leaderboard[0].team);
         }
 
-        const winningTeams = leaderboard.filter(t => t[key] >= game.state.starsForVictory);
+        const winningTeams = leaderboard.filter(
+            (t) => t[key] >= game.state.starsForVictory,
+        );
 
         if (winningTeams.length) {
             return teamWinner(winningTeams[0].team); // First team in array must have the highest count
@@ -510,13 +632,21 @@ export default class LeaderboardService {
         return null;
     }
 
-    getGameWinner(game: Game, leaderboard: LeaderboardPlayer[]): GameWinner | null {
-        const isKingOfTheHillMode = this.gameTypeService.isKingOfTheHillMode(game);
-        const isAllUndefeatedPlayersReadyToQuit = this.gameService.isReadyToQuitImmediateEnd(game);
+    getGameWinner(
+        game: Game,
+        leaderboard: LeaderboardPlayer[],
+    ): GameWinner | null {
+        const isKingOfTheHillMode =
+            this.gameTypeService.isKingOfTheHillMode(game);
+        const isAllUndefeatedPlayersReadyToQuit =
+            this.gameService.isReadyToQuitImmediateEnd(game);
 
         if (isAllUndefeatedPlayersReadyToQuit) {
             if (isKingOfTheHillMode) {
-                return playerWinner(this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard));
+                return playerWinner(
+                    this.playerService.getKingOfTheHillPlayer(game) ||
+                        this.getFirstPlacePlayer(leaderboard),
+                );
             }
 
             return playerWinner(this.getFirstPlacePlayer(leaderboard));
@@ -530,9 +660,15 @@ export default class LeaderboardService {
             }
         }
 
-        if (this.gameStateService.isCountingDownToEnd(game) && this.gameStateService.hasReachedCountdownEnd(game)) {
+        if (
+            this.gameStateService.isCountingDownToEnd(game) &&
+            this.gameStateService.hasReachedCountdownEnd(game)
+        ) {
             if (isKingOfTheHillMode) {
-                return playerWinner(this.playerService.getKingOfTheHillPlayer(game) || this.getFirstPlacePlayer(leaderboard));
+                return playerWinner(
+                    this.playerService.getKingOfTheHillPlayer(game) ||
+                        this.getFirstPlacePlayer(leaderboard),
+                );
             }
 
             return playerWinner(this.getFirstPlacePlayer(leaderboard));
@@ -549,7 +685,10 @@ export default class LeaderboardService {
         return null;
     }
 
-    getStarCountWinner(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
+    getStarCountWinner(
+        game: Game,
+        leaderboard: LeaderboardPlayer[],
+    ): Player | null {
         // There could be more than one player who has reached
         // the number of stars required at the same time.
         // In this case we pick the player who has the most ships.
@@ -557,27 +696,37 @@ export default class LeaderboardService {
 
         // If conquest and home star percentage then use the totalHomeStars as the sort
         // All other cases use totalStars
-        let totalStarsKey = this.gameTypeService.isConquestMode(game)
-            && game.settings.conquest.victoryCondition === 'homeStarPercentage' ? 'totalHomeStars' : 'totalStars';
+        let totalStarsKey =
+            this.gameTypeService.isConquestMode(game) &&
+            game.settings.conquest.victoryCondition === "homeStarPercentage"
+                ? "totalHomeStars"
+                : "totalStars";
 
         // Firstly, check if ANYONE has reached the star limit, if so we need to end the game.
-        let starWinners = leaderboard.filter(p => p.stats[totalStarsKey] >= game.state.starsForVictory);
+        let starWinners = leaderboard.filter(
+            (p) => p.stats[totalStarsKey] >= game.state.starsForVictory,
+        );
 
         // If someone has reached the star limit then pick the first player who is not defeated.
         if (starWinners.length) {
-            return leaderboard.filter(p => !p.player.defeated).map(p => p.player)[0];
+            return leaderboard
+                .filter((p) => !p.player.defeated)
+                .map((p) => p.player)[0];
         }
 
         return null;
     }
 
-    getLastTeamStanding(game: Game, leaderboard: LeaderboardTeam[]): Team | null {
+    getLastTeamStanding(
+        game: Game,
+        leaderboard: LeaderboardTeam[],
+    ): Team | null {
         if (!game.galaxy.teams) {
             return null;
         }
 
-        const undefeatedTeams = game.galaxy.teams.filter(t => {
-            return t.players.some(pId => {
+        const undefeatedTeams = game.galaxy.teams.filter((t) => {
+            return t.players.some((pId) => {
                 const player = this.playerService.getById(game, pId);
                 return player && !player.defeated;
             });
@@ -594,8 +743,11 @@ export default class LeaderboardService {
         return null;
     }
 
-    getLastManStanding(game: Game, leaderboard: LeaderboardPlayer[]): Player | null {
-        let undefeatedPlayers = game.galaxy.players.filter(p => !p.defeated);
+    getLastManStanding(
+        game: Game,
+        leaderboard: LeaderboardPlayer[],
+    ): Player | null {
+        let undefeatedPlayers = game.galaxy.players.filter((p) => !p.defeated);
 
         if (undefeatedPlayers.length === 1) {
             return undefeatedPlayers[0];
@@ -603,7 +755,7 @@ export default class LeaderboardService {
 
         // If all players have been defeated somehow then pick the player
         // who is currently in first place.
-        let defeatedPlayers = game.galaxy.players.filter(p => p.defeated);
+        let defeatedPlayers = game.galaxy.players.filter((p) => p.defeated);
 
         if (defeatedPlayers.length === game.settings.general.playerLimit) {
             return this.getFirstPlacePlayer(leaderboard);
@@ -611,8 +763,10 @@ export default class LeaderboardService {
 
         // If the remaining players alive are all AI then pick the player in 1st.
         // Note: Don't include pseudo afk, only legit actual afk players.
-        let undefeatedAI = undefeatedPlayers.filter(p => this.playerAfkService.isAIControlled(game, p));
-        
+        let undefeatedAI = undefeatedPlayers.filter((p) =>
+            this.playerAfkService.isAIControlled(game, p),
+        );
+
         if (undefeatedAI.length === undefeatedPlayers.length) {
             return this.getFirstPlacePlayer(leaderboard);
         }
@@ -627,7 +781,11 @@ export default class LeaderboardService {
     markNonAFKPlayersAsEstablishedPlayers(game: Game, gameUsers: User[]) {
         // Any player who isn't afk in an NPG is now considered an established player.
         for (let player of game.galaxy.players) {
-            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+            let user = gameUsers.find(
+                (u) =>
+                    player.userId &&
+                    u._id.toString() === player.userId.toString(),
+            );
 
             if (!user) {
                 continue;
@@ -640,8 +798,14 @@ export default class LeaderboardService {
     }
 
     incrementPlayersCompletedAchievement(game: Game, gameUsers: User[]) {
-        for (let player of game.galaxy.players.filter(p => !p.defeated && !p.afk)) {
-            let user = gameUsers.find(u => player.userId && u._id.toString() === player.userId.toString());
+        for (let player of game.galaxy.players.filter(
+            (p) => !p.defeated && !p.afk,
+        )) {
+            let user = gameUsers.find(
+                (u) =>
+                    player.userId &&
+                    u._id.toString() === player.userId.toString(),
+            );
 
             if (!user) {
                 continue;
@@ -650,5 +814,4 @@ export default class LeaderboardService {
             user.achievements.completed++;
         }
     }
-
-};
+}

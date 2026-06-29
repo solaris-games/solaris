@@ -3,24 +3,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, onMounted, onBeforeUnmount, type Ref, watch, computed } from 'vue';
-import { eventBusInjectionKey } from '../../../eventBus'
-import type { Carrier, Game, Star } from '../../../types/game';
+import {
+  ref,
+  inject,
+  onMounted,
+  onBeforeUnmount,
+  type Ref,
+  watch,
+  computed,
+} from "vue";
+import { eventBusInjectionKey } from "../../../eventBus";
+import type { Carrier, Game, Star } from "../../../types/game";
 import { attachEventDeduplication } from "../../../util/eventDeduplication";
-import { createGameContainer, type Services, MapEventBusEventNames, type ObjectClicked, type StarClickDispatchArgs, MapCommandEventBusEventNames } from '@solaris/map-rendering'
-import { mapTextureUrls } from './textureUrls';
-import { StoreDrawingContext } from './StoreDrawingContext';
-import {touch} from "@/services/typedapi/game";
-import {httpInjectionKey, isError} from "@/services/typedapi";
-import {useGameServices} from "@/util/gameServices";
-import { useUserStore } from '@/stores/user';
-import {useGameStore} from "@/stores/game";
+import {
+  createGameContainer,
+  type Services,
+  MapEventBusEventNames,
+  type ObjectClicked,
+  type StarClickDispatchArgs,
+  MapCommandEventBusEventNames,
+} from "@solaris/map-rendering";
+import { mapTextureUrls } from "./textureUrls";
+import { StoreDrawingContext } from "./StoreDrawingContext";
+import { touch } from "@/services/typedapi/game";
+import { httpInjectionKey, isError } from "@/services/typedapi";
+import { useGameServices } from "@/util/gameServices";
+import { useUserStore } from "@/stores/user";
+import { useGameStore } from "@/stores/game";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 import GameHelper from "@/services/gameHelper.ts";
-import {GameTooltips} from "@/views/game/components/tooltips.ts";
-import type {CarrierClickDispatchArgs} from "@solaris/map-rendering";
-import {useMapClickStore} from "@/stores/mapClick.ts";
+import { GameTooltips } from "@/views/game/components/tooltips.ts";
+import type { CarrierClickDispatchArgs } from "@solaris/map-rendering";
+import { useMapClickStore } from "@/stores/mapClick.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const mapClickStore = useMapClickStore();
@@ -32,11 +47,11 @@ const httpClient = inject(httpInjectionKey)!;
 const serviceProvider = useGameServices();
 
 const emit = defineEmits<{
-  onStarSelected: [starId: string],
-  onStarRightSelected: [starId: string],
-  onCarrierSelected: [carrierId: string],
-  onCarrierRightSelected: [carrierId: string],
-  onObjectsClicked: [objects: ObjectClicked[]]
+  onStarSelected: [starId: string];
+  onStarRightSelected: [starId: string];
+  onCarrierSelected: [carrierId: string];
+  onCarrierRightSelected: [carrierId: string];
+  onObjectsClicked: [objects: ObjectClicked[]];
 }>();
 
 const polling = ref(0);
@@ -54,18 +69,31 @@ onMounted(() => {
     technologyService: serviceProvider.technologyService,
   };
 
-  createGameContainer(services, new StoreDrawingContext(store), store.game!, store.settings!, (msg) => toast.error(msg), eventBus, mapTextureUrls).then((gameContainer) => {
+  createGameContainer(
+    services,
+    new StoreDrawingContext(store),
+    store.game!,
+    store.settings!,
+    (msg) => toast.error(msg),
+    eventBus,
+    mapTextureUrls,
+  ).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
 
       console.log("WebGL Support", webGLSupport);
 
       if (!webGLSupport.webgl) {
-        toast.error('WebGL is not supported on your device', { duration: 10000 });
+        toast.error("WebGL is not supported on your device", {
+          duration: 10000,
+        });
       }
 
       if (webGLSupport.webgl && !webGLSupport.performance) {
-        toast.info('Low-performance mode detected. You may consider lowering your graphics settings.', { duration: 10000 });
+        toast.info(
+          "Low-performance mode detected. You may consider lowering your graphics settings.",
+          { duration: 10000 },
+        );
       }
     };
 
@@ -74,10 +102,13 @@ onMounted(() => {
     };
 
     const drawGame = () => {
-      gameContainer.draw()
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandInitialPanForPlayer, {
-        player: GameHelper.getUserPlayer(store.game!),
-      });
+      gameContainer.draw();
+      eventBus.emit(
+        MapCommandEventBusEventNames.MapCommandInitialPanForPlayer,
+        {
+          player: GameHelper.getUserPlayer(store.game!),
+        },
+      );
     };
 
     const touchPlayer = async () => {
@@ -90,7 +121,7 @@ onMounted(() => {
           }
         }
       } catch (e) {
-        console.error(e)
+        console.error(e);
       }
     };
 
@@ -116,7 +147,9 @@ onMounted(() => {
       mapClickStore.onCarrierClick(args);
     };
 
-    const onCarrierRightClickDispatchHandler = (args: CarrierClickDispatchArgs) => {
+    const onCarrierRightClickDispatchHandler = (
+      args: CarrierClickDispatchArgs,
+    ) => {
       mapClickStore.onCarrierRightClick(args);
     };
 
@@ -128,19 +161,30 @@ onMounted(() => {
       emit("onCarrierSelected", carrier._id);
     };
 
-    const onCarrierRightSelectedHandler = ({ carrier }: { carrier: Carrier }) => {
+    const onCarrierRightSelectedHandler = ({
+      carrier,
+    }: {
+      carrier: Carrier;
+    }) => {
       emit("onCarrierRightSelected", carrier._id);
     };
 
-    const onObjectsClickedHandler = ({ objects }: { objects: ObjectClicked[] }) => {
+    const onObjectsClickedHandler = ({
+      objects,
+    }: {
+      objects: ObjectClicked[];
+    }) => {
       emit("onObjectsClicked", objects);
     };
 
-    const unwatch = watch(computed(() => store.game), (newGame) => {
-      updateGame(newGame);
-    }); // watcher is created async, so we have to do the cleanup ourselves
+    const unwatch = watch(
+      computed(() => store.game),
+      (newGame) => {
+        updateGame(newGame);
+      },
+    ); // watcher is created async, so we have to do the cleanup ourselves
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     checkPerformance();
 
@@ -151,15 +195,39 @@ onMounted(() => {
     const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
     attachEventDeduplication(gameRoot, canvas);
 
-    eventBus.on(MapEventBusEventNames.MapOnStarClickDispatched, onStarClickDispatchHandler);
+    eventBus.on(
+      MapEventBusEventNames.MapOnStarClickDispatched,
+      onStarClickDispatchHandler,
+    );
     eventBus.on(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
-    eventBus.on(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierClickDispatched, onCarrierClickDispatchHandler);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierRightClickDispatched, onCarrierRightClickDispatchHandler);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
-    eventBus.on(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+    eventBus.on(
+      MapEventBusEventNames.MapOnStarRightClickDispatched,
+      onStarRightClickDispatchHandler,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnStarRightSelected,
+      onStarRightSelected,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnCarrierClickDispatched,
+      onCarrierClickDispatchHandler,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnCarrierRightClickDispatched,
+      onCarrierRightClickDispatchHandler,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnCarrierSelected,
+      onCarrierSelectedHandler,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnCarrierRightSelected,
+      onCarrierRightSelectedHandler,
+    );
+    eventBus.on(
+      MapEventBusEventNames.MapOnObjectsClicked,
+      onObjectsClickedHandler,
+    );
 
     if (userStore.userId) {
       polling.value = setInterval(touchPlayer, 60000);
@@ -169,21 +237,48 @@ onMounted(() => {
     unsubscribe = () => {
       unwatch();
 
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
 
       clearInterval(polling.value);
 
       gameContainer.destroy();
 
-      eventBus.off(MapEventBusEventNames.MapOnStarClickDispatched, onStarClickDispatchHandler);
-      eventBus.off(MapEventBusEventNames.MapOnStarSelected, onStarSelectedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnStarRightClickDispatched, onStarRightClickDispatchHandler);
-      eventBus.off(MapEventBusEventNames.MapOnStarRightSelected, onStarRightSelected);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierClickDispatched, onCarrierClickDispatchHandler);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierRightClickDispatched, onCarrierRightClickDispatchHandler);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierSelected, onCarrierSelectedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnCarrierRightSelected, onCarrierRightSelectedHandler);
-      eventBus.off(MapEventBusEventNames.MapOnObjectsClicked, onObjectsClickedHandler);
+      eventBus.off(
+        MapEventBusEventNames.MapOnStarClickDispatched,
+        onStarClickDispatchHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnStarSelected,
+        onStarSelectedHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnStarRightClickDispatched,
+        onStarRightClickDispatchHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnStarRightSelected,
+        onStarRightSelected,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnCarrierClickDispatched,
+        onCarrierClickDispatchHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnCarrierRightClickDispatched,
+        onCarrierRightClickDispatchHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnCarrierSelected,
+        onCarrierSelectedHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnCarrierRightSelected,
+        onCarrierRightSelectedHandler,
+      );
+      eventBus.off(
+        MapEventBusEventNames.MapOnObjectsClicked,
+        onObjectsClickedHandler,
+      );
     };
   });
 

@@ -1,24 +1,24 @@
 <template>
-  <p class="team-name" v-if="team">({{team.name}})</p>
+  <p class="team-name" v-if="team">({{ team.name }})</p>
 </template>
 
 <script setup lang="ts">
-import GameHelper from '../../../../services/gameHelper';
-import { computed } from 'vue';
-import type { Game } from '@/types/game';
-import {useGameStore} from "@/stores/game";
+import GameHelper from "../../../../services/gameHelper";
+import { computed } from "vue";
+import type { Game } from "@/types/game";
+import { useGameStore } from "@/stores/game";
 
 const props = defineProps<{
-    playerId: string
-}>()
+  playerId: string;
+}>();
 
 const store = useGameStore();
 
 const team = computed(() => {
-    const game = store.game as Game;
-    const player = GameHelper.getPlayerById(game, props.playerId);
-    return GameHelper.getTeamByPlayer(game, player);
-})
+  const game = store.game as Game;
+  const player = GameHelper.getPlayerById(game, props.playerId);
+  return GameHelper.getTeamByPlayer(game, player);
+});
 </script>
 
 <style scoped>

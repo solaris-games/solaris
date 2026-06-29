@@ -6,10 +6,7 @@
 </template>
 
 <script setup lang="ts">
-
 const errors = () => window?._solaris?.errors || [];
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

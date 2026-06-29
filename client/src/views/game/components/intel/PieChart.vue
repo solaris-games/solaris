@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { Pie } from 'vue-chartjs'
+import { Pie } from "vue-chartjs";
 import {
   Chart as ChartJS,
   Title,
@@ -12,20 +12,27 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-  RadialLinearScale, ArcElement,
+  RadialLinearScale,
+  ArcElement,
   type ChartOptions,
-} from 'chart.js'
-import type {DataCollection} from "@/views/game/components/intel/types.ts";
+} from "chart.js";
+import type { DataCollection } from "@/views/game/components/intel/types.ts";
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, RadialLinearScale, ArcElement)
-
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  RadialLinearScale,
+  ArcElement,
+);
 
 const props = defineProps<{
-  options: ChartOptions<"pie">,
-  chartData: DataCollection,
+  options: ChartOptions<"pie">;
+  chartData: DataCollection;
 }>();
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

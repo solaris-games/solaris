@@ -1,24 +1,28 @@
 <template>
-    <div class="pt-1 pb-2 row">
-      <div class="col text-center">
-        <small>
-          <a class="text-danger" href="javascript:;" @click="onOpenReportPlayerRequested">Report this player</a>
-        </small>
-      </div>
+  <div class="pt-1 pb-2 row">
+    <div class="col text-center">
+      <small>
+        <a
+          class="text-danger"
+          href="javascript:;"
+          @click="onOpenReportPlayerRequested"
+          >Report this player</a
+        >
+      </small>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{
-  playerId: string,
+  playerId: string;
 }>();
 
 const emit = defineEmits<{
-  onOpenReportPlayerRequested: [],
+  onOpenReportPlayerRequested: [];
 }>();
 
-const onOpenReportPlayerRequested = () => emit('onOpenReportPlayerRequested');
+const onOpenReportPlayerRequested = () => emit("onOpenReportPlayerRequested");
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

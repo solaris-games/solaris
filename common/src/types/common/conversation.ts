@@ -1,6 +1,6 @@
 import type { ConversationMessage } from "./conversationMessage";
 import type { TradeEvent } from "./trade";
-import type {DiplomacyEvent} from "./diplomacy";
+import type { DiplomacyEvent } from "./diplomacy";
 
 export interface Conversation<ID> {
     _id: ID;
@@ -12,4 +12,4 @@ export interface Conversation<ID> {
     lastMessage?: ConversationMessage<ID>;
     unreadCount?: number;
     isMuted?: boolean;
-};
+}

@@ -4,7 +4,7 @@ import CarrierService from "./carrier";
 import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";
 import StarService from "./star";
-import { StarDistanceService } from '@solaris/common';
+import { StarDistanceService } from "@solaris/common";
 import CullWaypointsService from "./cullWaypoints";
 
 const PEACE_CYCLES = 3;
@@ -23,7 +23,7 @@ export default class BattleRoyaleService {
         mapService: MapService,
         starDistanceService: StarDistanceService,
         cullWaypointsService: CullWaypointsService,
-        carrierMovementService: CarrierMovementService
+        carrierMovementService: CarrierMovementService,
     ) {
         this.starService = starService;
         this.carrierService = carrierService;
@@ -63,22 +63,32 @@ export default class BattleRoyaleService {
         if (game.galaxy.stars.length - starCountToDestroy < 1) {
             starCountToDestroy = game.galaxy.stars.length - 1;
         }
-        
-        const starsToDestroy = this.starDistanceService.getFurthestStarsFromLocation(galaxyCenter, game.galaxy.stars, starCountToDestroy);
 
-        return starsToDestroy
-            .sort((a, b) => a._id.toString().localeCompare(b._id.toString()));
+        const starsToDestroy =
+            this.starDistanceService.getFurthestStarsFromLocation(
+                galaxyCenter,
+                game.galaxy.stars,
+                starCountToDestroy,
+            );
+
+        return starsToDestroy.sort((a, b) =>
+            a._id.toString().localeCompare(b._id.toString()),
+        );
     }
 
     _destroyStar(game: Game, star: Star) {
         this.starService.destroyStar(game, star);
 
-        const carriersEnRoute = this.carrierMovementService.getCarriersEnRouteToStar(game, star);
+        const carriersEnRoute =
+            this.carrierMovementService.getCarriersEnRouteToStar(game, star);
 
         // Cull the waypoints of carriers that have the given star in its
         // waypoint queue and destroy those that are lost in space.
         for (let carrier of carriersEnRoute) {
-            this.cullWaypointsService.cullWaypointsByHyperspaceRange(game, carrier);
+            this.cullWaypointsService.cullWaypointsByHyperspaceRange(
+                game,
+                carrier,
+            );
 
             if (this.carrierMovementService.isLostInSpace(game, carrier)) {
                 this.carrierService.destroyCarrier(game, carrier);
@@ -86,11 +96,13 @@ export default class BattleRoyaleService {
         }
 
         // Destroy any carriers stationed at the star.
-        const carriersInOrbit = this.carrierService.getCarriersAtStar(game, star._id);
+        const carriersInOrbit = this.carrierService.getCarriersAtStar(
+            game,
+            star._id,
+        );
 
         for (let carrier of carriersInOrbit) {
             this.carrierService.destroyCarrier(game, carrier);
         }
     }
-
-};
+}

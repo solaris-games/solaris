@@ -1,5 +1,9 @@
 <template>
-  <calculator-combat-group-object kind="star" v-model="model" @onRemove="remove">
+  <calculator-combat-group-object
+    kind="star"
+    v-model="model"
+    @onRemove="remove"
+  >
     <template v-slot:icon>
       <i class="fas fa-star"></i>
     </template>
@@ -11,20 +15,20 @@
   </calculator-combat-group-object>
 </template>
 <script setup lang="ts">
-import type {CCStar} from "@/views/game/components/combatcalculator/types";
+import type { CCStar } from "@/views/game/components/combatcalculator/types";
 import CalculatorCombatGroupObject from "@/views/game/components/combatcalculator/CalculatorCombatGroupObject.vue";
-import {useGameStore} from "@/stores/game.ts";
-import type {Star} from "@/types/game.ts";
+import { useGameStore } from "@/stores/game.ts";
+import type { Star } from "@/types/game.ts";
 
 const emit = defineEmits<{
-  onRemove: [],
+  onRemove: [];
 }>();
 
 const model = defineModel<CCStar>({ required: true });
 
 const store = useGameStore();
 
-const remove = () => emit('onRemove');
+const remove = () => emit("onRemove");
 
 const selectStar = () => {
   const cb = (star: Star | undefined) => {
@@ -32,11 +36,10 @@ const selectStar = () => {
       model.value.specialistId = star.specialistId;
       model.value.ships = star.ships || 0;
     }
-    store.setMenuState({ state: 'combatCalculator', advanced: true });
+    store.setMenuState({ state: "combatCalculator", advanced: true });
   };
 
-  store.setMenuState({ state: 'selectStar', callback: cb });
+  store.setMenuState({ state: "selectStar", callback: cb });
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,5 +1,5 @@
-import {JobParameters} from "../tool";
-import {Game} from "../../services/types/Game";
+import { JobParameters } from "../tool";
+import { Game } from "../../services/types/Game";
 import { Logger } from "pino";
 
 const migrateGame = (log: Logger, game: Game) => {
@@ -9,11 +9,12 @@ const migrateGame = (log: Logger, game: Game) => {
                 filter: { _id: game._id },
                 update: {
                     $set: {
-                        'settings.specialGalaxy.combatResolutionMalusStrategy': 'anyCarrier',
-                    }
-                }
-            }
-        }
+                        "settings.specialGalaxy.combatResolutionMalusStrategy":
+                            "anyCarrier",
+                    },
+                },
+            },
+        };
     } else {
         return null;
     }
@@ -30,11 +31,20 @@ export const migrateCombatResolution = async (ctx: JobParameters) => {
     const totalPages = Math.ceil(total / pageSize);
 
     do {
-        const games = await gameRepository.find({}, {
-            'settings': 1,
-        }, { _id: 1 }, pageSize, page * pageSize, false);
+        const games = await gameRepository.find(
+            {},
+            {
+                settings: 1,
+            },
+            { _id: 1 },
+            pageSize,
+            page * pageSize,
+            false,
+        );
 
-        const writes = games.map((game) => migrateGame(log, game)).filter(Boolean);
+        const writes = games
+            .map((game) => migrateGame(log, game))
+            .filter(Boolean);
 
         console.log(JSON.stringify(writes));
 
@@ -43,5 +53,5 @@ export const migrateCombatResolution = async (ctx: JobParameters) => {
         log.info(`Page ${page}/${totalPages}`);
 
         page++;
-    } while (page <= totalPages)
-}
+    } while (page <= totalPages);
+};

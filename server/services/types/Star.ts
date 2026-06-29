@@ -3,31 +3,29 @@ import { InfrastructureUpgradeCosts } from "./InfrastructureUpgrade";
 import { Location } from "./Location";
 import { MapObject } from "./Map";
 import { PlayerTechnologyLevels } from "./Player";
-import { Specialist } from '@solaris/common';
+import { Specialist } from "@solaris/common";
 
 export interface NaturalResources {
     economy: number;
     industry: number;
     science: number;
-};
+}
 
-export interface TerraformedResources extends NaturalResources {
-    
-};
+export interface TerraformedResources extends NaturalResources {}
 
-export type InfrastructureType = 'economy' | 'industry' | 'science';
+export type InfrastructureType = "economy" | "industry" | "science";
 
 export interface Infrastructure {
     economy: number | null;
     industry: number | null;
     science: number | null;
-};
+}
 
 export interface IgnoreBulkUpgrade {
     economy: boolean;
     industry: boolean;
     science: boolean;
-};
+}
 
 export interface Star extends MapObject {
     name: string;
@@ -56,11 +54,11 @@ export interface Star extends MapObject {
     manufacturing?: number;
     isInScanningRange?: boolean;
     effectiveTechs?: PlayerTechnologyLevels;
-};
+}
 
 export interface StarCaptureResult {
     capturedById: DBObjectId;
     capturedByAlias: string;
     captureReward: number;
     specialistDestroyed?: boolean;
-};
+}

@@ -5,7 +5,7 @@ import {
     GuildInviteUserRequest,
     object,
     stringValue,
-    username
+    username,
 } from "@solaris/common";
 
 const guildName: Validator<string> = stringValue({
@@ -19,16 +19,19 @@ const guildTag: Validator<string> = stringValue({
     maxLength: 4,
 });
 
-export const parseGuildCreateRequest: Validator<GuildCreateGuildRequest> = object({
-    name: guildName,
-    tag: guildTag,
-});
+export const parseGuildCreateRequest: Validator<GuildCreateGuildRequest> =
+    object({
+        name: guildName,
+        tag: guildTag,
+    });
 
-export const parseGuildRenameRequest: Validator<GuildRenameGuildRequest> = object({
-    name: guildName,
-    tag: guildTag,
-});
+export const parseGuildRenameRequest: Validator<GuildRenameGuildRequest> =
+    object({
+        name: guildName,
+        tag: guildTag,
+    });
 
-export const parseGuildInviteUserRequest: Validator<GuildInviteUserRequest> = object({
-    username: username,
-});
+export const parseGuildInviteUserRequest: Validator<GuildInviteUserRequest> =
+    object({
+        username: username,
+    });

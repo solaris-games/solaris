@@ -1,56 +1,81 @@
 <template>
-<div class="menu-page">
-  <div class="container">
-    <menu-title title="New Conversation" @onCloseRequested="onCloseRequested">
-      <button class="btn btn-sm btn-outline-primary" @click="onOpenInboxRequested" title="Back to Inbox"><i class="fas fa-inbox"></i></button>
-    </menu-title>
-
-    <div class="row">
-      <form class="col-12 pb-2" @submit="doCreateConversation">
-        <div class="col-12">
-            <form-error-list v-bind:errors="errors"/>
-        </div>
-        <div class="mb-2">
-          <label for="name">Name</label>
-          <input type="text" class="form-control" id="name" placeholder="Enter a name for the group" v-model="name">
-        </div>
-
-        <div class="mb-2">
-          <label for="participants">Participants</label>
-          <select multiple class="form-control" id="participants" v-model="participants">
-            <option v-for="participant in possibleParticipants" :key="participant._id" :value="participant._id">
-              {{participant.alias}}
-            </option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn btn-success float-end" :disabled="isLoading">
-          <i class="fas fa-comments"></i>
-          Create Conversation
+  <div class="menu-page">
+    <div class="container">
+      <menu-title title="New Conversation" @onCloseRequested="onCloseRequested">
+        <button
+          class="btn btn-sm btn-outline-primary"
+          @click="onOpenInboxRequested"
+          title="Back to Inbox"
+        >
+          <i class="fas fa-inbox"></i>
         </button>
-      </form>
+      </menu-title>
+
+      <div class="row">
+        <form class="col-12 pb-2" @submit="doCreateConversation">
+          <div class="col-12">
+            <form-error-list v-bind:errors="errors" />
+          </div>
+          <div class="mb-2">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              placeholder="Enter a name for the group"
+              v-model="name"
+            />
+          </div>
+
+          <div class="mb-2">
+            <label for="participants">Participants</label>
+            <select
+              multiple
+              class="form-control"
+              id="participants"
+              v-model="participants"
+            >
+              <option
+                v-for="participant in possibleParticipants"
+                :key="participant._id"
+                :value="participant._id"
+              >
+                {{ participant.alias }}
+              </option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="btn btn-success float-end"
+            :disabled="isLoading"
+          >
+            <i class="fas fa-comments"></i>
+            Create Conversation
+          </button>
+        </form>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import GameHelper from '../../../../../services/gameHelper';
-import MenuTitle from '../../MenuTitle.vue';
-import FormErrorList from '../../../../components/FormErrorList.vue';
-import { inject, ref, computed, onMounted } from 'vue';
-import { eventBusInjectionKey } from '../../../../../eventBus';
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {createConversation} from "@/services/typedapi/conversation";
-import type {Game, Player} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import GameHelper from "../../../../../services/gameHelper";
+import MenuTitle from "../../MenuTitle.vue";
+import FormErrorList from "../../../../components/FormErrorList.vue";
+import { inject, ref, computed, onMounted } from "vue";
+import { eventBusInjectionKey } from "../../../../../eventBus";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { createConversation } from "@/services/typedapi/conversation";
+import type { Game, Player } from "@/types/game";
 
 const props = defineProps<{
-  participantIds: readonly string[],
+  participantIds: readonly string[];
 }>();
 
 const emit = defineEmits<{
-  onCloseRequested: [],
+  onCloseRequested: [];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -63,25 +88,25 @@ const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);
-const name = ref('');
+const name = ref("");
 const participants = ref<string[]>([]);
 const possibleParticipants = ref<Player[]>([]);
 
-const onCloseRequested = () => emit('onCloseRequested');
+const onCloseRequested = () => emit("onCloseRequested");
 
 const onOpenInboxRequested = () => {
-  store.setMenuStateChat({ state: 'inbox' });
+  store.setMenuStateChat({ state: "inbox" });
 };
 
 const doCreateConversation = async (e: Event) => {
   errors.value = [];
 
   if (!name.value.length) {
-    errors.value.push('Name is required.');
+    errors.value.push("Name is required.");
   }
 
   if (!participants.value.length) {
-    errors.value.push('Must have at least one participant selected.');
+    errors.value.push("Must have at least one participant selected.");
   }
 
   e.preventDefault();
@@ -92,9 +117,16 @@ const doCreateConversation = async (e: Event) => {
 
   isLoading.value = true;
 
-  const response = await createConversation(httpClient)(game.value._id, name.value, participants.value);
+  const response = await createConversation(httpClient)(
+    game.value._id,
+    name.value,
+    participants.value,
+  );
   if (isOk(response)) {
-    store.setMenuStateChat({ state: 'conversation', conversationId: response.data._id });
+    store.setMenuStateChat({
+      state: "conversation",
+      conversationId: response.data._id,
+    });
   } else {
     console.error(formatError(response));
   }
@@ -103,7 +135,9 @@ const doCreateConversation = async (e: Event) => {
 };
 
 onMounted(() => {
-  possibleParticipants.value = game.value.galaxy.players.filter(p => p._id !== userPlayer.value._id);
+  possibleParticipants.value = game.value.galaxy.players.filter(
+    (p) => p._id !== userPlayer.value._id,
+  );
 
   if (props.participantIds?.length) {
     participants.value = props.participantIds.slice();

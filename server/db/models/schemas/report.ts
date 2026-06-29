@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
@@ -16,11 +16,11 @@ const schema = new Schema({
         abuse: { type: Types.Boolean, required: true },
         spamming: { type: Types.Boolean, required: true },
         multiboxing: { type: Types.Boolean, required: true },
-        inappropriateAlias: { type: Types.Boolean, required: true }
+        inappropriateAlias: { type: Types.Boolean, required: true },
     },
     actioned: { type: Types.Boolean, required: false, default: false },
     actionedBy: { type: Types.ObjectId, required: false },
-    date: { type: Types.Date, required: true, default: () => new Date() }
+    date: { type: Types.Date, required: true, default: () => new Date() },
 });
 
 export default schema;

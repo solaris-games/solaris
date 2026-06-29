@@ -2,18 +2,26 @@
   <view-container :is-auth-page="true">
     <view-title title="Purchase Failed" />
 
-    <p>There was an problem processing your payment, please contact a developer for support. You may have been charged, please do not try the transaction again.</p>
+    <p>
+      There was an problem processing your payment, please contact a developer
+      for support. You may have been charged, please do not try the transaction
+      again.
+    </p>
 
-    <a href="https://discord.com/invite/v7PD33d" target="_blank" title="Discord" class="btn btn-success">
+    <a
+      href="https://discord.com/invite/v7PD33d"
+      target="_blank"
+      title="Discord"
+      class="btn btn-success"
+    >
       <i class="fab fa-discord"></i> Discord
     </a>
   </view-container>
 </template>
 
 <script setup lang="ts">
-import ViewTitle from '../components/ViewTitle.vue'
-import ViewContainer from '../components/ViewContainer.vue'
+import ViewTitle from "../components/ViewTitle.vue";
+import ViewContainer from "../components/ViewContainer.vue";
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

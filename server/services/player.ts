@@ -1,27 +1,27 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import { DateTime } from "luxon";
 import EventEmitter from "events";
-import Repository from './repository';
-import { DBObjectId } from './types/DBObjectId';
-import {Game, Team} from './types/Game';
-import { Location } from './types/Location';
-import { Player, PlayerColour, PlayerShape } from './types/Player';
-import CarrierService from './carrier';
-import { GameTypeService, ResearchTypeNotRandom } from '@solaris/common';
-import MapService from './map';
-import PlayerReadyService from './playerReady';
-import RandomService from './random';
-import SpecialistService from './specialist';
-import StarService from './star';
-import { StarDistanceService } from '@solaris/common';
-import { TechnologyService } from '@solaris/common';
+import Repository from "./repository";
+import { DBObjectId } from "./types/DBObjectId";
+import { Game, Team } from "./types/Game";
+import { Location } from "./types/Location";
+import { Player, PlayerColour, PlayerShape } from "./types/Player";
+import CarrierService from "./carrier";
+import { GameTypeService, ResearchTypeNotRandom } from "@solaris/common";
+import MapService from "./map";
+import PlayerReadyService from "./playerReady";
+import RandomService from "./random";
+import SpecialistService from "./specialist";
+import StarService from "./star";
+import { StarDistanceService } from "@solaris/common";
+import { TechnologyService } from "@solaris/common";
 import TeamService from "./team";
 import { ValidationError } from "@solaris/common";
-import {shuffle} from "@solaris/common";
+import { shuffle } from "@solaris/common";
 import { Carrier } from "./types/Carrier";
 import { Star } from "./types/Star";
 import PlayerColourService from "./playerColour";
-import {MathRandomGen} from "../utils/randomGen";
+import { MathRandomGen } from "../utils/randomGen";
 import InitialGameStateService from "./initialGameState";
 import { logger } from "../utils/logging";
 
@@ -75,18 +75,31 @@ export default class PlayerService extends EventEmitter {
     }
 
     getById(game: Game, playerId: DBObjectId) {
-        return game.galaxy.players.find(p => p._id.toString() === playerId.toString());
+        return game.galaxy.players.find(
+            (p) => p._id.toString() === playerId.toString(),
+        );
     }
 
     getByUserId(game: Game, userId: DBObjectId) {
-        return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString());
+        return game.galaxy.players.find(
+            (p) => p.userId && p.userId.toString() === userId.toString(),
+        );
     }
 
-    getPlayerIdByUserId(game: Game, userId: DBObjectId): DBObjectId | undefined {
-        return game.galaxy.players.find(p => p.userId && p.userId.toString() === userId.toString())?._id;
+    getPlayerIdByUserId(
+        game: Game,
+        userId: DBObjectId,
+    ): DBObjectId | undefined {
+        return game.galaxy.players.find(
+            (p) => p.userId && p.userId.toString() === userId.toString(),
+        )?._id;
     }
 
-    createEmptyPlayer(game: Game, colour: PlayerColour, shape: PlayerShape): Player {
+    createEmptyPlayer(
+        game: Game,
+        colour: PlayerColour,
+        shape: PlayerShape,
+    ): Player {
         const defaultTech = this.technologyService.getDefaultTechnology(game);
         const researchingNow: ResearchTypeNotRandom = defaultTech;
         const researchingNext: ResearchTypeNotRandom = defaultTech;
@@ -95,7 +108,7 @@ export default class PlayerService extends EventEmitter {
             _id: new mongoose.Types.ObjectId(),
             userId: null,
             homeStarId: null,
-            alias: 'Empty Slot',
+            alias: "Empty Slot",
             avatar: null,
             notes: null,
             colour: colour,
@@ -118,14 +131,38 @@ export default class PlayerService extends EventEmitter {
             hasSentTurnReminder: false,
             hasFilledAfkSlot: false,
             research: {
-                terraforming: { level: game.settings.technology.startingTechnologyLevel.terraforming },
-                experimentation: { level: game.settings.technology.startingTechnologyLevel.experimentation },
-                scanning: { level: game.settings.technology.startingTechnologyLevel.scanning },
-                hyperspace: { level: game.settings.technology.startingTechnologyLevel.hyperspace },
-                manufacturing: { level: game.settings.technology.startingTechnologyLevel.manufacturing },
-                banking: { level: game.settings.technology.startingTechnologyLevel.banking },
-                weapons: { level: game.settings.technology.startingTechnologyLevel.weapons },
-                specialists: { level: game.settings.technology.startingTechnologyLevel.specialists }
+                terraforming: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .terraforming,
+                },
+                experimentation: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .experimentation,
+                },
+                scanning: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .scanning,
+                },
+                hyperspace: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .hyperspace,
+                },
+                manufacturing: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .manufacturing,
+                },
+                banking: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .banking,
+                },
+                weapons: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .weapons,
+                },
+                specialists: {
+                    level: game.settings.technology.startingTechnologyLevel
+                        .specialists,
+                },
             },
             ledger: {
                 credits: [],
@@ -144,7 +181,7 @@ export default class PlayerService extends EventEmitter {
     setupEmptyPlayers(game: Game) {
         const players: Player[] = [];
 
-        if (game.settings.general.mode === 'teamConquest') {
+        if (game.settings.general.mode === "teamConquest") {
             const teams: Team[] = [];
 
             const teamsNumber = game.settings.conquest.teamsCount;
@@ -153,28 +190,41 @@ export default class PlayerService extends EventEmitter {
                 throw new ValidationError("Team count not provided");
             }
 
-            const playersPerTeam = game.settings.general.playerLimit / teamsNumber;
-            const teamColourShapeList = this.playerColourService.generateTeamColourShapeList(teamsNumber, new Array<number>(teamsNumber).fill(playersPerTeam));
+            const playersPerTeam =
+                game.settings.general.playerLimit / teamsNumber;
+            const teamColourShapeList =
+                this.playerColourService.generateTeamColourShapeList(
+                    teamsNumber,
+                    new Array<number>(teamsNumber).fill(playersPerTeam),
+                );
 
             for (let ti = 0; ti < teamsNumber; ti++) {
                 const team: Team = {
                     _id: new mongoose.Types.ObjectId() as any,
                     name: `Team ${ti + 1}`,
-                    players: []
+                    players: [],
                 };
 
                 teams.push(team);
             }
 
-            const teamAssignments = this.teamService.generateTeamAssignments(game.settings.general.playerLimit, teamsNumber);
+            const teamAssignments = this.teamService.generateTeamAssignments(
+                game.settings.general.playerLimit,
+                teamsNumber,
+            );
 
             for (let i = 0; i < game.settings.general.playerLimit; i++) {
                 const teamNumber = teamAssignments[i];
                 const team = teams[teamNumber];
 
-                const shapeColour = teamColourShapeList[teamNumber][team.players.length];
+                const shapeColour =
+                    teamColourShapeList[teamNumber][team.players.length];
 
-                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+                const player = this.createEmptyPlayer(
+                    game,
+                    shapeColour.colour,
+                    shapeColour.shape,
+                );
 
                 players.push(player);
 
@@ -183,11 +233,18 @@ export default class PlayerService extends EventEmitter {
 
             game.galaxy.teams = teams;
         } else {
-            const shapeColours = this.playerColourService.generatePlayerColourShapeList(game.settings.general.playerLimit);
+            const shapeColours =
+                this.playerColourService.generatePlayerColourShapeList(
+                    game.settings.general.playerLimit,
+                );
 
             for (let i = 0; i < game.settings.general.playerLimit; i++) {
                 const shapeColour = shapeColours[i];
-                const player = this.createEmptyPlayer(game, shapeColour.colour, shapeColour.shape);
+                const player = this.createEmptyPlayer(
+                    game,
+                    shapeColour.colour,
+                    shapeColour.shape,
+                );
 
                 players.push(player);
             }
@@ -201,8 +258,7 @@ export default class PlayerService extends EventEmitter {
 
         if (game.galaxy.linkedStars && game.galaxy.linkedStars.length) {
             this._distributePlayerLinkedStartingStars(game, players);
-        }
-        else {
+        } else {
             this._distributePlayerStartingStars(game, players);
         }
 
@@ -212,9 +268,13 @@ export default class PlayerService extends EventEmitter {
     _distributePlayerLinkedHomeStars(game: Game, players: Player[]) {
         let playersDistributed: Player[] = [];
 
-        if (game.settings.specialGalaxy.playerDistribution === 'circularSequential') {
+        if (
+            game.settings.specialGalaxy.playerDistribution ===
+            "circularSequential"
+        ) {
             playersDistributed = players;
-        } else { // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
+        } else {
+            // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
             playersDistributed = shuffle(new MathRandomGen(), players);
         }
 
@@ -224,46 +284,71 @@ export default class PlayerService extends EventEmitter {
             // Set up the home star
             let homeStar = this.starService.getById(game, homeStarId);
 
-            this.starService.setupHomeStar(game, homeStar, player, game.settings);
+            this.starService.setupHomeStar(
+                game,
+                homeStar,
+                player,
+                game.settings,
+            );
         }
     }
 
     _distributePlayerHomeStars(game: Game, players: Player[]) {
         // Divide the galaxy into equal chunks, each player will spawned
         // at near equal distance from the center of the galaxy.
-        const starLocations = game.galaxy.stars.map(s => s.location);
+        const starLocations = game.galaxy.stars.map((s) => s.location);
 
         // Calculate the center point of the galaxy as we need to add it onto the starting location.
-        const galaxyCenter = this.starDistanceService.getGalaxyCenterOfMass(starLocations);
+        const galaxyCenter =
+            this.starDistanceService.getGalaxyCenterOfMass(starLocations);
 
-        const distanceFromCenter = this._getDesiredPlayerDistanceFromCenter(game);
+        const distanceFromCenter =
+            this._getDesiredPlayerDistanceFromCenter(game);
 
-        const radians = this._getPlayerStartingLocationRadians(game.settings.general.playerLimit);
+        const radians = this._getPlayerStartingLocationRadians(
+            game.settings.general.playerLimit,
+        );
 
         // Create each player starting at angle 0 at a distance of half the galaxy radius
 
-        for(let player of players) {
-            let homeStar = this._getNewPlayerHomeStar(game, starLocations, galaxyCenter, distanceFromCenter, radians);
+        for (let player of players) {
+            let homeStar = this._getNewPlayerHomeStar(
+                game,
+                starLocations,
+                galaxyCenter,
+                distanceFromCenter,
+                radians,
+            );
 
             // Set up the home star
-            this.starService.setupHomeStar(game, homeStar, player, game.settings);
+            this.starService.setupHomeStar(
+                game,
+                homeStar,
+                player,
+                game.settings,
+            );
         }
     }
 
     _getDesiredPlayerDistanceFromCenter(game: Game) {
         let distanceFromCenter;
-        const locations = game.galaxy.stars.map(s => s.location);
+        const locations = game.galaxy.stars.map((s) => s.location);
 
         // doughnut galaxies need the distance from the center needs to be slightly more than others
         // spiral galaxies need the distance to be slightly less, and they have a different galactic center
-        if (game.settings.galaxy.galaxyType === 'doughnut') {
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (3/4);
-        } else if(game.settings.galaxy.galaxyType === 'spiral') {
-            distanceFromCenter = this.starDistanceService.getMaxGalaxyRadius(locations) / 2;
-        } else{
+        if (game.settings.galaxy.galaxyType === "doughnut") {
+            distanceFromCenter =
+                this.starDistanceService.getMaxGalaxyRadius(locations) *
+                (3 / 4);
+        } else if (game.settings.galaxy.galaxyType === "spiral") {
+            distanceFromCenter =
+                this.starDistanceService.getMaxGalaxyRadius(locations) / 2;
+        } else {
             // The desired distance from the center is on two thirds from the galaxy center and the edge
             // for all galaxies other than doughnut and spiral.
-            distanceFromCenter = (this.starDistanceService.getMaxGalaxyRadius(locations)) * (2/3);
+            distanceFromCenter =
+                this.starDistanceService.getMaxGalaxyRadius(locations) *
+                (2 / 3);
         }
 
         return distanceFromCenter;
@@ -276,7 +361,11 @@ export default class PlayerService extends EventEmitter {
             for (let starId of linkedStars) {
                 let star = this.starService.getById(game, starId);
 
-                this.starService.setupPlayerStarForGameStart(game, star, player);
+                this.starService.setupPlayerStarForGameStart(
+                    game,
+                    star,
+                    player,
+                );
             }
         }
     }
@@ -290,10 +379,16 @@ export default class PlayerService extends EventEmitter {
 
         while (starsToDistribute--) {
             for (let player of players) {
-                let homeStar = this.starService.getById(game, player.homeStarId!);
+                let homeStar = this.starService.getById(
+                    game,
+                    player.homeStarId!,
+                );
 
                 // Get X closest stars to the home star and also give those to the player.
-                let s = this.starDistanceService.getClosestUnownedStar(homeStar, game.galaxy.stars);
+                let s = this.starDistanceService.getClosestUnownedStar(
+                    homeStar,
+                    game.galaxy.stars,
+                );
 
                 // Set up the closest star.
                 this.starService.setupPlayerStarForGameStart(game, s, player);
@@ -308,7 +403,8 @@ export default class PlayerService extends EventEmitter {
         player.alias = "Empty Slot";
         player.avatar = null;
         player.credits = game.settings.player.startingCredits;
-        player.creditsSpecialists = game.settings.player.startingCreditsSpecialists;
+        player.creditsSpecialists =
+            game.settings.player.startingCreditsSpecialists;
         player.ready = false;
         player.readyToCycle = false;
         player.readyToQuit = false;
@@ -318,15 +414,21 @@ export default class PlayerService extends EventEmitter {
         player.lastSeen = null;
         player.lastSeenIP = null;
 
-        const initialGameState = (await this.initialGameStateService.getByGameId(game._id));
+        const initialGameState = await this.initialGameStateService.getByGameId(
+            game._id,
+        );
 
         if (!initialGameState) {
-            log.error(`Fatal: Player ${player._id} cannot quit game ${game.settings.general.name} (${game._id}) because no initial game state exists`);
+            log.error(
+                `Fatal: Player ${player._id} cannot quit game ${game.settings.general.name} (${game._id}) because no initial game state exists`,
+            );
 
             throw new ValidationError("Failed to quit game", 500);
         }
 
-        const initialPlayer = initialGameState.galaxy.players.find(p => p.playerId.toString() === playerId)!;
+        const initialPlayer = initialGameState.galaxy.players.find(
+            (p) => p.playerId.toString() === playerId,
+        )!;
 
         player.credits = initialPlayer.credits;
         player.creditsSpecialists = initialPlayer.creditsSpecialists;
@@ -336,10 +438,15 @@ export default class PlayerService extends EventEmitter {
         player.diplomacy = initialPlayer.diplomacy;
 
         // Reset the player's stars.
-        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(
+            game.galaxy.stars,
+            player._id,
+        );
 
         for (let star of playerStars) {
-            const initialStar = initialGameState?.galaxy.stars.find(s => s.starId.toString() === star._id.toString())!;
+            const initialStar = initialGameState?.galaxy.stars.find(
+                (s) => s.starId.toString() === star._id.toString(),
+            )!;
 
             star.ignoreBulkUpgrade = {
                 economy: false,
@@ -367,7 +474,9 @@ export default class PlayerService extends EventEmitter {
         // Reset the player's carriers
         this.carrierService.clearPlayerCarriers(game, player);
 
-        const initialCarriers = initialGameState.galaxy.carriers.filter(c => c.ownedByPlayerId?.toString() === playerId);
+        const initialCarriers = initialGameState.galaxy.carriers.filter(
+            (c) => c.ownedByPlayerId?.toString() === playerId,
+        );
 
         for (let savedCarrier of initialCarriers) {
             const newCarrier: Carrier = {
@@ -388,39 +497,79 @@ export default class PlayerService extends EventEmitter {
                 locationNext: null,
                 toObject(): Carrier {
                     return this;
-                }
-            }
+                },
+            };
 
             game.galaxy.carriers.push(newCarrier);
         }
     }
 
-    _getNewPlayerHomeStar(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[]) {
+    _getNewPlayerHomeStar(
+        game: Game,
+        starLocations: Location[],
+        galaxyCenter: Location,
+        distanceFromCenter: number,
+        radians: number[],
+    ) {
         switch (game.settings.specialGalaxy.playerDistribution) {
-            case 'circular':
-                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, true);
-            case 'circularSequential':
-                return this._getNewPlayerHomeStarCircular(game, starLocations, galaxyCenter, distanceFromCenter, radians, false);
-            case 'random':
+            case "circular":
+                return this._getNewPlayerHomeStarCircular(
+                    game,
+                    starLocations,
+                    galaxyCenter,
+                    distanceFromCenter,
+                    radians,
+                    true,
+                );
+            case "circularSequential":
+                return this._getNewPlayerHomeStarCircular(
+                    game,
+                    starLocations,
+                    galaxyCenter,
+                    distanceFromCenter,
+                    radians,
+                    false,
+                );
+            case "random":
                 return this._getNewPlayerHomeStarRandom(game);
         }
 
-        throw new Error(`Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`);
+        throw new Error(
+            `Unsupported player distribution setting: ${game.settings.specialGalaxy.playerDistribution}`,
+        );
     }
 
-    _getNewPlayerHomeStarCircular(game: Game, starLocations: Location[], galaxyCenter: Location, distanceFromCenter: number, radians: number[], random: boolean) {
+    _getNewPlayerHomeStarCircular(
+        game: Game,
+        starLocations: Location[],
+        galaxyCenter: Location,
+        distanceFromCenter: number,
+        radians: number[],
+        random: boolean,
+    ) {
         // Get the player's starting location.
-        let startingLocation = this._getPlayerStartingLocation(radians, galaxyCenter, distanceFromCenter, random);
+        let startingLocation = this._getPlayerStartingLocation(
+            radians,
+            galaxyCenter,
+            distanceFromCenter,
+            random,
+        );
 
         // Find the star that is closest to this location, that will be the player's home star.
-        let homeStar = this.starDistanceService.getClosestUnownedStarFromLocation(startingLocation, game.galaxy.stars);
+        let homeStar =
+            this.starDistanceService.getClosestUnownedStarFromLocation(
+                startingLocation,
+                game.galaxy.stars,
+            );
 
         return homeStar;
     }
 
     _getNewPlayerHomeStarRandom(game: Game) {
         // Pick a random unowned star.
-        let unownedStars = game.galaxy.stars.filter(s => s.ownedByPlayerId == null);
+        let unownedStars = game.galaxy.stars.filter(
+            (s) => s.ownedByPlayerId == null,
+        );
 
         let rnd = this.randomService.getRandomNumber(unownedStars.length - 1);
 
@@ -428,7 +577,7 @@ export default class PlayerService extends EventEmitter {
     }
 
     _getPlayerStartingLocationRadians(playerCount: number) {
-        const increment = 360 / playerCount * Math.PI / 180;
+        const increment = ((360 / playerCount) * Math.PI) / 180;
         let current = 0;
 
         let radians: number[] = [];
@@ -441,12 +590,19 @@ export default class PlayerService extends EventEmitter {
         return radians;
     }
 
-    _getPlayerStartingLocation(radians: number[], galaxyCenter: Location, distanceFromCenter: number, random: boolean) {
+    _getPlayerStartingLocation(
+        radians: number[],
+        galaxyCenter: Location,
+        distanceFromCenter: number,
+        random: boolean,
+    ) {
         let currentRadian: number;
 
         if (random) {
             // Pick a random radian for the player's starting position.
-            let radianIndex = this.randomService.getRandomNumber(radians.length - 1);
+            let radianIndex = this.randomService.getRandomNumber(
+                radians.length - 1,
+            );
             currentRadian = radians.splice(radianIndex, 1)[0];
         } else {
             currentRadian = radians.pop()!;
@@ -455,7 +611,7 @@ export default class PlayerService extends EventEmitter {
         // Get the desired player starting location.
         let startingLocation = {
             x: distanceFromCenter * Math.cos(currentRadian),
-            y: distanceFromCenter * Math.sin(currentRadian)
+            y: distanceFromCenter * Math.sin(currentRadian),
         };
 
         // Add the galaxy center x and y so that the desired location is relative to the center.
@@ -480,14 +636,22 @@ export default class PlayerService extends EventEmitter {
     }
 
     createHomeStarCarrier(game: Game, player: Player) {
-        let homeStar = this.starService.getPlayerHomeStar(game.galaxy.stars, player);
+        let homeStar = this.starService.getPlayerHomeStar(
+            game.galaxy.stars,
+            player,
+        );
 
         if (!homeStar) {
-            throw new Error('The player must have a home star in order to set up a carrier');
+            throw new Error(
+                "The player must have a home star in order to set up a carrier",
+            );
         }
 
         // Create a carrier for the home star.
-        let homeCarrier = this.carrierService.createAtStar(homeStar, game.galaxy.carriers);
+        let homeCarrier = this.carrierService.createAtStar(
+            homeStar,
+            game.galaxy.carriers,
+        );
 
         return homeCarrier;
     }
@@ -496,40 +660,51 @@ export default class PlayerService extends EventEmitter {
         player.lastSeen = date || DateTime.utc().toJSDate();
     }
 
-    async updateLastSeenLean(gameId: DBObjectId, userId: DBObjectId, ipAddress: string) {
-        await this.gameRepo.updateOne({
-            _id: gameId,
-            'galaxy.players.userId': userId
-        }, {
-            $set: {
-                'galaxy.players.$.lastSeen': DateTime.utc().toJSDate(),
-                'galaxy.players.$.lastSeenIP': ipAddress
-            }
-        });
+    async updateLastSeenLean(
+        gameId: DBObjectId,
+        userId: DBObjectId,
+        ipAddress: string,
+    ) {
+        await this.gameRepo.updateOne(
+            {
+                _id: gameId,
+                "galaxy.players.userId": userId,
+            },
+            {
+                $set: {
+                    "galaxy.players.$.lastSeen": DateTime.utc().toJSDate(),
+                    "galaxy.players.$.lastSeenIP": ipAddress,
+                },
+            },
+        );
     }
 
     deductCarrierUpkeepCost(game: Game, player: Player) {
         const upkeepCosts = {
-            'none': 0,
-            'cheap': 1,
-            'standard': 3,
-            'expensive': 6
+            none: 0,
+            cheap: 1,
+            standard: 3,
+            expensive: 6,
         };
 
-        let costPerCarrier = upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
+        let costPerCarrier =
+            upkeepCosts[game.settings.specialGalaxy.carrierUpkeepCost];
 
         if (!costPerCarrier) {
             return null;
         }
 
-        let carrierCount = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id).length;
+        let carrierCount = this.carrierService.listCarriersOwnedByPlayer(
+            game.galaxy.carriers,
+            player._id,
+        ).length;
         let totalCost = carrierCount * costPerCarrier;
 
         player.credits -= totalCost; // Note: Don't care if this goes into negative figures.
 
         return {
             carrierCount,
-            totalCost
+            totalCost,
         };
     }
 
@@ -539,40 +714,55 @@ export default class PlayerService extends EventEmitter {
 
     async updateGameNotes(game: Game, player: Player, notes: string) {
         if (notes.length > 2000) {
-            throw new ValidationError('Notes cannot exceed 2000 characters.');
+            throw new ValidationError("Notes cannot exceed 2000 characters.");
         }
 
         player.notes = notes;
 
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.notes': notes
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+                "galaxy.players._id": player._id,
+            },
+            {
+                $set: {
+                    "galaxy.players.$.notes": notes,
+                },
+            },
+        );
     }
 
     ownsOriginalHomeStar(game: Game, player: Player) {
-        const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const stars = this.starService.listStarsOwnedByPlayer(
+            game.galaxy.stars,
+            player._id,
+        );
 
-        return this.starService.getByIdBSForStars(stars, player.homeStarId!) != null;
+        return (
+            this.starService.getByIdBSForStars(stars, player.homeStarId!) !=
+            null
+        );
     }
 
     canSlotBeOpen(game: Game, player: Player) {
-
         if (this.gameTypeService.isCapitalStarEliminationMode(game)) {
             return this.ownsOriginalHomeStar(game, player);
         }
 
-        const stars: Star[] = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const stars: Star[] = this.starService.listStarsOwnedByPlayer(
+            game.galaxy.stars,
+            player._id,
+        );
 
         if (stars.length > 0) {
             return true;
         }
 
-        const carriers: Carrier[] = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id);
+        const carriers: Carrier[] =
+            this.carrierService.listCarriersOwnedByPlayer(
+                game.galaxy.carriers,
+                player._id,
+            );
 
         return carriers.length > 0;
     }
@@ -582,8 +772,7 @@ export default class PlayerService extends EventEmitter {
             // If the player isn't ready, increase their number of missed turns.
             if (!player.ready && !player.defeated) {
                 player.missedTurns++;
-            }
-            else {
+            } else {
                 // Reset the missed turns if the player was ready, we'll kick the player if they have missed consecutive turns only.
                 player.missedTurns = 0;
             }
@@ -595,15 +784,18 @@ export default class PlayerService extends EventEmitter {
         player.defeated = true;
         player.defeatedDate = DateTime.utc().toJSDate();
 
-        player.researchingNext = 'random'; // Set up the AI for random research.
+        player.researchingNext = "random"; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.
-        if (game.settings.gameTime.gameType === 'turnBased') {
+        if (game.settings.gameTime.gameType === "turnBased") {
             player.ready = true;
         }
 
         // Make sure all stars are marked as not ignored - This is so the AI can bulk upgrade them.
-        const playerStars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const playerStars = this.starService.listStarsOwnedByPlayer(
+            game.galaxy.stars,
+            player._id,
+        );
 
         for (let star of playerStars) {
             this.starService.resetIgnoreBulkUpgradeStatuses(star);
@@ -622,9 +814,14 @@ export default class PlayerService extends EventEmitter {
             return false;
         }
 
-        return game.galaxy.players.find(p => p.lastSeenIP
-            && p._id.toString() !== player._id.toString()
-            && p.lastSeenIP === player.lastSeenIP) != null;
+        return (
+            game.galaxy.players.find(
+                (p) =>
+                    p.lastSeenIP &&
+                    p._id.toString() !== player._id.toString() &&
+                    p.lastSeenIP === player.lastSeenIP,
+            ) != null
+        );
     }
 
     getKingOfTheHillPlayer(game: Game) {
@@ -638,14 +835,16 @@ export default class PlayerService extends EventEmitter {
     }
 
     async setHasSentTurnReminder(game: Game, player: Player, sent: boolean) {
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.players._id': player._id
-        }, {
-            $set: {
-                'galaxy.players.$.hasSentTurnReminder': sent
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+                "galaxy.players._id": player._id,
+            },
+            {
+                $set: {
+                    "galaxy.players.$.hasSentTurnReminder": sent,
+                },
+            },
+        );
     }
-
 }

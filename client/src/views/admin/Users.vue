@@ -1,9 +1,14 @@
 <template>
   <administration-page title="Recent Users" name="users">
-    <loading-spinner :loading="!users"/>
+    <loading-spinner :loading="!users" />
 
     <div v-if="users">
-      <user-panel v-for="user of users" :key="user.username" :user="user" :duplicate-i-ps="Boolean(getDuplicateIPs(user).length)"></user-panel>
+      <user-panel
+        v-for="user of users"
+        :key="user.username"
+        :user="user"
+        :duplicate-i-ps="Boolean(getDuplicateIPs(user).length)"
+      ></user-panel>
     </div>
   </administration-page>
 </template>
@@ -11,15 +16,15 @@
 <script setup lang="ts">
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
-import { useRoute } from 'vue-router';
+import { useRoute } from "vue-router";
 import { inject, onMounted, ref, computed, type Ref } from "vue";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import type { ListUser, AdminSpecificUserInfo } from "@solaris/common";
 import { getUsers } from "@/services/typedapi/admin";
 import UserPanel from "@/views/admin/components/UserPanel.vue";
-import { useUserStore } from '@/stores/user';
+import { useUserStore } from "@/stores/user";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
@@ -28,7 +33,7 @@ const userStore = useUserStore();
 const route = useRoute();
 
 const filterUser: Ref<string | undefined> = ref(undefined);
-const filterType: Ref<string> = ref('_id');
+const filterType: Ref<string> = ref("_id");
 const users: Ref<ListUser<string>[] | null> = ref(null);
 
 const isAdministrator = computed(() => userStore.isAdmin);
@@ -38,11 +43,15 @@ const getDuplicateIPs = (user: ListUser<string>) => {
     return [];
   }
 
-  const userA = user as (ListUser<string> & AdminSpecificUserInfo);
+  const userA = user as ListUser<string> & AdminSpecificUserInfo;
 
-  const otherUsers = users.value.filter(u => u._id !== userA._id) as (ListUser<string> & AdminSpecificUserInfo)[];
+  const otherUsers = users.value.filter(
+    (u) => u._id !== userA._id,
+  ) as (ListUser<string> & AdminSpecificUserInfo)[];
 
-  return otherUsers.filter(oU => oU.lastSeenIP && oU.lastSeenIP === userA.lastSeenIP).map(x => x.username);
+  return otherUsers
+    .filter((oU) => oU.lastSeenIP && oU.lastSeenIP === userA.lastSeenIP)
+    .map((x) => x.username);
 };
 
 const reqGetUsers = async () => {
@@ -55,7 +64,7 @@ const reqGetUsers = async () => {
     toast.error("Error loading users");
     return [];
   }
-}
+};
 
 const filteredUsers = async () => {
   const users = await reqGetUsers();
@@ -69,7 +78,7 @@ const filteredUsers = async () => {
   };
 
   return users.filter(filterF);
-}
+};
 
 const update = async () => {
   filterUser.value = route.query?.userId?.toString();
@@ -79,5 +88,4 @@ const update = async () => {
 onMounted(async () => await update());
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

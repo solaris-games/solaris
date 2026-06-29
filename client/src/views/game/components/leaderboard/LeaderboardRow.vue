@@ -1,80 +1,125 @@
 <template>
   <tr>
-    <td :style="{'width': '8px', 'background-color': playerColourSpec.value}"></td>
+    <td
+      :style="{ width: '8px', 'background-color': playerColourSpec.value }"
+    ></td>
     <td class="col-avatar" :title="playerColourSpec.alias + ' ' + player.shape">
-      <player-avatar :player="player" @onClick="onOpenPlayerDetailRequested(player)"/>
+      <player-avatar
+        :player="player"
+        @onClick="onOpenPlayerDetailRequested(player)"
+      />
     </td>
     <td class="ps-2 pt-3 pb-0">
       <!-- Text styling for defeated players? -->
       <h5 class="alias-title">
         {{ player.alias }}
-        <team-name v-if="shouldShowTeamNames" :player-id="player._id"/>
-        <span v-if="isKingOfTheHillMode && player.isKingOfTheHill" title="This player is the king of the hill">
+        <team-name v-if="shouldShowTeamNames" :player-id="player._id" />
+        <span
+          v-if="isKingOfTheHillMode && player.isKingOfTheHill"
+          title="This player is the king of the hill"
+        >
           <i class="fas fa-crown"></i>
         </span>
         <span v-if="player.defeated" :title="getPlayerStatus(player)">
-          <i v-if="!player.afk" class="fas fa-skull-crossbones" title="This player has been defeated"></i>
-          <i v-if="player.afk" class="fas fa-user-clock" title="This player is AFK"></i>
+          <i
+            v-if="!player.afk"
+            class="fas fa-skull-crossbones"
+            title="This player has been defeated"
+          ></i>
+          <i
+            v-if="player.afk"
+            class="fas fa-user-clock"
+            title="This player is AFK"
+          ></i>
         </span>
-        <span v-if="canReadyToQuit && player.readyToQuit" @click="unconfirmReadyToQuit(player)">
-          <i class="fas fa-check text-warning"
-             title="This player is ready to quit - Ends the game early if all active players are ready to quit"></i>
+        <span
+          v-if="canReadyToQuit && player.readyToQuit"
+          @click="unconfirmReadyToQuit(player)"
+        >
+          <i
+            class="fas fa-check text-warning"
+            title="This player is ready to quit - Ends the game early if all active players are ready to quit"
+          ></i>
         </span>
       </h5>
     </td>
-    <td class="fit pt-3 pe-2" v-if="isStarCountWinCondition || isKingOfTheHillMode">
+    <td
+      class="fit pt-3 pe-2"
+      v-if="isStarCountWinCondition || isKingOfTheHillMode"
+    >
       <span class="d-xs-block d-sm-none">
         <i class="fas fa-star me-0"></i> {{ player.stats!.totalStars }}
       </span>
       <span class="d-none d-sm-block">
-        {{ player.stats!.totalStars }} Star<span v-if="player.stats!.totalStars !== 1">s</span>
+        {{ player.stats!.totalStars }} Star<span
+          v-if="player.stats!.totalStars !== 1"
+          >s</span
+        >
       </span>
     </td>
     <td class="fit pt-3 pe-2" v-if="isHomeStarsWinCondition">
       <span class="d-xs-block d-sm-none">
-        <i class="fas fa-star me-0"></i> {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }})
+        <i class="fas fa-star me-0"></i> {{ player.stats!.totalHomeStars }}({{
+          player.stats!.totalStars
+        }})
       </span>
       <span class="d-none d-sm-block">
-        {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }}) Star<span v-if="player.stats!.totalStars !== 1">s</span>
+        {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }})
+        Star<span v-if="player.stats!.totalStars !== 1">s</span>
       </span>
     </td>
-    <td class="pt-2 pb-2 pe-1 text-center turn-status" v-if="isTurnBasedGame && canEndTurn">
+    <td
+      class="pt-2 pb-2 pe-1 text-center turn-status"
+      v-if="isTurnBasedGame && canEndTurn"
+    >
       <h5 v-if="player.ready && !isUserPlayer(player)" class="pt-2 pe-2 ps-2">
-        <i class="fas fa-check text-success" title="This player has completed their turn"></i>
+        <i
+          class="fas fa-check text-success"
+          title="This player has completed their turn"
+        ></i>
       </h5>
 
-      <ready-status-button :smallButtons="false"
-        v-if="!isHistoricalMode && getUserPlayer() && isUserPlayer(player) && !getUserPlayer()?.defeated"/>
+      <ready-status-button
+        :smallButtons="false"
+        v-if="
+          !isHistoricalMode &&
+          getUserPlayer() &&
+          isUserPlayer(player) &&
+          !getUserPlayer()?.defeated
+        "
+      />
     </td>
     <td class="fit pt-2 pb-2 pe-2">
-      <button class="btn btn-outline-info" @click="panToPlayer(player)"><i class="fas fa-eye"></i></button>
+      <button class="btn btn-outline-info" @click="panToPlayer(player)">
+        <i class="fas fa-eye"></i>
+      </button>
     </td>
   </tr>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
-import TeamName from '@/views/game/components/shared/TeamName.vue';
-import PlayerAvatar from '@/views/game/components/menu/PlayerAvatar.vue';
-import ReadyStatusButton from '@/views/game/components/menu/ReadyStatusButton.vue';
-import GameHelper from '@/services/gameHelper';
-import {eventBusInjectionKey} from "@/eventBus";
-import { inject, computed } from 'vue';
-import type { Player } from '@/types/game';
+import { useGameStore } from "@/stores/game";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import TeamName from "@/views/game/components/shared/TeamName.vue";
+import PlayerAvatar from "@/views/game/components/menu/PlayerAvatar.vue";
+import ReadyStatusButton from "@/views/game/components/menu/ReadyStatusButton.vue";
+import GameHelper from "@/services/gameHelper";
+import { eventBusInjectionKey } from "@/eventBus";
+import { inject, computed } from "vue";
+import type { Player } from "@/types/game";
 
-import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import { notReadyToQuit } from '@/services/typedapi/game';
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { useColourStore } from '@/stores/colour';
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
+import { notReadyToQuit } from "@/services/typedapi/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { useColourStore } from "@/stores/colour";
 
 const props = defineProps<{
-  player: Player,
-  showTeamNames: boolean,
+  player: Player;
+  showTeamNames: boolean;
 }>();
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string],
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
@@ -94,7 +139,7 @@ const shouldShowTeamNames = computed(() => {
 });
 
 const isTurnBasedGame = computed(() => {
-  return store.game!.settings.gameTime.gameType === 'turnBased';
+  return store.game!.settings.gameTime.gameType === "turnBased";
 });
 
 const isKingOfTheHillMode = computed(() => {
@@ -106,9 +151,11 @@ const canEndTurn = computed(() => {
 });
 
 const canReadyToQuit = computed(() => {
-  return store.game!.settings.general.readyToQuit === 'enabled'
-    && store.game!.state.startDate
-    && store.game!.state.productionTick;
+  return (
+    store.game!.settings.general.readyToQuit === "enabled" &&
+    store.game!.state.startDate &&
+    store.game!.state.productionTick
+  );
 });
 
 const isStarCountWinCondition = computed(() => {
@@ -134,7 +181,7 @@ const getPlayerStatus = (player: Player) => {
 };
 
 const onOpenPlayerDetailRequested = (e: Player) => {
-  emit('onOpenPlayerDetailRequested', e._id);
+  emit("onOpenPlayerDetailRequested", e._id);
 };
 
 const unconfirmReadyToQuit = async (player: Player) => {
@@ -151,11 +198,12 @@ const unconfirmReadyToQuit = async (player: Player) => {
 };
 
 const panToPlayer = (player: Player) => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: player });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+    player: player,
+  });
   onOpenPlayerDetailRequested(player);
 };
 </script>
-
 
 <style scoped>
 .col-avatar {

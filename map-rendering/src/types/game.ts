@@ -1,4 +1,9 @@
-import type { Game as CGame, Player as CPlayer, Star as CStar, Carrier as CCarrier } from "@solaris/common";
+import type {
+    Game as CGame,
+    Player as CPlayer,
+    Star as CStar,
+    Carrier as CCarrier,
+} from "@solaris/common";
 
 export type Game = CGame<string>;
 export type Player = CPlayer<string>;

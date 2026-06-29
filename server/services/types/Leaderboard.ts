@@ -1,7 +1,7 @@
 import { DBObjectId } from "./DBObjectId";
 import { Guild } from "@solaris/common";
 import { Player } from "./Player";
-import {Team} from "./Game";
+import { Team } from "./Game";
 
 export interface PlayerStatistics {
     totalStars: number;
@@ -17,18 +17,18 @@ export interface PlayerStatistics {
     totalStarSpecialists: number;
     totalCarrierSpecialists: number;
     totalSpecialists: number;
-};
+}
 
 export interface LeaderboardPlayer {
     player: Player;
     stats: PlayerStatistics;
     isKingOfTheHill?: boolean;
-};
+}
 
 export interface PlayerLeaderboard {
     leaderboard: LeaderboardPlayer[];
     fullKey: string;
-};
+}
 
 export interface TeamLeaderboard {
     leaderboard: LeaderboardTeam[];
@@ -41,8 +41,8 @@ export interface LeaderboardTeam {
 }
 
 export interface LeaderboardUser {
-    _id: DBObjectId,
+    _id: DBObjectId;
     username: string;
     position: number;
     guild: Guild<DBObjectId> | null;
-};
+}

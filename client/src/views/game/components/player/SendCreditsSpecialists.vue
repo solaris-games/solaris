@@ -1,54 +1,80 @@
 <template>
-<div class="row bg-dark pt-2 pb-2">
-  <div class="col-12">
-    <form-error-list v-bind:errors="errors"/>
-  </div>
+  <div class="row bg-dark pt-2 pb-2">
+    <div class="col-12">
+      <form-error-list v-bind:errors="errors" />
+    </div>
 
-  <div class="col-12">
-    <p class="mb-2">Send <strong>Specialist Tokens</strong>. (You have <span class="text-warning">{{userPlayer.creditsSpecialists}}</span>)</p>
+    <div class="col-12">
+      <p class="mb-2">
+        Send <strong>Specialist Tokens</strong>. (You have
+        <span class="text-warning">{{ userPlayer.creditsSpecialists }}</span
+        >)
+      </p>
 
-    <form class="row">
-      <div class="col-7">
-        <div class="input-group">
-          <span class="input-group-text">
-            <i class="fas fa-user-astronaut"></i>
-          </span>
-          <input type="number" class="form-control" v-model="amount"/>
+      <form class="row">
+        <div class="col-7">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fas fa-user-astronaut"></i>
+            </span>
+            <input type="number" class="form-control" v-model="amount" />
+          </div>
         </div>
-      </div>
-      <div class="col-5">
-        <div class="d-grid gap-2">
-          <modalButton modalName="sendCreditsSpecialistsModal" classText="btn btn-success" :disabled="isHistoricalMode || isSendingCreditsSpecialists || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
+        <div class="col-5">
+          <div class="d-grid gap-2">
+            <modalButton
+              modalName="sendCreditsSpecialistsModal"
+              classText="btn btn-success"
+              :disabled="
+                isHistoricalMode || isSendingCreditsSpecialists || amount <= 0
+              "
+              ><i class="fas fa-paper-plane"></i> Send</modalButton
+            >
+          </div>
         </div>
-      </div>
-    </form>
-  </div>
+      </form>
+    </div>
 
-  <dialogModal modalName="sendCreditsSpecialistsModal" titleText="Send Specialist Tokens" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
-    <p>Are you sure you want to send <b>{{amount}}</b> specialist token(s) to <b>{{player.alias}}</b>?</p>
-  </dialogModal>
-</div>
+    <dialogModal
+      modalName="sendCreditsSpecialistsModal"
+      titleText="Send Specialist Tokens"
+      cancelText="No"
+      confirmText="Yes"
+      @onConfirm="confirmSendCredits"
+    >
+      <p>
+        Are you sure you want to send <b>{{ amount }}</b> specialist token(s) to
+        <b>{{ player.alias }}</b
+        >?
+      </p>
+    </dialogModal>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { ref, inject, computed } from 'vue';
-import ModalButton from '../../../components/modal/ModalButton.vue'
-import DialogModal from '../../../components/modal/DialogModal.vue'
-import FormErrorList from '../../../components/FormErrorList.vue'
-import type {Game, Player} from "@/types/game";
-import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {sendCreditsSpecialists} from "@/services/typedapi/trade";
-import {useIsHistoricalMode} from "@/util/reactiveHooks";
+import { useGameStore } from "@/stores/game";
+import { ref, inject, computed } from "vue";
+import ModalButton from "../../../components/modal/ModalButton.vue";
+import DialogModal from "../../../components/modal/DialogModal.vue";
+import FormErrorList from "../../../components/FormErrorList.vue";
+import type { Game, Player } from "@/types/game";
+import {
+  extractErrors,
+  formatError,
+  httpInjectionKey,
+  isOk,
+} from "@/services/typedapi";
+import { sendCreditsSpecialists } from "@/services/typedapi/trade";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const props = defineProps<{
-  player: Player,
-  userPlayer: Player,
+  player: Player;
+  userPlayer: Player;
 }>();
 
 const emit = defineEmits<{
-  onCreditsSpecialistsSent: [amount: number],
+  onCreditsSpecialistsSent: [amount: number];
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -67,10 +93,16 @@ const confirmSendCredits = async () => {
   isSendingCreditsSpecialists.value = true;
   amount.value = Math.floor(amount.value);
 
-  const response = await sendCreditsSpecialists(httpClient)(game.value._id, props.player._id, amount.value);
+  const response = await sendCreditsSpecialists(httpClient)(
+    game.value._id,
+    props.player._id,
+    amount.value,
+  );
   if (isOk(response)) {
     emit("onCreditsSpecialistsSent", amount.value);
-    toast.default(`Sent ${amount.value} specialist tokens to ${props.player.alias}.`);
+    toast.default(
+      `Sent ${amount.value} specialist tokens to ${props.player.alias}.`,
+    );
 
     props.userPlayer.credits -= amount.value;
     amount.value = 0;
@@ -81,7 +113,7 @@ const confirmSendCredits = async () => {
   }
 
   isSendingCreditsSpecialists.value = false;
-}
+};
 </script>
 
 <style scoped>

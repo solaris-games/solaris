@@ -1,52 +1,75 @@
 <template>
-<div class="menu-page container" v-if="carrierId">
-  <menu-title title="Rename Carrier" @onCloseRequested="e => emit('onCloseRequested', e)" :disabled="isSaving">
-    <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1"><i class="fas fa-eye"></i></button>
-  </menu-title>
+  <div class="menu-page container" v-if="carrierId">
+    <menu-title
+      title="Rename Carrier"
+      @onCloseRequested="(e) => emit('onCloseRequested', e)"
+      :disabled="isSaving"
+    >
+      <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1">
+        <i class="fas fa-eye"></i>
+      </button>
+    </menu-title>
 
-  <form @submit="doRename">
-    <div class="mb-2">
-      <input type="text" class="form-control" id="name" placeholder="Enter a new carrier name" v-model="currentName" minlength="3" maxlength="30">
-    </div>
-    <div class="mb-2 row pb-2 pt-2 ">
-      <div class="col">
-        <button type="button" class="btn btn-sm btn-primary" :disabled="isSaving" @click="_ => emit('onOpenCarrierDetailRequested', carrierId)">
-          <i class="fas fa-arrow-left"></i>
-          Back to Carrier
-        </button>
+    <form @submit="doRename">
+      <div class="mb-2">
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          placeholder="Enter a new carrier name"
+          v-model="currentName"
+          minlength="3"
+          maxlength="30"
+        />
       </div>
-      <div class="col-auto">
-        <button type="submit" class="btn btn-sm btn-success" :disabled="isHistoricalMode || isSaving || isNameInvalid">
-          <i class="fas fa-save"></i>
-          Rename
-        </button>
+      <div class="mb-2 row pb-2 pt-2">
+        <div class="col">
+          <button
+            type="button"
+            class="btn btn-sm btn-primary"
+            :disabled="isSaving"
+            @click="(_) => emit('onOpenCarrierDetailRequested', carrierId)"
+          >
+            <i class="fas fa-arrow-left"></i>
+            Back to Carrier
+          </button>
+        </div>
+        <div class="col-auto">
+          <button
+            type="submit"
+            class="btn btn-sm btn-success"
+            :disabled="isHistoricalMode || isSaving || isNameInvalid"
+          >
+            <i class="fas fa-save"></i>
+            Rename
+          </button>
+        </div>
       </div>
-    </div>
-  </form>
-</div>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { MapCommandEventBusEventNames } from '@solaris/map-rendering';
-import MenuTitle from '../MenuTitle.vue'
-import {eventBusInjectionKey} from "@/eventBus";
-import { inject, ref, computed } from 'vue';
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import type {Carrier, Game} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import MenuTitle from "../MenuTitle.vue";
+import { eventBusInjectionKey } from "@/eventBus";
+import { inject, ref, computed } from "vue";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
+import type { Carrier, Game } from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import type {MapObject} from "@solaris/common";
-import {rename} from "@/services/typedapi/carrier";
+import type { MapObject } from "@solaris/common";
+import { rename } from "@/services/typedapi/carrier";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const props = defineProps<{
-  carrierId: string,
+  carrierId: string;
 }>();
 
 const emit = defineEmits<{
-  (e: 'onCloseRequested', event: Event): void;
-  (e: 'onOpenCarrierDetailRequested', carrierId: string): void;
+  (e: "onCloseRequested", event: Event): void;
+  (e: "onOpenCarrierDetailRequested", carrierId: string): void;
 }>();
 
 const store = useGameStore();
@@ -56,7 +79,9 @@ const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
 const game = computed<Game>(() => store.game!);
-const carrier = computed<Carrier>(() => GameHelper.getCarrierById(game.value, props.carrierId)!);
+const carrier = computed<Carrier>(() =>
+  GameHelper.getCarrierById(game.value, props.carrierId)!,
+);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -72,7 +97,9 @@ const isNameInvalid = computed(() => {
 const viewOnMap = (e: Event) => {
   e.preventDefault();
 
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {object: carrier.value as MapObject<string> });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
+    object: carrier.value as MapObject<string>,
+  });
 };
 
 const doRename = async (e: Event) => {
@@ -86,16 +113,20 @@ const doRename = async (e: Event) => {
 
   const trimmed = currentName.value.trim();
 
-  const response = await rename(httpClient)(game.value._id, props.carrierId, trimmed);
+  const response = await rename(httpClient)(
+    game.value._id,
+    props.carrierId,
+    trimmed,
+  );
 
   if (isOk(response)) {
     carrier.value.name = trimmed;
 
     toast.default(`Carrier renamed to ${trimmed}.`);
 
-    emit('onOpenCarrierDetailRequested', props.carrierId);
+    emit("onOpenCarrierDetailRequested", props.carrierId);
   } else {
-    toast.error('Failed to rename carrier.');
+    toast.error("Failed to rename carrier.");
     console.error(formatError(response));
   }
 

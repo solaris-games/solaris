@@ -1,13 +1,16 @@
 <template>
   <div class="menu-page container">
-    <menu-title title="Select carrier" @onCloseRequested="onCloseRequested"></menu-title>
+    <menu-title
+      title="Select carrier"
+      @onCloseRequested="onCloseRequested"
+    ></menu-title>
   </div>
 </template>
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted } from "vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
-import type {Carrier} from "@/types/game.ts";
-import {useMapClickStore} from "@/stores/mapClick.ts";
+import type { Carrier } from "@/types/game.ts";
+import { useMapClickStore } from "@/stores/mapClick.ts";
 
 const props = defineProps<{
   callback: (carrier: Carrier | undefined) => void;
@@ -35,8 +38,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   mapClickStore.setStarClickCallback(null);
-})
+});
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>

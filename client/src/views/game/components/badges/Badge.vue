@@ -1,34 +1,57 @@
 <template>
-    <div v-if="badgeName" class="badge-container" @click="onOpenPurchasePlayerBadgeRequested">
-        <picture style="display: contents">
-          <source :srcset="badgeWebpSrc" type="image/webp">
-          <img class="badge-img" :src="badgeSrc" :title="badge.badge" :alt="badgeName"/>
-        </picture>
-        <span class="badge-label" :title="badgeName">{{badgeName}}</span>
-    </div>
+  <div
+    v-if="badgeName"
+    class="badge-container"
+    @click="onOpenPurchasePlayerBadgeRequested"
+  >
+    <picture style="display: contents">
+      <source :srcset="badgeWebpSrc" type="image/webp" />
+      <img
+        class="badge-img"
+        :src="badgeSrc"
+        :title="badge.badge"
+        :alt="badgeName"
+      />
+    </picture>
+    <span class="badge-label" :title="badgeName">{{ badgeName }}</span>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type {AwardedBadge, Badge} from "@solaris/common";
+import { computed } from "vue";
+import type { AwardedBadge, Badge } from "@solaris/common";
 
 const props = defineProps<{
-  badge: AwardedBadge<string>,
-  allBadges: Badge[],
+  badge: AwardedBadge<string>;
+  allBadges: Badge[];
 }>();
 
 const emit = defineEmits<{
-  onOpenPurchasePlayerBadgeRequested: []
+  onOpenPurchasePlayerBadgeRequested: [];
 }>();
 
 const onOpenPurchasePlayerBadgeRequested = () => {
-  emit('onOpenPurchasePlayerBadgeRequested');
-}
+  emit("onOpenPurchasePlayerBadgeRequested");
+};
 
-const badgeName = computed(() => props.allBadges.find(b => b.key === props.badge.badge)?.name);
+const badgeName = computed(
+  () => props.allBadges.find((b) => b.key === props.badge.badge)?.name,
+);
 
-const badgeSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.png`, import.meta.url).href)
-const badgeWebpSrc = computed(() => new URL(`../../../../assets/badges/${props.badge.badge}.webp`, import.meta.url).href)
+const badgeSrc = computed(
+  () =>
+    new URL(
+      `../../../../assets/badges/${props.badge.badge}.png`,
+      import.meta.url,
+    ).href,
+);
+const badgeWebpSrc = computed(
+  () =>
+    new URL(
+      `../../../../assets/badges/${props.badge.badge}.webp`,
+      import.meta.url,
+    ).href,
+);
 </script>
 
 <style scoped>

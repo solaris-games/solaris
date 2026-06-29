@@ -1,42 +1,54 @@
-import {boolean, GameSettingEnabledDisabled, number, object, string, Validator} from "@solaris/common";
-import {enabledDisabled} from "./validators";
+import {
+    boolean,
+    GameSettingEnabledDisabled,
+    number,
+    object,
+    string,
+    Validator,
+} from "@solaris/common";
+import { enabledDisabled } from "./validators";
 
 export type AdminSetUserRoleRequest = {
-    enabled: boolean,
-}
+    enabled: boolean;
+};
 
-export const parseAdminSetUserRoleRequest: Validator<AdminSetUserRoleRequest> = object({
-    enabled: boolean,
-});
+export const parseAdminSetUserRoleRequest: Validator<AdminSetUserRoleRequest> =
+    object({
+        enabled: boolean,
+    });
 
 export type AdminSetUserCreditsRequest = {
-    credits: number,
-}
+    credits: number;
+};
 
-export const parseAdminSetUserCreditsRequest: Validator<AdminSetUserCreditsRequest> = object({
-    credits: number,
-});
+export const parseAdminSetUserCreditsRequest: Validator<AdminSetUserCreditsRequest> =
+    object({
+        credits: number,
+    });
 
 export type AdminSetGameFeaturedRequest = {
-    featured: boolean,
-}
+    featured: boolean;
+};
 
-export const parseAdminSetGameFeaturedRequest: Validator<AdminSetGameFeaturedRequest> = object({
-    featured: boolean,
-});
+export const parseAdminSetGameFeaturedRequest: Validator<AdminSetGameFeaturedRequest> =
+    object({
+        featured: boolean,
+    });
 
 export type AdminSetGameTimeMachineRequest = {
-    timeMachine: GameSettingEnabledDisabled,
-}
+    timeMachine: GameSettingEnabledDisabled;
+};
 
-export const parseAdminSetGameTimeMachineRequest: Validator<AdminSetGameTimeMachineRequest> = object({
-    timeMachine: enabledDisabled,
-});
+export const parseAdminSetGameTimeMachineRequest: Validator<AdminSetGameTimeMachineRequest> =
+    object({
+        timeMachine: enabledDisabled,
+    });
 
 export type AdminAddWarningRequest = {
-    text: string,
-}
+    text: string;
+};
 
-export const parseAdminAddWarningRequest: Validator<AdminAddWarningRequest> = object({
-    text: string,
-});
+export const parseAdminAddWarningRequest: Validator<AdminAddWarningRequest> =
+    object({
+        text: string,
+    });

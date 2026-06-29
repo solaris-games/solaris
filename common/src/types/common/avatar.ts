@@ -5,8 +5,8 @@ export interface Avatar {
     description: string;
     price: number;
     isPatronAvatar: boolean;
-};
+}
 
 export interface UserAvatar extends Avatar {
     purchased: boolean;
-};
+}

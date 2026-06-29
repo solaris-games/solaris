@@ -1,6 +1,11 @@
-import { CombatService } from '../src/services/combat';
-import type { CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup } from '../src/types/common/combat';
-import type { WeaponsDetail } from '../src/services/technology';
+import { CombatService } from "../src/services/combat";
+import type {
+    CombatBaseCarrier,
+    CombatBasePlayer,
+    CombatBaseStar,
+    CombatGroup,
+} from "../src/types/common/combat";
+import type { WeaponsDetail } from "../src/services/technology";
 
 // ---------------------------------------------------------------------------
 // Stub dependencies
@@ -24,7 +29,9 @@ function makeWeaponsDetail(level: number): WeaponsDetail {
 }
 
 /** Build an attackAgainst map: each entry targets one group index at the given level. */
-function makeAttackMap(targets: Array<[targetIdx: number, level: number]>): Map<number, WeaponsDetail> {
+function makeAttackMap(
+    targets: Array<[targetIdx: number, level: number]>,
+): Map<number, WeaponsDetail> {
     const m = new Map<number, WeaponsDetail>();
     for (const [idx, level] of targets) {
         m.set(idx, makeWeaponsDetail(level));
@@ -33,19 +40,33 @@ function makeAttackMap(targets: Array<[targetIdx: number, level: number]>): Map<
 }
 
 type TestPlayer = CombatBasePlayer<string>;
-type TestStar   = CombatBaseStar<string>;
+type TestStar = CombatBaseStar<string>;
 type TestCarrier = CombatBaseCarrier<string>;
-type TestGroup  = CombatGroup<string, TestPlayer, TestStar, TestCarrier>;
+type TestGroup = CombatGroup<string, TestPlayer, TestStar, TestCarrier>;
 
 function makePlayer(id: string, weaponsLevel: number): TestPlayer {
     return { _id: id, research: { weapons: { level: weaponsLevel } } };
 }
 
-function makeCarrier(id: string, ownedByPlayerId: string, ships: number): TestCarrier {
-    return { _id: id, ships, specialistId: null, specialistTargetedPlayers: [], ownedByPlayerId };
+function makeCarrier(
+    id: string,
+    ownedByPlayerId: string,
+    ships: number,
+): TestCarrier {
+    return {
+        _id: id,
+        ships,
+        specialistId: null,
+        specialistTargetedPlayers: [],
+        ownedByPlayerId,
+    };
 }
 
-function makeStar(id: string, ownedByPlayerId: string, ships: number): TestStar {
+function makeStar(
+    id: string,
+    ownedByPlayerId: string,
+    ships: number,
+): TestStar {
     return { _id: id, ships, specialistId: null, ownedByPlayerId };
 }
 
@@ -98,15 +119,13 @@ function makeGroup(
 //
 // ---------------------------------------------------------------------------
 
-describe('CombatService – computeBasic', () => {
-
+describe("CombatService – computeBasic", () => {
     // -----------------------------------------------------------------------
     // Carrier-to-star (isCarrierToStarCombat = true)
     // -----------------------------------------------------------------------
 
-    describe('carrier-to-star', () => {
-
-        it('equal ships, equal weapons – defender wins by first-mover advantage', () => {
+    describe("carrier-to-star", () => {
+        it("equal ships, equal weapons – defender wins by first-mover advantage", () => {
             // D=10 @ weps 1, A=10 @ weps 1.
             // Round 0 (defender first): D=10, A=9.
             // Rounds 1-9 (simultaneous, 1 dmg each side): D-=1, A-=1.
@@ -121,7 +140,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(0);
         });
 
-        it('attacker overwhelming – attacker wins', () => {
+        it("attacker overwhelming – attacker wins", () => {
             // D=10 @ weps 1, A=50 @ weps 1.
             // Round 0: D=10, A=49.
             // 10 more rounds simultaneous: D reaches 0, A still has 39.
@@ -135,7 +154,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(39);
         });
 
-        it('defender overwhelming – defender wins', () => {
+        it("defender overwhelming – defender wins", () => {
             // D=50 @ weps 1, A=10 @ weps 1.
             // Round 0: D=50, A=9.
             // 9 more rounds: D=41, A=0.
@@ -149,7 +168,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(0);
         });
 
-        it('defender higher weapons – defender wins with ships to spare', () => {
+        it("defender higher weapons – defender wins with ships to spare", () => {
             // D=10 @ weps 3, A=10 @ weps 1.
             // Round 0: D=10, A=7  (defender deals 3).
             // Round 1: D=9, A=4; Round 2: D=8, A=1; Round 3: D=7, A=0.
@@ -163,7 +182,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(0);
         });
 
-        it('attacker higher weapons – attacker wins', () => {
+        it("attacker higher weapons – attacker wins", () => {
             // D=10 @ weps 1, A=10 @ weps 3.
             // Round 0: D=10, A=9.
             // Round 1: D=7, A=8; Round 2: D=4, A=7; Round 3: D=1, A=6; Round 4: D=0, A=5.
@@ -177,7 +196,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(5);
         });
 
-        it('mutual destruction – both sides reach zero', () => {
+        it("mutual destruction – both sides reach zero", () => {
             // D=1 @ weps 1, A=2 @ weps 1.
             // Round 0: D=1, A=1.  Round 1: D=0, A=0.
             const result = service.calculateBasic(
@@ -189,16 +208,14 @@ describe('CombatService – computeBasic', () => {
             expect(result.defender.shipsAfter).toBe(0);
             expect(result.attacker.shipsAfter).toBe(0);
         });
-
     });
 
     // -----------------------------------------------------------------------
     // Carrier-to-carrier (isCarrierToStarCombat = false)
     // -----------------------------------------------------------------------
 
-    describe('carrier-to-carrier', () => {
-
-        it('equal ships, equal weapons – mutual destruction (no first-mover)', () => {
+    describe("carrier-to-carrier", () => {
+        it("equal ships, equal weapons – mutual destruction (no first-mover)", () => {
             // Both deal 1 damage simultaneously each round.
             // After 10 rounds: both at 0.
             const result = service.calculateBasic(
@@ -211,7 +228,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(0);
         });
 
-        it('attacker has more ships – attacker wins', () => {
+        it("attacker has more ships – attacker wins", () => {
             // D=5 @ weps 1, A=10 @ weps 1.
             // After 5 rounds: D=0, A=5.
             const result = service.calculateBasic(
@@ -224,7 +241,7 @@ describe('CombatService – computeBasic', () => {
             expect(result.attacker.shipsAfter).toBe(5);
         });
 
-        it('defender has more ships – defender wins', () => {
+        it("defender has more ships – defender wins", () => {
             // D=10 @ weps 1, A=5 @ weps 1.
             // After 5 rounds: D=5, A=0.
             const result = service.calculateBasic(
@@ -236,14 +253,13 @@ describe('CombatService – computeBasic', () => {
             expect(result.defender.shipsAfter).toBe(5);
             expect(result.attacker.shipsAfter).toBe(0);
         });
-
     });
 
     // -----------------------------------------------------------------------
     // shipsBefore consistency
     // -----------------------------------------------------------------------
 
-    it('shipsBefore equals the original ship count for both sides', () => {
+    it("shipsBefore equals the original ship count for both sides", () => {
         const result = service.calculateBasic(
             { ships: 17, weaponsLevel: 2 },
             { ships: 11, weaponsLevel: 3 },
@@ -254,17 +270,20 @@ describe('CombatService – computeBasic', () => {
         expect(result.attacker.shipsBefore).toBe(11);
     });
 
-    it('shipsLost = shipsBefore - shipsAfter for both sides', () => {
+    it("shipsLost = shipsBefore - shipsAfter for both sides", () => {
         const result = service.calculateBasic(
             { ships: 20, weaponsLevel: 1 },
             { ships: 15, weaponsLevel: 2 },
             true,
         );
 
-        expect(result.defender.shipsLost).toBe(result.defender.shipsBefore - result.defender.shipsAfter);
-        expect(result.attacker.shipsLost).toBe(result.attacker.shipsBefore - result.attacker.shipsAfter);
+        expect(result.defender.shipsLost).toBe(
+            result.defender.shipsBefore - result.defender.shipsAfter,
+        );
+        expect(result.attacker.shipsLost).toBe(
+            result.attacker.shipsBefore - result.attacker.shipsAfter,
+        );
     });
-
 });
 
 // ---------------------------------------------------------------------------
@@ -281,22 +300,20 @@ describe('CombatService – computeBasic', () => {
 //
 // ---------------------------------------------------------------------------
 
-describe('CombatService – computeGroups', () => {
-
+describe("CombatService – computeGroups", () => {
     // -----------------------------------------------------------------------
     // Two-group scenarios – validates that computeGroups and computeBasic
     // agree when given equivalent setups.
     // -----------------------------------------------------------------------
 
-    describe('two groups', () => {
-
-        it('carrier-to-star: equal forces – defender wins by first-mover advantage', () => {
+    describe("two groups", () => {
+        it("carrier-to-star: equal forces – defender wins by first-mover advantage", () => {
             // Mirrors computeBasic C-to-S equal-forces case.
             // G0 (star/defender, idx 0) attacks G1; G1 (attacker, idx 1) attacks G0.
-            const star = makeStar('s0', 'p0', 10);
+            const star = makeStar("s0", "p0", 10);
             const groups: TestGroup[] = [
-                makeGroup('p0', 10, 1, true,  [[1, 1]], star),
-                makeGroup('p1', 10, 1, false, [[0, 1]]),
+                makeGroup("p0", 10, 1, true, [[1, 1]], star),
+                makeGroup("p1", 10, 1, false, [[0, 1]]),
             ];
 
             const result = service.calculateGroups(groups, true);
@@ -305,11 +322,11 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[1].shipsAfter).toBe(0);
         });
 
-        it('carrier-to-carrier: equal forces – mutual destruction', () => {
+        it("carrier-to-carrier: equal forces – mutual destruction", () => {
             // Both groups attack each other simultaneously; equal damage per round.
             const groups: TestGroup[] = [
-                makeGroup('p0', 10, 1, false, [[1, 1]]),
-                makeGroup('p1', 10, 1, false, [[0, 1]]),
+                makeGroup("p0", 10, 1, false, [[1, 1]]),
+                makeGroup("p1", 10, 1, false, [[0, 1]]),
             ];
 
             const result = service.calculateGroups(groups, false);
@@ -318,12 +335,12 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[1].shipsAfter).toBe(0);
         });
 
-        it('carrier-to-carrier: unequal ships – larger group wins', () => {
+        it("carrier-to-carrier: unequal ships – larger group wins", () => {
             // G0: 15 ships, G1: 7 ships, equal weapons.
             // After 7 rounds: G0=8, G1=0.
             const groups: TestGroup[] = [
-                makeGroup('p0', 15, 1, false, [[1, 1]]),
-                makeGroup('p1',  7, 1, false, [[0, 1]]),
+                makeGroup("p0", 15, 1, false, [[1, 1]]),
+                makeGroup("p1", 7, 1, false, [[0, 1]]),
             ];
 
             const result = service.calculateGroups(groups, false);
@@ -331,16 +348,14 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[0].shipsAfter).toBe(8);
             expect(result.groups[1].shipsAfter).toBe(0);
         });
-
     });
 
     // -----------------------------------------------------------------------
     // Three-group scenarios
     // -----------------------------------------------------------------------
 
-    describe('three groups', () => {
-
-        it('carrier-to-carrier: one strong group outlasts two weaker groups', () => {
+    describe("three groups", () => {
+        it("carrier-to-carrier: one strong group outlasts two weaker groups", () => {
             // G0: 10 ships @ weps 1; G1: 5 ships @ weps 1; G2: 5 ships @ weps 1.
             // Every group attacks all others.
             //
@@ -353,9 +368,18 @@ describe('CombatService – computeGroups', () => {
             // Round 1: G0=6, G1=1, G2=1
             // Round 2: G0=4, G1=0, G2=0  → G0 wins.
             const groups: TestGroup[] = [
-                makeGroup('p0', 10, 1, false, [[1, 1], [2, 1]]),
-                makeGroup('p1',  5, 1, false, [[0, 1], [2, 1]]),
-                makeGroup('p2',  5, 1, false, [[0, 1], [1, 1]]),
+                makeGroup("p0", 10, 1, false, [
+                    [1, 1],
+                    [2, 1],
+                ]),
+                makeGroup("p1", 5, 1, false, [
+                    [0, 1],
+                    [2, 1],
+                ]),
+                makeGroup("p2", 5, 1, false, [
+                    [0, 1],
+                    [1, 1],
+                ]),
             ];
 
             const result = service.calculateGroups(groups, false);
@@ -365,7 +389,7 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[2].shipsAfter).toBe(0);
         });
 
-        it('carrier-to-star: two attackers vs defender – defender wins when its fleet is large enough', () => {
+        it("carrier-to-star: two attackers vs defender – defender wins when its fleet is large enough", () => {
             // G0 (star, idx 0): 20 ships @ weps 1 – attacks both attackers.
             // G1 (attacker, idx 1): 10 ships @ weps 1 – attacks G0 and G2.
             // G2 (attacker, idx 2): 10 ships @ weps 1 – attacks G0 and G1.
@@ -381,11 +405,27 @@ describe('CombatService – computeGroups', () => {
             // Round 3: G0=14, G1=3,  G2=3
             // Round 4: G0=12, G1=1,  G2=1
             // Round 5: G0=10, G1=0,  G2=0  → defender wins.
-            const star = makeStar('s0', 'p0', 20);
+            const star = makeStar("s0", "p0", 20);
             const groups: TestGroup[] = [
-                makeGroup('p0', 20, 1, true,  [[1, 1], [2, 1]], star),
-                makeGroup('p1', 10, 1, false, [[0, 1], [2, 1]]),
-                makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
+                makeGroup(
+                    "p0",
+                    20,
+                    1,
+                    true,
+                    [
+                        [1, 1],
+                        [2, 1],
+                    ],
+                    star,
+                ),
+                makeGroup("p1", 10, 1, false, [
+                    [0, 1],
+                    [2, 1],
+                ]),
+                makeGroup("p2", 10, 1, false, [
+                    [0, 1],
+                    [1, 1],
+                ]),
             ];
 
             const result = service.calculateGroups(groups, true);
@@ -395,7 +435,7 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[2].shipsAfter).toBe(0);
         });
 
-        it('carrier-to-star: two strong attackers eliminate the defender then destroy each other', () => {
+        it("carrier-to-star: two strong attackers eliminate the defender then destroy each other", () => {
             // G0 (star, idx 0): 10 ships @ weps 1.
             // G1 (attacker, idx 1): 15 ships @ weps 1.
             // G2 (attacker, idx 2): 15 ships @ weps 1.
@@ -415,11 +455,27 @@ describe('CombatService – computeGroups', () => {
             //   Round 7: G1=2, G2=2
             //   Round 8: G1=1, G2=1
             //   Round 9: G1=0, G2=0  → mutual destruction.
-            const star = makeStar('s0', 'p0', 10);
+            const star = makeStar("s0", "p0", 10);
             const groups: TestGroup[] = [
-                makeGroup('p0', 10, 1, true,  [[1, 1], [2, 1]], star),
-                makeGroup('p1', 15, 1, false, [[0, 1], [2, 1]]),
-                makeGroup('p2', 15, 1, false, [[0, 1], [1, 1]]),
+                makeGroup(
+                    "p0",
+                    10,
+                    1,
+                    true,
+                    [
+                        [1, 1],
+                        [2, 1],
+                    ],
+                    star,
+                ),
+                makeGroup("p1", 15, 1, false, [
+                    [0, 1],
+                    [2, 1],
+                ]),
+                makeGroup("p2", 15, 1, false, [
+                    [0, 1],
+                    [1, 1],
+                ]),
             ];
 
             const result = service.calculateGroups(groups, true);
@@ -429,7 +485,7 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[2].shipsAfter).toBe(0);
         });
 
-        it('carrier-to-carrier: asymmetric weapons – high-weapons group wins despite fewer ships', () => {
+        it("carrier-to-carrier: asymmetric weapons – high-weapons group wins despite fewer ships", () => {
             // G0: 5 ships @ weps 3; G1: 10 ships @ weps 1; G2: 10 ships @ weps 1.
             // G0 attacks {1: 3, 2: 3}; G1 attacks {0: 1, 2: 1}; G2 attacks {0: 1, 1: 1}.
             //
@@ -444,9 +500,18 @@ describe('CombatService – computeGroups', () => {
             //   (G0 takes 2; G1 takes min(1,3)+min(2,1)=3+1=4 → 0; G2 similarly → 0)
             //   All three reach zero simultaneously.
             const groups: TestGroup[] = [
-                makeGroup('p0',  5, 3, false, [[1, 3], [2, 3]]),
-                makeGroup('p1', 10, 1, false, [[0, 1], [2, 1]]),
-                makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
+                makeGroup("p0", 5, 3, false, [
+                    [1, 3],
+                    [2, 3],
+                ]),
+                makeGroup("p1", 10, 1, false, [
+                    [0, 1],
+                    [2, 1],
+                ]),
+                makeGroup("p2", 10, 1, false, [
+                    [0, 1],
+                    [1, 1],
+                ]),
             ];
 
             const result = service.calculateGroups(groups, false);
@@ -455,17 +520,16 @@ describe('CombatService – computeGroups', () => {
             expect(result.groups[1].shipsAfter).toBe(0);
             expect(result.groups[2].shipsAfter).toBe(0);
         });
-
     });
 
     // -----------------------------------------------------------------------
     // Result shape
     // -----------------------------------------------------------------------
 
-    it('each result group records the correct shipsBefore', () => {
+    it("each result group records the correct shipsBefore", () => {
         const groups: TestGroup[] = [
-            makeGroup('p0', 25, 1, false, [[1, 1]]),
-            makeGroup('p1', 12, 1, false, [[0, 1]]),
+            makeGroup("p0", 25, 1, false, [[1, 1]]),
+            makeGroup("p1", 12, 1, false, [[0, 1]]),
         ];
 
         const result = service.calculateGroups(groups, false);
@@ -474,11 +538,20 @@ describe('CombatService – computeGroups', () => {
         expect(result.groups[1].shipsBefore).toBe(12);
     });
 
-    it('shipsLost = shipsBefore - shipsAfter for every group', () => {
+    it("shipsLost = shipsBefore - shipsAfter for every group", () => {
         const groups: TestGroup[] = [
-            makeGroup('p0', 20, 2, false, [[1, 2], [2, 2]]),
-            makeGroup('p1', 10, 1, false, [[0, 1], [2, 1]]),
-            makeGroup('p2', 10, 1, false, [[0, 1], [1, 1]]),
+            makeGroup("p0", 20, 2, false, [
+                [1, 2],
+                [2, 2],
+            ]),
+            makeGroup("p1", 10, 1, false, [
+                [0, 1],
+                [2, 1],
+            ]),
+            makeGroup("p2", 10, 1, false, [
+                [0, 1],
+                [1, 1],
+            ]),
         ];
 
         const result = service.calculateGroups(groups, false);
@@ -498,7 +571,7 @@ describe('CombatService – computeGroups', () => {
     // every carrier, so shipsToKill never decrements.
     // -----------------------------------------------------------------------
 
-    it('multi-carrier group: odd shipsLost across two carriers does not hang', () => {
+    it("multi-carrier group: odd shipsLost across two carriers does not hang", () => {
         // G0 has two carriers (1 ship each, 2 total); G1 has 3 ships.
         // C-to-C, simultaneous: G0 deals 1/round to G1, G1 deals 1/round to G0.
         // After round 1: G0 ships=1 (lost 1), G1 ships=2.
@@ -508,22 +581,22 @@ describe('CombatService – computeGroups', () => {
         // The interesting case is a prior round result where G0 loses 1 ship
         // across 2 carriers (shipsToKill=1, objectsToDeduct.length=2 → floor=0).
         const multiCarrierGroup: TestGroup = {
-            id: 'p0',
+            id: "p0",
             originalShips: 2,
             ships: 2,
             isDefender: false,
             attackAgainst: makeAttackMap([[1, 1]]),
-            players: [makePlayer('p0', 1)],
+            players: [makePlayer("p0", 1)],
             carriers: [
-                makeCarrier('p0-c1', 'p0', 1),
-                makeCarrier('p0-c2', 'p0', 1),
+                makeCarrier("p0-c1", "p0", 1),
+                makeCarrier("p0-c2", "p0", 1),
             ],
             star: undefined,
             shipsKilled: 0,
         };
         const groups: TestGroup[] = [
             multiCarrierGroup,
-            makeGroup('p1', 3, 1, false, [[0, 1]]),
+            makeGroup("p1", 3, 1, false, [[0, 1]]),
         ];
 
         const result = service.calculateGroups(groups, false);
@@ -536,29 +609,29 @@ describe('CombatService – computeGroups', () => {
         expect(g0.shipsLost).toBe(g0.shipsBefore - g0.shipsAfter);
     });
 
-    it('multi-carrier group: shipsLost indivisible by three carriers does not hang', () => {
+    it("multi-carrier group: shipsLost indivisible by three carriers does not hang", () => {
         // G0 has three carriers (2 ships each, 6 total); G1 has 8 ships.
         // G0 loses 2 ships per round; after 3 rounds G0 has 0 ships.
         // shipsLost=6, carriers=3 → evenly divides, but intermediate rounds
         // lose 2 ships across 3 carriers (floor(2/3)=0 per carrier without fix).
         const multiCarrierGroup: TestGroup = {
-            id: 'p0',
+            id: "p0",
             originalShips: 6,
             ships: 6,
             isDefender: false,
             attackAgainst: makeAttackMap([[1, 2]]),
-            players: [makePlayer('p0', 2)],
+            players: [makePlayer("p0", 2)],
             carriers: [
-                makeCarrier('p0-c1', 'p0', 2),
-                makeCarrier('p0-c2', 'p0', 2),
-                makeCarrier('p0-c3', 'p0', 2),
+                makeCarrier("p0-c1", "p0", 2),
+                makeCarrier("p0-c2", "p0", 2),
+                makeCarrier("p0-c3", "p0", 2),
             ],
             star: undefined,
             shipsKilled: 0,
         };
         const groups: TestGroup[] = [
             multiCarrierGroup,
-            makeGroup('p1', 8, 1, false, [[0, 1]]),
+            makeGroup("p1", 8, 1, false, [[0, 1]]),
         ];
 
         const result = service.calculateGroups(groups, false);
@@ -571,5 +644,4 @@ describe('CombatService – computeGroups', () => {
             expect(g.shipsLost).toBe(g.shipsBefore - g.shipsAfter);
         }
     });
-
 });

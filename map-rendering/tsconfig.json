@@ -9,13 +9,7 @@
         "strict": true,
         "noImplicitAny": false,
         "skipLibCheck": true,
-        "lib": [
-            "es2024",
-            "DOM",
-            "DOM.Iterable"
-        ]
+        "lib": ["es2024", "DOM", "DOM.Iterable"]
     },
-    "include": [
-        "src/**/*"
-    ]
+    "include": ["src/**/*"]
 }

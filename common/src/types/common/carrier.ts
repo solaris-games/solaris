@@ -12,7 +12,7 @@ export interface Carrier<ID> extends MapObject<ID> {
     specialistId: number | null;
     specialistExpireTick: number | null;
     specialist: Specialist | null;
-    specialistTargetedPlayers: ID[],
+    specialistTargetedPlayers: ID[];
     isGift: boolean;
     isScuttled: boolean;
     waypoints: CarrierWaypoint<ID>[];
@@ -21,7 +21,7 @@ export interface Carrier<ID> extends MapObject<ID> {
     locationNext: Location | null;
     distanceToDestination?: number;
     effectiveTechs?: PlayerTechnologyLevels;
-};
+}
 
 export interface CarrierPosition<ID> {
     carrier: Carrier<ID>;
@@ -33,4 +33,4 @@ export interface CarrierPosition<ID> {
     distanceToDestinationCurrent: number;
     distanceToSourceNext: number;
     distanceToDestinationNext: number;
-};
+}

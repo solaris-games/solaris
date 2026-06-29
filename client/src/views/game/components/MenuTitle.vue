@@ -1,33 +1,34 @@
 <template>
-<div class="row pt-2">
+  <div class="row pt-2">
     <div class="col">
-        <h4 @click="titleClicked">{{ title }}</h4>
+      <h4 @click="titleClicked">{{ title }}</h4>
     </div>
     <div class="col-auto">
-        <slot></slot>
-        <button @click="close" class="btn btn-danger btn-sm ms-1"><i class="fas fa-times"></i></button>
+      <slot></slot>
+      <button @click="close" class="btn btn-danger btn-sm ms-1">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
-</div>
+  </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps<{
-  title: string
+  title: string;
 }>();
 
 const emit = defineEmits<{
-  onCloseRequested: [e: Event],
-  onTitleClicked: []
+  onCloseRequested: [e: Event];
+  onTitleClicked: [];
 }>();
 
 const close = (e: Event) => {
-  emit('onCloseRequested', e);
+  emit("onCloseRequested", e);
 };
 
 const titleClicked = () => {
-  emit('onTitleClicked');
+  emit("onTitleClicked");
 };
-
 </script>
 
 <style scoped>

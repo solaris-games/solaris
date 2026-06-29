@@ -4,21 +4,21 @@ export type Statistics = {
             ships: number;
             carriers: number;
             specialists: number;
-        },
+        };
         losses: {
             ships: number;
             carriers: number;
             specialists: number;
-        },
+        };
         stars: {
             captured: number;
             lost: number;
-        },
+        };
         homeStars: {
             captured: number;
             lost: number;
-        }
-    },
+        };
+    };
     infrastructure: {
         economy: number;
         industry: number;
@@ -27,7 +27,7 @@ export type Statistics = {
         warpGatesDestroyed: number;
         carriers: number;
         specialistsHired: number;
-    },
+    };
     research: {
         scanning: number;
         hyperspace: number;
@@ -37,7 +37,7 @@ export type Statistics = {
         banking: number;
         manufacturing: number;
         specialists: number;
-    },
+    };
     trade: {
         creditsSent: number;
         creditsReceived: number;
@@ -47,5 +47,5 @@ export type Statistics = {
         technologyReceived: number;
         giftsSent: number;
         giftsReceived: number;
-    },
-}
+    };
+};

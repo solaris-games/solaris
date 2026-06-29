@@ -1,51 +1,102 @@
 <template>
-<tr :class="{'allies' : diplomaticStatus.actualStatus==='allies', 'enemies' : diplomaticStatus.actualStatus==='enemies'}">
-  <td :style="{'width': '8px', 'background-color': getFriendlyColour(diplomaticStatus.playerIdTo)}"></td>
-  <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
-    <player-avatar @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)" :player="getPlayer(diplomaticStatus.playerIdTo)"/>
-  </td>
-  <td class="ps-2 pt-3 pb-2">
-    <h5 class="alias-title">{{getPlayerAlias(diplomaticStatus.playerIdTo)}}</h5>
-  </td>
-  <td class="fit pt-3 pe-1">
-    <diplomacy-icons
-      :statusFrom="diplomaticStatus.statusFrom"
-      :statusTo="diplomaticStatus.statusTo"
-      :actualStatus="diplomaticStatus.actualStatus"/>
-  </td>
-  <td class="fit pt-3 pb-2 pe-2" v-if="!isGameFinished">
-    <div class="btn-group">
-      <button class="btn btn-sm" :class="{'btn-success':diplomaticStatus.statusTo === 'allies', 'btn-outline-success':diplomaticStatus.statusTo !== 'allies'}" @click="declareAlly(diplomaticStatus)" title="Declare this player an ally"><i class="fas fa-handshake"></i></button>
-      <button class="btn btn-sm" :class="{'btn-info':diplomaticStatus.statusTo === 'neutral', 'btn-outline-info':diplomaticStatus.statusTo !== 'neutral'}" @click="declareNeutral(diplomaticStatus)" title="Declare this player as neutral"><i class="fas fa-dove"></i></button>
-      <button class="btn btn-sm" :class="{'btn-danger':diplomaticStatus.statusTo === 'enemies', 'btn-outline-danger':diplomaticStatus.statusTo !== 'enemies'}" @click="declareEnemy(diplomaticStatus)" title="Declare this player as an enemy"><i class="fas fa-crosshairs"></i></button>
-    </div>
-  </td>
-</tr>
+  <tr
+    :class="{
+      allies: diplomaticStatus.actualStatus === 'allies',
+      enemies: diplomaticStatus.actualStatus === 'enemies',
+    }"
+  >
+    <td
+      :style="{
+        width: '8px',
+        'background-color': getFriendlyColour(diplomaticStatus.playerIdTo),
+      }"
+    ></td>
+    <td class="col-avatar" :title="getPlayerAlias(diplomaticStatus.playerIdTo)">
+      <player-avatar
+        @onClick="onOpenPlayerDetailRequested(diplomaticStatus.playerIdTo)"
+        :player="getPlayer(diplomaticStatus.playerIdTo)"
+      />
+    </td>
+    <td class="ps-2 pt-3 pb-2">
+      <h5 class="alias-title">
+        {{ getPlayerAlias(diplomaticStatus.playerIdTo) }}
+      </h5>
+    </td>
+    <td class="fit pt-3 pe-1">
+      <diplomacy-icons
+        :statusFrom="diplomaticStatus.statusFrom"
+        :statusTo="diplomaticStatus.statusTo"
+        :actualStatus="diplomaticStatus.actualStatus"
+      />
+    </td>
+    <td class="fit pt-3 pb-2 pe-2" v-if="!isGameFinished">
+      <div class="btn-group">
+        <button
+          class="btn btn-sm"
+          :class="{
+            'btn-success': diplomaticStatus.statusTo === 'allies',
+            'btn-outline-success': diplomaticStatus.statusTo !== 'allies',
+          }"
+          @click="declareAlly(diplomaticStatus)"
+          title="Declare this player an ally"
+        >
+          <i class="fas fa-handshake"></i>
+        </button>
+        <button
+          class="btn btn-sm"
+          :class="{
+            'btn-info': diplomaticStatus.statusTo === 'neutral',
+            'btn-outline-info': diplomaticStatus.statusTo !== 'neutral',
+          }"
+          @click="declareNeutral(diplomaticStatus)"
+          title="Declare this player as neutral"
+        >
+          <i class="fas fa-dove"></i>
+        </button>
+        <button
+          class="btn btn-sm"
+          :class="{
+            'btn-danger': diplomaticStatus.statusTo === 'enemies',
+            'btn-outline-danger': diplomaticStatus.statusTo !== 'enemies',
+          }"
+          @click="declareEnemy(diplomaticStatus)"
+          title="Declare this player as an enemy"
+        >
+          <i class="fas fa-crosshairs"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import PlayerAvatar from '../menu/PlayerAvatar.vue';
-import gameHelper from '../../../../services/gameHelper';
-import DiplomacyHelper from '../../../../services/diplomacyHelper';
-import DiplomacyIcons from './DiplomacyIcons.vue';
-import { inject, computed } from 'vue';
-import type {DiplomaticStatus} from "@solaris/common";
-import {useConfirm} from "@/hooks/confirm.ts";
-import type {Game} from "@/types/game";
-import {extractErrors, formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import {ally, enemy, neutral} from "@/services/typedapi/diplomacy";
-import { useColourStore } from '@/stores/colour';
+import { useGameStore } from "@/stores/game";
+import PlayerAvatar from "../menu/PlayerAvatar.vue";
+import gameHelper from "../../../../services/gameHelper";
+import DiplomacyHelper from "../../../../services/diplomacyHelper";
+import DiplomacyIcons from "./DiplomacyIcons.vue";
+import { inject, computed } from "vue";
+import type { DiplomaticStatus } from "@solaris/common";
+import { useConfirm } from "@/hooks/confirm.ts";
+import type { Game } from "@/types/game";
+import {
+  extractErrors,
+  formatError,
+  httpInjectionKey,
+  isOk,
+} from "@/services/typedapi";
+import { ally, enemy, neutral } from "@/services/typedapi/diplomacy";
+import { useColourStore } from "@/stores/colour";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const props = defineProps<{
-  diplomaticStatus: DiplomaticStatus<string>,
+  diplomaticStatus: DiplomaticStatus<string>;
 }>();
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string],
-  onApiRequestSuccess: [],
-  onApiRequestError: [errors: string[]],
+  onOpenPlayerDetailRequested: [playerId: string];
+  onApiRequestSuccess: [];
+  onApiRequestError: [errors: string[]];
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -59,44 +110,72 @@ const colourStore = useColourStore();
 const isGameFinished = computed(() => gameHelper.isGameFinished(game.value));
 const userPlayer = computed(() => gameHelper.getUserPlayer(game.value)!);
 
-const getPlayer = (playerId: string) => gameHelper.getPlayerById(game.value, playerId)!;
+const getPlayer = (playerId: string) =>
+  gameHelper.getPlayerById(game.value, playerId)!;
 
 const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-const getFriendlyColour = (playerId: string) => colourStore.getColourForPlayer(game.value, playerId)!.value;
+const getFriendlyColour = (playerId: string) =>
+  colourStore.getColourForPlayer(game.value, playerId)!.value;
 
-const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+const onOpenPlayerDetailRequested = (playerId: string) =>
+  emit("onOpenPlayerDetailRequested", playerId);
 
 const declareAlly = async (diplomaticStatus: DiplomaticStatus<string>) => {
   const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
 
-  let allianceFee = 0
+  let allianceFee = 0;
   let cycleCredits = gameHelper.calculateIncome(game.value, userPlayer.value);
 
   if (DiplomacyHelper.isAllianceUpkeepEnabled(game.value)) {
-    allianceFee = DiplomacyHelper.getAllianceUpkeepCost(game.value, userPlayer.value, cycleCredits, 1);
+    allianceFee = DiplomacyHelper.getAllianceUpkeepCost(
+      game.value,
+      userPlayer.value,
+      cycleCredits,
+      1,
+    );
 
-    if (!await confirm('Alliance Fee', `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`)) {
+    if (
+      !(await confirm(
+        "Alliance Fee",
+        `Allying with this player will cost you $${allianceFee} credits, are you sure you want to continue?`,
+      ))
+    ) {
       return;
     }
   }
 
-  if (game.value.settings.diplomacy.lockedAlliances === 'enabled') {
-    if (!await confirm('Permanent Alliance', 'If you form an alliance in this game, you will not be able to cancel it.')) {
+  if (game.value.settings.diplomacy.lockedAlliances === "enabled") {
+    if (
+      !(await confirm(
+        "Permanent Alliance",
+        "If you form an alliance in this game, you will not be able to cancel it.",
+      ))
+    ) {
       return;
     }
   }
 
-  if (!await confirm('Declare Allies', `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`)) {
+  if (
+    !(await confirm(
+      "Declare Allies",
+      `Are you sure you want to change your diplomatic status to ${playerAlias} to allied?`,
+    ))
+  ) {
     return;
   }
 
-  const response = await ally(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+  const response = await ally(httpClient)(
+    game.value._id,
+    diplomaticStatus.playerIdTo,
+  );
   if (isOk(response)) {
-    if (response.data.statusTo === 'allies') {
+    if (response.data.statusTo === "allies") {
       toast.success(`Your diplomatic status to ${playerAlias} is now allied.`);
     } else {
-      toast.error(`You can not ally ${playerAlias}. Check the maximum alliance limits.`);
+      toast.error(
+        `You can not ally ${playerAlias}. Check the maximum alliance limits.`,
+      );
     }
 
     diplomaticStatus.statusFrom = response.data.statusFrom;
@@ -105,21 +184,29 @@ const declareAlly = async (diplomaticStatus: DiplomaticStatus<string>) => {
 
     userPlayer.value.credits -= allianceFee;
 
-    emit('onApiRequestSuccess')
+    emit("onApiRequestSuccess");
   } else {
     console.error(formatError(response));
-    emit('onApiRequestError', extractErrors(response));
+    emit("onApiRequestError", extractErrors(response));
   }
 };
 
 const declareEnemy = async (diplomaticStatus: DiplomaticStatus<string>) => {
   const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
 
-  if (!await confirm('Declare Enemy', `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`)) {
+  if (
+    !(await confirm(
+      "Declare Enemy",
+      `Are you sure you want to change your diplomatic status to ${playerAlias} to enemies?`,
+    ))
+  ) {
     return;
   }
 
-  const response = await enemy(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+  const response = await enemy(httpClient)(
+    game.value._id,
+    diplomaticStatus.playerIdTo,
+  );
 
   if (isOk(response)) {
     toast.success(`Your diplomatic status to ${playerAlias} is now enemies.`);
@@ -128,21 +215,29 @@ const declareEnemy = async (diplomaticStatus: DiplomaticStatus<string>) => {
     diplomaticStatus.statusTo = response.data.statusTo;
     diplomaticStatus.actualStatus = response.data.actualStatus;
 
-    emit('onApiRequestSuccess');
+    emit("onApiRequestSuccess");
   } else {
     console.error(formatError(response));
-    emit('onApiRequestError', extractErrors(response));
+    emit("onApiRequestError", extractErrors(response));
   }
 };
 
 const declareNeutral = async (diplomaticStatus: DiplomaticStatus<string>) => {
   const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
 
-  if (!await confirm('Declare Neutral', `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`)) {
+  if (
+    !(await confirm(
+      "Declare Neutral",
+      `Are you sure you want to change your diplomatic status to ${playerAlias} to neutral?`,
+    ))
+  ) {
     return;
   }
 
-  const response = await neutral(httpClient)(game.value._id, diplomaticStatus.playerIdTo);
+  const response = await neutral(httpClient)(
+    game.value._id,
+    diplomaticStatus.playerIdTo,
+  );
   if (isOk(response)) {
     toast.success(`Your diplomatic status to ${playerAlias} is now neutral.`);
 
@@ -150,17 +245,17 @@ const declareNeutral = async (diplomaticStatus: DiplomaticStatus<string>) => {
     diplomaticStatus.statusTo = response.data.statusTo;
     diplomaticStatus.actualStatus = response.data.actualStatus;
 
-    emit('onApiRequestSuccess');
+    emit("onApiRequestSuccess");
   } else {
     console.error(formatError(response));
-    emit('onApiRequestError', extractErrors(response));
+    emit("onApiRequestError", extractErrors(response));
   }
 };
 </script>
 
 <style scoped>
 .col-avatar {
-  position:absolute;
+  position: absolute;
   width: 59px;
   height: 59px;
   cursor: pointer;
@@ -181,8 +276,8 @@ td {
 
 .table td.fit,
 .table th.fit {
-    white-space: nowrap;
-    width: 1%;
+  white-space: nowrap;
+  width: 1%;
 }
 
 .allies {
@@ -190,9 +285,8 @@ td {
 }
 
 .enemies {
-  background: linear-gradient(to left, black 40%, #DD0000  95%);
+  background: linear-gradient(to left, black 40%, #dd0000 95%);
 }
-
 
 @media screen and (max-width: 576px) {
   tr {

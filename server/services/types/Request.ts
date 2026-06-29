@@ -2,7 +2,7 @@ import { Game } from "./Game";
 import { Player } from "./Player";
 import { PlayerMutexLock } from "./PlayerMutexLock";
 
-export { };
+export {};
 
 declare global {
     namespace Express {

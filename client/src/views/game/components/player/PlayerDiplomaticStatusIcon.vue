@@ -1,22 +1,34 @@
 <template>
   <span>
-    <i v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'allies'" class="fas fa-handshake" title="This player is an ally"></i>
-    <i v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'neutral'" class="fas fa-dove" title="This player is neutral"></i>
-    <i v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'enemies'" class="fas fa-crosshairs" title="This player is an enemy"></i>
+    <i
+      v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'allies'"
+      class="fas fa-handshake"
+      title="This player is an ally"
+    ></i>
+    <i
+      v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'neutral'"
+      class="fas fa-dove"
+      title="This player is neutral"
+    ></i>
+    <i
+      v-if="diplomaticStatus && diplomaticStatus.actualStatus === 'enemies'"
+      class="fas fa-crosshairs"
+      title="This player is an enemy"
+    ></i>
   </span>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import GameHelper from '../../../../services/gameHelper'
-import { ref, onMounted, computed, inject } from 'vue'
-import type {DiplomaticStatus} from "@solaris/common";
-import type {Game} from "@/types/game";
-import {detailDiplomacy} from "@/services/typedapi/diplomacy";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
+import { useGameStore } from "@/stores/game";
+import GameHelper from "../../../../services/gameHelper";
+import { ref, onMounted, computed, inject } from "vue";
+import type { DiplomaticStatus } from "@solaris/common";
+import type { Game } from "@/types/game";
+import { detailDiplomacy } from "@/services/typedapi/diplomacy";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 
 const props = defineProps<{
-  toPlayerId: string,
+  toPlayerId: string;
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -33,7 +45,10 @@ const loadDiplomaticStatus = async () => {
     return;
   }
 
-  const response = await detailDiplomacy(httpClient)(game.value._id, props.toPlayerId);
+  const response = await detailDiplomacy(httpClient)(
+    game.value._id,
+    props.toPlayerId,
+  );
   if (isOk(response)) {
     diplomaticStatus.value = response.data;
   } else {
@@ -46,6 +61,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

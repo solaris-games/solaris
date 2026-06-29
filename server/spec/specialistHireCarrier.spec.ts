@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
-import SpecialistHireService from '../services/specialistHire';
+import mongoose from "mongoose";
+import SpecialistHireService from "../services/specialistHire";
 
-describe('specialistHire - Carrier', () => {
-
+describe("specialistHire - Carrier", () => {
     // -------------
     // Mock Objects
 
@@ -10,65 +9,86 @@ describe('specialistHire - Carrier', () => {
         let obj = {
             service: {} as any,
             gameRepo: {
-                bulkWrite: () => {}
+                bulkWrite: () => {},
             },
             specialistService: {} as any,
             technologyService: {
-                getCarrierEffectiveTechnologyLevels: () => {}
+                getCarrierEffectiveTechnologyLevels: () => {},
             },
             achievementService: {
-                incrementSpecialistsHired: () => {}
+                incrementSpecialistsHired: () => {},
             },
             waypointService: {
-                cullWaypointsByHyperspaceRangeDB: () => {}
+                cullWaypointsByHyperspaceRangeDB: () => {},
             },
             playerService: {} as any,
             playerCreditsService: {} as any,
             starService: {
-                getById: () => { return {} as any; },
+                getById: () => {
+                    return {} as any;
+                },
             },
             starDataService: {
-                isDeadStar: () => { return false; },
-                isOwnedByPlayer: () => { return true; },
+                isDeadStar: () => {
+                    return false;
+                },
+                isOwnedByPlayer: () => {
+                    return true;
+                },
             },
             gameTypeService: {
-                isTutorialGame: () => { return false; }
+                isTutorialGame: () => {
+                    return false;
+                },
             },
             specialistBanService: {
-                isCarrierSpecialistBanned: () => { return false; }
+                isCarrierSpecialistBanned: () => {
+                    return false;
+                },
             },
-            game: { 
+            game: {
                 settings: {
                     specialGalaxy: {
-                        specialistCost: 'standard',
-                        specialistsCurrency: 'credits',
+                        specialistCost: "standard",
+                        specialistsCurrency: "credits",
                         specialistBans: {
                             star: [] as any[],
-                            carrier: [] as any[]
-                        }
-                    }
+                            carrier: [] as any[],
+                        },
+                    },
                 },
                 galaxy: {
                     carriers: [] as any[],
-                    stars: [] as any[]
-                }
+                    stars: [] as any[],
+                },
             },
             playerId: new mongoose.Types.ObjectId(),
             player: {
                 _id: new mongoose.Types.ObjectId(),
                 credits: 0,
-                creditsSpecialists: 0
+                creditsSpecialists: 0,
             },
             carrierId: new mongoose.Types.ObjectId(),
             starId: new mongoose.Types.ObjectId(),
             statisticsService: {} as any,
-            specialistId: 1
+            specialistId: 1,
         };
 
         obj.player._id = obj.playerId;
 
         // @ts-ignore
-        obj.service = new SpecialistHireService(obj.gameRepo, obj.specialistService, obj.achievementService, obj.waypointService, obj.playerCreditsService, obj.starService, obj.gameTypeService, obj.specialistBanService, obj.technologyService, obj.starDataService);
+        obj.service = new SpecialistHireService(
+            obj.gameRepo,
+            obj.specialistService,
+            obj.achievementService,
+            obj.waypointService,
+            obj.playerCreditsService,
+            obj.starService,
+            obj.gameTypeService,
+            obj.specialistBanService,
+            obj.technologyService,
+            obj.starDataService,
+        );
 
         return obj;
     }
@@ -78,7 +98,7 @@ describe('specialistHire - Carrier', () => {
             _id: testObj.carrierId,
             ownedByPlayerId: new mongoose.Types.ObjectId(),
             orbiting: testObj.starId,
-            specialistId: null
+            specialistId: null,
         };
     }
 
@@ -87,23 +107,23 @@ describe('specialistHire - Carrier', () => {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
             orbiting: null,
-            specialistId: null
+            specialistId: null,
         };
     }
-    
+
     function carrierInOrbit(testObj) {
         return {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
             orbiting: testObj.starId,
-            specialistId: null
+            specialistId: null,
         };
     }
 
     function starBasic(testObj) {
         return {
             _id: testObj.starId,
-            ownedByPlayerId: testObj.playerId
+            ownedByPlayerId: testObj.playerId,
         };
     }
 
@@ -112,83 +132,103 @@ describe('specialistHire - Carrier', () => {
             _id: testObj.carrierId,
             ownedByPlayerId: testObj.playerId,
             orbiting: testObj.starId,
-            specialistId: specId || null
+            specialistId: specId || null,
         };
     }
 
     function specialistBasic(testObj) {
         return {
-            id: testObj.specialistId
-        }
+            id: testObj.specialistId,
+        };
     }
 
     // -------------
 
-    it('should throw an error if specialists are disabled', async () => {
+    it("should throw an error if specialists are disabled", async () => {
         let testObj = setup();
         let hasError = false;
 
-        testObj.game.settings.specialGalaxy.specialistCost = 'none';
+        testObj.game.settings.specialGalaxy.specialistCost = "none";
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('disabled the hiring of specialists');
+            expect(err.message).toContain("disabled the hiring of specialists");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the specialist is banned', async () => {
+    it("should throw an error if the specialist is banned", async () => {
         let testObj = setup();
         let hasError = false;
 
         testObj.specialistBanService.isCarrierSpecialistBanned = () => true;
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('banned');
+            expect(err.message).toContain("banned");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the carrier does not exist', async () => {
+    it("should throw an error if the carrier does not exist", async () => {
         let testObj = setup();
         let hasError = false;
 
         testObj.game.galaxy.carriers.push(carrierUnowned(testObj));
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('you do not own');
+            expect(err.message).toContain("you do not own");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the carrier is not in orbit', async () => {
+    it("should throw an error if the carrier is not in orbit", async () => {
         let testObj = setup();
         let hasError = false;
 
         testObj.game.galaxy.carriers.push(carrierInTransit(testObj));
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('in transit');
+            expect(err.message).toContain("in transit");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error trying to hire the specialist on a dead star', async () => {
+    it("should throw an error trying to hire the specialist on a dead star", async () => {
         let testObj = setup();
         let hasError = false;
         let star = starBasic(testObj);
@@ -209,16 +249,21 @@ describe('specialistHire - Carrier', () => {
         };
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('dead star');
+            expect(err.message).toContain("dead star");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the specialist does not exist', async () => {
+    it("should throw an error if the specialist does not exist", async () => {
         let testObj = setup();
         let hasError = false;
         let star = starBasic(testObj);
@@ -239,21 +284,28 @@ describe('specialistHire - Carrier', () => {
         };
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('does not exist');
+            expect(err.message).toContain("does not exist");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the specialist is already on the carrier', async () => {
+    it("should throw an error if the specialist is already on the carrier", async () => {
         let testObj = setup();
         let hasError = false;
         let star = starBasic(testObj);
 
-        testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, testObj.specialistId));
+        testObj.game.galaxy.carriers.push(
+            carrierInOrbitWithSpec(testObj, testObj.specialistId),
+        );
         testObj.game.galaxy.stars.push(star);
 
         testObj.specialistService.getByIdCarrier = (id) => {
@@ -269,21 +321,30 @@ describe('specialistHire - Carrier', () => {
         };
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('already has the specialist assigned');
+            expect(err.message).toContain(
+                "already has the specialist assigned",
+            );
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the player cannot afford the specialist by credits', async () => {
+    it("should throw an error if the player cannot afford the specialist by credits", async () => {
         let testObj = setup();
         let hasError = false;
         let star = starBasic(testObj);
 
-        testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
+        testObj.game.galaxy.carriers.push(
+            carrierInOrbitWithSpec(testObj, null),
+        );
         testObj.game.galaxy.stars.push(star);
 
         testObj.specialistService.getByIdCarrier = (id) => {
@@ -300,29 +361,36 @@ describe('specialistHire - Carrier', () => {
 
         testObj.specialistService.getSpecialistActualCost = () => {
             return {
-                credits: 1000
-            }
+                credits: 1000,
+            };
         };
 
-        testObj.game.settings.specialGalaxy.specialistsCurrency = 'credits';
+        testObj.game.settings.specialGalaxy.specialistsCurrency = "credits";
         testObj.player.credits = 1;
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('cannot afford');
+            expect(err.message).toContain("cannot afford");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should throw an error if the player cannot afford the specialist by specialist credits', async () => {
+    it("should throw an error if the player cannot afford the specialist by specialist credits", async () => {
         let testObj = setup();
         let hasError = false;
         let star = starBasic(testObj);
 
-        testObj.game.galaxy.carriers.push(carrierInOrbitWithSpec(testObj, null));
+        testObj.game.galaxy.carriers.push(
+            carrierInOrbitWithSpec(testObj, null),
+        );
         testObj.game.galaxy.stars.push(star);
 
         testObj.specialistService.getByIdCarrier = (id) => {
@@ -339,24 +407,30 @@ describe('specialistHire - Carrier', () => {
 
         testObj.specialistService.getSpecialistActualCost = () => {
             return {
-                creditsSpecialists: 1000
-            }
+                creditsSpecialists: 1000,
+            };
         };
 
-        testObj.game.settings.specialGalaxy.specialistsCurrency = 'creditsSpecialists';
+        testObj.game.settings.specialGalaxy.specialistsCurrency =
+            "creditsSpecialists";
         testObj.player.creditsSpecialists = 1;
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
-            expect(err.message).toContain('cannot afford');
+            expect(err.message).toContain("cannot afford");
         }
-        
+
         expect(hasError).toBeTruthy();
     });
 
-    it('should assign the specialist to the carrier', async () => {
+    it("should assign the specialist to the carrier", async () => {
         let testObj = setup();
         let hasError = false;
         let carrier = carrierInOrbitWithSpec(testObj, null);
@@ -379,25 +453,34 @@ describe('specialistHire - Carrier', () => {
 
         testObj.specialistService.getSpecialistActualCost = () => {
             return {
-                credits: 100
-            }
+                credits: 100,
+            };
         };
 
-        testObj.playerCreditsService.addCredits = (game, player, amount: number) => {
+        testObj.playerCreditsService.addCredits = (
+            game,
+            player,
+            amount: number,
+        ) => {
             expect(amount).toBe(-100);
         };
 
-        testObj.game.settings.specialGalaxy.specialistsCurrency = 'credits';
+        testObj.game.settings.specialGalaxy.specialistsCurrency = "credits";
         testObj.player.credits = 100;
 
         try {
-            await testObj.service.hireCarrierSpecialist(testObj.game, testObj.player, testObj.carrierId, testObj.specialistId);
+            await testObj.service.hireCarrierSpecialist(
+                testObj.game,
+                testObj.player,
+                testObj.carrierId,
+                testObj.specialistId,
+            );
         } catch (err: any) {
             hasError = true;
         }
-        
+
         expect(hasError).toBeFalsy();
         expect(carrier.specialistId).toBe(testObj.specialistId);
         expect(testObj.player.credits).toBe(0);
     });
-})
+});

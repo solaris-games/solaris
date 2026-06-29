@@ -1,39 +1,58 @@
 <template>
   <div class="table-responsive">
-    <table class="table table-striped table-hover leaderboard-table" v-if="leaderboard">
+    <table
+      class="table table-striped table-hover leaderboard-table"
+      v-if="leaderboard"
+    >
       <thead class="table-dark">
-        <slot name="header" v-bind:sort="sortBy" v-bind:getColumnClass="getColumnClass" v-bind:isActive="isActiveSorting"></slot>
+        <slot
+          name="header"
+          v-bind:sort="sortBy"
+          v-bind:getColumnClass="getColumnClass"
+          v-bind:isActive="isActiveSorting"
+        ></slot>
       </thead>
       <tbody>
-        <slot v-for="value in leaderboard" name="row" v-bind="{ value, getColumnClass }"></slot>
+        <slot
+          v-for="value in leaderboard"
+          name="row"
+          v-bind="{ value, getColumnClass }"
+        ></slot>
       </tbody>
     </table>
   </div>
 </template>
 <script setup lang="ts" generic="K extends string, T">
 const props = defineProps<{
-  sortingKey: K,
-  leaderboard: T[]
+  sortingKey: K;
+  leaderboard: T[];
 }>();
 
 const slots = defineSlots<{
-  header(props: { getColumnClass: (k: K) => Record<string, boolean>, sort: (k: K) => void, isActive: (k: K) => boolean }): any,
-  row(props: { value: T, getColumnClass: (k: K) => Record<string, boolean> }): any
+  header(props: {
+    getColumnClass: (k: K) => Record<string, boolean>;
+    sort: (k: K) => void;
+    isActive: (k: K) => boolean;
+  }): any;
+  row(props: {
+    value: T;
+    getColumnClass: (k: K) => Record<string, boolean>;
+  }): any;
 }>();
 
 const emit = defineEmits<{
-  sortingRequested: [key: K],
+  sortingRequested: [key: K];
 }>();
 
 const getColumnClass = (colKey: K) => {
-  return { 'table-primary': props.sortingKey === colKey };
+  return { "table-primary": props.sortingKey === colKey };
 };
 
 const isActiveSorting = (colKey: K) => {
   return props.sortingKey === colKey;
 };
 
-const sortBy = (key: K) => emit('sortingRequested', key);
+const sortBy = (key: K) => emit("sortingRequested", key);
 </script>
 
 <!-- This is deliberately not scoped, scoping is done by using the .leaderboard-table selector. Scoping would break the styling for nested components. -->

@@ -1,6 +1,6 @@
 <template>
   <div class="solaris-app col-xs-12 col-sm-10 col-md-10 col-lg-6">
-    <view-container-top-bar v-if="!props.hideTopBar"/>
+    <view-container-top-bar v-if="!props.hideTopBar" />
     <div class="content">
       <div class="container">
         <slot></slot>
@@ -11,18 +11,18 @@
 </template>
 
 <script setup lang="ts">
-import ViewContainerTopBar from './ViewContainerTopBar.vue'
-import {withMessages} from "../../util/messages";
-import {onMounted, inject} from 'vue';
-import router from '@/router';
-import {useUserStore} from '@/stores/user';
-import {httpInjectionKey} from "@/services/typedapi";
-import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user.ts";
+import ViewContainerTopBar from "./ViewContainerTopBar.vue";
+import { withMessages } from "../../util/messages";
+import { onMounted, inject } from "vue";
+import router from "@/router";
+import { useUserStore } from "@/stores/user";
+import { httpInjectionKey } from "@/services/typedapi";
+import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user.ts";
 import ViewContainerFooter from "@/views/components/ViewContainerFooter.vue";
 
 const props = defineProps<{
-  isAuthPage: boolean,
-  hideTopBar?: boolean
+  isAuthPage: boolean;
+  hideTopBar?: boolean;
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
@@ -39,7 +39,7 @@ onMounted(async () => {
     const isOk = await userStore.verify(httpClient, userClientSocketEmitter);
 
     if (!isOk) {
-      router.push({name: 'home'});
+      router.push({ name: "home" });
     }
   }
 });

@@ -1,46 +1,56 @@
-import { ref, readonly } from 'vue';
-import { defineStore } from 'pinia';
-import type {Game} from "@/types/game";
+import { ref, readonly } from "vue";
+import { defineStore } from "pinia";
+import type { Game } from "@/types/game";
 import {
-  type BulkUpgradeReport, type CarrierBuildReport,
-  type GameState, type InfrastructureUpgradeReport, LedgerType,
-  type PlayerScheduledActions, type ShipTransferReport,
+  type BulkUpgradeReport,
+  type CarrierBuildReport,
+  type GameState,
+  type InfrastructureUpgradeReport,
+  LedgerType,
+  type PlayerScheduledActions,
+  type ShipTransferReport,
   type Specialist,
   type UserGameSettings,
-  type WarpgateBuildReport
+  type WarpgateBuildReport,
 } from "@solaris/common";
-import {type EventBus} from "@/eventBus";
-import {useColourStore} from "@/stores/colour";
+import { type EventBus } from "@/eventBus";
+import { useColourStore } from "@/stores/colour";
 import GameHelper from "@/services/gameHelper";
-import {listCarrierForGame, listStarForGame} from "@/services/typedapi/specialist";
-import {formatError, isOk} from "@/services/typedapi";
+import {
+  listCarrierForGame,
+  listStarForGame,
+} from "@/services/typedapi/specialist";
+import { formatError, isOk } from "@/services/typedapi";
 import type { Axios } from "axios";
-import type {MenuState, MenuStateChat} from "@/types/menu";
-import GameCommandEventBusEventNames from '@solaris/map-rendering/eventBusEventNames/gameCommand';
+import type { MenuState, MenuStateChat } from "@/types/menu";
+import GameCommandEventBusEventNames from "@solaris/map-rendering/eventBusEventNames/gameCommand";
 
 type PlayerJoinedData = {
-  playerId: string,
-  alias: string,
-  avatar: string,
+  playerId: string;
+  alias: string;
+  avatar: string;
 };
 
-const EMPTY_MENU: MenuState = { state: 'none' };
+const EMPTY_MENU: MenuState = { state: "none" };
 
-const menuStatesEqual = <T extends { state: K }, K extends string>(a: T, b: T): boolean => {
+const menuStatesEqual = <T extends { state: K }, K extends string>(
+  a: T,
+  b: T,
+): boolean => {
   if (a.state !== b.state) return false;
 
   const aRecord = a as Record<string, unknown>;
   const bRecord = b as Record<string, unknown>;
 
   for (const key of Object.keys(aRecord)) {
-    if (key === 'state') continue;
+    if (key === "state") continue;
     if (aRecord[key] !== bRecord[key]) return false;
   }
 
   return true;
 };
 
-export const useGameStore = defineStore('game', () => {
+export const useGameStore = defineStore("game", () => {
   const game = ref<Game | null>(null);
   const tick = ref(0);
   const starSpecialists = ref<Specialist[] | null>(null);
@@ -105,54 +115,63 @@ export const useGameStore = defineStore('game', () => {
     unreadMessages.value = count;
   };
 
-  const gameStarBulkUpgraded = (eventBus: EventBus, data: BulkUpgradeReport<string>) => {
+  const gameStarBulkUpgraded = (
+    eventBus: EventBus,
+    data: BulkUpgradeReport<string>,
+  ) => {
     const player = GameHelper.getUserPlayer(game.value!)!;
 
     let newScience = 0;
 
-    data.stars.forEach(s => {
+    data.stars.forEach((s) => {
       const star = GameHelper.getStarById(game.value!, s.starId)!;
 
-      if (data.infrastructureType === 'science') {
-        newScience += (s.infrastructure - s.infrastructureCurrent) * (star.specialistId === 11 ? 2 : 1); // Research Station
+      if (data.infrastructureType === "science") {
+        newScience +=
+          (s.infrastructure - s.infrastructureCurrent) *
+          (star.specialistId === 11 ? 2 : 1); // Research Station
       }
 
-      star.infrastructure[data.infrastructureType] = s.infrastructure
+      star.infrastructure[data.infrastructureType] = s.infrastructure;
 
       if (star.upgradeCosts && s.nextInfrastructureCost) {
-        star.upgradeCosts[data.infrastructureType] = s.nextInfrastructureCost
+        star.upgradeCosts[data.infrastructureType] = s.nextInfrastructureCost;
       }
 
       if (s.manufacturing != null) {
-        player.stats!.newShips -= (star.manufacturing || 0) // Deduct old value
-        star.manufacturing = s.manufacturing
-        player.stats!.newShips += s.manufacturing // Add the new value
+        player.stats!.newShips -= star.manufacturing || 0; // Deduct old value
+        star.manufacturing = s.manufacturing;
+        player.stats!.newShips += s.manufacturing; // Add the new value
       }
 
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    })
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+        star,
+      });
+    });
 
-    player.credits -= data.cost
-    player.stats!.newShips = Math.round((player.stats!.newShips + Number.EPSILON) * 100) / 100
+    player.credits -= data.cost;
+    player.stats!.newShips =
+      Math.round((player.stats!.newShips + Number.EPSILON) * 100) / 100;
 
     if (data.currentResearchTicksEta) {
-      player.currentResearchTicksEta = data.currentResearchTicksEta
+      player.currentResearchTicksEta = data.currentResearchTicksEta;
     }
 
     if (data.nextResearchTicksEta) {
-      player.nextResearchTicksEta = data.nextResearchTicksEta
+      player.nextResearchTicksEta = data.nextResearchTicksEta;
     }
 
     // Update player total stats.
     switch (data.infrastructureType) {
-      case 'economy':
+      case "economy":
         player.stats!.totalEconomy += data.upgraded;
         break;
-      case 'industry':
+      case "industry":
         player.stats!.totalIndustry += data.upgraded;
         break;
-      case 'science':
-        player.stats!.totalScience += (newScience * game.value!.constants.research.sciencePointMultiplier)
+      case "science":
+        player.stats!.totalScience +=
+          newScience * game.value!.constants.research.sciencePointMultiplier;
         break;
     }
   };
@@ -164,23 +183,38 @@ export const useGameStore = defineStore('game', () => {
 
   const gameBulkActionTrashed = (data: PlayerScheduledActions<string>) => {
     const player = GameHelper.getUserPlayer(game.value!)!;
-    player.scheduledActions = player.scheduledActions.filter(a => a._id != data._id)
+    player.scheduledActions = player.scheduledActions.filter(
+      (a) => a._id != data._id,
+    );
   };
 
-  const gameStarWarpGateBuilt = (eventBus: EventBus, data: WarpgateBuildReport<string>) => {
+  const gameStarWarpGateBuilt = (
+    eventBus: EventBus,
+    data: WarpgateBuildReport<string>,
+  ) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     star.warpGate = true;
     GameHelper.getUserPlayer(game.value!)!.credits -= data.cost;
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
-  const gameStarWarpGateDestroyed = (eventBus: EventBus, data: { starId: string }) => {
+  const gameStarWarpGateDestroyed = (
+    eventBus: EventBus,
+    data: { starId: string },
+  ) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     star.warpGate = false;
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
-  const gameStarCarrierBuilt = (eventBus: EventBus, data: CarrierBuildReport<string>) => {
+  const gameStarCarrierBuilt = (
+    eventBus: EventBus,
+    data: CarrierBuildReport<string>,
+  ) => {
     const carrier = GameHelper.getCarrierById(game.value!, data.carrier._id);
 
     if (!carrier) {
@@ -192,21 +226,37 @@ export const useGameStore = defineStore('game', () => {
 
     const userPlayer = GameHelper.getUserPlayer(game.value!)!;
     userPlayer.credits -= star.upgradeCosts!.carriers || 0;
-    userPlayer.stats!.totalCarriers++
+    userPlayer.stats!.totalCarriers++;
 
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier: data.carrier });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {
+      carrier: data.carrier,
+    });
   };
 
-  const gameStarCarrierShipTransferred = (eventBus: EventBus, data: { starId: string, carrierId: string, starShips: number, carrierShips: number }) => {
+  const gameStarCarrierShipTransferred = (
+    eventBus: EventBus,
+    data: {
+      starId: string;
+      carrierId: string;
+      starShips: number;
+      carrierShips: number;
+    },
+  ) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
     const carrier = GameHelper.getCarrierById(game.value!, data.carrierId)!;
 
-    star.ships = data.starShips
-    carrier.ships = data.carrierShips
+    star.ships = data.starShips;
+    carrier.ships = data.carrierShips;
 
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, { carrier });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadCarrier, {
+      carrier,
+    });
   };
 
   const gameStarAllShipsTransferred = (data: ShipTransferReport<string>) => {
@@ -214,8 +264,11 @@ export const useGameStore = defineStore('game', () => {
 
     star.ships = data.star.ships;
 
-    data.carriers.forEach(carrier => {
-      const mapObjectCarrier = GameHelper.getCarrierById(game.value!, carrier._id)!
+    data.carriers.forEach((carrier) => {
+      const mapObjectCarrier = GameHelper.getCarrierById(
+        game.value!,
+        carrier._id,
+      )!;
 
       mapObjectCarrier.ships = carrier.ships;
     });
@@ -224,37 +277,76 @@ export const useGameStore = defineStore('game', () => {
   const gameStarAbandoned = (eventBus: EventBus, data: { starId: string }) => {
     const star = GameHelper.getStarById(game.value!, data.starId)!;
 
-    const player = GameHelper.getPlayerById(game.value!, star.ownedByPlayerId!)!;
+    const player = GameHelper.getPlayerById(
+      game.value!,
+      star.ownedByPlayerId!,
+    )!;
     player.stats!.totalStars--;
 
     star.ownedByPlayerId = null;
     star.ships = 0;
 
     // Redraw and remove carriers
-    const carriers = game.value!.galaxy.carriers.filter(x => x.orbiting && x.orbiting === star._id && x.ownedByPlayerId === player._id);
+    const carriers = game.value!.galaxy.carriers.filter(
+      (x) =>
+        x.orbiting &&
+        x.orbiting === star._id &&
+        x.ownedByPlayerId === player._id,
+    );
 
-    carriers.forEach(c => {
-      eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, { carrier: c });
-      game.value!.galaxy.carriers.splice(game.value!.galaxy.carriers.indexOf(c), 1);
+    carriers.forEach((c) => {
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandRemoveCarrier, {
+        carrier: c,
+      });
+      game.value!.galaxy.carriers.splice(
+        game.value!.galaxy.carriers.indexOf(c),
+        1,
+      );
     });
 
     // Redraw the star
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
-  const gameStarEconomyUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
-    const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'economy', ...data });
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+  const gameStarEconomyUpgraded = (
+    eventBus: EventBus,
+    data: InfrastructureUpgradeReport<string>,
+  ) => {
+    const star = GameHelper.starInfrastructureUpgraded(game.value!, {
+      type: "economy",
+      ...data,
+    });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
-  const gameStarIndustryUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
-    const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'industry', ...data });
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+  const gameStarIndustryUpgraded = (
+    eventBus: EventBus,
+    data: InfrastructureUpgradeReport<string>,
+  ) => {
+    const star = GameHelper.starInfrastructureUpgraded(game.value!, {
+      type: "industry",
+      ...data,
+    });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
-  const gameStarScienceUpgraded = (eventBus: EventBus, data: InfrastructureUpgradeReport<string>) => {
-    const star = GameHelper.starInfrastructureUpgraded(game.value!, { type: 'science', ...data });
-    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+  const gameStarScienceUpgraded = (
+    eventBus: EventBus,
+    data: InfrastructureUpgradeReport<string>,
+  ) => {
+    const star = GameHelper.starInfrastructureUpgraded(game.value!, {
+      type: "science",
+      ...data,
+    });
+    eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+      star,
+    });
   };
 
   const loadSpecialistData = async (httpClient: Axios, gameId: string) => {
@@ -263,7 +355,7 @@ export const useGameStore = defineStore('game', () => {
       listStarForGame(httpClient)(gameId),
     ];
 
-    const responses = await Promise.all(requests)
+    const responses = await Promise.all(requests);
 
     const carrierResponse = responses[0];
 
@@ -283,10 +375,10 @@ export const useGameStore = defineStore('game', () => {
   };
 
   const socketMutations = {
-    'gameStarted': (data: { state: GameState<string> }) => {
+    gameStarted: (data: { state: GameState<string> }) => {
       game.value!.state = data.state;
     },
-    'gamePlayerJoined': (data: PlayerJoinedData) => {
+    gamePlayerJoined: (data: PlayerJoinedData) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.isOpenSlot = false;
@@ -296,54 +388,58 @@ export const useGameStore = defineStore('game', () => {
       player.defeatedDate = null;
       player.afk = false;
     },
-    'gamePlayerQuit': (data: { playerId: string }) => {
+    gamePlayerQuit: (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.isOpenSlot = true;
-      player.alias = 'Empty Slot';
+      player.alias = "Empty Slot";
       player.avatar = null;
     },
-    'gamePlayerReady': (data: { playerId: string }) => {
+    gamePlayerReady: (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.ready = true;
     },
-    'gamePlayerNotReady': (data: { playerId: string }) => {
+    gamePlayerNotReady: (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.ready = false;
     },
-    'gamePlayerConcededDefeat': (data: { playerId: string }) => {
+    gamePlayerConcededDefeat: (data: { playerId: string }) => {
       const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
       player.defeated = true;
     },
-    'gamePlayerReadyToQuit': (data: { playerId: string | null }) => {
+    gamePlayerReadyToQuit: (data: { playerId: string | null }) => {
       if (data.playerId !== null) {
         const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
         player.readyToQuit = true;
       }
 
-      game.value!.state.readyToQuitCount = (game.value!.state.readyToQuitCount ?? 0) + 1;
+      game.value!.state.readyToQuitCount =
+        (game.value!.state.readyToQuitCount ?? 0) + 1;
     },
-    'gamePlayerNotReadyToQuit': (data: { playerId: string | null }) => {
+    gamePlayerNotReadyToQuit: (data: { playerId: string | null }) => {
       if (data.playerId !== null) {
         const player = GameHelper.getPlayerById(game.value!, data.playerId)!;
 
         player.readyToQuit = false;
       }
 
-      game.value!.state.readyToQuitCount = (game.value!.state.readyToQuitCount ?? 0) - 1;
+      game.value!.state.readyToQuitCount =
+        (game.value!.state.readyToQuitCount ?? 0) - 1;
     },
-    'playerDebtSettled': (data: { debtorPlayerId: string,
-      creditorPlayerId: string,
-      amount: number,
-      ledgerType: LedgerType, }) => {
+    playerDebtSettled: (data: {
+      debtorPlayerId: string;
+      creditorPlayerId: string;
+      amount: number;
+      ledgerType: LedgerType;
+    }) => {
       const player = GameHelper.getUserPlayer(game.value!)!;
 
       if (data.creditorPlayerId === player._id) {
-        if (data.ledgerType === 'credits') {
+        if (data.ledgerType === "credits") {
           player.credits += data.amount;
         } else {
           player.creditsSpecialists += data.amount;
@@ -352,13 +448,13 @@ export const useGameStore = defineStore('game', () => {
     },
   };
 
-  const getSpecialist = (id: number, kind: 'star' | 'carrier'): Specialist => {
-    if (kind === 'star') {
-      return starSpecialists.value!.find(spec => spec.id === id)!;
+  const getSpecialist = (id: number, kind: "star" | "carrier"): Specialist => {
+    if (kind === "star") {
+      return starSpecialists.value!.find((spec) => spec.id === id)!;
     } else {
-      return carrierSpecialists.value!.find(spec => spec.id === id)!;
+      return carrierSpecialists.value!.find((spec) => spec.id === id)!;
     }
-  }
+  };
 
   return {
     game,

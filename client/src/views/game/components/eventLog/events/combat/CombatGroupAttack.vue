@@ -1,17 +1,21 @@
 <template>
   <p v-if="hasMultiple" class="combat-group-attack">
-    <span class="weapons-level" v-for="[weaponsLevel, groups] of groupedAttack">Weapons {{weaponsLevel}} against {{formatGroups(groups)}}</span>
+    <span class="weapons-level" v-for="[weaponsLevel, groups] of groupedAttack"
+      >Weapons {{ weaponsLevel }} against {{ formatGroups(groups) }}</span
+    >
   </p>
   <p v-else class="combat-group-attack">
-    <span class="weapons-level" v-for="[weaponsLevel, _d] of groupedAttack">Weapons {{weaponsLevel}}</span>
+    <span class="weapons-level" v-for="[weaponsLevel, _d] of groupedAttack"
+      >Weapons {{ weaponsLevel }}</span
+    >
   </p>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue';
-import {groupBy, type WeaponsDetail} from "@solaris/common";
+import { computed } from "vue";
+import { groupBy, type WeaponsDetail } from "@solaris/common";
 
 const props = defineProps<{
-  attackAgainst:  Record<number, WeaponsDetail>,
+  attackAgainst: Record<number, WeaponsDetail>;
 }>();
 
 const groupedAttack = computed(() => {

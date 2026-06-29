@@ -1,16 +1,16 @@
-import backspaceFile from '../assets/audio/backspace.mp3'
-import clickFile from '../assets/audio/click.mp3'
-import closeFile from '../assets/audio/close.mp3'
-import dialogOpenFile from '../assets/audio/dialog_open.mp3'
-import downloadFile from '../assets/audio/download.mp3'
-import hoverFile from '../assets/audio/hover.mp3'
-import joinFile from '../assets/audio/join.mp3'
-import leaveFile from '../assets/audio/leave.mp3'
-import loadingFile from '../assets/audio/loading.mp3'
-import openFile from '../assets/audio/open.mp3'
-import quitFile from '../assets/audio/quit.mp3'
-import typeFile from '../assets/audio/type.mp3'
-import type { GameStore } from '../stores/game'
+import backspaceFile from "../assets/audio/backspace.mp3";
+import clickFile from "../assets/audio/click.mp3";
+import closeFile from "../assets/audio/close.mp3";
+import dialogOpenFile from "../assets/audio/dialog_open.mp3";
+import downloadFile from "../assets/audio/download.mp3";
+import hoverFile from "../assets/audio/hover.mp3";
+import joinFile from "../assets/audio/join.mp3";
+import leaveFile from "../assets/audio/leave.mp3";
+import loadingFile from "../assets/audio/loading.mp3";
+import openFile from "../assets/audio/open.mp3";
+import quitFile from "../assets/audio/quit.mp3";
+import typeFile from "../assets/audio/type.mp3";
+import type { GameStore } from "../stores/game";
 
 // TODO: This service doesn't really belong in the game folder, should be in the services folder instead.
 class AudioService {
@@ -28,107 +28,107 @@ class AudioService {
   quitAudio: HTMLAudioElement | undefined;
   typeAudio: HTMLAudioElement | undefined;
 
-  _play (audio: HTMLAudioElement) {
-    const audioEnabled = this.store?.settings?.interface?.audio !== 'disabled';
+  _play(audio: HTMLAudioElement) {
+    const audioEnabled = this.store?.settings?.interface?.audio !== "disabled";
 
     if (!this.store || !audioEnabled) {
-      return
+      return;
     }
 
-    audio.volume = 0.5
-    audio.play()
+    audio.volume = 0.5;
+    audio.play();
   }
 
-  _preload () {
+  _preload() {
     if (this.backspaceAudio) {
-      return
+      return;
     }
 
-    this.backspaceAudio = new Audio(backspaceFile)
-    this.clickAudio = new Audio(clickFile)
-    this.closeAudio = new Audio(closeFile)
-    this.dialogOpenAudio = new Audio(dialogOpenFile)
-    this.downloadAudio = new Audio(downloadFile)
-    this.hoverAudio = new Audio(hoverFile)
-    this.joinAudio = new Audio(joinFile)
-    this.leaveAudio = new Audio(leaveFile)
-    this.loadingAudio = new Audio(loadingFile)
-    this.openAudio = new Audio(openFile)
-    this.quitAudio = new Audio(quitFile)
-    this.typeAudio = new Audio(typeFile)
+    this.backspaceAudio = new Audio(backspaceFile);
+    this.clickAudio = new Audio(clickFile);
+    this.closeAudio = new Audio(closeFile);
+    this.dialogOpenAudio = new Audio(dialogOpenFile);
+    this.downloadAudio = new Audio(downloadFile);
+    this.hoverAudio = new Audio(hoverFile);
+    this.joinAudio = new Audio(joinFile);
+    this.leaveAudio = new Audio(leaveFile);
+    this.loadingAudio = new Audio(loadingFile);
+    this.openAudio = new Audio(openFile);
+    this.quitAudio = new Audio(quitFile);
+    this.typeAudio = new Audio(typeFile);
   }
 
   _checkLoad() {
-    const audioEnabled = this.store?.settings?.interface?.audio !== 'disabled';
+    const audioEnabled = this.store?.settings?.interface?.audio !== "disabled";
 
     if (audioEnabled) {
       this._preload();
     }
   }
 
-  loadStore (store: GameStore) {
+  loadStore(store: GameStore) {
     this.store = store;
     this._checkLoad();
   }
 
-  backspace () {
+  backspace() {
     this._checkLoad();
-    this._play(this.backspaceAudio!)
+    this._play(this.backspaceAudio!);
   }
 
-  click () {
-    this._play(this.clickAudio!)
+  click() {
+    this._play(this.clickAudio!);
   }
 
-  close () {
+  close() {
     this._checkLoad();
-    this._play(this.closeAudio!)
+    this._play(this.closeAudio!);
   }
 
-  dialogOpen () {
+  dialogOpen() {
     this._checkLoad();
-    this._play(this.dialogOpenAudio!)
+    this._play(this.dialogOpenAudio!);
   }
 
-  download () {
+  download() {
     this._checkLoad();
-    this._play(this.downloadAudio!)
+    this._play(this.downloadAudio!);
   }
 
-  hover () {
+  hover() {
     this._checkLoad();
-    this._play(this.hoverAudio!)
+    this._play(this.hoverAudio!);
   }
 
-  join () {
+  join() {
     this._checkLoad();
-    this._play(this.joinAudio!)
+    this._play(this.joinAudio!);
   }
 
-  leave () {
+  leave() {
     this._checkLoad();
-    this._play(this.leaveAudio!)
+    this._play(this.leaveAudio!);
   }
 
-  loading () {
+  loading() {
     this._checkLoad();
-    this._play(this.loadingAudio!)
+    this._play(this.loadingAudio!);
   }
 
-  open () {
+  open() {
     this._checkLoad();
-    this._play(this.openAudio!)
+    this._play(this.openAudio!);
   }
 
-  quit () {
+  quit() {
     this._checkLoad();
-    this._play(this.quitAudio!)
+    this._play(this.quitAudio!);
   }
 
-  type () {
+  type() {
     this._checkLoad();
-    this._play(this.typeAudio!)
+    this._play(this.typeAudio!);
   }
 }
 
-export default new AudioService()
+export default new AudioService();

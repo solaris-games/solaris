@@ -1,13 +1,16 @@
-import {computed, inject, readonly, ref } from 'vue';
-import { defineStore } from 'pinia';
-import type {UserPrivate, UserRoles} from "@solaris/common";
-import {httpInjectionKey, formatError, isOk} from "@/services/typedapi";
-import {UserClientSocketEmitter, userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user";
-import {verify as verifyApi} from "@/services/typedapi/auth";
-import {detailMe} from "@/services/typedapi/user";
+import { computed, inject, readonly, ref } from "vue";
+import { defineStore } from "pinia";
+import type { UserPrivate, UserRoles } from "@solaris/common";
+import { httpInjectionKey, formatError, isOk } from "@/services/typedapi";
+import {
+  UserClientSocketEmitter,
+  userClientSocketEmitterInjectionKey,
+} from "@/sockets/socketEmitters/user";
+import { verify as verifyApi } from "@/services/typedapi/auth";
+import { detailMe } from "@/services/typedapi/user";
 import type { Axios } from "axios";
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore("user", () => {
   // State
   const user = ref<UserPrivate<string> | null>(null);
   const userId = ref<string | null>(null);
@@ -67,7 +70,10 @@ export const useUserStore = defineStore('user', () => {
   };
 
   // Verify authentication action
-  const verify = async (httpClient: Axios, userClientSocketEmitter: UserClientSocketEmitter): Promise<boolean> => {
+  const verify = async (
+    httpClient: Axios,
+    userClientSocketEmitter: UserClientSocketEmitter,
+  ): Promise<boolean> => {
     const response = await verifyApi(httpClient)();
     if (isOk(response)) {
       if (response.data._id) {
@@ -84,7 +90,7 @@ export const useUserStore = defineStore('user', () => {
               userClientSocketEmitter.emitJoined();
             }
           } else {
-            console.error('Failed to get user info', resp2);
+            console.error("Failed to get user info", resp2);
           }
         }
 

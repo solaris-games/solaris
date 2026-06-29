@@ -24,10 +24,18 @@
       </div>
     </div>
 
-    <div class="row pb-2" title="Weapons modifier" v-for="buff of weaponsDetail.appliedBuffs">
+    <div
+      class="row pb-2"
+      title="Weapons modifier"
+      v-for="buff of weaponsDetail.appliedBuffs"
+    >
       <div class="col-auto" title="Weapons technology">
-        <span v-if="buff.kind === 'star'">{{getSpecialistName(buff.specialistId, 'star')}}</span>
-        <span v-if="buff.kind === 'carrier'">{{getSpecialistName(buff.specialistId, 'carrier')}}</span>
+        <span v-if="buff.kind === 'star'">{{
+          getSpecialistName(buff.specialistId, "star")
+        }}</span>
+        <span v-if="buff.kind === 'carrier'">{{
+          getSpecialistName(buff.specialistId, "carrier")
+        }}</span>
         {{ buff.amount }}
         <i class="fas fa-user-astronaut ms-1"></i>
       </div>
@@ -46,9 +54,7 @@
     </summary>
 
     <div class="row pt-1 pb-1">
-      <div class="col" title="Weapons technology">
-        Weapons technology
-      </div>
+      <div class="col" title="Weapons technology">Weapons technology</div>
 
       <div class="col text-end">
         {{ weaponsDetail.weaponsLevel }}
@@ -57,9 +63,7 @@
     </div>
 
     <div class="row pt-1 pb-1">
-      <div class="col" title="Defender Bonus">
-        Defender Bonus
-      </div>
+      <div class="col" title="Defender Bonus">Defender Bonus</div>
 
       <div class="col text-end">
         {{ weaponsDetail.defenderBonus }}
@@ -67,10 +71,18 @@
       </div>
     </div>
 
-    <div class="row pt-1 pb-1" title="Weapons modifier" v-for="buff of weaponsDetail.appliedBuffs">
+    <div
+      class="row pt-1 pb-1"
+      title="Weapons modifier"
+      v-for="buff of weaponsDetail.appliedBuffs"
+    >
       <div class="col" title="Weapons technology">
-        <span v-if="buff.kind === 'star'">{{getSpecialistName(buff.specialistId, 'star')}}</span>
-        <span v-if="buff.kind === 'carrier'">{{getSpecialistName(buff.specialistId, 'carrier')}}</span>
+        <span v-if="buff.kind === 'star'">{{
+          getSpecialistName(buff.specialistId, "star")
+        }}</span>
+        <span v-if="buff.kind === 'carrier'">{{
+          getSpecialistName(buff.specialistId, "carrier")
+        }}</span>
       </div>
 
       <div class="col text-end">
@@ -82,40 +94,66 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import {computed} from 'vue';
-import {useGameServices} from "@/util/gameServices";
-import type {Game, Player, Star} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import { useGameServices } from "@/util/gameServices";
+import type { Game, Player, Star } from "@/types/game";
 import GameHelper from "@/services/gameHelper";
-import type {Specialist} from "@solaris/common";
+import type { Specialist } from "@solaris/common";
 
 const props = defineProps<{
-  star: Star,
-  compact: boolean,
+  star: Star;
+  compact: boolean;
 }>();
 
 const gameServices = useGameServices();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
-const starSpecialists = computed<readonly Specialist[]>(() => store.starSpecialists!);
-const carrierSpecialists = computed<readonly Specialist[]>(() => store.carrierSpecialists!);
+const starSpecialists = computed<readonly Specialist[]>(
+  () => store.starSpecialists!,
+);
+const carrierSpecialists = computed<readonly Specialist[]>(
+  () => store.carrierSpecialists!,
+);
 
-const getSpecialistName = (id: number, kind: 'star' | 'carrier') => {
-  if (kind === 'carrier') {
+const getSpecialistName = (id: number, kind: "star" | "carrier") => {
+  if (kind === "carrier") {
     return carrierSpecialists.value.find((spec) => spec.id === id)!.name;
-  } else if (kind === 'star') {
+  } else if (kind === "star") {
     return starSpecialists.value.find((spec) => spec.id === id)!.name;
   }
 };
 
-const starOwningPlayer = computed<Player | undefined>(() => props.star.ownedByPlayerId && GameHelper.getPlayerById(game.value, props.star.ownedByPlayerId) || undefined);
+const starOwningPlayer = computed<Player | undefined>(
+  () =>
+    (props.star.ownedByPlayerId &&
+      GameHelper.getPlayerById(game.value, props.star.ownedByPlayerId)) ||
+    undefined,
+);
 
-const carriersInOrbit = computed(() => GameHelper.getCarriersOrbitingStar(game.value, props.star));
+const carriersInOrbit = computed(() =>
+  GameHelper.getCarriersOrbitingStar(game.value, props.star),
+);
 
-const defenders = computed(() => starOwningPlayer.value ? [starOwningPlayer.value].concat(...carriersInOrbit.value.map(c => GameHelper.getPlayerById(game.value, c.ownedByPlayerId!)!)) : []);
+const defenders = computed(() =>
+  starOwningPlayer.value
+    ? [starOwningPlayer.value].concat(
+        ...carriersInOrbit.value.map((c) =>
+          GameHelper.getPlayerById(game.value, c.ownedByPlayerId!)!,
+        ),
+      )
+    : [],
+);
 
-const weaponsDetail = computed(() => gameServices.technologyService.getStarOwnWeaponsDetail<string>(game.value, defenders.value, props.star, carriersInOrbit.value));
+const weaponsDetail = computed(() =>
+  gameServices.technologyService.getStarOwnWeaponsDetail<string>(
+    game.value,
+    defenders.value,
+    props.star,
+    carriersInOrbit.value,
+  ),
+);
 </script>
 
 <style scoped>

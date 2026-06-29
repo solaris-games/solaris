@@ -1,4 +1,4 @@
-import {date, object, string, Validator} from "@solaris/common";
+import { date, object, string, Validator } from "@solaris/common";
 
 export type AnnouncementRequest = {
     title: string;
@@ -9,5 +9,5 @@ export type AnnouncementRequest = {
 export const parseAnnouncementRequest: Validator<AnnouncementRequest> = object({
     title: string,
     content: string,
-    date: date
+    date: date,
 });

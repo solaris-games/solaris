@@ -1,16 +1,16 @@
-import { DBObjectId } from './types/DBObjectId';
+import { DBObjectId } from "./types/DBObjectId";
 import { ValidationError } from "@solaris/common";
-import Repository from './repository';
-import { Badge } from './types/Badge';
-import { Game } from './types/Game';
-import {AwardedBadge, User} from './types/User';
-import PlayerService from './player';
-import UserService from './user';
-import InternalGamePlayerBadgePurchasedEvent from './types/internalEvents/GamePlayerBadgePurchased';
-import { GameTypeService } from '@solaris/common'
+import Repository from "./repository";
+import { Badge } from "./types/Badge";
+import { Game } from "./types/Game";
+import { AwardedBadge, User } from "./types/User";
+import PlayerService from "./player";
+import UserService from "./user";
+import InternalGamePlayerBadgePurchasedEvent from "./types/internalEvents/GamePlayerBadgePurchased";
+import { GameTypeService } from "@solaris/common";
 import GameStateService from "./gameState";
 import EventEmitter from "events";
-import { IEventService } from './types/IEventService';
+import { IEventService } from "./types/IEventService";
 
 export default class BadgeService extends EventEmitter {
     userRepo: Repository<User>;
@@ -36,27 +36,32 @@ export default class BadgeService extends EventEmitter {
     }
 
     listBadges(): Badge[] {
-        return require('../config/game/badges').slice();
+        return require("../config/game/badges").slice();
     }
 
     listPurchasableBadges(): Badge[] {
-        return this.listBadges().filter(b => b.price);
+        return this.listBadges().filter((b) => b.price);
     }
 
-    async listBadgesByUser(userId: DBObjectId, requestingUserId?: DBObjectId): Promise<AwardedBadge[]> {
+    async listBadgesByUser(
+        userId: DBObjectId,
+        requestingUserId?: DBObjectId,
+    ): Promise<AwardedBadge[]> {
         const user = await this.userService.getById(userId, {
-            'achievements.badges': 1,
-            isAnonymous: 1
+            "achievements.badges": 1,
+            isAnonymous: 1,
         });
 
         if (!user) {
-            throw new ValidationError('User not found.', 404);
+            throw new ValidationError("User not found.", 404);
         }
 
-        const isSelf = requestingUserId && requestingUserId.toString() === user._id.toString();
+        const isSelf =
+            requestingUserId &&
+            requestingUserId.toString() === user._id.toString();
 
         if (user.isAnonymous && !isSelf) {
-            throw new ValidationError('User not found.', 404);
+            throw new ValidationError("User not found.", 404);
         }
 
         if (!user.achievements?.badges) {
@@ -70,7 +75,9 @@ export default class BadgeService extends EventEmitter {
         const player = this.playerService.getById(game, playerId);
 
         if (!player) {
-            throw new ValidationError(`Could not find the player in this game.`);
+            throw new ValidationError(
+                `Could not find the player in this game.`,
+            );
         }
 
         if (!player.userId) {
@@ -78,27 +85,42 @@ export default class BadgeService extends EventEmitter {
         }
 
         // Do not reveal badges for anon games.
-        if (game.settings.general.anonymity === 'extra') {
-            return []
+        if (game.settings.general.anonymity === "extra") {
+            return [];
         }
 
         return await this.listBadgesByUser(player.userId);
     }
 
-    async purchaseBadgeForPlayer(game: Game, purchasedByUserId: DBObjectId, purchasedForPlayerId: DBObjectId, badgeKey: string, eventService: IEventService) {
+    async purchaseBadgeForPlayer(
+        game: Game,
+        purchasedByUserId: DBObjectId,
+        purchasedForPlayerId: DBObjectId,
+        badgeKey: string,
+        eventService: IEventService,
+    ) {
         let buyer = this.playerService.getByUserId(game, purchasedByUserId)!;
         let recipient = this.playerService.getById(game, purchasedForPlayerId);
 
         if (!recipient) {
-            throw new ValidationError(`Could not find the player in this game.`);
+            throw new ValidationError(
+                `Could not find the player in this game.`,
+            );
         }
 
         if (!recipient.userId) {
-            throw new ValidationError(`The player slot has not been filled by a user.`);
+            throw new ValidationError(
+                `The player slot has not been filled by a user.`,
+            );
         }
 
-        if (this.gameTypeService.isAnonymousGameDuringGame(game) && !this.gameStateService.isFinished(game)) {
-            throw new ValidationError(`Cannot purchase a badge in an anonymous game before it finishes.`);
+        if (
+            this.gameTypeService.isAnonymousGameDuringGame(game) &&
+            !this.gameStateService.isFinished(game)
+        ) {
+            throw new ValidationError(
+                `Cannot purchase a badge in an anonymous game before it finishes.`,
+            );
         }
 
         const purchasedForUserId = recipient.userId;
@@ -107,23 +129,33 @@ export default class BadgeService extends EventEmitter {
             throw new ValidationError(`Cannot purchased a badge for yourself.`);
         }
 
-        const badge = this.listPurchasableBadges().find(b => b.key === badgeKey);
+        const badge = this.listPurchasableBadges().find(
+            (b) => b.key === badgeKey,
+        );
 
         if (!badge) {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
         }
 
-        const recipientUser = await this.userService.getById(purchasedForUserId, {_id: 1});
+        const recipientUser = await this.userService.getById(
+            purchasedForUserId,
+            { _id: 1 },
+        );
 
         if (!recipientUser) {
-            throw new ValidationError(`Recipient user ${purchasedForUserId} does not exist.`);
+            throw new ValidationError(
+                `Recipient user ${purchasedForUserId} does not exist.`,
+            );
         }
 
         // Check if the buyer can afford the badge.
-        const creditsOwned = await this.userService.getCredits(purchasedByUserId);
+        const creditsOwned =
+            await this.userService.getCredits(purchasedByUserId);
 
         if (!creditsOwned || creditsOwned < badge.price) {
-            throw new ValidationError(`You cannot afford to purchase this badge.`);
+            throw new ValidationError(
+                `You cannot afford to purchase this badge.`,
+            );
         }
 
         // TODO: This would be better in a bulk update.
@@ -136,16 +168,19 @@ export default class BadgeService extends EventEmitter {
             awardedInGame: game._id,
             awardedInGameName: game.settings.general.name,
             playerAwarded: true,
-            time: new Date()
-        }
+            time: new Date(),
+        };
 
-        await this.userRepo.updateOne({
-            _id: purchasedForUserId
-        }, {
-            $push: {
-                'achievements.badges': awardedBadge,
-            }
-        });
+        await this.userRepo.updateOne(
+            {
+                _id: purchasedForUserId,
+            },
+            {
+                $push: {
+                    "achievements.badges": awardedBadge,
+                },
+            },
+        );
 
         const e: InternalGamePlayerBadgePurchasedEvent = {
             gameId: game._id,
@@ -155,14 +190,19 @@ export default class BadgeService extends EventEmitter {
             purchasedForPlayerId: recipient._id,
             purchasedForPlayerAlias: recipient.alias,
             badgeKey,
-            badgeName: badge.name
+            badgeName: badge.name,
         };
 
         await eventService.createGamePlayerBadgePurchased(e);
     }
 
-    awardBadgeForUser(user: User, badgeKey: string, game: Game, date: Date): void {
-        const badge = this.listBadges().find(b => b.key === badgeKey);
+    awardBadgeForUser(
+        user: User,
+        badgeKey: string,
+        game: Game,
+        date: Date,
+    ): void {
+        const badge = this.listBadges().find((b) => b.key === badgeKey);
 
         if (!badge) {
             throw new ValidationError(`Badge ${badgeKey} does not exist.`);
@@ -175,17 +215,22 @@ export default class BadgeService extends EventEmitter {
             awardedInGame: game._id,
             awardedInGameName: game.settings.general.name,
             playerAwarded: false,
-            time: date
-        }
+            time: date,
+        };
 
         user.achievements.badges.push(awardedBadge);
     }
 
     awardBadgeForUserVictor32PlayerGame(user: User, game: Game): void {
-        this.awardBadgeForUser(user, 'victor32', game, game.state.endDate!);
+        this.awardBadgeForUser(user, "victor32", game, game.state.endDate!);
     }
 
     awardBadgeForUserVictorySpecialGame(user: User, game: Game): void {
-        this.awardBadgeForUser(user, game.settings.general.type, game, game.state.endDate!);
+        this.awardBadgeForUser(
+            user,
+            game.settings.general.type,
+            game,
+            game.state.endDate!,
+        );
     }
-};
+}

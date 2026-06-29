@@ -1,13 +1,19 @@
-import { DependencyContainer } from '../../services/types/DependencyContainer';
-import { mapToTradeSendTechnologyToPlayerRequest, mapToTradeSendToPlayerRequest } from '../requests/trade';
-import {objectIdFromString} from "../../services/types/DBObjectId";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {
+    mapToTradeSendTechnologyToPlayerRequest,
+    mapToTradeSendToPlayerRequest,
+} from "../requests/trade";
+import { objectIdFromString } from "../../services/types/DBObjectId";
 
 export default (container: DependencyContainer) => {
     return {
         sendCredits: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
-    
+                const reqObj = mapToTradeSendToPlayerRequest(
+                    req.body,
+                    req.session.userId,
+                );
+
                 let trade = await container.tradeService.sendCredits(
                     req.game,
                     req.player,
@@ -15,13 +21,20 @@ export default (container: DependencyContainer) => {
                     reqObj.amount,
                     container.eventService,
                     container.statisticsService,
-                    container.notificationService);
-                
+                    container.notificationService,
+                );
+
                 res.status(200).json({
-                    reputation: trade.reputation
+                    reputation: trade.reputation,
                 });
-    
-                container.broadcastService.gamePlayerCreditsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+
+                container.broadcastService.gamePlayerCreditsReceived(
+                    req.game,
+                    trade.fromPlayer._id,
+                    trade.toPlayer._id,
+                    trade.amount,
+                    trade.date,
+                );
                 return next();
             } catch (err) {
                 return next(err);
@@ -29,8 +42,11 @@ export default (container: DependencyContainer) => {
         },
         sendCreditsSpecialists: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
-    
+                const reqObj = mapToTradeSendToPlayerRequest(
+                    req.body,
+                    req.session.userId,
+                );
+
                 let trade = await container.tradeService.sendCreditsSpecialists(
                     req.game,
                     req.player,
@@ -38,21 +54,31 @@ export default (container: DependencyContainer) => {
                     reqObj.amount,
                     container.eventService,
                     container.statisticsService,
-                    container.notificationService);
-                
+                    container.notificationService,
+                );
+
                 res.status(200).json({
-                    reputation: trade.reputation
+                    reputation: trade.reputation,
                 });
-    
-                container.broadcastService.gamePlayerCreditsSpecialistsReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+
+                container.broadcastService.gamePlayerCreditsSpecialistsReceived(
+                    req.game,
+                    trade.fromPlayer._id,
+                    trade.toPlayer._id,
+                    trade.amount,
+                    trade.date,
+                );
                 return next();
             } catch (err) {
                 return next(err);
             }
         },
-        sendRenown: async (req, res, next) => {    
+        sendRenown: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(req.body, req.session.userId);
+                const reqObj = mapToTradeSendToPlayerRequest(
+                    req.body,
+                    req.session.userId,
+                );
 
                 const trade = await container.tradeService.sendRenown(
                     req.game,
@@ -60,11 +86,18 @@ export default (container: DependencyContainer) => {
                     reqObj.toPlayerId,
                     reqObj.amount,
                     container.eventService,
-                    container.notificationService);
+                    container.notificationService,
+                );
 
                 res.sendStatus(200);
-    
-                container.broadcastService.gamePlayerRenownReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.amount, trade.date);
+
+                container.broadcastService.gamePlayerRenownReceived(
+                    req.game,
+                    trade.fromPlayer._id,
+                    trade.toPlayer._id,
+                    trade.amount,
+                    trade.date,
+                );
                 return next();
             } catch (err) {
                 return next(err);
@@ -72,8 +105,10 @@ export default (container: DependencyContainer) => {
         },
         sendTechnology: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendTechnologyToPlayerRequest(req.body);
-                
+                const reqObj = mapToTradeSendTechnologyToPlayerRequest(
+                    req.body,
+                );
+
                 let trade = await container.tradeService.sendTechnology(
                     req.game,
                     req.player,
@@ -82,13 +117,20 @@ export default (container: DependencyContainer) => {
                     reqObj.level,
                     container.eventService,
                     container.statisticsService,
-                    container.notificationService);
-    
+                    container.notificationService,
+                );
+
                 res.status(200).json({
-                    reputation: trade.reputation
+                    reputation: trade.reputation,
                 });
-                
-                container.broadcastService.gamePlayerTechnologyReceived(req.game, trade.fromPlayer._id, trade.toPlayer._id, trade.technology, trade.date);
+
+                container.broadcastService.gamePlayerTechnologyReceived(
+                    req.game,
+                    trade.fromPlayer._id,
+                    trade.toPlayer._id,
+                    trade.technology,
+                    trade.date,
+                );
                 return next();
             } catch (err) {
                 return next(err);
@@ -96,11 +138,13 @@ export default (container: DependencyContainer) => {
         },
         listTradeableTechnologies: async (req, res, next) => {
             try {
-                let techs = await container.tradeService.listTradeableTechnologies(
-                    req.game,
-                    req.player,
-                    req.params.toPlayerId);
-    
+                let techs =
+                    await container.tradeService.listTradeableTechnologies(
+                        req.game,
+                        req.player,
+                        req.params.toPlayerId,
+                    );
+
                 res.status(200).json(techs);
                 return next();
             } catch (err) {
@@ -109,19 +153,21 @@ export default (container: DependencyContainer) => {
         },
         listTradeEvents: async (req, res, next) => {
             try {
-                let events = await container.tradeService.listTradeEventsBetweenPlayers(
-                    req.game, 
-                    req.player._id, 
-                    [
-                        req.player._id, 
-                        objectIdFromString(req.params.toPlayerId),
-                    ]);
-    
+                let events =
+                    await container.tradeService.listTradeEventsBetweenPlayers(
+                        req.game,
+                        req.player._id,
+                        [
+                            req.player._id,
+                            objectIdFromString(req.params.toPlayerId),
+                        ],
+                    );
+
                 res.status(200).json(events);
                 return next();
             } catch (err) {
                 return next(err);
             }
-        }
-    }
+        },
+    };
 };

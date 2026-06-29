@@ -1,11 +1,11 @@
-import http from 'http';
+import http from "http";
 import { Server } from "socket.io";
-import config from '../config';
-import mongooseLoader from '../db';
-import containerLoader from '../services';
+import config from "../config";
+import mongooseLoader from "../db";
+import containerLoader from "../services";
 import { logger, setupLogging } from "../utils/logging";
-import expressLoader from './express';
-const express = require('express');
+import expressLoader from "./express";
+const express = require("express");
 
 let mongo;
 Error.stackTraceLimit = 1000;
@@ -17,51 +17,51 @@ const log = logger();
 log.info(`Node ${process.version}`);
 
 async function startServer() {
-  mongo = await mongooseLoader(config, {});
+    mongo = await mongooseLoader(config, {});
 
-  const app = express();
-  const server: http.Server = http.createServer(app);
+    const app = express();
+    const server: http.Server = http.createServer(app);
 
-  const socketServer = new Server(server, {
-    cors: {
-      origin: config.corsUrls,
-      methods: ['POST', 'PUT', 'PATCH', 'GET', 'DELETE', 'OPTIONS'],
-      credentials: true,
-    },
-    transports: ["websocket", "polling"]
-  });
+    const socketServer = new Server(server, {
+        cors: {
+            origin: config.corsUrls,
+            methods: ["POST", "PUT", "PATCH", "GET", "DELETE", "OPTIONS"],
+            credentials: true,
+        },
+        transports: ["websocket", "polling"],
+    });
 
-  log.info('Sockets initialized.');
+    log.info("Sockets initialized.");
 
-  const container = containerLoader(config, socketServer, log);
+    const container = containerLoader(config, socketServer, log);
 
-  const { sessionStore } = await expressLoader(config, app, container);
-  container.sessionService.setSessionStorage(sessionStore);
-  container.socketService.setSessionStorage(sessionStore);
+    const { sessionStore } = await expressLoader(config, app, container);
+    container.sessionService.setSessionStorage(sessionStore);
+    container.socketService.setSessionStorage(sessionStore);
 
-  server.on('error', (err) => {
-    if (err) {
-      log.error(err);
-    }
-  });
+    server.on("error", (err) => {
+        if (err) {
+            log.error(err);
+        }
+    });
 
-  server.listen(config.port, () => {
-    log.info(`Server is running on port ${config.port}.`);
-  });
+    server.listen(config.port, () => {
+        log.info(`Server is running on port ${config.port}.`);
+    });
 
-  await container.discordService.initialize();
+    await container.discordService.initialize();
 }
 
-process.on('SIGINT', async () => {
-  log.info('Shutting down...');
+process.on("SIGINT", async () => {
+    log.info("Shutting down...");
 
-  log.info('Disconnecting from MongoDB...');
-  await mongo.disconnect();
-  log.info('MongoDB disconnected.');
+    log.info("Disconnecting from MongoDB...");
+    await mongo.disconnect();
+    log.info("MongoDB disconnected.");
 
-  log.info('Shutdown complete.');
+    log.info("Shutdown complete.");
 
-  process.exit(0);
+    process.exit(0);
 });
 
 startServer();

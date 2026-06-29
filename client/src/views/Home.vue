@@ -1,60 +1,95 @@
 <template>
-<div class="full-container">
-  <view-container :hideTopBar="true" :isAuthPage="false">
-    <view-title title="Welcome to Solaris" :hideHomeButton="true" :showSocialLinks="true" />
+  <div class="full-container">
+    <view-container :hideTopBar="true" :isAuthPage="false">
+      <view-title
+        title="Welcome to Solaris"
+        :hideHomeButton="true"
+        :showSocialLinks="true"
+      />
 
-    <div class="row">
-      <div class="col-sm-12 col-md-6 pb-3">
-        <p>Discover a space strategy game filled with <span class="text-warning">conquest</span>, <span class="text-warning">betrayal</span> and <span class="text-warning">subterfuge</span>.</p>
-        <p>Build alliances, make enemies and fight your way to victory to <span class="text-danger">galactic domination.</span></p>
-        <p>Will <strong>you</strong> conquer the galaxy?</p>
-        <a :href="documentationUrl" target="_blank">Learn more...</a>
+      <div class="row">
+        <div class="col-sm-12 col-md-6 pb-3">
+          <p>
+            Discover a space strategy game filled with
+            <span class="text-warning">conquest</span>,
+            <span class="text-warning">betrayal</span> and
+            <span class="text-warning">subterfuge</span>.
+          </p>
+          <p>
+            Build alliances, make enemies and fight your way to victory to
+            <span class="text-danger">galactic domination.</span>
+          </p>
+          <p>Will <strong>you</strong> conquer the galaxy?</p>
+          <a :href="documentationUrl" target="_blank">Learn more...</a>
+        </div>
+        <div class="col-sm-12 col-md-6">
+          <h4>Login</h4>
+
+          <loading-spinner :loading="isAutoLoggingIn" />
+
+          <account-login v-if="!isAutoLoggingIn"></account-login>
+        </div>
       </div>
-      <div class="col-sm-12 col-md-6">
-        <h4>Login</h4>
 
-        <loading-spinner :loading="isAutoLoggingIn"/>
-
-        <account-login v-if="!isAutoLoggingIn"></account-login>
+      <div class="row bg-dark">
+        <div class="col text-center">
+          <p class="mb-2 mt-2">
+            Play <span class="text-warning">Solaris</span> on
+            <a href="https://solaris.games" target="_blank" title="Web"
+              ><i class="fab fa-chrome me-1"></i>Web</a
+            >,
+            <a
+              href="https://store.steampowered.com/app/1623930/Solaris/"
+              target="_blank"
+              title="Steam"
+              ><i class="fab fa-steam me-1"></i>Steam</a
+            >
+            and
+            <a
+              href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android"
+              target="_blank"
+              title="Android"
+              ><i class="fab fa-google-play me-1"></i>Android</a
+            >.
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="row bg-dark">
-      <div class="col text-center">
-        <p class="mb-2 mt-2">Play <span class="text-warning">Solaris</span> on <a href="https://solaris.games" target="_blank" title="Web"><i class="fab fa-chrome me-1"></i>Web</a>, <a href="https://store.steampowered.com/app/1623930/Solaris/" target="_blank" title="Steam"><i class="fab fa-steam me-1"></i>Steam</a> and <a href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android" target="_blank" title="Android"><i class="fab fa-google-play me-1"></i>Android</a>.</p>
+      <div class="row bg-primary">
+        <div class="col text-center">
+          <p class="mb-2 mt-2">
+            <a
+              class="text-white"
+              href="https://command.solaris.games"
+              target="_blank"
+            >
+              Play Solaris:Command, the new, hex-based strategy and tactics
+              game!
+            </a>
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="row bg-primary">
-      <div class="col text-center">
-        <p class="mb-2 mt-2">
-          <a class="text-white" href="https://command.solaris.games" target="_blank">
-            Play Solaris:Command, the new, hex-based strategy and tactics game!
-          </a>
-        </p>
-      </div>
-    </div>
+      <latest-announcement />
+    </view-container>
 
-    <latest-announcement />
-  </view-container>
-
-  <parallax />
-</div>
+    <parallax />
+  </div>
 </template>
 
 <script setup lang="ts">
-import ViewContainer from './components/ViewContainer.vue'
-import ViewTitle from './components/ViewTitle.vue'
-import AccountLogin from './account/components/Login.vue'
-import router from '../router'
-import LoadingSpinner from './components/LoadingSpinner.vue'
-import Parallax from './components/Parallax.vue'
+import ViewContainer from "./components/ViewContainer.vue";
+import ViewTitle from "./components/ViewTitle.vue";
+import AccountLogin from "./account/components/Login.vue";
+import router from "../router";
+import LoadingSpinner from "./components/LoadingSpinner.vue";
+import Parallax from "./components/Parallax.vue";
 import LatestAnnouncement from "./components/LatestAnnouncement.vue";
-import { ref, inject, onMounted } from 'vue';
-import {configInjectionKey} from "@/config";
-import { useUserStore } from '@/stores/user';
-import {httpInjectionKey} from "@/services/typedapi";
-import {userClientSocketEmitterInjectionKey} from "@/sockets/socketEmitters/user.ts";
+import { ref, inject, onMounted } from "vue";
+import { configInjectionKey } from "@/config";
+import { useUserStore } from "@/stores/user";
+import { httpInjectionKey } from "@/services/typedapi";
+import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user.ts";
 
 const config = inject(configInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -70,7 +105,7 @@ onMounted(async () => {
   isAutoLoggingIn.value = true;
 
   if (await userStore.verify(httpClient, userClientSocketEmitter)) {
-    router.push({ name: 'main-menu' });
+    router.push({ name: "main-menu" });
   }
 
   isAutoLoggingIn.value = false;

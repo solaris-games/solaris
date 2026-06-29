@@ -10,83 +10,195 @@ export class PlayerServerSocketEmitter extends ServerSocketEmitter<PlayerSocketE
         super(server);
     }
 
-    public emitGamePlayerJoined(room: string | string[], data: { playerId: string, alias: string, avatar: string }) {
+    public emitGamePlayerJoined(
+        room: string | string[],
+        data: { playerId: string; alias: string; avatar: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerJoined, data);
     }
 
-    public emitGamePlayerQuit(room: string | string[], data: { playerId: string }) {
+    public emitGamePlayerQuit(
+        room: string | string[],
+        data: { playerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerQuit, data);
     }
 
-    public emitGamePlayerConcededDefeat(room: string | string[], data: { playerId: string }) {
+    public emitGamePlayerConcededDefeat(
+        room: string | string[],
+        data: { playerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerConcededDefeat, data);
     }
 
-    public emitGamePlayerReady(room: string | string[], data: { playerId: string }) {
+    public emitGamePlayerReady(
+        room: string | string[],
+        data: { playerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerReady, data);
     }
 
-    public emitGamePlayerNotReady(room: string | string[], data: { playerId: string }) {
+    public emitGamePlayerNotReady(
+        room: string | string[],
+        data: { playerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerNotReady, data);
     }
 
-    public emitGamePlayerReadyToQuit(room: string | string[], data: { playerId?: string }) {
+    public emitGamePlayerReadyToQuit(
+        room: string | string[],
+        data: { playerId?: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerReadyToQuit, data);
     }
 
-    public emitGamePlayerNotReadyToQuit(room: string | string[], data: { playerId?: string }) {
+    public emitGamePlayerNotReadyToQuit(
+        room: string | string[],
+        data: { playerId?: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GamePlayerNotReadyToQuit, data);
     }
 
-    public emitGameConversationRead(room: string | string[], data: { conversationId: string, readByPlayerId: string }) {
+    public emitGameConversationRead(
+        room: string | string[],
+        data: { conversationId: string; readByPlayerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GameConversationRead, data);
     }
 
-    public emitGameConversationLeft(room: string | string[], data: { conversationId: string, playerId: string }) {
+    public emitGameConversationLeft(
+        room: string | string[],
+        data: { conversationId: string; playerId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.GameConversationLeft, data);
     }
 
-    public emitGameConversationMessagePinned(room: string | string[], data: { conversationId: string, messageId: string }) {
-        this.emit(room, PlayerSocketEventNames.GameConversationMessagePinned, data);
+    public emitGameConversationMessagePinned(
+        room: string | string[],
+        data: { conversationId: string; messageId: string },
+    ) {
+        this.emit(
+            room,
+            PlayerSocketEventNames.GameConversationMessagePinned,
+            data,
+        );
     }
 
-    public emitGameConversationMessageUnpinned(room: string | string[], data: { conversationId: string, messageId: string }) {
-        this.emit(room, PlayerSocketEventNames.GameConversationMessageUnpinned, data);
+    public emitGameConversationMessageUnpinned(
+        room: string | string[],
+        data: { conversationId: string; messageId: string },
+    ) {
+        this.emit(
+            room,
+            PlayerSocketEventNames.GameConversationMessageUnpinned,
+            data,
+        );
     }
 
-    public emitPlayerEventRead(room: string | string[], data: { eventId: string }) {
+    public emitPlayerEventRead(
+        room: string | string[],
+        data: { eventId: string },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerEventRead, data);
     }
 
-    public emitPlayerAllEventsRead(room: string | string[], data: { }) {
+    public emitPlayerAllEventsRead(room: string | string[], data: {}) {
         this.emit(room, PlayerSocketEventNames.PlayerAllEventsRead, data);
     }
 
-    public emitPlayerCreditsReceived(room: string | string[], data: { playerId: string, type: string, date: Date, data: { fromPlayerId: string, toPlayerId: string, credits: number } }) {
+    public emitPlayerCreditsReceived(
+        room: string | string[],
+        data: {
+            playerId: string;
+            type: string;
+            date: Date;
+            data: { fromPlayerId: string; toPlayerId: string; credits: number };
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerCreditsReceived, data);
     }
 
-    public emitPlayerCreditsSpecialistsReceived(room: string | string[], data: { playerId: string, type: string, date: Date, data: { fromPlayerId: string, toPlayerId: string, creditsSpecialists: number } }) {
-        this.emit(room, PlayerSocketEventNames.PlayerCreditsSpecialistsReceived, data);
+    public emitPlayerCreditsSpecialistsReceived(
+        room: string | string[],
+        data: {
+            playerId: string;
+            type: string;
+            date: Date;
+            data: {
+                fromPlayerId: string;
+                toPlayerId: string;
+                creditsSpecialists: number;
+            };
+        },
+    ) {
+        this.emit(
+            room,
+            PlayerSocketEventNames.PlayerCreditsSpecialistsReceived,
+            data,
+        );
     }
 
-    public emitPlayerRenownReceived(room: string | string[], data: { playerId: string, type: string, date: Date, data: { fromPlayerId: string, toPlayerId: string, renown: number } }) {
+    public emitPlayerRenownReceived(
+        room: string | string[],
+        data: {
+            playerId: string;
+            type: string;
+            date: Date;
+            data: { fromPlayerId: string; toPlayerId: string; renown: number };
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerRenownReceived, data);
     }
 
-    public emitPlayerTechnologyReceived(room: string | string[], data: { playerId: string, type: string, date: Date, data: { fromPlayerId: string, toPlayerId: string, technology: TradeEventTechnology } }) {
+    public emitPlayerTechnologyReceived(
+        room: string | string[],
+        data: {
+            playerId: string;
+            type: string;
+            date: Date;
+            data: {
+                fromPlayerId: string;
+                toPlayerId: string;
+                technology: TradeEventTechnology;
+            };
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerTechnologyReceived, data);
     }
 
-    public emitPlayerDebtAdded(room: string | string[], data: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) {
+    public emitPlayerDebtAdded(
+        room: string | string[],
+        data: {
+            debtorPlayerId: string;
+            creditorPlayerId: string;
+            amount: number;
+            ledgerType: LedgerType;
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerDebtAdded, data);
     }
 
-    public emitPlayerDebtForgiven(room: string | string[], data: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) {
+    public emitPlayerDebtForgiven(
+        room: string | string[],
+        data: {
+            debtorPlayerId: string;
+            creditorPlayerId: string;
+            amount: number;
+            ledgerType: LedgerType;
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerDebtForgiven, data);
     }
 
-    public emitPlayerDebtSettled(room: string | string[], data: { debtorPlayerId: string, creditorPlayerId: string, amount: number, ledgerType: LedgerType }) {
+    public emitPlayerDebtSettled(
+        room: string | string[],
+        data: {
+            debtorPlayerId: string;
+            creditorPlayerId: string;
+            amount: number;
+            ledgerType: LedgerType;
+        },
+    ) {
         this.emit(room, PlayerSocketEventNames.PlayerDebtSettled, data);
     }
 }

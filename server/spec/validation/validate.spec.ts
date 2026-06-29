@@ -1,4 +1,14 @@
-import {anyObject, array, bigInt, just, number, object, or, record, string} from "@solaris/common";
+import {
+    anyObject,
+    array,
+    bigInt,
+    just,
+    number,
+    object,
+    or,
+    record,
+    string,
+} from "@solaris/common";
 
 describe("validate", () => {
     it("validates strings correctly", () => {
@@ -72,9 +82,9 @@ describe("validate", () => {
 
         expect(res).toEqual({});
 
-        const res2 = anyObject({a: 2, b: "asdf"});
+        const res2 = anyObject({ a: 2, b: "asdf" });
 
-        expect(res2).toEqual({a: 2, b: "asdf"});
+        expect(res2).toEqual({ a: 2, b: "asdf" });
 
         const res3 = anyObject([]);
 
@@ -140,8 +150,8 @@ describe("validate", () => {
     it("validates records correctly", () => {
         const val = record(number);
 
-        const res = val({a: 2, b: 3});
-        expect(res).toEqual({a: 2, b: 3});
+        const res = val({ a: 2, b: 3 });
+        expect(res).toEqual({ a: 2, b: 3 });
 
         expect(val({})).toEqual({});
     });
@@ -190,17 +200,17 @@ describe("validate", () => {
     it("validates objects correctly", () => {
         const val = object({
             a: string,
-            b: number
+            b: number,
         });
 
-        const res = val({a: "test", b: 2});
-        expect(res).toEqual({a: "test", b: 2});
+        const res = val({ a: "test", b: 2 });
+        expect(res).toEqual({ a: "test", b: 2 });
     });
 
     it("does not accept non-object-values", () => {
         const val = object({
             a: string,
-            b: number
+            b: number,
         });
 
         expect(() => val("asdf")).toThrow();
@@ -223,11 +233,11 @@ describe("validate", () => {
             a: string,
             b: object({
                 c: number,
-                d: string
-            })
+                d: string,
+            }),
         });
 
-        const res = val({a: "test", b: {c: 2, d: "test"}});
-        expect(res).toEqual({a: "test", b: {c: 2, d: "test"}});
+        const res = val({ a: "test", b: { c: 2, d: "test" } });
+        expect(res).toEqual({ a: "test", b: { c: 2, d: "test" } });
     });
-})
+});

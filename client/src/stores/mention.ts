@@ -1,25 +1,25 @@
-import { defineStore } from 'pinia';
-import { type StarClickDispatchArgs } from '@solaris/map-rendering';
-import type {Player, Star} from "@/types/game";
-import { ref } from 'vue';
-import {type StarClickCallback, useMapClickStore} from "@/stores/mapClick.ts";
+import { defineStore } from "pinia";
+import { type StarClickDispatchArgs } from "@solaris/map-rendering";
+import type { Player, Star } from "@/types/game";
+import { ref } from "vue";
+import { type StarClickCallback, useMapClickStore } from "@/stores/mapClick.ts";
 
 export type MentionData = {
-  element: HTMLTextAreaElement,
-  callbacks: MentionCallbacks,
-}
+  element: HTMLTextAreaElement;
+  callbacks: MentionCallbacks;
+};
 
 export type MentionCallbacks = {
   player: (p: Player) => void;
   star: (s: Star) => void;
-}
+};
 
 export type PlayerClickedData = {
-  player: Player,
-  permitCallback: (p: Player) => void,
-}
+  player: Player;
+  permitCallback: (p: Player) => void;
+};
 
-export const useMentionStore = defineStore('mentions', () => {
+export const useMentionStore = defineStore("mentions", () => {
   const mentionReceivingElement = ref<HTMLTextAreaElement | null>(null);
   const playerCallback = ref<((p: Player) => void) | null>(null);
   const starCallback = ref<StarClickCallback | null>(null);

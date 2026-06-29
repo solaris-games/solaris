@@ -48,10 +48,7 @@
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
         "specialistBans": {
-            "star": [
-                16,
-                17
-            ],
+            "star": [16, 17],
             "carrier": []
         }
     },

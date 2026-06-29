@@ -8,25 +8,23 @@ export interface NaturalResources {
     economy: number;
     industry: number;
     science: number;
-};
+}
 
-export interface TerraformedResources extends NaturalResources {
-    
-};
+export interface TerraformedResources extends NaturalResources {}
 
-export type InfrastructureType = 'economy' | 'industry' | 'science';
+export type InfrastructureType = "economy" | "industry" | "science";
 
 export interface Infrastructure {
     economy: number | null;
     industry: number | null;
     science: number | null;
-};
+}
 
 export interface IgnoreBulkUpgrade {
     economy: boolean;
     industry: boolean;
     science: boolean;
-};
+}
 
 export interface Star<ID> extends MapObject<ID> {
     name: string;
@@ -55,11 +53,11 @@ export interface Star<ID> extends MapObject<ID> {
     manufacturing?: number;
     isInScanningRange?: boolean;
     effectiveTechs?: PlayerTechnologyLevels;
-};
+}
 
 export interface StarCaptureResult<ID> {
     capturedById: ID;
     capturedByAlias: string;
     captureReward: number;
     specialistDestroyed?: boolean;
-};
+}

@@ -1,39 +1,48 @@
 import type { InjectionKey } from "vue";
 
 import { inject } from "vue";
-import {initialize, type ServiceProvider} from "@/services/services";
+import { initialize, type ServiceProvider } from "@/services/services";
 import GameHelper from "@/services/gameHelper";
-import type {Game} from "@solaris/common";
+import type { Game } from "@solaris/common";
 import type { GameStore } from "@/stores/game";
 
-export const gameServicesKey: InjectionKey<ServiceProvider> = Symbol('gameServices');
+export const gameServicesKey: InjectionKey<ServiceProvider> =
+  Symbol("gameServices");
 
 export const createGameServices = (store: GameStore) => {
   const starService = {
-    getById: (game: Game<string>, id: string) => GameHelper.getStarById(game, id)!,
+    getById: (game: Game<string>, id: string) =>
+      GameHelper.getStarById(game, id)!,
   };
 
   const specialistService = {
-    getByIdStar: (id: number) => store.starSpecialists!.find((s) => s.id === id)!,
-    getByIdCarrier: (id: number) => store.carrierSpecialists!.find((s) => s.id === id)!,
+    getByIdStar: (id: number) =>
+      store.starSpecialists!.find((s) => s.id === id)!,
+    getByIdCarrier: (id: number) =>
+      store.carrierSpecialists!.find((s) => s.id === id)!,
   };
 
   const diplomacyService = {
-    isFormalAlliancesEnabled: (game: Game<string>) => game.settings.diplomacy.enabled === 'enabled',
-    isDiplomaticStatusToPlayersAllied: (game: Game<string>, playerId: string, otherPlayerIds: string[]) => {
+    isFormalAlliancesEnabled: (game: Game<string>) =>
+      game.settings.diplomacy.enabled === "enabled",
+    isDiplomaticStatusToPlayersAllied: (
+      game: Game<string>,
+      playerId: string,
+      otherPlayerIds: string[],
+    ) => {
       const player = GameHelper.getPlayerById(game, playerId)!;
 
       return player.diplomacy.every((status) => {
         const isRelevant = otherPlayerIds.includes(status.playerId);
 
-        return !isRelevant || status.status === 'allies';
+        return !isRelevant || status.status === "allies";
       });
     },
   };
 
   return initialize(starService, specialistService, diplomacyService);
-}
+};
 
 export const useGameServices = () => {
   return inject(gameServicesKey)!;
-}
+};

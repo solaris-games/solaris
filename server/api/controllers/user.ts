@@ -1,5 +1,5 @@
-import { ValidationError } from '@solaris/common';
-import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { ValidationError } from "@solaris/common";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
     mapToUserRequestPasswordResetRequest,
     mapToUserRequestUsernameRequest,
@@ -8,9 +8,10 @@ import {
     parseUserUpdateEmailRequest,
     parseUserUpdatePasswordRequest,
     parseUserUpdateUserNameRequest,
-    parseCreateUserRequest, parseUpdateSettingsRequest
-} from '../requests/user';
-import {logger} from "../../utils/logging";
+    parseCreateUserRequest,
+    parseUpdateSettingsRequest,
+} from "../requests/user";
+import { logger } from "../../utils/logging";
 
 const log = logger("User Controller");
 
@@ -22,15 +23,20 @@ export default (container: DependencyContainer) => {
                 const skip = +req.query.skip || 0;
 
                 if (limit !== null && limit > 1000) {
-                    throw new ValidationError('Limit cannot exceed 1000.');
+                    throw new ValidationError("Limit cannot exceed 1000.");
                 }
 
                 if (skip > 1000) {
-                    throw new ValidationError('Skip cannot exceed 1000.');
+                    throw new ValidationError("Skip cannot exceed 1000.");
                 }
 
-                const result = await container.userLeaderboardService.getUserLeaderboard(limit, req.query.sortingKey, skip);
-    
+                const result =
+                    await container.userLeaderboardService.getUserLeaderboard(
+                        limit,
+                        req.query.sortingKey,
+                        skip,
+                    );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -38,29 +44,42 @@ export default (container: DependencyContainer) => {
             }
         },
         create: async (req, res, next) => {
-            const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            const ip =
+                req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
             try {
                 const reqObj = parseCreateUserRequest(req.body);
 
                 const email = reqObj.email.toLowerCase();
-    
-                const emailExists = await container.userService.userExists(email);
-    
+
+                const emailExists =
+                    await container.userService.userExists(email);
+
                 if (emailExists) {
-                    throw new ValidationError('An account with this email already exists');
+                    throw new ValidationError(
+                        "An account with this email already exists",
+                    );
                 }
-    
+
                 const username = reqObj.username;
-    
-                const usernameExists = await container.userService.usernameExists(username);
-    
+
+                const usernameExists =
+                    await container.userService.usernameExists(username);
+
                 if (usernameExists) {
-                    throw new ValidationError('An account with this username already exists');
+                    throw new ValidationError(
+                        "An account with this username already exists",
+                    );
                 }
-    
-                const userId = await container.userService.create(email, username, reqObj.password, ip, container.emailService);
-    
+
+                const userId = await container.userService.create(
+                    email,
+                    username,
+                    reqObj.password,
+                    ip,
+                    container.emailService,
+                );
+
                 res.status(201).json({ id: userId });
                 return next();
             } catch (err) {
@@ -69,8 +88,10 @@ export default (container: DependencyContainer) => {
         },
         getSettings: async (req, res, next) => {
             try {
-                const settings = await container.userService.getGameSettings(req.session.userId);
-    
+                const settings = await container.userService.getGameSettings(
+                    req.session.userId,
+                );
+
                 res.status(200).json(settings);
                 return next();
             } catch (err) {
@@ -81,8 +102,11 @@ export default (container: DependencyContainer) => {
             try {
                 const settings = parseUpdateSettingsRequest(req.body);
 
-                await container.userService.saveGameSettings(req.session.userId, settings);
-    
+                await container.userService.saveGameSettings(
+                    req.session.userId,
+                    settings,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -91,8 +115,11 @@ export default (container: DependencyContainer) => {
         },
         getSubscriptions: async (req, res, next) => {
             try {
-                let subscriptions = await container.userService.getSubscriptions(req.session.userId);
-    
+                let subscriptions =
+                    await container.userService.getSubscriptions(
+                        req.session.userId,
+                    );
+
                 res.status(200).json(subscriptions);
                 return next();
             } catch (err) {
@@ -101,8 +128,11 @@ export default (container: DependencyContainer) => {
         },
         saveSubscriptions: async (req, res, next) => {
             try {
-                await container.userService.saveSubscriptions(req.session.userId, req.body);
-    
+                await container.userService.saveSubscriptions(
+                    req.session.userId,
+                    req.body,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -111,10 +141,12 @@ export default (container: DependencyContainer) => {
         },
         getCredits: async (req, res, next) => {
             try {
-                let credits = await container.userService.getCredits(req.session.userId);
-    
+                let credits = await container.userService.getCredits(
+                    req.session.userId,
+                );
+
                 res.status(200).json({
-                    credits
+                    credits,
                 });
                 return next();
             } catch (err) {
@@ -123,7 +155,9 @@ export default (container: DependencyContainer) => {
         },
         detailMe: async (req, res, next) => {
             try {
-                let user = await container.userService.getMe(req.session.userId);
+                let user = await container.userService.getMe(
+                    req.session.userId,
+                );
 
                 if (!user) {
                     res.sendStatus(404);
@@ -143,8 +177,10 @@ export default (container: DependencyContainer) => {
         },
         listMyAvatars: async (req, res, next) => {
             try {
-                let avatars = await container.avatarService.listUserAvatars(req.session.userId);
-    
+                let avatars = await container.avatarService.listUserAvatars(
+                    req.session.userId,
+                );
+
                 res.status(200).json(avatars);
                 return next();
             } catch (err) {
@@ -153,8 +189,11 @@ export default (container: DependencyContainer) => {
         },
         purchaseAvatar: async (req, res, next) => {
             try {
-                await container.avatarService.purchaseAvatar(req.session.userId, parseInt(req.params.avatarId));
-    
+                await container.avatarService.purchaseAvatar(
+                    req.session.userId,
+                    parseInt(req.params.avatarId),
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -163,8 +202,12 @@ export default (container: DependencyContainer) => {
         },
         getAchievements: async (req, res, next) => {
             try {
-                let achievements = await container.userAchievementService.getAchievements(req.params.id, req.session.userId);
-    
+                let achievements =
+                    await container.userAchievementService.getAchievements(
+                        req.params.id,
+                        req.session.userId,
+                    );
+
                 res.status(200).json(achievements);
                 return next();
             } catch (err) {
@@ -174,9 +217,12 @@ export default (container: DependencyContainer) => {
         updateEmailPreference: async (req, res, next) => {
             try {
                 const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
-    
-                await container.userService.updateEmailPreference(req.session.userId, reqObj.enabled);
-    
+
+                await container.userService.updateEmailPreference(
+                    req.session.userId,
+                    reqObj.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -186,9 +232,12 @@ export default (container: DependencyContainer) => {
         updateEmailOtherPreference: async (req, res, next) => {
             try {
                 const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
-    
-                await container.userService.updateEmailOtherPreference(req.session.userId, reqObj.enabled);
-    
+
+                await container.userService.updateEmailOtherPreference(
+                    req.session.userId,
+                    reqObj.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -198,9 +247,12 @@ export default (container: DependencyContainer) => {
         updateIsAnonymous: async (req, res, next) => {
             try {
                 const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
-    
-                await container.userService.updateIsAnonymous(req.session.userId, reqObj.enabled);
-    
+
+                await container.userService.updateIsAnonymous(
+                    req.session.userId,
+                    reqObj.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -210,9 +262,12 @@ export default (container: DependencyContainer) => {
         updateUsername: async (req, res, next) => {
             try {
                 const reqObj = parseUserUpdateUserNameRequest(req.body);
-                
-                await container.userService.updateUsername(req.session.userId, reqObj.username);
-    
+
+                await container.userService.updateUsername(
+                    req.session.userId,
+                    reqObj.username,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -222,9 +277,12 @@ export default (container: DependencyContainer) => {
         updateEmailAddress: async (req, res, next) => {
             try {
                 const reqObj = parseUserUpdateEmailRequest(req.body);
-                
-                await container.userService.updateEmailAddress(req.session.userId, reqObj.email);
-    
+
+                await container.userService.updateEmailAddress(
+                    req.session.userId,
+                    reqObj.email,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -234,12 +292,13 @@ export default (container: DependencyContainer) => {
         updatePassword: async (req, res, next) => {
             try {
                 const reqObj = parseUserUpdatePasswordRequest(req.body);
-                
+
                 await container.userService.updatePassword(
                     req.session.userId,
                     reqObj.currentPassword,
-                    reqObj.newPassword);
-    
+                    reqObj.newPassword,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -249,11 +308,17 @@ export default (container: DependencyContainer) => {
         requestPasswordReset: async (req, res, next) => {
             try {
                 const reqObj = mapToUserRequestPasswordResetRequest(req.body);
-                
-                let token = await container.userService.requestResetPassword(reqObj.email);
-    
+
+                let token = await container.userService.requestResetPassword(
+                    reqObj.email,
+                );
+
                 try {
-                    await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.RESET_PASSWORD, [token]);
+                    await container.emailService.sendTemplate(
+                        reqObj.email,
+                        container.emailService.TEMPLATES.RESET_PASSWORD,
+                        [token],
+                    );
                 } catch (emailError) {
                     log.error(emailError);
                     res.sendStatus(500);
@@ -268,9 +333,12 @@ export default (container: DependencyContainer) => {
         resetPassword: async (req, res, next) => {
             try {
                 const reqObj = mapToUserResetPasswordResetRequest(req.body);
-                
-                await container.userService.resetPassword(reqObj.token, reqObj.newPassword);
-    
+
+                await container.userService.resetPassword(
+                    reqObj.token,
+                    reqObj.newPassword,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -280,14 +348,20 @@ export default (container: DependencyContainer) => {
         requestUsername: async (req, res, next) => {
             try {
                 const reqObj = mapToUserRequestUsernameRequest(req.body);
-                
-                let username = await container.userService.getUsernameByEmail(reqObj.email);
-    
+
+                let username = await container.userService.getUsernameByEmail(
+                    reqObj.email,
+                );
+
                 try {
-                    await container.emailService.sendTemplate(reqObj.email, container.emailService.TEMPLATES.FORGOT_USERNAME, [username]);
+                    await container.emailService.sendTemplate(
+                        reqObj.email,
+                        container.emailService.TEMPLATES.FORGOT_USERNAME,
+                        [username],
+                    );
                 } catch (emailError) {
                     log.error(emailError);
-    
+
                     res.sendStatus(500);
                     return next(emailError);
                 }
@@ -300,23 +374,28 @@ export default (container: DependencyContainer) => {
         },
         delete: async (req, res, next) => {
             try {
-                await container.gameService.quitAllActiveGames(req.session.userId, container.eventService);
+                await container.gameService.quitAllActiveGames(
+                    req.session.userId,
+                    container.eventService,
+                );
                 await container.guildService.tryLeave(req.session.userId);
-                await container.guildService.declineAllInvitations(req.session.userId);
+                await container.guildService.declineAllInvitations(
+                    req.session.userId,
+                );
                 await container.userService.closeAccount(req.session.userId);
-    
+
                 // Delete the session object.
                 req.session.destroy((err) => {
                     if (err) {
                         return next(err);
                     }
-    
+
                     res.sendStatus(200);
                     return next();
                 });
             } catch (err) {
                 return next(err);
             }
-        }
-    }
+        },
+    };
 };

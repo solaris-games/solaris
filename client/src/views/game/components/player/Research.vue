@@ -84,28 +84,31 @@
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { computed } from 'vue';
-import gameHelper from "../../../../services/gameHelper"
-import TechnologyHelper from "../../../../services/technologyHelper"
-import ResearchRow from "./ResearchRow.vue"
-import type {Game} from "@/types/game.ts";
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import gameHelper from "../../../../services/gameHelper";
+import TechnologyHelper from "../../../../services/technologyHelper";
+import ResearchRow from "./ResearchRow.vue";
+import type { Game } from "@/types/game.ts";
 import GameHelper from "@/services/gameHelper.ts";
-import type {ResearchTypeNotRandom} from "@solaris/common";
-import {useGameServices} from "@/util/gameServices.ts";
+import type { ResearchTypeNotRandom } from "@solaris/common";
+import { useGameServices } from "@/util/gameServices.ts";
 
 const props = defineProps<{
-  playerId: string,
+  playerId: string;
 }>();
 
 const store = useGameStore();
 const services = useGameServices();
 
 const game = computed<Game>(() => store.game!);
-const player = computed(() => GameHelper.getPlayerById(game.value, props.playerId)!);
+const player = computed(() =>
+  GameHelper.getPlayerById(game.value, props.playerId)!,
+);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
 
-const isTechnologyEnabled = (technologyKey: ResearchTypeNotRandom) => services.technologyService.isTechnologyEnabled(game.value, technologyKey);
+const isTechnologyEnabled = (technologyKey: ResearchTypeNotRandom) =>
+  services.technologyService.isTechnologyEnabled(game.value, technologyKey);
 </script>
 
 <style scoped>

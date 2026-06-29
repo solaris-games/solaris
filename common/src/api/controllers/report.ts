@@ -1,4 +1,4 @@
-import {PostRoute} from "./index";
+import { PostRoute } from "./index";
 
 export type ReportCreateReportRequest<ID> = {
     playerId: ID;
@@ -7,13 +7,18 @@ export type ReportCreateReportRequest<ID> = {
         spamming: boolean;
         multiboxing: boolean;
         inappropriateAlias: boolean;
-    },
+    };
     conversation?: {
         conversationId: ID;
         messageId: ID;
-    }
+    };
 };
 
 export const createReportRoutes = <ID>() => ({
-    createReport: new PostRoute<{ gameId: ID }, {}, ReportCreateReportRequest<ID>, {}>("/api/game/:gameId/report"),
+    createReport: new PostRoute<
+        { gameId: ID },
+        {},
+        ReportCreateReportRequest<ID>,
+        {}
+    >("/api/game/:gameId/report"),
 });

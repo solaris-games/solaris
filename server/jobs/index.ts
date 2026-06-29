@@ -1,18 +1,18 @@
-import {logger, setupLogging} from "../utils/logging";
+import { logger, setupLogging } from "../utils/logging";
 
-import config from '../config';
-import mongooseLoader from '../db';
-import containerLoader from '../services';
+import config from "../config";
+import mongooseLoader from "../db";
+import containerLoader from "../services";
 
-import { gameTickJob } from './jobs/gameTick';
-import { officialGamesCheckJob } from './jobs/officialGamesCheck';
-import { cleanupGamesTimedOutJob } from './jobs/cleanupGamesTimedOut';
-import { cleanupOldGameHistoryJob } from './jobs/cleanupOldGameHistory';
-import { cleanupOldTutorialsJob } from './jobs/cleanupOldTutorials';
+import { gameTickJob } from "./jobs/gameTick";
+import { officialGamesCheckJob } from "./jobs/officialGamesCheck";
+import { cleanupGamesTimedOutJob } from "./jobs/cleanupGamesTimedOut";
+import { cleanupOldGameHistoryJob } from "./jobs/cleanupOldGameHistory";
+import { cleanupOldTutorialsJob } from "./jobs/cleanupOldTutorials";
 import { serverStub } from "../sockets/serverStub";
-import {Scheduler, SchedulerOptions} from "./scheduler/scheduler";
+import { Scheduler, SchedulerOptions } from "./scheduler/scheduler";
 import events from "node:events";
-import {sumGameStatisticsJob} from "./jobs/sumGameStatistics";
+import { sumGameStatisticsJob } from "./jobs/sumGameStatistics";
 
 let mongo;
 Error.stackTraceLimit = 1000;
@@ -32,73 +32,75 @@ const ONE_DAY = 3600000 * 24;
 const log = logger();
 
 async function startup() {
-
     const container = containerLoader(config, serverStub, log);
 
     mongo = await mongooseLoader(config, {
         unlockJobs: true,
-        poolSize: 1
+        poolSize: 1,
     });
 
     await container.discordService.initialize();
-    
+
     // ------------------------------
     // Jobs that run every time the server restarts.
 
-    log.info('Unlock all games...');
+    log.info("Unlock all games...");
     await container.gameLockService.lockAll(false);
-    log.info('All games unlocked');
+    log.info("All games unlocked");
 
     const schedulerOptions: SchedulerOptions = {
         checkInterval: 5000,
     };
 
-    const scheduler = new Scheduler([
-        {
-            name: 'game-tick',
-            job: gameTickJob(container),
-            interval: TEN_SECONDS
-        },
-        {
-            name: 'new-player-game-check',
-            job: officialGamesCheckJob(container),
-            interval: ONE_MINUTE
-        },
-        {
-            name: 'cleanup-games-timed-out',
-            job: cleanupGamesTimedOutJob(container),
-            interval: ONE_HOUR
-        },
-        {
-            name: 'cleanup-old-game-history',
-            job: cleanupOldGameHistoryJob(container),
-            interval: ONE_DAY
-        },
-        {
-            name: 'cleanup-old-tutorials',
-            job: cleanupOldTutorialsJob(container),
-            interval: ONE_DAY
-        },
-        {
-            name: 'sum-game-statistics',
-            job: sumGameStatisticsJob(container),
-            interval: ONE_HOUR,
-        },
-    ], schedulerOptions);
+    const scheduler = new Scheduler(
+        [
+            {
+                name: "game-tick",
+                job: gameTickJob(container),
+                interval: TEN_SECONDS,
+            },
+            {
+                name: "new-player-game-check",
+                job: officialGamesCheckJob(container),
+                interval: ONE_MINUTE,
+            },
+            {
+                name: "cleanup-games-timed-out",
+                job: cleanupGamesTimedOutJob(container),
+                interval: ONE_HOUR,
+            },
+            {
+                name: "cleanup-old-game-history",
+                job: cleanupOldGameHistoryJob(container),
+                interval: ONE_DAY,
+            },
+            {
+                name: "cleanup-old-tutorials",
+                job: cleanupOldTutorialsJob(container),
+                interval: ONE_DAY,
+            },
+            {
+                name: "sum-game-statistics",
+                job: sumGameStatisticsJob(container),
+                interval: ONE_HOUR,
+            },
+        ],
+        schedulerOptions,
+    );
 
     await scheduler.startup();
 
     const schedulerFinished = scheduler.run();
 
     await new Promise<void>((resolve, _) => {
-        process.on('SIGINT', async () => {
-            log.info('Shutting down...');
+        process.on("SIGINT", async () => {
+            log.info("Shutting down...");
 
             await schedulerFinished;
 
             await mongo.disconnect();
 
-            log.info('Shutdown complete.');
+            log.info("Shutdown complete.");
             resolve();
 
             process.exit(0);
@@ -107,7 +109,7 @@ async function startup() {
 }
 
 startup().then(() => {
-    log.info('Jobs started.');
+    log.info("Jobs started.");
 });
 
 export {};

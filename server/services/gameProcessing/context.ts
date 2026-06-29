@@ -1,19 +1,19 @@
 import UserService from "../user";
-import {Game} from "../types/Game";
-import {ActiveModel} from "../types/ActiveModel";
-import {User} from "../types/User";
-import {EmailService} from "../email";
-import {NotificationService} from "../notification";
-import {EventService} from "../event";
+import { Game } from "../types/Game";
+import { ActiveModel } from "../types/ActiveModel";
+import { User } from "../types/User";
+import { EmailService } from "../email";
+import { NotificationService } from "../notification";
+import { EventService } from "../event";
 import StatisticsService from "../statistics";
-import {IEmailService} from "../types/IEmailService";
-import {IEventService} from "../types/IEventService";
-import {INotificationService} from "../types/INotificationService";
-import {IStatisticsService} from "../types/IStatisticsService";
-import {ProcessingEventService} from "./event";
-import {ProcessingEmailService} from "./email";
-import {ProcessingNotificationService} from "./notification";
-import {ProcessingStatisticsService} from "./statistics";
+import { IEmailService } from "../types/IEmailService";
+import { IEventService } from "../types/IEventService";
+import { INotificationService } from "../types/INotificationService";
+import { IStatisticsService } from "../types/IStatisticsService";
+import { ProcessingEventService } from "./event";
+import { ProcessingEmailService } from "./email";
+import { ProcessingNotificationService } from "./notification";
+import { ProcessingStatisticsService } from "./statistics";
 
 export class GameTickContext {
     private game: Game;
@@ -28,13 +28,34 @@ export class GameTickContext {
     private processingNotificationService: ProcessingNotificationService;
     private processingStatisticsService: ProcessingStatisticsService;
 
-    static async load(userService: UserService, game: Game, emailService: EmailService, notificationService: NotificationService, eventService: EventService, statisticsService: StatisticsService) {
+    static async load(
+        userService: UserService,
+        game: Game,
+        emailService: EmailService,
+        notificationService: NotificationService,
+        eventService: EventService,
+        statisticsService: StatisticsService,
+    ) {
         const gameUsers = await userService.getGameUsers(game);
 
-        return new GameTickContext(game, gameUsers, emailService, notificationService, eventService, statisticsService);
+        return new GameTickContext(
+            game,
+            gameUsers,
+            emailService,
+            notificationService,
+            eventService,
+            statisticsService,
+        );
     }
 
-    constructor(game: Game, gameUsers: ActiveModel<User>[], emailService: EmailService, notificationService: NotificationService, eventService: EventService, statisticsService: StatisticsService) {
+    constructor(
+        game: Game,
+        gameUsers: ActiveModel<User>[],
+        emailService: EmailService,
+        notificationService: NotificationService,
+        eventService: EventService,
+        statisticsService: StatisticsService,
+    ) {
         this.game = game;
         this.gameUsers = gameUsers;
         this.emailService = emailService;
@@ -43,7 +64,8 @@ export class GameTickContext {
         this.statisticsService = statisticsService;
         this.processingEventService = new ProcessingEventService();
         this.processingEmailService = new ProcessingEmailService();
-        this.processingNotificationService = new ProcessingNotificationService();
+        this.processingNotificationService =
+            new ProcessingNotificationService();
         this.processingStatisticsService = new ProcessingStatisticsService();
     }
 
@@ -54,7 +76,9 @@ export class GameTickContext {
 
         await this.processingEventService.process(this.eventService);
         await this.processingEmailService.process(this.emailService);
-        await this.processingNotificationService.process(this.notificationService);
+        await this.processingNotificationService.process(
+            this.notificationService,
+        );
         await this.processingStatisticsService.process(this.statisticsService);
     }
 

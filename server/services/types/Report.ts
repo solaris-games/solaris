@@ -5,7 +5,7 @@ export interface ReportReasons {
     spamming: boolean;
     multiboxing: boolean;
     inappropriateAlias: boolean;
-};
+}
 
 export interface Report {
     _id: DBObjectId;
@@ -22,4 +22,4 @@ export interface Report {
     actioned: boolean;
     actionedBy: DBObjectId | null;
     date: Date;
-};
+}

@@ -1,22 +1,31 @@
-import type {Player, PlayerTechnologyLevels, ResearchTypeNotRandom} from "../types/common/player";
-import type {Specialist} from "../types/common/specialist";
-import type {GameTypeService} from "./gameType";
-import type {Game} from "../types/common/game";
-import type {Star} from "../types/common/star";
-import type {Id} from "../types/id";
-import type {Carrier} from "../types/common/carrier";
-import {maxBy, maxOf, minOf, notUndefined} from "../utilities/utils";
-import type {CombatBaseCarrier, CombatBasePlayer, CombatBaseStar, CombatGroup} from "../types/common/combat";
+import type {
+    Player,
+    PlayerTechnologyLevels,
+    ResearchTypeNotRandom,
+} from "../types/common/player";
+import type { Specialist } from "../types/common/specialist";
+import type { GameTypeService } from "./gameType";
+import type { Game } from "../types/common/game";
+import type { Star } from "../types/common/star";
+import type { Id } from "../types/id";
+import type { Carrier } from "../types/common/carrier";
+import { maxBy, maxOf, minOf, notUndefined } from "../utilities/utils";
+import type {
+    CombatBaseCarrier,
+    CombatBasePlayer,
+    CombatBaseStar,
+    CombatGroup,
+} from "../types/common/combat";
 
 const DEFAULT_TECHNOLOGIES: ResearchTypeNotRandom[] = [
-    'terraforming',
-    'experimentation',
-    'banking',
-    'weapons',
-    'manufacturing',
-    'specialists',
-    'scanning',
-    'hyperspace'
+    "terraforming",
+    "experimentation",
+    "banking",
+    "weapons",
+    "manufacturing",
+    "specialists",
+    "scanning",
+    "hyperspace",
 ];
 
 interface ISpecialistService {
@@ -25,18 +34,18 @@ interface ISpecialistService {
 }
 
 export type Buff = {
-    kind: 'star' | 'carrier',
-    amount: number,
-    specialistId: number,
-}
+    kind: "star" | "carrier";
+    amount: number;
+    specialistId: number;
+};
 
 export type WeaponsDetail = {
-    total: number,
-    appliedBuffs: Buff[],
-    weaponsBuff: number,
-    weaponsLevel: number,
-    defenderBonus?: number,
-}
+    total: number;
+    appliedBuffs: Buff[];
+    weaponsBuff: number;
+    weaponsLevel: number;
+    defenderBonus?: number;
+};
 
 export class TechnologyService {
     specialistService: ISpecialistService;
@@ -44,18 +53,20 @@ export class TechnologyService {
 
     constructor(
         specialistService: ISpecialistService,
-        gameTypeService: GameTypeService
+        gameTypeService: GameTypeService,
     ) {
         this.specialistService = specialistService;
         this.gameTypeService = gameTypeService;
     }
 
     getResearchableTechnologies<ID>(game: Game<ID>) {
-        let techs: ResearchTypeNotRandom[] = Object.keys(game.settings.technology.researchCosts).filter(k => {
+        let techs: ResearchTypeNotRandom[] = Object.keys(
+            game.settings.technology.researchCosts,
+        ).filter((k) => {
             return k.match(/^[^_\$]/) != null;
         }) as ResearchTypeNotRandom[];
 
-        return techs.filter(t => this.isTechnologyResearchable(game, t));
+        return techs.filter((t) => this.isTechnologyResearchable(game, t));
     }
 
     // Enabled means: will this technology be in effect? It can be enabled, but not researchable (thereby fixed).
@@ -63,17 +74,32 @@ export class TechnologyService {
         return game.settings.technology.startingTechnologyLevel[techKey] > 0;
     }
 
-    isTechnologyResearchable<ID>(game: Game<ID>, technologyKey: ResearchTypeNotRandom) {
-      return this.isTechnologyEnabled(game, technologyKey) && game.settings.technology.researchCosts[technologyKey] !== 'none'
+    isTechnologyResearchable<ID>(
+        game: Game<ID>,
+        technologyKey: ResearchTypeNotRandom,
+    ) {
+        return (
+            this.isTechnologyEnabled(game, technologyKey) &&
+            game.settings.technology.researchCosts[technologyKey] !== "none"
+        );
     }
 
     getDefaultTechnology<ID>(game: Game<ID>): ResearchTypeNotRandom {
         const researchableTechnologies = this.getResearchableTechnologies(game);
 
-        return DEFAULT_TECHNOLOGIES.find(t => researchableTechnologies.includes(t)) || 'weapons';
+        return (
+            DEFAULT_TECHNOLOGIES.find((t) =>
+                researchableTechnologies.includes(t),
+            ) || "weapons"
+        );
     }
 
-    _applyTechModifiers(techs: PlayerTechnologyLevels, modifiers: Partial<PlayerTechnologyLevels>, sanitize: boolean = true) { // TODO: types
+    _applyTechModifiers(
+        techs: PlayerTechnologyLevels,
+        modifiers: Partial<PlayerTechnologyLevels>,
+        sanitize: boolean = true,
+    ) {
+        // TODO: types
         techs.scanning += modifiers.scanning || 0;
         techs.hyperspace += modifiers.hyperspace || 0;
         techs.terraforming += modifiers.terraforming || 0;
@@ -82,7 +108,7 @@ export class TechnologyService {
         techs.banking += modifiers.banking || 0;
         techs.manufacturing += modifiers.manufacturing || 0;
         techs.specialists += modifiers.specialists || 0;
-        
+
         if (sanitize) {
             techs.scanning = Math.max(1, techs.scanning);
             techs.hyperspace = Math.max(1, techs.hyperspace);
@@ -97,7 +123,11 @@ export class TechnologyService {
         return techs;
     }
 
-    getPlayerEffectiveTechnologyLevels<ID>(game: Game<ID>, player: Player<ID> | null, sanitize: boolean = true): PlayerTechnologyLevels {
+    getPlayerEffectiveTechnologyLevels<ID>(
+        game: Game<ID>,
+        player: Player<ID> | null,
+        sanitize: boolean = true,
+    ): PlayerTechnologyLevels {
         // TODO: This is a plaster over a bug where in the gameGalaxy service
         // it sets research to null if its in extra dark galaxy but somehow
         // this function is still being called by getStats. Needs investigating...
@@ -107,7 +137,7 @@ export class TechnologyService {
         // TODO: It probably has something to do with scanning range, maybe it
         // isn't checking if players have 0 stars? In which case they have no scanning range
         // and therefore nobody is within scanning range.
-    
+
         if (!player || !player.research) {
             return {
                 scanning: 1,
@@ -117,7 +147,7 @@ export class TechnologyService {
                 weapons: 1,
                 banking: 1,
                 manufacturing: 1,
-                specialists: 1
+                specialists: 1,
             };
         }
 
@@ -129,21 +159,39 @@ export class TechnologyService {
             weapons: player.research.weapons.level,
             banking: player.research.banking.level,
             manufacturing: player.research.manufacturing.level,
-            specialists: player.research.specialists.level
+            specialists: player.research.specialists.level,
         };
 
         return techs;
     }
 
-    getStarEffectiveTechnologyLevels<ID extends Id>(game: Game<ID>, star: Star<ID>, sanitize: boolean = true): PlayerTechnologyLevels {
-        let player = star.ownedByPlayerId ? game.galaxy.players.find(x => x._id.toString() === star.ownedByPlayerId!.toString()) || null : null;
-        let techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
+    getStarEffectiveTechnologyLevels<ID extends Id>(
+        game: Game<ID>,
+        star: Star<ID>,
+        sanitize: boolean = true,
+    ): PlayerTechnologyLevels {
+        let player = star.ownedByPlayerId
+            ? game.galaxy.players.find(
+                  (x) => x._id.toString() === star.ownedByPlayerId!.toString(),
+              ) || null
+            : null;
+        let techs = this.getPlayerEffectiveTechnologyLevels(
+            game,
+            player,
+            false,
+        );
 
         if (star.specialistId) {
-            let specialist = this.specialistService.getByIdStar(star.specialistId);
+            let specialist = this.specialistService.getByIdStar(
+                star.specialistId,
+            );
 
             if (specialist && specialist.modifiers.local != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
+                this._applyTechModifiers(
+                    techs,
+                    specialist.modifiers.local,
+                    sanitize,
+                );
             }
         }
 
@@ -154,16 +202,33 @@ export class TechnologyService {
         return techs;
     }
 
-    getCarrierEffectiveTechnologyLevels<ID extends Id>(game: Game<ID>, carrier: Carrier<ID>, sanitize: boolean = true) {
-        const player = game.galaxy.players.find(x => x._id.toString() === carrier.ownedByPlayerId!.toString()) || null;
-        const techs = this.getPlayerEffectiveTechnologyLevels(game, player, false);
+    getCarrierEffectiveTechnologyLevels<ID extends Id>(
+        game: Game<ID>,
+        carrier: Carrier<ID>,
+        sanitize: boolean = true,
+    ) {
+        const player =
+            game.galaxy.players.find(
+                (x) => x._id.toString() === carrier.ownedByPlayerId!.toString(),
+            ) || null;
+        const techs = this.getPlayerEffectiveTechnologyLevels(
+            game,
+            player,
+            false,
+        );
 
         // Apply any specialist tech modifiers.
         if (carrier.specialistId) {
-            const specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+            const specialist = this.specialistService.getByIdCarrier(
+                carrier.specialistId,
+            );
 
             if (specialist && specialist.modifiers.local != null) {
-                this._applyTechModifiers(techs, specialist.modifiers.local, sanitize);
+                this._applyTechModifiers(
+                    techs,
+                    specialist.modifiers.local,
+                    sanitize,
+                );
             }
         }
 
@@ -172,27 +237,38 @@ export class TechnologyService {
 
     _getStarWeaponsBuff<ID>(star: Star<ID>): Buff | undefined {
         if (star.specialistId) {
-            const specialist = this.specialistService.getByIdStar(star.specialistId);
+            const specialist = this.specialistService.getByIdStar(
+                star.specialistId,
+            );
 
             if (specialist && specialist.modifiers.local != null) {
                 return {
                     amount: specialist.modifiers.local.weapons || 0,
                     specialistId: specialist.id,
-                    kind: 'star',
-                }
+                    kind: "star",
+                };
             }
         }
 
         return undefined;
     }
 
-    _getCarrierWeaponsBuff<ID extends Id>(carrier: CombatBaseCarrier<ID>, isCarrierToStarCombat: boolean, isDefender: boolean, opponentIsDefender: boolean, allyCount: number, targetedPlayers: ID[]): Buff | undefined {
+    _getCarrierWeaponsBuff<ID extends Id>(
+        carrier: CombatBaseCarrier<ID>,
+        isCarrierToStarCombat: boolean,
+        isDefender: boolean,
+        opponentIsDefender: boolean,
+        allyCount: number,
+        targetedPlayers: ID[],
+    ): Buff | undefined {
         if (!carrier.specialistId) {
             return undefined;
         }
 
         const buffs: number[] = [];
-        const specialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+        const specialist = this.specialistService.getByIdCarrier(
+            carrier.specialistId,
+        );
 
         const isAttacker = !isDefender;
 
@@ -201,32 +277,80 @@ export class TechnologyService {
         }
 
         if (specialist.modifiers.local) {
-            if (isCarrierToStarCombat && specialist.modifiers.local.carrierToStarCombat) {
-                if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.weapons) {
-                    if (specialist.modifiers.local?.carrierToStarCombat?.captureTargetedPlayers) {
+            if (
+                isCarrierToStarCombat &&
+                specialist.modifiers.local.carrierToStarCombat
+            ) {
+                if (
+                    isAttacker &&
+                    specialist.modifiers.local.carrierToStarCombat.attacker
+                        ?.weapons
+                ) {
+                    if (
+                        specialist.modifiers.local?.carrierToStarCombat
+                            ?.captureTargetedPlayers
+                    ) {
                         // apply buff when either: against defender group OR group contains one of the targeted players
                         if (opponentIsDefender) {
-                            buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
-                        } else if (carrier.specialistTargetedPlayers.find(tpId => targetedPlayers.find(pId => pId.toString() === tpId.toString()))) {
-                            buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                            buffs.push(
+                                specialist.modifiers.local.carrierToStarCombat
+                                    .attacker.weapons,
+                            );
+                        } else if (
+                            carrier.specialistTargetedPlayers.find((tpId) =>
+                                targetedPlayers.find(
+                                    (pId) => pId.toString() === tpId.toString(),
+                                ),
+                            )
+                        ) {
+                            buffs.push(
+                                specialist.modifiers.local.carrierToStarCombat
+                                    .attacker.weapons,
+                            );
                         }
                     } else {
-                        buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.weapons);
+                        buffs.push(
+                            specialist.modifiers.local.carrierToStarCombat
+                                .attacker.weapons,
+                        );
                     }
                 }
 
-                if (!isAttacker && specialist.modifiers.local.carrierToStarCombat.defender?.weapons) {
-                    buffs.push(specialist.modifiers.local.carrierToStarCombat.defender.weapons);
+                if (
+                    !isAttacker &&
+                    specialist.modifiers.local.carrierToStarCombat.defender
+                        ?.weapons
+                ) {
+                    buffs.push(
+                        specialist.modifiers.local.carrierToStarCombat.defender
+                            .weapons,
+                    );
                 }
 
-                if (isAttacker && specialist.modifiers.local.carrierToStarCombat.attacker?.perAlly) {
-                    const adjustedAllyCount = Math.min(allyCount, specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.maxAllies);
-                    buffs.push(specialist.modifiers.local.carrierToStarCombat.attacker.perAlly.weapons * adjustedAllyCount);
+                if (
+                    isAttacker &&
+                    specialist.modifiers.local.carrierToStarCombat.attacker
+                        ?.perAlly
+                ) {
+                    const adjustedAllyCount = Math.min(
+                        allyCount,
+                        specialist.modifiers.local.carrierToStarCombat.attacker
+                            .perAlly.maxAllies,
+                    );
+                    buffs.push(
+                        specialist.modifiers.local.carrierToStarCombat.attacker
+                            .perAlly.weapons * adjustedAllyCount,
+                    );
                 }
             }
 
-            if (!isCarrierToStarCombat && specialist.modifiers.local.carrierToCarrierCombat?.weapons) {
-                buffs.push(specialist.modifiers.local.carrierToCarrierCombat.weapons);
+            if (
+                !isCarrierToStarCombat &&
+                specialist.modifiers.local.carrierToCarrierCombat?.weapons
+            ) {
+                buffs.push(
+                    specialist.modifiers.local.carrierToCarrierCombat.weapons,
+                );
             }
 
             if (specialist.modifiers.local.weapons) {
@@ -241,27 +365,35 @@ export class TechnologyService {
         const relevantBuff = maxBy((a) => a, buffs);
 
         return {
-            kind: 'carrier',
+            kind: "carrier",
             specialistId: carrier.specialistId,
             amount: relevantBuff,
-        }
+        };
     }
 
-    getCarriersWeaponsDebuff<ID>(carriersToCheck: CombatBaseCarrier<ID>[]): Buff | undefined {
+    getCarriersWeaponsDebuff<ID>(
+        carriersToCheck: CombatBaseCarrier<ID>[],
+    ): Buff | undefined {
         if (!carriersToCheck.length) {
             return undefined;
         }
-        
+
         // If any of the carriers have a specialist which deducts enemy weapons
         // then find the one that has the highest deduction.
         const allBuffs = carriersToCheck
-            .filter(c => c.specialistId != null)
-            .flatMap(c => {
-                let specialist = this.specialistService.getByIdCarrier(c.specialistId!);
+            .filter((c) => c.specialistId != null)
+            .flatMap((c) => {
+                let specialist = this.specialistService.getByIdCarrier(
+                    c.specialistId!,
+                );
 
-                if (specialist && specialist.modifiers.special && specialist.modifiers.special.deductEnemyWeapons) {
+                if (
+                    specialist &&
+                    specialist.modifiers.special &&
+                    specialist.modifiers.special.deductEnemyWeapons
+                ) {
                     const buff: Buff = {
-                        kind: 'carrier',
+                        kind: "carrier",
                         specialistId: specialist.id,
                         amount: specialist.modifiers.special.deductEnemyWeapons,
                     };
@@ -272,17 +404,35 @@ export class TechnologyService {
                 return [];
             });
 
-        return maxOf(b => b.amount, allBuffs);
+        return maxOf((b) => b.amount, allBuffs);
     }
 
-    getStarOwnWeaponsDetail<ID extends Id>(game: Game<ID>, defenders: Player<ID>[], star: Star<ID>, carriersInOrbit: Carrier<ID>[]): WeaponsDetail {
-        const weapons = defenders.sort((a, b) => b.research.weapons.level - a.research.weapons.level)[0].research.weapons.level;
+    getStarOwnWeaponsDetail<ID extends Id>(
+        game: Game<ID>,
+        defenders: Player<ID>[],
+        star: Star<ID>,
+        carriersInOrbit: Carrier<ID>[],
+    ): WeaponsDetail {
+        const weapons = defenders.sort(
+            (a, b) => b.research.weapons.level - a.research.weapons.level,
+        )[0].research.weapons.level;
         const defenderBonus = this.getDefenderBonus(game, star);
 
         let buffs: Buff[] = [];
 
         if (carriersInOrbit.length) {
-            buffs = carriersInOrbit.map(c => (this._getCarrierWeaponsBuff(c, true, true, false, defenders.length, []))).filter(notUndefined);
+            buffs = carriersInOrbit
+                .map((c) =>
+                    this._getCarrierWeaponsBuff(
+                        c,
+                        true,
+                        true,
+                        false,
+                        defenders.length,
+                        [],
+                    ),
+                )
+                .filter(notUndefined);
         }
 
         const starBuff = this._getStarWeaponsBuff(star);
@@ -291,19 +441,35 @@ export class TechnologyService {
             buffs.push(starBuff);
         }
 
-        const detail = this._calculateActualWeaponsBuff(weapons, buffs, defenderBonus);
+        const detail = this._calculateActualWeaponsBuff(
+            weapons,
+            buffs,
+            defenderBonus,
+        );
 
         return {
             ...detail,
             defenderBonus,
-        }
+        };
     }
 
-    getBaseWeapons<ID extends Id, P extends CombatBasePlayer<ID>>(players: P[]) {
-        return maxBy(p => p.research.weapons.level, players);
+    getBaseWeapons<ID extends Id, P extends CombatBasePlayer<ID>>(
+        players: P[],
+    ) {
+        return maxBy((p) => p.research.weapons.level, players);
     }
 
-    getEffectiveWeaponsDetail<ID extends Id, P extends CombatBasePlayer<ID>, S extends CombatBaseStar<ID>, C extends CombatBaseCarrier<ID>>(game: Game<ID>, group: CombatGroup<ID, P, S, C>, opponents: CombatGroup<ID, P, S, C>, isCarrierToStarCombat: boolean): WeaponsDetail {
+    getEffectiveWeaponsDetail<
+        ID extends Id,
+        P extends CombatBasePlayer<ID>,
+        S extends CombatBaseStar<ID>,
+        C extends CombatBaseCarrier<ID>,
+    >(
+        game: Game<ID>,
+        group: CombatGroup<ID, P, S, C>,
+        opponents: CombatGroup<ID, P, S, C>,
+        isCarrierToStarCombat: boolean,
+    ): WeaponsDetail {
         const baseWeapons = this.getBaseWeapons(group.players);
 
         let defenderBonus: number | undefined = undefined;
@@ -311,13 +477,28 @@ export class TechnologyService {
             defenderBonus = this.getDefenderBonus(game, group.star!);
         }
 
-        const buffs: Buff[] = group.carriers.map(c => {
-            return this._getCarrierWeaponsBuff(c, isCarrierToStarCombat, group.isDefender, opponents.isDefender, group.players.length, c.specialistTargetedPlayers);
-        }).filter(notUndefined);
+        const buffs: Buff[] = group.carriers
+            .map((c) => {
+                return this._getCarrierWeaponsBuff(
+                    c,
+                    isCarrierToStarCombat,
+                    group.isDefender,
+                    opponents.isDefender,
+                    group.players.length,
+                    c.specialistTargetedPlayers,
+                );
+            })
+            .filter(notUndefined);
 
-        const buff = this._calculateActualWeaponsBuff(baseWeapons, buffs, defenderBonus || 0);
+        const buff = this._calculateActualWeaponsBuff(
+            baseWeapons,
+            buffs,
+            defenderBonus || 0,
+        );
 
-        const opponentDebuff = this.getCarriersWeaponsDebuff(opponents.carriers);
+        const opponentDebuff = this.getCarriersWeaponsDebuff(
+            opponents.carriers,
+        );
 
         const appliedBuffs = buff.appliedBuffs;
 
@@ -330,7 +511,7 @@ export class TechnologyService {
                 weaponsBuff: buff.weaponsBuff - opponentDebuff.amount,
                 total: buff.total - opponentDebuff.amount,
                 defenderBonus,
-            }
+            };
         } else {
             return {
                 weaponsLevel: baseWeapons,
@@ -338,11 +519,15 @@ export class TechnologyService {
                 weaponsBuff: buff.weaponsBuff,
                 total: buff.total,
                 defenderBonus,
-            }
+            };
         }
     }
 
-    _calculateActualWeaponsBuff(weapons: number, buffs: Buff[], additionalBuff: number): WeaponsDetail {
+    _calculateActualWeaponsBuff(
+        weapons: number,
+        buffs: Buff[],
+        additionalBuff: number,
+    ): WeaponsDetail {
         const highestBuff = maxOf((b) => b.amount, buffs);
         const lowestBuff = minOf((b) => b.amount, buffs);
 
@@ -359,7 +544,10 @@ export class TechnologyService {
             appliedBuffs.push(lowestBuff!);
         }
 
-        const buffsTotal = appliedBuffs.reduce((acc, curr) => acc + curr.amount, 0);
+        const buffsTotal = appliedBuffs.reduce(
+            (acc, curr) => acc + curr.amount,
+            0,
+        );
 
         const total = Math.max(1, weapons + buffsTotal + additionalBuff);
 
@@ -368,18 +556,21 @@ export class TechnologyService {
             total,
             appliedBuffs,
             weaponsBuff: buffsTotal,
-        }
-    }   
+        };
+    }
 
     getDefenderBonus<ID>(game: Game<ID>, star: CombatBaseStar<ID>) {
-        let bonus = game.settings.specialGalaxy.defenderBonus === 'enabled' ? 1 : 0;
+        let bonus =
+            game.settings.specialGalaxy.defenderBonus === "enabled" ? 1 : 0;
 
         if (star.isAsteroidField) {
             bonus++;
         }
 
         if (star.specialistId) {
-            const specialist = this.specialistService.getByIdStar(star.specialistId);
+            const specialist = this.specialistService.getByIdStar(
+                star.specialistId,
+            );
 
             if (specialist && specialist.modifiers.special?.defenderBonus) {
                 bonus += specialist.modifiers.special.defenderBonus;

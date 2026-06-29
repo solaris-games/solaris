@@ -1,15 +1,24 @@
 import type { GameState } from "@solaris/common";
 import { makeCastFunc } from "@solaris/common";
-import type {EventBusEventName} from "@solaris/map-rendering";
+import type { EventBusEventName } from "@solaris/map-rendering";
 
-export type GameEventBusEventType = { gameEventBusEventType: 'gameEventBusEventType' };
-export type GameEventBusEventName<TData> = EventBusEventName<GameEventBusEventType, TData> & { gameEventBusEventName: 'gameEventBusEventName' }
+export type GameEventBusEventType = {
+  gameEventBusEventType: "gameEventBusEventType";
+};
+export type GameEventBusEventName<TData> = EventBusEventName<
+  GameEventBusEventType,
+  TData
+> & { gameEventBusEventName: "gameEventBusEventName" };
 
-const toEventName: <TData>(value: string) => GameEventBusEventName<TData> = makeCastFunc();
+const toEventName: <TData>(value: string) => GameEventBusEventName<TData> =
+  makeCastFunc();
 
 export default class GameEventBusEventNames {
-  private constructor() { };
+  private constructor() {}
 
-  public static readonly GameStarted: GameEventBusEventName<{ state: GameState<string> }> = toEventName('gameStarted');
-  public static readonly OnGameTick: GameEventBusEventName<void> = toEventName('onGameTick');
+  public static readonly GameStarted: GameEventBusEventName<{
+    state: GameState<string>;
+  }> = toEventName("gameStarted");
+  public static readonly OnGameTick: GameEventBusEventName<void> =
+    toEventName("onGameTick");
 }

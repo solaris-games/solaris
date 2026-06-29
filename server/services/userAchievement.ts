@@ -10,7 +10,11 @@ export default class UserAchievementService {
     guildService: GuildService;
     userLevelService: UserLevelService;
 
-    constructor(userRepo: Repository<User>, guildService: GuildService, userLevelService: UserLevelService) {
+    constructor(
+        userRepo: Repository<User>,
+        guildService: GuildService,
+        userLevelService: UserLevelService,
+    ) {
         this.userRepo = userRepo;
         this.guildService = guildService;
         this.userLevelService = userLevelService;
@@ -24,24 +28,28 @@ export default class UserAchievementService {
             username: 1,
             isAnonymous: 1,
             signupDate: 1,
-            'roles.contributor': 1,
-            'roles.developer': 1,
-            'roles.communityManager': 1,
-            'roles.gameMaster': 1
+            "roles.contributor": 1,
+            "roles.developer": 1,
+            "roles.communityManager": 1,
+            "roles.gameMaster": 1,
         });
 
         if (!user) {
-            throw new ValidationError('User not found.', 404);
+            throw new ValidationError("User not found.", 404);
         }
 
         // If the user is anonymous and the requester is not the user themselves, return 404.
-        const isSelf = requestingUserId && requestingUserId.toString() === user._id.toString();
+        const isSelf =
+            requestingUserId &&
+            requestingUserId.toString() === user._id.toString();
 
         if (user.isAnonymous && !isSelf) {
-            throw new ValidationError('User not found.', 404);
+            throw new ValidationError("User not found.", 404);
         }
 
-        user.level = this.userLevelService.getByRankPoints(user.achievements.rank);
+        user.level = this.userLevelService.getByRankPoints(
+            user.achievements.rank,
+        );
 
         // Strip isAnonymous from the response.
         const { isAnonymous, ...userWithoutAnonymous } = user;
@@ -49,38 +57,63 @@ export default class UserAchievementService {
         if (userWithoutAnonymous.guildId) {
             return {
                 ...userWithoutAnonymous,
-                guild: await this.guildService.getInfoById(userWithoutAnonymous.guildId)
-            }
+                guild: await this.guildService.getInfoById(
+                    userWithoutAnonymous.guildId,
+                ),
+            };
         }
 
         return userWithoutAnonymous;
     }
 
-    async _incrementAchievement(userId: DBObjectId, achievement: string, amount: number = 1) {
+    async _incrementAchievement(
+        userId: DBObjectId,
+        achievement: string,
+        amount: number = 1,
+    ) {
         let updateQuery = {
-            $inc: {}
+            $inc: {},
         };
 
         updateQuery.$inc[achievement] = amount;
 
-        await this.userRepo.updateOne({
-            _id: userId
-        }, updateQuery);
+        await this.userRepo.updateOne(
+            {
+                _id: userId,
+            },
+            updateQuery,
+        );
     }
 
     async incrementDefeated(userId: DBObjectId, amount: number = 1) {
-        return await this._incrementAchievement(userId, 'achievements.defeated', amount);
+        return await this._incrementAchievement(
+            userId,
+            "achievements.defeated",
+            amount,
+        );
     }
 
     async incrementJoined(userId: DBObjectId, amount: number = 1) {
-        return await this._incrementAchievement(userId, 'achievements.joined', amount);
+        return await this._incrementAchievement(
+            userId,
+            "achievements.joined",
+            amount,
+        );
     }
 
     async incrementRenown(userId: DBObjectId, amount: number = 1) {
-        return await this._incrementAchievement(userId, 'achievements.renown', amount);
+        return await this._incrementAchievement(
+            userId,
+            "achievements.renown",
+            amount,
+        );
     }
 
     async incrementRenownSent(userId: DBObjectId, amount: number = 1) {
-        return await this._incrementAchievement(userId, 'achievements.renownSent', amount);
+        return await this._incrementAchievement(
+            userId,
+            "achievements.renownSent",
+            amount,
+        );
     }
-};
+}

@@ -1,49 +1,61 @@
 <template>
-<div class="container pb-2">
-  <loading-spinner :loading="isLoading"/>
+  <div class="container pb-2">
+    <loading-spinner :loading="isLoading" />
 
-  <div v-if="conversations">
-    <div class="row">
-      <div class="col">
-        <button class="btn btn-sm btn-outline-primary" @click="onRefreshClicked"><i class="fas fa-sync"></i> Refresh</button>
+    <div v-if="conversations">
+      <div class="row">
+        <div class="col">
+          <button
+            class="btn btn-sm btn-outline-primary"
+            @click="onRefreshClicked"
+          >
+            <i class="fas fa-sync"></i> Refresh
+          </button>
+        </div>
+        <div class="col-auto" v-if="canCreateConversation">
+          <button
+            class="btn btn-sm btn-info ms-1"
+            @click="onCreateNewConversationRequested"
+          >
+            <i class="fas fa-comments"></i>
+            Create...
+          </button>
+        </div>
       </div>
-      <div class="col-auto" v-if="canCreateConversation">
-        <button class="btn btn-sm btn-info ms-1" @click="onCreateNewConversationRequested">
-          <i class="fas fa-comments"></i>
-          Create...
-        </button>
-      </div>
-    </div>
 
-    <div class="text-center pt-2" v-if="conversations?.length === 0">
+      <div class="text-center pt-2" v-if="conversations?.length === 0">
         No Conversations.
-    </div>
+      </div>
 
-    <div class="pt-2">
+      <div class="pt-2">
         <conversation-preview
           v-for="conversation in orderedConversations"
           v-bind:key="conversation._id"
           :conversation="conversation"
           :isTruncated="true"
           :isFullWidth="true"
-          class="mb-2"/>
+          class="mb-2"
+        />
+      </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
-import { useGameStore } from '@/stores/game';
-import { eventBusInjectionKey } from '../../../../../eventBus';
-import LoadingSpinner from '../../../../components/LoadingSpinner.vue';
-import ConversationPreview from './ConversationPreview.vue';
-import gameHelper from '../../../../../services/gameHelper';
-import { ref, computed, inject, onMounted, onUnmounted } from 'vue';
+import { useGameStore } from "@/stores/game";
+import { eventBusInjectionKey } from "../../../../../eventBus";
+import LoadingSpinner from "../../../../components/LoadingSpinner.vue";
+import ConversationPreview from "./ConversationPreview.vue";
+import gameHelper from "../../../../../services/gameHelper";
+import { ref, computed, inject, onMounted, onUnmounted } from "vue";
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
-import {type ConversationMessageSentResult, type ConversationOverview} from "@solaris/common";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import type {Game} from "@/types/game";
-import {listConversations} from "@/services/typedapi/conversation";
+import {
+  type ConversationMessageSentResult,
+  type ConversationOverview,
+} from "@solaris/common";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import type { Game } from "@/types/game";
+import { listConversations } from "@/services/typedapi/conversation";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
@@ -51,7 +63,11 @@ const httpClient = inject(httpInjectionKey)!;
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
 
-const canCreateConversation = computed(() => game.value.settings.general.playerLimit > 2 && !gameHelper.isTutorialGame(game.value));
+const canCreateConversation = computed(
+  () =>
+    game.value.settings.general.playerLimit > 2 &&
+    !gameHelper.isTutorialGame(game.value),
+);
 
 const isLoading = ref(false);
 const conversations = ref<ConversationOverview<string>[]>([]);
@@ -60,15 +76,14 @@ const orderedConversations = computed(() => {
   return conversations.value.sort((a, b) => {
     if (a === b) {
       return 0;
-    }
-    else if (a.lastMessage === null) {
+    } else if (a.lastMessage === null) {
       return 1;
-    }
-    else if (b.lastMessage === null) {
+    } else if (b.lastMessage === null) {
       return -1;
-    }
-    else {
-      return b.lastMessage.sentDate.getTime() - a.lastMessage.sentDate.getTime();
+    } else {
+      return (
+        b.lastMessage.sentDate.getTime() - a.lastMessage.sentDate.getTime()
+      );
     }
   });
 });
@@ -91,7 +106,7 @@ const onRefreshClicked = refreshList;
 
 const onMessageReceived = (e: ConversationMessageSentResult<string>) => {
   // Find the conversation that this message is for and replace the last message.
-  const convo = conversations.value.find(c => c._id === e.conversationId);
+  const convo = conversations.value.find((c) => c._id === e.conversationId);
 
   if (!convo) {
     return;
@@ -102,7 +117,7 @@ const onMessageReceived = (e: ConversationMessageSentResult<string>) => {
 };
 
 const onCreateNewConversationRequested = () => {
-  store.setMenuStateChat({ state: 'createConversation', participantIds: [] });
+  store.setMenuStateChat({ state: "createConversation", participantIds: [] });
 };
 
 onMounted(() => {
@@ -116,5 +131,4 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

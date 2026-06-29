@@ -1,14 +1,14 @@
-import {IStatisticsService} from "../types/IStatisticsService";
-import {Game} from "../types/Game";
-import {DBObjectId} from "../types/DBObjectId";
+import { IStatisticsService } from "../types/IStatisticsService";
+import { Game } from "../types/Game";
+import { DBObjectId } from "../types/DBObjectId";
 import { Statistics } from "@solaris/common";
-import {logger} from "../../utils/logging";
+import { logger } from "../../utils/logging";
 
 type Modifications = {
     gameId: DBObjectId;
     playerId: DBObjectId;
     modif: (stats: Statistics) => void;
-}
+};
 
 const log = logger("Context: ProcessingStatisticsService");
 
@@ -21,7 +21,11 @@ export class ProcessingStatisticsService implements IStatisticsService {
         return Promise.resolve();
     }
 
-    modifyStats(gameId: DBObjectId, playerId: DBObjectId, modif: (stats: Statistics) => void): Promise<void> {
+    modifyStats(
+        gameId: DBObjectId,
+        playerId: DBObjectId,
+        modif: (stats: Statistics) => void,
+    ): Promise<void> {
         this._modifications.push({ gameId, playerId, modif });
         return Promise.resolve();
     }
@@ -42,7 +46,11 @@ export class ProcessingStatisticsService implements IStatisticsService {
         }
 
         for (let modifcation of modifcations) {
-            await statisticsService.modifyStats(modifcation.gameId, modifcation.playerId, modifcation.modif);
+            await statisticsService.modifyStats(
+                modifcation.gameId,
+                modifcation.playerId,
+                modifcation.modif,
+            );
         }
     }
 }

@@ -1,4 +1,4 @@
-import type {IntelPlayer} from "@solaris/common";
+import type { IntelPlayer } from "@solaris/common";
 
 export type DataSet = {
   label: string;
@@ -8,20 +8,22 @@ export type DataSet = {
   borderWidth: number;
   pointHitRadius: number;
   data: number[];
-}
+};
 
 export type DataCollection = {
   labels: string[];
   datasets: DataSet[];
-}
-
-export type PlayerFilter = {
-  enabled: boolean,
-  playerId: string,
-  alias: string,
-  shape: string,
-  defeated: boolean,
-  colour: string
 };
 
-export type IntelType = keyof IntelPlayer<string>['statistics'] | keyof IntelPlayer<string>['research'];
+export type PlayerFilter = {
+  enabled: boolean;
+  playerId: string;
+  alias: string;
+  shape: string;
+  defeated: boolean;
+  colour: string;
+};
+
+export type IntelType =
+  | keyof IntelPlayer<string>["statistics"]
+  | keyof IntelPlayer<string>["research"];

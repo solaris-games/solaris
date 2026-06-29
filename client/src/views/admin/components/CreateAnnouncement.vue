@@ -7,20 +7,48 @@
       <form>
         <div class="form-group mb-2">
           <label for="announcement-title">Title</label>
-          <input type="text" class="form-control" id="announcement-title" placeholder="Title" v-model="title" required>
+          <input
+            type="text"
+            class="form-control"
+            id="announcement-title"
+            placeholder="Title"
+            v-model="title"
+            required
+          />
         </div>
         <div class="form-group mb-2">
           <label for="announcement-date">Date (UTC)</label>
-          <input type="datetime-local" class="form-control" id="announcement-date" placeholder="Date" v-model="date" required>
+          <input
+            type="datetime-local"
+            class="form-control"
+            id="announcement-date"
+            placeholder="Date"
+            v-model="date"
+            required
+          />
         </div>
         <div class="form-group mb-2">
           <label for="announcement-content">Content</label>
-          <textarea class="form-control" id="announcement-content" rows="3" placeholder="Content" v-model="content" required></textarea>
+          <textarea
+            class="form-control"
+            id="announcement-content"
+            rows="3"
+            placeholder="Content"
+            v-model="content"
+            required
+          ></textarea>
         </div>
 
         <form-error-list v-bind:errors="errors" />
 
-        <button type="button" class="btn btn-success" :disabled="!canSubmit" @click="submit">Create</button>
+        <button
+          type="button"
+          class="btn btn-success"
+          :disabled="!canSubmit"
+          @click="submit"
+        >
+          Create
+        </button>
       </form>
     </div>
   </div>
@@ -28,21 +56,26 @@
 
 <script setup lang="ts">
 import FormErrorList from "../../components/FormErrorList.vue";
-import { ref, computed, inject, type Ref } from 'vue';
-import { httpInjectionKey, isError, formatError, extractErrors } from "@/services/typedapi";
+import { ref, computed, inject, type Ref } from "vue";
+import {
+  httpInjectionKey,
+  isError,
+  formatError,
+  extractErrors,
+} from "@/services/typedapi";
 import { createAnnouncement } from "@/services/typedapi/admin";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
 const emit = defineEmits<{
-  onAnnouncementCreated: [],
+  onAnnouncementCreated: [];
 }>();
 
-const title = ref('');
-const date = ref('');
-const content = ref('');
+const title = ref("");
+const date = ref("");
+const content = ref("");
 const errors = ref<string[]>([]);
 
 const canSubmit = computed(() => title.value && date.value && content.value);
@@ -64,16 +97,14 @@ const submit = async (e: Event) => {
     errors.value = extractErrors(response);
   } else {
     toast.success("Announcement created successfully");
-    title.value = '';
-    date.value = '';
-    content.value = '';
+    title.value = "";
+    date.value = "";
+    content.value = "";
     errors.value = [];
   }
 
-  emit('onAnnouncementCreated');
-}
+  emit("onAnnouncementCreated");
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -5,15 +5,29 @@
     <form @submit.prevent="handleSubmit">
       <div class="mb-2">
         <label for="username">New Username</label>
-        <input type="text" :required="true" class="form-control" minlength="3" maxlength="24" v-model="username"
-          :disabled="isLoading" />
+        <input
+          type="text"
+          :required="true"
+          class="form-control"
+          minlength="3"
+          maxlength="24"
+          v-model="username"
+          :disabled="isLoading"
+        />
       </div>
 
       <form-error-list v-bind:errors="errors" />
 
       <div>
-        <button type="submit" class="btn btn-success" :disabled="isLoading">Change Username</button>
-        <router-link to="/account/settings" tag="button" class="btn btn-danger float-end">Cancel</router-link>
+        <button type="submit" class="btn btn-success" :disabled="isLoading">
+          Change Username
+        </button>
+        <router-link
+          to="/account/settings"
+          tag="button"
+          class="btn btn-danger float-end"
+          >Cancel</router-link
+        >
       </div>
     </form>
 
@@ -22,17 +36,22 @@
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from '../components/LoadingSpinner.vue'
-import ViewContainer from '../components/ViewContainer.vue'
-import router from '../../router'
-import ViewTitle from '../components/ViewTitle.vue'
-import FormErrorList from '../components/FormErrorList.vue'
-import { extractErrors, formatError, httpInjectionKey, isOk } from '@/services/typedapi'
-import { updateUsername } from '@/services/typedapi/user'
-import { ref, inject } from 'vue';
-import { useUserStore } from '@/stores/user';
+import LoadingSpinner from "../components/LoadingSpinner.vue";
+import ViewContainer from "../components/ViewContainer.vue";
+import router from "../../router";
+import ViewTitle from "../components/ViewTitle.vue";
+import FormErrorList from "../components/FormErrorList.vue";
+import {
+  extractErrors,
+  formatError,
+  httpInjectionKey,
+  isOk,
+} from "@/services/typedapi";
+import { updateUsername } from "@/services/typedapi/user";
+import { ref, inject } from "vue";
+import { useUserStore } from "@/stores/user";
 
-import { useToast } from 'vue-toast-notification';
+import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
 
@@ -40,16 +59,16 @@ const userStore = useUserStore();
 
 const isLoading = ref(false);
 const errors = ref<string[]>([]);
-const username = ref<string>('');
+const username = ref<string>("");
 
 const handleSubmit = async (e) => {
-  errors.value = []
+  errors.value = [];
 
   if (!username.value) {
-    errors.value.push('Username required.')
+    errors.value.push("Username required.");
   }
 
-  e.preventDefault()
+  e.preventDefault();
 
   if (errors.value.length) {
     return;
@@ -61,16 +80,18 @@ const handleSubmit = async (e) => {
 
   if (isOk(response)) {
     userStore.setUsername(username.value);
-    toast.success(`Username updated.`)
-    router.push({ name: 'account-settings' })
+    toast.success(`Username updated.`);
+    router.push({ name: "account-settings" });
   } else {
     console.error(formatError(response));
     errors.value = extractErrors(response);
-    toast.error(`There was a problem updating your username, please try again.`);
+    toast.error(
+      `There was a problem updating your username, please try again.`,
+    );
   }
 
   isLoading.value = false;
-}
+};
 </script>
 
 <style scoped></style>

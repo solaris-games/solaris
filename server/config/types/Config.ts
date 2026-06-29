@@ -1,6 +1,6 @@
-import {FrontendConfig} from "@solaris/common";
+import { FrontendConfig } from "@solaris/common";
 
-export type LoggingType = 'pretty' | 'stdout';
+export type LoggingType = "pretty" | "stdout";
 
 export interface Config {
     port?: string;
@@ -20,18 +20,18 @@ export interface Config {
         from?: string;
         username?: string;
         password?: string;
-    },
+    };
     paypal: {
         environment: string;
         clientId?: string;
         clientSecret?: string;
-    },
+    };
     discord: {
         serverId?: string;
         clientId?: string;
         clientSecret?: string;
         oauthRedirectUri?: string;
         botToken?: string;
-    },
-    frontend: FrontendConfig,
-};
+    };
+    frontend: FrontendConfig;
+}

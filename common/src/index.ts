@@ -27,7 +27,7 @@ export * from "./types/common/avatar";
 export * from "./types/common/report";
 export * from "./types/common/statsSlice";
 export * from "./types/common/stats";
-export * from './types/common/flux';
+export * from "./types/common/flux";
 export * from "./types/common/customGalaxy";
 export * from "./types/common/tutorial";
 export * from "./types/common/specialStar";
