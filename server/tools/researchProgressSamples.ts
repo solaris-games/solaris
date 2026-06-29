@@ -3,6 +3,7 @@ import {
     RESEARCH_TYPES_NOT_RANDOM,
 } from "@solaris/common";
 import type { ResearchTypeNotRandom } from "@solaris/common";
+import type {Game} from "../services/types/Game";
 
 const service = new ResearchProgressService();
 
@@ -91,7 +92,7 @@ console.log(
 for (const tech of RESEARCH_TYPES_NOT_RANDOM) {
     for (const expenseTier of EXPENSE_TIERS) {
         for (const progression of PROGRESSIONS) {
-            const game = makeGame(tech, expenseTier, progression) as any;
+            const game = makeGame(tech, expenseTier, progression) as Game;
             for (let level = MIN_LEVEL; level <= MAX_LEVEL; level++) {
                 const required = service.getRequiredResearchProgress(
                     game,

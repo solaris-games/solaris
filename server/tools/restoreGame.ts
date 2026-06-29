@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { Carrier } from "../services/types/Carrier";
 import {
     DBObjectId,
@@ -140,7 +139,7 @@ const applyCarriers = (
 
     const addCarriers = new Array<Carrier>();
 
-    for (let carrier of history.carriers) {
+    for (const carrier of history.carriers) {
         const currentCarrier = game.galaxy.carriers.find(
             (c) => c._id.toString() === carrier.carrierId.toString(),
         );
@@ -198,7 +197,7 @@ const applyHistory = (
 
 const job = makeJob(
     "Restore game",
-    async ({ log, container, mongo }: JobParameters) => {
+    async ({ log, container }: JobParameters) => {
         const gameIdS = process.argv[2];
         const tick = Number.parseInt(process.argv[3]);
 

@@ -5,8 +5,10 @@ import mongooseLoader from "../db/index";
 import { serverStub } from "../sockets/serverStub";
 import { logger } from "../utils/logging";
 import { Logger } from "pino";
+import mongoose from "mongoose";
 
-let mongo, container: DependencyContainer;
+let mongo: mongoose.Mongoose;
+let container: DependencyContainer;
 
 const startup = async (jobName) => {
     const log = logger(jobName);
@@ -28,7 +30,7 @@ const startup = async (jobName) => {
 };
 
 export type JobParameters = {
-    mongo: any;
+    mongo: mongoose.Mongoose;
     container: DependencyContainer;
     log: Logger;
 };
