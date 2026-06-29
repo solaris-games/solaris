@@ -1,10 +1,6 @@
 import { Game } from "../services/types/Game";
 import LeaderboardService from "../services/leaderboard";
-import Repository from "../services/repository";
-import { User } from "../services/types/User";
-import UserService from "../services/user";
 import PlayerService from "../services/player";
-import UserGuildService from "../services/guildUser";
 import RatingService from "../services/rating";
 import GameService from "../services/game";
 import { GameTypeService } from "@solaris/common";
@@ -73,13 +69,14 @@ describe("Leaderboard - Last man standing", () => {
 
         // @ts-ignore
         service = new LeaderboardService(
+            // @ts-ignore
             playerService,
-            playerAfkService,
-            userLevelService,
-            ratingService,
-            gameService,
-            gameTypeService,
-            gameStateService,
+            playerAfkService, // @ts-ignore
+            userLevelService, // @ts-ignore
+            ratingService, // @ts-ignore
+            gameService, // @ts-ignore
+            gameTypeService, // @ts-ignore
+            gameStateService, // @ts-ignore
             badgeService,
             playerStatisticsService,
             teamService,

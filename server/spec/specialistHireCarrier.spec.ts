@@ -78,6 +78,7 @@ describe("specialistHire - Carrier", () => {
 
         // @ts-ignore
         obj.service = new SpecialistHireService(
+            // @ts-ignore
             obj.gameRepo,
             obj.specialistService,
             obj.achievementService,

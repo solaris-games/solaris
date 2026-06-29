@@ -71,8 +71,8 @@ type OldUserAchievements<ID> = {
 };
 
 const moveStats = (user: User) => {
-    // @ts-ignore
     const oldAchievements =
+        // @ts-ignore
         user.achievements as OldUserAchievements<DBObjectId>;
 
     const stats: Statistics = {

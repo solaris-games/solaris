@@ -70,6 +70,7 @@ describe("specialistHire - Star", () => {
 
         // @ts-ignore
         obj.service = new SpecialistHireService(
+            // @ts-ignore
             obj.gameRepo,
             obj.specialistService,
             obj.achievementService,

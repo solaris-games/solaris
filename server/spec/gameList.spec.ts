@@ -19,8 +19,8 @@ describe("game list", () => {
     let gameListService;
 
     beforeAll(() => {
-        // @ts-ignore
         gameListService = new GameListService(
+            // @ts-ignore
             fakeGameModel,
             fakeGameService,
             {},

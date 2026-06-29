@@ -101,9 +101,8 @@ describe("map", () => {
         randGen = new SeededRandomGen("1");
         // Use a real random service because it would not be easy to fake for these tests.
         randomService = new RandomService();
-        // @ts-ignore
         starMapService = new CircularMapService(
-            randomService,
+            randomService, // @ts-ignore
             fakeStarService,
             fakeStarDistanceService,
             fakeDistanceService,

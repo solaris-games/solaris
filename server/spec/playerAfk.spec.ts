@@ -61,11 +61,11 @@ describe("Player AFK Service", () => {
             lastSeen: null,
         } as Player;
 
-        // @ts-ignore
         service = new PlayerAfkService(
-            gameRepo,
-            playerService,
-            starService,
+            // @ts-ignore
+            gameRepo, // @ts-ignore
+            playerService, // @ts-ignore
+            starService, // @ts-ignore
             carrierService,
             gameTypeService,
             gameStateService,

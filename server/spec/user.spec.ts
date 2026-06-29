@@ -38,9 +38,8 @@ describe("user", () => {
     let service;
 
     beforeAll(() => {
-        // @ts-ignore
         service = new UserService(
-            fakeUserModel,
+            fakeUserModel, // @ts-ignore
             fakeUserRepo,
             fakeBcrypt,
             fakeSessionService,
