@@ -1209,13 +1209,8 @@ export class Star
     }
 
     deselectAllText() {
-        // @ts-ignore
         if (window.getSelection) {
-            window.getSelection().removeAllRanges();
-        }
-        // @ts-ignore
-        else if (document.selection) {
-            document.selection.empty();
+            window.getSelection()?.removeAllRanges();
         }
     }
 
