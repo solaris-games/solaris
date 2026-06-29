@@ -1,5 +1,4 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
-import mongoose from "mongoose";
 import config from "../config";
 import containerLoader from "../services";
 import mongooseLoader from "../db/index";

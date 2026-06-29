@@ -9,10 +9,18 @@ import UserModel from "./models/User";
 import PaymentModel from "./models/Payment";
 import ReportModel from "./models/Report";
 import StatsSliceModel from "./models/StatsSlice";
+import type {Config} from "../config/types/Config";
 
 const log = logger("Database");
 
-export default async (config, options) => {
+export type DbOptions = {
+    connectionString?: string,
+    syncIndexes?: boolean,
+    unlockJobs?: boolean,
+    poolSize?: number,
+}
+
+export default async (config: Config, options: DbOptions): Promise<mongoose.Mongoose> => {
     async function syncIndexes() {
         log.info("Syncing indexes...");
         await EventModel.syncIndexes();
@@ -62,9 +70,13 @@ export default async (config, options) => {
         options.unlockJobs == null ? false : options.unlockJobs;
     options.poolSize = options.poolSize || 5;
 
+    if (!options.connectionString) {
+        throw new Error("No connection string set")
+    }
+
     log.info(`Connecting to database: ${options.connectionString}`);
 
-    const db = await mongoose.connect(options.connectionString, {
+    const db: mongoose.Mongoose = await mongoose.connect(options.connectionString, {
         maxPoolSize: options.poolSize,
         socketTimeoutMS: 120000,
     });
