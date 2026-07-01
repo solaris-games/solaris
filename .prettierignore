@@ -3,3 +3,4 @@ client/public
 client/src/assets
 *.yml
 *.md
+database_data/

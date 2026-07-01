@@ -3,9 +3,10 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 import pluginVue from "eslint-plugin-vue";
 import configPrettier from "eslint-config-prettier/flat";
-import { defineConfig } from "eslint/config";
+import {defineConfig, globalIgnores} from "eslint/config";
 
 export default defineConfig([
+  globalIgnores(["database_data/"]),
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"],
     plugins: { js },
