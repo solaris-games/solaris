@@ -1,5 +1,5 @@
 <template>
-  <loading-spinner :loading="!announcement" />
+  <loading-spinner :loading="isLoading" />
   <div class="mt-4" v-if="announcement">
     <h5 class="latest-update-title">Latest Update: {{ date }}</h5>
 
@@ -21,7 +21,9 @@ import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
 
 const httpClient = inject(httpInjectionKey)!;
 
+const isLoading = ref(true);
 const announcement: Ref<Announcement<string> | null> = ref(null);
+
 const date = computed(
   () =>
     announcement.value && new Date(announcement.value.date).toLocaleString(),
@@ -31,6 +33,7 @@ onMounted(async () => {
   const response = await getLatestAnnouncement(httpClient)();
 
   if (isOk(response)) {
+    isLoading.value = false;
     announcement.value = response.data;
   } else {
     console.error(formatError(response));
