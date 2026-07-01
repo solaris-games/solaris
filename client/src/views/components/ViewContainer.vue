@@ -1,8 +1,8 @@
 <template>
-  <div class="solaris-app col-xs-12 col-sm-10 col-md-10 col-lg-6">
+  <div class="solaris-app">
     <view-container-top-bar v-if="!props.hideTopBar" />
     <div class="content">
-      <div class="container">
+      <div class="container col-xs-12 col-sm-10 col-md-10 col-lg-10">
         <slot></slot>
       </div>
       <view-container-footer />
