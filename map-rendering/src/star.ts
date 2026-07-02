@@ -75,7 +75,6 @@ export class Star
     };
 
     app: Application;
-    fixedContainer: Container;
     container: Container;
     graphics_shape_part: Sprite;
     graphics_shape_full: Sprite;
@@ -133,9 +132,6 @@ export class Star
         this.userSettings = userSettings;
 
         this.app = app;
-        this.fixedContainer = new Container(); // this container isnt affected by culling or user setting scalling
-        this.fixedContainer.interactiveChildren = false;
-        this.fixedContainer.eventMode = "none";
         this.container = new Container();
         this.container.zIndex = 0;
         this.container.interactiveChildren = false;
@@ -159,8 +155,8 @@ export class Star
         this.container.addChild(this.graphics_selected);
         this.container.addChild(this.graphics_kingOfTheHill);
 
-        this.fixedContainer.addChild(this.graphics_scanningRange);
-        this.fixedContainer.addChild(this.graphics_hyperspaceRange);
+        this.container.addChild(this.graphics_scanningRange);
+        this.container.addChild(this.graphics_hyperspaceRange);
 
         this.container.on("pointerup", this.onClicked.bind(this));
         this.container.on("mouseover", this.onMouseOver.bind(this));
@@ -226,8 +222,6 @@ export class Star
         this.lightYearDistance = game.constants.distances.lightYear;
         this.container.position.x = this.data.location.x;
         this.container.position.y = this.data.location.y;
-        this.fixedContainer.position.x = this.data.location.x;
-        this.fixedContainer.position.y = this.data.location.y;
         this.container.hitArea = new Circle(0, 0, 15);
 
         this.userSettings = userSettings;
@@ -374,7 +368,7 @@ export class Star
             return;
         }
         if (this.nebulaSprite) {
-            this.fixedContainer.removeChild(this.nebulaSprite);
+            this.container.removeChild(this.nebulaSprite);
             this.nebulaSprite = null;
         }
         let seed = this.data._id;
@@ -395,19 +389,18 @@ export class Star
         this.nebulaSprite.tint = playerColour;
         //this.nebulaSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
-        let blendSprite = new Sprite(nebulaTexture);
+        const blendSprite = new Sprite(nebulaTexture);
         blendSprite.anchor.set(0.5);
         blendSprite.rotation = Star.seededRNG.random() * Math.PI * 2.0;
-        //blendSprite.blendMode = BLEND_MODES.ADD
         blendSprite.tint = playerColour;
         this.nebulaSprite.addChild(blendSprite);
 
-        this.fixedContainer.addChild(this.nebulaSprite);
+        this.container.addChild(this.nebulaSprite);
     }
 
     drawWormHole() {
         if (this.wormHoleSprite) {
-            this.fixedContainer.removeChild(this.wormHoleSprite);
+            this.container.removeChild(this.wormHoleSprite);
             this.wormHoleSprite = null;
         }
 
@@ -430,9 +423,8 @@ export class Star
             ? this.context.getPlayerColour(player._id)
             : 0xffffff;
         this.wormHoleSprite.tint = playerColour;
-        //this.asteroidFieldSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
-        this.fixedContainer.addChild(this.wormHoleSprite);
+        this.container.addChild(this.wormHoleSprite);
     }
 
     drawAsteroidField() {
@@ -440,7 +432,7 @@ export class Star
             return;
         }
         if (this.asteroidFieldSprite) {
-            this.fixedContainer.removeChild(this.asteroidFieldSprite);
+            this.container.removeChild(this.asteroidFieldSprite);
             this.asteroidFieldSprite = null;
         }
         let seed = this.data._id;
@@ -460,9 +452,8 @@ export class Star
             ? this.context.getPlayerColour(player._id)
             : 0xffffff;
         this.asteroidFieldSprite.tint = playerColour;
-        //this.asteroidFieldSprite.blendMode = BLEND_MODES.ADD // for extra punch
 
-        this.fixedContainer.addChild(this.asteroidFieldSprite);
+        this.container.addChild(this.asteroidFieldSprite);
     }
 
     drawSpecialist() {

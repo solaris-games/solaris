@@ -78,7 +78,6 @@ export class Map {
     playerNamesContainer: PIXI.Container;
     orbitalContainer: PIXI.Container;
     wormHoleContainer: PIXI.Container;
-    starContainer: PIXI.Container;
     waypointContainer: PIXI.Container;
     rulerPointContainer: PIXI.Container;
     highlightLocationsContainer: PIXI.Container;
@@ -154,8 +153,6 @@ export class Map {
         this.orbitalContainer.zIndex = 3;
         this.wormHoleContainer = new PIXI.Container();
         this.wormHoleContainer.zIndex = 5;
-        this.starContainer = new PIXI.Container();
-        this.starContainer.zIndex = 3;
         this.waypointContainer = new PIXI.Container();
         this.waypointContainer.zIndex = 2;
         this.waypointContainer.eventMode = "none";
@@ -165,7 +162,7 @@ export class Map {
         this.highlightLocationsContainer.zIndex = 6;
         this.tooltipContainer = new PIXI.Container();
         this.tooltipContainer.zIndex = 8;
-        this.pathManager!.container.zIndex = 7;
+        this.pathManager.container.zIndex = 7;
 
         // Add stars
         for (let i = 0; i < game.galaxy.stars.length; i++) {
@@ -271,11 +268,10 @@ export class Map {
         this.container.addChild(this.backgroundContainer);
         this.container.addChild(this.territoryContainer);
         this.container.addChild(this.wormHoleContainer);
-        this.container.addChild(this.pathManager!.container);
+        this.container.addChild(this.pathManager.container);
         this.container.addChild(this.rulerPointContainer);
         this.container.addChild(this.chunks.chunksContainer);
         this.container.addChild(this.orbitalContainer);
-        this.container.addChild(this.starContainer);
         this.container.addChild(this.highlightLocationsContainer);
         this.container.addChild(this.playerNamesContainer);
         this.container.addChild(this.tooltipContainer);
@@ -467,8 +463,6 @@ export class Map {
             );
             this.stars.push(star);
 
-            this.starContainer!.addChild(star.fixedContainer);
-
             star.on("onStarClicked", this._onStarClicked.bind(this));
             star.on("onStarRightClicked", this._onStarRightClicked.bind(this));
             star.on(
@@ -546,7 +540,7 @@ export class Map {
 
     drawGalaxyCenter() {
         if (this.galaxyCenterGraphics) {
-            this.starContainer.removeChild(this.galaxyCenterGraphics);
+            this.container.removeChild(this.galaxyCenterGraphics);
         }
 
         const userWantsToSeeCenter =
@@ -572,7 +566,7 @@ export class Map {
                 alpha: 0.75,
             });
 
-            this.starContainer.addChild(this.galaxyCenterGraphics);
+            this.container.addChild(this.galaxyCenterGraphics);
         }
     }
 
@@ -580,13 +574,6 @@ export class Map {
         return (
             this.game.constants.distances.galaxyCenterLocation &&
             this.game.settings.orbitalMechanics.enabled === "enabled"
-        );
-    }
-
-    _isWormHolesEnabled() {
-        return (
-            this.game.settings.specialGalaxy.randomWormHoles ||
-            this.game.galaxy.stars.find((s) => s.wormHoleToStarId)
         );
     }
 
@@ -733,8 +720,6 @@ export class Map {
 
     _undrawStar(star: Star) {
         star.removeAllListeners();
-
-        this.starContainer.removeChild(star.fixedContainer);
 
         this.chunks.removeMapObjectFromChunks(star);
 
@@ -910,7 +895,7 @@ export class Map {
     }
 
     clearCarrierHighlights() {
-        this.waypoints!.clear();
+        this.waypoints.clear();
     }
 
     onTick(deltaTime: number) {
@@ -933,7 +918,7 @@ export class Map {
             yradius: viewportYRadius,
         };
 
-        this.background!.onTick(deltaTime, viewportData);
+        this.background.onTick(deltaTime, viewportData);
 
         //chunk culling
 
@@ -944,15 +929,15 @@ export class Map {
         const zoomChanging =
             Math.abs(this.zoomPercent - this.lastZoomPercent) > 1.0 / 128.0;
 
-        this.chunks!.onTick(positionChanging, zoomChanging, this.zoomPercent, {
+        this.chunks.onTick(positionChanging, zoomChanging, this.zoomPercent, {
             left: this.viewport.left,
             right: this.viewport.right,
             top: this.viewport.top,
             bottom: this.viewport.bottom,
         });
 
-        this.pathManager!.onTick(this.zoomPercent, this.viewport, zoomChanging);
-        this.playerNames!.onTick(this.zoomPercent, zoomChanging);
+        this.pathManager.onTick(this.zoomPercent, this.viewport, zoomChanging);
+        this.playerNames.onTick(this.zoomPercent, zoomChanging);
 
         this.lastZoomPercent = this.zoomPercent;
     }
