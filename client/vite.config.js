@@ -17,6 +17,7 @@ export default defineConfig({
       }),
   ].filter(Boolean),
   resolve: {
+    extensions: [".mts", ".ts", ".tsx", ".mjs", ".js", ".jsx", ".json"],
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       "@solaris/common": fileURLToPath(
