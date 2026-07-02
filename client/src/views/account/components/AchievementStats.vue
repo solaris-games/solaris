@@ -258,7 +258,9 @@ onMounted(async () => {
           </tr>
           <tr v-if="user.level.rankPointsNext != null">
             <td>Next Rank Points</td>
-            <td class="text-end">{{ user.level.rankPointsNext }}</td>
+            <td class="text-end">
+              {{ user.level.rankPointsNext }}
+            </td>
           </tr>
           <tr>
             <td>
@@ -268,15 +270,21 @@ onMounted(async () => {
                 title="Improve your ELO by participating in 1v1's"
               ></i>
             </td>
-            <td class="text-end">{{ user.achievements.eloRating || 1200 }}</td>
+            <td class="text-end">
+              {{ user.achievements.eloRating || 1200 }}
+            </td>
           </tr>
           <tr>
             <td>Victories</td>
-            <td class="text-end">{{ user.achievements.victories }}</td>
+            <td class="text-end">
+              {{ user.achievements.victories }}
+            </td>
           </tr>
           <tr>
             <td>Victories (1 vs. 1)</td>
-            <td class="text-end">{{ user.achievements.victories1v1 }}</td>
+            <td class="text-end">
+              {{ user.achievements.victories1v1 }}
+            </td>
           </tr>
         </tbody>
       </table>
@@ -294,15 +302,21 @@ onMounted(async () => {
           </tr>
           <tr>
             <td>Completed</td>
-            <td class="text-end">{{ user.achievements.completed }}</td>
+            <td class="text-end">
+              {{ user.achievements.completed }}
+            </td>
           </tr>
           <tr>
             <td>Defeated</td>
-            <td class="text-end">{{ user.achievements.defeated }}</td>
+            <td class="text-end">
+              {{ user.achievements.defeated }}
+            </td>
           </tr>
           <tr>
             <td>Defeated (1 vs. 1)</td>
-            <td class="text-end">{{ user.achievements.defeated1v1 }}</td>
+            <td class="text-end">
+              {{ user.achievements.defeated1v1 }}
+            </td>
           </tr>
           <tr>
             <td>AFK</td>
@@ -570,7 +584,9 @@ onMounted(async () => {
           </tr>
           <tr>
             <td>Renown Sent</td>
-            <td class="text-end">{{ user.achievements.renownSent }}</td>
+            <td class="text-end">
+              {{ user.achievements.renownSent }}
+            </td>
           </tr>
           <tr>
             <td>Renown Received</td>

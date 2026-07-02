@@ -6,10 +6,10 @@
 
     <p v-if="event.data.creditsEconomy || event.data.creditsBanking">
       You have received
-      <span class="text-success">${{ event.data.creditsEconomy }}</span> from
-      your economic infrastructure and
-      <span class="text-success">${{ event.data.creditsBanking }}</span> from
-      your banking technology.
+      <span class="text-success">${{ event.data.creditsEconomy }}</span>
+      from your economic infrastructure and
+      <span class="text-success">${{ event.data.creditsBanking }}</span>
+      from your banking technology.
     </p>
 
     <p v-if="event.data.creditsSpecialists">

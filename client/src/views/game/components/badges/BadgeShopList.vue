@@ -13,10 +13,8 @@
             v-if="userCredits >= badge.price"
             @click="purchaseBadge(badge)"
           >
-            <i class="fas fa-shopping-basket"></i> {{ badge.price }} Credit<span
-              v-if="badge.price > 1"
-              >s</span
-            >
+            <i class="fas fa-shopping-basket"></i>
+            {{ badge.price }} Credit<span v-if="badge.price > 1">s</span>
           </button>
         </div>
         <div class="d-grid gap-2">
@@ -25,10 +23,8 @@
             class="btn btn-sm btn-outline-danger"
             v-if="userCredits < badge.price"
           >
-            <i class="fas fa-coins"></i> {{ badge.price }} Credit<span
-              v-if="badge.price > 1"
-              >s</span
-            >
+            <i class="fas fa-coins"></i>
+            {{ badge.price }} Credit<span v-if="badge.price > 1">s</span>
           </router-link>
         </div>
       </div>

@@ -21,7 +21,10 @@
         <tr v-for="game in games" v-bind:key="game._id">
           <td>
             <router-link
-              :to="{ path: '/game/detail', query: { id: game._id } }"
+              :to="{
+                path: '/game/detail',
+                query: { id: game._id },
+              }"
               class="me-1"
               >{{ game.settings.general.name }}</router-link
             >
@@ -33,7 +36,10 @@
           </td>
           <td>
             <router-link
-              :to="{ path: '/game/detail', query: { id: game._id } }"
+              :to="{
+                path: '/game/detail',
+                query: { id: game._id },
+              }"
               tag="button"
               class="btn btn-outline-success float-end"
               >View</router-link

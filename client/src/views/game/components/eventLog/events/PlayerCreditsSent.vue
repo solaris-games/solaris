@@ -2,7 +2,8 @@
   <div v-if="player">
     <p>
       You have sent
-      <span class="text-warning">${{ event.data.credits }} credits</span> to
+      <span class="text-warning">${{ event.data.credits }} credits</span>
+      to
       <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{
         player.alias
       }}</a

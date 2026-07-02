@@ -349,7 +349,11 @@ const onCarrierRenameRequested = (e: string) =>
   changeMenuState({ state: "carrierRename", carrierId: e });
 
 const onViewCarrierCombatCalculatorRequested = (e: string | undefined) =>
-  changeMenuState({ state: "combatCalculator", carrierId: e, advanced: false });
+  changeMenuState({
+    state: "combatCalculator",
+    carrierId: e,
+    advanced: false,
+  });
 
 const onViewSettingsRequested = () => changeMenuState({ state: "settings" });
 

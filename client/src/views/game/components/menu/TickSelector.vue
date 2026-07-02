@@ -11,7 +11,10 @@
       <span>
         <i
           class="fas"
-          :class="{ 'fa-chevron-down': !display, 'fa-chevron-up': display }"
+          :class="{
+            'fa-chevron-down': !display,
+            'fa-chevron-up': display,
+          }"
         ></i>
       </span>
     </div>

@@ -505,19 +505,31 @@ class GameHelper {
   }
 
   isGameNotStarted(game: {
-    state: { startDate: Date | null; endDate: Date | null; paused: boolean };
+    state: {
+      startDate: Date | null;
+      endDate: Date | null;
+      paused: boolean;
+    };
   }) {
     return !game.state.startDate;
   }
 
   isGameStarted(game: {
-    state: { startDate: Date | null; endDate: Date | null; paused: boolean };
+    state: {
+      startDate: Date | null;
+      endDate: Date | null;
+      paused: boolean;
+    };
   }) {
     return game.state.startDate != null;
   }
 
   isGameInProgress(game: {
-    state: { startDate: Date | null; endDate: Date | null; paused: boolean };
+    state: {
+      startDate: Date | null;
+      endDate: Date | null;
+      paused: boolean;
+    };
   }) {
     return (
       !this.isGameWaitingForPlayers(game) &&
@@ -529,7 +541,11 @@ class GameHelper {
   }
 
   isGamePendingStart(game: {
-    state: { startDate: Date | null; endDate: Date | null; paused: boolean };
+    state: {
+      startDate: Date | null;
+      endDate: Date | null;
+      paused: boolean;
+    };
   }) {
     return (
       !this.isGameWaitingForPlayers(game) &&

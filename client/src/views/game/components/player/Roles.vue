@@ -12,7 +12,8 @@
     <div class="row bg-warning mb-2" v-if="user && user.roles.developer">
       <div class="col text-center">
         <p class="mt-1 mb-1">
-          <span v-if="displayText">This player is an active</span> Developer
+          <span v-if="displayText">This player is an active</span>
+          Developer
           <i class="fas fa-code"></i>
         </p>
       </div>
@@ -21,8 +22,8 @@
     <div class="row bg-info mb-2" v-if="user && user.roles.communityManager">
       <div class="col text-center">
         <p class="mt-1 mb-1">
-          <span v-if="displayText">This player is an active</span> Community
-          Manager <i class="fas fa-user-friends"></i>
+          <span v-if="displayText">This player is an active</span>
+          Community Manager <i class="fas fa-user-friends"></i>
         </p>
       </div>
     </div>
@@ -30,7 +31,8 @@
     <div class="row bg-info mb-2" v-if="user && user.roles.gameMaster">
       <div class="col text-center">
         <p class="mt-1 mb-1">
-          <span v-if="displayText">This player is an active</span> Game Master
+          <span v-if="displayText">This player is an active</span>
+          Game Master
           <i class="fas fa-dice"></i>
         </p>
       </div>

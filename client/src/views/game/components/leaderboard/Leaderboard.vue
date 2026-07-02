@@ -19,7 +19,9 @@
 
     <div class="row">
       <div class="col">
-        <h4 class="text-center mt-2">{{ game.settings.general.name }}</h4>
+        <h4 class="text-center mt-2">
+          {{ game.settings.general.name }}
+        </h4>
       </div>
     </div>
 
@@ -28,8 +30,9 @@
     <div class="row" v-if="!game.state.endDate && almostAfkReminder">
       <div class="col text-center">
         <p class="mt-2 mb-2 text-danger">
-          You have missed the last {{ userPlayer?.missedTurns }} turn(s). Please
-          mark your turn as completed or you will be marked afk.
+          You have missed the last
+          {{ userPlayer?.missedTurns }} turn(s). Please mark your turn as
+          completed or you will be marked afk.
         </p>
       </div>
     </div>

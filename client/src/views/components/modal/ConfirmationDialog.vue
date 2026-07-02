@@ -9,7 +9,9 @@
     @onConfirm="onConfirm"
     @onCancel="onCancel"
   >
-    <p style="white-space: pre-wrap">{{ props.dialogSettings?.text || "" }}</p>
+    <p style="white-space: pre-wrap">
+      {{ props.dialogSettings?.text || "" }}
+    </p>
   </DialogModal>
 </template>
 

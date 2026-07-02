@@ -79,7 +79,9 @@
         <button
           class="btn btn-success me-1"
           @click="onViewConversationRequested"
-          :class="{ 'btn-warning': conversation && conversation.unreadCount }"
+          :class="{
+            'btn-warning': conversation && conversation.unreadCount,
+          }"
           v-if="canCreateConversation"
         >
           <i class="fas fa-envelope"></i>

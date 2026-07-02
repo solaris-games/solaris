@@ -30,7 +30,9 @@
             </select>
             <span
               class="override-current-colour"
-              :style="{ 'background-color': toColourValue(currentColour!) }"
+              :style="{
+                'background-color': toColourValue(currentColour!),
+              }"
             />
             <button class="btn btn-default btn-sm" v-on:click="setToDefault">
               Use default

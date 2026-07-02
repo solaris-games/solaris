@@ -30,7 +30,9 @@
   <div v-if="state && state.state === 'error'" class="alert alert-danger mt-2">
     <p>Invalid galaxy JSON:</p>
     <ul>
-      <li v-for="(error, index) in state.errors" :key="index">{{ error }}</li>
+      <li v-for="(error, index) in state.errors" :key="index">
+        {{ error }}
+      </li>
     </ul>
   </div>
 

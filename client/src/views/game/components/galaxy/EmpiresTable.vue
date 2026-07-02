@@ -28,7 +28,9 @@
           <thead class="table-dark">
             <tr>
               <td><i class="fas fa-user"></i></td>
-              <td><a href="javascript:;" @click="sort(['alias'])">Name</a></td>
+              <td>
+                <a href="javascript:;" @click="sort(['alias'])">Name</a>
+              </td>
               <td></td>
               <td class="text-end" title="Stars">
                 <a href="javascript:;" @click="sort(['stats', 'totalStars'])"

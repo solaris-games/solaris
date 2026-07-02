@@ -5,7 +5,9 @@
         <table class="table table-sm mb-1" v-if="research">
           <tbody>
             <tr v-if="isTechnologyEnabled('scanning')">
-              <td class="row-icon"><i :class="getIcon('scanning')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('scanning')"></i>
+              </td>
               <td>Scanning</td>
               <td>
                 <span class="level-label">Level</span>
@@ -23,7 +25,9 @@
               </td>
             </tr>
             <tr v-if="isTechnologyEnabled('hyperspace')">
-              <td class="row-icon"><i :class="getIcon('hyperspace')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('hyperspace')"></i>
+              </td>
               <td>
                 <span
                   class="label label-default"
@@ -54,7 +58,9 @@
               </td>
             </tr>
             <tr v-if="isTechnologyEnabled('terraforming')">
-              <td class="row-icon"><i :class="getIcon('terraforming')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('terraforming')"></i>
+              </td>
               <td>Terraforming</td>
               <td>
                 <span class="level-label">Level</span>
@@ -102,7 +108,9 @@
               </td>
             </tr>
             <tr v-if="isTechnologyEnabled('weapons')">
-              <td class="row-icon"><i :class="getIcon('weapons')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('weapons')"></i>
+              </td>
               <td>Weapons</td>
               <td>
                 <span class="level-label">Level</span>
@@ -122,7 +130,9 @@
               </td>
             </tr>
             <tr v-if="isTechnologyEnabled('banking')">
-              <td class="row-icon"><i :class="getIcon('banking')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('banking')"></i>
+              </td>
               <td>Banking</td>
               <td>
                 <span class="level-label">Level</span>
@@ -167,7 +177,9 @@
               </td>
             </tr>
             <tr v-if="isTechnologyEnabled('specialists')">
-              <td class="row-icon"><i :class="getIcon('specialists')"></i></td>
+              <td class="row-icon">
+                <i :class="getIcon('specialists')"></i>
+              </td>
               <td>Specialists</td>
               <td>
                 <span class="level-label">Level</span>

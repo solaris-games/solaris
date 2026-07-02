@@ -53,7 +53,11 @@
           </th>
         </template>
         <template v-slot:row="{ value: player, getColumnClass }">
-          <tr :class="{ 'bg-primary': userStore.userId === player._id }">
+          <tr
+            :class="{
+              'bg-primary': userStore.userId === player._id,
+            }"
+          >
             <td>{{ player.position }}</td>
             <td>
               <router-link

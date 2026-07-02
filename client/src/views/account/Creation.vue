@@ -5,7 +5,10 @@
 
       <div class="row">
         <div class="col-sm-12 col-md-6">
-          <h4>Sign up to play <span class="text-warning">Solaris</span>!</h4>
+          <h4>
+            Sign up to play
+            <span class="text-warning">Solaris</span>!
+          </h4>
           <p>
             Discover a space strategy game filled with conquest, betrayal and
             subterfuge.
@@ -15,15 +18,16 @@
             <span class="text-danger">galactic domination.</span>
           </p>
           <p>
-            <span class="text-info">Research and improve technologies</span> to
-            gain an edge over your opponents. Trade with allies and build up
+            <span class="text-info">Research and improve technologies</span>
+            to gain an edge over your opponents. Trade with allies and build up
             huge fleets of ships.
           </p>
           <p>Will you conquer the galaxy?</p>
           <hr />
           <p>
-            You can play <span class="text-warning">Solaris</span> on any of the
-            following platforms:
+            You can play
+            <span class="text-warning">Solaris</span> on any of the following
+            platforms:
           </p>
           <p>
             <a

@@ -3,7 +3,7 @@ import {
     RESEARCH_TYPES_NOT_RANDOM,
 } from "@solaris/common";
 import type { ResearchTypeNotRandom } from "@solaris/common";
-import type {Game} from "../services/types/Game";
+import type { Game } from "../services/types/Game";
 
 const service = new ResearchProgressService();
 

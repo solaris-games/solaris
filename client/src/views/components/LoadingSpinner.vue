@@ -3,7 +3,9 @@
     <h6>
       <div class="spinner-border"></div>
     </h6>
-    <p class="mb-1" v-if="!props.hideText">{{ props.text || "Loading..." }}</p>
+    <p class="mb-1" v-if="!props.hideText">
+      {{ props.text || "Loading..." }}
+    </p>
   </div>
 </template>
 

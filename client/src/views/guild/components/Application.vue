@@ -2,7 +2,10 @@
   <tr>
     <td>
       <router-link
-        :to="{ name: 'guild-details', params: { guildId: application._id } }"
+        :to="{
+          name: 'guild-details',
+          params: { guildId: application._id },
+        }"
       >
         <span>{{ application.name }} [{{ application.tag }}]</span>
       </router-link>

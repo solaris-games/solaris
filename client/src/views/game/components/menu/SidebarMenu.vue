@@ -1,7 +1,10 @@
 <template>
   <div
     class="sidebar-menu d-none d-md-block"
-    :class="{ 'header-bar-bg': !isHistoricalMode, 'bg-dark': isHistoricalMode }"
+    :class="{
+      'header-bar-bg': !isHistoricalMode,
+      'bg-dark': isHistoricalMode,
+    }"
   >
     <div class="sidebar-menu-top">
       <div v-if="!userPlayer && gameIsJoinable">

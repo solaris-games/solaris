@@ -1059,7 +1059,9 @@ export class Map {
             if (this.mode.mode === ModeKind.Galaxy) {
                 this.eventBus.emit(
                     MapEventBusEventNames.MapOnStarRightSelected,
-                    { star: e },
+                    {
+                        star: e,
+                    },
                 );
             }
         };
@@ -1163,7 +1165,9 @@ export class Map {
         if (this.mode.mode === ModeKind.Galaxy) {
             this.eventBus.emit(
                 MapEventBusEventNames.MapOnCarrierRightSelected,
-                { carrier },
+                {
+                    carrier,
+                },
             );
         }
     }

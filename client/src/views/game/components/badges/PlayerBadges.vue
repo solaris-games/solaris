@@ -29,7 +29,9 @@
 
     <div class="row" v-if="isExtraAnonymity && (!isLoading || !badges.length)">
       <div v-if="!badges.length" class="col text-center pt-3">
-        <p class="mb-3"><small>Badges are hidden in anonymous games.</small></p>
+        <p class="mb-3">
+          <small>Badges are hidden in anonymous games.</small>
+        </p>
       </div>
     </div>
 

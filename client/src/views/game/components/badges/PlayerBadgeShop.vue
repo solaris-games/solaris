@@ -17,7 +17,8 @@
           <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{
             recipientPlayer.alias
           }}</a>
-          a <strong>Badge of Honor<i class="fas fa-medal ms-1"></i></strong>
+          a
+          <strong>Badge of Honor<i class="fas fa-medal ms-1"></i></strong>
         </p>
 
         <p v-if="userCredits !== null && userCredits !== undefined">

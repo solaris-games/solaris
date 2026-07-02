@@ -16,7 +16,8 @@
       <div class="row pt-2 pb-2 bg-dark">
         <div class="col-3 text-left">
           <span title="Total number of waypoints plotted">
-            <i class="fas fa-map-marker-alt"></i> {{ points.length }}
+            <i class="fas fa-map-marker-alt"></i>
+            {{ points.length }}
           </span>
         </div>
         <div class="col-3 text-center">
@@ -68,7 +69,8 @@
         <div class="col-6">Waypoints</div>
         <div class="col-6 text-end">
           <span title="Total number of waypoints plotted">
-            <i class="fas fa-map-marker-alt"></i> {{ points.length }}
+            <i class="fas fa-map-marker-alt"></i>
+            {{ points.length }}
           </span>
         </div>
       </div>

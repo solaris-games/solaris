@@ -8,7 +8,8 @@
         </h5>
         <span v-if="isHomeStarsWinCondition" class="team-score">
           <span class="d-xs-block d-sm-none">
-            <i class="fas fa-star me-0"></i> {{ team.totalHomeStars }}
+            <i class="fas fa-star me-0"></i>
+            {{ team.totalHomeStars }}
           </span>
           <span class="d-none d-sm-block">
             {{ team.totalHomeStars }} Star<span v-if="team.totalHomeStars !== 1"

@@ -69,8 +69,8 @@
         <li v-if="isAllianceUpkeepEnabled">
           <small
             >Establishing an alliance will incur an
-            <span class="text-warning">upfront upkeep fee</span> based on your
-            cycle income.</small
+            <span class="text-warning">upfront upkeep fee</span>
+            based on your cycle income.</small
           >
         </li>
       </ul>

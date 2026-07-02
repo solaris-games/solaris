@@ -20,7 +20,9 @@
           <tr
             v-for="player of leaderboard"
             :key="player._id"
-            :class="{ 'bg-primary': userStore.userId === player._id }"
+            :class="{
+              'bg-primary': userStore.userId === player._id,
+            }"
           >
             <td>{{ player.position }}</td>
             <td>
@@ -69,7 +71,9 @@
                 player.achievements.defeated1v1
               }}
             </td>
-            <td align="right">{{ player.achievements.eloRating }}</td>
+            <td align="right">
+              {{ player.achievements.eloRating }}
+            </td>
           </tr>
         </tbody>
       </table>

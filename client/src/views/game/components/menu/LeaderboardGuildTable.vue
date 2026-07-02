@@ -46,7 +46,10 @@
           <td>{{ value.position }}</td>
           <td>
             <router-link
-              :to="{ name: 'guild-details', params: { guildId: value._id } }"
+              :to="{
+                name: 'guild-details',
+                params: { guildId: value._id },
+              }"
             >
               <span>{{ value.name }} [{{ value.tag }}]</span>
             </router-link>

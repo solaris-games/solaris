@@ -139,7 +139,9 @@ export default class BadgeService extends EventEmitter {
 
         const recipientUser = await this.userService.getById(
             purchasedForUserId,
-            { _id: 1 },
+            {
+                _id: 1,
+            },
         );
 
         if (!recipientUser) {

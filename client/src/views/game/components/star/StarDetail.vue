@@ -581,7 +581,8 @@
         class="row pt-1 pb-1 bg-dark"
       >
         <div class="col">
-          Ticks to {{ star.manufacturing! > 1 ? "bonus" : "next" }} ship
+          Ticks to
+          {{ star.manufacturing! > 1 ? "bonus" : "next" }} ship
         </div>
         <div
           class="col text-end"

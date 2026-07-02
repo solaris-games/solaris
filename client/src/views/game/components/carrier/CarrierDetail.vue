@@ -104,7 +104,8 @@
         </div>
         <div class="col-auto" v-if="carrier.effectiveTechs">
           <span title="The weapons level of this carrier">
-            {{ carrier.effectiveTechs.weapons }} <i class="fas fa-gun ms-1"></i>
+            {{ carrier.effectiveTechs.weapons }}
+            <i class="fas fa-gun ms-1"></i>
           </span>
         </div>
         <div class="col-auto">
@@ -268,7 +269,8 @@
       <div class="row mb-0 pt-1 pb-1" v-if="carrier.effectiveTechs">
         <div class="col">Weapons</div>
         <div class="col text-end">
-          {{ carrier.effectiveTechs.weapons }} <i class="fas fa-gun ms-1"></i>
+          {{ carrier.effectiveTechs.weapons }}
+          <i class="fas fa-gun ms-1"></i>
         </div>
       </div>
       <div class="row mb-0 pt-1 pb-1 bg-dark" v-if="carrier.effectiveTechs">
@@ -344,7 +346,8 @@
                 carrier.ticksEtaTotal !== undefined
               "
             >
-              (Total: <timer :ticks="carrier.ticksEtaTotal" />)</span
+              (Total:
+              <timer :ticks="carrier.ticksEtaTotal" />)</span
             >
           </span>
         </div>

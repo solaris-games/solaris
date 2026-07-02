@@ -94,7 +94,10 @@ const onViewConversationRequested = async (playerId: string) => {
     });
   } else {
     // todo: select participants
-    store.setMenuStateChat({ state: "createConversation", participantIds: [] });
+    store.setMenuStateChat({
+      state: "createConversation",
+      participantIds: [],
+    });
   }
 };
 </script>

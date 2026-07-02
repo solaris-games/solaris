@@ -38,7 +38,8 @@
                   title="Getting Started"
                   class="btn btn-outline-warning me-2 mb-1 float-end"
                 >
-                  <i class="fas fa-handshake-angle"></i> Getting Started
+                  <i class="fas fa-handshake-angle"></i>
+                  Getting Started
                 </a>
               </div>
             </div>

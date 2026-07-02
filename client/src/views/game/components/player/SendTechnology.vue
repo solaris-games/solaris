@@ -23,9 +23,8 @@
               v-bind:key="opt.name + opt.level"
               v-bind:value="opt"
             >
-              {{ getTechnologyFriendlyName(opt.name) }} {{ opt.level }} (${{
-                opt.cost
-              }})
+              {{ getTechnologyFriendlyName(opt.name) }}
+              {{ opt.level }} (${{ opt.cost }})
             </option>
           </select>
         </div>

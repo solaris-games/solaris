@@ -86,8 +86,8 @@
       <p>
         To win a game of Solaris, you must capture a specified number of stars.
         You are currently in control of
-        <span class="text-info">{{ playerStars.length }} stars</span> and you
-        need to capture
+        <span class="text-info">{{ playerStars.length }} stars</span>
+        and you need to capture
         <span class="text-warning">{{ starsForVictory }} stars</span> to win the
         game and end the tutorial.
       </p>
@@ -146,9 +146,10 @@
       <h5>Carriers &amp; Waypoints</h5>
 
       <p>
-        In order to capture stars, you must build <strong>Carriers</strong>, use
-        carriers to transport ships across the galaxy to stars in order to
-        capture them. A carrier must have at least 1 ship.
+        In order to capture stars, you must build
+        <strong>Carriers</strong>, use carriers to transport ships across the
+        galaxy to stars in order to capture them. A carrier must have at least 1
+        ship.
       </p>
 
       <p>
@@ -165,8 +166,8 @@
       <p>
         Once you've built the carrier, edit the waypoints of the carrier to
         travel to stars that you do not own to capture them, make sure you
-        <span class="text-danger">load the carrier with enough ships</span> in
-        case they run into a combat situation.
+        <span class="text-danger">load the carrier with enough ships</span>
+        in case they run into a combat situation.
       </p>
 
       <p>
@@ -203,9 +204,9 @@
           >Use the menu at the <strong>top right</strong> of the screen to
           navigate to the <strong>Research</strong> screen</span
         >
-        and set your current research to <span class="text-info">Weapons</span>.
-        This will make your ships more powerful and hit harder in combat once
-        researched.
+        and set your current research to
+        <span class="text-info">Weapons</span>. This will make your ships more
+        powerful and hit harder in combat once researched.
       </p>
 
       <p class="text-warning">
@@ -222,16 +223,16 @@
       <p>
         To win a game of Solaris, you must capture a specified number of stars.
         You are currently in control of
-        <span class="text-info">{{ playerStars.length }} stars</span> and you
-        need to capture
+        <span class="text-info">{{ playerStars.length }} stars</span>
+        and you need to capture
         <span class="text-warning">{{ starsForVictory }} stars</span> to win the
         game and end the tutorial.
       </p>
 
       <p class="text-danger">
         Keep producing ships, building carriers and plotting waypoints.
-        Eliminate your opponent and capture the <strong>entire map</strong> to
-        win this tutorial.
+        Eliminate your opponent and capture the
+        <strong>entire map</strong> to win this tutorial.
       </p>
     </div>
 

@@ -16,7 +16,9 @@
         <h6>Star specialist bans:</h6>
 
         <ul>
-          <li v-for="specialist of monthlyBans.star">{{ specialist.name }}</li>
+          <li v-for="specialist of monthlyBans.star">
+            {{ specialist.name }}
+          </li>
         </ul>
 
         <h6>Carrier specialist bans:</h6>
@@ -30,7 +32,9 @@
         <h6>Special star bans:</h6>
 
         <ul>
-          <li v-for="star of monthlyBans.specialStar">{{ star.name }}</li>
+          <li v-for="star of monthlyBans.specialStar">
+            {{ star.name }}
+          </li>
         </ul>
 
         <p>

@@ -67,7 +67,8 @@
     >
       <small
         >Your ELO rating has changed from
-        <span class="text-info">{{ userPlayerRating.oldRating }}</span> to
+        <span class="text-info">{{ userPlayerRating.oldRating }}</span>
+        to
         <span class="text-warning">{{ userPlayerRating.newRating }}</span
         >.</small
       >

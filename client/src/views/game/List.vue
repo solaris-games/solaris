@@ -36,7 +36,11 @@
           <div class="col-sm-12 col-md-12 col-lg-12 mb-0" v-if="games.featured">
             <div
               class="card featured-card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.featured._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.featured._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source :srcset="featuredImgWebp" type="image/webp" />
@@ -90,7 +94,9 @@
             <div
               class="card bg-dark text-white p-1"
               @click="
-                routeToPath('/game/detail', { id: games.newPlayerRT._id })
+                routeToPath('/game/detail', {
+                  id: games.newPlayerRT._id,
+                })
               "
             >
               <picture style="display: contents">
@@ -128,7 +134,11 @@
           <div class="col-sm-12 col-md-6 col-lg-6" v-if="games.special">
             <div
               class="card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.special._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.special._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source
@@ -206,7 +216,11 @@
           <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardRT">
             <div
               class="card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.standardRT._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.standardRT._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source :srcset="standardRtImgWebp" type="image/webp" />
@@ -244,7 +258,11 @@
           <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.standardTB">
             <div
               class="card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.standardTB._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.standardTB._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source :srcset="standardTbImgWebp" type="image/webp" />
@@ -282,7 +300,11 @@
           <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneRT">
             <div
               class="card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.oneVsOneRT._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.oneVsOneRT._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source :srcset="duelRtImgWebp" type="image/webp" />
@@ -316,7 +338,11 @@
           <div class="col-sm-12 col-md-3 col-lg-3" v-if="games.oneVsOneTB">
             <div
               class="card bg-dark text-white p-1"
-              @click="routeToPath('/game/detail', { id: games.oneVsOneTB._id })"
+              @click="
+                routeToPath('/game/detail', {
+                  id: games.oneVsOneTB._id,
+                })
+              "
             >
               <picture style="display: contents">
                 <source :srcset="duelTbImgWebp" type="image/webp" />
@@ -355,7 +381,9 @@
             <div
               class="card bg-dark text-white p-1"
               @click="
-                routeToPath('/game/detail', { id: games.standardTeam._id })
+                routeToPath('/game/detail', {
+                  id: games.standardTeam._id,
+                })
               "
             >
               <picture style="display: contents">
@@ -444,7 +472,9 @@
           <div
             class="card bg-dark text-white p-1"
             @click="
-              routeToPath('/game/detail', { id: games.thirtyTwoPlayerRT._id })
+              routeToPath('/game/detail', {
+                id: games.thirtyTwoPlayerRT._id,
+              })
             "
           >
             <picture style="display: contents">
@@ -534,7 +564,10 @@
               </td>
               <td>
                 <router-link
-                  :to="{ path: '/game/detail', query: { id: game._id } }"
+                  :to="{
+                    path: '/game/detail',
+                    query: { id: game._id },
+                  }"
                   tag="button"
                   class="btn btn-outline-success float-end"
                 >
@@ -609,14 +642,16 @@
                     @click="startTutorial(tutorial.key)"
                     class="btn btn-warning float-end"
                   >
-                    <i class="fas fa-graduation-cap"></i> Start Tutorial
+                    <i class="fas fa-graduation-cap"></i>
+                    Start Tutorial
                   </button>
                   <button
                     v-if="tutorial.completed"
                     @click="startTutorial(tutorial.key)"
                     class="btn btn-info float-end"
                   >
-                    <i class="fas fa-graduation-cap"></i> Restart Tutorial
+                    <i class="fas fa-graduation-cap"></i>
+                    Restart Tutorial
                   </button>
                 </div>
               </td>
@@ -680,7 +715,10 @@
             <tr v-for="game in inProgressGames" v-bind:key="game._id">
               <td>
                 <router-link
-                  :to="{ path: '/game/detail', query: { id: game._id } }"
+                  :to="{
+                    path: '/game/detail',
+                    query: { id: game._id },
+                  }"
                   >{{ game.settings.general.name }}</router-link
                 >
                 <br v-if="game.state.openSlots" />
@@ -695,7 +733,9 @@
               </td>
               <td
                 class="d-none d-md-table-cell text-center"
-                :class="{ 'text-warning': game.state.openSlots }"
+                :class="{
+                  'text-warning': game.state.openSlots,
+                }"
               >
                 {{ game.state.players }}/{{ game.settings.general.playerLimit }}
               </td>
@@ -704,7 +744,10 @@
               </td>
               <td>
                 <router-link
-                  :to="{ path: '/game/detail', query: { id: game._id } }"
+                  :to="{
+                    path: '/game/detail',
+                    query: { id: game._id },
+                  }"
                   tag="button"
                   class="btn btn-outline-success float-end"
                 >
@@ -765,7 +808,10 @@
             <tr v-for="game in recentlyCompletedGames" v-bind:key="game._id">
               <td>
                 <router-link
-                  :to="{ path: '/game/detail', query: { id: game._id } }"
+                  :to="{
+                    path: '/game/detail',
+                    query: { id: game._id },
+                  }"
                   >{{ game.settings.general.name }}</router-link
                 >
                 <br />
@@ -779,7 +825,10 @@
               </td>
               <td>
                 <router-link
-                  :to="{ path: '/game', query: { id: game._id } }"
+                  :to="{
+                    path: '/game',
+                    query: { id: game._id },
+                  }"
                   tag="button"
                   class="btn btn-outline-success float-end"
                 >

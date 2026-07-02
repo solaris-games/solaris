@@ -125,7 +125,11 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
         playerId: string;
         type: string;
         date: Date;
-        data: { fromPlayerId: string; toPlayerId: string; credits: number };
+        data: {
+          fromPlayerId: string;
+          toPlayerId: string;
+          credits: number;
+        };
       }) => eventBus.emit(PlayerEventBusEventNames.PlayerCreditsReceived, e),
     );
     this.on(
@@ -164,7 +168,11 @@ export class PlayerClientSocketHandler extends ClientSocketHandler<PlayerSocketE
         playerId: string;
         type: string;
         date: Date;
-        data: { fromPlayerId: string; toPlayerId: string; renown: number };
+        data: {
+          fromPlayerId: string;
+          toPlayerId: string;
+          renown: number;
+        };
       }) => eventBus.emit(PlayerEventBusEventNames.PlayerRenownReceived, e),
     );
 

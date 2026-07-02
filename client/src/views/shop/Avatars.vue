@@ -56,10 +56,8 @@
                 class="btn btn-sm btn-outline-danger"
                 v-if="!avatar.purchased && (userCredits || 0) < avatar.price"
               >
-                <i class="fas fa-coins"></i> {{ avatar.price }} Credit<span
-                  v-if="avatar.price > 1"
-                  >s</span
-                >
+                <i class="fas fa-coins"></i>
+                {{ avatar.price }} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
               <h5>
                 <span class="badge bg-primary" v-if="avatar.purchased"

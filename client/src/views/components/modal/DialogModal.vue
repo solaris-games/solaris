@@ -29,7 +29,8 @@
             data-bs-dismiss="modal"
             v-if="!hideCancelButton"
           >
-            <i class="fas fa-times"></i> {{ cancelText || "Cancel" }}
+            <i class="fas fa-times"></i>
+            {{ cancelText || "Cancel" }}
           </button>
           <button
             @click="onConfirm"
@@ -37,7 +38,8 @@
             class="btn btn-success ps-3 pe-3"
             data-bs-dismiss="modal"
           >
-            <i class="fas fa-check"></i> {{ confirmText || "Confirm" }}
+            <i class="fas fa-check"></i>
+            {{ confirmText || "Confirm" }}
           </button>
         </div>
       </div>

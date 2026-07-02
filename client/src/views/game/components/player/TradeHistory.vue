@@ -27,7 +27,9 @@
           <p v-if="event.type === 'playerRenownReceived'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-left text-success': event.data.fromPlayerId }"
+              :class="{
+                'fa-arrow-left text-success': event.data.fromPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.renown }}
@@ -37,7 +39,9 @@
           <p v-if="event.type === 'playerRenownSent'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-right text-danger': event.data.toPlayerId }"
+              :class="{
+                'fa-arrow-right text-danger': event.data.toPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.renown }}
@@ -47,7 +51,9 @@
           <p v-if="event.type === 'playerCreditsReceived'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-left text-success': event.data.fromPlayerId }"
+              :class="{
+                'fa-arrow-left text-success': event.data.fromPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.credits }}
@@ -57,7 +63,9 @@
           <p v-if="event.type === 'playerCreditsSent'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-right text-danger': event.data.toPlayerId }"
+              :class="{
+                'fa-arrow-right text-danger': event.data.toPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.credits }}
@@ -70,7 +78,9 @@
           >
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-left text-success': event.data.fromPlayerId }"
+              :class="{
+                'fa-arrow-left text-success': event.data.fromPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.creditsSpecialists }}
@@ -80,7 +90,9 @@
           <p v-if="event.type === 'playerCreditsSpecialistsSent'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-right text-danger': event.data.toPlayerId }"
+              :class="{
+                'fa-arrow-right text-danger': event.data.toPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.creditsSpecialists }}
@@ -90,7 +102,9 @@
           <p v-if="event.type === 'playerTechnologyReceived'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-left text-success': event.data.fromPlayerId }"
+              :class="{
+                'fa-arrow-left text-success': event.data.fromPlayerId,
+              }"
             ></i>
             <span
               >Level {{ event.data.technology.level }}
@@ -104,7 +118,9 @@
           <p v-if="event.type === 'playerTechnologySent'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-right text-danger': event.data.toPlayerId }"
+              :class="{
+                'fa-arrow-right text-danger': event.data.toPlayerId,
+              }"
             ></i>
             <span
               >Level {{ event.data.technology.level }}
@@ -118,7 +134,9 @@
           <p v-if="event.type === 'playerGiftReceived'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-left text-success': event.data.fromPlayerId }"
+              :class="{
+                'fa-arrow-left text-success': event.data.fromPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.carrierShips }}
@@ -128,7 +146,9 @@
           <p v-if="event.type === 'playerGiftSent'" class="mb-1">
             <i
               class="me-1 fas"
-              :class="{ 'fa-arrow-right text-danger': event.data.toPlayerId }"
+              :class="{
+                'fa-arrow-right text-danger': event.data.toPlayerId,
+              }"
             ></i>
             <span
               >{{ event.data.carrierShips }}
@@ -147,8 +167,9 @@
             ></i>
             <span
               >{{ event.data.amount }}
-              <span class="text-warning">{{ getCreditsType(event) }}</span> of
-              debt <span class="text-warning">settled</span>.</span
+              <span class="text-warning">{{ getCreditsType(event) }}</span>
+              of debt
+              <span class="text-warning">settled</span>.</span
             >
           </p>
           <p v-if="event.type === 'playerDebtForgiven'" class="mb-1">
@@ -163,8 +184,9 @@
             ></i>
             <span
               >{{ event.data.amount }}
-              <span class="text-warning">{{ getCreditsType(event) }}</span> of
-              debt <span class="text-warning">forgiven</span>.</span
+              <span class="text-warning">{{ getCreditsType(event) }}</span>
+              of debt
+              <span class="text-warning">forgiven</span>.</span
             >
           </p>
         </div>

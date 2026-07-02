@@ -12,13 +12,19 @@
           <span v-if="!user.guild && isUserInvited">Invited to </span>
           <router-link
             v-if="user.guild"
-            :to="{ name: 'guild-details', params: { guildId: user.guild._id } }"
+            :to="{
+              name: 'guild-details',
+              params: { guildId: user.guild._id },
+            }"
           >
             <span>{{ user.guild.name }} [{{ user.guild.tag }}]</span>
           </router-link>
           <router-link
             v-if="myGuild && isUserInvited"
-            :to="{ name: 'guild-details', params: { guildId: myGuild._id } }"
+            :to="{
+              name: 'guild-details',
+              params: { guildId: myGuild._id },
+            }"
           >
             <span>{{ myGuild.name }} [{{ myGuild.tag }}]</span>
           </router-link>

@@ -15,8 +15,9 @@
         <strong class="text-info">Officers</strong>.
       </li>
       <li>
-        Arrange <strong class="text-warning">Guild vs. Guild</strong> matches to
-        see which guild is best.
+        Arrange
+        <strong class="text-warning">Guild vs. Guild</strong> matches to see
+        which guild is best.
       </li>
     </ul>
 

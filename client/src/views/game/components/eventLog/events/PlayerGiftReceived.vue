@@ -7,7 +7,8 @@
         :carrierName="event.data.carrierName"
       />
       of
-      <span class="text-warning">{{ event.data.carrierShips }} ships</span> from
+      <span class="text-warning">{{ event.data.carrierShips }} ships</span>
+      from
       <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{
         player.alias
       }}</a>

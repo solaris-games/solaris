@@ -2,7 +2,10 @@
   <div class="position-static btn-group">
     <button
       class="btn btn-sm ms-1"
-      :class="{ 'btn-success': action.active, 'btn-danger': !action.active }"
+      :class="{
+        'btn-success': action.active,
+        'btn-danger': !action.active,
+      }"
       @click="toggleRepeat()"
     >
       <i

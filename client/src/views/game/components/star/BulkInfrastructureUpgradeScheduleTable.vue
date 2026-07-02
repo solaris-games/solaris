@@ -6,7 +6,9 @@
         <table class="table table-striped table-hover mb-0">
           <thead class="table-dark">
             <tr>
-              <td><a href="javascript:;" @click="sort(['tick'])">Tick</a></td>
+              <td>
+                <a href="javascript:;" @click="sort(['tick'])">Tick</a>
+              </td>
               <td>
                 <a href="javascript:;" @click="sort(['infrastructureType'])"
                   >Infrastructure</a

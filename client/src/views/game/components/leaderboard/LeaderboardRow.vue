@@ -1,7 +1,10 @@
 <template>
   <tr>
     <td
-      :style="{ width: '8px', 'background-color': playerColourSpec.value }"
+      :style="{
+        width: '8px',
+        'background-color': playerColourSpec.value,
+      }"
     ></td>
     <td class="col-avatar" :title="playerColourSpec.alias + ' ' + player.shape">
       <player-avatar
@@ -59,9 +62,8 @@
     </td>
     <td class="fit pt-3 pe-2" v-if="isHomeStarsWinCondition">
       <span class="d-xs-block d-sm-none">
-        <i class="fas fa-star me-0"></i> {{ player.stats!.totalHomeStars }}({{
-          player.stats!.totalStars
-        }})
+        <i class="fas fa-star me-0"></i>
+        {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }})
       </span>
       <span class="d-none d-sm-block">
         {{ player.stats!.totalHomeStars }}({{ player.stats!.totalStars }})

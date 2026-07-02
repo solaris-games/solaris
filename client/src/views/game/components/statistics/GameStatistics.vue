@@ -20,15 +20,21 @@
             <tbody>
               <tr>
                 <td>Ship Kills</td>
-                <td class="text-end">{{ statistics.combat.kills.ships }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.kills.ships }}
+                </td>
               </tr>
               <tr>
                 <td>Ship Losses</td>
-                <td class="text-end">{{ statistics.combat.losses.ships }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.losses.ships }}
+                </td>
               </tr>
               <tr>
                 <td>Carrier Kills</td>
-                <td class="text-end">{{ statistics.combat.kills.carriers }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.kills.carriers }}
+                </td>
               </tr>
               <tr>
                 <td>Carrier Losses</td>
@@ -50,11 +56,15 @@
               </tr>
               <tr>
                 <td>Stars Captured</td>
-                <td class="text-end">{{ statistics.combat.stars.captured }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.stars.captured }}
+                </td>
               </tr>
               <tr>
                 <td>Stars Lost</td>
-                <td class="text-end">{{ statistics.combat.stars.lost }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.stars.lost }}
+                </td>
               </tr>
               <tr>
                 <td>Capital Stars Captured</td>
@@ -64,7 +74,9 @@
               </tr>
               <tr>
                 <td>Capital Stars Lost</td>
-                <td class="text-end">{{ statistics.combat.homeStars.lost }}</td>
+                <td class="text-end">
+                  {{ statistics.combat.homeStars.lost }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -122,23 +134,33 @@
             <tbody>
               <tr>
                 <td>Scanning</td>
-                <td class="text-end">{{ statistics.research.scanning }}</td>
+                <td class="text-end">
+                  {{ statistics.research.scanning }}
+                </td>
               </tr>
               <tr>
                 <td>Hyperspace</td>
-                <td class="text-end">{{ statistics.research.hyperspace }}</td>
+                <td class="text-end">
+                  {{ statistics.research.hyperspace }}
+                </td>
               </tr>
               <tr>
                 <td>Terraforming</td>
-                <td class="text-end">{{ statistics.research.terraforming }}</td>
+                <td class="text-end">
+                  {{ statistics.research.terraforming }}
+                </td>
               </tr>
               <tr>
                 <td>Weapons</td>
-                <td class="text-end">{{ statistics.research.weapons }}</td>
+                <td class="text-end">
+                  {{ statistics.research.weapons }}
+                </td>
               </tr>
               <tr>
                 <td>Banking</td>
-                <td class="text-end">{{ statistics.research.banking }}</td>
+                <td class="text-end">
+                  {{ statistics.research.banking }}
+                </td>
               </tr>
               <tr>
                 <td>Manufacturing</td>
@@ -154,7 +176,9 @@
               </tr>
               <tr>
                 <td>Specialists</td>
-                <td class="text-end">{{ statistics.research.specialists }}</td>
+                <td class="text-end">
+                  {{ statistics.research.specialists }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -167,11 +191,15 @@
             <tbody>
               <tr>
                 <td>Credits Sent</td>
-                <td class="text-end">{{ statistics.trade.creditsSent }}</td>
+                <td class="text-end">
+                  {{ statistics.trade.creditsSent }}
+                </td>
               </tr>
               <tr>
                 <td>Credits Received</td>
-                <td class="text-end">{{ statistics.trade.creditsReceived }}</td>
+                <td class="text-end">
+                  {{ statistics.trade.creditsReceived }}
+                </td>
               </tr>
               <tr>
                 <td>Specialist Tokens Sent</td>
@@ -187,7 +215,9 @@
               </tr>
               <tr>
                 <td>Technology Sent</td>
-                <td class="text-end">{{ statistics.trade.technologySent }}</td>
+                <td class="text-end">
+                  {{ statistics.trade.technologySent }}
+                </td>
               </tr>
               <tr>
                 <td>Technology Received</td>
@@ -197,11 +227,15 @@
               </tr>
               <tr>
                 <td>Gifts Sent</td>
-                <td class="text-end">{{ statistics.trade.giftsSent }}</td>
+                <td class="text-end">
+                  {{ statistics.trade.giftsSent }}
+                </td>
               </tr>
               <tr>
                 <td>Gifts Received</td>
-                <td class="text-end">{{ statistics.trade.giftsReceived }}</td>
+                <td class="text-end">
+                  {{ statistics.trade.giftsReceived }}
+                </td>
               </tr>
             </tbody>
           </table>

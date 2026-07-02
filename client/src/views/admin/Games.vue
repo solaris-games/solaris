@@ -70,12 +70,19 @@
                 @click="forceGameFinish(game)"
               ></i>
             </td>
-            <td :class="{ 'text-warning': gameNeedsAttention(game) }">
+            <td
+              :class="{
+                'text-warning': gameNeedsAttention(game),
+              }"
+            >
               {{ game.state.tick }}
             </td>
             <td>
               <router-link
-                :to="{ path: '/game/detail', query: { id: game._id } }"
+                :to="{
+                  path: '/game/detail',
+                  query: { id: game._id },
+                }"
                 tag="button"
                 class="btn btn-outline-success btn-sm"
                 >View

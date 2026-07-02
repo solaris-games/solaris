@@ -2,7 +2,10 @@
   <tr>
     <td>
       <router-link
-        :to="{ name: 'account-achievements', params: { userId: user._id } }"
+        :to="{
+          name: 'account-achievements',
+          params: { userId: user._id },
+        }"
         >{{ user.username }}</router-link
       >
     </td>

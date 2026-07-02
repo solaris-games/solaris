@@ -129,7 +129,6 @@ export default class CombatProcessingService extends EventEmitter {
             Star<DBObjectId>,
             Carrier<DBObjectId>
         >,
-        captureResult: StarCaptureResult<DBObjectId> | null,
     ): CombatResultStar<DBObjectId> | undefined {
         if (!group.star) {
             return undefined;
@@ -149,18 +148,29 @@ export default class CombatProcessingService extends EventEmitter {
             shipsAfter: group.star.shipsAfter,
             shipsLost: group.star.shipsLost,
             hasScrambler,
-            captureResult,
+            captureResult: null, // backfill later
         };
     }
 
-    lowerResult(
+    // fill in the star capture result later
+    _addCaptureResult(
+        result: CombatResult<DBObjectId>,
+        captureResult: StarCaptureResult<DBObjectId>,
+    ) {
+        const starGroup = result.groups.find((g) => g.star);
+
+        if (starGroup) {
+            starGroup.star!.captureResult = captureResult;
+        }
+    }
+
+    _lowerResult(
         result: DetailedCombatResult<
             DBObjectId,
             Player,
             Star<DBObjectId>,
             Carrier<DBObjectId>
         >,
-        captureResult: StarCaptureResult<DBObjectId> | null,
     ): CombatResult<DBObjectId> {
         const groups: CombatResultGroup<DBObjectId>[] = result.groups.map(
             (g) => {
@@ -169,7 +179,7 @@ export default class CombatProcessingService extends EventEmitter {
                     carriers: g.carriers.map((c) =>
                         this._lowerResultCarriers(g, c),
                     ),
-                    star: this._lowerResultStar(g, captureResult),
+                    star: this._lowerResultStar(g),
                     attackAgainst: g.attackAgainst,
                     shipsBefore: g.shipsBefore,
                     shipsAfter: g.shipsAfter,
@@ -190,15 +200,7 @@ export default class CombatProcessingService extends EventEmitter {
         carriers: Carrier<DBObjectId>[],
         eventService: IEventService,
         statisticsService: IStatisticsService,
-    ): Promise<
-        | DetailedCombatResult<
-              DBObjectId,
-              Player,
-              Star<DBObjectId>,
-              Carrier<DBObjectId>
-          >
-        | undefined
-    > {
+    ) {
         let combatResult:
             | DetailedCombatResult<
                   DBObjectId,
@@ -221,9 +223,10 @@ export default class CombatProcessingService extends EventEmitter {
             combatResult = this.combatService.computeCarrier(game, carriers);
         }
 
-        let captureResult: StarCaptureResult<DBObjectId> | null = null;
-
         if (combatResult) {
+            // important to capture the result now before it gets modified
+            const eventResult = this._lowerResult(combatResult);
+
             // Distribute damage evenly across all objects that are involved in combat.
             this._distributeDamage(combatResult);
 
@@ -251,13 +254,17 @@ export default class CombatProcessingService extends EventEmitter {
             if (star) {
                 if (star.ownedByPlayerId) {
                     // capture star because it may be owned by hostile player
-                    captureResult = this._starDefeatedCheck(
+                    const captureResult = this._starDefeatedCheck(
                         game,
                         star,
                         combatResult,
                         gameUsers,
                         statisticsService,
                     );
+
+                    if (captureResult) {
+                        this._addCaptureResult(eventResult, captureResult);
+                    }
                 } else {
                     const winnerGroup =
                         this.combatService.getWinnerDetailed(combatResult);
@@ -279,6 +286,23 @@ export default class CombatProcessingService extends EventEmitter {
                     }
                 }
             }
+
+            await this._deductReputation(game, combatResult);
+
+            // Log the combat event
+            if (isOwnedStar) {
+                await eventService.createPlayerCombatStarEvent(
+                    game._id,
+                    game.state.tick,
+                    eventResult,
+                );
+            } else {
+                await eventService.createPlayerCombatCarrierEvent(
+                    game._id,
+                    game.state.tick,
+                    eventResult,
+                );
+            }
         } else if (star && !star.ownedByPlayerId) {
             const claimingCarrier = maxOf((c) => c.ships || 0, carriers)!;
 
@@ -290,31 +314,6 @@ export default class CombatProcessingService extends EventEmitter {
                 statisticsService,
             );
         }
-
-        if (!combatResult) {
-            return undefined;
-        }
-
-        await this._deductReputation(game, combatResult);
-
-        const eventResult = this.lowerResult(combatResult, captureResult);
-
-        // Log the combat event
-        if (isOwnedStar) {
-            await eventService.createPlayerCombatStarEvent(
-                game._id,
-                game.state.tick,
-                eventResult,
-            );
-        } else {
-            await eventService.createPlayerCombatCarrierEvent(
-                game._id,
-                game.state.tick,
-                eventResult,
-            );
-        }
-
-        return combatResult;
     }
 
     async _deductReputation(

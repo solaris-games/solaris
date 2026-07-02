@@ -157,7 +157,9 @@ const triggerChanged = () => {
     starId: props.starId,
   });
   const star = GameHelper.getStarById(store.game!, props.starId);
-  eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, { star });
+  eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadStar, {
+    star,
+  });
 };
 
 const getInfrastructureIgnoreStatus = (

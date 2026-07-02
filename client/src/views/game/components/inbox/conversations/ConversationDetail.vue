@@ -44,7 +44,10 @@
         >
           <i
             class="fas"
-            :class="{ 'fa-eye-slash': !toggleDisplay, 'fa-eye': toggleDisplay }"
+            :class="{
+              'fa-eye-slash': !toggleDisplay,
+              'fa-eye': toggleDisplay,
+            }"
           ></i>
         </button>
         <button

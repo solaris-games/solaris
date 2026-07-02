@@ -40,7 +40,10 @@
           <tr v-for="game in filteredActiveGames" v-bind:key="game._id">
             <td class="col-6">
               <router-link
-                :to="{ path: '/game/detail', query: { id: game._id } }"
+                :to="{
+                  path: '/game/detail',
+                  query: { id: game._id },
+                }"
                 class="me-1"
                 >{{ game.settings.general.name }}</router-link
               >
@@ -127,13 +130,19 @@
             <td class="col-auto">
               <div class="btn-group">
                 <router-link
-                  :to="{ path: '/game/detail', query: { id: game._id } }"
+                  :to="{
+                    path: '/game/detail',
+                    query: { id: game._id },
+                  }"
                   tag="button"
                   class="btn btn-primary"
                   >View</router-link
                 >
                 <router-link
-                  :to="{ path: '/game', query: { id: game._id } }"
+                  :to="{
+                    path: '/game',
+                    query: { id: game._id },
+                  }"
                   tag="button"
                   class="btn btn-success"
                 >

@@ -49,7 +49,9 @@
                   ><i class="fas fa-user"></i
                 ></a>
               </td>
-              <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
+              <td>
+                <a href="javascript:;" @click="sort(['name'])">Name</a>
+              </td>
               <td></td>
               <td title="Specialist">
                 <a href="javascript:;" @click="sort(['specialist', 'name'])"

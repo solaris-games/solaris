@@ -16,7 +16,9 @@
         <table class="table table-striped table-hover mb-0">
           <thead class="table-dark">
             <tr>
-              <td><a href="javascript:;" @click="sort(['name'])">Name</a></td>
+              <td>
+                <a href="javascript:;" @click="sort(['name'])">Name</a>
+              </td>
               <td></td>
               <td title="Specialist">
                 <a href="javascript:;" @click="sort(['specialist', 'name'])"

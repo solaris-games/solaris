@@ -50,7 +50,10 @@
           <router-link
             tag="button"
             class="btn btn-small btn-info me-2"
-            :to="{ path: '/game/detail', query: { id: report.gameId } }"
+            :to="{
+              path: '/game/detail',
+              query: { id: report.gameId },
+            }"
             >View Game</router-link
           >
           <button

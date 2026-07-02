@@ -34,7 +34,10 @@
           <label for="defenderShips" class="col-8 col-form-label">
             <i
               class="fas"
-              :class="{ 'fa-rocket': !defender.star, 'fa-star': defender.star }"
+              :class="{
+                'fa-rocket': !defender.star,
+                'fa-star': defender.star,
+              }"
             ></i>
             <span class="text-success ms-2">{{
               defender.star ? defender.star.name : "Defender"

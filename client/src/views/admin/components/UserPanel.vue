@@ -18,7 +18,9 @@
           ></i>
           <i
             class="fas fa-user-friends ms-1 clickable"
-            :class="{ 'disabled-role': !userA.roles.communityManager }"
+            :class="{
+              'disabled-role': !userA.roles.communityManager,
+            }"
             @click="toggleRole(user, 'communityManager')"
             title="Toggle Community Manager Role"
           ></i>

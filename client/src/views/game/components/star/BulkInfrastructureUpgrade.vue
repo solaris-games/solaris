@@ -193,11 +193,9 @@
       <div class="row bg-dark" v-if="hasChecked && !isChecking">
         <div class="col pt-3">
           <p>
-            <b class="text-success">{{ upgradeAvailable }}</b> upgrade<span
-              v-if="upgradeAvailable > 1"
-              >s</span
-            >
-            for <b class="text-danger">${{ cost }}</b>
+            <b class="text-success">{{ upgradeAvailable }}</b>
+            upgrade<span v-if="upgradeAvailable > 1">s</span> for
+            <b class="text-danger">${{ cost }}</b>
           </p>
         </div>
         <div class="col-4 pt-2 ps-1">

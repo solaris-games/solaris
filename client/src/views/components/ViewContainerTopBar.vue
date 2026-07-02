@@ -52,10 +52,14 @@
             to="/account/settings"
             class="dropdown-item d-flex align-items-center"
           >
-            ACCOUNT <i class="fas fa-user ms-auto text-theme fs-16px my-n1"></i>
+            ACCOUNT
+            <i class="fas fa-user ms-auto text-theme fs-16px my-n1"></i>
           </router-link>
           <router-link
-            :to="{ name: 'account-achievements', params: { userId: userId } }"
+            :to="{
+              name: 'account-achievements',
+              params: { userId: userId },
+            }"
             class="dropdown-item d-flex align-items-center"
           >
             ACHIEVEMENTS

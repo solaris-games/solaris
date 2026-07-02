@@ -1,7 +1,9 @@
 <template>
   <tr>
     <td class="sm-padding text-center">{{ action.tick }}</td>
-    <td class="sm-padding">{{ getFriendlyText(action.infrastructureType) }}</td>
+    <td class="sm-padding">
+      {{ getFriendlyText(action.infrastructureType) }}
+    </td>
     <td class="sm-padding">{{ getFriendlyText(action.buyType) }}</td>
     <td class="sm-padding">{{ action.amount }}</td>
     <td class="sm-padding">

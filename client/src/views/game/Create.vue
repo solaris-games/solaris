@@ -2683,7 +2683,10 @@ const handleSubmit = async (e: Event) => {
   if (isOk(response)) {
     toast.success(`The game ${settings.value!.general.name} has been created.`);
 
-    router.push({ name: "game-detail", query: { id: response.data.gameId } });
+    router.push({
+      name: "game-detail",
+      query: { id: response.data.gameId },
+    });
   } else {
     console.error(formatError(response));
 

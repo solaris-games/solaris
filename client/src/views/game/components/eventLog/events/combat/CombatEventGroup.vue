@@ -55,9 +55,13 @@
           </template>
           <tr>
             <td class="combat-side-total">Total</td>
-            <td class="combat-side-total">{{ group.shipsBefore }}</td>
+            <td class="combat-side-total">
+              {{ group.shipsBefore }}
+            </td>
             <td class="combat-side-total">{{ group.shipsLost }}</td>
-            <td class="combat-side-total">{{ group.shipsAfter }}</td>
+            <td class="combat-side-total">
+              {{ group.shipsAfter }}
+            </td>
           </tr>
         </tbody>
       </table>
