@@ -1240,7 +1240,6 @@ export class Star
 
     destroy() {
         this.container.destroy();
-        this.fixedContainer.destroy();
     }
 
     _isDeadStar() {
