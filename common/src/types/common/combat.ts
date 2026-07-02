@@ -140,12 +140,12 @@ export type BasicCombatResult = {
         shipsBefore: number;
         shipsAfter: number;
         shipsLost: number;
-        shipsNeeded: number;
+        shipsNeeded: number | undefined;
     };
     attacker: {
         shipsBefore: number;
         shipsAfter: number;
         shipsLost: number;
-        shipsNeeded: number;
+        shipsNeeded: number | undefined;
     };
 };

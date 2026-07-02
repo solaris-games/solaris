@@ -1474,7 +1474,7 @@ export default class AIService {
             },
             true,
             game.settings.specialGalaxy.defenderBonus === "enabled",
-        ).attacker.shipsNeeded;
+        ).attacker.shipsNeeded!;
     }
 
     _calculateRequiredShipsForDefense(

@@ -855,8 +855,15 @@ export class CombatService<ID extends Id> {
         const defenderGroup = findGroupDetailed(result, "defender")!;
         const attackerGroup = findGroupDetailed(result, "attacker")!;
 
-        const defenderNeeded = estimateNeeded(result, defenderGroup, groups);
-        const attackerNeeded = estimateNeeded(result, attackerGroup, groups);
+        const attackerWon = attackerGroup.shipsAfter > defenderGroup.shipsAfter;
+
+        const defenderNeeded = attackerWon ? estimateNeeded(result, defenderGroup, groups) : undefined;
+        const attackerNeeded = attackerWon ? undefined : estimateNeeded(result, attackerGroup, groups);
+
+        console.log({
+            defenderNeeded,
+            attackerNeeded,
+        });
 
         return {
             defender: {
