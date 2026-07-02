@@ -19,22 +19,22 @@
           v-if="userHasAdminRole"
           class="menu-link"
         >
-          <div class="menu-icon"><i class="fas fa-users-cog"></i></div>
-          <div class="menu-text d-sm-block d-none ms-1">Admin</div>
+          <span class="menu-icon"><i class="fas fa-users-cog"></i></span>
+          <span class="menu-text d-sm-block d-none ms-1">Admin</span>
         </router-link>
       </div>
       <div class="solaris-menu-item">
         <router-link :to="{ name: 'galactic-credits-shop' }" class="menu-link">
-          <div class="menu-icon"><i class="fas fa-coins"></i></div>
-          <div class="menu-text d-sm-block d-none ms-1">
+          <span class="menu-icon"><i class="fas fa-coins"></i></span>
+          <span class="menu-text d-sm-block d-none ms-1">
             {{ userCredits }} Credit{{ userCredits === 1 ? "" : "s" }}
-          </div>
+          </span>
         </router-link>
       </div>
       <div class="solaris-menu-item">
         <router-link :to="{ name: 'avatars' }" class="menu-link">
-          <div class="menu-icon"><i class="fas fa-shopping-basket"></i></div>
-          <div class="menu-text d-sm-block d-none ms-1">Shop</div>
+          <span class="menu-icon"><i class="fas fa-shopping-basket"></i></span>
+          <span class="menu-text d-sm-block d-none ms-1">Shop</span>
         </router-link>
       </div>
       <div class="solaris-menu-item dropdown">
@@ -44,8 +44,8 @@
           data-bs-display="static"
           class="menu-link"
         >
-          <div class="menu-icon"><i class="fas fa-user"></i></div>
-          <div class="menu-text d-sm-block d-none ms-1">{{ username }}</div>
+          <span class="menu-icon"><i class="fas fa-user"></i></span>
+          <span class="menu-text d-sm-block d-none ms-1">{{ username }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end me-lg-3 fs-11px mt-1">
           <router-link
@@ -154,9 +154,26 @@ const doLogout = async () => {
   width: 100%;
   justify-content: space-between;
   align-items: center;
+  padding: 0.2rem 1rem 0.2rem 1rem;
 }
 
 .solaris-menu-item {
+  .menu-icon {
+    margin-right: 0.25rem;
+  }
+
+  .menu-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .menu-text {
+    color: #ffffff;
+  }
+
   .menu-icon {
     color: #ffffff;
     font-size: 1.25rem;
@@ -169,7 +186,7 @@ const doLogout = async () => {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
 }
 
 .logo-link {
