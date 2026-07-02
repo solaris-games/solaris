@@ -5,12 +5,11 @@ import { DistanceService, type UserGameSettings } from "@solaris/common";
 import helpers from "./helpers";
 
 class PlayerNames {
-    static zoomLevel = 90;
     container: Container;
-    zoomPercent = 0;
 
-    game: Game | undefined;
-    context: DrawingContext | undefined;
+    userSettings: UserGameSettings;
+    game: Game;
+    context: DrawingContext;
     distanceService: DistanceService;
 
     constructor(
@@ -22,8 +21,7 @@ class PlayerNames {
         this.container = new Container();
         this.distanceService = distanceService;
         this.game = game;
-
-        PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
+        this.userSettings = userSettings;
         this.context = context;
     }
 
@@ -80,8 +78,6 @@ class PlayerNames {
         }
 
         this.separate();
-
-        this.refreshZoom(this.zoomPercent || 0);
     }
 
     separate() {
@@ -180,27 +176,26 @@ class PlayerNames {
         }
     }
 
-    onTick(zoomPercent, zoomChanging) {
-        this.zoomPercent = zoomPercent;
-
+    _updateZoom(zoomPercent: number, zoomChanging: boolean) {
         if (zoomChanging) {
             if (this.container) {
-                this.container.visible = zoomPercent <= PlayerNames.zoomLevel;
+                this.container.visible =
+                    zoomPercent <= this.userSettings.map.zoomLevels.playerNames;
             }
         }
     }
 
-    refreshZoom(zoomPercent: number) {
-        this.zoomPercent = zoomPercent;
+    onTick(zoomPercent: number, zoomChanging: boolean) {
+        this._updateZoom(zoomPercent, zoomChanging);
+    }
 
-        if (this.container) {
-            this.container.visible = zoomPercent <= PlayerNames.zoomLevel;
-        }
+    refreshZoom(zoomPercent: number) {
+        this._updateZoom(zoomPercent, true);
     }
 
     update(game: Game, userSettings: UserGameSettings) {
         this.game = game;
-        PlayerNames.zoomLevel = userSettings.map.zoomLevels.playerNames;
+        this.userSettings = userSettings;
     }
 }
 
