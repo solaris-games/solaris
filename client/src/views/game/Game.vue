@@ -4,35 +4,55 @@
 
     <loading-spinner :loading="!hasGame" />
 
-    <div v-if="hasGame">
-      <span class="d-none">{{ gameId }}</span>
+    <game-screen v-if="hasGame">
+      <template v-slot:header>
+        <header-bar
+          class="header-bar"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        />
+      </template>
 
-      <colour-override-dialog
-        v-if="colourOverride"
-        :playerId="colourOverride.playerId"
-        @onColourOverrideCancelled="onColourOverrideCancelled"
-        @onColourOverrideConfirmed="onColourOverrideConfirmed"
-      />
+      <template v-slot:content-left>
+        <sidebar-menu />
+      </template>
 
-      <game-container
-        @onStarSelected="onStarSelected"
-        @onStarRightSelected="onStarRightSelected"
-        @onCarrierSelected="onCarrierSelected"
-        @onCarrierRightSelected="onCarrierRightSelected"
-        @onObjectsClicked="onObjectsClicked"
-      />
+      <template v-slot:content-ui>
+        <colour-override-dialog
+          v-if="colourOverride"
+          :playerId="colourOverride.playerId"
+          @onColourOverrideCancelled="onColourOverrideCancelled"
+          @onColourOverrideConfirmed="onColourOverrideConfirmed"
+        />
 
-      <main-bar
-        @onPlayerSelected="onPlayerSelected"
-        @onReloadGameRequested="reloadGame"
-        @onViewColourOverrideRequested="onViewColourOverrideRequested"
-      />
+        <main-bar
+          @onPlayerSelected="onPlayerSelected"
+          @onReloadGameRequested="reloadGame"
+          @onViewColourOverrideRequested="onViewColourOverrideRequested"
+        />
 
-      <chat
-        @onOpenPlayerDetailRequested="onPlayerSelected"
-        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
-      />
-    </div>
+        <chat
+          @onOpenPlayerDetailRequested="onPlayerSelected"
+          @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+        />
+      </template>
+
+      <template v-slot:content-game>
+        <game-container
+          @onStarSelected="onStarSelected"
+          @onStarRightSelected="onStarRightSelected"
+          @onCarrierSelected="onCarrierSelected"
+          @onCarrierRightSelected="onCarrierRightSelected"
+          @onObjectsClicked="onObjectsClicked"
+        />
+      </template>
+
+      <template v-slot:footer>
+        <footer-bar
+          class="footer-bar d-xs-block d-sm-none"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        />
+      </template>
+    </game-screen>
   </div>
 </template>
 
@@ -84,6 +104,10 @@ import { useColourStore } from "@/stores/colour";
 import { useGameStore } from "@/stores/game";
 
 import { useToast } from "vue-toast-notification";
+import GameScreen from "@/views/game/GameScreen.vue";
+import HeaderBar from "@/views/game/components/menu/HeaderBar.vue";
+import SidebarMenu from "@/views/game/components/menu/SidebarMenu.vue";
+import FooterBar from "@/views/game/components/menu/FooterBar.vue";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
@@ -155,6 +179,10 @@ const onStarRightSelected = (starId: string) => {
   }
 
   AudioService.click();
+};
+
+const onOpenPlayerDetailRequested = (e: string) => {
+  store.setMenuState({ state: "player", playerId: e });
 };
 
 const onCarrierSelected = (carrierId: string) => {

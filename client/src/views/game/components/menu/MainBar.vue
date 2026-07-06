@@ -1,12 +1,5 @@
 <template>
   <div>
-    <header-bar
-      class="header-bar"
-      @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-    />
-
-    <sidebar-menu />
-
     <div class="menu">
       <not-logged-in-bar v-if="!userStore.isLoggedIn" />
 
@@ -230,14 +223,7 @@
           :callback="menuState.callback"
         />
       </div>
-
-      <div class="spacing-footer d-block d-sm-none"></div>
     </div>
-
-    <footer-bar
-      class="footer-bar d-xs-block d-sm-none"
-      @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-    />
   </div>
 </template>
 
@@ -368,24 +354,8 @@ const onViewColourOverrideRequested = (e: string) =>
 
 const onReloadGameRequested = () => emit("onReloadGameRequested");
 </script>
-
 <style scoped>
-.header-bar {
-  position: fixed;
-  top: 0;
-  height: 45px;
-  z-index: 1000;
-}
-
-.footer-bar {
-  position: fixed;
-  height: 52px;
-  bottom: 0px;
-  z-index: 1000;
-}
-
 .menu {
-  /* This is a must otherwise the div overlays the map */
   position: absolute;
   left: 50px;
   width: 473px;
@@ -394,11 +364,6 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   overflow: auto;
   overflow-x: hidden;
   scrollbar-width: none;
-}
-
-.spacing-footer {
-  height: 52px;
-  pointer-events: none;
 }
 
 ::-webkit-scrollbar {

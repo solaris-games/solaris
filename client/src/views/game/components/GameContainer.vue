@@ -12,9 +12,9 @@ import {
   watch,
   computed,
 } from "vue";
-import { eventBusInjectionKey } from "../../../eventBus";
-import type { Carrier, Game, Star } from "../../../types/game";
-import { attachEventDeduplication } from "../../../util/eventDeduplication";
+import { eventBusInjectionKey } from "@/eventBus.ts";
+import type { Carrier, Game, Star } from "@/types/game.ts";
+import { attachEventDeduplication } from "@/util/eventDeduplication";
 import {
   createGameContainer,
   type Services,
@@ -291,12 +291,6 @@ onMounted(() => {
 </script>
 <style scoped>
 #gameContainer {
-  position: absolute;
-  left: 0;
-  top: 45px;
-  margin: 0;
-  height: calc(100% - 52px);
-  width: 100%;
   overflow: hidden;
   user-select: none;
 }
