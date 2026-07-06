@@ -23,7 +23,7 @@ export class RulerPoints extends EventEmitter<keyof Events, Events> {
         this.game = game;
     }
 
-    update(game: Game) {
+    reset(game: Game) {
         this.game = game;
 
         this.rulerPoints = [];
@@ -38,21 +38,20 @@ export class RulerPoints extends EventEmitter<keyof Events, Events> {
 
         this.emit("onRulerPointsCleared", undefined);
 
-        this.clear();
+        this._clear();
     }
 
-    clear() {
+    _clear() {
         this.container.removeChildren();
     }
 
     draw() {
-        this.clear();
-
-        this.drawPaths();
-        this.drawHyperspaceRange();
+        this._clear();
+        this._drawPaths();
+        this._drawHyperspaceRange();
     }
 
-    drawPaths() {
+    _drawPaths() {
         if (!this.rulerPoints.length) {
             return;
         }
@@ -80,7 +79,7 @@ export class RulerPoints extends EventEmitter<keyof Events, Events> {
         this.container.addChild(graphics);
     }
 
-    drawHyperspaceRange() {
+    _drawHyperspaceRange() {
         const lastPoint = this.rulerPoints[this.rulerPoints.length - 1];
 
         if (!lastPoint) {

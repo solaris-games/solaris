@@ -530,9 +530,7 @@ export class Map {
         }
 
         if (this.mode.mode === "ruler") {
-            this.drawRulerPoints();
-        } else {
-            this.clearRulerPoints();
+            this.rulerPoints.draw();
         }
 
         this.refreshZoom();
@@ -681,7 +679,7 @@ export class Map {
         this.unselectAllCarriers();
         this.unselectAllStars();
         this.clearWaypoints();
-        this.clearRulerPoints();
+        this.rulerPoints.reset(this.game);
 
         if (this.mode.mode === ModeKind.Waypoints) {
             this._disableCarriersInteractivity();
@@ -690,10 +688,6 @@ export class Map {
 
         if (wasWaypoints) {
             this._enableCarriersInteractivity();
-        }
-
-        if (this.mode.mode === ModeKind.Ruler) {
-            this.drawRulerPoints();
         }
     }
 
@@ -774,14 +768,6 @@ export class Map {
 
     clearWaypoints() {
         this.waypoints.clear();
-    }
-
-    drawRulerPoints() {
-        this.rulerPoints.draw();
-    }
-
-    clearRulerPoints() {
-        this.rulerPoints.update(this.game);
     }
 
     drawTerritories(userSettings: UserGameSettings) {
