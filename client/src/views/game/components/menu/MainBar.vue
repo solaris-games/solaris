@@ -1,228 +1,224 @@
 <template>
-  <div>
-    <div class="menu">
-      <not-logged-in-bar v-if="!userStore.isLoggedIn" />
+  <div class="menu">
+    <not-logged-in-bar v-if="!userStore.isLoggedIn" />
 
-      <spectating-warning-bar />
+    <spectating-warning-bar />
 
-      <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+    <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
 
-      <div class="menu-content">
-        <welcome
-          v-if="menuState.state == 'welcome'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          @onViewSettingsRequested="onViewSettingsRequested"
-        />
-        <tutorial
-          v-if="menuState.state == 'tutorial'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        />
-        <leaderboard
-          v-if="menuState.state == 'leaderboard'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          @onViewSettingsRequested="onViewSettingsRequested"
-        />
-        <player
-          v-if="menuState.state == 'player'"
-          @onCloseRequested="onCloseRequested"
-          :playerId="menuState.playerId"
-          :key="menuState.playerId"
-          @onViewCompareIntelRequested="onViewCompareIntelRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          @onOpenTradeRequested="onOpenTradeRequested"
-          @onOpenPurchasePlayerBadgeRequested="
-            onOpenPurchasePlayerBadgeRequested
-          "
-          @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
-          @onViewColourOverrideRequested="onViewColourOverrideRequested"
-        />
-        <trade
-          v-if="menuState.state == 'trade'"
-          @onCloseRequested="onCloseRequested"
-          :playerId="menuState.playerId"
-          :key="menuState.playerId"
-          @onOpenTradeRequested="onOpenTradeRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <research
-          v-if="menuState.state == 'research'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <star-detail
-          v-if="menuState.state == 'starDetail'"
-          :starId="menuState.starId"
-          :key="menuState.starId"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-          @onViewCompareIntelRequested="onViewCompareIntelRequested"
-          @onEditWaypointsRequested="onEditWaypointsRequested"
-          @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
-          @onBuildCarrierRequested="onBuildCarrierRequested"
-          @onShipTransferRequested="onShipTransferRequested"
-        />
-        <carrier-detail
-          v-if="menuState.state == 'carrierDetail'"
-          @onCloseRequested="onCloseRequested"
-          :carrierId="menuState.carrierId"
-          :key="menuState.carrierId"
-          @onShipTransferRequested="onShipTransferRequested"
-          @onEditWaypointsRequested="onEditWaypointsRequested"
-          @onEditWaypointRequested="onEditWaypointRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          @onViewCompareIntelRequested="onViewCompareIntelRequested"
-          @onViewHireCarrierSpecialistRequested="
-            onViewHireCarrierSpecialistRequested
-          "
-          @onCarrierRenameRequested="onCarrierRenameRequested"
-          @onViewCarrierCombatCalculatorRequested="
-            onViewCarrierCombatCalculatorRequested
-          "
-        />
-        <carrier-waypoints
-          v-if="menuState.state == 'carrierWaypoints'"
-          @onCloseRequested="onCloseRequested"
-          :carrierId="menuState.carrierId"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-          @onEditWaypointRequested="onEditWaypointRequested"
-        />
-        <carrier-waypoint
-          v-if="menuState.state == 'carrierWaypointDetail'"
-          @onCloseRequested="onCloseRequested"
-          :carrierId="menuState.carrierId"
-          :waypoint="menuState.waypoint"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        />
-        <carrier-rename
-          v-if="menuState.state == 'carrierRename'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-          :carrierId="menuState.carrierId"
-        />
-        <combat-calculator
-          v-if="menuState.state == 'combatCalculator'"
-          :carrierId="menuState.carrierId"
-          :advanced="menuState.advanced"
-          @onCloseRequested="onCloseRequested"
-        />
-        <ship-transfer
-          v-if="menuState.state == 'shipTransfer'"
-          @onCloseRequested="onCloseRequested"
-          :carrierId="menuState.carrierId"
-          @onShipsTransferred="onShipsTransferred"
-          @onEditWaypointsRequested="onEditWaypointsRequested"
-        />
-        <build-carrier
-          v-if="menuState.state == 'buildCarrier'"
-          :starId="menuState.starId"
-          @onCloseRequested="onCloseRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-          @onEditWaypointsRequested="onEditWaypointsRequested"
-        />
-        <event-log
-          v-if="menuState.state == 'eventLog'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <intel
-          v-if="menuState.state == 'intel'"
-          @onCloseRequested="onCloseRequested"
-          :compareWithPlayerId="menuState?.compareWithPlayerId"
-        />
-        <galaxy
-          v-if="menuState.state == 'galaxy'"
-          :tab="menuState.menu"
-          @onCloseRequested="onCloseRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <bulk-infrastructure-upgrade
-          v-if="menuState.state == 'bulkInfrastructureUpgrade'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-        />
-        <map-object-selector
-          v-if="menuState.state == 'mapObjectSelector'"
-          @onCloseRequested="onCloseRequested"
-          :mapObjects="menuState.objects as ObjectClicked[]"
-          @onEditWaypointsRequested="onEditWaypointsRequested"
-          @onShipTransferRequested="onShipTransferRequested"
-          @onBuildCarrierRequested="onBuildCarrierRequested"
-        />
-        <ruler
-          v-if="menuState.state == 'ruler'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <ledger
-          v-if="menuState.state == 'ledger'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <diplomacy
-          v-if="menuState.state == 'diplomacy'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <hire-specialist-carrier
-          v-if="menuState.state == 'hireSpecialistCarrier'"
-          :carrierId="menuState.carrierId"
-          @onCloseRequested="onCloseRequested"
-          @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-        />
-        <hire-specialist-star
-          v-if="menuState.state == 'hireSpecialistStar'"
-          :starId="menuState.starId"
-          @onCloseRequested="onCloseRequested"
-          @onOpenStarDetailRequested="onOpenStarDetailRequested"
-          @onReloadGameRequested="onReloadGameRequested"
-        />
-        <game-notes
-          v-if="menuState.state == 'gameNotes'"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <options
-          v-if="menuState.state == 'options'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <settings
-          v-if="menuState.state == 'settings'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <player-badge-shop
-          v-if="menuState.state == 'playerBadgeShop'"
-          :recipientPlayerId="menuState.recipientPlayerId"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <report-player
-          v-if="menuState.state == 'reportPlayer'"
-          :args="menuState.args"
-          @onCloseRequested="onCloseRequested"
-          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-        />
-        <spectators
-          v-if="menuState.state == 'spectators'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <game-statistics
-          v-if="menuState.state == 'statistics'"
-          @onCloseRequested="onCloseRequested"
-        />
-        <select-star
-          v-if="menuState.state === 'selectStar'"
-          :callback="menuState.callback"
-        />
-        <select-carrier
-          v-if="menuState.state === 'selectCarrier'"
-          :callback="menuState.callback"
-        />
-      </div>
+    <div class="menu-content">
+      <welcome
+        v-if="menuState.state == 'welcome'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"
+      />
+      <tutorial
+        v-if="menuState.state == 'tutorial'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+      />
+      <leaderboard
+        v-if="menuState.state == 'leaderboard'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewSettingsRequested="onViewSettingsRequested"
+      />
+      <player
+        v-if="menuState.state == 'player'"
+        @onCloseRequested="onCloseRequested"
+        :playerId="menuState.playerId"
+        :key="menuState.playerId"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenTradeRequested="onOpenTradeRequested"
+        @onOpenPurchasePlayerBadgeRequested="onOpenPurchasePlayerBadgeRequested"
+        @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+        @onViewColourOverrideRequested="onViewColourOverrideRequested"
+      />
+      <trade
+        v-if="menuState.state == 'trade'"
+        @onCloseRequested="onCloseRequested"
+        :playerId="menuState.playerId"
+        :key="menuState.playerId"
+        @onOpenTradeRequested="onOpenTradeRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <research
+        v-if="menuState.state == 'research'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <star-detail
+        v-if="menuState.state == 'starDetail'"
+        :starId="menuState.starId"
+        :key="menuState.starId"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
+        @onBuildCarrierRequested="onBuildCarrierRequested"
+        @onShipTransferRequested="onShipTransferRequested"
+      />
+      <carrier-detail
+        v-if="menuState.state == 'carrierDetail'"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuState.carrierId"
+        :key="menuState.carrierId"
+        @onShipTransferRequested="onShipTransferRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onEditWaypointRequested="onEditWaypointRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        @onViewCompareIntelRequested="onViewCompareIntelRequested"
+        @onViewHireCarrierSpecialistRequested="
+          onViewHireCarrierSpecialistRequested
+        "
+        @onCarrierRenameRequested="onCarrierRenameRequested"
+        @onViewCarrierCombatCalculatorRequested="
+          onViewCarrierCombatCalculatorRequested
+        "
+      />
+      <carrier-waypoints
+        v-if="menuState.state == 'carrierWaypoints'"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuState.carrierId"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onEditWaypointRequested="onEditWaypointRequested"
+      />
+      <carrier-waypoint
+        v-if="menuState.state == 'carrierWaypointDetail'"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuState.carrierId"
+        :waypoint="menuState.waypoint"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+      />
+      <carrier-rename
+        v-if="menuState.state == 'carrierRename'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        :carrierId="menuState.carrierId"
+      />
+      <combat-calculator
+        v-if="menuState.state == 'combatCalculator'"
+        :carrierId="menuState.carrierId"
+        :advanced="menuState.advanced"
+        @onCloseRequested="onCloseRequested"
+      />
+      <ship-transfer
+        v-if="menuState.state == 'shipTransfer'"
+        @onCloseRequested="onCloseRequested"
+        :carrierId="menuState.carrierId"
+        @onShipsTransferred="onShipsTransferred"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+      />
+      <build-carrier
+        v-if="menuState.state == 'buildCarrier'"
+        :starId="menuState.starId"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+      />
+      <event-log
+        v-if="menuState.state == 'eventLog'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <intel
+        v-if="menuState.state == 'intel'"
+        @onCloseRequested="onCloseRequested"
+        :compareWithPlayerId="menuState?.compareWithPlayerId"
+      />
+      <galaxy
+        v-if="menuState.state == 'galaxy'"
+        :tab="menuState.menu"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <bulk-infrastructure-upgrade
+        v-if="menuState.state == 'bulkInfrastructureUpgrade'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+      />
+      <map-object-selector
+        v-if="menuState.state == 'mapObjectSelector'"
+        @onCloseRequested="onCloseRequested"
+        :mapObjects="menuState.objects as ObjectClicked[]"
+        @onEditWaypointsRequested="onEditWaypointsRequested"
+        @onShipTransferRequested="onShipTransferRequested"
+        @onBuildCarrierRequested="onBuildCarrierRequested"
+      />
+      <ruler
+        v-if="menuState.state == 'ruler'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <ledger
+        v-if="menuState.state == 'ledger'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <diplomacy
+        v-if="menuState.state == 'diplomacy'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <hire-specialist-carrier
+        v-if="menuState.state == 'hireSpecialistCarrier'"
+        :carrierId="menuState.carrierId"
+        @onCloseRequested="onCloseRequested"
+        @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+      />
+      <hire-specialist-star
+        v-if="menuState.state == 'hireSpecialistStar'"
+        :starId="menuState.starId"
+        @onCloseRequested="onCloseRequested"
+        @onOpenStarDetailRequested="onOpenStarDetailRequested"
+        @onReloadGameRequested="onReloadGameRequested"
+      />
+      <game-notes
+        v-if="menuState.state == 'gameNotes'"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <options
+        v-if="menuState.state == 'options'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <settings
+        v-if="menuState.state == 'settings'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <player-badge-shop
+        v-if="menuState.state == 'playerBadgeShop'"
+        :recipientPlayerId="menuState.recipientPlayerId"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <report-player
+        v-if="menuState.state == 'reportPlayer'"
+        :args="menuState.args"
+        @onCloseRequested="onCloseRequested"
+        @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+      />
+      <spectators
+        v-if="menuState.state == 'spectators'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <game-statistics
+        v-if="menuState.state == 'statistics'"
+        @onCloseRequested="onCloseRequested"
+      />
+      <select-star
+        v-if="menuState.state === 'selectStar'"
+        :callback="menuState.callback"
+      />
+      <select-carrier
+        v-if="menuState.state === 'selectCarrier'"
+        :callback="menuState.callback"
+      />
     </div>
   </div>
 </template>
@@ -356,30 +352,9 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 </script>
 <style scoped>
 .menu {
-  position: absolute;
-  left: 50px;
-  width: 473px;
-  padding-top: 45px;
-  max-height: 100%;
-  overflow: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
+  z-index: 100;
 }
 
 ::-webkit-scrollbar {
-  width: 0px;
-  background: transparent; /* make scrollbar transparent */
-}
-
-@media (max-width: 473px) {
-  .menu {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .menu {
-    left: 0px;
-  }
 }
 </style>

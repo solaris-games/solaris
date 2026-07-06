@@ -17,23 +17,25 @@
       </template>
 
       <template v-slot:content-ui>
-        <colour-override-dialog
-          v-if="colourOverride"
-          :playerId="colourOverride.playerId"
-          @onColourOverrideCancelled="onColourOverrideCancelled"
-          @onColourOverrideConfirmed="onColourOverrideConfirmed"
-        />
+        <stacked-u-i>
+          <colour-override-dialog
+            v-if="colourOverride"
+            :playerId="colourOverride.playerId"
+            @onColourOverrideCancelled="onColourOverrideCancelled"
+            @onColourOverrideConfirmed="onColourOverrideConfirmed"
+          />
 
-        <main-bar
-          @onPlayerSelected="onPlayerSelected"
-          @onReloadGameRequested="reloadGame"
-          @onViewColourOverrideRequested="onViewColourOverrideRequested"
-        />
+          <main-bar
+            @onPlayerSelected="onPlayerSelected"
+            @onReloadGameRequested="reloadGame"
+            @onViewColourOverrideRequested="onViewColourOverrideRequested"
+          />
 
-        <chat
-          @onOpenPlayerDetailRequested="onPlayerSelected"
-          @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
-        />
+          <chat
+            @onOpenPlayerDetailRequested="onPlayerSelected"
+            @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+          />
+        </stacked-u-i>
       </template>
 
       <template v-slot:content-game>
@@ -108,6 +110,7 @@ import GameScreen from "@/views/game/GameScreen.vue";
 import HeaderBar from "@/views/game/components/menu/HeaderBar.vue";
 import SidebarMenu from "@/views/game/components/menu/SidebarMenu.vue";
 import FooterBar from "@/views/game/components/menu/FooterBar.vue";
+import StackedUI from "@/views/game/StackedUI.vue";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
