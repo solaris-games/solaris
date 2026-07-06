@@ -864,11 +864,6 @@ export class CombatService<ID extends Id> {
             ? undefined
             : estimateNeeded(result, attackerGroup, groups);
 
-        console.log({
-            defenderNeeded,
-            attackerNeeded,
-        });
-
         return {
             defender: {
                 shipsBefore: defenderGroup.shipsBefore,
