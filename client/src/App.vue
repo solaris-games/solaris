@@ -30,10 +30,6 @@ const confirmStore = useConfirmationDialogStore();
   background-color: rgba(29, 40, 53, 0.98);
 }
 
-.header-bar-bg {
-  background-color: rgba(29, 40, 53, 0.98);
-}
-
 /* Scroll Bar */
 /* Track */
 ::-webkit-scrollbar-track {

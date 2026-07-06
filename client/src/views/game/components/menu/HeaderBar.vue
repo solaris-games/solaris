@@ -1,44 +1,41 @@
 <template>
   <div
-    class="container-fluid header-bar"
+    class="header-bar"
     :class="{
       'header-bar-bg': !isHistoricalMode,
-      'bg-dark': isHistoricalMode,
+      'bg-light': isHistoricalMode,
     }"
   >
-    <div class="row pt-2 pb-2 g-0">
-      <div
-        class="col-auto d-none d-md-inline-block me-5 pointer pt-1"
-        v-on:click="setMenuState({ state: 'leaderboard' })"
-      >
-        <server-connection-status />
+    <div
+      class="header-bar-left header-bar-el"
+      v-on:click="setMenuState({ state: 'leaderboard' })"
+    >
+      <server-connection-status />
 
-        {{ game.settings.general.name }}
-      </div>
-      <div class="col-auto pt-1 me-3">
-        <span
-          class="pointer"
-          v-if="gameIsPaused"
-          v-on:click="setMenuState({ state: 'leaderboard' })"
-          >{{ getGameStatusText }}</span
-        >
-        <span
-          class="pointer"
-          v-if="gameIsInProgress"
-          v-on:click="setMenuState({ state: 'leaderboard' })"
-          title="Next production tick"
-          ><i class="fas fa-clock"></i> {{ timeRemaining }}</span
-        >
-        <span
-          class="pointer"
-          v-if="gameIsPendingStart"
-          v-on:click="setMenuState({ state: 'leaderboard' })"
-          title="Game starts in"
-          ><i class="fas fa-stopwatch"></i> {{ timeRemaining }}</span
-        >
-      </div>
+      {{ game.settings.general.name }}
+
+      <span
+        class="pointer"
+        v-if="gameIsPaused"
+        v-on:click="setMenuState({ state: 'leaderboard' })"
+      >{{ getGameStatusText }}</span
+      >
+      <span
+        class="pointer"
+        v-if="gameIsInProgress"
+        v-on:click="setMenuState({ state: 'leaderboard' })"
+        title="Next production tick"
+      ><i class="fas fa-clock"></i> {{ timeRemaining }}</span
+      >
+      <span
+        class="pointer"
+        v-if="gameIsPendingStart"
+        v-on:click="setMenuState({ state: 'leaderboard' })"
+        title="Game starts in"
+      ><i class="fas fa-stopwatch"></i> {{ timeRemaining }}</span
+      >
       <div
-        class="col-auto pt-1"
+        class=""
         v-if="
           isLoggedIn &&
           isTimeMachineEnabled &&
@@ -48,52 +45,55 @@
       >
         <tick-selector />
       </div>
-      <div class="col text-end pt-1">
-        <span
-          v-if="userPlayer"
-          class="pointer me-2"
-          title="Total credits"
-          @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })"
-        >
-          <i class="fas fa-dollar-sign text-success"></i>
-          {{ userPlayer.credits }}
-        </span>
+    </div>
+    <div class="header-bar-middle header-bar-el">
+      <span
+        v-if="userPlayer"
+        class="pointer"
+        title="Total credits"
+        @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })"
+      >
+        <i class="fas fa-dollar-sign text-success"></i>
+        {{ userPlayer.credits }}
+      </span>
 
-        <span
-          class="pointer me-2"
-          v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists"
-          title="Total specialist tokens"
-          @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })"
-        >
-          <i class="fas fa-coins text-success"></i>
-          {{ userPlayer.creditsSpecialists }}
-        </span>
+      <span
+        class="pointer"
+        v-if="userPlayer && isSpecialistsCurrencyCreditsSpecialists"
+        title="Total specialist tokens"
+        @click="setMenuState({ state: 'bulkInfrastructureUpgrade' })"
+      >
+        <i class="fas fa-coins text-success"></i>
+        {{ userPlayer.creditsSpecialists }}
+      </span>
 
-        <research-progress
-          class="d-none d-lg-inline-block me-2"
-          v-if="userPlayer"
-          @onViewResearchRequested="onViewResearchRequested"
-        />
-      </div>
+      <research-progress
+        class=""
+        v-if="userPlayer"
+        @onViewResearchRequested="onViewResearchRequested"
+      />
+
       <div
-        class="col-auto text-end pointer pt-1"
+        class="text-end pointer pt-1"
         v-if="userPlayer?.stats"
         @click="onViewBulkUpgradeRequested"
       >
-        <span class="d-none d-lg-inline-block me-2" title="Total economy">
+        <span class="" title="Total economy">
           <i class="fas fa-money-bill-wave text-success"></i>
           {{ userPlayer.stats.totalEconomy }}
         </span>
-        <span class="d-none d-lg-inline-block me-2" title="Total industry">
+        <span class="" title="Total industry">
           <i class="fas fa-tools text-warning"></i>
           {{ userPlayer.stats.totalIndustry }}
         </span>
-        <span class="d-none d-lg-inline-block me-2" title="Total science">
+        <span class="" title="Total science">
           <i class="fas fa-flask text-info"></i>
           {{ userPlayer.stats.totalScience }}
         </span>
       </div>
-      <div class="col-auto">
+    </div>
+    <div class="header-bar-right header-bar-el">
+      <div class="">
         <button
           class="btn btn-sm btn-warning"
           v-if="isTutorialGame"
@@ -546,17 +546,35 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.header-bar {
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.header-bar-bg {
+  background-color: rgba(29, 40, 53, 0.98);
+}
+
+.header-bar-el {
+  gap: 1rem;
+}
+
+.header-bar-left {
+}
+
+.header-bar-middle {
+  display: flex;
+  flex-direction: row;
+}
+
+.header-bar-right {
+}
+
 .pointer {
   cursor: pointer;
-}
-
-.pulse {
-  animation: blinker 1.5s linear infinite;
-}
-
-@keyframes blinker {
-  50% {
-    opacity: 0.3;
-  }
 }
 </style>
