@@ -218,7 +218,7 @@ export default class CarrierCombatService {
             if (graphObj) {
                 graphObj.push(carrierPosition);
             } else {
-                graph[graphKeyA] = [carrierPosition];
+                graph.set(graphKeyA, [carrierPosition]);
             }
         }
 
