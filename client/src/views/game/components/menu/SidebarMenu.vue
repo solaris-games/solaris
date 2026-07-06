@@ -1,6 +1,6 @@
 <template>
   <div
-    class="sidebar-menu d-none d-md-block"
+    class="sidebar-menu d-none d-md-flex"
     :class="{
       'header-bar-bg': !isHistoricalMode,
       'bg-dark': isHistoricalMode,
@@ -172,19 +172,11 @@ const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
 
 <style scoped>
 .sidebar-menu {
-  position: absolute;
-  padding-top: 45px;
   height: 100%;
-}
-
-.sidebar-menu-top,
-.sidebar-menu-bottom {
   width: 50px;
-}
-
-.sidebar-menu-bottom {
-  position: absolute;
-  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 a {
