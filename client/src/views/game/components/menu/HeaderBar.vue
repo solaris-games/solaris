@@ -74,7 +74,7 @@
       />
 
       <div
-        class="text-end pointer pt-1"
+        class="pointer header-bar-stats"
         v-if="userPlayer?.stats"
         @click="onViewBulkUpgradeRequested"
       >
@@ -560,6 +560,9 @@ onMounted(async () => {
 }
 
 .header-bar-el {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
   gap: 1rem;
 }
 
@@ -572,6 +575,12 @@ onMounted(async () => {
 }
 
 .header-bar-right {
+}
+
+.header-bar-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
 }
 
 .pointer {
