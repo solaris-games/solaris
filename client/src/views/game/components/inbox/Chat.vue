@@ -1,5 +1,5 @@
 <template>
-  <div class="d-lg-block" v-if="isUserInGame && !isTutorialGame">
+  <div class="d-block chat-ui" v-if="isUserInGame && !isTutorialGame">
     <div
       id="toggle"
       class="d-none d-lg-flex chat-toggle"
@@ -16,7 +16,7 @@
       >
     </div>
 
-    <div id="window" v-if="isExpanded" class="header-bar-bg">
+    <div id="chat-window" v-if="isExpanded" class="header-bar-bg">
       <conversation-create
         v-if="store.menuStateChat.state === 'createConversation'"
         :participantIds="store.menuStateChat.participantIds"
@@ -156,15 +156,17 @@ onMounted(() => {
   z-index: 1;
 }
 
-#window {
+#chat-window {
   position: absolute;
   right: 0;
-  width: min(100%, 473px);
-  top: 45px;
-  overflow: auto;
+  width: min(100%, 600px);
+  overflow: scroll;
   overflow-x: hidden;
   scrollbar-width: none;
-  z-index: 4;
+}
+
+.chat-ui {
+  z-index: 100;
 }
 
 .has-unread {
@@ -183,6 +185,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
 }
+
 @keyframes blinker {
   0% {
     opacity: 0.5;
