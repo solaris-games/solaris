@@ -355,6 +355,7 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   z-index: 100;
 }
 
-::-webkit-scrollbar {
+.menu-content {
+  max-width: 600px;
 }
 </style>

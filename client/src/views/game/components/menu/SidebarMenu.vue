@@ -86,18 +86,23 @@
           tooltip="Statistics"
           iconClass="fas fa-chart-bar"
         />
+        <sidebar-menu-item
+          :menuState="{ state: 'settings' }"
+          tooltip="Settings"
+          iconClass="fas fa-cog"
+        />
       </div>
     </div>
 
     <div class="sidebar-menu-bottom" v-if="canDisplayBottomBar">
+      <a :href="documentationUrl" target="_blank" title="How to Play"
+        ><i class="far fa-question-circle"></i
+      ></a>
       <sidebar-menu-item
         :menuState="{ state: 'options' }"
         tooltip="Options (O)"
         iconClass="fas fa-cog"
       />
-      <a :href="documentationUrl" target="_blank" title="How to Play"
-        ><i class="far fa-question-circle"></i
-      ></a>
       <router-link v-if="isLoggedIn" to="/game/active-games" title="My Games"
         ><i class="fas fa-dice"></i
       ></router-link>
