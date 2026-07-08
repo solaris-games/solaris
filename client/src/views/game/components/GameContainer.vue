@@ -77,6 +77,7 @@ onMounted(() => {
     (msg) => toast.error(msg),
     eventBus,
     mapTextureUrls,
+    el.value!,
   ).then((gameContainer) => {
     const checkPerformance = () => {
       const webGLSupport = gameContainer.checkPerformance();
@@ -95,10 +96,6 @@ onMounted(() => {
           { duration: 10000 },
         );
       }
-    };
-
-    const handleResize = () => {
-      gameContainer.resize();
     };
 
     const drawGame = () => {
@@ -184,12 +181,9 @@ onMounted(() => {
       },
     ); // watcher is created async, so we have to do the cleanup ourselves
 
-    window.addEventListener("resize", handleResize);
-
     checkPerformance();
 
     const canvas = gameContainer.app!.canvas;
-    el.value?.appendChild(canvas);
     drawGame();
 
     const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
@@ -236,8 +230,6 @@ onMounted(() => {
 
     unsubscribe = () => {
       unwatch();
-
-      window.removeEventListener("resize", handleResize);
 
       clearInterval(polling.value);
 
@@ -291,7 +283,7 @@ onMounted(() => {
 </script>
 <style scoped>
 #gameContainer {
-  overflow: hidden;
   user-select: none;
+  width: 100%;
 }
 </style>

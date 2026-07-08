@@ -2,7 +2,7 @@ import { Viewport } from "pixi-viewport";
 import Map from "./map";
 import helpers from "./helpers";
 import textureService, { type TextureUrls } from "./texture";
-import { Application, isWebGLSupported, Ticker } from "pixi.js";
+import { Application, isWebGLSupported, Ticker, ResizePlugin } from "pixi.js";
 import {
     DEFAULT_SETTINGS,
     DistanceService,
@@ -52,13 +52,13 @@ export const createGameContainer = async (
     reportGameError: (err: string) => void,
     eventBus: EventBus,
     textureUrls: TextureUrls,
+    container: HTMLElement,
 ) => {
     const settings: UserGameSettings = userSettings || DEFAULT_SETTINGS;
     const antialiasing = settings.map.antiAliasing === "enabled";
 
     const options = {
-        width: window.innerWidth, // window.innerWidth,
-        height: window.innerHeight - 45, // window.innerHeight,
+        resizeTo: container,
         backgroundColor: 0x000000, // black hexadecimal
         resolution: window.devicePixelRatio || 1,
         antialias: antialiasing,
@@ -71,6 +71,10 @@ export const createGameContainer = async (
 
     await textureService.loadAssets(textureUrls);
     textureService.initialize(textureUrls);
+
+    container.appendChild(app.canvas);
+
+    app.resize();
 
     return new GameContainer(
         services,
@@ -366,17 +370,6 @@ export class GameContainer {
 
     onTick(ticker: Ticker) {
         this.map.onTick(ticker.deltaTime);
-    }
-
-    resize() {
-        this.app.renderer.resize(window.innerWidth, window.innerHeight);
-
-        this.viewport.resize(
-            window.innerWidth,
-            window.innerHeight,
-            Number.MAX_VALUE,
-            Number.MAX_VALUE,
-        );
     }
 
     _fitGalaxy(x: number | undefined, y: number | undefined) {

@@ -30,10 +30,11 @@
 
 <style scoped>
 .game-grid {
-  width: 100%;
+  height: 100dvh;
+  width: 100dvw;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "header header header"
     "content-left content content-right"
@@ -54,6 +55,14 @@
 
 .game-grid-content {
   grid-area: content;
+
+  display: flex;
+  justify-content: stretch;
+  align-items: stretch;
+
+ * {
+   flex-grow: 1;
+ }
 }
 
 .game-grid-header {
