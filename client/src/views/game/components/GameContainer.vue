@@ -284,6 +284,12 @@ onMounted(() => {
 <style scoped>
 #gameContainer {
   user-select: none;
+  height: 100%;
   width: 100%;
+  overflow: hidden;
+}
+
+#gameContainer :deep(canvas) {
+  display: block;
 }
 </style>

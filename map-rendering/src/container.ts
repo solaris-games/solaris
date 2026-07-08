@@ -86,7 +86,7 @@ export const createGameContainer = async (
         app,
     );
 
-    app.renderer.on("resize", gameContainer.resize);
+    app.renderer.on("resize", () => gameContainer.resize());
 
     return gameContainer;
 };
@@ -296,13 +296,6 @@ export class GameContainer {
             2 * Math.abs(this.starFieldLeft) + Math.abs(this.starFieldRight);
         const maxHeight =
             2 * Math.abs(this.starFieldBottom) + Math.abs(this.starFieldTop);
-
-        this.viewport.resize(
-            window.innerWidth,
-            window.innerHeight,
-            maxWidth,
-            maxHeight,
-        );
 
         // activate plugins
         this.viewport
