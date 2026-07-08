@@ -74,9 +74,9 @@ export const createGameContainer = async (
 
     container.appendChild(app.canvas);
 
-    app.resize();
+    app.queueResize();
 
-    return new GameContainer(
+    const gameContainer = new GameContainer(
         services,
         drawingContext,
         game,
@@ -85,6 +85,10 @@ export const createGameContainer = async (
         eventBus,
         app,
     );
+
+    app.renderer.on("resize", gameContainer.resize);
+
+    return gameContainer;
 };
 
 export class GameContainer {
@@ -379,5 +383,14 @@ export class GameContainer {
         this.viewport.moveCenter(x, y);
         this.viewport.fitWorld();
         this.viewport.zoom(this.starFieldRight, true);
+    }
+
+    resize() {
+        this.viewport.resize(
+            this.app.renderer.width,
+            this.app.renderer.height,
+            Number.MAX_VALUE,
+            Number.MAX_VALUE,
+        );
     }
 }
