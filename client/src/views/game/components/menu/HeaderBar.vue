@@ -10,9 +10,9 @@
       class="header-bar-left header-bar-el"
       v-on:click="setMenuState({ state: 'leaderboard' })"
     >
-      <server-connection-status />
+      <server-connection-status class="d-none d-md-inline" />
 
-      {{ game.settings.general.name }}
+      <span class="d-none d-md-inline">{{ game.settings.general.name }}</span>
 
       <span
         class="pointer"
@@ -68,13 +68,13 @@
       </span>
 
       <research-progress
-        class=""
+        class="d-none d-md-flex"
         v-if="userPlayer"
         @onViewResearchRequested="onViewResearchRequested"
       />
 
       <div
-        class="pointer header-bar-stats"
+        class="d-none d-md-flex pointer header-bar-stats"
         v-if="userPlayer?.stats"
         @click="onViewBulkUpgradeRequested"
       >
