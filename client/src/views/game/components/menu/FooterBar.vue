@@ -92,6 +92,12 @@ const panToHomeStar = () => {
 </script>
 
 <style scoped>
+.footer-bar {
+  position: relative;
+  background-color: rgba(29, 40, 53, 0.98);
+  z-index: 200;
+}
+
 .pointer {
   cursor: pointer;
 }
