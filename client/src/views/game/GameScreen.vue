@@ -31,7 +31,7 @@
 <style scoped>
 .game-grid {
   height: 100dvh;
-  width: 100dvw;
+  width: 100%;
   display: grid;
   grid-template-columns: auto 1fr auto;
   grid-template-rows: auto 1fr auto;
