@@ -35,50 +35,50 @@
               </td>
               <td></td>
               <td class="text-end" title="Scanning">
-                <a href="javascript:;" @click="sort(['research', 'scanning'])"
+                <a href="javascript:;" @click="sort(['research', 'scanning', 'level'])"
                   ><i class="fas fa-binoculars"></i
                 ></a>
               </td>
               <td class="text-end" title="Hyperspace">
-                <a href="javascript:;" @click="sort(['research', 'hyperspace'])"
+                <a href="javascript:;" @click="sort(['research', 'hyperspace', 'level'])"
                   ><i class="fas fa-gas-pump"></i
                 ></a>
               </td>
               <td class="text-end" title="Terraforming">
                 <a
                   href="javascript:;"
-                  @click="sort(['research', 'terraforming'])"
+                  @click="sort(['research', 'terraforming', 'level'])"
                   ><i class="fas fa-globe-europe"></i
                 ></a>
               </td>
               <td class="text-end" title="Experimentation">
                 <a
                   href="javascript:;"
-                  @click="sort(['research', 'experimentation'])"
+                  @click="sort(['research', 'experimentation', 'level'])"
                   ><i class="fas fa-microscope"></i
                 ></a>
               </td>
               <td class="text-end" title="Weapons">
-                <a href="javascript:;" @click="sort(['research', 'weapons'])"
+                <a href="javascript:;" @click="sort(['research', 'weapons', 'level'])"
                   ><i class="fas fa-gun"></i
                 ></a>
               </td>
               <td class="text-end" title="Banking">
-                <a href="javascript:;" @click="sort(['research', 'banking'])"
+                <a href="javascript:;" @click="sort(['research', 'banking', 'level'])"
                   ><i class="fas fa-money-bill-alt"></i
                 ></a>
               </td>
               <td class="text-end" title="Manufacturing">
                 <a
                   href="javascript:;"
-                  @click="sort(['research', 'manufacturing'])"
+                  @click="sort(['research', 'manufacturing', 'level'])"
                   ><i class="fas fa-industry"></i
                 ></a>
               </td>
               <td class="text-end" title="Specialists">
                 <a
                   href="javascript:;"
-                  @click="sort(['research', 'specialists'])"
+                  @click="sort(['research', 'specialists', 'level'])"
                   ><i class="fas fa-user-astronaut"></i
                 ></a>
               </td>
