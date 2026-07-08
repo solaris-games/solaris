@@ -172,6 +172,7 @@ const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
 
 <style scoped>
 .sidebar-menu {
+  background-color: rgba(29, 40, 53, 0.98);
   height: 100%;
   width: 50px;
   display: flex;

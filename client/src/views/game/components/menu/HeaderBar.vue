@@ -553,6 +553,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: 0.25rem 1rem 0.25rem 1rem;
 }
 
 .header-bar-bg {
