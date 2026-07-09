@@ -73,8 +73,10 @@ export default class CombatProcessingService extends EventEmitter {
                 const star = group.star.star;
 
                 const newShips = Math.max(0, group.star.shipsAfter);
+                const fractional = (star.shipsActual || 0) - Math.floor(star.shipsActual || 0);
+
                 star.ships! = newShips;
-                star.shipsActual! = newShips;
+                star.shipsActual! = newShips + fractional;
             }
 
             for (let carrierRes of group.carriers) {
