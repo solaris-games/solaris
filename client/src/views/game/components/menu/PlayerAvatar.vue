@@ -8,7 +8,7 @@
         :class="{ 'defeated-player': player.defeated }"
       />
     </picture>
-    <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
+    <i v-if="!player.avatar" class="avatar-placeholder fas fa-user"></i>
     <span class="shapeIcon">
       <player-icon :playerId="player._id" />
     </span>
@@ -120,6 +120,14 @@ const hasPerspective = () => {
   opacity: 0.3;
 }
 
+.avatar-placeholder {
+  grid-area: a;
+  display: block;
+
+  height: 59px;
+  width: 59px;
+}
+
 .avatar-image {
   grid-area: a;
   display: block;
@@ -141,6 +149,11 @@ const hasPerspective = () => {
       height: 35px;
       width: 35px;
     }
+  }
+
+  .avatar-placeholder {
+    height: 35px;
+    width: 35px;
   }
 
   .player-icon .userIcon {
