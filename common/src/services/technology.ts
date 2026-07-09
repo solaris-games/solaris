@@ -235,7 +235,7 @@ export class TechnologyService {
         return techs;
     }
 
-    _getStarWeaponsBuff<ID>(star: Star<ID>): Buff | undefined {
+    _getStarWeaponsBuff<ID>(star: CombatBaseStar<ID>): Buff | undefined {
         if (star.specialistId) {
             const specialist = this.specialistService.getByIdStar(
                 star.specialistId,
@@ -489,6 +489,14 @@ export class TechnologyService {
                 );
             })
             .filter(notUndefined);
+
+        if (group.star) {
+            const starBuff = this._getStarWeaponsBuff(group.star);
+
+            if (starBuff) {
+                buffs.push(starBuff);
+            }
+        }
 
         const buff = this._calculateActualWeaponsBuff(
             baseWeapons,
