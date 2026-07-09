@@ -1,10 +1,12 @@
 <template>
   <div class="menu">
-    <not-logged-in-bar v-if="!userStore.isLoggedIn" />
+    <div class="menu-bars">
+      <not-logged-in-bar v-if="!userStore.isLoggedIn" />
 
-    <spectating-warning-bar />
+      <spectating-warning-bar />
 
-    <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+      <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
+    </div>
 
     <div class="menu-content">
       <welcome
@@ -353,9 +355,15 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 <style scoped>
 .menu {
   z-index: 100;
+  pointer-events: none;
+}
+
+.menu-bars {
+  pointer-events: auto;
 }
 
 .menu-content {
+  pointer-events: auto;
   max-height: min(800px, 100dvh - 140px);
   width: min(600px, 100%);
   overflow: auto;
