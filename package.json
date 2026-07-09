@@ -5,7 +5,7 @@
         "check": "npm run check --workspaces --if-present",
         "test": "npm run test --workspaces --if-present",
         "lint": "eslint .",
-        "format": "prettier . --write"
+        "format": "prettier . --write '!./database_data'"
     },
     "workspaces": [
         "common/",
