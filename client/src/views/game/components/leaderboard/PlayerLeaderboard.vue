@@ -1,18 +1,16 @@
 <template>
-  <div class="row">
-    <div class="table-responsive p-0">
-      <table class="table table-sm table-striped">
-        <tbody>
-          <leaderboard-row
-            v-for="player in sortedPlayers"
-            :key="player._id"
-            :player="player"
-            :show-team-names="true"
-            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-          />
-        </tbody>
-      </table>
-    </div>
+  <div class="table-responsive p-0">
+    <table class="table table-sm table-striped">
+      <tbody>
+        <leaderboard-row
+          v-for="player in sortedPlayers"
+          :key="player._id"
+          :player="player"
+          :show-team-names="true"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        />
+      </tbody>
+    </table>
   </div>
 </template>
 

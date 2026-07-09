@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row mb-2 g-0">
       <div class="col-auto">
         <button

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row mb-2 g-0">
       <div class="col-auto">
         <button
@@ -22,59 +22,57 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td title="Player">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['ownedByPlayer', 'alias'],
-                      ['ownedByPlayerId'],
-                      ['name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <td>
-                <a href="javascript:;" @click="sort(['name'])">Name</a>
-              </td>
-              <td></td>
-              <td title="Type">
-                <a
-                  href="javascript:;"
-                  class="small text-decoration-none"
-                  @click="sort(['type'])"
-                  ><i class="fas fa-star"></i> / <i class="fas fa-rocket"></i
-                ></a>
-              </td>
-              <td title="Specialist">
-                <a href="javascript:;" @click="sort(['specialist', 'name'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td title="Ships" class="text-end">
-                <a href="javascript:;" @click="sort(['ships'])"
-                  ><i class="fas fa-rocket"></i
-                ></a>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <ship-row
-              v-for="ship in sortedFilteredTableData"
-              v-bind:key="ship._id"
-              :ship="ship"
-              @onOpenStarDetailRequested="onOpenStarDetailRequested"
-              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td title="Player">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['ownedByPlayer', 'alias'],
+                    ['ownedByPlayerId'],
+                    ['name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <td>
+              <a href="javascript:;" @click="sort(['name'])">Name</a>
+            </td>
+            <td></td>
+            <td title="Type">
+              <a
+                href="javascript:;"
+                class="small text-decoration-none"
+                @click="sort(['type'])"
+                ><i class="fas fa-star"></i> / <i class="fas fa-rocket"></i
+              ></a>
+            </td>
+            <td title="Specialist">
+              <a href="javascript:;" @click="sort(['specialist', 'name'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td title="Ships" class="text-end">
+              <a href="javascript:;" @click="sort(['ships'])"
+                ><i class="fas fa-rocket"></i
+              ></a>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <ship-row
+            v-for="ship in sortedFilteredTableData"
+            v-bind:key="ship._id"
+            :ship="ship"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">

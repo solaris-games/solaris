@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row mb-2 g-0">
       <div class="col-auto">
         <button
@@ -22,66 +22,64 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td title="Player">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['ownedByPlayer', 'alias'],
-                      ['ownedByPlayerId'],
-                      ['name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <td>
-                <a href="javascript:;" @click="sort(['name'])">Name</a>
-              </td>
-              <td></td>
-              <td title="Specialist">
-                <a href="javascript:;" @click="sort(['specialist', 'name'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td title="Economy Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'economy'])"
-                  ><i class="fas fa-money-bill-wave me-2"></i
-                ></a>
-              </td>
-              <td title="Industry Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'industry'])"
-                  ><i class="fas fa-tools me-2"></i
-                ></a>
-              </td>
-              <td title="Science Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'science'])"
-                  ><i class="fas fa-flask"></i
-                ></a>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <capital-row
-              v-for="star in sortedFilteredTableData"
-              v-bind:key="star._id"
-              :star="star"
-              @onOpenStarDetailRequested="onOpenStarDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td title="Player">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['ownedByPlayer', 'alias'],
+                    ['ownedByPlayerId'],
+                    ['name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <td>
+              <a href="javascript:;" @click="sort(['name'])">Name</a>
+            </td>
+            <td></td>
+            <td title="Specialist">
+              <a href="javascript:;" @click="sort(['specialist', 'name'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td title="Economy Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'economy'])"
+                ><i class="fas fa-money-bill-wave me-2"></i
+              ></a>
+            </td>
+            <td title="Industry Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'industry'])"
+                ><i class="fas fa-tools me-2"></i
+              ></a>
+            </td>
+            <td title="Science Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'science'])"
+                ><i class="fas fa-flask"></i
+              ></a>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <capital-row
+            v-for="star in sortedFilteredTableData"
+            v-bind:key="star._id"
+            :star="star"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">

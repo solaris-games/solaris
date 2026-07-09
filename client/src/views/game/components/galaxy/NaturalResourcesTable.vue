@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row mb-2 g-0">
       <div class="col-auto">
         <button
@@ -22,106 +22,104 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td title="Player">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['ownedByPlayer', '_id'],
-                      ['ownedByPlayer', '_id'],
-                      ['name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <td>
-                <a href="javascript:;" @click="sort(['name'])">Name</a>
-              </td>
-              <td></td>
-              <td title="Specialist">
-                <a href="javascript:;" @click="sort(['specialist', 'name'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td title="Economy Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'economy'])"
-                  ><i class="fas fa-money-bill-wave me-2"></i
-                ></a>
-              </td>
-              <td title="Industry Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'industry'])"
-                  ><i class="fas fa-tools me-2"></i
-                ></a>
-              </td>
-              <td title="Science Infrastructure" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['infrastructure', 'science'])"
-                  ><i class="fas fa-flask"></i
-                ></a>
-              </td>
-              <td v-if="!isSplitResources" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['naturalResources', 'economy'])"
-                  >Resources</a
-                >
-              </td>
-              <td
-                title="Economy Resources"
-                v-if="isSplitResources"
-                class="text-end"
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td title="Player">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['ownedByPlayer', '_id'],
+                    ['ownedByPlayer', '_id'],
+                    ['name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <td>
+              <a href="javascript:;" @click="sort(['name'])">Name</a>
+            </td>
+            <td></td>
+            <td title="Specialist">
+              <a href="javascript:;" @click="sort(['specialist', 'name'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td title="Economy Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'economy'])"
+                ><i class="fas fa-money-bill-wave me-2"></i
+              ></a>
+            </td>
+            <td title="Industry Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'industry'])"
+                ><i class="fas fa-tools me-2"></i
+              ></a>
+            </td>
+            <td title="Science Infrastructure" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['infrastructure', 'science'])"
+                ><i class="fas fa-flask"></i
+              ></a>
+            </td>
+            <td v-if="!isSplitResources" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['naturalResources', 'economy'])"
+                >Resources</a
               >
-                <a
-                  href="javascript:;"
-                  @click="sort(['naturalResources', 'economy'])"
-                  ><i class="fas fa-globe me-2 text-success"> E</i></a
-                >
-              </td>
-              <td
-                title="Industry Resources"
-                v-if="isSplitResources"
-                class="text-end"
+            </td>
+            <td
+              title="Economy Resources"
+              v-if="isSplitResources"
+              class="text-end"
+            >
+              <a
+                href="javascript:;"
+                @click="sort(['naturalResources', 'economy'])"
+                ><i class="fas fa-globe me-2 text-success"> E</i></a
               >
-                <a
-                  href="javascript:;"
-                  @click="sort(['naturalResources', 'industry'])"
-                  ><i class="fas fa-globe me-2 text-warning"> I</i></a
-                >
-              </td>
-              <td
-                title="Science Resources"
-                v-if="isSplitResources"
-                class="text-end"
+            </td>
+            <td
+              title="Industry Resources"
+              v-if="isSplitResources"
+              class="text-end"
+            >
+              <a
+                href="javascript:;"
+                @click="sort(['naturalResources', 'industry'])"
+                ><i class="fas fa-globe me-2 text-warning"> I</i></a
               >
-                <a
-                  href="javascript:;"
-                  @click="sort(['naturalResources', 'science'])"
-                  ><i class="fas fa-globe me-2 text-info"> S</i></a
-                >
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <natural-resources-row
-              v-for="star in sortedFilteredTableData"
-              v-bind:key="star._id"
-              :star="star"
-              @onOpenStarDetailRequested="onOpenStarDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+            </td>
+            <td
+              title="Science Resources"
+              v-if="isSplitResources"
+              class="text-end"
+            >
+              <a
+                href="javascript:;"
+                @click="sort(['naturalResources', 'science'])"
+                ><i class="fas fa-globe me-2 text-info"> S</i></a
+              >
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <natural-resources-row
+            v-for="star in sortedFilteredTableData"
+            v-bind:key="star._id"
+            :star="star"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">

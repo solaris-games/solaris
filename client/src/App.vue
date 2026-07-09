@@ -66,7 +66,7 @@ option {
 
 .table-responsive {
   position: relative;
-  max-width: calc(100vw - 32px);
+  max-width: calc(100vw - 16px);
   overflow: auto;
 }
 </style>

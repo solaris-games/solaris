@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div>
     <div class="row mb-2 g-0">
       <div class="col-auto">
         <button
@@ -22,76 +22,72 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td title="Player">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['ownedByPlayer', 'alias'],
-                      ['ownedByPlayerId'],
-                      ['name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <td>
-                <a href="javascript:;" @click="sort(['name'])">Name</a>
-              </td>
-              <td></td>
-              <td title="Specialist">
-                <a
-                  href="javascript:;"
-                  @click="sort(['specialist', 'name'], ['name'], ['_id'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td title="Ships" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['ships'], ['name'], ['_id'])"
-                  ><i class="fas fa-rocket"></i
-                ></a>
-              </td>
-              <td title="Waypoints" class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['waypoints', 'length'], ['name'], ['_id'])"
-                  ><i class="fas fa-map-marker-alt"></i
-                ></a>
-              </td>
-              <!-- <td></td> -->
-              <td class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['ticksEta'], ['name'], ['_id'])"
-                  >ETA</a
-                >
-              </td>
-              <td class="text-end">
-                <a
-                  href="javascript:;"
-                  @click="sort(['ticksEtaTotal'], ['name'], ['_id'])"
-                  >Total</a
-                >
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <carrier-row
-              v-for="carrier in sortedFilteredTableData"
-              v-bind:key="carrier._id"
-              :carrier="carrier"
-              @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td title="Player">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['ownedByPlayer', 'alias'],
+                    ['ownedByPlayerId'],
+                    ['name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <td>
+              <a href="javascript:;" @click="sort(['name'])">Name</a>
+            </td>
+            <td></td>
+            <td title="Specialist">
+              <a
+                href="javascript:;"
+                @click="sort(['specialist', 'name'], ['name'], ['_id'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td title="Ships" class="text-end">
+              <a href="javascript:;" @click="sort(['ships'], ['name'], ['_id'])"
+                ><i class="fas fa-rocket"></i
+              ></a>
+            </td>
+            <td title="Waypoints" class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['waypoints', 'length'], ['name'], ['_id'])"
+                ><i class="fas fa-map-marker-alt"></i
+              ></a>
+            </td>
+            <!-- <td></td> -->
+            <td class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['ticksEta'], ['name'], ['_id'])"
+                >ETA</a
+              >
+            </td>
+            <td class="text-end">
+              <a
+                href="javascript:;"
+                @click="sort(['ticksEtaTotal'], ['name'], ['_id'])"
+                >Total</a
+              >
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <carrier-row
+            v-for="carrier in sortedFilteredTableData"
+            v-bind:key="carrier._id"
+            :carrier="carrier"
+            @onOpenCarrierDetailRequested="onOpenCarrierDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">
