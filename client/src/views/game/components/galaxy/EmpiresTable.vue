@@ -22,70 +22,68 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td><i class="fas fa-user"></i></td>
-              <td>
-                <a href="javascript:;" @click="sort(['alias'])">Name</a>
-              </td>
-              <td></td>
-              <td class="text-end" title="Stars">
-                <a href="javascript:;" @click="sort(['stats', 'totalStars'])"
-                  ><i class="fas fa-star"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Carriers">
-                <a href="javascript:;" @click="sort(['stats', 'totalCarriers'])"
-                  ><i class="fas fa-rocket"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Specialists">
-                <a
-                  href="javascript:;"
-                  @click="sort(['stats', 'totalSpecialists'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Ships">
-                <a href="javascript:;" @click="sort(['stats', 'totalShips'])"
-                  >S</a
-                >
-              </td>
-              <td class="text-end" title="Ship Production">
-                <a href="javascript:;" @click="sort(['stats', 'newShips'])"
-                  ><i class="fas fa-industry"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Economy Infrastructure">
-                <a href="javascript:;" @click="sort(['stats', 'totalEconomy'])"
-                  ><i class="fas fa-money-bill-wave"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Industry Infrastructure">
-                <a href="javascript:;" @click="sort(['stats', 'totalIndustry'])"
-                  ><i class="fas fa-tools"></i
-                ></a>
-              </td>
-              <td class="text-end" title="Science Infrastructure">
-                <a href="javascript:;" @click="sort(['stats', 'totalScience'])"
-                  ><i class="fas fa-flask"></i
-                ></a>
-              </td>
-            </tr>
-          </thead>
-          <tbody>
-            <empire-row
-              v-for="empire in sortedFilteredTableData"
-              v-bind:key="empire._id"
-              :empire="empire"
-              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td><i class="fas fa-user"></i></td>
+            <td>
+              <a href="javascript:;" @click="sort(['alias'])">Name</a>
+            </td>
+            <td></td>
+            <td class="text-end" title="Stars">
+              <a href="javascript:;" @click="sort(['stats', 'totalStars'])"
+                ><i class="fas fa-star"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Carriers">
+              <a href="javascript:;" @click="sort(['stats', 'totalCarriers'])"
+                ><i class="fas fa-rocket"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Specialists">
+              <a
+                href="javascript:;"
+                @click="sort(['stats', 'totalSpecialists'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Ships">
+              <a href="javascript:;" @click="sort(['stats', 'totalShips'])"
+                >S</a
+              >
+            </td>
+            <td class="text-end" title="Ship Production">
+              <a href="javascript:;" @click="sort(['stats', 'newShips'])"
+                ><i class="fas fa-industry"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Economy Infrastructure">
+              <a href="javascript:;" @click="sort(['stats', 'totalEconomy'])"
+                ><i class="fas fa-money-bill-wave"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Industry Infrastructure">
+              <a href="javascript:;" @click="sort(['stats', 'totalIndustry'])"
+                ><i class="fas fa-tools"></i
+              ></a>
+            </td>
+            <td class="text-end" title="Science Infrastructure">
+              <a href="javascript:;" @click="sort(['stats', 'totalScience'])"
+                ><i class="fas fa-flask"></i
+              ></a>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          <empire-row
+            v-for="empire in sortedFilteredTableData"
+            v-bind:key="empire._id"
+            :empire="empire"
+            @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">

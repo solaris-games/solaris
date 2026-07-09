@@ -63,4 +63,10 @@ option {
 .card-arrow {
   pointer-events: none;
 }
+
+.table-responsive {
+  position: relative;
+  max-width: calc(100vw - 32px);
+  overflow: auto;
+}
 </style>

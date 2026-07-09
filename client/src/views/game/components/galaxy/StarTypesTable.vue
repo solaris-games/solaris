@@ -22,101 +22,99 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="table-responsive">
-        <table class="table table-striped table-hover mb-0">
-          <thead class="table-dark">
-            <tr>
-              <td title="Player">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['ownedByPlayer', 'alias'],
-                      ['ownedByPlayerId'],
-                      ['name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <td>
-                <a href="javascript:;" @click="sort(['name'])">Name</a>
-              </td>
-              <td></td>
-              <td title="Specialist">
-                <a
-                  href="javascript:;"
-                  @click="sort(['specialist', 'name'], ['name'])"
-                  ><i class="fas fa-user-astronaut"></i
-                ></a>
-              </td>
-              <td title="Warp Gate">
-                <a href="javascript:;" @click="sort(['warpGate'], ['name'])"
-                  ><i class="fas fa-dungeon"></i
-                ></a>
-              </td>
-              <td title="Binary Star">
-                <a href="javascript:;" @click="sort(['isBinaryStar'], ['name'])"
-                  ><star-icon :isBinaryStar="true"></star-icon
-                ></a>
-              </td>
-              <td title="Nebula">
-                <a href="javascript:;" @click="sort(['isNebula'], ['name'])"
-                  ><star-icon :isNebula="true"></star-icon
-                ></a>
-              </td>
-              <td title="Black Hole">
-                <a href="javascript:;" @click="sort(['isBlackHole'], ['name'])"
-                  ><star-icon :isBlackHole="true"></star-icon
-                ></a>
-              </td>
-              <td title="Asteroid Field">
-                <a
-                  href="javascript:;"
-                  @click="sort(['isAsteroidField'], ['name'])"
-                  ><star-icon :isAsteroidField="true"></star-icon
-                ></a>
-              </td>
-              <td title="Pulsar">
-                <a href="javascript:;" @click="sort(['isPulsar'], ['name'])"
-                  ><star-icon :isPulsar="true"></star-icon
-                ></a>
-              </td>
-              <td title="Wormhole" style="text-align: center">
-                <a
-                  href="javascript:;"
-                  @click="sort(['isWormHole'], ['wormHolePairStar', 'name'])"
-                  ><star-icon :isWormHole="true"></star-icon
-                ></a>
-              </td>
-              <td></td>
-              <td title="Wormhole destination owner">
-                <a
-                  href="javascript:;"
-                  @click="
-                    sort(
-                      ['wormHolePairStar', 'ownedByPlayer', 'alias'],
-                      ['wormHolePairStar', 'ownedByPlayerId'],
-                      ['wormHolePairStar', 'name'],
-                    )
-                  "
-                  ><i class="fas fa-user"></i
-                ></a>
-              </td>
-              <!--TODO: Fix time machine bar on tick.-->
-            </tr>
-          </thead>
-          <tbody>
-            <star-types-row
-              v-for="star in sortedFilteredTableData"
-              v-bind:key="star._id"
-              :star="star"
-              @onOpenStarDetailRequested="onOpenStarDetailRequested"
-            />
-          </tbody>
-        </table>
-      </div>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <td title="Player">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['ownedByPlayer', 'alias'],
+                    ['ownedByPlayerId'],
+                    ['name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <td>
+              <a href="javascript:;" @click="sort(['name'])">Name</a>
+            </td>
+            <td></td>
+            <td title="Specialist">
+              <a
+                href="javascript:;"
+                @click="sort(['specialist', 'name'], ['name'])"
+                ><i class="fas fa-user-astronaut"></i
+              ></a>
+            </td>
+            <td title="Warp Gate">
+              <a href="javascript:;" @click="sort(['warpGate'], ['name'])"
+                ><i class="fas fa-dungeon"></i
+              ></a>
+            </td>
+            <td title="Binary Star">
+              <a href="javascript:;" @click="sort(['isBinaryStar'], ['name'])"
+                ><star-icon :isBinaryStar="true"></star-icon
+              ></a>
+            </td>
+            <td title="Nebula">
+              <a href="javascript:;" @click="sort(['isNebula'], ['name'])"
+                ><star-icon :isNebula="true"></star-icon
+              ></a>
+            </td>
+            <td title="Black Hole">
+              <a href="javascript:;" @click="sort(['isBlackHole'], ['name'])"
+                ><star-icon :isBlackHole="true"></star-icon
+              ></a>
+            </td>
+            <td title="Asteroid Field">
+              <a
+                href="javascript:;"
+                @click="sort(['isAsteroidField'], ['name'])"
+                ><star-icon :isAsteroidField="true"></star-icon
+              ></a>
+            </td>
+            <td title="Pulsar">
+              <a href="javascript:;" @click="sort(['isPulsar'], ['name'])"
+                ><star-icon :isPulsar="true"></star-icon
+              ></a>
+            </td>
+            <td title="Wormhole" style="text-align: center">
+              <a
+                href="javascript:;"
+                @click="sort(['isWormHole'], ['wormHolePairStar', 'name'])"
+                ><star-icon :isWormHole="true"></star-icon
+              ></a>
+            </td>
+            <td></td>
+            <td title="Wormhole destination owner">
+              <a
+                href="javascript:;"
+                @click="
+                  sort(
+                    ['wormHolePairStar', 'ownedByPlayer', 'alias'],
+                    ['wormHolePairStar', 'ownedByPlayerId'],
+                    ['wormHolePairStar', 'name'],
+                  )
+                "
+                ><i class="fas fa-user"></i
+              ></a>
+            </td>
+            <!--TODO: Fix time machine bar on tick.-->
+          </tr>
+        </thead>
+        <tbody>
+          <star-types-row
+            v-for="star in sortedFilteredTableData"
+            v-bind:key="star._id"
+            :star="star"
+            @onOpenStarDetailRequested="onOpenStarDetailRequested"
+          />
+        </tbody>
+      </table>
     </div>
 
     <p v-if="!sortedFilteredTableData.length" class="text-center mt-2 mb-2">
