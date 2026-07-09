@@ -73,12 +73,9 @@ type GroupsWithDamage<
 > = [CombatGroup<ID, P, S, C>, Map<string, number>][];
 
 
-//This is specifically for crediting ship kills. There are a few scenarios to consider with the last round of combat:
-//  1) when damage > remaining ships, the remaining kills need to be not more than remaining ships,
-//      but when there are more than 2 groups doing damage, the ship kills need to also be distributed somehow
-//      between groups who did the damage
-//  2) there can still be fractional kills remaining (after kills are distributed as integers) that need to be allocated in some way if we want total #kills == #losses
-//  see "shipKill counts" in combat.spec.ts for examples
+//This is specifically for crediting ship kills:
+// -proportionally to raw damage when incoming damage exceeds the target's remaining ships.
+// -remainder handling ensures total credited kills equals actual ships destroyed.
 const allocateKillsFromDamage = (
     damageFromGroups: Map<string, number>,
     totalDamage: number,
@@ -155,7 +152,6 @@ const calculateIncomingDamages = <
 ): GroupsWithDamage<ID, P, S, C> => {
     return groups.map((group, groupIdx) => {
         const damageFromGroups = new Map<string, number>();
-        let ships = group.ships;
         let totalDamage = 0;
 
         attackingGroups.forEach((otherGroup) => {
@@ -177,7 +173,7 @@ const calculateIncomingDamages = <
         });
 
         const shipsAfterDamage = Math.max(0, group.ships - totalDamage);
-        const shipsActuallyDestroyed = ships - shipsAfterDamage; //in case damage > ships remaining, shipsDestroyed is the accurate number in order to credit kills for
+        const shipsActuallyDestroyed = group.ships - shipsAfterDamage; //in case damage > ships remaining, shipsDestroyed is the accurate number in order to credit kills for
 
         const killsFromGroups = allocateKillsFromDamage(
             damageFromGroups,
