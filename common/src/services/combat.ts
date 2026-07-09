@@ -83,7 +83,8 @@ const calculateIncomingDamages = <
 ): GroupsWithDamage<ID, P, S, C> => {
     return groups.map((group, groupIdx) => {
         const damageFromGroups = new Map<string, number>();
-        let totalDamage = 0;
+
+        let ships = group.ships;
 
         attackingGroups.forEach((otherGroup) => {
             if (group.id === otherGroup.id) {
@@ -99,14 +100,16 @@ const calculateIncomingDamages = <
                 damage = dmgFromOther.total;
             }
 
-            damageFromGroups.set(otherGroup.id, damage);
-            totalDamage += damage;
+            const actualDamage = Math.min(damage, ships);
+
+            damageFromGroups.set(otherGroup.id, actualDamage);
+            ships -= actualDamage;
         });
 
         return [
             {
                 ...group,
-                ships: Math.max(0, group.ships - totalDamage),
+                ships,
             },
             damageFromGroups,
         ];
@@ -130,7 +133,7 @@ const applyDamages = <
 
         return {
             ...group,
-            shipsKilled: damageDone,
+            shipsKilled: group.shipsKilled + damageDone,
         };
     });
 };
