@@ -157,11 +157,9 @@ onMounted(() => {
 }
 
 #chat-window {
-  position: absolute;
-  right: 0;
-  width: min(100%, 600px);
-  overflow: scroll;
-  overflow-x: hidden;
+  max-height: min(800px, 100dvh - 140px);
+  width: min(600px, 100%);
+  overflow: auto;
   scrollbar-width: none;
 }
 

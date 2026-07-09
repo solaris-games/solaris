@@ -547,7 +547,7 @@ onMounted(async () => {
   .menu-page-header {
     position: fixed;
     z-index: 1;
-    width: 456px;
+    width: min(600px, 100%);
   }
 
   .menu-page-header-padding {
