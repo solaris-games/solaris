@@ -285,8 +285,12 @@ onMounted(() => {
 #gameContainer {
   user-select: none;
   height: 100%;
-  width: 100%;
+  width: calc(100vw - 50px);
   overflow: hidden;
+
+  @media screen and (max-width: 576px) {
+    width: 100vw;
+  }
 }
 
 #gameContainer :deep(canvas) {
