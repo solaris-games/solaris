@@ -1,19 +1,10 @@
 <template>
   <tr>
-    <td
-      :style="{
-        width: '8px',
-        'background-color': playerColourSpec.value,
-      }"
-    ></td>
-    <td class="col-avatar" :title="playerColourSpec.alias + ' ' + player.shape">
-      <player-avatar
-        :player="player"
-        @onClick="onOpenPlayerDetailRequested(player)"
-      />
-    </td>
+    <leaderboard-player
+      :player="player"
+      @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+    />
     <td class="ps-2 pt-3 pb-0">
-      <!-- Text styling for defeated players? -->
       <h5 class="alias-title">
         {{ player.alias }}
         <team-name v-if="shouldShowTeamNames" :player-id="player._id" />
@@ -114,6 +105,7 @@ import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import { notReadyToQuit } from "@/services/typedapi/game";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { useColourStore } from "@/stores/colour";
+import LeaderboardPlayer from "@/views/game/components/leaderboard/LeaderboardPlayer.vue";
 
 const props = defineProps<{
   player: Player;
@@ -128,13 +120,8 @@ const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();
-const colourStore = useColourStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
-
-const playerColourSpec = computed(() => {
-  return colourStore.getColourForPlayer(store.game!, props.player._id)!;
-});
 
 const shouldShowTeamNames = computed(() => {
   return props.showTeamNames && GameHelper.isTeamConquest(store.game!);
@@ -182,8 +169,8 @@ const getPlayerStatus = (player: Player) => {
   return GameHelper.getPlayerStatus(player);
 };
 
-const onOpenPlayerDetailRequested = (e: Player) => {
-  emit("onOpenPlayerDetailRequested", e._id);
+const onOpenPlayerDetailRequested = (id: string) => {
+  emit("onOpenPlayerDetailRequested", id);
 };
 
 const unconfirmReadyToQuit = async (player: Player) => {
@@ -203,13 +190,13 @@ const panToPlayer = (player: Player) => {
   eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
     player: player,
   });
-  onOpenPlayerDetailRequested(player);
+
+  onOpenPlayerDetailRequested(player._id);
 };
 </script>
 
 <style scoped>
 .col-avatar {
-  position: absolute;
   width: 59px;
   height: 59px;
   cursor: pointer;

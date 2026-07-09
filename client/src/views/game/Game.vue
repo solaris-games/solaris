@@ -294,9 +294,9 @@ const reloadGameCheck = async () => {
 
       const hasEnded =
         !GameHelper.isGameFinished(game.value) &&
-        Boolean(response.data.state.endDate);
+        Boolean(response.data.state?.endDate);
 
-      if (store.tick < response.data.state.tick || hasEnded) {
+      if (store.tick < response.data.state?.tick || hasEnded) {
         // If the user is currently using the time machine then only set the state variables.
         // Otherwise reload the current game tick.
         if (isHistorical.value) {

@@ -1,8 +1,12 @@
 <template>
   <div @click="onClick" class="player-icon text-center bg-dark">
-    <picture style="display: contents" v-if="player.avatar">
+    <picture class="avatar-image" v-if="player.avatar">
       <source :srcset="avatarWebpSrc" type="image/webp" />
-      <img :src="avatarSrc" :class="{ 'defeated-player': player.defeated }" />
+      <img
+        alt="defeated"
+        :src="avatarSrc"
+        :class="{ 'defeated-player': player.defeated }"
+      />
     </picture>
     <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
     <span class="shapeIcon">
@@ -80,30 +84,31 @@ const hasPerspective = () => {
 </script>
 
 <style scoped>
-.player-icon,
-img {
+.player-icon {
+  display: grid;
+  grid-template-areas: "a";
   width: 59px;
   height: 59px;
 }
 
 .player-icon .userIcon {
-  position: absolute;
-  left: 3px;
-  top: 40px;
+  grid-area: a;
+  margin-left: 3px;
+  margin-top: 40px;
   font-size: 16px;
 }
 
 .player-icon .shapeIcon {
-  position: absolute;
-  left: 40px;
-  top: 3px;
+  grid-area: a;
+  margin-left: 40px;
+  margin-top: 0;
   font-size: 16px;
 }
 
 .player-icon .medalIcon {
-  position: absolute;
-  left: 40px;
-  top: 40px;
+  grid-area: a;
+  margin-left: 40px;
+  margin-top: 40px;
   font-size: 16px;
 }
 
@@ -115,36 +120,48 @@ img {
   opacity: 0.3;
 }
 
-@media screen and (max-width: 576px) {
-  .player-icon,
+.avatar-image {
+  grid-area: a;
+  display: block;
+
   img {
+    height: 59px;
+    width: 59px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .player-icon {
     height: 35px;
     width: 35px;
   }
 
+  .avatar-image {
+    img {
+      height: 35px;
+      width: 35px;
+    }
+  }
+
   .player-icon .userIcon {
-    position: absolute;
-    left: 1px;
-    top: 22px;
-    font-size: 10px;
+    grid-area: a;
+    margin-left: 3px;
+    margin-top: 20px;
+    font-size: 14px;
   }
 
   .player-icon .shapeIcon {
-    position: absolute;
-    left: 22px;
-    top: 1px;
-    font-size: 10px;
+    grid-area: a;
+    margin-left: 20px;
+    margin-top: 0;
+    font-size: 14px;
   }
 
   .player-icon .medalIcon {
-    position: absolute;
-    left: 22px;
-    top: 22px;
-    font-size: 10px;
-  }
-
-  .fa-user {
-    font-size: 30px;
+    grid-area: a;
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 14px;
   }
 }
 
