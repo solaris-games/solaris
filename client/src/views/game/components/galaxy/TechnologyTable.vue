@@ -35,12 +35,16 @@
               </td>
               <td></td>
               <td class="text-end" title="Scanning">
-                <a href="javascript:;" @click="sort(['research', 'scanning', 'level'])"
+                <a
+                  href="javascript:;"
+                  @click="sort(['research', 'scanning', 'level'])"
                   ><i class="fas fa-binoculars"></i
                 ></a>
               </td>
               <td class="text-end" title="Hyperspace">
-                <a href="javascript:;" @click="sort(['research', 'hyperspace', 'level'])"
+                <a
+                  href="javascript:;"
+                  @click="sort(['research', 'hyperspace', 'level'])"
                   ><i class="fas fa-gas-pump"></i
                 ></a>
               </td>
@@ -59,12 +63,16 @@
                 ></a>
               </td>
               <td class="text-end" title="Weapons">
-                <a href="javascript:;" @click="sort(['research', 'weapons', 'level'])"
+                <a
+                  href="javascript:;"
+                  @click="sort(['research', 'weapons', 'level'])"
                   ><i class="fas fa-gun"></i
                 ></a>
               </td>
               <td class="text-end" title="Banking">
-                <a href="javascript:;" @click="sort(['research', 'banking', 'level'])"
+                <a
+                  href="javascript:;"
+                  @click="sort(['research', 'banking', 'level'])"
                   ><i class="fas fa-money-bill-alt"></i
                 ></a>
               </td>

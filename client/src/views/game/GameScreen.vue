@@ -60,11 +60,11 @@
   justify-content: stretch;
   align-items: stretch;
 
- * {
-   flex-grow: 1;
-   min-height: 0;
-   min-width: 0;
- }
+  * {
+    flex-grow: 1;
+    min-height: 0;
+    min-width: 0;
+  }
 }
 
 .game-grid-header {

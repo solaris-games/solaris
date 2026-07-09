@@ -1,83 +1,81 @@
 <template>
-  <div class="menu-page">
-    <div class="container">
-      <menu-title title="Galaxy" @onCloseRequested="onCloseRequested" />
+  <div class="menu-page container">
+    <menu-title title="Galaxy" @onCloseRequested="onCloseRequested" />
 
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'empires' }"
-            data-bs-toggle="tab"
-            href="#empires"
-            >Empires</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'stars' }"
-            data-bs-toggle="tab"
-            href="#stars"
-            >Stars</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'starTypes' }"
-            data-bs-toggle="tab"
-            href="#starTypes"
-            >Star Types</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'carriers' }"
-            data-bs-toggle="tab"
-            href="#carriers"
-            >Carriers</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'ships' }"
-            data-bs-toggle="tab"
-            href="#ships"
-            >Ships</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'capitals' }"
-            data-bs-toggle="tab"
-            href="#capitals"
-            >Capitals</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'naturalResources' }"
-            data-bs-toggle="tab"
-            href="#naturalResources"
-            >Resources</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            :class="{ active: activeTab === 'technology' }"
-            data-bs-toggle="tab"
-            href="#technology"
-            >Technology</a
-          >
-        </li>
-      </ul>
-    </div>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'empires' }"
+          data-bs-toggle="tab"
+          href="#empires"
+          >Empires</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'stars' }"
+          data-bs-toggle="tab"
+          href="#stars"
+          >Stars</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'starTypes' }"
+          data-bs-toggle="tab"
+          href="#starTypes"
+          >Star Types</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'carriers' }"
+          data-bs-toggle="tab"
+          href="#carriers"
+          >Carriers</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'ships' }"
+          data-bs-toggle="tab"
+          href="#ships"
+          >Ships</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'capitals' }"
+          data-bs-toggle="tab"
+          href="#capitals"
+          >Capitals</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'naturalResources' }"
+          data-bs-toggle="tab"
+          href="#naturalResources"
+          >Resources</a
+        >
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          :class="{ active: activeTab === 'technology' }"
+          data-bs-toggle="tab"
+          href="#technology"
+          >Technology</a
+        >
+      </li>
+    </ul>
 
     <div class="tab-content pt-2 pb-2">
       <div

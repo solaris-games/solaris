@@ -18,21 +18,21 @@
         class="pointer"
         v-if="gameIsPaused"
         v-on:click="setMenuState({ state: 'leaderboard' })"
-      >{{ getGameStatusText }}</span
+        >{{ getGameStatusText }}</span
       >
       <span
         class="pointer"
         v-if="gameIsInProgress"
         v-on:click="setMenuState({ state: 'leaderboard' })"
         title="Next production tick"
-      ><i class="fas fa-clock"></i> {{ timeRemaining }}</span
+        ><i class="fas fa-clock"></i> {{ timeRemaining }}</span
       >
       <span
         class="pointer"
         v-if="gameIsPendingStart"
         v-on:click="setMenuState({ state: 'leaderboard' })"
         title="Game starts in"
-      ><i class="fas fa-stopwatch"></i> {{ timeRemaining }}</span
+        ><i class="fas fa-stopwatch"></i> {{ timeRemaining }}</span
       >
       <div
         class=""

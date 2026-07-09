@@ -356,7 +356,8 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 }
 
 .menu-content {
-  position: absolute;
-  max-width: 600px;
+  max-height: 700px;
+  width: min(600px, 100%);
+  overflow: auto;
 }
 </style>
