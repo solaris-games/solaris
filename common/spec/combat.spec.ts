@@ -644,4 +644,320 @@ describe("CombatService – computeGroups", () => {
             expect(g.shipsLost).toBe(g.shipsBefore - g.shipsAfter);
         }
     });
+
+    it("shipKill counts - does not over-credit or under-credit shipsKilled", () => {
+        // This test is designed to catch the bug where each attacker gets credited
+        // with min(rawDamage, targetActualKills), causing total credited kills to
+        // exceed total ships actually lost.
+        //
+        // Initial:
+        // G0: 5 ships, deals 0 damage
+        // G1: 8 ships, deals 8 to G0 and 8 to G2
+        // G2: 8 ships, deals 8 to G0 and 8 to G1
+        //
+        // Single simultaneous carrier-to-carrier round:
+        // G0 takes 16 incoming damage but only has 5 ships -> loses 5
+        // G1 takes 8 incoming damage -> loses 8
+        // G2 takes 8 incoming damage -> loses 8
+        //
+        // All groups are dead after one round.
+        //
+        // Actual total ships lost = 5 + 8 + 8 = 21.
+        //
+        // Broken per-attacker cap behavior:
+        // G1 gets min(8, 5) = 5 kills on G0, plus 8 kills on G2 = 13
+        // G2 gets min(8, 5) = 5 kills on G0, plus 8 kills on G1 = 13
+        // Total credited kills = 26, which is impossible.
+
+        const groups: TestGroup[] = [
+            makeGroup("p0", 5, 0, false, [
+                [1, 0],
+                [2, 0],
+            ]),
+            makeGroup("p1", 8, 8, false, [
+                [0, 8],
+                [2, 8],
+            ]),
+            makeGroup("p2", 8, 8, false, [
+                [0, 8],
+                [1, 8],
+            ]),
+        ];
+
+        const result = service.calculateGroups(groups, false);
+
+        expect(result.groups[0].shipsAfter).toBe(0);
+        expect(result.groups[1].shipsAfter).toBe(0);
+        expect(result.groups[2].shipsAfter).toBe(0);
+
+        const totalShipsLost = result.groups.reduce(
+            (sum, group) => sum + group.shipsLost,
+            0,
+        );
+
+        const totalShipsKilled = result.groups.reduce(
+            (sum, group) => sum + group.shipsKilled,
+            0,
+        );
+
+        expect(totalShipsLost).toBe(21);
+        expect(totalShipsKilled).toBe(totalShipsLost);
+    });
+});
+
+describe("CombatService - shipsKilled", () => {
+    type TestPlayer = {
+        _id: string;
+        research: {
+            weapons: {
+                level: number;
+            };
+        };
+    };
+
+    function makeWeaponsDetail(level: number): WeaponsDetail {
+        return {
+            total: level,
+            weaponsLevel: level,
+            weaponsBuff: 0,
+            appliedBuffs: [],
+        };
+    }
+
+    function makePlayer(id: string, weaponsLevel: number): TestPlayer {
+        return {
+            _id: id,
+            research: {
+                weapons: {
+                    level: weaponsLevel,
+                },
+            },
+        };
+    }
+
+    function makeGame(players: TestPlayer[]) {
+        return {
+            galaxy: {
+                players,
+            },
+        } as any;
+    }
+
+    function makeStar(id: string, ownedByPlayerId: string, ships: number) {
+        return {
+            _id: id,
+            ownedByPlayerId,
+            ships,
+            specialistId: null,
+            specialistTargetedPlayers: [],
+            isAsteroidField: false,
+            homeStar: false,
+        } as any;
+    }
+
+    function makeCarrier(id: string, ownedByPlayerId: string, ships: number) {
+        return {
+            _id: id,
+            ownedByPlayerId,
+            ships,
+            specialistId: null,
+            specialistTargetedPlayers: [],
+        } as any;
+    }
+
+    function makeService() {
+        const combatGroupService = {
+            computeCombatGroups: jasmine
+                .createSpy("computeCombatGroups")
+                .and.callFake((_game: any, players: TestPlayer[]) => {
+                    return {
+                        groups: players.map((p) => [p]),
+                    };
+                }),
+        };
+
+        const technologyService = {
+            getEffectiveWeaponsDetail: jasmine
+                .createSpy("getEffectiveWeaponsDetail")
+                .and.callFake((_game: any, group: any) => {
+                    return makeWeaponsDetail(group.players[0].research.weapons.level);
+                }),
+        };
+
+        const specialistService = {
+            getByIdStar: jasmine.createSpy("getByIdStar").and.returnValue(null),
+            getByIdCarrier: jasmine.createSpy("getByIdCarrier").and.returnValue(null),
+        };
+
+        return new CombatService(
+            combatGroupService as any,
+            technologyService as any,
+            specialistService as any,
+        );
+    }
+
+    function runComputeStarScenario(params: {
+        starShips: number;
+        carrierShips: number;
+        defenderWeapons?: number;
+        attackerWeapons?: number;
+    }) {
+        const defenderWeapons = params.defenderWeapons ?? 1;
+        const attackerWeapons = params.attackerWeapons ?? 1;
+
+        const defender = makePlayer("defender", defenderWeapons);
+        const attacker = makePlayer("attacker", attackerWeapons);
+
+        const game = makeGame([defender, attacker]);
+        const star = makeStar("star", "defender", params.starShips);
+        const carrier = makeCarrier("carrier", "attacker", params.carrierShips);
+
+        const service = makeService();
+
+        const callbackStates: any[] = [];
+
+        const result = service.computeStar(
+            game,
+            star,
+            [carrier],
+            (state) => callbackStates.push(state),
+        );
+
+        expect(result).toBeDefined();
+
+        const defenderGroup = result!.groups.find((g) => g.star)!;
+        const attackerGroup = result!.groups.find((g) => g.carriers.length)!;
+
+        return {
+            result: result!,
+            defenderGroup,
+            attackerGroup,
+            callbackStates,
+        };
+    }
+
+    [
+        {
+            name: "equal 10v10 takes multiple rounds and defender first shot matters",
+            starShips: 10,
+            carrierShips: 10,
+            expectedDefenderShipsAfter: 1,
+            expectedAttackerShipsAfter: 0,
+            expectedDefenderShipsKilled: 10,
+            expectedAttackerShipsKilled: 9,
+        },
+        {
+            name: "1v2 mutual destruction catches defender-first off-by-one",
+            starShips: 1,
+            carrierShips: 2,
+            expectedDefenderShipsAfter: 0,
+            expectedAttackerShipsAfter: 0,
+            expectedDefenderShipsKilled: 2,
+            expectedAttackerShipsKilled: 1,
+        },
+        {
+            name: "10v50 attacker wins but defender still killed more than one round",
+            starShips: 10,
+            carrierShips: 50,
+            expectedDefenderShipsAfter: 0,
+            expectedAttackerShipsAfter: 39,
+            expectedDefenderShipsKilled: 11,
+            expectedAttackerShipsKilled: 10,
+        },
+        {
+            name: "25v50 with 7v8 weapons caps final-round overkill",
+            starShips: 25,
+            carrierShips: 50,
+            defenderWeapons: 7,
+            attackerWeapons: 8,
+            expectedDefenderShipsAfter: 0,
+            expectedAttackerShipsAfter: 21,
+            expectedDefenderShipsKilled: 29,
+            expectedAttackerShipsKilled: 25,
+        },
+    ].forEach((tc) => {
+        it(`shipsKilled counts - records total shipsKilled for computeStar: ${tc.name}`, () => {
+            const { defenderGroup, attackerGroup, callbackStates } =
+                runComputeStarScenario({
+                    starShips: tc.starShips,
+                    carrierShips: tc.carrierShips,
+                    defenderWeapons: tc.defenderWeapons,
+                    attackerWeapons: tc.attackerWeapons,
+                });
+
+            expect(callbackStates[callbackStates.length - 1].round).toBeGreaterThan(1);
+
+            expect(defenderGroup.shipsAfter).toBe(tc.expectedDefenderShipsAfter);
+            expect(attackerGroup.shipsAfter).toBe(tc.expectedAttackerShipsAfter);
+
+            expect(defenderGroup.shipsKilled).toBe(tc.expectedDefenderShipsKilled);
+            expect(attackerGroup.shipsKilled).toBe(tc.expectedAttackerShipsKilled);
+
+            expect(defenderGroup.shipsKilled).toBe(attackerGroup.shipsLost);
+            expect(attackerGroup.shipsKilled).toBe(defenderGroup.shipsLost);
+        });
+    });
+
+    it("shipKill counts - assigns multiple leftover fractional kill credits when needed", () => {
+        // This catches a bug where only one fractional leftover kill is assigned.
+        //
+        // Group 0 has 2 ships.
+        // Groups 1, 2, and 3 each deal 1 damage to Group 0.
+        //
+        // Group 0 receives 3 raw damage but only loses 2 ships.
+        //
+        // Exact kill credit against Group 0:
+        // Group 1: 1 / 3 * 2 = 0.666...
+        // Group 2: 1 / 3 * 2 = 0.666...
+        // Group 3: 1 / 3 * 2 = 0.666...
+        //
+        // Flooring gives:
+        // 0 + 0 + 0 = 0
+        //
+        // There are 2 leftover kills to assign.
+        // A broken "only assign one fractional kill" implementation would credit
+        // only 1 kill for Group 0's 2 lost ships.
+
+        const groups: TestGroup[] = [
+            makeGroup("p0", 2, 0, false, [
+                [1, 0],
+                [2, 0],
+                [3, 0],
+            ]),
+            makeGroup("p1", 1, 1, false, [
+                [0, 1],
+                [2, 1],
+                [3, 1],
+            ]),
+            makeGroup("p2", 1, 1, false, [
+                [0, 1],
+                [1, 1],
+                [3, 1],
+            ]),
+            makeGroup("p3", 1, 1, false, [
+                [0, 1],
+                [1, 1],
+                [2, 1],
+            ]),
+        ];
+
+        const result = service.calculateGroups(groups, false);
+
+        result.groups.forEach((group) => {
+            expect(group.shipsAfter).toBe(0);
+        });
+
+        const totalShipsLost = result.groups.reduce(
+            (sum, group) => sum + group.shipsLost,
+            0,
+        );
+
+        const totalShipsKilled = result.groups.reduce(
+            (sum, group) => sum + group.shipsKilled,
+            0,
+        );
+
+        expect(totalShipsLost).toBe(5);
+        expect(totalShipsKilled).toBe(totalShipsLost);
+    });
 });
