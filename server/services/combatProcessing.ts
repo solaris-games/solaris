@@ -16,9 +16,7 @@ import {
     DetailedCombatResultGroup,
     CombatResultStar,
     Specialist,
-    maxBy,
     maxOf,
-    WeaponsDetail,
 } from "@solaris/common";
 import EventEmitter from "events";
 import { DBObjectId } from "./types/DBObjectId";
@@ -74,7 +72,9 @@ export default class CombatProcessingService extends EventEmitter {
             if (group.star) {
                 const star = group.star.star;
 
-                star.shipsActual! = Math.max(0, group.star.shipsAfter);
+                const newShips = Math.max(0, group.star.shipsAfter);
+                star.ships! = newShips;
+                star.shipsActual! = newShips;
             }
 
             for (let carrierRes of group.carriers) {
