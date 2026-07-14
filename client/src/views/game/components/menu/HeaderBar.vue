@@ -8,7 +8,6 @@
   >
     <div
       class="header-bar-left header-bar-el"
-      v-on:click="setMenuState({ state: 'leaderboard' })"
     >
       <server-connection-status class="d-none d-md-inline" />
 

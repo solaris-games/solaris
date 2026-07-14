@@ -266,10 +266,13 @@ onUnmounted(() => {
 }
 
 .tick-form {
-  z-index: 1;
+  z-index: 120;
   position: absolute;
   width: 300px;
-  left: 0px;
+  left: 50px;
+  background: #1d2835;
+  border: black 2px solid;
+  border-radius: 4px;
 }
 
 @media screen and (max-width: 473px) {
