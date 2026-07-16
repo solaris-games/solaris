@@ -112,14 +112,13 @@
 
     <div class="row" v-if="userPlayer != null && !game.state.endDate">
       <div class="col text-start m-2">
-        <modalButton
+        <button
           v-if="!game.state.startDate"
-          :disabled="isQuittingGame"
-          modalName="quitGameModal"
-          classText="btn btn-sm btn-danger"
+          class="btn btn-sm btn-danger"
+          @click="requestQuitGame"
         >
           <i class="fas fa-sign-out-alt"></i> Quit Game
-        </modalButton>
+        </button>
         <button
           v-if="
             canReadyToQuit && !userPlayer.defeated && !userPlayer.readyToQuit
@@ -141,28 +140,12 @@
         <concede-defeat-button />
       </div>
     </div>
-
-    <!-- Modals -->
-    <dialogModal
-      modalName="quitGameModal"
-      titleText="Quit Game"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="quitGame"
-    >
-      <p>
-        Are you sure you want to quit this game? Your position will be opened
-        again and you will <b>not</b> be able to rejoin.
-      </p>
-    </dialogModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import router from "../../../../router";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import GameHelper from "../../../../services/gameHelper";
 import MenuTitle from "../MenuTitle.vue";
 import AudioService from "../../../../services/audio";
@@ -242,7 +225,18 @@ const onViewSettingsRequested = () => emit("onViewSettingsRequested");
 const onOpenPlayerDetailRequested = (playerId: string) =>
   emit("onOpenPlayerDetailRequested", playerId);
 
-const quitGame = async () => {
+const requestQuitGame = async () => {
+  const confirmed = await confirm(
+    "Quit Game",
+    `Are you sure you want to quit this game? Your position will be opened again and you will not be able to rejoin.`,
+  );
+
+  if (confirmed) {
+    await confirmQuitGame();
+  }
+};
+
+const confirmQuitGame = async () => {
   isQuittingGame.value = true;
 
   const response = await quit(httpClient)(game.value._id);

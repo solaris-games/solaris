@@ -30,46 +30,29 @@
         </div>
         <div class="col-5">
           <div class="d-grid gap-2">
-            <modalButton
-              modalName="shareTechnologyModal"
-              classText="btn btn-success"
+            <button
               :disabled="
                 isHistoricalMode ||
                 isSendingTech ||
                 !availableTechnologies.length ||
                 selectedTechnology.cost > userPlayer.credits
               "
-              ><i class="fas fa-paper-plane"></i> Share</modalButton
+              class="btn btn-success"
+              @click="requestSendTechnology"
             >
+              <i class="fas fa-paper-plane"></i> Share
+            </button>
           </div>
         </div>
       </form>
     </div>
-
-    <dialogModal
-      modalName="shareTechnologyModal"
-      titleText="Share Technology"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="confirmSendTechnology"
-    >
-      <p>
-        Are you sure you want to share
-        <b>{{ selectedTechnology.name }}</b> (level
-        {{ selectedTechnology.level }}) with <b>{{ player.alias }}</b
-        >?
-      </p>
-    </dialogModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { inject, ref, computed, onMounted } from "vue";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import TechnologyHelper from "../../../../services/technologyHelper";
-import gameHelper from "../../../../services/gameHelper";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game } from "@/types/game";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
@@ -87,6 +70,7 @@ import {
 } from "@/services/typedapi/trade";
 
 import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
 const props = defineProps<{
   playerId: string;
 }>();
@@ -97,6 +81,7 @@ const toast = useToast();
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
 const isHistoricalMode = useIsHistoricalMode(store);
+const confirm = useConfirm();
 
 const errors = ref<string[]>([]);
 const isSendingTech = ref(false);
@@ -126,6 +111,17 @@ const getTradeableTechnologies = async () => {
   } else {
     console.error(formatError(response));
     errors.value = extractErrors(response);
+  }
+};
+
+const requestSendTechnology = async () => {
+  const confirmed = await confirm(
+    "Share Technology",
+    `Are you sure you want to share ${selectedTechnology.value?.name} (level ${selectedTechnology.value?.level}) with ${player.value.alias}?`,
+  );
+
+  if (confirmed) {
+    await confirmSendTechnology();
   }
 };
 

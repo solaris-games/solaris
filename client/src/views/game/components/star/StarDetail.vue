@@ -811,7 +811,7 @@ import StarIcon from "./../star/StarIcon.vue";
 import HelpTooltip from "../../../components/HelpTooltip.vue";
 import { formatLocation } from "client/src/util/format";
 import { eventBusInjectionKey } from "@/eventBus";
-import { inject, ref, computed, type Ref } from "vue";
+import { inject, computed } from "vue";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import type { Carrier, Game, Player } from "@/types/game";
 import type { MapObject } from "@solaris/common";
@@ -950,7 +950,7 @@ const viewOnMap = (e: MapObject<string>) =>
 const requestAbandonStar = async () => {
   const confirmed = await confirm(
     "Abandon Star",
-    ` Are you sure you want to abandon <b>{{ star.name }}</b>?`,
+    `Are you sure you want to abandon ${star.name}?`,
     "Yes",
     "No",
     false,

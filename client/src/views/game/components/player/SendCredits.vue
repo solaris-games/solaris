@@ -20,38 +20,23 @@
         </div>
         <div class="col-5">
           <div class="d-grid gap-2">
-            <modalButton
-              modalName="sendCreditsModal"
-              classText="btn btn-success"
+            <button
+              class="btn btn-success"
               :disabled="isHistoricalMode || isSendingCredits || amount <= 0"
-              ><i class="fas fa-paper-plane"></i> Send</modalButton
+              @click="requestSendCredits"
             >
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
           </div>
         </div>
       </form>
     </div>
-
-    <dialogModal
-      modalName="sendCreditsModal"
-      titleText="Send Credits"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="confirmSendCredits"
-    >
-      <p>
-        Are you sure you want to send <b>${{ amount }}</b> to
-        <b>{{ player.alias }}</b
-        >?
-      </p>
-    </dialogModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { ref, inject, computed } from "vue";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game, Player } from "@/types/game";
 import {
@@ -64,6 +49,7 @@ import { sendCredits } from "@/services/typedapi/trade";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
 import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
 const props = defineProps<{
   player: Player;
   userPlayer: Player;
@@ -79,10 +65,22 @@ const toast = useToast();
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
 const isHistoricalMode = useIsHistoricalMode(store);
+const confirm = useConfirm();
 
 const errors = ref<string[]>([]);
 const isSendingCredits = ref(false);
 const amount = ref(0);
+
+const requestSendCredits = async () => {
+  const confirmed = await confirm(
+    "Send Credits",
+    `Are you sure you want to send ${amount.value} credits to ${props.player.alias}?`,
+  );
+
+  if (confirmed) {
+    await confirmSendCredits();
+  }
+};
 
 const confirmSendCredits = async () => {
   errors.value = [];

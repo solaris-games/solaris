@@ -8,13 +8,13 @@
       >
         <i class="fas fa-calculator"></i>
       </button>
-      <modalButton
-        modalName="scuttleCarrierModal"
+      <button
         v-if="!isHistoricalMode && canScuttleCarrier"
-        classText="btn btn-sm btn-outline-danger ms-1"
+        @click="requestScuttleCarrier"
+        class="btn btn-sm btn-outline-danger ms-1"
       >
         <i class="fas fa-rocket"></i> <i class="fas fa-trash ms-1"></i>
-      </modalButton>
+      </button>
       <button
         v-if="!isHistoricalMode && isOwnedByUserPlayer"
         @click="onCarrierRenameRequested"
@@ -406,20 +406,6 @@
 
       <gift-carrier v-if="canGiftCarrier" :carrierId="carrier._id" />
     </div>
-
-    <!-- Modals -->
-    <dialogModal
-      modalName="scuttleCarrierModal"
-      titleText="Scuttle Carrier"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="confirmScuttleCarrier"
-    >
-      <p>
-        Are you sure you want to scuttle <b>{{ carrier.name }}</b
-        >?
-      </p>
-    </dialogModal>
   </div>
 </template>
 
@@ -429,15 +415,13 @@ import {
   MapCommandEventBusEventNames,
   GameCommandEventBusEventNames,
 } from "@solaris/map-rendering";
-import { inject, computed, ref, onMounted, onUnmounted } from "vue";
+import { inject, computed, ref } from "vue";
 import GameHelper from "../../../../services/gameHelper";
 import MenuTitle from "../MenuTitle.vue";
 import WaypointTable from "./WaypointTable.vue";
 import CarrierSpecialist from "./CarrierSpecialist.vue";
 import GiftCarrier from "./GiftCarrier.vue";
 import SpecialistIcon from "../specialist/SpecialistIcon.vue";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import AudioService from "../../../../services/audio";
 import OrbitalMechanicsETAWarning from "../shared/OrbitalMechanicsETAWarning.vue";
 import HelpTooltip from "../../../components/HelpTooltip.vue";
@@ -712,6 +696,17 @@ const onOpenDestinationStarDetailRequested = (e: Event) => {
 
   if (firstWaypointDestination.value) {
     emit("onOpenStarDetailRequested", firstWaypointDestination.value._id);
+  }
+};
+
+const requestScuttleCarrier = async () => {
+  const confirmed = await confirm(
+    "Scuttle Carrier",
+    `Are you sure you want to scuttle ${carrier.name}?`,
+  );
+
+  if (confirmed) {
+    await confirmScuttleCarrier();
   }
 };
 

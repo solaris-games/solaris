@@ -22,40 +22,25 @@
         </div>
         <div class="col-5">
           <div class="d-grid gap-2">
-            <modalButton
-              modalName="sendCreditsSpecialistsModal"
-              classText="btn btn-success"
+            <button
               :disabled="
                 isHistoricalMode || isSendingCreditsSpecialists || amount <= 0
               "
-              ><i class="fas fa-paper-plane"></i> Send</modalButton
+              class="btn btn-success"
+              @click="requestSendCredits"
             >
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
           </div>
         </div>
       </form>
     </div>
-
-    <dialogModal
-      modalName="sendCreditsSpecialistsModal"
-      titleText="Send Specialist Tokens"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="confirmSendCredits"
-    >
-      <p>
-        Are you sure you want to send <b>{{ amount }}</b> specialist token(s) to
-        <b>{{ player.alias }}</b
-        >?
-      </p>
-    </dialogModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { ref, inject, computed } from "vue";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game, Player } from "@/types/game";
 import {
@@ -68,6 +53,7 @@ import { sendCreditsSpecialists } from "@/services/typedapi/trade";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
 import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
 const props = defineProps<{
   player: Player;
   userPlayer: Player;
@@ -79,6 +65,7 @@ const emit = defineEmits<{
 
 const httpClient = inject(httpInjectionKey)!;
 const toast = useToast();
+const confirm = useConfirm();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
@@ -87,6 +74,17 @@ const isHistoricalMode = useIsHistoricalMode(store);
 const errors = ref<string[]>([]);
 const isSendingCreditsSpecialists = ref(false);
 const amount = ref(0);
+
+const requestSendCredits = async () => {
+  const confirmed = await confirm(
+    "Send Specialist Tokens",
+    `Are you sure you want to send ${amount.value} specialist token(s) to ${props.player.alias}?`,
+  );
+
+  if (confirmed) {
+    await confirmSendCredits();
+  }
+};
 
 const confirmSendCredits = async () => {
   errors.value = [];
