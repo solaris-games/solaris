@@ -39,6 +39,10 @@
     "header header header"
     "content-left content content-right"
     "footer footer footer";
+
+  * {
+    min-height: 0;
+  }
 }
 
 .game-grid-content-left {
