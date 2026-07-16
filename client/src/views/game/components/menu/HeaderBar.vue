@@ -3,7 +3,7 @@
     class="header-bar"
     :class="{
       'header-bar-bg': !isHistoricalMode,
-      'bg-info': isHistoricalMode,
+      'bg-dark': isHistoricalMode,
     }"
   >
     <div class="header-bar-left header-bar-el">
