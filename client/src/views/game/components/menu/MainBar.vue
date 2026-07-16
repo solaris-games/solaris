@@ -364,7 +364,7 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 
 .menu-content {
   pointer-events: auto;
-  max-height: min(800px, 100dvh - 140px);
+  max-height: min(1200px, 100dvh - 140px);
   width: min(600px, 100%);
   overflow: auto;
 }
