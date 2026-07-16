@@ -70,7 +70,7 @@
         >
         </statistic-row>
         <statistic-row
-          v-if="playerTickIncome > 0 || userPlayerTickIncome > 0"
+          v-if="playerTickIncome > 0 || (userPlayerTickIncome && userPlayerTickIncome > 0)"
           :playerId="playerId"
           header="Tick Income"
           scanningRangeTooltip="This figure is based on the Financial Analysts in your scanning range."
@@ -121,16 +121,16 @@ const isConquestHomeStars = computed(() =>
   GameHelper.isConquestHomeStars(game.value),
 );
 const playerIncome = computed(() =>
-  GameHelper.calculateIncome(game.value, player.value),
+  GameHelper.calculateIncome(game.value, player.value) || 0, // no stats -> assume zero
 );
 const userPlayerIncome = computed(() =>
-  GameHelper.calculateIncome(game.value, userPlayer.value),
+  userPlayer.value && GameHelper.calculateIncome(game.value, userPlayer.value),
 );
 const playerTickIncome = computed(() =>
   GameHelper.calculateTickIncome(game.value, player.value),
 );
 const userPlayerTickIncome = computed(() =>
-  GameHelper.calculateTickIncome(game.value, userPlayer.value),
+  userPlayer.value && GameHelper.calculateTickIncome(game.value, userPlayer.value),
 );
 
 const formatCreditsValue = (player: Player, value: number) => `$${value}`;

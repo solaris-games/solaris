@@ -1091,23 +1091,22 @@ class GameHelper {
     return player.stats.totalCarriers * costPerCarrier;
   }
 
-  calculateIncomeMinusUpkeep(game, player) {
-    const fromEconomy = player.stats.totalEconomy * 10;
-    return fromEconomy + this._getBankingCredits(game, player);
-  }
+  calculateIncome(game: Game, player: Player) {
+    if (!player.stats) {
+      return undefined;
+    }
 
-  calculateIncome(game, player) {
     const fromEconomy = player.stats.totalEconomy * 10;
     const upkeep = this._getUpkeepCosts(game, player);
     return fromEconomy - upkeep + this._getBankingCredits(game, player);
   }
 
-  calculateTickIncome(game, player) {
-    let stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(
+  calculateTickIncome(game: Game, player: Player) {
+    const stars = this.getStarsOwnedByPlayer(player, game.galaxy.stars).filter(
       (s) => s.specialistId === 12,
     ); // Financial Analyst
 
-    let creditsPerTickByScience =
+    const creditsPerTickByScience =
       stars[0]?.specialist?.modifiers?.special?.creditsPerTickByScience ?? 0;
 
     return (
