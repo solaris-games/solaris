@@ -359,7 +359,7 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 }
 
 .menu-bars {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .menu-content {

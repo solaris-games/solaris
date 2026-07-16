@@ -97,6 +97,7 @@ ul {
 
 li {
   display: inline-block;
+  pointer-events: auto;
 }
 
 .grow .colour-bar {

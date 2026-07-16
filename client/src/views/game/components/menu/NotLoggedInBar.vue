@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-danger container">
+  <div class="not-logged-in-bar bg-danger container">
     <div class="row pt-2 pb-2">
       <div class="col d-none d-sm-block">
         <p class="mt-1 mb-0">You are not logged in.</p>
@@ -16,6 +16,11 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+</script>
 
-<style scoped></style>
+<style scoped>
+.not-logged-in-bar {
+  pointer-events: auto;
+}
+</style>
