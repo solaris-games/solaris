@@ -72,6 +72,75 @@ type GroupsWithDamage<
     C extends CombatBaseCarrier<ID>,
 > = [CombatGroup<ID, P, S, C>, Map<string, number>][];
 
+
+//This is specifically for crediting ship kills:
+// -proportionally to raw damage when incoming damage exceeds the target's remaining ships.
+// -remainder handling ensures total credited kills equals actual ships destroyed.
+const allocateKillsFromDamage = (
+    damageFromGroups: Map<string, number>,
+    totalDamage: number,
+    shipsActuallyDestroyed: number,
+): Map<string, number> => {
+    const killsFromGroups = new Map<string, number>();
+
+    // Nothing was damaged/killed. Return zero kill credit for each attacker.
+    if (totalDamage <= 0 || shipsActuallyDestroyed <= 0) {
+        damageFromGroups.forEach((_, groupId) => {
+            killsFromGroups.set(groupId, 0);
+        });
+
+        return killsFromGroups;
+    }
+
+    //1) distribute credit for kills fairly between groups based on the proportion of damage they did this round.
+    //  Count up how many fractional kills are un-credited as "remainder".
+    //Example:
+    //  Target loses 5 ships.
+    //  Group A did 8 of 16 total damage -> exactKills = 2.5
+    //  Group B did 8 of 16 total damage -> exactKills = 2.5
+    const killShares = Array.from(damageFromGroups.entries()).map(
+        ([groupId, damage]) => {
+            const exactKills =
+                (damage / totalDamage) * shipsActuallyDestroyed;
+
+            const flooredKills = Math.floor(exactKills);
+
+            return {
+                groupId,
+                flooredKills,
+
+                remainder: exactKills - flooredKills,
+            };
+        },
+    );
+
+    //2) Assign fractional kills which were dropped on the floor()
+    //Give leftover kills to the groups with the largest fractional remainders.
+    //Ties are deterministic based on the existing Map insertion order.
+    //Example:
+    //  2.5 + 2.5 floors to 2 + 2 = 4,
+    //  but 5 ships were actually destroyed,
+    //  so 1 leftover kill still needs to be assigned.
+    let killsRemaining =
+        shipsActuallyDestroyed -
+        killShares.reduce((sum, share) => sum + share.flooredKills, 0);
+
+    killShares
+        .sort((a, b) => b.remainder - a.remainder)
+        .forEach((share) => {
+            const extraKill = killsRemaining > 0 ? 1 : 0;
+
+            killsFromGroups.set(
+                share.groupId,
+                share.flooredKills + extraKill,
+            );
+
+            killsRemaining -= extraKill;
+        });
+
+    return killsFromGroups;
+};
+
 const calculateIncomingDamages = <
     ID extends Id,
     P extends CombatBasePlayer<ID>,
@@ -83,8 +152,7 @@ const calculateIncomingDamages = <
 ): GroupsWithDamage<ID, P, S, C> => {
     return groups.map((group, groupIdx) => {
         const damageFromGroups = new Map<string, number>();
-
-        let ships = group.ships;
+        let totalDamage = 0;
 
         attackingGroups.forEach((otherGroup) => {
             if (group.id === otherGroup.id) {
@@ -100,18 +168,25 @@ const calculateIncomingDamages = <
                 damage = dmgFromOther.total;
             }
 
-            const actualDamage = Math.min(damage, ships);
-
-            damageFromGroups.set(otherGroup.id, actualDamage);
-            ships -= actualDamage;
+            damageFromGroups.set(otherGroup.id, damage);
+            totalDamage += damage;
         });
+
+        const shipsAfterDamage = Math.max(0, group.ships - totalDamage);
+        const shipsActuallyDestroyed = group.ships - shipsAfterDamage; //in case damage > ships remaining, shipsDestroyed is the accurate number in order to credit kills for
+
+        const killsFromGroups = allocateKillsFromDamage(
+            damageFromGroups,
+            totalDamage,
+            shipsActuallyDestroyed,
+        );
 
         return [
             {
                 ...group,
-                ships,
+                ships: shipsAfterDamage,
             },
-            damageFromGroups,
+            killsFromGroups, //credit for shipKills distributed among groups doing damage, not to exceed actual # of ships killed.
         ];
     });
 };
