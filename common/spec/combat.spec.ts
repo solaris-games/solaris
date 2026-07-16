@@ -873,29 +873,31 @@ describe("CombatService - shipsKilled", () => {
             },
         ].forEach((tc) => {
             it(`records total shipsKilled: ${tc.name}`, () => {
-                const {
-                    defenderGroup,
-                    attackerGroup,
-                    callbackStates,
-                } = runComputeStarScenario({
-                    starShips: tc.starShips,
-                    carrierShips: tc.carrierShips,
-                    defenderWeapons: tc.defenderWeapons,
-                    attackerWeapons: tc.attackerWeapons,
-                });
+                const { defenderGroup, attackerGroup, callbackStates } =
+                    runComputeStarScenario({
+                        starShips: tc.starShips,
+                        carrierShips: tc.carrierShips,
+                        defenderWeapons: tc.defenderWeapons,
+                        attackerWeapons: tc.attackerWeapons,
+                    });
 
-                expect(callbackStates[callbackStates.length - 1].round)
-                    .toBeGreaterThan(1);
+                expect(
+                    callbackStates[callbackStates.length - 1].round,
+                ).toBeGreaterThan(1);
 
-                expect(defenderGroup.shipsAfter)
-                    .toBe(tc.expectedDefenderShipsAfter);
-                expect(attackerGroup.shipsAfter)
-                    .toBe(tc.expectedAttackerShipsAfter);
+                expect(defenderGroup.shipsAfter).toBe(
+                    tc.expectedDefenderShipsAfter,
+                );
+                expect(attackerGroup.shipsAfter).toBe(
+                    tc.expectedAttackerShipsAfter,
+                );
 
-                expect(defenderGroup.shipsKilled)
-                    .toBe(tc.expectedDefenderShipsKilled);
-                expect(attackerGroup.shipsKilled)
-                    .toBe(tc.expectedAttackerShipsKilled);
+                expect(defenderGroup.shipsKilled).toBe(
+                    tc.expectedDefenderShipsKilled,
+                );
+                expect(attackerGroup.shipsKilled).toBe(
+                    tc.expectedAttackerShipsKilled,
+                );
 
                 expect(defenderGroup.shipsKilled).toBe(attackerGroup.shipsLost);
                 expect(attackerGroup.shipsKilled).toBe(defenderGroup.shipsLost);

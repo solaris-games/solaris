@@ -72,7 +72,6 @@ type GroupsWithDamage<
     C extends CombatBaseCarrier<ID>,
 > = [CombatGroup<ID, P, S, C>, Map<string, number>][];
 
-
 //This is specifically for crediting ship kills:
 // -proportionally to raw damage when incoming damage exceeds the target's remaining ships.
 // -remainder handling ensures total credited kills equals actual ships destroyed.
@@ -100,8 +99,7 @@ const allocateKillsFromDamage = (
     //  Group B did 8 of 16 total damage -> exactKills = 2.5
     const killShares = Array.from(damageFromGroups.entries()).map(
         ([groupId, damage]) => {
-            const exactKills =
-                (damage / totalDamage) * shipsActuallyDestroyed;
+            const exactKills = (damage / totalDamage) * shipsActuallyDestroyed;
 
             const flooredKills = Math.floor(exactKills);
 
@@ -130,10 +128,7 @@ const allocateKillsFromDamage = (
         .forEach((share) => {
             const extraKill = killsRemaining > 0 ? 1 : 0;
 
-            killsFromGroups.set(
-                share.groupId,
-                share.flooredKills + extraKill,
-            );
+            killsFromGroups.set(share.groupId, share.flooredKills + extraKill);
 
             killsRemaining -= extraKill;
         });

@@ -9,7 +9,11 @@
     <div class="header-bar-left header-bar-el">
       <server-connection-status class="d-none d-md-inline" />
 
-      <span class="d-none d-md-inline">{{ game.settings.general.name }}</span>
+      <span
+        @click="setMenuState({ state: 'leaderboard' })"
+        class="d-none d-md-inline"
+        >{{ game.settings.general.name }}</span
+      >
 
       <span
         class="pointer"
@@ -554,7 +558,7 @@ onMounted(async () => {
 }
 
 .header-bar-bg {
-  background-color: #1D2835;
+  background-color: #1d2835;
 }
 
 .header-bar-el {
