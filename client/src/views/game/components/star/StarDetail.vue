@@ -6,8 +6,7 @@
         :starId="star._id"
         class="me-1"
       />
-      <modalButton
-        modalName="abandonStarModal"
+      <button
         v-if="
           !isHistoricalMode &&
           isOwnedByUserPlayer &&
@@ -15,10 +14,11 @@
           isGameInProgress &&
           isGameAllowAbandonStars
         "
-        classText="btn btn-sm btn-outline-danger"
+        class="btn btn=sm btn-outline-danger"
+        @click="requestAbandonStar"
       >
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
-      </modalButton>
+      </button>
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1">
         <i class="fas fa-eye"></i>
       </button>
@@ -770,14 +770,14 @@
           </div>
           <div class="col-4">
             <div class="d-grid gap-2">
-              <modalButton
-                modalName="abandonStarModal"
-                classText="btn btn-outline-danger mb-2"
+              <button
                 :disabled="isHistoricalMode"
+                class="btn btn=sm btn-outline-danger"
+                @click="requestAbandonStar"
               >
                 <i class="fas fa-trash"></i>
                 Abandon Star
-              </modalButton>
+              </button>
             </div>
           </div>
         </div>
@@ -791,25 +791,6 @@
         @onViewHireStarSpecialistRequested="onViewHireStarSpecialistRequested"
       />
     </div>
-
-    <!-- Modals -->
-
-    <dialogModal
-      modalName="abandonStarModal"
-      titleText="Abandon Star"
-      cancelText="No"
-      confirmText="Yes"
-      @onConfirm="confirmAbandonStar"
-    >
-      <p>
-        Are you sure you want to abandon <b>{{ star.name }}</b
-        >?
-      </p>
-      <p>
-        Its Economy, Industry and Science will remain, but all ships and
-        carriers at this star will be destroyed.
-      </p>
-    </dialogModal>
   </div>
 </template>
 
@@ -822,8 +803,6 @@ import MenuTitle from "../MenuTitle.vue";
 import Infrastructure from "../shared/Infrastructure.vue";
 import InfrastructureUpgrade from "./InfrastructureUpgrade.vue";
 import InfrastructureUpgradeCompact from "./InfrastructureUpgradeCompact.vue";
-import ModalButton from "../../../components/modal/ModalButton.vue";
-import DialogModal from "../../../components/modal/DialogModal.vue";
 import StarSpecialist from "./StarSpecialist.vue";
 import SpecialistIcon from "../specialist/SpecialistIcon.vue";
 import IgnoreBulkUpgrade from "./IgnoreBulkUpgrade.vue";
@@ -843,6 +822,7 @@ import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import StarWeaponsLevel from "@/views/game/components/star/StarWeaponsLevel.vue";
 
 import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
 const props = defineProps<{
   starId: string;
 }>();
@@ -863,6 +843,8 @@ const toast = useToast();
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
+
+const confirm = useConfirm();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -964,6 +946,26 @@ const viewOnMap = (e: MapObject<string>) =>
   eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
     object: e,
   });
+
+const requestAbandonStar = async () => {
+  const confirmed = await confirm(
+    "Abandon Star",
+    ` Are you sure you want to abandon <b>{{ star.name }}</b>?`,
+    "Yes",
+    "No",
+    false,
+    false,
+    [
+      `Its Economy, Industry and Science will remain, but all ships and carriers at this star will be destroyed.`,
+    ],
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  await confirmAbandonStar();
+};
 
 const confirmAbandonStar = async () => {
   const response = await abandon(httpClient)(game.value._id, star.value._id);

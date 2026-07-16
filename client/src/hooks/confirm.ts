@@ -15,6 +15,7 @@ export const useConfirm = () => {
     cancelText = "No",
     hideCancelButton = false,
     cover = false,
+    additionalParagraphs: string[] = [],
   ): Promise<boolean> => {
     return new Promise((resolve) => {
       const settings: ConfirmationDialogSettings = {
@@ -24,6 +25,7 @@ export const useConfirm = () => {
         cover: Boolean(cover),
         titleText: title,
         text,
+        additionalParagraphs,
         onConfirm: async () => {
           await close();
           resolve(true);

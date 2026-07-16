@@ -6,9 +6,7 @@
       'bg-light': isHistoricalMode,
     }"
   >
-    <div
-      class="header-bar-left header-bar-el"
-    >
+    <div class="header-bar-left header-bar-el">
       <server-connection-status class="d-none d-md-inline" />
 
       <span class="d-none d-md-inline">{{ game.settings.general.name }}</span>

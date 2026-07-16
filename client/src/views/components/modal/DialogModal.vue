@@ -71,4 +71,8 @@ const onConfirm = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.modal {
+  padding: 0;
+}
+</style>

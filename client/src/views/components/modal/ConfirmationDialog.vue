@@ -12,23 +12,16 @@
     <p style="white-space: pre-wrap">
       {{ props.dialogSettings?.text || "" }}
     </p>
+    <p v-for="p in props.dialogSettings?.additionalParagraphs">{{ p }}</p>
   </DialogModal>
 </template>
 
 <script setup lang="ts">
 import DialogModal from "./DialogModal.vue";
+import type { ConfirmationDialogSettings } from "@/stores/confirmationDialog.ts";
 
 const props = defineProps<{
-  dialogSettings: {
-    titleText: string;
-    text: string;
-    confirmText: string;
-    cancelText: string;
-    hideCancelButton: boolean;
-    cover: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-  } | null;
+  dialogSettings: ConfirmationDialogSettings | null;
 }>();
 
 const onConfirm = () => {
