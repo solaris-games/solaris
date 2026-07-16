@@ -165,6 +165,11 @@ onMounted(() => {
 
 .chat-ui {
   z-index: 100;
+  pointer-events: none;
+
+  * {
+    pointer-events: auto;
+  }
 }
 
 .has-unread {
