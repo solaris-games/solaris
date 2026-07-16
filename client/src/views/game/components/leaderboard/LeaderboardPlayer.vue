@@ -36,4 +36,8 @@ const playerColourSpec = computed(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.col-avatar {
+  cursor: pointer;
+}
+</style>
