@@ -950,7 +950,7 @@ const viewOnMap = (e: MapObject<string>) =>
 const requestAbandonStar = async () => {
   const confirmed = await confirm(
     "Abandon Star",
-    `Are you sure you want to abandon ${star.name}?`,
+    `Are you sure you want to abandon ${star.value.name}?`,
     "Yes",
     "No",
     false,

@@ -125,7 +125,7 @@ const declareAlly = async (diplomaticStatus: DiplomaticStatus<string>) => {
   const playerAlias = getPlayerAlias(diplomaticStatus.playerIdTo);
 
   let allianceFee = 0;
-  let cycleCredits = gameHelper.calculateIncome(game.value, userPlayer.value);
+  const cycleCredits = gameHelper.calculateIncome(game.value, userPlayer.value) || 0;
 
   if (DiplomacyHelper.isAllianceUpkeepEnabled(game.value)) {
     allianceFee = DiplomacyHelper.getAllianceUpkeepCost(

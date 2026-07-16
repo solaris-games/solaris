@@ -702,7 +702,7 @@ const onOpenDestinationStarDetailRequested = (e: Event) => {
 const requestScuttleCarrier = async () => {
   const confirmed = await confirm(
     "Scuttle Carrier",
-    `Are you sure you want to scuttle ${carrier.name}?`,
+    `Are you sure you want to scuttle ${carrier.value.name}?`,
   );
 
   if (confirmed) {
