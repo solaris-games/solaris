@@ -3,7 +3,7 @@
     class="header-bar"
     :class="{
       'header-bar-bg': !isHistoricalMode,
-      'bg-light': isHistoricalMode,
+      'bg-info': isHistoricalMode,
     }"
   >
     <div class="header-bar-left header-bar-el">
@@ -554,7 +554,7 @@ onMounted(async () => {
 }
 
 .header-bar-bg {
-  background-color: rgba(29, 40, 53, 0.98);
+  background-color: #1D2835;
 }
 
 .header-bar-el {
