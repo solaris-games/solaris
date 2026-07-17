@@ -157,7 +157,7 @@ onMounted(() => {
 }
 
 #chat-window {
-  max-height: min(1200px, 100dvh - 240px); /* more space needed for the toggle itself */
+  max-height: min(1200px, 100dvh - 240px);
   width: min(600px, 100%);
   overflow: auto;
   scrollbar-width: none;
@@ -170,43 +170,44 @@ onMounted(() => {
 }
 
 .chat-ui {
-z-index: 100;
-pointer-events: none;
-display: flex;
-flex-direction: row-reverse;
+  grid-area: stacked-content;
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  flex-direction: row-reverse;
 
-* {
-pointer-events: auto;
-}
+  * {
+    pointer-events: auto;
+  }
 }
 
 .has-unread {
-font-size: 20px;
+  font-size: 20px;
 }
 
 .has-read {
-font-size: 30px;
+  font-size: 30px;
 }
 
 .pulse {
-animation: blinker 1.5s linear infinite;
+  animation: blinker 1.5s linear infinite;
 }
 
 .chat-toggle {
-align-items: center;
-justify-content: center;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes blinker {
-0% {
-opacity: 0.5;
-}
-50% {
-opacity: 1;
-transform: scale(1.1);
-}
-100% {
-opacity: 0.5;
-}
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 </style>

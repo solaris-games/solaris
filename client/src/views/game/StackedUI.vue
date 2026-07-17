@@ -9,12 +9,8 @@
 <style scoped>
 .stacked {
   display: grid;
-  grid-template-rows: auto;
-  grid-template-columns: auto;
-
-  * {
-    grid-column: 1;
-    grid-row: 1;
-  }
+  grid-template-rows: 100%;
+  grid-template-columns: 100%;
+  grid-template-areas: "stacked-content";
 }
 </style>

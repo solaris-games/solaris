@@ -356,6 +356,7 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 .menu {
   z-index: 100;
   pointer-events: none;
+  grid-area: stacked-content;
 }
 
 .menu-bars {

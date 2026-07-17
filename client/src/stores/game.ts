@@ -68,7 +68,6 @@ export const useGameStore = defineStore("game", () => {
       menuState.value = EMPTY_MENU;
     } else {
       menuState.value = newMenuState;
-      menuStateChat.value = EMPTY_MENU;
     }
   };
 
@@ -81,7 +80,6 @@ export const useGameStore = defineStore("game", () => {
       menuStateChat.value = EMPTY_MENU;
     } else {
       menuStateChat.value = newState;
-      menuState.value = EMPTY_MENU;
     }
   };
 
