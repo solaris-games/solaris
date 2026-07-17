@@ -157,7 +157,7 @@ onMounted(() => {
 }
 
 #chat-window {
-  max-height: min(1200px, 100dvh - 240px);
+  max-height: min(1200px, 100dvh - 200px);
   width: min(600px, 100%);
   overflow: auto;
   scrollbar-width: none;
@@ -165,7 +165,7 @@ onMounted(() => {
 
 @media screen and (max-width: 576px) {
   #chat-window {
-    max-height: min(1200px, 100dvh - 140px);
+    max-height: min(1200px, 100dvh - 100px);
   }
 }
 
