@@ -1,5 +1,12 @@
 <template>
   <div id="gameRoot">
+    <colour-override-dialog
+      v-if="colourOverride"
+      :playerId="colourOverride.playerId"
+      @onColourOverrideCancelled="onColourOverrideCancelled"
+      @onColourOverrideConfirmed="onColourOverrideConfirmed"
+    />
+
     <logo v-if="!hasGame"></logo>
 
     <loading-spinner :loading="!hasGame" />
@@ -18,13 +25,6 @@
 
       <template v-slot:content-ui>
         <stacked-u-i>
-          <colour-override-dialog
-            v-if="colourOverride"
-            :playerId="colourOverride.playerId"
-            @onColourOverrideCancelled="onColourOverrideCancelled"
-            @onColourOverrideConfirmed="onColourOverrideConfirmed"
-          />
-
           <main-bar
             @onPlayerSelected="onPlayerSelected"
             @onReloadGameRequested="reloadGame"
