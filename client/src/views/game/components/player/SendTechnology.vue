@@ -31,6 +31,8 @@
         <div class="col-5">
           <div class="d-grid gap-2">
             <button
+              type="button"
+              @click="requestSendTechnology"
               :disabled="
                 isHistoricalMode ||
                 isSendingTech ||
@@ -38,7 +40,6 @@
                 selectedTechnology.cost > userPlayer.credits
               "
               class="btn btn-success"
-              @click="requestSendTechnology"
             >
               <i class="fas fa-paper-plane"></i> Share
             </button>

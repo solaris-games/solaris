@@ -21,6 +21,7 @@
         <div class="col-5">
           <div class="d-grid gap-2">
             <button
+              type="button"
               class="btn btn-success"
               :disabled="isHistoricalMode || isSendingCredits || amount <= 0"
               @click="requestSendCredits"

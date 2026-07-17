@@ -23,6 +23,7 @@
         <div class="col-5">
           <div class="d-grid gap-2">
             <button
+              type="button"
               :disabled="
                 isHistoricalMode || isSendingCreditsSpecialists || amount <= 0
               "
