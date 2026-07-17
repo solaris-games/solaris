@@ -248,7 +248,6 @@ onMounted(() => {
 }
 
 .events-container {
-  max-height: 600px;
   overflow: auto;
 }
 </style>
