@@ -64,6 +64,9 @@ const researchProgress = computed(() => {
 
 <style scoped>
 span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   cursor: pointer;
 }
 </style>
