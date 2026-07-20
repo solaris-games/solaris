@@ -1,7 +1,12 @@
 <template>
-  <p v-if="hasMultiple" class="combat-group-attack">
-    <span class="weapons-level" v-for="[weaponsLevel, groups] of groupedAttack"
-      >Weapons {{ weaponsLevel }} against {{ formatGroups(groups) }}</span
+  <p
+    v-if="hasMultiple"
+    v-for="[weaponsLevel, groups] of groupedAttack"
+    class="combat-group-attack"
+  >
+    <span class="weapons-level"
+      >Weapons {{ weaponsLevel }} against group(s):
+      {{ formatGroups(groups) }}</span
     >
   </p>
   <p v-else class="combat-group-attack">
@@ -22,11 +27,11 @@ const groupedAttack = computed(() => {
   return groupBy(Object.entries(props.attackAgainst), ([_n, wd]) => wd.total);
 });
 
-const hasMultiple = computed(() => groupedAttack.value.size > 1);
-
 const formatGroups = (gr: [string, WeaponsDetail][]) => {
   return gr.map(([n, _]) => n).join(", ");
 };
+
+const hasMultiple = computed(() => groupedAttack.value.size > 1);
 </script>
 <style scoped>
 .combat-group-attack {
