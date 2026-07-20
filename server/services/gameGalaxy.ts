@@ -792,7 +792,7 @@ export default class GameGalaxyService {
                     playerGuild = guildUser.guild;
 
                     if (playerGuild) {
-                        p.alias += `[${playerGuild.tag}]`;
+                        p.alias += ` [${playerGuild.tag}]`;
                     }
                 }
             }
