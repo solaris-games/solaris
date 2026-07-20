@@ -71,9 +71,9 @@
       </div>
 
       <latest-announcement />
-    </view-container>
 
-    <parallax />
+      <parallax />
+    </view-container>
   </div>
 </template>
 
