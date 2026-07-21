@@ -5,7 +5,7 @@ import mongooseLoader from "../db";
 import containerLoader from "../services";
 import { logger, setupLogging } from "../utils/logging";
 import expressLoader from "./express";
-const express = require("express");
+import express from "express";
 
 let mongo;
 Error.stackTraceLimit = 1000;
