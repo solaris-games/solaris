@@ -354,9 +354,13 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 </script>
 <style scoped>
 .menu {
+  display: flex;
+  flex-direction: column;
   z-index: 100;
   pointer-events: none;
   grid-area: stacked-content;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .menu-bars {
@@ -365,8 +369,11 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
 
 .menu-content {
   pointer-events: auto;
-  max-height: min(1200px, 100dvh - 140px);
   width: min(600px, 100%);
+  max-height: min(1200px, calc(100dvh - 140px));
   overflow: auto;
+
+  flex: 1 1 auto;
+  min-height: 0;
 }
 </style>

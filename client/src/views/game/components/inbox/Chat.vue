@@ -170,6 +170,8 @@ onMounted(() => {
 }
 
 .chat-ui {
+  min-height: 0;
+  max-height: 100%;
   grid-area: stacked-content;
   z-index: 100;
   pointer-events: none;
