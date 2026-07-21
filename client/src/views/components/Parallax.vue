@@ -33,15 +33,14 @@ onMounted(() => {
 
 <style scoped>
 #parallax {
-  position: fixed;
-  width: 100%;
-  height: 100vh;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 100%;
   background-color: black;
   background-image:
     url(../../assets/parallax/layer3.png),
     url(../../assets/parallax/layer2.png), url(../../assets/parallax/layer1.png);
   background-repeat: no-repeat;
   background-position: center;
-  background-position: 50% 50%;
 }
 </style>

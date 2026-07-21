@@ -56,5 +56,11 @@ onMounted(async () => {
   min-height: 0;
   overflow-y: auto;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex-grow: 1;
 }
 </style>
