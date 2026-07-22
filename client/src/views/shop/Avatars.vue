@@ -26,7 +26,11 @@
       <div class="row mb-4" v-for="avatar in sortedAvatars" :key="avatar.id">
         <div class="col-auto">
           <picture style="display: contents">
-            <source v-if="getAvatarWebpImage(avatar)" :srcset="getAvatarWebpImage(avatar)" type="image/webp" />
+            <source
+              v-if="getAvatarWebpImage(avatar)"
+              :srcset="getAvatarWebpImage(avatar)"
+              type="image/webp"
+            />
             <img :src="getAvatarImage(avatar)" width="128" height="128" />
           </picture>
         </div>
@@ -168,7 +172,7 @@ const getAvatarImage = (avatar: UserAvatar) => {
 };
 
 const getAvatarWebpImage = (avatar: UserAvatar) => {
-  if (["jpg", "png", "jpeg"].some(ext => avatar.file.endsWith(ext))) {
+  if (["jpg", "png", "jpeg"].some((ext) => avatar.file.endsWith(ext))) {
     try {
       const base = avatar.file.replace(/\.[^.]+$/, "");
       return new URL(`../../assets/avatars/${base}.webp`, import.meta.url).href;

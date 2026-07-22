@@ -37,20 +37,20 @@
             <p class="mb-2 mt-2">
               Play <span class="text-warning">Solaris</span> on
               <a href="https://solaris.games" target="_blank" title="Web"
-              ><i class="fab fa-chrome me-1"></i>Web</a
+                ><i class="fab fa-chrome me-1"></i>Web</a
               >,
               <a
                 href="https://store.steampowered.com/app/1623930/Solaris/"
                 target="_blank"
                 title="Steam"
-              ><i class="fab fa-steam me-1"></i>Steam</a
+                ><i class="fab fa-steam me-1"></i>Steam</a
               >
               and
               <a
                 href="https://play.google.com/store/apps/details?id=com.voxel.solaris_android"
                 target="_blank"
                 title="Android"
-              ><i class="fab fa-google-play me-1"></i>Android</a
+                ><i class="fab fa-google-play me-1"></i>Android</a
               >.
             </p>
           </div>

@@ -1,16 +1,16 @@
 <template>
   <div v-if="!isLoading">
-    <div class="row avatar-container text-center">
-      <picture style="display: contents" v-if="avatar != null">
+    <div class="avatar-container">
+      <picture class="avatar-image" v-if="avatar != null">
         <source :srcset="getAvatarWebpImage()" type="image/webp" />
         <img :src="getAvatarImage()" width="128" height="128" />
       </picture>
-      <p v-if="avatar == null" class="select-avatar-warning text-warning">
+      <span v-if="avatar == null" class="select-avatar-warning text-warning">
         Select an avatar
-      </p>
-      <p v-if="avatar && !avatar.purchased" class="select-avatar-locked">
+      </span>
+      <span v-if="avatar && !avatar.purchased" class="select-avatar-locked">
         <i class="fas fa-lock"></i>
-      </p>
+      </span>
     </div>
 
     <div class="row mt-1 mb-1">
@@ -92,15 +92,19 @@ const getAvatarImage = () => {
 };
 
 const getAvatarWebpImage = () => {
-  try {
-    const base = avatar.value!.file.replace(/\.[^.]+$/, "");
-    return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url)
-      .href;
-  } catch (err) {
-    console.error(err);
+  if (["jpg", "png", "jpeg"].some((ext) => avatar.value!.file.endsWith(ext))) {
+    try {
+      const base = avatar.value!.file.replace(/\.[^.]+$/, "");
+      return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url)
+        .href;
+    } catch (err) {
+      console.error(err);
 
-    return undefined;
+      return undefined;
+    }
   }
+
+  return undefined;
 };
 
 const nextAvatar = () => {
@@ -146,27 +150,36 @@ onMounted(async () => {
 
 <style scoped>
 .avatar-container {
+  display: grid;
+  grid-template-areas: "a";
+  width: 128px;
+  height: 128px;
+}
+
+.avatar-image {
+  grid-area: a;
   width: 128px;
   height: 128px;
 }
 
 .select-avatar-warning {
-  display: table-cell;
   width: 128px;
   height: 128px;
-  padding: 20px 0px;
+  grid-area: a;
   border: 3px dashed #fff;
-  vertical-align: middle;
+  text-align: center;
+  vertical-align: center;
+  padding-top: 24px;
 }
 
 .select-avatar-locked {
-  display: table-cell;
+  padding-top: 24px;
   width: 128px;
   height: 128px;
-  padding: 20px 0px;
-  vertical-align: middle;
-  position: absolute;
+  grid-area: a;
   font-size: 55px;
-  opacity: 0.75;
+  text-align: center;
+  vertical-align: center;
+  color: white;
 }
 </style>
