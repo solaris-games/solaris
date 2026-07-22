@@ -549,7 +549,6 @@ onMounted(async () => {
 <style scoped>
 .header-bar {
   width: 100%;
-  height: 40px;
   align-items: center;
   display: flex;
   flex-direction: row;
