@@ -183,6 +183,7 @@ const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 a {
