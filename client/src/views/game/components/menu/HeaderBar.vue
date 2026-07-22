@@ -567,6 +567,12 @@ onMounted(async () => {
   gap: 1rem;
 }
 
+@media screen and (max-width: 576px) {
+  .header-bar-el {
+    gap: 0.25rem;
+  }
+}
+
 .header-bar-left {
 }
 
