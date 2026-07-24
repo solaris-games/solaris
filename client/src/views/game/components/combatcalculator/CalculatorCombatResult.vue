@@ -54,7 +54,7 @@ const neededForOthers = computed(() => {
       const needed = serviceProvider.combatService.estimateNeeded(
         props.result,
         g,
-        g.star ? 'eliminateOtherGroups' : 'greaterThanZeroShips',
+        g.star ? "eliminateOtherGroups" : "greaterThanZeroShips",
       );
 
       return [
