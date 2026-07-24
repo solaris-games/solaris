@@ -219,18 +219,10 @@ const performCombatRound = <
 ): CombatRoundState<ID, P, S, C> => {
     let groupsWithDamage: GroupsWithDamage<ID, P, S, C>;
 
-    if (isCarrierToStarCombat && oldState.round === 0) {
-        // special handling for defender attacking first
-        groupsWithDamage = calculateIncomingDamages(
-            oldState.groups,
-            oldState.groups.filter((g) => g.isDefender),
-        );
-    } else {
-        groupsWithDamage = calculateIncomingDamages(
-            oldState.groups,
-            oldState.groups,
-        );
-    }
+    groupsWithDamage = calculateIncomingDamages(
+        oldState.groups,
+        oldState.groups,
+    );
 
     const newGroups = applyDamages(groupsWithDamage);
 
