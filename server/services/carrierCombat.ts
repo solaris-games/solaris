@@ -140,7 +140,7 @@ export default class CarrierCombatService {
 
         for (let positions of positionGraph.values()) {
             if (positions.length <= 1) {
-                return;
+                continue;
             }
 
             const dualCollisions: DualCarrierCollision[] =
