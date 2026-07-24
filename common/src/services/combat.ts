@@ -544,6 +544,7 @@ const estimateNeeded = <
     combatResult: DetailedCombatResult<ID, P, S, C>,
     estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>,
     originalGroups: CombatGroup<ID, P, S, C>[],
+    terminationCondition: 'greaterThanZeroShips' | 'eliminateOtherGroups' = 'greaterThanZeroShips',
 ) => {
     const originalShips = estimateForGroup.shipsBefore;
 
@@ -590,11 +591,19 @@ const estimateNeeded = <
         const groupInNew = newResult.groups.find(
             (g) => g.id === estimateForGroup.id,
         );
-        if (groupInNew!.shipsAfter > 0) {
-            break;
+
+        if (terminationCondition === 'greaterThanZeroShips') {
+            if (groupInNew!.shipsAfter > 0) {
+                break;
+            }
+        } else if (terminationCondition === 'eliminateOtherGroups') {
+            const otherGroups = newResult.groups.filter(g => g != groupInNew!);
+            if (otherGroups.every(g => g.shipsAfter === 0)) {
+                break;
+            }
         }
 
-        if (shipsNeeded > 1000) {
+        if (shipsNeeded > 10000) {
             break;
         }
 
@@ -783,11 +792,13 @@ export class CombatService<ID extends Id> {
     >(
         combatResult: DetailedCombatResult<ID, P, S, C>,
         estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>,
+        terminationCondition: 'greaterThanZeroShips' | 'eliminateOtherGroups' = 'greaterThanZeroShips',
     ) {
         return estimateNeeded(
             combatResult,
             estimateForGroup,
             combatResult.combatGroups,
+            terminationCondition,
         );
     }
 
@@ -931,11 +942,11 @@ export class CombatService<ID extends Id> {
         const attackerWon = attackerGroup.shipsAfter > defenderGroup.shipsAfter;
 
         const defenderNeeded = attackerWon
-            ? estimateNeeded(result, defenderGroup, groups)
+            ? estimateNeeded(result, defenderGroup, groups, 'eliminateOtherGroups')
             : undefined;
         const attackerNeeded = attackerWon
             ? undefined
-            : estimateNeeded(result, attackerGroup, groups);
+            : estimateNeeded(result, attackerGroup, groups, 'greaterThanZeroShips');
 
         return {
             defender: {
