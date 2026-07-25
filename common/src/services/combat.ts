@@ -853,7 +853,7 @@ export class CombatService<ID extends Id> {
                 attackAgainst: attackMap(
                     ownId === 0 ? 1 : 0,
                     weapons,
-                    includeDefenderBonus ? 1 : 0,
+                    0,
                 ),
             };
         };
