@@ -261,6 +261,14 @@ const distributeDamage = <
 >(
     group: CombatResultGrouped<ID, P, S, C>,
 ): DetailedCombatResultGroup<ID, P, S, C> => {
+    const getShips = (obj: MO<ID, S, C>) => {
+        if (obj.type === "carrier") {
+            return obj.carrier.shipsAfter;
+        } else {
+            return obj.star.shipsAfter;
+        }
+    };
+
     let shipsToKill = group.shipsLost;
 
     const groupObjects: MO<ID, S, C>[] = group.carriers.map((carrier) => {
@@ -287,80 +295,67 @@ const distributeDamage = <
         });
     }
 
-    const deductShips = (ships: number, obj: MO<ID, S, C>) => {
-        if (obj.type === "star") {
-            obj.star.shipsLost += ships;
-            obj.star.shipsAfter -= ships;
-        } else if (obj.type === "carrier") {
-            obj.carrier.shipsAfter -= ships;
-            obj.carrier.shipsLost += ships;
-        }
-    };
+    groupObjects.sort((a, b) => {
+        const specsIdA =
+            a.type === "carrier"
+                ? a.carrier.carrier.specialistId
+                : a.star.star.specialistId;
+        const specsIdB =
+            b.type === "carrier"
+                ? b.carrier.carrier.specialistId
+                : b.star.star.specialistId;
 
-    const getShips = (obj: MO<ID, S, C>) => {
-        if (obj.type === "carrier") {
-            return obj.carrier.shipsAfter;
-        } else {
-            return obj.star.shipsAfter;
+        // Sort by specialist (kill objects without specialists first)
+        if (specsIdA == null && specsIdB != null) {
+            return -1;
+        } else if (specsIdA != null && specsIdB == null) {
+            return 1;
         }
-    };
+
+        const shipsA = getShips(a);
+        const shipsB = getShips(b);
+
+        // Sort by ships descending (kill objects with the most ships first)
+        if (shipsA > shipsB) return -1;
+        if (shipsA < shipsB) return 1;
+
+        return 0; // Both are the same.
+    });
+
+    const shipValues = groupObjects.map(getShips);
+    const objCount = shipValues.length;
+
+    let nextIdx = 0;
 
     while (shipsToKill > 0) {
-        const objectsToDeduct = groupObjects.filter((o) => {
-            if (o.type === "carrier") {
-                return getShips(o) > 0; // carrier alive
-            } else {
-                return getShips(o) > 0; // star alive
+        if (shipValues[nextIdx] > 0) {
+            shipsToKill--;
+            shipValues[nextIdx] = shipValues[nextIdx] - 1;
+            nextIdx = (nextIdx + 1) % objCount;
+        } else {
+            nextIdx = (nextIdx + 1) % objCount;
+
+            if (shipValues.every(v => v === 0)) {
+                throw new Error(`Objects are all at 0 but shipsToKill is ${shipsToKill}`); // should not ever happen but just to avoid the endless loop...
             }
-        });
-
-        if (objectsToDeduct.length === 0) {
-            throw Error("No more objects to deduct damage from");
         }
+    }
 
-        objectsToDeduct.sort((a, b) => {
-            const specsIdA =
-                a.type === "carrier"
-                    ? a.carrier.carrier.specialistId
-                    : a.star.star.specialistId;
-            const specsIdB =
-                b.type === "carrier"
-                    ? b.carrier.carrier.specialistId
-                    : b.star.star.specialistId;
-
-            // Sort by specialist (kill objects without specialists first)
-            if (specsIdA == null && specsIdB != null) {
-                return -1;
-            } else if (specsIdA != null && specsIdB == null) {
-                return 1;
-            }
-
-            const shipsA = getShips(a);
-            const shipsB = getShips(b);
-
-            // Sort by ships descending (kill objects with the most ships first)
-            if (shipsA > shipsB) return -1;
-            if (shipsA < shipsB) return 1;
-
-            return 0; // Both are the same.
-        });
-
-        const killPerObject = shipsToKill / objectsToDeduct.length;
-
-        for (let [idx, obj] of objectsToDeduct.entries()) {
-            const killForObj =
-                idx === 0
-                    ? Math.ceil(killPerObject)
-                    : Math.floor(killPerObject);
-
-            const shipsRemain = getShips(obj);
-
-            const actualKill = Math.min(killForObj, shipsRemain);
-
-            deductShips(actualKill, obj);
-
-            shipsToKill -= actualKill;
+    const setShips = (ships: number, obj: MO<ID, S, C>) => {
+        if (obj.type === "star") {
+            const before = obj.star.shipsBefore;
+            obj.star.shipsLost = before - ships;
+            obj.star.shipsAfter = ships;
+        } else if (obj.type === "carrier") {
+            const before = obj.carrier.shipsBefore;
+            obj.carrier.shipsLost = before - ships;
+            obj.carrier.shipsAfter = ships;
         }
+    };
+
+    // write back ships after kills were deducted
+    for (let i = 0; i < shipValues.length; i++) {
+        setShips(shipValues[i], groupObjects[i]);
     }
 
     const carriersLost = groupObjects.filter(
