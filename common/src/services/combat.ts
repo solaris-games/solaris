@@ -335,8 +335,10 @@ const distributeDamage = <
         } else {
             nextIdx = (nextIdx + 1) % objCount;
 
-            if (shipValues.every(v => v === 0)) {
-                throw new Error(`Objects are all at 0 but shipsToKill is ${shipsToKill}`); // should not ever happen but just to avoid the endless loop...
+            if (shipValues.every((v) => v === 0)) {
+                throw new Error(
+                    `Objects are all at 0 but shipsToKill is ${shipsToKill}`,
+                ); // should not ever happen but just to avoid the endless loop...
             }
         }
     }
