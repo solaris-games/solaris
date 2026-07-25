@@ -68,21 +68,6 @@ const errors = computed(() => {
   return [];
 });
 
-const actualCombatGroups = computed<
-  CombatGroup<
-    string,
-    CombatBasePlayer<string>,
-    CombatBaseStar<string>,
-    CombatBaseCarrier<string>
-  >[]
->(() => {
-  return makeCombatGroups(
-    game.value,
-    groups.value,
-    serviceProvider.combatService,
-  );
-});
-
 const hasErrors = computed(() => errors.value.length > 0);
 
 const onGroupRemoved = (gr: CCGroup) => {
@@ -117,8 +102,14 @@ const reset = () => {
 };
 
 const calculate = () => {
+  const actualCombatGroups = makeCombatGroups(
+    game.value,
+    groups.value,
+    serviceProvider.combatService,
+  );
+
   result.value = serviceProvider.combatService.calculateGroups(
-    actualCombatGroups.value,
+    actualCombatGroups,
     groups.value.some((g) => Boolean(g.star)),
   );
 };
