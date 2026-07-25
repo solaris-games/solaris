@@ -11,7 +11,6 @@ ADD map-rendering/ map-rendering/
 ADD common/ common/
 ADD server/ server/
 
-RUN rm -f client/.env
 RUN rm -f server/.env
 
 RUN npm install
