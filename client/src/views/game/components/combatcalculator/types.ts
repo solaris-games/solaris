@@ -15,6 +15,8 @@ export type CCCarrier = {
 export type CCStar = {
   ships: number;
   specialistId: number | null;
+  isHomeStar: boolean;
+  isAsteroidField: boolean;
 };
 
 export type CCGroupWeaponsSpec =
@@ -67,8 +69,8 @@ export const makeCombatGroups = (
         ships: star.ships,
         specialistId: star.specialistId,
         ownedByPlayerId: firstPlayer._id,
-        homeStar: false,
-        isAsteroidField: false,
+        homeStar: star.isHomeStar,
+        isAsteroidField: star.isAsteroidField,
       };
     };
 

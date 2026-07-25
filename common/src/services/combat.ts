@@ -752,14 +752,14 @@ export class CombatService<ID extends Id> {
         S extends CombatBaseStar<ID>,
         C extends CombatBaseCarrier<ID>,
     >(combatResult: DetailedCombatResult<ID, P, S, C>) {
-        const isC2S = Boolean(combatResult.groups.find(g => g.star));
+        const isC2S = Boolean(combatResult.groups.find((g) => g.star));
 
         const nonZeroGroup = combatResult.groups.find(
             (g) => (typeof g.shipsAfter === "number" ? g.shipsAfter : 1) > 0,
         ); // if result is masked it is non-zero
 
         if (isC2S && !nonZeroGroup) {
-            return combatResult.groups.find(g => g.star);
+            return combatResult.groups.find((g) => g.star);
         }
 
         return nonZeroGroup;
@@ -850,11 +850,7 @@ export class CombatService<ID extends Id> {
                 ],
                 star: undefined,
                 shipsKilled: 0,
-                attackAgainst: attackMap(
-                    ownId === 0 ? 1 : 0,
-                    weapons,
-                    0,
-                ),
+                attackAgainst: attackMap(ownId === 0 ? 1 : 0, weapons, 0),
             };
         };
 

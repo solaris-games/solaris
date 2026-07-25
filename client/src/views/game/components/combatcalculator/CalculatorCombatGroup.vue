@@ -87,6 +87,8 @@ const addStar = () => {
   model.value!.star = {
     ships: 0,
     specialistId: null,
+    isHomeStar: false,
+    isAsteroidField: false,
   };
 };
 

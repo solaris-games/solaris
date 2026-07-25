@@ -1,9 +1,5 @@
 <template>
-  <calculator-combat-group-object
-    kind="carrier"
-    v-model="model"
-    @onRemove="remove"
-  >
+  <calculator-combat-group-object @onRemove="remove">
     <template v-slot:icon>
       <i class="fas fa-rocket"></i>
     </template>
@@ -15,6 +11,21 @@
         <i class="fas fa-location-pin"></i>
       </button>
     </template>
+    <template v-slot:inputs>
+      <div class="input-group mb-1">
+        <span class="input-group-text">
+          <i class="fas fa-rocket"></i>
+        </span>
+        <input
+          type="number"
+          class="form-control form-control-sm ships-input"
+          v-model.number="model.ships"
+          min="0"
+          placeholder="Ships"
+        />
+      </div>
+      <specialist-selection kind="carrier" v-model="model.specialistId" />
+    </template>
   </calculator-combat-group-object>
 </template>
 <script setup lang="ts">
@@ -22,6 +33,7 @@ import type { CCCarrier } from "@/views/game/components/combatcalculator/types";
 import CalculatorCombatGroupObject from "@/views/game/components/combatcalculator/CalculatorCombatGroupObject.vue";
 import type { Carrier } from "@/types/game.ts";
 import { useGameStore } from "@/stores/game.ts";
+import SpecialistSelection from "@/views/game/components/combatcalculator/SpecialistSelection.vue";
 
 const emit = defineEmits<{
   onRemove: [carrier: CCCarrier];
