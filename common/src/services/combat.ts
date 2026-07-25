@@ -156,9 +156,18 @@ const calculateIncomingDamages = <
 
             const dmgFromOther = otherGroup.attackAgainst.get(groupIdx)!;
 
+            const otherIsDefender = otherGroup.isDefender;
+
             let damage;
             if (otherGroup.ships < dmgFromOther.total) {
-                damage = otherGroup.ships;
+                // clamp damage
+                // if the other group is the defender, we apply the defender bonus anyway
+                if (otherIsDefender) {
+                    damage =
+                        otherGroup.ships + (dmgFromOther.defenderBonus || 0);
+                } else {
+                    damage = otherGroup.ships;
+                }
             } else {
                 damage = dmgFromOther.total;
             }
@@ -684,6 +693,7 @@ export class CombatService<ID extends Id> {
                     otherGroup,
                     isCarrierToStarCombat,
                 );
+
                 group.attackAgainst.set(otherGroupIdx, weps);
             }
         }
@@ -806,13 +816,18 @@ export class CombatService<ID extends Id> {
         isCarrierToStarCombat: boolean,
         includeDefenderBonus: boolean,
     ): BasicCombatResult {
-        const attackMap = (group: number, level: number) => {
+        const attackMap = (
+            group: number,
+            level: number,
+            defenderBonus: number,
+        ) => {
             const m = new Map<number, WeaponsDetail>();
             m.set(group, {
-                total: level,
+                total: level + defenderBonus,
                 appliedBuffs: [],
                 weaponsBuff: 0,
                 weaponsLevel: level,
+                defenderBonus,
             });
             return m;
         };
@@ -849,7 +864,11 @@ export class CombatService<ID extends Id> {
                 ],
                 star: undefined,
                 shipsKilled: 0,
-                attackAgainst: attackMap(ownId === 0 ? 1 : 0, weapons),
+                attackAgainst: attackMap(
+                    ownId === 0 ? 1 : 0,
+                    weapons,
+                    includeDefenderBonus ? 1 : 0,
+                ),
             };
         };
 
@@ -879,7 +898,11 @@ export class CombatService<ID extends Id> {
                     isAsteroidField: false,
                 },
                 shipsKilled: 0,
-                attackAgainst: attackMap(1, weapons),
+                attackAgainst: attackMap(
+                    1,
+                    weapons,
+                    includeDefenderBonus ? 1 : 0,
+                ),
             };
         };
 
@@ -892,11 +915,7 @@ export class CombatService<ID extends Id> {
 
         if (isCarrierToStarCombat) {
             groups = [
-                starGroup(
-                    "defender",
-                    defender.weaponsLevel + (includeDefenderBonus ? 1 : 0),
-                    defender.ships,
-                ),
+                starGroup("defender", defender.weaponsLevel, defender.ships),
                 carrierGroup(
                     "attacker",
                     attacker.weaponsLevel,
