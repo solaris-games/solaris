@@ -32,7 +32,7 @@
         <div class="col">
           <select
             :disabled="isLoading"
-            class="form-control form-control-sm"
+            class="form-select form-select-sm"
             v-model="selectedFilter"
             @change="loadPage(0)"
           >

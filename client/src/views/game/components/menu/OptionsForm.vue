@@ -11,7 +11,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="uiStyle"
             v-model="settings.interface.uiStyle"
             :disabled="isSavingSettings"
@@ -26,7 +26,7 @@
         <label for="audio" class="col-12 col-sm-6 col-form-label">Audio</label>
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="audio"
             v-model="settings.interface.audio"
             :disabled="isSavingSettings"
@@ -43,7 +43,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="suggestMentions"
             v-model="settings.interface.suggestMentions"
             :disabled="isSavingSettings"
@@ -61,7 +61,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="shiftKeyMentions"
             v-model="settings.interface.shiftKeyMentions"
             :disabled="isSavingSettings"
@@ -78,7 +78,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="galaxyScreenUpgrades"
             v-model="settings.interface.galaxyScreenUpgrades"
             :disabled="isSavingSettings"
@@ -97,7 +97,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="displayGuildTag"
             v-model="settings.guild.displayGuildTag"
             :disabled="isSavingSettings"
@@ -117,7 +117,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="territory-style"
               v-model="settings.map.territoryStyle"
               :disabled="isSavingSettings"
@@ -255,7 +255,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="objects-scaling"
               v-model="settings.map.objectsScaling"
               :disabled="isSavingSettings"
@@ -272,7 +272,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="objects-depth"
               v-model="settings.map.objectsDepth"
               :disabled="isSavingSettings"
@@ -351,7 +351,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="loop-style"
               v-model="settings.map.carrierLoopStyle"
               :disabled="isSavingSettings"
@@ -390,7 +390,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="naturalResources"
               v-model="settings.map.naturalResources"
               :disabled="isSavingSettings"
@@ -487,7 +487,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="background-blend-mode"
               v-model="settings.map.background.blendMode"
               :disabled="isSavingSettings"
@@ -504,7 +504,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="moving-nebulas"
               v-model="settings.map.background.moveNebulas"
               :disabled="isSavingSettings"
@@ -736,7 +736,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="antiAliasing"
               v-model="settings.map.antiAliasing"
               :disabled="isSavingSettings"
@@ -775,7 +775,7 @@
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="galaxyCenterVisible"
               v-model="settings.map.galaxyCenterAlwaysVisible"
               :disabled="isSavingSettings"
@@ -795,7 +795,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="carrierDefaultAction"
             v-model="settings.carrier.defaultAction"
             :disabled="isSavingSettings"
@@ -835,7 +835,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmBuildCarrier"
             v-model="settings.carrier.confirmBuildCarrier"
             :disabled="isSavingSettings"
@@ -852,7 +852,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmBuildEconomy"
             v-model="settings.star.confirmBuildEconomy"
             :disabled="isSavingSettings"
@@ -869,7 +869,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmBuildIndustry"
             v-model="settings.star.confirmBuildIndustry"
             :disabled="isSavingSettings"
@@ -886,7 +886,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmBuildScience"
             v-model="settings.star.confirmBuildScience"
             :disabled="isSavingSettings"
@@ -903,7 +903,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmBuildWarpGate"
             v-model="settings.star.confirmBuildWarpGate"
             :disabled="isSavingSettings"
@@ -922,7 +922,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="confirmShipDistribution"
             v-model="settings.star.confirmShipDistribution"
             :disabled="isSavingSettings"
@@ -941,7 +941,7 @@
         >
         <div class="col-12 col-sm-6">
           <select
-            class="form-control"
+            class="form-select"
             id="performanceMonitor"
             v-model="settings.technical.performanceMonitor"
             :disabled="isSavingSettings"

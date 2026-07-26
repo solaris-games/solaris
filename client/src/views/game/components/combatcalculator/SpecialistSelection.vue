@@ -3,7 +3,7 @@
     <span class="input-group-text">
       <i class="fas fa-user-astronaut"></i>
     </span>
-    <select class="form-control form-control-sm" v-model="model">
+    <select class="form-select form-select-sm" v-model="model">
       <option :value="null">None</option>
       <option v-for="s in specialists" :key="s.id" :value="s.id">
         {{ s.name }}

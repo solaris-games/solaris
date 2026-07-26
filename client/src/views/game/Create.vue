@@ -59,7 +59,7 @@
               tooltip="The game mode Conquest is victory by stars, Battle Royale is last man standing in a constantly shrinking galaxy, King of the Hill is a fight for a key star, Team Conquest is conquest, but with teams"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="mode"
             v-model="settings.general.mode"
             :disabled="isCreatingGame"
@@ -88,7 +88,7 @@
               tooltip="The victory condition in which a Conquest game will be decided."
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="conquestVictoryCondition"
             v-model="settings.conquest.victoryCondition"
             :disabled="isCreatingGame"
@@ -116,7 +116,7 @@
               tooltip="How many stars are needed for a player to win the game"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="conquestVictoryPercentage"
             v-model="settings.conquest.victoryPercentage"
             :disabled="isCreatingGame"
@@ -143,7 +143,7 @@
               tooltip="Determines whether players become defeated if they lose control of their capital star"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="conquestCapitalStarElimination"
             v-model="settings.conquest.capitalStarElimination"
             :disabled="isCreatingGame"
@@ -177,7 +177,7 @@
 
           <select
             v-if="(possibleTeamCounts.length || 0) > 0"
-            class="form-control"
+            class="form-select"
             id="teamConquestTeamCount"
             v-model="settings.conquest.teamsCount"
             @change="onTeamCountChanged"
@@ -235,7 +235,7 @@
             >Players <help-tooltip tooltip="Total number of player slots"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="players"
             v-model="settings.general.playerLimit"
             :disabled="isCreatingGame"
@@ -258,7 +258,7 @@
               tooltip="Determines what type of players can join the game"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="playerType"
             v-model="settings.general.playerType"
             :disabled="isCreatingGame"
@@ -280,7 +280,7 @@
               tooltip="Anonymous will hide player identities such as their Victories, Rank and Renown. Identities are revealed after the game ends"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="anonymity"
             v-model="settings.general.anonymity"
             :disabled="isCreatingGame"
@@ -302,7 +302,7 @@
               tooltip="Determines whether players can see who is online in real time"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="playerOnlineStatus"
             v-model="settings.general.playerOnlineStatus"
             :disabled="isCreatingGame"
@@ -324,7 +324,7 @@
               tooltip="Show warnings when players use the same IP to prevent multiboxing. Only disable this if you are sure"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="playerIPWarning"
             v-model="settings.general.playerIPWarning"
             :disabled="isCreatingGame"
@@ -346,7 +346,7 @@
               tooltip="Players will only be able to join a random slot instead of choosing a specific one"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="joinRandomSlot"
             v-model="settings.general.joinRandomSlot"
             :disabled="isCreatingGame"
@@ -369,7 +369,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="advancedAI"
             v-model="settings.general.advancedAI"
             :disabled="isCreatingGame"
@@ -392,7 +392,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="spectators"
             v-model="settings.general.spectators"
             :disabled="isCreatingGame"
@@ -415,7 +415,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="afkSlotsOpen"
             v-model="settings.general.afkSlotsOpen"
             :disabled="isCreatingGame"
@@ -438,7 +438,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="readyToQuit"
             v-model="settings.general.readyToQuit"
             :disabled="isCreatingGame"
@@ -464,7 +464,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="readyToQuitFraction"
             v-model="settings.general.readyToQuitFraction"
             :disabled="isCreatingGame"
@@ -490,7 +490,7 @@
             ></help-tooltip
           ></label>
           <select
-            class="form-control"
+            class="form-select"
             id="readyToQuitTimerCycles"
             v-model="settings.general.readyToQuitTimerCycles"
             :disabled="isCreatingGame"
@@ -517,7 +517,7 @@
           ></label>
 
           <select
-            class="form-control"
+            class="form-select"
             id="readyToQuitVisibility"
             v-model="settings.general.readyToQuitVisibility"
             :disabled="isCreatingGame"
@@ -538,7 +538,7 @@
             <help-tooltip tooltip="Rank distribution scheme to be used"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="awardRankTo"
             v-model="settings.general.awardRankTo"
             :disabled="isCreatingGame"
@@ -584,7 +584,7 @@
               tooltip="Determines whether players are allowed to abandon stars"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="allowAbandonStars"
             v-model="settings.player.allowAbandonStars"
             :disabled="isCreatingGame"
@@ -608,7 +608,7 @@
               tooltip="Real time games are constantly running however Turn based games all players must submit their turn in order for the game to progress"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="gameType"
             v-model="settings.gameTime.gameType"
             :disabled="isCreatingGame"
@@ -629,7 +629,7 @@
             <help-tooltip tooltip="Determines how fast a single tick will take"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="gameSpeed"
             v-model="settings.gameTime.speed"
             :disabled="isCreatingGame"
@@ -651,7 +651,7 @@
               tooltip="Determines whether the game has a time limit"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="isTickLimited"
             v-model="settings.gameTime.isTickLimited"
             :disabled="isCreatingGame"
@@ -695,7 +695,7 @@
               tooltip="Determines how long the warmup period is before games start, for large games it is recommended to have a long start delay"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="startDelay"
             v-model="settings.gameTime.startDelay"
             :disabled="isCreatingGame"
@@ -717,7 +717,7 @@
               tooltip="Determines how many ticks are processed for a single turn"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="turnJumps"
             v-model="settings.gameTime.turnJumps"
             :disabled="isCreatingGame"
@@ -739,7 +739,7 @@
               tooltip="The timeout period in which players have to take their turn, if the limit is reached then the turn will process regardless of whether players are ready or not"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="maxTurnWait"
             v-model="settings.gameTime.maxTurnWait"
             :disabled="isCreatingGame"
@@ -833,7 +833,7 @@
               tooltip="Determines whether this month's flux is applied to the game"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="fluxEnabled"
             v-model="settings.general.fluxEnabled"
             :disabled="isCreatingGame"
@@ -857,7 +857,7 @@
               tooltip="The shape of the galaxy that will be generated for the game"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="galaxyType"
             v-model="settings.galaxy.galaxyType"
             :disabled="isCreatingGame"
@@ -903,7 +903,7 @@
               tooltip="If enabled, overrides the starting player, team, star and carrier settings with data provided in the JSON"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="advancedCustomGalaxyEnabled"
             v-model="settings.galaxy.advancedCustomGalaxyEnabled"
             :disabled="isCreatingGame"
@@ -972,7 +972,7 @@
               tooltip="Determines how expensive carriers cost to build"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="carrierCost"
             v-model="settings.specialGalaxy.carrierCost"
             :disabled="isCreatingGame"
@@ -994,7 +994,7 @@
               tooltip="Determines how expensive the carrier upkeep is - Upkeep is paid at the end of a galactic cycle"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="carrierUpkeepCost"
             v-model="settings.specialGalaxy.carrierUpkeepCost"
             :disabled="isCreatingGame"
@@ -1016,7 +1016,7 @@
               tooltip="Determines how expensive warp gates cost to build"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="warpgateCost"
             v-model="settings.specialGalaxy.warpgateCost"
             :disabled="isCreatingGame"
@@ -1038,7 +1038,7 @@
               tooltip="Determines how expensive specialists cost to hire"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="specialistCost"
             v-model="settings.specialGalaxy.specialistCost"
             :disabled="isCreatingGame"
@@ -1063,7 +1063,7 @@
               tooltip="Determines the type of currency used to hire specialists"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="specialistsCurrency"
             v-model="settings.specialGalaxy.specialistsCurrency"
             :disabled="isCreatingGame"
@@ -1240,7 +1240,7 @@
                 tooltip="Dark galaxies hide stars outside of player scanning ranges - Extra dark galaxies hide player statistics so that players only know what other players have based on what they can see in their scanning range"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="darkGalaxy"
               v-model="settings.specialGalaxy.darkGalaxy"
               :disabled="isCreatingGame"
@@ -1262,7 +1262,7 @@
                 tooltip="Determines whether carriers can be gifted to other players"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="giftCarriers"
               v-model="settings.specialGalaxy.giftCarriers"
               :disabled="isCreatingGame"
@@ -1284,7 +1284,7 @@
                 tooltip="Enables or disables the defender bonus - Grants +1 to the defender in carrier-to-star combat"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="defenderBonus"
               v-model="settings.specialGalaxy.defenderBonus"
               :disabled="isCreatingGame"
@@ -1309,7 +1309,7 @@
                 tooltip="Determines whether carrier-to-carrier combat is enabled. If disabled, carriers will not fight each other in space"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="carrierToCarrierCombat"
               v-model="settings.specialGalaxy.carrierToCarrierCombat"
               :disabled="isCreatingGame"
@@ -1331,7 +1331,7 @@
                 tooltip="Determines whether star natural resources are independent values, giving the game more granular infrastructure costs"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="splitResources"
               v-model="settings.specialGalaxy.splitResources"
               :disabled="isCreatingGame"
@@ -1353,7 +1353,7 @@
                 tooltip="Determines the shape of distributed natural resources in the galaxy"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="resourceDistribution"
               v-model="settings.specialGalaxy.resourceDistribution"
               :disabled="isCreatingGame"
@@ -1375,7 +1375,7 @@
                 tooltip="Determines where player home stars are located at the start of the game"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="playerDistribution"
               v-model="settings.specialGalaxy.playerDistribution"
               :disabled="isCreatingGame"
@@ -1395,7 +1395,7 @@
               >Carrier Speed <help-tooltip tooltip="Carriers go brrr"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="carrierSpeed"
               v-model="settings.specialGalaxy.carrierSpeed"
               :disabled="isCreatingGame"
@@ -1417,7 +1417,7 @@
                 tooltip="Determines whether economic infrastructure is destroyed on star capture and if the attacker is awarded cash for destroying them"
             /></label>
             <select
-              class="form-control"
+              class="form-select"
               id="starCaptureReward"
               v-model="settings.specialGalaxy.starCaptureReward"
               :disabled="isCreatingGame"
@@ -1449,7 +1449,7 @@
               tooltip="If enabled, orbits stars and carriers around the center of the galaxy every tick"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="orbitalMechanicsEnabled"
             v-model="settings.orbitalMechanics.enabled"
             :disabled="isCreatingGame"
@@ -1474,7 +1474,7 @@
               tooltip="Determines how fast stars and carriers orbit"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="orbitSpeed"
             v-model="settings.orbitalMechanics.orbitSpeed"
             :disabled="isCreatingGame"
@@ -1592,7 +1592,7 @@
               tooltip="Determines whether players can trade credits"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="tradeCredits"
             v-model="settings.player.tradeCredits"
             :disabled="isCreatingGame"
@@ -1619,7 +1619,7 @@
               tooltip="Determines whether players can trade specialist tokens"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="tradeCreditsSpecialists"
             v-model="settings.player.tradeCreditsSpecialists"
             :disabled="isCreatingGame"
@@ -1641,7 +1641,7 @@
               tooltip="Determines how expensive the technology trade fee costs"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="tradeCost"
             v-model="settings.player.tradeCost"
             :disabled="isCreatingGame"
@@ -1669,7 +1669,7 @@
               tooltip="If enabled, players can only trade with other players who are in their scanning range"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="tradeScanning"
             v-model="settings.player.tradeScanning"
             :disabled="isCreatingGame"
@@ -1693,7 +1693,7 @@
               tooltip="If enabled, the maximum ship population per player will be restricted"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="populationCapEnabled"
             v-model="settings.player.populationCap.enabled"
             :disabled="isCreatingGame"
@@ -1749,7 +1749,7 @@
               tooltip="If enabled, players can change their diplomatic status to allied or enemies - Allied players can orbit each other's stars and support each other in combat"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="diplomacy"
             v-model="settings.diplomacy.enabled"
             :disabled="isCreatingGame"
@@ -1775,7 +1775,7 @@
               tooltip="If enabled, alliances cannot be canceled."
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="alliancesLocked"
             v-model="settings.diplomacy.lockedAlliances"
             :disabled="isCreatingGame"
@@ -1829,7 +1829,7 @@
               tooltip="Determines how expensive the alliance upkeep is - Upkeep is paid at the end of a galactic cycle"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="allianceUpkeepCost"
             v-model="settings.diplomacy.upkeepCost"
             :disabled="isCreatingGame"
@@ -1850,7 +1850,7 @@
               tooltip="If enabled, only allies can trade with each other."
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="allianceTradeRestricted"
             v-model="settings.diplomacy.tradeRestricted"
             :disabled="isCreatingGame"
@@ -1877,7 +1877,7 @@
               tooltip="If enabled, global events will be displayed when players declare war or make peace"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="alliancesGlobalEvents"
             v-model="settings.diplomacy.globalEvents"
             :disabled="isCreatingGame"
@@ -1979,7 +1979,7 @@
               tooltip="Determines how expensive infrastructure costs to build. If disabled, then one third of all stars will start with the starting infrastructure"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="economyCost"
             v-model="settings.player.developmentCost.economy"
             :disabled="isCreatingGame"
@@ -1993,7 +1993,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="industryCost"
             v-model="settings.player.developmentCost.industry"
             :disabled="isCreatingGame"
@@ -2007,7 +2007,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="scienceCost"
             v-model="settings.player.developmentCost.science"
             :disabled="isCreatingGame"
@@ -2257,7 +2257,7 @@
               tooltip="Determines how many research points it takes to level up a technology"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechTerraforming"
             v-model="settings.technology.researchCosts.terraforming"
             :disabled="isCreatingGame"
@@ -2271,7 +2271,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechExperimentation"
             v-model="settings.technology.researchCosts.experimentation"
             :disabled="isCreatingGame"
@@ -2285,7 +2285,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechScanning"
             v-model="settings.technology.researchCosts.scanning"
             :disabled="isCreatingGame"
@@ -2299,7 +2299,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechHyperspace"
             v-model="settings.technology.researchCosts.hyperspace"
             :disabled="isCreatingGame"
@@ -2313,7 +2313,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechManufacturing"
             v-model="settings.technology.researchCosts.manufacturing"
             :disabled="isCreatingGame"
@@ -2327,7 +2327,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechBanking"
             v-model="settings.technology.researchCosts.banking"
             :disabled="isCreatingGame"
@@ -2341,7 +2341,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechWeapons"
             v-model="settings.technology.researchCosts.weapons"
             :disabled="isCreatingGame"
@@ -2355,7 +2355,7 @@
             </option>
           </select>
           <select
-            class="form-control"
+            class="form-select"
             id="researchCostsTechSpecialists"
             v-model="settings.technology.researchCosts.specialists"
             :disabled="isCreatingGame"
@@ -2423,7 +2423,7 @@
               tooltip="Determines the amount of credits awarded for the banking technology at the end of a galactic cycle"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="bankingReward"
             v-model="settings.technology.bankingReward"
             :disabled="isCreatingGame"
@@ -2449,7 +2449,7 @@
           /></label>
 
           <select
-            class="form-control"
+            class="form-select"
             id="experimentationDistribution"
             v-model="settings.technology.experimentationDistribution"
             :disabled="isCreatingGame"
@@ -2474,7 +2474,7 @@
               tooltip="Determines the amount of research points awarded for the experimentation technology at the end of a galactic cycle"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="experimentationReward"
             v-model="settings.technology.experimentationReward"
             :disabled="isCreatingGame"
@@ -2496,7 +2496,7 @@
               tooltip="Determines the amount of specialist tokens awarded for the specialist technology at the end of a galactic cycle"
           /></label>
           <select
-            class="form-control"
+            class="form-select"
             id="specialistTokenReward"
             v-model="settings.technology.specialistTokenReward"
             :disabled="isCreatingGame"

@@ -15,7 +15,7 @@
       <label class="col-5 col-form-label">Researching:</label>
       <div class="col-7">
         <select
-          class="form-control"
+          class="form-select"
           v-model="player.researchingNow"
           v-on:change="doUpdateResearchNow"
           v-if="!loadingNow"
@@ -53,7 +53,7 @@
       <label class="col-5 col-form-label">Next:</label>
       <div class="col-7">
         <select
-          class="form-control"
+          class="form-select"
           v-model="player.researchingNext"
           v-on:change="doUpdateResearchNext"
           v-if="!loadingNext"

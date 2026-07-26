@@ -13,7 +13,7 @@
       <form class="row">
         <div class="col-7">
           <select
-            class="form-control"
+            class="form-select"
             id="technologySelection"
             v-model="selectedTechnology"
             :disabled="!availableTechnologies.length"

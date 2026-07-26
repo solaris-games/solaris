@@ -14,7 +14,7 @@
     </td>
     <td class="waypoint-element">
       <select
-        class="form-control form-control-sm"
+        class="form-select form-select-sm"
         v-model="waypoint.action"
         @change="onChanged"
       >

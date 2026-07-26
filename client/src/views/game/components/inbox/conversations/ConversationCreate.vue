@@ -31,7 +31,7 @@
             <label for="participants">Participants</label>
             <select
               multiple
-              class="form-control"
+              class="form-select"
               id="participants"
               v-model="participants"
             >

@@ -5,7 +5,7 @@
     >
     <select
       name="settingsTemplate"
-      class="form-control form-inline"
+      class="form-select form-inline"
       v-model="settingsTemplateName"
     >
       <option value="standard">Standard</option>

@@ -4,7 +4,7 @@
       <span class="input-group-text">
         <i class="fas fa-gun"></i>
       </span>
-      <select class="form-control form-control-sm" v-model="model.kind">
+      <select class="form-select form-select-sm" v-model="model.kind">
         <option value="level">Level</option>
         <option value="players">Players</option>
       </select>
@@ -17,7 +17,7 @@
       />
       <select
         v-if="model.kind === 'players'"
-        class="form-control form-control-sm"
+        class="form-select form-select-sm"
         v-model="model.players"
         multiple
       >

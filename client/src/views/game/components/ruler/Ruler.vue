@@ -52,7 +52,7 @@
       <div class="col-6">Speed Modifier</div>
       <div class="col-6 text-end">
         <select
-          class="form-control form-control-sm"
+          class="form-select form-select-sm"
           v-model="speedModifier"
           @change="onSpeedModifierChanged"
         >

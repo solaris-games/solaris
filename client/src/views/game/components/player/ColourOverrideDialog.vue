@@ -20,7 +20,7 @@
         <div class="modal-body">
           <div class="colour-override-controls form-group">
             <label for="colour">Colour</label>
-            <select v-model="currentColour">
+            <select v-model="currentColour" class="form-select form-select-sm">
               <option
                 v-for="colour in colourStore.coloursConfig"
                 :value="colour.alias"

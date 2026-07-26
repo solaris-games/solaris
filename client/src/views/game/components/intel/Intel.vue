@@ -14,7 +14,7 @@
         <div class="row g-0">
           <div class="col">
             <select
-              class="form-control input-sm"
+              class="form-select form-select-sm"
               id="intelType"
               v-model="intelType"
               v-on:change="fillData"
@@ -84,7 +84,7 @@
           </div>
           <div class="col-auto ms-1">
             <select
-              class="form-control input-sm"
+              class="form-select form-select-sm"
               v-model="startTick"
               v-on:change="reloadData"
               :disabled="history == null"

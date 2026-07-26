@@ -24,7 +24,7 @@ import { useToast } from 'vue-toast-notification';
           /></label>
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="notifyActiveGamesOnly"
               v-model="subscriptions.settings.notifyActiveGamesOnly"
               :disabled="isSaving"
@@ -49,7 +49,7 @@ import { useToast } from 'vue-toast-notification';
           /></label>
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="notifyForOtherGames"
               v-model="subscriptions.inapp.notificationsForOtherGames"
               :disabled="isSaving"
@@ -70,7 +70,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="gameStarted"
               v-model="subscriptions.discord.gameStarted"
               :disabled="isSaving"
@@ -87,7 +87,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="gameEnded"
               v-model="subscriptions.discord.gameEnded"
               :disabled="isSaving"
@@ -104,7 +104,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="gameTurnEnded"
               v-model="subscriptions.discord.gameTurnEnded"
               :disabled="isSaving"
@@ -123,7 +123,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerGalacticCycleComplete"
               v-model="subscriptions.discord.playerGalacticCycleComplete"
               :disabled="isSaving"
@@ -142,7 +142,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerRenownReceived"
               v-model="subscriptions.discord.playerRenownReceived"
               :disabled="isSaving"
@@ -161,7 +161,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerResearchComplete"
               v-model="subscriptions.discord.playerResearchComplete"
               :disabled="isSaving"
@@ -180,7 +180,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerTechnologyReceived"
               v-model="subscriptions.discord.playerTechnologyReceived"
               :disabled="isSaving"
@@ -199,7 +199,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerCreditsReceived"
               v-model="subscriptions.discord.playerCreditsReceived"
               :disabled="isSaving"
@@ -218,7 +218,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="playerCreditsSpecialistsReceived"
               v-model="subscriptions.discord.playerCreditsSpecialistsReceived"
               :disabled="isSaving"
@@ -237,7 +237,7 @@ import { useToast } from 'vue-toast-notification';
           >
           <div class="col-12 col-sm-6">
             <select
-              class="form-control"
+              class="form-select"
               id="conversationMessageSent"
               v-model="subscriptions.discord.conversationMessageSent"
               :disabled="isSaving"

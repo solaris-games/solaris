@@ -69,4 +69,8 @@ option {
   max-width: calc(100vw - 16px);
   overflow: auto;
 }
+
+.form-select option {
+  color: unset !important;
+}
 </style>

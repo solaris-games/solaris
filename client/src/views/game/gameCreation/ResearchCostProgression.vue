@@ -6,7 +6,7 @@
         tooltip="Determines the growth of research points needed for the next level of technology"
     /></label>
     <select
-      class="form-control"
+      class="form-select"
       id="'researchProgression' + name"
       v-model="researchProgression.progression"
       :disabled="isCreatingGame"
@@ -32,7 +32,7 @@
       <help-tooltip tooltip="Determines the speed of exponential growth"
     /></label>
     <select
-      class="form-control"
+      class="form-select"
       :id="'researchProgressionFactor' + name"
       v-model="researchProgression.growthFactor"
       :disabled="isCreatingGame"
@@ -59,7 +59,7 @@
         tooltip="Determines the scaling factor applied cumulatively per level"
     /></label>
     <select
-      class="form-control"
+      class="form-select"
       :id="'researchProgressionScaling' + name"
       v-model="researchProgression.scalingFactor"
       :disabled="isCreatingGame"
