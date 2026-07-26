@@ -22,6 +22,7 @@
           <div class="col-4">
             <input
               type="number"
+              min="1"
               class="form-control"
               id="defenderWeaponTech"
               placeholder="Tech Level"
@@ -48,6 +49,7 @@
             <input
               type="number"
               class="form-control"
+              min="0"
               id="defenderShips"
               placeholder="Ships"
               v-model="defender.ships"
@@ -112,6 +114,7 @@
             <input
               type="number"
               class="form-control"
+              min="1"
               id="attackerWeaponTech"
               placeholder="Tech Level"
               v-model="attacker.weaponsLevel"
@@ -132,6 +135,7 @@
               type="number"
               class="form-control"
               id="attackerShips"
+              min="0"
               placeholder="Ships"
               v-model="attacker.ships"
               :required="true"
