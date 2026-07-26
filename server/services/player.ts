@@ -713,10 +713,6 @@ export default class PlayerService extends EventEmitter {
     }
 
     async updateGameNotes(game: Game, player: Player, notes: string) {
-        if (notes.length > 2000) {
-            throw new ValidationError("Notes cannot exceed 2000 characters.");
-        }
-
         player.notes = notes;
 
         await this.gameRepo.updateOne(
