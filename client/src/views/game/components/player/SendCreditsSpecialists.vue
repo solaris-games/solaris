@@ -103,7 +103,7 @@ const confirmSendCredits = async () => {
       `Sent ${amount.value} specialist tokens to ${props.player.alias}.`,
     );
 
-    props.userPlayer.credits -= amount.value;
+    props.userPlayer.creditsSpecialists -= amount.value;
     amount.value = 0;
     props.player.reputation = response.data.reputation;
   } else {
