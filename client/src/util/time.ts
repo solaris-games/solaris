@@ -1,5 +1,5 @@
-import { add } from 'date-fns';
-import type {Game} from "@/types/game";
+import { DateTime } from "luxon";
+import type { Game } from "@/types/game";
 import GameHelper from "@/services/gameHelper";
 import {
   between,
@@ -7,45 +7,54 @@ import {
   type Duration,
   formatDuration as formatRealDuration,
   normalize,
-  toSeconds
+  toSeconds,
 } from "@/util/duration";
 import {
   type GameInfoState,
-  type GameSettingsGalaxyBase, type GameSettingsGameTime, type ListGameSettingsGeneral
-} from "@solaris-common";
+  type GameSettingsGalaxyBase,
+  type GameSettingsGameTime,
+  type ListGameSettingsGeneral,
+} from "@solaris/common";
 
 type TGame = {
   settings: {
-    general: ListGameSettingsGeneral<string>,
-    gameTime: GameSettingsGameTime,
-    galaxy: GameSettingsGalaxyBase,
-  },
-  state: GameInfoState<string>,
-}
-
-export const addTicksToTime = (ticks: number, speedInSeconds: number, relativeTo: Date): Date => {
-  return add(relativeTo, { seconds: ticks * speedInSeconds });
+    general: ListGameSettingsGeneral<string>;
+    gameTime: GameSettingsGameTime;
+    galaxy: GameSettingsGalaxyBase;
+  };
+  state: GameInfoState<string>;
 };
 
-// for non-started or paused games we want the current time as base
+export const addTicksToTime = (
+  ticks: number,
+  speedInSeconds: number,
+  relativeTo: Date,
+): Date => {
+  return DateTime.fromJSDate(relativeTo)
+    .plus({ seconds: ticks * speedInSeconds })
+    .toJSDate();
+};
+
 const getLastTickDate = (game: TGame) => {
   if (!game.state.lastTickDate) {
     return null;
   }
 
-  const isBehind = game.state.lastTickDate.getTime() + (game.settings.gameTime.speed * 1000) < Date.now();
+  const isBehind =
+    game.state.lastTickDate.getTime() + game.settings.gameTime.speed * 1000 <
+    Date.now();
 
-  if (GameHelper.isGameInProgress(game) && !isBehind) {
+  if (!isBehind && GameHelper.isGameInProgress(game)) {
     return game.state.lastTickDate;
   }
 
-  return new Date();
-}
+  return null;
+};
 
 export const addTicksToLastTick = (game: Game, ticks: number): Date | null => {
   const date = getLastTickDate(game);
 
-  if (!date || game.settings.gameTime.gameType !== 'realTime') {
+  if (!date || game.settings.gameTime.gameType !== "realTime") {
     return null;
   }
 
@@ -65,11 +74,17 @@ export const getCountdownTimeString = (date: Date): string => {
 };
 
 const formatTick = (ticks: number): string => {
-  return ticks === 1 ?  `1 tick` : `${ticks} ticks`;
+  return ticks === 1 ? `1 tick` : `${ticks} ticks`;
 };
 
-export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string => {
-  if (game.settings.gameTime.gameType === 'realTime' && !GameHelper.isGameFinished(game)) {
+export const getCountdownTimeStringByTicks = (
+  game: Game,
+  ticks: number,
+): string => {
+  if (
+    game.settings.gameTime.gameType === "realTime" &&
+    !GameHelper.isGameFinished(game)
+  ) {
     const time = addTicksToLastTick(game, ticks);
 
     if (!time) {
@@ -88,17 +103,27 @@ export const getCountdownTimeStringByTicks = (game: Game, ticks: number): string
   return formatTick(ticks);
 };
 
-export const getCountdownTimeForProductionCycle = (game: TGame): Date | null => {
+export const getCountdownTimeForProductionCycle = (
+  game: TGame,
+): Date | null => {
   const lastTickDate = getLastTickDate(game);
 
   if (!lastTickDate) {
     return null;
   }
 
-  const ticksToProduction = GameHelper.getTicksToProduction(game, game.state.tick, game.state.productionTick);
+  const ticksToProduction = GameHelper.getTicksToProduction(
+    game,
+    game.state.tick,
+    game.state.productionTick,
+  );
 
-  return addTicksToTime(ticksToProduction, game.settings.gameTime.speed, lastTickDate);
-}
+  return addTicksToTime(
+    ticksToProduction,
+    game.settings.gameTime.speed,
+    lastTickDate,
+  );
+};
 
 export const ticksToDuration = (game: Game, ticks: number): Duration => {
   const seconds = ticks * game.settings.gameTime.speed;
@@ -106,15 +131,24 @@ export const ticksToDuration = (game: Game, ticks: number): Duration => {
   return normalize({ seconds });
 };
 
-export const getCountdownTimeStringWithETA = (game: Game, ticks: number): string => {
+export const getCountdownTimeStringWithETA = (
+  game: Game,
+  ticks: number,
+): string => {
   const relative = getCountdownTimeStringByTicks(game, ticks);
 
   return `${relative} - ETA: Tick ${game.state.tick + ticks}`;
 };
 
 export const getTurnTimeoutTime = (game: TGame): Date | null => {
-  if (game.settings.gameTime.gameType === 'turnBased' && game.state.lastTickDate && !GameHelper.isGameFinished(game)) {
-    return add(game.state.lastTickDate, { minutes: game.settings.gameTime.maxTurnWait });
+  if (
+    game.settings.gameTime.gameType === "turnBased" &&
+    game.state.lastTickDate &&
+    !GameHelper.isGameFinished(game)
+  ) {
+    return DateTime.fromJSDate(game.state.lastTickDate)
+      .plus({ minutes: game.settings.gameTime.maxTurnWait })
+      .toJSDate();
   }
 
   return null;

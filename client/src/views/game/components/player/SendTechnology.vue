@@ -1,119 +1,169 @@
 <template>
-<div class="row bg-dark pt-2 pb-2" v-if="selectedTechnology">
-  <div class="col-12">
-    <form-error-list v-bind:errors="errors"/>
-  </div>
+  <div class="row bg-dark pt-2 pb-2" v-if="selectedTechnology">
+    <div class="col-12">
+      <form-error-list v-bind:errors="errors" />
+    </div>
 
-  <div class="col-12">
-    <p class="mb-2">Share Technology. (Costs <span class="text-warning">${{getTradeCost()}}</span> per tech level)</p>
+    <div class="col-12">
+      <p class="mb-2">
+        Share Technology. (Costs
+        <span class="text-warning">${{ tradeCost }}</span> per tech level)
+      </p>
 
-    <form class="row">
-      <div class="col-7">
-        <select class="form-control" id="technologySelection" v-model="selectedTechnology" :disabled="!availableTechnologies.length">
-          <option v-for="opt in availableTechnologies" v-bind:key="opt.name + opt.level" v-bind:value="opt">
-            {{ getTechnologyFriendlyName(opt.name) }} {{opt.level}} (${{opt.cost}})
-          </option>
-        </select>
-      </div>
-      <div class="col-5">
-        <div class="d-grid gap-2">
-          <modalButton modalName="shareTechnologyModal" classText="btn btn-success"
-            :disabled="$isHistoricalMode() || isSendingTech || !availableTechnologies.length || selectedTechnology.cost > userPlayer.credits"><i class="fas fa-paper-plane"></i> Share</modalButton>
+      <form class="row">
+        <div class="col-7">
+          <select
+            class="form-select"
+            id="technologySelection"
+            v-model="selectedTechnology"
+            :disabled="!availableTechnologies.length"
+          >
+            <option
+              v-for="opt in availableTechnologies"
+              v-bind:key="opt.name + opt.level"
+              v-bind:value="opt"
+            >
+              {{ getTechnologyFriendlyName(opt.name) }}
+              {{ opt.level }} (${{ opt.cost }})
+            </option>
+          </select>
         </div>
-      </div>
-    </form>
+        <div class="col-5">
+          <div class="d-grid gap-2">
+            <button
+              type="button"
+              @click="requestSendTechnology"
+              :disabled="
+                isHistoricalMode ||
+                isSendingTech ||
+                !availableTechnologies.length ||
+                selectedTechnology.cost > userPlayer.credits
+              "
+              class="btn btn-success"
+            >
+              <i class="fas fa-paper-plane"></i> Share
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
-
-  <dialogModal modalName="shareTechnologyModal" titleText="Share Technology" cancelText="No" confirmText="Yes" @onConfirm="confirmSendTechnology">
-    <p>Are you sure you want to share <b>{{selectedTechnology.name}}</b> (level {{selectedTechnology.level}}) with <b>{{player.alias}}</b>?</p>
-  </dialogModal>
-</div>
 </template>
 
-<script>
-import ModalButton from '../../../components/modal/ModalButton.vue'
-import DialogModal from '../../../components/modal/DialogModal.vue'
-import TradeApiService from '../../../../services/api/trade'
-import TechnologyHelper from '../../../../services/technologyHelper'
-import gameHelper from '../../../../services/gameHelper'
-import FormErrorList from '../../../components/FormErrorList.vue'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { inject, ref, computed, onMounted } from "vue";
+import TechnologyHelper from "../../../../services/technologyHelper";
+import FormErrorList from "../../../components/FormErrorList.vue";
+import type { Game } from "@/types/game";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
+import {
+  extractErrors,
+  formatError,
+  httpInjectionKey,
+  isOk,
+} from "@/services/typedapi";
+import type { ResearchType, TradeTechnology } from "@solaris/common";
+import GameHelper from "../../../../services/gameHelper";
+import {
+  listTradeableTechnologies,
+  sendTechnology,
+} from "@/services/typedapi/trade";
 
-export default {
-  props: {
-    playerId: String
-  },
-  components: {
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'form-error-list': FormErrorList
-  },
-  data () {
-    return {
-      errors: [],
-      isSendingTech: false,
-      player: null,
-      userPlayer: null,
-      selectedTechnology: null,
-      availableTechnologies: []
+import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
+const props = defineProps<{
+  playerId: string;
+}>();
+
+const httpClient = inject(httpInjectionKey)!;
+const toast = useToast();
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const isHistoricalMode = useIsHistoricalMode(store);
+const confirm = useConfirm();
+
+const errors = ref<string[]>([]);
+const isSendingTech = ref(false);
+const availableTechnologies = ref<TradeTechnology[]>([]);
+const selectedTechnology = ref<TradeTechnology | null>(null);
+
+const player = computed(() =>
+  GameHelper.getPlayerById(game.value, props.playerId)!,
+);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const tradeCost = computed(() => game.value.settings.player.tradeCost);
+
+const getTechnologyFriendlyName = (key: ResearchType) =>
+  TechnologyHelper.getFriendlyName(key);
+
+const getTradeableTechnologies = async () => {
+  const response = await listTradeableTechnologies(httpClient)(
+    game.value._id,
+    player.value._id,
+  );
+  if (isOk(response)) {
+    availableTechnologies.value = response.data;
+
+    if (availableTechnologies.value?.length) {
+      selectedTechnology.value = availableTechnologies.value[0];
     }
-  },
-  mounted () {
-    this.player = gameHelper.getPlayerById(this.$store.state.game, this.playerId)
-    this.userPlayer = gameHelper.getUserPlayer(this.$store.state.game)
-
-    this.getTradeableTechnologies()
-  },
-  methods: {
-    getTechnologyFriendlyName (key) {
-      return TechnologyHelper.getFriendlyName(key)
-    },
-    getTradeCost () {
-      return this.$store.state.game.settings.player.tradeCost
-    },
-    async getTradeableTechnologies () {
-      try {
-        let response = await TradeApiService.getTradeableTechnologies(this.$store.state.game._id, this.player._id)
-
-        if (response.status === 200) {
-          this.availableTechnologies = response.data
-
-          if (this.availableTechnologies.length) {
-            this.selectedTechnology = this.availableTechnologies[0]
-          }
-        }
-      } catch (err) {
-        console.error(err)
-      }
-    },
-    async confirmSendTechnology () {
-      this.errors = []
-      this.isSendingTech = true
-
-      try {
-        let response = await TradeApiService.sendTechnology(this.$store.state.game._id, this.player._id, this.selectedTechnology.name, this.selectedTechnology.level)
-
-        if (response.status === 200) {
-          this.$toast.default(`Sent ${this.selectedTechnology.name} (level ${this.selectedTechnology.level}) to ${this.player.alias}.`)
-
-          let playerTech = gameHelper.getPlayerById(this.$store.state.game, this.playerId).research[this.selectedTechnology.name]
-
-          playerTech.level = this.selectedTechnology.level
-
-          gameHelper.getUserPlayer(this.$store.state.game).credits -= this.selectedTechnology.cost
-
-          this.player.reputation = response.data.reputation
-
-          await this.getTradeableTechnologies()
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
-
-      this.isSendingTech = false
-    }
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
   }
-}
+};
+
+const requestSendTechnology = async () => {
+  const confirmed = await confirm(
+    "Share Technology",
+    `Are you sure you want to share ${selectedTechnology.value?.name} (level ${selectedTechnology.value?.level}) with ${player.value.alias}?`,
+  );
+
+  if (confirmed) {
+    await confirmSendTechnology();
+  }
+};
+
+const confirmSendTechnology = async () => {
+  errors.value = [];
+  isSendingTech.value = true;
+
+  if (!selectedTechnology.value) {
+    return;
+  }
+
+  const response = await sendTechnology(httpClient)(
+    game.value._id,
+    player.value._id,
+    selectedTechnology.value.name,
+    selectedTechnology.value.level,
+  );
+  if (isOk(response)) {
+    toast.default(
+      `Sent ${selectedTechnology.value.name} (level ${selectedTechnology.value.level}) to ${player.value.alias}.`,
+    );
+
+    const playerTech = GameHelper.getPlayerById(game.value, player.value._id)!
+      .research[selectedTechnology.value.name];
+
+    playerTech.level = selectedTechnology.value.level;
+
+    userPlayer.value.credits -= selectedTechnology.value.cost;
+
+    player.value.reputation = response.data.reputation;
+
+    await getTradeableTechnologies();
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+  }
+};
+
+onMounted(async () => {
+  await getTradeableTechnologies();
+});
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

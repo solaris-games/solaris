@@ -17,6 +17,8 @@ services:
       SERVER_URL: "http://localhost:3000"
       SESSION_SECRET: top_secret
       SESSION_SECURE_COOKIES: false
+      FRONTEND_APP_SOCKETS_HOST: "localhost:3000"
+      FRONTEND_APP_API_HOST: "http://localhost:3000"
     depends_on:
       - database
       
@@ -34,8 +36,10 @@ services:
       - database
 
   database:
-    image: mongo:7
+    image: mongo:8.0
     volumes:
-      - ./database_data:/data/db
+      - "dbdata:/data/db"
     ports:
       - "27017:27017"
+volumes:
+  dbdata:

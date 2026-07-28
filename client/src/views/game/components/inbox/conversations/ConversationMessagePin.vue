@@ -5,38 +5,46 @@
 </template>
 
 <script setup lang="ts">
+import { useGameStore } from "@/stores/game";
 import { inject, computed } from "vue";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from "vuex";
-import {pinMessage, unpinMessage} from "@/services/typedapi/conversation";
-import type {Game} from "@/types/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { pinMessage, unpinMessage } from "@/services/typedapi/conversation";
+import type { Game } from "@/types/game";
 
 const props = defineProps<{
-  conversationId: string,
-  messageId: string,
-  pinned: boolean,
+  conversationId: string;
+  messageId: string;
+  pinned: boolean;
 }>();
 
 const emit = defineEmits<{
-  onPinned: [],
-  onUnpinned: [],
+  onPinned: [];
+  onUnpinned: [];
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const game = computed<Game>(() => store.state.game);
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 
 const togglePinned = async () => {
   if (props.pinned) {
-    const response = await unpinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
+    const response = await unpinMessage(httpClient)(
+      game.value._id,
+      props.conversationId,
+      props.messageId,
+    );
     if (isOk(response)) {
       emit("onUnpinned");
     } else {
       console.error(formatError(response));
     }
   } else {
-    const response = await pinMessage(httpClient)(game.value._id, props.conversationId, props.messageId);
+    const response = await pinMessage(httpClient)(
+      game.value._id,
+      props.conversationId,
+      props.messageId,
+    );
     if (isOk(response)) {
       emit("onPinned");
     } else {
@@ -46,5 +54,4 @@ const togglePinned = async () => {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

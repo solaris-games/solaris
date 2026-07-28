@@ -1,32 +1,26 @@
 <template>
-<div class="menu-page container">
-    <menu-title title="Settings" @onCloseRequested="onCloseRequested"/>
+  <div class="menu-page container">
+    <menu-title title="Settings" @onCloseRequested="onCloseRequested" />
 
-    <game-settings :game="game"/>
-</div>
+    <game-settings :game="game" />
+  </div>
 </template>
 
-<script>
-import MenuTitle from '../MenuTitle.vue'
-import GameSettings from './GameSettings.vue'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import MenuTitle from "../MenuTitle.vue";
+import GameSettings from "./GameSettings.vue";
+import type { Game } from "@/types/game.ts";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'game-settings': GameSettings
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    }
-  }
-}
+const emit = defineEmits<{
+  onCloseRequested: [];
+}>();
+
+const onCloseRequested = () => emit("onCloseRequested");
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

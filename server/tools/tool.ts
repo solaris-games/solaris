@@ -1,14 +1,14 @@
 import { DependencyContainer } from "../services/types/DependencyContainer";
-import mongoose from "mongoose";
 import config from "../config";
 import containerLoader from "../services";
 import mongooseLoader from "../db/index";
 import { serverStub } from "../sockets/serverStub";
 import { logger } from "../utils/logging";
 import { Logger } from "pino";
+import mongoose from "mongoose";
 
-let mongo,
-    container: DependencyContainer;
+let mongo: mongoose.Mongoose;
+let container: DependencyContainer;
 
 const startup = async (jobName) => {
     const log = logger(jobName);
@@ -25,41 +25,43 @@ const startup = async (jobName) => {
     return {
         mongo,
         container,
-        log
-    }
-} 
+        log,
+    };
+};
 
 export type JobParameters = {
-    mongo: any,
-    container: DependencyContainer,
-    log: Logger,
-}
+    mongo: mongoose.Mongoose;
+    container: DependencyContainer;
+    log: Logger;
+};
 
-export const makeJob = (jobName: string, job: (params: JobParameters) => Promise<void>) => async () => {
-    const params = await startup(jobName);
+export const makeJob =
+    (jobName: string, job: (params: JobParameters) => Promise<void>) =>
+    async () => {
+        const params = await startup(jobName);
 
-    const log = params.log;
+        const log = params.log;
 
-    const shutdown = async () => { 
-        log.info('Shutting down...');
-    
-        await mongo.disconnect();
-    
-        log.info('Shutdown complete.');
-    
-        process.exit();
-    }
+        const shutdown = async () => {
+            log.info("Shutting down...");
 
-    process.on('SIGINT', async () => {
-        await shutdown();
-    });
-    
-    try {
-        await job(params);
-        log.info(`${jobName}: done.`);
-    } catch (e) {
-        log.error(e);
-    } finally {
-        await shutdown();
-    }
-}
+            await mongo.disconnect();
+
+            log.info("Shutdown complete.");
+
+            process.exit();
+        };
+
+        process.on("SIGINT", async () => {
+            await shutdown();
+        });
+
+        try {
+            await job(params);
+            log.info(`${jobName}: done.`);
+        } catch (e) {
+            log.error(e);
+        } finally {
+            await shutdown();
+        }
+    };

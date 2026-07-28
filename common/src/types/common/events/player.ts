@@ -1,134 +1,149 @@
-import type { StarCaptureResult } from "../star";
 import type { CombatResult } from "../combat";
-import type {BulkUpgradeReport} from "../infrastructureUpgrade";
-import type {BaseGameEvent} from "./game";
-import type {LedgerType} from "../ledger";
-import type {DiplomaticStatus} from "../diplomacy";
-import type {TradeEventTechnology} from "../trade";
+import type { BulkUpgradeReport } from "../infrastructureUpgrade";
+import type { BaseGameEvent } from "./game";
+import type { LedgerType } from "../ledger";
+import type { DiplomaticStatus } from "../diplomacy";
+import type { TradeEventTechnology } from "../trade";
 
 export interface BasePlayerEvent<ID> extends BaseGameEvent<ID> {
     playerId: ID;
 }
 
 export interface PlayerCreditsReceivedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCreditsReceived',
+    type: "playerCreditsReceived";
     data: {
-        fromPlayerId: ID,
-        credits: number,
-    }
+        fromPlayerId: ID;
+        credits: number;
+    };
 }
 
 export interface PlayerCreditsSentEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCreditsSent',
+    type: "playerCreditsSent";
     data: {
-        toPlayerId: ID,
-        credits: number,
-    }
+        toPlayerId: ID;
+        credits: number;
+    };
 }
 
-export interface PlayerSpecialistTokensReceivedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCreditsSpecialistsReceived',
+export interface PlayerSpecialistTokensReceivedEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerCreditsSpecialistsReceived";
     data: {
-        fromPlayerId: ID,
-        creditsSpecialists: number,
-    }
+        fromPlayerId: ID;
+        creditsSpecialists: number;
+    };
 }
 
-export interface PlayerSpecialistTokensSentEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCreditsSpecialistsSent',
+export interface PlayerSpecialistTokensSentEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerCreditsSpecialistsSent";
     data: {
-        toPlayerId: ID,
-        creditsSpecialists: number,
-    }
+        toPlayerId: ID;
+        creditsSpecialists: number;
+    };
+}
+
+export interface PlayerDebtEventData<ID> {
+    debtorPlayerId: ID;
+    creditorPlayerId: ID;
+    amount: number;
+    ledgerType: LedgerType;
 }
 
 export interface BasePlayerDebtEvent<ID> extends BasePlayerEvent<ID> {
-    data: {
-        debtorPlayerId: ID,
-        creditorPlayerId: ID,
-        amount: number,
-        ledgerType: LedgerType,
-    }
+    data: PlayerDebtEventData<ID>;
 }
 
 export interface PlayerDebtForgivenEvent<ID> extends BasePlayerDebtEvent<ID> {
-    type: 'playerDebtForgiven',
+    type: "playerDebtForgiven";
 }
 
 export interface PlayerDebtSettledEvent<ID> extends BasePlayerDebtEvent<ID> {
-    type: 'playerDebtSettled',
+    type: "playerDebtSettled";
 }
 
 export interface PlayerGiftReceivedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerGiftReceived',
+    type: "playerGiftReceived";
     data: {
-        fromPlayerId: ID,
-        carrierId: ID,
-        carrierName: string,
-        carrierShips: number,
-        starId: ID,
-        starName: string,
-    }
+        fromPlayerId: ID;
+        carrierId: ID;
+        carrierName: string;
+        carrierShips: number;
+        starId: ID;
+        starName: string;
+    };
 }
 
 export interface PlayerGiftSentEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerGiftSent',
+    type: "playerGiftSent";
     data: {
-        toPlayerId: ID,
-        carrierId: ID,
-        carrierName: string,
-        carrierShips: number,
-        starId: ID,
-        starName: string,
-    }
+        toPlayerId: ID;
+        carrierId: ID;
+        carrierName: string;
+        carrierShips: number;
+        starId: ID;
+        starName: string;
+    };
 }
 
-export interface PlayerCarrierSpecialistHiredEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCarrierSpecialistHired',
+export interface PlayerCarrierSpecialistHiredEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerCarrierSpecialistHired";
     data: {
-        carrierId: ID,
-        carrierName: string,
-        specialistId: number,
-        specialistName: string,
-        specialistDescription: string,
-    }
+        carrierId: ID;
+        carrierName: string;
+        specialistId: number;
+        specialistName: string;
+        specialistDescription: string;
+    };
 }
 
-export interface PlayerConversationCreatedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerConversationCreated',
+export interface PlayerConversationCreatedEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerConversationCreated";
     data: {
-        conversationId: ID,
-        createdBy: ID,
-        name: string,
-        participants: ID[],
-    },
+        conversationId: ID;
+        createdBy: ID;
+        name: string;
+        participants: ID[];
+    };
 }
 
-export interface PlayerConversationInvitedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerConversationInvited',
+export interface PlayerConversationInvitedEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerConversationInvited";
     data: {
-        conversationId: ID,
-        name: string,
-        playerId: ID,
-    },
+        conversationId: ID;
+        name: string;
+        playerId: ID;
+    };
 }
 
 export interface PlayerConversationLeftEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerConversationLeft',
+    type: "playerConversationLeft";
     data: {
-        conversationId: ID,
-        name: string,
-        playerId: ID,
-    },
+        conversationId: ID;
+        name: string;
+        playerId: ID;
+    };
 }
 
-export interface PlayerDiplomacyStatusChangedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerDiplomacyStatusChanged',
-    data: DiplomaticStatus<ID>,
+export interface PlayerDiplomacyStatusChangedEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerDiplomacyStatusChanged";
+    data: DiplomaticStatus<ID>;
 }
 
-export interface PlayerGalacticCycleCompleteEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerGalacticCycleComplete',
+export interface PlayerGalacticCycleCompleteEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerGalacticCycleComplete";
     data: {
         creditsEconomy: number;
         creditsBanking: number;
@@ -140,120 +155,113 @@ export interface PlayerGalacticCycleCompleteEvent<ID> extends BasePlayerEvent<ID
         experimentResearchingNext: string | null;
         carrierUpkeep: {
             carrierCount: number;
-            totalCost: number
+            totalCost: number;
         } | null;
         allianceUpkeep: {
             allianceCount: number;
             totalCost: number;
         } | null;
-    },
-}
-
-export interface PlayerStarSpecialistHiredEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerStarSpecialistHired',
-    data: {
-        starId: ID,
-        starName: string,
-        specialistId: number,
-        specialistName: string,
-        specialistDescription: string,
-    },
-}
-
-export interface PlayerRenownReceivedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerRenownReceived',
-    data: {
-        fromPlayerId: ID,
-        renown: number,
-    },
-}
-
-export interface PlayerRenownSentEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerRenownSent',
-    data: {
-        toPlayerId: ID,
-        renown: number,
-    },
-}
-
-export interface PlayerResearchCompleteEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerResearchComplete',
-    data: {
-        technologyKey: string,
-        technologyLevel: number,
-        technologyKeyNext: string,
-        technologyLevelNext: number,
-    },
-}
-
-export interface PlayerStarAbandonedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerStarAbandoned',
-    data: {
-        starId: ID,
-        starName: string,
-    },
-}
-
-export interface PlayerStarDiedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerStarDied',
-    data: {
-        starId: ID,
-        starName: string,
-    },
-}
-
-export interface PlayerStarReignitedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerStarReignited',
-    data: {
-        starId: ID,
-        starName: string,
-    },
-}
-
-export interface PlayerTechnologyReceivedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerTechnologyReceived',
-    data: {
-        fromPlayerId: ID,
-        technology: TradeEventTechnology,
-    },
-}
-
-export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerTechnologySent',
-    data: {
-        toPlayerId: ID,
-        technology: TradeEventTechnology,
-    },
-}
-
-export interface CombatEventData<ID> {
-    playerIdDefenders: ID[];
-    playerIdAttackers: ID[];
-    combatResult: CombatResult<ID>;
-}
-
-export interface BaseCombatEvent<ID> extends BasePlayerEvent<ID> {
-    data: CombatEventData<ID>,
-}
-
-export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCombatStar';
-    data: CombatEventData<ID> & {
-        playerIdOwner: ID;
-        starId: ID;
-        starName: string;
-        captureResult: StarCaptureResult<ID>;
     };
 }
 
-export interface PlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerCombatCarrier',
-    data: CombatEventData<ID>,
+export interface PlayerStarSpecialistHiredEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerStarSpecialistHired";
+    data: {
+        starId: ID;
+        starName: string;
+        specialistId: number;
+        specialistName: string;
+        specialistDescription: string;
+    };
 }
 
-export interface PlayerBulkInfrastructureUpgradedEvent<ID> extends BasePlayerEvent<ID> {
-    type: 'playerBulkInfrastructureUpgraded',
+export interface PlayerRenownReceivedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerRenownReceived";
     data: {
-        upgradeReport: BulkUpgradeReport<ID>,
-    }
+        fromPlayerId: ID;
+        renown: number;
+    };
+}
+
+export interface PlayerRenownSentEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerRenownSent";
+    data: {
+        toPlayerId: ID;
+        renown: number;
+    };
+}
+
+export interface PlayerResearchCompleteEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerResearchComplete";
+    data: {
+        technologyKey: string;
+        technologyLevel: number;
+        technologyKeyNext: string;
+        technologyLevelNext: number;
+    };
+}
+
+export interface PlayerStarAbandonedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerStarAbandoned";
+    data: {
+        starId: ID;
+        starName: string;
+    };
+}
+
+export interface PlayerStarDiedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerStarDied";
+    data: {
+        starId: ID;
+        starName: string;
+    };
+}
+
+export interface PlayerStarReignitedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerStarReignited";
+    data: {
+        starId: ID;
+        starName: string;
+    };
+}
+
+export interface PlayerTechnologyReceivedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerTechnologyReceived";
+    data: {
+        fromPlayerId: ID;
+        technology: TradeEventTechnology;
+    };
+}
+
+export interface PlayerTechnologySentEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerTechnologySent";
+    data: {
+        toPlayerId: ID;
+        technology: TradeEventTechnology;
+    };
+}
+
+export interface BaseCombatEvent<ID> extends BasePlayerEvent<ID> {
+    data: CombatResult<ID>;
+}
+
+export interface PlayerCombatStarEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerCombatStar";
+    data: CombatResult<ID>;
+}
+
+export interface PlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerCombatCarrier";
+    data: CombatResult<ID>;
+}
+
+export interface PlayerBulkInfrastructureUpgradedEvent<
+    ID,
+> extends BasePlayerEvent<ID> {
+    type: "playerBulkInfrastructureUpgraded";
+    data: {
+        upgradeReport: BulkUpgradeReport<ID>;
+    };
 }

@@ -1,19 +1,23 @@
 {
-  "name": "solaris-common",
-  "version": "1.0.0",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "check": "tsc",
-    "build": "tsc"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {},
-  "devDependencies": {},
-  "files": [
-    "/dist"
-  ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts"
+    "name": "@solaris/common",
+    "version": "1.0.0",
+    "scripts": {
+        "test": "tsx ../node_modules/jasmine/bin/jasmine",
+        "check": "tsc",
+        "build": "tsc"
+    },
+    "author": "",
+    "license": "GPL-3.0-or-later",
+    "description": "",
+    "dependencies": {},
+    "devDependencies": {
+        "@types/jasmine": "5.1.5",
+        "jasmine": "5.5.0",
+        "ts-node": "10.9.2"
+    },
+    "files": [
+        "/dist"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
 }

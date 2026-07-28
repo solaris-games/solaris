@@ -1,47 +1,38 @@
 <template>
-  <div class="row">
-    <div class="table-responsive p-0">
-      <table class="table table-sm table-striped">
-        <tbody>
-          <leaderboard-row v-for="player in sortedPlayers" :key="player._id" :player="player" :show-team-names="true" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
-        </tbody>
-      </table>
-    </div>
+  <div class="table-responsive p-0">
+    <table class="table table-sm table-striped">
+      <tbody>
+        <leaderboard-row
+          v-for="player in sortedPlayers"
+          :key="player._id"
+          :player="player"
+          :show-team-names="true"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+        />
+      </tbody>
+    </table>
   </div>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
-import LeaderboardRow from './LeaderboardRow.vue';
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import GameHelper from "../../../../services/gameHelper";
+import LeaderboardRow from "./LeaderboardRow.vue";
+import type { Game } from "@/types/game";
 
-export default {
-  components: {
-    'leaderboard-row': LeaderboardRow
-  },
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
 
-  data () {
-    return {
-      players: []
-    }
-  },
-  mounted () {
-    this.players = this.$store.state.game.galaxy.players
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', e)
-    }
-  },
+const onOpenPlayerDetailRequested = (e: string) =>
+  emit("onOpenPlayerDetailRequested", e);
 
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    sortedPlayers () {
-      return GameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-    }
-  }
-}
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const sortedPlayers = computed(() =>
+  GameHelper.getSortedLeaderboardPlayerList(game.value),
+);
 </script>
 
 <style scoped>

@@ -1,24 +1,30 @@
 import { Game } from "./types/Game";
-import { Specialist } from 'solaris-common';
+import { Specialist } from "@solaris/common";
 import SpecialistService from "./specialist";
-const RNG = require('random-seed');
-import moment from "moment";
+const RNG = require("random-seed");
+import { DateTime } from "luxon";
 
 export default class SpecialistBanService {
     specialistService: SpecialistService;
 
-    constructor(
-        specialistService: SpecialistService
-    ) {
+    constructor(specialistService: SpecialistService) {
         this.specialistService = specialistService;
     }
 
     isStarSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.star.indexOf(specialistId) > -1;
+        return (
+            game.settings.specialGalaxy.specialistBans.star.indexOf(
+                specialistId,
+            ) > -1
+        );
     }
 
     isCarrierSpecialistBanned(game: Game, specialistId: number) {
-        return game.settings.specialGalaxy.specialistBans.carrier.indexOf(specialistId) > -1;
+        return (
+            game.settings.specialGalaxy.specialistBans.carrier.indexOf(
+                specialistId,
+            ) > -1
+        );
     }
 
     _getCurrentMonthBans(specialistIds: number[], amount: number) {
@@ -30,8 +36,8 @@ export default class SpecialistBanService {
             return specialistIds;
         }
 
-        const now = moment().utc();
-        const seed = now.format('YYYYMM');
+        const now = DateTime.utc();
+        const seed = now.toFormat("yyyyMM");
         const rng = RNG.create(seed);
 
         const bans: number[] = [];
@@ -48,7 +54,9 @@ export default class SpecialistBanService {
     }
 
     getCurrentMonthStarBans(amount: number): Specialist[] {
-        const specs = this.specialistService.listStar(null).filter(s => s.active.official);
+        const specs = this.specialistService
+            .listStar(null)
+            .filter((s) => s.active.official);
         const ids = specs.map((s: Specialist) => s.id);
         const bans = this._getCurrentMonthBans(ids, amount);
 
@@ -56,7 +64,9 @@ export default class SpecialistBanService {
     }
 
     getCurrentMonthCarrierBans(amount: number): Specialist[] {
-        const specs = this.specialistService.listCarrier(null).filter(s => s.active.official);
+        const specs = this.specialistService
+            .listCarrier(null)
+            .filter((s) => s.active.official);
         const ids = specs.map((s: Specialist) => s.id);
         const bans = this._getCurrentMonthBans(ids, amount);
 
@@ -67,10 +77,9 @@ export default class SpecialistBanService {
         const carrierBans = this.getCurrentMonthCarrierBans(amount);
         const starBans = this.getCurrentMonthStarBans(amount);
 
-        return{
+        return {
             carrier: carrierBans,
-            star: starBans
+            star: starBans,
         };
     }
-
-};
+}

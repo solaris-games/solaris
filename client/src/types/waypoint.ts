@@ -4,4 +4,4 @@ export type TempWaypoint = {
   actionShips: number;
   delayTicks: number;
   source: string | undefined | null;
-}
+};

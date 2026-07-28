@@ -1,16 +1,15 @@
-import {Persistence} from "./persistence";
-import {logger} from "../../utils/logging";
+import { Persistence } from "./persistence";
+import { logger } from "../../utils/logging";
 
 export type JobSpec = {
     name: string;
-    job: (signal: AbortSignal) => Promise<void>,
+    job: (signal: AbortSignal) => Promise<void>;
     interval: number;
-}
-
+};
 
 export type SchedulerOptions = {
     checkInterval: number;
-}
+};
 
 const log = logger("Scheduler");
 
@@ -18,7 +17,7 @@ export class Scheduler {
     jobs: JobSpec[] = [];
     options: SchedulerOptions;
     persistence: Persistence;
-    pending: Promise<void> | null =  null;
+    pending: Promise<void> | null = null;
     lastExecution: number = 0;
     abort: AbortController | null = null;
 
@@ -35,9 +34,14 @@ export class Scheduler {
             const jobsToProcess: JobSpec[] = [];
 
             for (const job of this.jobs) {
-                const lastExecution = await this.persistence.getLastExecution(job.name);
+                const lastExecution = await this.persistence.getLastExecution(
+                    job.name,
+                );
 
-                if (lastExecution === null || now - lastExecution >= job.interval) {
+                if (
+                    lastExecution === null ||
+                    now - lastExecution >= job.interval
+                ) {
                     jobsToProcess.push(job);
                 }
             }
@@ -59,7 +63,7 @@ export class Scheduler {
             }
 
             this.lastExecution = now;
-        }
+        };
 
         const finishJob = () => {
             this.pending = null;
@@ -70,8 +74,8 @@ export class Scheduler {
         };
 
         this.abort = new AbortController();
-        this.abort.signal.addEventListener('abort', () => {
-            log.warn('Aborting pending job');
+        this.abort.signal.addEventListener("abort", () => {
+            log.warn("Aborting pending job");
 
             finishJob();
         });
@@ -81,19 +85,21 @@ export class Scheduler {
     }
 
     async startup() {
-        await this.persistence.loadExecutionsFor(...this.jobs.map(j => j.name));
+        await this.persistence.loadExecutionsFor(
+            ...this.jobs.map((j) => j.name),
+        );
     }
 
     run(): Promise<void> {
-        return new Promise(((finish, reject) => {
-            process.on('uncaughtException', (e) => {
-                log.error(e, 'Uncaught exception');
+        return new Promise((finish, reject) => {
+            process.on("uncaughtException", (e) => {
+                log.error(e, "Uncaught exception");
 
                 this.abort && this.abort.abort();
             });
 
-            process.on('SIGINT', () => {
-                log.info('Shutdown requested...');
+            process.on("SIGINT", () => {
+                log.info("Shutdown requested...");
 
                 if (this.pending) {
                     log.info("Shutdown after awaiting pending job");
@@ -109,6 +115,6 @@ export class Scheduler {
             });
 
             this._process();
-        }));
+        });
     }
 }

@@ -1,27 +1,36 @@
 import Repository from "./repository";
-import {Announcement} from "./types/Announcement";
-import {DBObjectId, objectId} from "./types/DBObjectId";
+import { Announcement } from "./types/Announcement";
+import { DBObjectId, objectId } from "./types/DBObjectId";
 import UserService from "./user";
-import { ValidationError } from "solaris-common";
-import {Model} from "mongoose";
-import {AnnouncementState} from "solaris-common";
+import { ValidationError } from "@solaris/common";
+import { Model } from "mongoose";
+import { AnnouncementState } from "@solaris/common";
 
 export default class AnnouncementService {
     announcementModel: Model<Announcement>;
     announcementRepo: Repository<Announcement>;
     userService: UserService;
 
-    constructor(announcementModel, announcementRepo: Repository<Announcement>, userService: UserService) {
+    constructor(
+        announcementModel,
+        announcementRepo: Repository<Announcement>,
+        userService: UserService,
+    ) {
         this.announcementModel = announcementModel;
         this.announcementRepo = announcementRepo;
         this.userService = userService;
     }
 
     async getLatestAnnouncement(): Promise<Announcement | null> {
-        return this.announcementModel.findOne({ date: { $lte: new Date() } }).sort({ date: -1 }).exec();
+        return this.announcementModel
+            .findOne({ date: { $lte: new Date() } })
+            .sort({ date: -1 })
+            .exec();
     }
 
-    async getAnnouncementState(userId: DBObjectId): Promise<AnnouncementState<DBObjectId>> {
+    async getAnnouncementState(
+        userId: DBObjectId,
+    ): Promise<AnnouncementState<DBObjectId>> {
         const user = await this.userService.getById(userId);
 
         if (!user) {
@@ -29,16 +38,21 @@ export default class AnnouncementService {
         }
 
         const lastReadAnnouncement = user.lastReadAnnouncement?.toString();
-        const announcementIds: { _id: DBObjectId }[] = await this.getCurrentAnnouncementsQuery().select({ _id: 1 }).exec();
+        const announcementIds: { _id: DBObjectId }[] =
+            await this.getCurrentAnnouncementsQuery().select({ _id: 1 }).exec();
 
         let unreadCount: number;
         if (lastReadAnnouncement) {
-            unreadCount = announcementIds.findIndex(a => a._id.toString() === lastReadAnnouncement);
+            unreadCount = announcementIds.findIndex(
+                (a) => a._id.toString() === lastReadAnnouncement,
+            );
         } else {
             unreadCount = announcementIds.length;
         }
 
-        const unreadAnnouncements = announcementIds.slice(0, unreadCount).map(a => a._id);
+        const unreadAnnouncements = announcementIds
+            .slice(0, unreadCount)
+            .map((a) => a._id);
 
         return {
             lastReadAnnouncement: user.lastReadAnnouncement,
@@ -67,7 +81,9 @@ export default class AnnouncementService {
     }
 
     getCurrentAnnouncementsQuery() {
-        return this.announcementModel.find({ date: { $lte: new Date() } }).sort({ date: -1 });
+        return this.announcementModel
+            .find({ date: { $lte: new Date() } })
+            .sort({ date: -1 });
     }
 
     async createAnnouncement(title: String, date: Date, content: String) {

@@ -1,15 +1,15 @@
-import {User} from "./types/User";
+import { User } from "./types/User";
 
-import moment from "moment";
+import { DateTime } from "luxon";
 import EventEmitter from "events";
-import Repository from './repository';
-import { Game } from './types/Game';
-import { Player } from './types/Player';
-import CarrierService from './carrier';
-import { GameTypeService } from 'solaris-common'
-import StarService from './star';
-import GameStateService from './gameState';
-import PlayerService from './player';
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import CarrierService from "./carrier";
+import { GameTypeService } from "@solaris/common";
+import StarService from "./star";
+import GameStateService from "./gameState";
+import PlayerService from "./player";
 
 export default class PlayerAfkService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -25,7 +25,7 @@ export default class PlayerAfkService extends EventEmitter {
         starService: StarService,
         carrierService: CarrierService,
         gameTypeService: GameTypeService,
-        gameStateService: GameStateService
+        gameStateService: GameStateService,
     ) {
         super();
 
@@ -37,31 +37,39 @@ export default class PlayerAfkService extends EventEmitter {
         this.gameStateService = gameStateService;
     }
 
-    incrementAfkCount (user: User) {
+    incrementAfkCount(user: User) {
         user.achievements.afk++;
 
         // Even better would be to look only at recent games, but there is no data for that at the moment
-        const hasHighAfkRate = (user.achievements.afk / user.achievements.joined) > 0.4;
+        const hasHighAfkRate =
+            user.achievements.afk / user.achievements.joined > 0.4;
         const hasJoinedSeveralGames = user.achievements.joined > 2;
-        const hasRecentAfkWarning = user.warnings.find(w => w.text === 'Frequent AFK' && moment(w.date).isAfter(moment().subtract(1, 'month')));
+        const hasRecentAfkWarning = user.warnings.find(
+            (w) =>
+                w.text === "Frequent AFK" &&
+                DateTime.fromJSDate(w.date) >
+                    DateTime.utc().minus({ months: 1 }),
+        );
 
         if (hasHighAfkRate && hasJoinedSeveralGames && !hasRecentAfkWarning) {
             user.warnings.push({
                 date: new Date(),
-                text: 'Frequent AFK'
+                text: "Frequent AFK",
             });
         }
     }
 
     performDefeatedOrAfkCheck(game: Game, player: Player) {
         if (player.defeated) {
-            throw new Error(`Cannot perform a defeated check on an already defeated player.`);
+            throw new Error(
+                `Cannot perform a defeated check on an already defeated player.`,
+            );
         }
 
         if (!player.afk) {
             // Check if the player has been AFK.
             const isAfk = this.isAfk(game, player);
-    
+
             if (isAfk) {
                 this.setPlayerAsAfk(game, player);
             }
@@ -69,11 +77,17 @@ export default class PlayerAfkService extends EventEmitter {
 
         // Check if the player has been defeated by conquest.
         if (!player.defeated) {
-            const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+            const stars = this.starService.listStarsOwnedByPlayer(
+                game.galaxy.stars,
+                player._id,
+            );
 
             // If there are no stars and there are no carriers then the player is defeated.
             if (stars.length === 0) {
-                const carriers = this.carrierService.listCarriersOwnedByPlayer(game.galaxy.carriers, player._id); // Note: This logic looks a bit weird, but its more performant.
+                const carriers = this.carrierService.listCarriersOwnedByPlayer(
+                    game.galaxy.carriers,
+                    player._id,
+                ); // Note: This logic looks a bit weird, but its more performant.
 
                 if (carriers.length === 0) {
                     this.playerService.setPlayerAsDefeated(game, player, false);
@@ -81,17 +95,23 @@ export default class PlayerAfkService extends EventEmitter {
             }
 
             // For capital star elimination games, if the player doesn't own their original home star then they are defeated.
-            if (this.gameTypeService.isCapitalStarEliminationMode(game) && !this.playerService.ownsOriginalHomeStar(game, player)) {
+            if (
+                this.gameTypeService.isCapitalStarEliminationMode(game) &&
+                !this.playerService.ownsOriginalHomeStar(game, player)
+            ) {
                 this.playerService.setPlayerAsDefeated(game, player, false);
             }
         }
     }
 
     setPlayerAsAfk(game: Game, player: Player) {
-        this.playerService.setPlayerAsDefeated(game, player, game.settings.general.afkSlotsOpen === 'enabled');
+        this.playerService.setPlayerAsDefeated(
+            game,
+            player,
+            game.settings.general.afkSlotsOpen === "enabled",
+        );
         player.afk = true;
     }
-
 
     isAIControlled(game: Game, player: Player) {
         // Defeated players or players not controlled by a user are controlled by AI.
@@ -119,7 +139,11 @@ export default class PlayerAfkService extends EventEmitter {
             return false;
         }
 
-        let lastSeenMoreThanXDaysAgo = moment(player.lastSeen).utc() <= moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days');
+        let lastSeenMoreThanXDaysAgo =
+            DateTime.fromJSDate(player.lastSeen!).toUTC() <=
+            DateTime.utc().minus({
+                days: game.settings.gameTime.afk.lastSeenTimeout,
+            });
 
         if (lastSeenMoreThanXDaysAgo) {
             return true;
@@ -129,11 +153,15 @@ export default class PlayerAfkService extends EventEmitter {
             return player.missedTurns >= game.settings.gameTime.afk.turnTimeout;
         }
 
-        let secondsXCycles = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
+        let secondsXCycles =
+            game.settings.galaxy.productionTicks *
+            game.settings.gameTime.speed *
+            game.settings.gameTime.afk.cycleTimeout;
         let secondsToAfk = Math.max(secondsXCycles, 43200); // Minimum of 12 hours.
-        let lastSeenMoreThanXSecondsAgo = moment(player.lastSeen).utc() <= moment().utc().subtract(secondsToAfk, 'seconds');
+        let lastSeenMoreThanXSecondsAgo =
+            DateTime.fromJSDate(player.lastSeen!).toUTC() <=
+            DateTime.utc().minus({ seconds: secondsToAfk });
 
         return lastSeenMoreThanXSecondsAgo;
     }
-
 }

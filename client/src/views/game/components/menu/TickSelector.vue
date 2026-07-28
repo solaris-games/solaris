@@ -1,54 +1,98 @@
 <template>
-
   <div>
     <div @click="toggleDisplay" class="pointer">
-        <span class="me-1">
-            <i class="fas fa-stopwatch"></i>
-        </span>
-      <span class="d-none d-md-inline-block me-1">
-            Tick
-        </span>
+      <span class="me-1">
+        <i class="fas fa-stopwatch"></i>
+      </span>
+      <span class="d-none d-md-inline-block me-1"> Tick </span>
       <span class="d-none d-sm-inline-block user-select-none me-1">
-            {{ tick }}
-        </span>
+        {{ tick }}
+      </span>
       <span>
-            <i class="fas" :class="{'fa-chevron-down':!display,'fa-chevron-up':display}"></i>
-        </span>
+        <i
+          class="fas"
+          :class="{
+            'fa-chevron-down': !display,
+            'fa-chevron-up': display,
+          }"
+        ></i>
+      </span>
     </div>
 
-    <div class="tick-form container mt-1 p-3"
-         :class="{'header-bar-bg': !isHistoricalMode,'bg-dark': isHistoricalMode}" v-if="display">
+    <div
+      class="tick-form container mt-1 p-3"
+      :class="{
+        'header-bar-bg': !isHistoricalMode,
+        'bg-dark': isHistoricalMode,
+      }"
+      v-if="display"
+    >
       <div class="row mt-0 pt-2 pb-2 g-0">
         <div class="col-12 mb-1">
-          <input type="range" :min="minimumTick" :max="stateTick" class="slider" v-model="tick"
-                 @change="onRequestedTickChanged" :disabled="isLoading">
+          <input
+            type="range"
+            :min="minimumTick"
+            :max="stateTick"
+            class="slider"
+            v-model="tick"
+            @change="onRequestedTickChanged"
+            :disabled="isLoading"
+          />
         </div>
         <div class="col-5">
-          <button class="btn btn-sm btn-secondary" @click="loadPreviousTick(turnTicks)"
-                  :disabled="isLoading || tick <= minimumTick" :title="`Jump back ${turnTicks.value} ticks`">
+          <button
+            class="btn btn-sm btn-secondary"
+            @click="loadPreviousTick(turnTicks)"
+            :disabled="isLoading || tick <= minimumTick"
+            :title="`Jump back ${turnTicks} ticks`"
+          >
             <i class="fas fa-angle-double-left"></i>
           </button>
-          <button class="btn btn-sm btn-secondary ms-1" @click="loadPreviousTick(1)"
-                  :disabled="isLoading || tick <= minimumTick" title="Previous tick">
+          <button
+            class="btn btn-sm btn-secondary ms-1"
+            @click="loadPreviousTick(1)"
+            :disabled="isLoading || tick <= minimumTick"
+            title="Previous tick"
+          >
             <i class="fas fa-angle-left"></i> Prev
           </button>
         </div>
         <div class="col-2 text-center">
           <div v-if="isInputMode" class="tickInputContainer">
-            <input type="number" v-model="inputTick" class="tickInput" :min="minimumTick" :max="stateTick" />
-            <button class="btn btn-sm btn-primary" @click="confirmInput">Go</button>
+            <input
+              type="number"
+              v-model="inputTick"
+              class="tickInput"
+              :min="minimumTick"
+              :max="stateTick"
+            />
+            <button class="btn btn-sm btn-primary" @click="confirmInput">
+              Go
+            </button>
           </div>
-          <button v-else class="btn btn-sm btn-primary px-3" @click="toggleMode">
+          <button
+            v-else
+            class="btn btn-sm btn-primary px-3"
+            @click="toggleMode"
+          >
             {{ tick }}
           </button>
         </div>
         <div class="col-5 text-end">
-          <button class="btn btn-sm btn-secondary" @click="loadNextTick(1)" :disabled="isLoading || tick >= stateTick"
-                  title="Next tick">
+          <button
+            class="btn btn-sm btn-secondary"
+            @click="loadNextTick(1)"
+            :disabled="isLoading || tick >= stateTick"
+            title="Next tick"
+          >
             Next <i class="fas fa-angle-right"></i>
           </button>
-          <button class="btn btn-sm btn-secondary ms-1" @click="loadNextTick(turnTicks)"
-                  :disabled="isLoading || tick >= stateTick" :title="`Jump forward ${turnTicks.value} ticks`">
+          <button
+            class="btn btn-sm btn-secondary ms-1"
+            @click="loadNextTick(turnTicks)"
+            :disabled="isLoading || tick >= stateTick"
+            :title="`Jump forward ${turnTicks} ticks`"
+          >
             <i class="fas fa-angle-double-right"></i>
           </button>
         </div>
@@ -58,20 +102,19 @@
 </template>
 
 <script setup lang="ts">
-import {eventBusInjectionKey} from '../../../../eventBus'
-import GameEventBusEventNames from '../../../../eventBusEventNames/game'
-import {computed, inject, onMounted, onUnmounted, ref} from 'vue'
-import {type Store, useStore} from 'vuex';
-import type {State} from "@/store";
-import {useIsHistoricalMode} from "@/util/reactiveHooks";
-import {detailGalaxy} from "@/services/typedapi/game";
-import {formatError, httpInjectionKey, isOk} from "@/services/typedapi";
-import type {Game} from "@/types/game";
+import { useGameStore } from "@/stores/game";
+import { eventBusInjectionKey } from "../../../../eventBus";
+import GameEventBusEventNames from "../../../../eventBusEventNames/game";
+import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
+import { detailGalaxy } from "@/services/typedapi/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import type { Game } from "@/types/game";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
@@ -81,18 +124,27 @@ const display = ref(false);
 const tick = ref(0);
 const inputTick = ref(0);
 
-const game = computed<Game>(() => store.state.game);
+const game = computed<Game>(() => store.game!);
 
-const stateTick = computed(() => store.state.tick);
+const stateTick = computed(() => store.tick);
 
 const gameTick = computed(() => game.value.state.tick);
 
-const minimumTick = computed(() => store.state.game.state.timeMachineMinimumTick ?? 1);
+const minimumTick = computed(
+  () => store.game!.state.timeMachineMinimumTick ?? 1,
+);
 
-const turnTicks = computed(() => store.state.game.settings.gameTime.gameType === 'turnBased' ? store.state.game.settings.gameTime.turnJumps : 6);
+const turnTicks = computed(() =>
+  store.game!.settings.gameTime.gameType === "turnBased"
+    ? store.game!.settings.gameTime.turnJumps
+    : 6,
+);
 
 const onGameTick = () => {
-  const oneIncrement = game.value.settings.gameTime.gameType === 'turnBased' ? game.value.settings.gameTime.turnJumps : 1;
+  const oneIncrement =
+    game.value.settings.gameTime.gameType === "turnBased"
+      ? game.value.settings.gameTime.turnJumps
+      : 1;
 
   if (tick.value === gameTick.value - oneIncrement) {
     tick.value = gameTick.value;
@@ -100,7 +152,10 @@ const onGameTick = () => {
 };
 
 const confirmInput = async () => {
-  tick.value = Math.max(minimumTick.value, Math.min(inputTick.value, stateTick.value));
+  tick.value = Math.max(
+    minimumTick.value,
+    Math.min(inputTick.value, stateTick.value),
+  );
   isInputMode.value = false;
 
   await onRequestedTickChanged();
@@ -115,18 +170,23 @@ const toggleDisplay = () => {
 };
 
 const onRequestedTickChanged = async () => {
-  if (isLoading.value || tick.value < minimumTick.value || tick.value > stateTick.value || tick.value === gameTick.value) {
+  if (
+    isLoading.value ||
+    tick.value < minimumTick.value ||
+    tick.value > stateTick.value ||
+    tick.value === gameTick.value
+  ) {
     return;
   }
 
   isLoading.value = true;
 
-  const game = store.state.game;
+  const game = store.game!;
 
   const response = await detailGalaxy(httpClient)(game._id, tick.value);
 
   if (isOk(response)) {
-    store.commit('setGame', response.data);
+    store.setGame(response.data as any);
     tick.value = response.data.state.tick;
     inputTick.value = response.data.state.tick;
   } else {
@@ -183,8 +243,8 @@ onUnmounted(() => {
   background: #444;
   outline: none;
   opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
+  -webkit-transition: 0.2s;
+  transition: opacity 0.2s;
 }
 
 .slider::-webkit-slider-thumb {
@@ -206,10 +266,13 @@ onUnmounted(() => {
 }
 
 .tick-form {
-  z-index: 1;
+  z-index: 120;
   position: absolute;
   width: 300px;
-  left: 0px;
+  left: 50px;
+  background: #1d2835;
+  border: black 2px solid;
+  border-radius: 4px;
 }
 
 @media screen and (max-width: 473px) {

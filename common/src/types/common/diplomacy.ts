@@ -1,4 +1,4 @@
-export type DiplomaticState = 'enemies' | 'neutral' | 'allies';
+export type DiplomaticState = "enemies" | "neutral" | "allies";
 
 export interface DiplomaticStatus<ID> {
     playerIdFrom: ID;
@@ -8,7 +8,7 @@ export interface DiplomaticStatus<ID> {
     statusFrom: DiplomaticState;
     statusTo: DiplomaticState;
     actualStatus: DiplomaticState;
-};
+}
 
 export interface DiplomacyEvent<ID> {
     playerId: ID;
@@ -16,4 +16,4 @@ export interface DiplomacyEvent<ID> {
     data: DiplomaticStatus<ID>;
     sentDate: Date;
     sentTick: number;
-};
+}

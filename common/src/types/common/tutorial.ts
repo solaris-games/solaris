@@ -1,4 +1,4 @@
-export type TutorialLevel = 'beginner' | 'intermediate' | 'advanced';
+export type TutorialLevel = "beginner" | "intermediate" | "advanced";
 
 export interface Tutorial {
     key: string;
@@ -7,4 +7,4 @@ export interface Tutorial {
     description: string;
     level: TutorialLevel;
     completed?: boolean;
-};
+}

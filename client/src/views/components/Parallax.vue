@@ -3,9 +3,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, useTemplateRef } from "vue";
 
-const elem = useTemplateRef('parallax');
+const elem = useTemplateRef("parallax");
 
 const parallax = (e: MouseEvent) => {
   if (!elem.value) {
@@ -33,16 +33,14 @@ onMounted(() => {
 
 <style scoped>
 #parallax {
-  position: absolute;
-  left: 0;
-  top: 40%;
-  width: 100%;
-  height: 60%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 100%;
   background-color: black;
-  background-image: url(../../assets/parallax/layer3.png), url(../../assets/parallax/layer2.png), url(../../assets/parallax/layer1.png);
+  background-image:
+    url(../../assets/parallax/layer3.png),
+    url(../../assets/parallax/layer2.png), url(../../assets/parallax/layer1.png);
   background-repeat: no-repeat;
   background-position: center;
-  background-position: 50% 50%;
-  z-index: -1;
 }
 </style>

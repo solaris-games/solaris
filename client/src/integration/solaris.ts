@@ -1,4 +1,4 @@
-import type {MessageIntegration} from "@/integration/messages";
+import type { MessageIntegration } from "@/integration/messages";
 
 export interface SolarisIntegration {
   messages: MessageIntegration;

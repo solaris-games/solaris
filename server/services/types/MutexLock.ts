@@ -1,4 +1,4 @@
 export interface MutexLock {
-    key: string,
-    mutexLockId: number
+    key: string;
+    mutexLockId: number;
 }

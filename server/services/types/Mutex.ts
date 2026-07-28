@@ -1,5 +1,5 @@
-import crypto from 'crypto'
-import {logger} from "../../utils/logging";
+import crypto from "crypto";
+import { logger } from "../../utils/logging";
 
 const log = logger("Mutex");
 
@@ -31,18 +31,18 @@ export class Mutex {
                     if (lockIdInput === lockId) {
                         resolve();
                         return true;
-                    }
-                    else {
-                        log.warn(`Cannot unlock Mutex wiht id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`);
+                    } else {
+                        log.warn(
+                            `Cannot unlock Mutex wiht id ${this.id} as lockId does not match.  Expected: ${lockId}, Actual: ${lockIdInput}`,
+                        );
                     }
 
                     return false;
-                }
+                };
             });
 
             return lockId;
-        }
-        else {
+        } else {
             //console.log(`Mutex ${this.id}, Awaiting (${lockId})`);
             await currentPromise;
             //console.log(`Mutex ${this.id}, Awaited.`);
@@ -60,7 +60,9 @@ export class Mutex {
     }
 
     private getLockId(): number {
-        let lockId = Number(`${new Date().getTime()}${crypto.randomInt(65535)}`);
+        let lockId = Number(
+            `${new Date().getTime()}${crypto.randomInt(65535)}`,
+        );
 
         return lockId;
     }

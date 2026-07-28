@@ -1,5 +1,5 @@
-import { LedgerType } from "solaris-common";
-import { ValidationError } from "solaris-common";
+import { LedgerType } from "@solaris/common";
+import { ValidationError } from "@solaris/common";
 import PlayerService from "./player";
 import PlayerCreditsService from "./playerCredits";
 import Repository from "./repository";
@@ -8,12 +8,7 @@ import { Game } from "./types/Game";
 import { Player, PlayerLedgerDebt } from "./types/Player";
 
 import EventEmitter from "events";
-
-export const LedgerServiceEvents = {
-    onDebtAdded: 'onDebtAdded',
-    onDebtSettled: 'onDebtSettled',
-    onDebtForgiven: 'onDebtForgiven'
-}
+import { IEventService } from "./types/IEventService";
 
 export default class LedgerService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -23,7 +18,7 @@ export default class LedgerService extends EventEmitter {
     constructor(
         gameRepo: Repository<Game>,
         playerService: PlayerService,
-        playerCreditsService: PlayerCreditsService
+        playerCreditsService: PlayerCreditsService,
     ) {
         super();
 
@@ -40,7 +35,9 @@ export default class LedgerService extends EventEmitter {
         let fullLedger = this.getLedger(player, type);
 
         // Get the ledger between the two players.
-        let playerLedger: PlayerLedgerDebt = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
+        let playerLedger: PlayerLedgerDebt = fullLedger.find(
+            (l) => l.playerId.toString() === playerId.toString(),
+        )!;
         let isNew: boolean = false;
 
         // If no ledger exists, create one.
@@ -54,50 +51,88 @@ export default class LedgerService extends EventEmitter {
             isNew = true;
         }
 
-        playerLedger = fullLedger.find(l => l.playerId.toString() === playerId.toString())!;
+        playerLedger = fullLedger.find(
+            (l) => l.playerId.toString() === playerId.toString(),
+        )!;
 
         return {
             ledger: playerLedger,
-            isNew
+            isNew,
         };
     }
 
-    async addDebt(game: Game, creditor: Player, debtor: Player, debt: number, type: LedgerType) {
+    async addDebt(
+        game: Game,
+        creditor: Player,
+        debtor: Player,
+        debt: number,
+        type: LedgerType,
+        eventService: IEventService,
+    ) {
         // Get both of the ledgers between the two players.
-        let ledgerCreditor = this.getLedgerForPlayer(creditor, debtor._id, type);
+        let ledgerCreditor = this.getLedgerForPlayer(
+            creditor,
+            debtor._id,
+            type,
+        );
         let ledgerDebtor = this.getLedgerForPlayer(debtor, creditor._id, type);
 
-        ledgerCreditor.ledger.debt += debt;   // Player B now has debt to player A
-        ledgerDebtor.ledger.debt -= debt;   // Player A has paid off some of the debt to player B
+        ledgerCreditor.ledger.debt += debt; // Player B now has debt to player A
+        ledgerDebtor.ledger.debt -= debt; // Player A has paid off some of the debt to player B
 
-        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
-        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
-        
-        this.emit(LedgerServiceEvents.onDebtAdded, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debt,
-            ledgerType: type
-        });
+        await this._updateLedger(
+            game,
+            creditor,
+            ledgerCreditor.ledger,
+            ledgerCreditor.isNew,
+            type,
+        );
+        await this._updateLedger(
+            game,
+            debtor,
+            ledgerDebtor.ledger,
+            ledgerDebtor.isNew,
+            type,
+        );
+
+        await eventService.createDebtAddedEvent(
+            game._id,
+            game.state.tick,
+            debtor._id,
+            creditor._id,
+            debt,
+            type,
+        );
 
         return ledgerCreditor;
     }
 
-    async settleDebt(game: Game, debtor: Player, playerBId: DBObjectId, type: LedgerType) {
+    async settleDebt(
+        game: Game,
+        debtor: Player,
+        playerBId: DBObjectId,
+        type: LedgerType,
+        eventService: IEventService,
+    ) {
         let creditor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
         let ledgerDebtor = this.getLedgerForPlayer(debtor, playerBId, type);
-        let ledgerCreditor = this.getLedgerForPlayer(creditor, debtor._id, type);
+        let ledgerCreditor = this.getLedgerForPlayer(
+            creditor,
+            debtor._id,
+            type,
+        );
 
         if (ledgerDebtor.ledger.debt > 0) {
-            throw new ValidationError('You do not owe the player anything.');
+            throw new ValidationError("You do not owe the player anything.");
         }
 
         let debtAmount = Math.abs(ledgerDebtor.ledger.debt);
-        let debtorCredits = type === LedgerType.Credits ? debtor.credits : debtor.creditsSpecialists
+        let debtorCredits =
+            type === LedgerType.Credits
+                ? debtor.credits
+                : debtor.creditsSpecialists;
 
         // If the debtor cannot fully settle the debt then only
         // pay what they can (their total credits)
@@ -109,31 +144,65 @@ export default class LedgerService extends EventEmitter {
         ledgerCreditor.ledger.debt -= debtAmount;
 
         if (type === LedgerType.Credits) {
-            await this.playerCreditsService.addCredits(game, debtor, -debtAmount);
-            await this.playerCreditsService.addCredits(game, creditor, debtAmount);
+            await this.playerCreditsService.addCredits(
+                game,
+                debtor,
+                -debtAmount,
+            );
+            await this.playerCreditsService.addCredits(
+                game,
+                creditor,
+                debtAmount,
+            );
         } else if (type === LedgerType.CreditsSpecialists) {
-            await this.playerCreditsService.addCreditsSpecialists(game, debtor, -debtAmount);
-            await this.playerCreditsService.addCreditsSpecialists(game, creditor, debtAmount);
+            await this.playerCreditsService.addCreditsSpecialists(
+                game,
+                debtor,
+                -debtAmount,
+            );
+            await this.playerCreditsService.addCreditsSpecialists(
+                game,
+                creditor,
+                debtAmount,
+            );
         } else {
             throw new Error(`Unsupported ledger type: ${type}`);
         }
 
-        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
-        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
+        await this._updateLedger(
+            game,
+            debtor,
+            ledgerDebtor.ledger,
+            ledgerDebtor.isNew,
+            type,
+        );
+        await this._updateLedger(
+            game,
+            creditor,
+            ledgerCreditor.ledger,
+            ledgerCreditor.isNew,
+            type,
+        );
 
-        this.emit(LedgerServiceEvents.onDebtSettled, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debtAmount,
-            ledgerType: type
-        });
+        await eventService.createDebtSettledEvent(
+            game._id,
+            game.state.tick,
+            debtor._id,
+            creditor._id,
+            debtAmount,
+            type,
+        );
 
         return ledgerDebtor;
     }
 
-    async forgiveDebt(game: Game, creditor: Player, playerBId: DBObjectId, type: LedgerType) {
+    async forgiveDebt(
+        game: Game,
+        creditor: Player,
+        playerBId: DBObjectId,
+        type: LedgerType,
+        eventService: IEventService,
+    ) {
         let debtor = this.playerService.getById(game, playerBId)!;
 
         // Get both of the ledgers between the two players.
@@ -141,76 +210,92 @@ export default class LedgerService extends EventEmitter {
         let ledgerDebtor = this.getLedgerForPlayer(debtor, creditor._id, type);
 
         if (ledgerCreditor.ledger.debt <= 0) {
-            throw new ValidationError('The player does not owe you anything.');
+            throw new ValidationError("The player does not owe you anything.");
         }
 
         let debtAmount = ledgerCreditor.ledger.debt;
 
         ledgerDebtor.ledger.debt += debtAmount; // Player B no longer has debt to player A
-        ledgerCreditor.ledger.debt = 0;             // Forgive Player B's debt.
+        ledgerCreditor.ledger.debt = 0; // Forgive Player B's debt.
 
-        await this._updateLedger(game, creditor, ledgerCreditor.ledger, ledgerCreditor.isNew, type);
-        await this._updateLedger(game, debtor, ledgerDebtor.ledger, ledgerDebtor.isNew, type);
+        await this._updateLedger(
+            game,
+            creditor,
+            ledgerCreditor.ledger,
+            ledgerCreditor.isNew,
+            type,
+        );
+        await this._updateLedger(
+            game,
+            debtor,
+            ledgerDebtor.ledger,
+            ledgerDebtor.isNew,
+            type,
+        );
 
-        this.emit(LedgerServiceEvents.onDebtForgiven, {
-            gameId: game._id,
-            gameTick: game.state.tick,
-            debtor: debtor._id,
-            creditor: creditor._id,
-            amount: debtAmount,
-            ledgerType: type
-        });
+        await eventService.createDebtForgivenEvent(
+            game._id,
+            game.state.tick,
+            debtor._id,
+            creditor._id,
+            debtAmount,
+            type,
+        );
 
         return ledgerCreditor;
     }
 
-    async _updateLedger(game: Game, player: Player, ledger: PlayerLedgerDebt, isNew: boolean, type: LedgerType) {
+    async _updateLedger(
+        game: Game,
+        player: Player,
+        ledger: PlayerLedgerDebt,
+        isNew: boolean,
+        type: LedgerType,
+    ) {
         let dbWrites: any[] = [];
 
         if (isNew) {
             const updateObject = {
-                $push: {}
+                $push: {},
             };
 
             // Funky string manipulation
             updateObject.$push[`galaxy.players.$[p].ledger.${type}`] = {
                 playerId: ledger.playerId,
-                debt: ledger.debt
+                debt: ledger.debt,
             };
 
             dbWrites.push({
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.players._id': player._id
+                        "galaxy.players._id": player._id,
                     },
                     update: updateObject,
-                    arrayFilters: [
-                        { 'p._id': player._id }
-                    ]
-                }
+                    arrayFilters: [{ "p._id": player._id }],
+                },
             });
         } else {
             const updateObject = {};
 
             // Funky string manipulation
-            updateObject[`galaxy.players.$[p].ledger.${type}.$[l].debt`] = ledger.debt;
+            updateObject[`galaxy.players.$[p].ledger.${type}.$[l].debt`] =
+                ledger.debt;
 
             dbWrites.push({
                 updateOne: {
                     filter: {
-                        _id: game._id
+                        _id: game._id,
                     },
                     update: updateObject,
                     arrayFilters: [
-                        { 'p._id': player._id },
-                        { 'l.playerId': ledger.playerId }
-                    ]
-                }
+                        { "p._id": player._id },
+                        { "l.playerId": ledger.playerId },
+                    ],
+                },
             });
         }
 
         await this.gameRepo.bulkWrite(dbWrites);
     }
-
-};
+}

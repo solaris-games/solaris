@@ -8,7 +8,7 @@ export default class NameService {
     constructor(
         gameNames: string[],
         starNames: string[],
-        randomService: RandomService
+        randomService: RandomService,
     ) {
         this.gameNames = gameNames;
         this.starNames = starNames;
@@ -16,15 +16,22 @@ export default class NameService {
     }
 
     getRandomStarName() {
-        return this.starNames[this.randomService.getRandomNumber(this.starNames.length - 1)];
+        return this.starNames[
+            this.randomService.getRandomNumber(this.starNames.length - 1)
+        ];
     }
 
     getRandomStarNameInList(starNames: string[]) {
-        return starNames.splice(this.randomService.getRandomNumber(starNames.length - 1), 1)[0];
+        return starNames.splice(
+            this.randomService.getRandomNumber(starNames.length - 1),
+            1,
+        )[0];
     }
 
     getRandomGameName() {
-        return this.gameNames[this.randomService.getRandomNumber(this.gameNames.length - 1)];
+        return this.gameNames[
+            this.randomService.getRandomNumber(this.gameNames.length - 1)
+        ];
     }
 
     getRandomStarNames(count: number) {
@@ -42,5 +49,4 @@ export default class NameService {
 
         return list;
     }
-
-};
+}

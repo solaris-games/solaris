@@ -1,37 +1,34 @@
-import { shuffle } from "solaris-common";
-import mongoose from 'mongoose';
-import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
-import Repository from './repository';
-import { Carrier } from './types/Carrier';
-import { Game } from './types/Game';
-import { Location } from './types/Location';
-import { MapObjectWithVisibility } from './types/Map';
-import { Player } from './types/Player';
-import { InfrastructureType, NaturalResources, Star, TerraformedResources } from './types/Star';
-import { User } from './types/User';
-import { DistanceService } from 'solaris-common';
-import GameStateService from './gameState';
-import { GameTypeService } from 'solaris-common'
-import NameService from './name';
-import RandomService from './random';
-import SpecialistService from './specialist';
-import { StarDistanceService } from 'solaris-common';
-import { TechnologyService } from 'solaris-common';
-import UserService from './user';
+import { Carrier, shuffle } from "@solaris/common";
+import mongoose from "mongoose";
+import { DBObjectId } from "./types/DBObjectId";
+import { ValidationError } from "@solaris/common";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Location } from "./types/Location";
+import { Player } from "./types/Player";
+import {
+    InfrastructureType,
+    NaturalResources,
+    Star,
+    TerraformedResources,
+} from "./types/Star";
+import { User } from "./types/User";
+import { DistanceService } from "@solaris/common";
+import GameStateService from "./gameState";
+import { GameTypeService } from "@solaris/common";
+import NameService from "./name";
+import RandomService from "./random";
+import SpecialistService from "./specialist";
+import { StarDistanceService } from "@solaris/common";
+import { TechnologyService } from "@solaris/common";
+import UserService from "./user";
 import { MathRandomGen } from "../utils/randomGen";
-import StatisticsService from "./statistics";
-import {GameSettings} from "solaris-common";
+import { GameSettings } from "@solaris/common";
 import EventEmitter from "events";
-import { StarDataService } from "solaris-common";
-
-const RNG = require('random-seed');
-
-export const StarServiceEvents = {
-    onPlayerStarAbandoned: 'onPlayerStarAbandoned',
-    onPlayerStarDied: 'onPlayerStarDied',
-    onPlayerStarReignited: 'onPlayerStarReignited'
-}
+import { StarDataService } from "@solaris/common";
+import { IEventService } from "./types/IEventService";
+import { IStatisticsService } from "./types/IStatisticsService";
+const RNG = require("random-seed");
 
 export default class StarService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -44,7 +41,6 @@ export default class StarService extends EventEmitter {
     userService: UserService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
-    statisticsService: StatisticsService;
     starDataService: StarDataService;
 
     constructor(
@@ -58,7 +54,6 @@ export default class StarService extends EventEmitter {
         userService: UserService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        statisticsService: StatisticsService,
         starDataService: StarDataService,
     ) {
         super();
@@ -73,15 +68,18 @@ export default class StarService extends EventEmitter {
         this.userService = userService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-        this.statisticsService = statisticsService;
         this.starDataService = starDataService;
     }
 
-    generateUnownedStar(name: string, location: Location, naturalResources: NaturalResources) {
+    generateUnownedStar(
+        name: string,
+        location: Location,
+        naturalResources: NaturalResources,
+    ) {
         naturalResources = naturalResources || {
             economy: 0,
             industry: 0,
-            science: 0
+            science: 0,
         };
 
         return {
@@ -92,17 +90,26 @@ export default class StarService extends EventEmitter {
             infrastructure: {
                 economy: 0,
                 industry: 0,
-                science: 0
-            }
+                science: 0,
+            },
         };
     }
 
-    generateStarPosition(game: Game, originX: number, originY: number, radius: number) {
+    generateStarPosition(
+        game: Game,
+        originX: number,
+        originY: number,
+        radius: number,
+    ) {
         if (radius == null) {
             radius = game.constants.distances.maxDistanceBetweenStars;
         }
 
-        return this.randomService.getRandomPositionInCircleFromOrigin(originX, originY, radius);
+        return this.randomService.getRandomPositionInCircleFromOrigin(
+            originX,
+            originY,
+            radius,
+        );
     }
 
     getById(game: Game, id: DBObjectId | string) {
@@ -113,7 +120,10 @@ export default class StarService extends EventEmitter {
         return this.getByIdBSForStars<Star>(game.galaxy.stars, id);
     }
 
-    _binarySearchIndex<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string) {
+    _binarySearchIndex<T extends { _id: DBObjectId | string }>(
+        stars: T[],
+        id: DBObjectId | string,
+    ) {
         let low = 0,
             high = stars.length;
 
@@ -129,7 +139,10 @@ export default class StarService extends EventEmitter {
         return low;
     }
 
-    binarySearchStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T | undefined {
+    binarySearchStars<T extends { _id: DBObjectId | string }>(
+        stars: T[],
+        id: DBObjectId | string,
+    ): T | undefined {
         const index = this._binarySearchIndex(stars, id.toString());
         if (stars[index] && stars[index]._id.toString() === id.toString()) {
             return stars[index];
@@ -138,17 +151,25 @@ export default class StarService extends EventEmitter {
         return undefined;
     }
 
-    getByIdBSForStars<T extends { _id: DBObjectId | string }>(stars: T[], id: DBObjectId | string): T {
+    getByIdBSForStars<T extends { _id: DBObjectId | string }>(
+        stars: T[],
+        id: DBObjectId | string,
+    ): T {
         let star = this.binarySearchStars(stars, id);
         if (star) {
             return star;
         }
         // id wasn't found
         // Return the old way
-        return stars.find(s => s._id.toString() === id.toString())!;
+        return stars.find((s) => s._id.toString() === id.toString())!;
     }
 
-    setupHomeStar(game: Game, homeStar: Star, player: Player, gameSettings: GameSettings<DBObjectId>) {
+    setupHomeStar(
+        game: Game,
+        homeStar: Star,
+        player: Player,
+        gameSettings: GameSettings<DBObjectId>,
+    ) {
         // Set up the home star
         player.homeStarId = homeStar._id;
         homeStar.ownedByPlayerId = player._id;
@@ -159,287 +180,178 @@ export default class StarService extends EventEmitter {
         homeStar.warpGate = false;
         homeStar.specialistId = null;
 
-        homeStar.naturalResources.economy = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.industry = game.constants.star.resources.maxNaturalResources;
-        homeStar.naturalResources.science = game.constants.star.resources.maxNaturalResources;
+        homeStar.naturalResources.economy =
+            game.constants.star.resources.maxNaturalResources;
+        homeStar.naturalResources.industry =
+            game.constants.star.resources.maxNaturalResources;
+        homeStar.naturalResources.science =
+            game.constants.star.resources.maxNaturalResources;
 
         // Seed the home star with the starting infrastructure.
-        homeStar.infrastructure.economy = gameSettings.player.startingInfrastructure.economy;
-        homeStar.infrastructure.industry = gameSettings.player.startingInfrastructure.industry;
-        homeStar.infrastructure.science = gameSettings.player.startingInfrastructure.science;
+        homeStar.infrastructure.economy =
+            gameSettings.player.startingInfrastructure.economy;
+        homeStar.infrastructure.industry =
+            gameSettings.player.startingInfrastructure.industry;
+        homeStar.infrastructure.science =
+            gameSettings.player.startingInfrastructure.science;
 
         homeStar.shipsActual = Math.max(gameSettings.player.startingShips, 1); // Must be at least 1 ship at the home star so that a carrier can be built there.
         homeStar.ships = homeStar.shipsActual;
-
     }
 
     getPlayerHomeStar(stars: Star[], player: Player) {
-        return this.listStarsOwnedByPlayer(stars, player._id).find(s => s._id.toString() === player.homeStarId!.toString());
+        return this.listStarsOwnedByPlayer(stars, player._id).find(
+            (s) => s._id.toString() === player.homeStarId!.toString(),
+        );
     }
 
     listStarsOwnedByPlayer(stars: Star[], playerId: DBObjectId) {
-        return stars.filter(s => s.ownedByPlayerId && s.ownedByPlayerId.toString() === playerId.toString());
+        return stars.filter(
+            (s) =>
+                s.ownedByPlayerId &&
+                s.ownedByPlayerId.toString() === playerId.toString(),
+        );
     }
 
     listStarsOwnedByPlayers(stars: Star[], playerIds: DBObjectId[]) {
-        const ids = playerIds.map(p => p.toString());
+        const ids = playerIds.map((p) => p.toString());
 
-        return stars.filter(s => s.ownedByPlayerId && ids.includes(s.ownedByPlayerId.toString()));
+        return stars.filter(
+            (s) =>
+                s.ownedByPlayerId && ids.includes(s.ownedByPlayerId.toString()),
+        );
     }
 
-    listStarIdsWithPlayerCarriersInOrbit(game: Game, playerId: DBObjectId): string[] {
+    listStarIdsWithPlayerCarriersInOrbit(
+        game: Game,
+        playerId: DBObjectId,
+    ): string[] {
         return game.galaxy.carriers
-            .filter(c => c.orbiting)
-            .filter(c => c.ownedByPlayerId!.toString() === playerId.toString())
-            .map(c => c.orbiting!.toString());
+            .filter((c) => c.orbiting)
+            .filter(
+                (c) => c.ownedByPlayerId!.toString() === playerId.toString(),
+            )
+            .map((c) => c.orbiting!.toString());
     }
 
-    listStarIdsWithPlayersCarriersInOrbit(game: Game, playerIds: DBObjectId[]): string[] {
-        const ids = playerIds.map(p => p.toString());
+    listStarIdsWithPlayersCarriersInOrbit(
+        game: Game,
+        playerIds: DBObjectId[],
+    ): string[] {
+        const ids = playerIds.map((p) => p.toString());
 
         return game.galaxy.carriers
-            .filter(c => c.orbiting)
-            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
-            .map(c => c.orbiting!.toString());
+            .filter((c) => c.orbiting)
+            .filter((c) => ids.includes(c.ownedByPlayerId!.toString()))
+            .map((c) => c.orbiting!.toString());
     }
 
-    listStarsWithScanningRangeByPlayer(game: Game, playerId: DBObjectId): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayer(game.galaxy.stars, playerId).map(s => s._id.toString());
+    listStarsOwnedOrInOrbitByPlayers(
+        game: Game,
+        playerIds: DBObjectId[],
+    ): Star[] {
+        let starIds: string[] = this.listStarsOwnedByPlayers(
+            game.galaxy.stars,
+            playerIds,
+        ).map((s) => s._id.toString());
 
-        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
-            starIds = starIds.concat(this.listStarIdsWithPlayerCarriersInOrbit(game, playerId));
+        if (game.settings.diplomacy.enabled === "enabled") {
+            // Don't need to check in orbit carriers if alliances is disabled
+            starIds = starIds.concat(
+                this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds),
+            );
         }
 
         starIds = [...new Set(starIds)];
 
-        return starIds
-            .map(id => this.getById(game, id))
-            .filter(s => !this.starDataService.isDeadStar(s));
+        return starIds.map((id) => this.getById(game, id));
     }
 
-    listStarsWithScanningRangeByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
-
-        if (game.settings.diplomacy.enabled === 'enabled') { // This never occurs when alliances is disabled.
-            starIds = starIds.concat(this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds));
-        }
-
-        starIds = [...new Set(starIds)];
-
-        return starIds
-            .map(id => this.getById(game, id))
-            .filter(s => !this.starDataService.isDeadStar(s));
-    }
-
-    listStarsOwnedOrInOrbitByPlayers(game: Game, playerIds: DBObjectId[]): Star[] {
-        let starIds: string[] = this.listStarsOwnedByPlayers(game.galaxy.stars, playerIds).map(s => s._id.toString());
-
-        if (game.settings.diplomacy.enabled === 'enabled') { // Don't need to check in orbit carriers if alliances is disabled
-            starIds = starIds.concat(this.listStarIdsWithPlayersCarriersInOrbit(game, playerIds));
-        }
-
-        starIds = [...new Set(starIds)];
-
-        return starIds
-            .map(id => this.getById(game, id));
-    }
-
-    listStarsOwnedByPlayerBulkIgnored(stars: Star[], playerId: DBObjectId, infrastructureType: InfrastructureType) {
-        return this.listStarsOwnedByPlayer(stars, playerId)
-            .filter(s => s.ignoreBulkUpgrade![infrastructureType]);
-    }
-
-    isStarAlwaysVisible(star: Star) {
-        return star.isPulsar || star.specialistId === 10 // Trade port
-    }
-
-    isStarWithinScanningRangeOfStars(game: Game, star: Star, stars: Star[]) {
-        // Pulsars are considered to be always in scanning range.
-        // Note: They are not visible until the game starts to prevent pre-teaming.
-        if (this.isStarAlwaysVisible(star) && this.gameStateService.isStarted(game)) {
-            return true;
-        }
-
-        // Go through all of the stars one by one and calculate
-        // whether any one of them is within scanning range.
-        for (let otherStar of stars) {
-            if (otherStar.ownedByPlayerId == null) {
-                continue;
-            }
-
-            // Use the effective scanning range of the other star to check if it can "see" the given star.
-            let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, otherStar);
-            let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-            let distance = this.starDistanceService.getDistanceBetweenStars(star, otherStar);
-
-            if (distance <= scanningRangeDistance) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    _insertIntoSortedMapObjectsArray(mapObjects: MapObjectWithVisibility[], mapObject: MapObjectWithVisibility) {
-        let index = this._binarySearchIndex(mapObjects, mapObject._id.toString());
-        mapObjects.splice(index, 0, mapObject);
-    }
-
-    filterStarsByScanningRange(game: Game, players: Player[]) {
-        // Stars may have different scanning ranges independently so we need to check
-        // each star to check what is within its scanning range.
-        const starsOwnedOrInOrbit = this.listStarsOwnedOrInOrbitByPlayers(game, players.map(p => p._id));
-        const starsWithScanning = starsOwnedOrInOrbit.filter(s => !this.starDataService.isDeadStar(s));
-
-        // Seed the stars that are in range to be the stars owned or are in orbit of.
-        let starsInRange: MapObjectWithVisibility[] = starsOwnedOrInOrbit.map(s => {
-            return {
-                _id: s._id,
-                location: s.location,
-                ownedByPlayerId: s.ownedByPlayerId,
-            }
-        })
-            .sort((a, b) => a._id.toString() < b._id.toString() ? -1 : 1);
-
-        // Calculate which stars need to be checked excluding the ones that the player can definitely see.
-        let starsToCheck: MapObjectWithVisibility[] = game.galaxy.stars
-            .filter(s => starsInRange.find(r => r._id.toString() === s._id.toString()) == null)
-            .map(s => {
-                return {
-                    _id: s._id,
-                    location: s.location,
-                    ownedByPlayerId: s.ownedByPlayerId,
-                    isAlwaysVisible: this.isStarAlwaysVisible(s)
-                }
-            });
-
-        for (let star of starsWithScanning) {
-            let starIds = this.getStarsWithinScanningRangeOfStarByStarIds(game, star, starsToCheck);
-
-            for (let starId of starIds) {
-                if (this.binarySearchStars(starsInRange, starId._id) == null) {
-                    this._insertIntoSortedMapObjectsArray(starsInRange, starId);
-                    starsToCheck.splice(starsToCheck.indexOf(starId), 1);
-                }
-            }
-
-            // If we've checked all stars then no need to continue.
-            if (!starsToCheck.length) {
-                break;
-            }
-        }
-
-        // If worm holes are present, then ensure that any owned star OR star in orbit
-        // also has its paired star visible.
-        //if (game.settings.specialGalaxy.randomWormHoles) {
-        let wormHoleStars = starsOwnedOrInOrbit
-            .filter(s => s.wormHoleToStarId)
-            .map(s => {
-                return {
-                    source: s,
-                    destination: this.getById(game, s.wormHoleToStarId!)
-                };
-            });
-
-        for (let wormHoleStar of wormHoleStars) {
-            if (this.binarySearchStars(starsInRange, wormHoleStar.destination._id) == null) {
-                this._insertIntoSortedMapObjectsArray(starsInRange, {
-                    _id: wormHoleStar.destination._id,
-                    location: wormHoleStar.destination.location,
-                    ownedByPlayerId: wormHoleStar.destination.ownedByPlayerId
-                });
-            }
-        }
-        //}
-        return starsInRange.map(s => this.getById(game, s._id));
-    }
-
-    filterStarsByScanningRangeAndWaypointDestinations(game: Game, players: Player[]) {
-        const playerIds = players.map(p => p._id);
-        // Get all stars within the player's normal scanning vision.
-        let starsInScanningRange = this.filterStarsByScanningRange(game, players);
-
-        const ids = playerIds.map(p => p.toString());
-
-        // If in dark mode then we need to also include any stars that are 
-        // being travelled to by carriers in transit for the current player.
-        const inTransitStars = game.galaxy.carriers
-            .filter(c => !c.orbiting)
-            .filter(c => ids.includes(c.ownedByPlayerId!.toString()))
-            .map(c => c.waypoints[0].destination)
-            .map(d => this.getById(game, d));
-
-        for (let transitStar of inTransitStars) {
-            if (starsInScanningRange.indexOf(transitStar) < 0) {
-                starsInScanningRange.push(transitStar);
-            }
-        }
-
-        return starsInScanningRange;
-    }
-
-    getStarsWithinScanningRangeOfStarByStarIds(game: Game, star: Star, stars: MapObjectWithVisibility[]) {
-        // If the star isn't owned then it cannot have a scanning range
-        if (star.ownedByPlayerId == null) {
-            return [];
-        }
-
-        // Calculate the scanning distance of the given star.
-        let effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star, true);
-        let scanningRangeDistance = this.distanceService.getScanningDistance(game, effectiveTechs.scanning);
-
-        // Go through all stars and find each star that is in scanning range.
-        return stars.filter(s => {
-            return s.isAlwaysVisible || this.starDistanceService.getDistanceBetweenStars(s, star) <= scanningRangeDistance;
-        });
+    listStarsOwnedByPlayerBulkIgnored(
+        stars: Star[],
+        playerId: DBObjectId,
+        infrastructureType: InfrastructureType,
+    ) {
+        return this.listStarsOwnedByPlayer(stars, playerId).filter(
+            (s) => s.ignoreBulkUpgrade![infrastructureType],
+        );
     }
 
     calculateActualNaturalResources(star: Star): NaturalResources {
         return {
             economy: Math.max(Math.floor(star.naturalResources.economy), 0),
             industry: Math.max(Math.floor(star.naturalResources.industry), 0),
-            science: Math.max(Math.floor(star.naturalResources.science), 0)
-        }
+            science: Math.max(Math.floor(star.naturalResources.science), 0),
+        };
     }
 
-    calculateTerraformedResources(star: Star, terraforming: number): TerraformedResources {
+    calculateTerraformedResources(
+        star: Star,
+        terraforming: number,
+    ): TerraformedResources {
         return {
-            economy: this.calculateTerraformedResource(star.naturalResources.economy, terraforming),
-            industry: this.calculateTerraformedResource(star.naturalResources.industry, terraforming),
-            science: this.calculateTerraformedResource(star.naturalResources.science, terraforming)
-        }
+            economy: this.calculateTerraformedResource(
+                star.naturalResources.economy,
+                terraforming,
+            ),
+            industry: this.calculateTerraformedResource(
+                star.naturalResources.industry,
+                terraforming,
+            ),
+            science: this.calculateTerraformedResource(
+                star.naturalResources.science,
+                terraforming,
+            ),
+        };
     }
 
-    calculateTerraformedResource(naturalResource: number, terraforming: number) {
-        return Math.floor(naturalResource + (5 * terraforming));
+    calculateTerraformedResource(
+        naturalResource: number,
+        terraforming: number,
+    ) {
+        return Math.floor(naturalResource + 5 * terraforming);
     }
 
-    async abandonStar(game: Game, player: Player, starId: DBObjectId) {
-        if (game.settings.player.allowAbandonStars === 'disabled') {
-            throw new ValidationError(`Abandoning stars has been disabled in this game.`);
+    async abandonStar(
+        game: Game,
+        player: Player,
+        starId: DBObjectId,
+        eventService: IEventService,
+    ) {
+        if (game.settings.player.allowAbandonStars === "disabled") {
+            throw new ValidationError(
+                `Abandoning stars has been disabled in this game.`,
+            );
         }
 
         // Get the star.
-        let star = game.galaxy.stars.find(x => x._id.toString() === starId.toString())!;
+        let star = game.galaxy.stars.find(
+            (x) => x._id.toString() === starId.toString(),
+        )!;
 
         // Check whether the star is owned by the player
-        if ((star.ownedByPlayerId || '').toString() !== player._id.toString()) {
-            throw new ValidationError(`Cannot abandon a star that is not owned by the player.`);
+        if ((star.ownedByPlayerId || "").toString() !== player._id.toString()) {
+            throw new ValidationError(
+                `Cannot abandon a star that is not owned by the player.`,
+            );
         }
 
         this.resetIgnoreBulkUpgradeStatuses(star);
 
         // Destroy the carriers owned by the player who abandoned the star.
         // Note: If an ally is currently in orbit then they will capture the star on the next tick.
-        let playerCarriers = game.galaxy.carriers
-            .filter(x =>
-                x.orbiting
-                && x.orbiting.toString() === star._id.toString()
-                && x.ownedByPlayerId!.toString() === player._id.toString()
-            );
+        let playerCarriers = game.galaxy.carriers.filter(
+            (x) =>
+                x.orbiting &&
+                x.orbiting.toString() === star._id.toString() &&
+                x.ownedByPlayerId!.toString() === player._id.toString(),
+        );
 
         for (let playerCarrier of playerCarriers) {
-            game.galaxy.carriers.splice(game.galaxy.carriers.indexOf(playerCarrier), 1);
+            game.galaxy.carriers.splice(
+                game.galaxy.carriers.indexOf(playerCarrier),
+                1,
+            );
         }
 
         star.ownedByPlayerId = null;
@@ -448,17 +360,19 @@ export default class StarService extends EventEmitter {
 
         await game.save();
 
-        this.emit(StarServiceEvents.onPlayerStarAbandoned, {
-            gameId: game._id,
-            gameTick: game.state.tick,
+        await eventService.createStarAbandonedEvent(
+            game._id,
+            game.state.tick,
             player,
-            star
-        });
+            star,
+        );
     }
 
     canPlayersSeeStarShips(star: Star, playerIds: DBObjectId[]) {
-        const ids = playerIds.map(p => p.toString());
-        const isOwnedByPlayer = ids.includes((star.ownedByPlayerId || '').toString());
+        const ids = playerIds.map((p) => p.toString());
+        const isOwnedByPlayer = ids.includes(
+            (star.ownedByPlayerId || "").toString(),
+        );
 
         if (isOwnedByPlayer) {
             return true;
@@ -470,11 +384,17 @@ export default class StarService extends EventEmitter {
         }
 
         if (star.specialistId) {
-            let specialist = this.specialistService.getByIdStar(star.specialistId);
+            let specialist = this.specialistService.getByIdStar(
+                star.specialistId,
+            );
 
             // If the star has a hideShips spec and is not owned by the given player
             // then that player cannot see the carrier's ships.
-            if (specialist && specialist.modifiers.special && specialist.modifiers.special.hideShips) {
+            if (
+                specialist &&
+                specialist.modifiers.special &&
+                specialist.modifiers.special.hideShips
+            ) {
                 return false;
             }
         }
@@ -482,7 +402,13 @@ export default class StarService extends EventEmitter {
         return true;
     }
 
-    claimUnownedStar(game: Game, gameUsers: User[], star: Star, carrier: Carrier) {
+    claimUnownedStar(
+        game: Game,
+        gameUsers: User[],
+        star: Star,
+        carrier: Carrier<DBObjectId>,
+        statisticsService: IStatisticsService,
+    ) {
         if (star.ownedByPlayerId) {
             throw new ValidationError(`Cannot claim an owned star`);
         }
@@ -496,21 +422,39 @@ export default class StarService extends EventEmitter {
             carrier.isGift = false;
         }
 
-        let carrierPlayer = game.galaxy.players.find(p => p._id.toString() === carrier.ownedByPlayerId!.toString())!;
-        let carrierUser = gameUsers.find(u => carrierPlayer.userId && u._id.toString() === carrierPlayer.userId.toString()) || null;
+        let carrierPlayer = game.galaxy.players.find(
+            (p) => p._id.toString() === carrier.ownedByPlayerId!.toString(),
+        )!;
+        let carrierUser =
+            gameUsers.find(
+                (u) =>
+                    carrierPlayer.userId &&
+                    u._id.toString() === carrierPlayer.userId.toString(),
+            ) || null;
 
-        if (carrierUser && !carrierPlayer.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            this.statisticsService.modifyStats(game._id, carrierPlayer._id, (stats) => {
-                stats.combat.stars.captured++;
+        if (
+            carrierUser &&
+            !carrierPlayer.defeated &&
+            !this.gameTypeService.isTutorialGame(game)
+        ) {
+            statisticsService.modifyStats(
+                game._id,
+                carrierPlayer._id,
+                (stats) => {
+                    stats.combat.stars.captured++;
 
-                if (star.homeStar) {
-                    stats.combat.homeStars.captured++;
-                }
-            });
+                    if (star.homeStar) {
+                        stats.combat.homeStars.captured++;
+                    }
+                },
+            );
         }
     }
 
-    applyStarSpecialistSpecialModifiers(game: Game) {
+    applyStarSpecialistSpecialModifiers(
+        game: Game,
+        eventService: IEventService,
+    ) {
         // NOTE: Specialist modifiers that affect stars on tick only apply
         // to stars that are owned by players. i.e NOT abandoned stars.
         for (let i = 0; i < game.galaxy.stars.length; i++) {
@@ -518,11 +462,22 @@ export default class StarService extends EventEmitter {
 
             if (star.ownedByPlayerId) {
                 if (star.specialistId) {
-                    let specialist = this.specialistService.getByIdStar(star.specialistId);
+                    let specialist = this.specialistService.getByIdStar(
+                        star.specialistId,
+                    );
 
                     if (specialist && specialist.modifiers.special) {
-                        if (specialist.modifiers.special.addNaturalResourcesOnTick) {
-                            this.addNaturalResources(game, star, specialist.modifiers.special.addNaturalResourcesOnTick);
+                        if (
+                            specialist.modifiers.special
+                                .addNaturalResourcesOnTick
+                        ) {
+                            this.addNaturalResources(
+                                game,
+                                star,
+                                specialist.modifiers.special
+                                    .addNaturalResourcesOnTick,
+                                eventService,
+                            );
                         }
                     }
                 }
@@ -530,15 +485,26 @@ export default class StarService extends EventEmitter {
         }
     }
 
-    addNaturalResources(game: Game, star: Star, amount: number) {
+    async addNaturalResources(
+        game: Game,
+        star: Star,
+        amount: number,
+        eventService: IEventService,
+    ) {
         let wasDeadStar = this.starDataService.isDeadStar(star);
 
         if (this.gameTypeService.isSplitResources(game)) {
-            let total = star.naturalResources.economy + star.naturalResources.industry + star.naturalResources.science;
+            let total =
+                star.naturalResources.economy +
+                star.naturalResources.industry +
+                star.naturalResources.science;
 
-            star.naturalResources.economy += 3 * amount * (star.naturalResources.economy / total);
-            star.naturalResources.industry += 3 * amount * (star.naturalResources.industry / total);
-            star.naturalResources.science += 3 * amount * (star.naturalResources.science / total);
+            star.naturalResources.economy +=
+                3 * amount * (star.naturalResources.economy / total);
+            star.naturalResources.industry +=
+                3 * amount * (star.naturalResources.industry / total);
+            star.naturalResources.science +=
+                3 * amount * (star.naturalResources.science / total);
         } else {
             star.naturalResources.economy += amount;
             star.naturalResources.industry += amount;
@@ -567,42 +533,47 @@ export default class StarService extends EventEmitter {
             star.infrastructure.science = 0;
 
             if (star.ownedByPlayerId) {
-                this.emit(StarServiceEvents.onPlayerStarDied, {
-                    gameId: game._id,
-                    gameTick: game.state.tick,
-                    playerId: star.ownedByPlayerId,
-                    starId: star._id,
-                    starName: star.name
-                });
+                await eventService.createStarDiedEvent(
+                    game._id,
+                    game.state.tick,
+                    star.ownedByPlayerId,
+                    star._id,
+                    star.name,
+                );
             }
         }
         // If it was a dead star but is now not a dead star then it has been reignited.
         else if (wasDeadStar && star.ownedByPlayerId) {
-            this.emit(StarServiceEvents.onPlayerStarReignited, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                playerId: star.ownedByPlayerId,
-                starId: star._id,
-                starName: star.name
-            });
+            await eventService.createStarReignitedEvent(
+                game._id,
+                game.state.tick,
+                star.ownedByPlayerId,
+                star._id,
+                star.name,
+            );
         }
     }
 
-    reigniteDeadStar(game: Game, star: Star, naturalResources: NaturalResources) {
+    async reigniteDeadStar(
+        game: Game,
+        star: Star,
+        naturalResources: NaturalResources,
+        eventService: IEventService,
+    ) {
         if (!this.starDataService.isDeadStar(star)) {
-            throw new Error('The star cannot be reignited, it is not dead.');
+            throw new Error("The star cannot be reignited, it is not dead.");
         }
 
         star.naturalResources = naturalResources;
 
         if (star.ownedByPlayerId) {
-            this.emit(StarServiceEvents.onPlayerStarReignited, {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                playerId: star.ownedByPlayerId,
-                starId: star._id,
-                starName: star.name
-            });
+            await eventService.createStarReignitedEvent(
+                game._id,
+                game.state.tick,
+                star.ownedByPlayerId,
+                star._id,
+                star.name,
+            );
         }
     }
 
@@ -621,95 +592,143 @@ export default class StarService extends EventEmitter {
         }
 
         // Recalculate how many stars are needed for victory in conquest mode.
-        if (game.settings.general.mode === 'conquest' || game.settings.general.mode === 'teamConquest') {
+        if (
+            game.settings.general.mode === "conquest" ||
+            game.settings.general.mode === "teamConquest"
+        ) {
             // TODO: Find a better place for this as its shared in the gameCreate service.
             switch (game.settings.conquest.victoryCondition) {
-                case 'starPercentage':
-                    game.state.starsForVictory = Math.ceil((game.state.stars / 100) * game.settings.conquest.victoryPercentage);
+                case "starPercentage":
+                    game.state.starsForVictory = Math.ceil(
+                        (game.state.stars / 100) *
+                            game.settings.conquest.victoryPercentage,
+                    );
                     break;
-                case 'homeStarPercentage':
-                    game.state.starsForVictory = Math.ceil((game.settings.general.playerLimit / 100) * game.settings.conquest.victoryPercentage);
+                case "homeStarPercentage":
+                    game.state.starsForVictory = Math.ceil(
+                        (game.settings.general.playerLimit / 100) *
+                            game.settings.conquest.victoryPercentage,
+                    );
                     break;
                 default:
-                    throw new Error(`Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`)
+                    throw new Error(
+                        `Unsupported conquest victory condition: ${game.settings.conquest.victoryCondition}`,
+                    );
             }
         }
     }
 
-    async toggleIgnoreBulkUpgrade(game: Game, player: Player, starId: DBObjectId, infrastructureType: InfrastructureType) {
+    async toggleIgnoreBulkUpgrade(
+        game: Game,
+        player: Player,
+        starId: DBObjectId,
+        infrastructureType: InfrastructureType,
+    ) {
         let star = this.getById(game, starId);
 
-        if (!star.ownedByPlayerId || star.ownedByPlayerId.toString() !== player._id.toString()) {
+        if (
+            !star.ownedByPlayerId ||
+            star.ownedByPlayerId.toString() !== player._id.toString()
+        ) {
             throw new ValidationError(`You do not own this star.`);
         }
 
-        let newValue = star.ignoreBulkUpgrade![infrastructureType] ? false : true;
+        let newValue = star.ignoreBulkUpgrade![infrastructureType]
+            ? false
+            : true;
 
         let updateObject = {
-            $set: {}
+            $set: {},
         };
 
-        updateObject['$set'][`galaxy.stars.$.ignoreBulkUpgrade.${infrastructureType}`] = newValue
+        updateObject["$set"][
+            `galaxy.stars.$.ignoreBulkUpgrade.${infrastructureType}`
+        ] = newValue;
 
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.stars._id': starId
-        }, updateObject);
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+                "galaxy.stars._id": starId,
+            },
+            updateObject,
+        );
     }
 
-    async toggleIgnoreBulkUpgradeAll(game: Game, player: Player, starId: DBObjectId, ignoreStatus: boolean) {
+    async toggleIgnoreBulkUpgradeAll(
+        game: Game,
+        player: Player,
+        starId: DBObjectId,
+        ignoreStatus: boolean,
+    ) {
         let star = this.getById(game, starId);
 
-        if (!star.ownedByPlayerId || star.ownedByPlayerId.toString() !== player._id.toString()) {
+        if (
+            !star.ownedByPlayerId ||
+            star.ownedByPlayerId.toString() !== player._id.toString()
+        ) {
             throw new ValidationError(`You do not own this star.`);
         }
 
-        await this.gameRepo.updateOne({
-            _id: game._id,
-            'galaxy.stars._id': starId
-        }, {
-            $set: {
-                'galaxy.stars.$.ignoreBulkUpgrade.economy': ignoreStatus,
-                'galaxy.stars.$.ignoreBulkUpgrade.industry': ignoreStatus,
-                'galaxy.stars.$.ignoreBulkUpgrade.science': ignoreStatus
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+                "galaxy.stars._id": starId,
+            },
+            {
+                $set: {
+                    "galaxy.stars.$.ignoreBulkUpgrade.economy": ignoreStatus,
+                    "galaxy.stars.$.ignoreBulkUpgrade.industry": ignoreStatus,
+                    "galaxy.stars.$.ignoreBulkUpgrade.science": ignoreStatus,
+                },
+            },
+        );
     }
 
     resetIgnoreBulkUpgradeStatuses(star: Star) {
         star.ignoreBulkUpgrade = {
             economy: false,
             industry: false,
-            science: false
-        }
+            science: false,
+        };
 
         return star.ignoreBulkUpgrade;
     }
 
     listHomeStars(game: Game) {
-        return game.galaxy.stars.filter(s => s.homeStar);
+        return game.galaxy.stars.filter((s) => s.homeStar);
     }
 
     getKingOfTheHillStar(game: Game) {
-        const center = this.starDistanceService.getGalaxyCenterOfMass(game.galaxy.stars.map(s => s.location));
+        const center = this.starDistanceService.getGalaxyCenterOfMass(
+            game.galaxy.stars.map((s) => s.location),
+        );
 
         // Note: We have to get the closest one to the center as its possible
         // to move the center star by using a stellar engine so we can't assume
         // the center star will always be at 0,0
-        const closestToCenter = game.galaxy.stars.map(star => {
-            const distance = this.distanceService.getDistanceBetweenLocations(center, star.location);
+        const closestToCenter = game.galaxy.stars
+            .map((star) => {
+                const distance =
+                    this.distanceService.getDistanceBetweenLocations(
+                        center,
+                        star.location,
+                    );
 
-            return {
-                star,
-                distance
-            }
-        }).sort((a, b) => a.distance - b.distance)[0].star;
+                return {
+                    star,
+                    distance,
+                };
+            })
+            .sort((a, b) => a.distance - b.distance)[0].star;
 
         return closestToCenter;
     }
 
     isKingOfTheHillStar(game: Game, star: Star) {
-        return star._id.toString() === this.getKingOfTheHillStar(game)._id.toString();
+        return (
+            star._id.toString() ===
+            this.getKingOfTheHillStar(game)._id.toString()
+        );
     }
 
     setupPlayerStarForGameStart(game: Game, star: Star, player: Player) {
@@ -723,15 +742,15 @@ export default class StarService extends EventEmitter {
             star.warpGate = false; // TODO: BUG - This resets warp gates generated by map terrain.
             star.specialistId = null;
 
-            if (game.settings.player.developmentCost.economy !== 'none') {
+            if (game.settings.player.developmentCost.economy !== "none") {
                 star.infrastructure.economy = 0;
             }
 
-            if (game.settings.player.developmentCost.industry !== 'none') {
+            if (game.settings.player.developmentCost.industry !== "none") {
                 star.infrastructure.industry = 0;
             }
 
-            if (game.settings.player.developmentCost.science !== 'none') {
+            if (game.settings.player.developmentCost.science !== "none") {
                 star.infrastructure.science = 0;
             }
 
@@ -744,19 +763,27 @@ export default class StarService extends EventEmitter {
         // assign a portion of stars for each type to be seeded with the starting infrastructure.
         // For example, if eco is disabled then each star in the galaxy will have a 1 in 3 chance of being seeded with eco.
         // Note that we will not allow a mix of seeds, a star can only be seeded with one infrastructure type.
-        if (game.settings.player.developmentCost.economy !== 'none' &&
-            game.settings.player.developmentCost.industry !== 'none' &&
-            game.settings.player.developmentCost.science !== 'none') {
+        if (
+            game.settings.player.developmentCost.economy !== "none" &&
+            game.settings.player.developmentCost.industry !== "none" &&
+            game.settings.player.developmentCost.science !== "none"
+        ) {
             return;
         }
 
         // Note: Because each setting is independent, we only want to seed the
         // ones where the development cost is set to none.
         const types: (InfrastructureType | null)[] = [
-            game.settings.player.developmentCost.economy === 'none' ? 'economy' : null,
-            game.settings.player.developmentCost.industry === 'none' ? 'industry' : null,
-            game.settings.player.developmentCost.science === 'none' ? 'science' : null,
-        ]
+            game.settings.player.developmentCost.economy === "none"
+                ? "economy"
+                : null,
+            game.settings.player.developmentCost.industry === "none"
+                ? "industry"
+                : null,
+            game.settings.player.developmentCost.science === "none"
+                ? "science"
+                : null,
+        ];
 
         const rng = RNG.create(game._id.toString());
 
@@ -768,13 +795,18 @@ export default class StarService extends EventEmitter {
                 continue;
             }
 
-            star.infrastructure[type] = game.settings.player.startingInfrastructure[type];
+            star.infrastructure[type] =
+                game.settings.player.startingInfrastructure[type];
         }
     }
 
     pairWormHoleConstructors(game: Game) {
-        const constructors = game.galaxy.stars
-            .filter(s => s.specialistId && this.specialistService.getByIdStar(s.specialistId)?.modifiers.special?.wormHoleConstructor);
+        const constructors = game.galaxy.stars.filter(
+            (s) =>
+                s.specialistId &&
+                this.specialistService.getByIdStar(s.specialistId)?.modifiers
+                    .special?.wormHoleConstructor,
+        );
 
         shuffle(new MathRandomGen(), constructors);
 

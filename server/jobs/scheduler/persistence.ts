@@ -1,4 +1,4 @@
-import {logger} from "../../utils/logging";
+import { logger } from "../../utils/logging";
 
 import mongoose from "mongoose";
 import mongooseLeanDefaults from "mongoose-lean-defaults";
@@ -6,34 +6,37 @@ import mongooseLeanDefaults from "mongoose-lean-defaults";
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 export type JobExecuted = {
-    jobName: string,
-    timestamp: number,
-}
+    jobName: string;
+    timestamp: number;
+};
 
 const schema = new Schema({
     jobName: { type: Types.String, required: true },
-    timestamp: { type: Types.Number, required: true }
+    timestamp: { type: Types.Number, required: true },
 });
 
 schema.plugin(mongooseLeanDefaults);
 
-const model = mongoose.model('executedJob', schema);
+const model = mongoose.model("executedJob", schema);
 
 const loadJob = async (jobName: string): Promise<JobExecuted | null> => {
     return await model.findOne({ jobName }).lean();
-}
+};
 
 const saveJob = async (jobName: string, timestamp: number): Promise<void> => {
-    await model.updateOne({ jobName }, { jobName, timestamp }, { upsert: true });
-}
+    await model.updateOne(
+        { jobName },
+        { jobName, timestamp },
+        { upsert: true },
+    );
+};
 
 const log = logger("Jobs persistence");
 
 export class Persistence {
     cache: Map<string, number> = new Map();
 
-    constructor() {
-    }
+    constructor() {}
 
     async loadExecutionsFor(...jobs: string[]) {
         try {
@@ -41,7 +44,9 @@ export class Persistence {
 
             this.cache.clear();
 
-            const executions = await model.find({ jobName: { $in: jobs } }).lean();
+            const executions = await model
+                .find({ jobName: { $in: jobs } })
+                .lean();
 
             for (const execution of executions) {
                 this.cache.set(execution.jobName, execution.timestamp);
@@ -49,7 +54,10 @@ export class Persistence {
         } catch (e) {
             log.error(e, "Failed to load job executions");
 
-            throw new Error("Failed to initialize job persistence: " + (e as Error)?.message);
+            throw new Error(
+                "Failed to initialize job persistence: " +
+                    (e as Error)?.message,
+            );
         }
     }
 

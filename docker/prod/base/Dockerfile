@@ -1,4 +1,4 @@
-FROM node:22-slim
+FROM node:24
 
 RUN mkdir /solaris
 
@@ -7,10 +7,10 @@ WORKDIR /solaris
 ADD package.json package.json
 ADD package-lock.json package-lock.json
 ADD client/ client/
+ADD map-rendering/ map-rendering/
 ADD common/ common/
 ADD server/ server/
 
-RUN rm -f client/.env
 RUN rm -f server/.env
 
 RUN npm install

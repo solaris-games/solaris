@@ -1,42 +1,38 @@
 <template>
-    <div>
-        <p>
-            Your forces have engaged the enemy in <span class="text-warning">carrier-to-carrier</span> combat.
-        </p>
-      <CombatEventSide title="Defender" :side="defenderSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
-      <CombatEventSide title="Attacker" :side="attackerSide" @onOpenPlayerDetailRequested="requestOpenPlayerDetail" />
-    </div>
+  <div>
+    <p>
+      Your forces have engaged the enemy in
+      <span class="text-warning">carrier-to-carrier</span> combat.
+    </p>
+
+    <combat-event-group
+      v-for="(group, groupIndex) of event.data.groups"
+      :title="undefined"
+      :group="group"
+      @onOpenPlayerDetailRequested="requestOpenPlayerDetail"
+      :groupIndex="groupIndex"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type {PlayerCombatCarrierEvent} from "@solaris-common";
-import { useStore, type Store } from 'vuex';
-import CombatEventSide from './CombatEventSide.vue';
-import type { State } from '@/store';
-import {createCarrierDefenderSide, createCarrierAttackerSide} from '@/services/combat';
+import type {
+  CombatResultGroup,
+  PlayerCombatCarrierEvent,
+} from "@solaris/common";
+import CombatEventGroup from "./combat/CombatEventGroup.vue";
 
 const props = defineProps<{
-  event: PlayerCombatCarrierEvent<string>
+  event: PlayerCombatCarrierEvent<string>;
 }>();
 
 const emit = defineEmits<{
-  onOpenPlayerDetailRequested: [playerId: string]
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
-const store: Store<State> = useStore();
-
-const game = store.state.game!;
-
-const defenderSide = computed(() => createCarrierDefenderSide(game, props.event));
-
-const attackerSide = computed(() => createCarrierAttackerSide(game, props.event));
-
 const requestOpenPlayerDetail = (playerId: string) => {
-  emit('onOpenPlayerDetailRequested', playerId);
+  emit("onOpenPlayerDetailRequested", playerId);
 };
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

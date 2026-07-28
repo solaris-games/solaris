@@ -1,15 +1,22 @@
-import { Request } from 'express';
-import { ValidationError } from 'solaris-common';
-import { DBObjectId } from '../../services/types/DBObjectId';
-import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { Request } from "express";
+import { ValidationError } from "@solaris/common";
+import { DBObjectId } from "../../services/types/DBObjectId";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
 import { parseAnnouncementRequest } from "../requests/announcements";
+import {
+    parseAdminAddWarningRequest,
+    parseAdminSetGameFeaturedRequest,
+    parseAdminSetGameTimeMachineRequest,
+    parseAdminSetUserCreditsRequest,
+    parseAdminSetUserRoleRequest,
+} from "../requests/admin";
 
 export default (container: DependencyContainer) => {
     return {
         getInsights: async (req, res, next) => {
             try {
-                let result = await container.adminService.getInsights();
-                
+                const result = await container.adminService.getInsights();
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -17,19 +24,27 @@ export default (container: DependencyContainer) => {
             }
         },
         addWarning: async (req, res, next) => {
-           try {
-               const result = await container.adminService.addWarning(req.params.userId, req.body.text);
+            try {
+                const body = parseAdminAddWarningRequest(req.body);
 
-               res.status(200).json(result);
-               return next();
-           } catch (err) {
-               return next(err);
-           }
+                const result = await container.adminService.addWarning(
+                    req.params.userId,
+                    body.text,
+                );
+
+                res.status(200).json(result);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
         },
         listUsers: async (req: Request<unknown>, res, next) => {
             try {
-                let result = await container.adminService.listUsers(req.session.userId!, 300);
-                
+                const result = await container.adminService.listUsers(
+                    req.session.userId!,
+                    300,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -38,8 +53,9 @@ export default (container: DependencyContainer) => {
         },
         listPasswordResets: async (req, res, next) => {
             try {
-                let result = await container.adminService.listPasswordResets();
-                
+                const result =
+                    await container.adminService.listPasswordResets();
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -48,7 +64,11 @@ export default (container: DependencyContainer) => {
         },
         conversationForReport: async (req, res, next) => {
             try {
-                const result = await container.reportService.conversationForReport(req.params.reportId, req.session.userId);
+                const result =
+                    await container.reportService.conversationForReport(
+                        req.params.reportId,
+                        req.session.userId,
+                    );
 
                 res.status(200).json(result);
                 return next();
@@ -58,8 +78,10 @@ export default (container: DependencyContainer) => {
         },
         listReports: async (req, res, next) => {
             try {
-                let result = await container.reportService.listReports(req.session.userId);
-                
+                const result = await container.reportService.listReports(
+                    req.session.userId,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -68,8 +90,11 @@ export default (container: DependencyContainer) => {
         },
         actionReport: async (req, res, next) => {
             try {
-                await container.reportService.actionReport(req.session.userId, req.params.reportId);
-    
+                await container.reportService.actionReport(
+                    req.session.userId,
+                    req.params.reportId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -79,8 +104,13 @@ export default (container: DependencyContainer) => {
 
         setRoleContributor: async (req, res, next) => {
             try {
-                await container.adminService.setRoleContributor(req.params.userId, req.body.enabled);
-    
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleContributor(
+                    req.params.userId,
+                    body.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -89,8 +119,13 @@ export default (container: DependencyContainer) => {
         },
         setRoleDeveloper: async (req, res, next) => {
             try {
-                await container.adminService.setRoleDeveloper(req.params.userId, req.body.enabled);
-    
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleDeveloper(
+                    req.params.userId,
+                    body.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -99,8 +134,13 @@ export default (container: DependencyContainer) => {
         },
         setRoleGameMaster: async (req, res, next) => {
             try {
-                await container.adminService.setRoleGameMaster(req.params.userId, req.body.enabled);
-    
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleGameMaster(
+                    req.params.userId,
+                    body.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -109,8 +149,13 @@ export default (container: DependencyContainer) => {
         },
         setRoleCommunityManager: async (req, res, next) => {
             try {
-                await container.adminService.setRoleCommunityManager(req.params.userId, req.body.enabled);
-    
+                const body = parseAdminSetUserRoleRequest(req.body);
+
+                await container.adminService.setRoleCommunityManager(
+                    req.params.userId,
+                    body.enabled,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -119,10 +164,15 @@ export default (container: DependencyContainer) => {
         },
         setCredits: async (req, res, next) => {
             try {
-                let credits = await container.userService.setCredits(req.params.userId, req.body.credits);
-    
+                const body = parseAdminSetUserCreditsRequest(req.body);
+
+                const credits = await container.userService.setCredits(
+                    req.params.userId,
+                    body.credits,
+                );
+
                 res.status(200).json({
-                    credits
+                    credits,
                 });
                 return next();
             } catch (err) {
@@ -131,21 +181,31 @@ export default (container: DependencyContainer) => {
         },
         banUser: async (req: Request<{ userId?: DBObjectId }>, res, next) => {
             try {
-
                 if (req.params.userId == null) {
-                    throw new ValidationError(`Parameter 'userId' is required.`);
+                    throw new ValidationError(
+                        `Parameter 'userId' is required.`,
+                    );
                 }
 
-                if (req.params.userId.toString() === req.session.userId?.toString()) {
+                if (
+                    req.params.userId.toString() ===
+                    req.session.userId?.toString()
+                ) {
                     throw new ValidationError(`You cannot ban yourself!`);
                 }
 
-                if (req.session.isImpersonating && req.params.userId.toString() === req.session.originalUserId?.toString()) {
-                    throw new ValidationError(`The user you're impersonating cannot be used to ban you!`);
+                if (
+                    req.session.isImpersonating &&
+                    req.params.userId.toString() ===
+                        req.session.originalUserId?.toString()
+                ) {
+                    throw new ValidationError(
+                        `The user you're impersonating cannot be used to ban you!`,
+                    );
                 }
 
                 await container.adminService.ban(req.params.userId);
-    
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -155,7 +215,7 @@ export default (container: DependencyContainer) => {
         unbanUser: async (req, res, next) => {
             try {
                 await container.adminService.unban(req.params.userId);
-    
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -164,8 +224,10 @@ export default (container: DependencyContainer) => {
         },
         resetAchievements: async (req, res, next) => {
             try {
-                await container.adminService.resetAchievements(req.params.userId);
-    
+                await container.adminService.resetAchievements(
+                    req.params.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -174,28 +236,43 @@ export default (container: DependencyContainer) => {
         },
         promoteToEstablishedPlayer: async (req, res, next) => {
             try {
-                await container.adminService.promoteToEstablishedPlayer(req.params.userId);
-    
+                await container.adminService.promoteToEstablishedPlayer(
+                    req.params.userId,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);
             }
         },
-        impersonate: async (req: Request<{ userId?: DBObjectId }>, res, next) => {
+        impersonate: async (
+            req: Request<{ userId?: DBObjectId }>,
+            res,
+            next,
+        ) => {
             try {
-                const user = await container.userService.getById(req.params.userId!);
-    
+                const user = await container.userService.getById(
+                    req.params.userId!,
+                );
+
                 if (!user) {
                     throw new ValidationError(`User does not exist.`);
                 }
 
                 if (req.session.isImpersonating) {
-                    throw new ValidationError(`Cannot impersonate while already impersonating!`);
+                    throw new ValidationError(
+                        `Cannot impersonate while already impersonating!`,
+                    );
                 }
 
-                if (req.session.userId?.toString() === req.params.userId?.toString()) {
-                    throw new ValidationError(`You cannot impersonate yourself!`);
+                if (
+                    req.session.userId?.toString() ===
+                    req.params.userId?.toString()
+                ) {
+                    throw new ValidationError(
+                        `You cannot impersonate yourself!`,
+                    );
                 }
 
                 req.session.originalUserId = req.session.userId;
@@ -204,14 +281,14 @@ export default (container: DependencyContainer) => {
                 req.session.roles = user.roles;
                 req.session.userCredits = user.credits;
                 req.session.isImpersonating = true;
-    
+
                 res.status(200).json({
                     _originalUserId: req.session.originalUserId,
                     _id: user._id,
                     username: user.username,
                     roles: user.roles,
                     credits: user.credits,
-                    isImpersonating: req.session.isImpersonating
+                    isImpersonating: req.session.isImpersonating,
                 });
                 return next();
             } catch (err) {
@@ -221,10 +298,14 @@ export default (container: DependencyContainer) => {
         endImpersonate: async (req: Request<unknown>, res, next) => {
             try {
                 if (req.session.originalUserId == null) {
-                    throw new ValidationError(`User was not impersonating anyone.`);
+                    throw new ValidationError(
+                        `User was not impersonating anyone.`,
+                    );
                 }
 
-                const user = await container.userService.getById(req.session.originalUserId);
+                const user = await container.userService.getById(
+                    req.session.originalUserId,
+                );
 
                 if (!user) {
                     throw new ValidationError(`User does not exist.`);
@@ -241,18 +322,17 @@ export default (container: DependencyContainer) => {
                     _id: user._id,
                     username: user.username,
                     roles: user.roles,
-                    credits: user.credits
+                    credits: user.credits,
                 });
                 return next();
-            }
-            catch (err) {
+            } catch (err) {
                 return next(err);
             }
         },
         listGames: async (req, res, next) => {
             try {
-                let result = await container.adminService.listGames(25);
-                
+                const result = await container.adminService.listGames(25);
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -261,8 +341,13 @@ export default (container: DependencyContainer) => {
         },
         setGameFeatured: async (req, res, next) => {
             try {
-                await container.adminService.setGameFeatured(req.params.gameId, req.body.featured);
-    
+                const body = parseAdminSetGameFeaturedRequest(req.body);
+
+                await container.adminService.setGameFeatured(
+                    req.params.gameId,
+                    body.featured,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -271,8 +356,13 @@ export default (container: DependencyContainer) => {
         },
         setGameTimeMachine: async (req, res, next) => {
             try {
-                await container.adminService.setGameTimeMachine(req.params.gameId, req.body.timeMachine);
-    
+                const body = parseAdminSetGameTimeMachineRequest(req.body);
+
+                await container.adminService.setGameTimeMachine(
+                    req.params.gameId,
+                    body.timeMachine,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -282,7 +372,7 @@ export default (container: DependencyContainer) => {
         forceEndGame: async (req, res, next) => {
             try {
                 await container.gameService.forceEndGame(req.game);
-    
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -292,7 +382,11 @@ export default (container: DependencyContainer) => {
         createAnnouncement: async (req, res, next) => {
             try {
                 const body = parseAnnouncementRequest(req.body);
-                await container.announcementService.createAnnouncement(body.title, body.date, body.content);
+                await container.announcementService.createAnnouncement(
+                    body.title,
+                    body.date,
+                    body.content,
+                );
 
                 res.sendStatus(201);
                 return next();
@@ -302,7 +396,9 @@ export default (container: DependencyContainer) => {
         },
         deleteAnnouncement: async (req, res, next) => {
             try {
-                await container.announcementService.deleteAnnouncement(req.params.id);
+                await container.announcementService.deleteAnnouncement(
+                    req.params.id,
+                );
 
                 res.sendStatus(204);
                 return next();
@@ -312,13 +408,14 @@ export default (container: DependencyContainer) => {
         },
         getAllAnnouncements: async (req, res, next) => {
             try {
-                const result = await container.announcementService.getAllAnnouncements();
+                const result =
+                    await container.announcementService.getAllAnnouncements();
 
                 res.status(200).json(result);
                 return next();
             } catch (err) {
                 return next(err);
             }
-        }
-    }
+        },
+    };
 };

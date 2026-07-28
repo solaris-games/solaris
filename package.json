@@ -2,14 +2,28 @@
     "name": "solaris",
     "scripts": {
         "build": "npm run build --workspaces --if-present",
-        "check": "npm run check --workspaces --if-present"
+        "check": "npm run check --workspaces --if-present",
+        "test": "npm run test --workspaces --if-present",
+        "lint": "eslint .",
+        "format": "prettier . --write '!./database_data'"
     },
     "workspaces": [
         "common/",
+        "map-rendering/",
         "client/",
         "server/"
     ],
+    "engines": {
+        "node": ">=24"
+    },
     "devDependencies": {
-        "typescript": "5.6.3"
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.6.0",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-vue": "^10.9.2",
+        "globals": "^17.7.0",
+        "prettier": "3.9.1",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.62.0"
     }
 }

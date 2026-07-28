@@ -1,34 +1,30 @@
-import moment from "moment/moment";
+import { DateTime } from "luxon";
 
 import EventEmitter from "events";
-import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
-import Repository from './repository';
-import { Game } from './types/Game';
-import { Player } from './types/Player';
-import UserAchievementService from './userAchievement';
-import AvatarService from './avatar';
-import CarrierService from './carrier';
-import GameStateService from './gameState';
-import { GameTypeService } from 'solaris-common'
-import PasswordService from './password';
-import PlayerService from './player';
-import StarService from './star';
-import UserService from './user';
-import ConversationService from './conversation';
-import PlayerReadyService from './playerReady';
-import InternalGamePlayerQuitEvent from './types/internalEvents/GamePlayerQuit';
-import InternalGamePlayerDefeatedEvent from './types/internalEvents/GamePlayerDefeated';
-import {LeaderboardPlayer} from "./types/Leaderboard";
+import { DBObjectId } from "./types/DBObjectId";
+import { ValidationError } from "@solaris/common";
+import Repository from "./repository";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import UserAchievementService from "./userAchievement";
+import AvatarService from "./avatar";
+import CarrierService from "./carrier";
+import GameStateService from "./gameState";
+import { GameTypeService } from "@solaris/common";
+import PasswordService from "./password";
+import PlayerService from "./player";
+import StarService from "./star";
+import UserService from "./user";
+import ConversationService from "./conversation";
+import PlayerReadyService from "./playerReady";
+import InternalGamePlayerQuitEvent from "./types/internalEvents/GamePlayerQuit";
+import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDefeated";
+import { LeaderboardPlayer } from "./types/Leaderboard";
 import GameJoinService from "./gameJoin";
 import GameAuthService from "./gameAuth";
 import PlayerAfkService from "./playerAfk";
-
-export const GameServiceEvents = {
-    onPlayerQuit: 'onPlayerQuit',
-    onPlayerDefeated: 'onPlayerDefeated',
-    onGameDeleted: 'onGameDeleted'
-}
+import { INotificationService } from "./types/INotificationService";
+import { EventService } from "./event";
 
 export default class GameService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -65,7 +61,7 @@ export default class GameService extends EventEmitter {
         playerAfkService: PlayerAfkService,
     ) {
         super();
-        
+
         this.gameRepo = gameRepo;
         this.userService = userService;
         this.starService = starService;
@@ -96,17 +92,20 @@ export default class GameService extends EventEmitter {
     }
 
     async getByNameStateSettingsLean(name: string) {
-        return await this.gameRepo.find({
-            'settings.general.name': name
-        }, {
-            state: 1,
-            settings: 1
-        });
+        return await this.gameRepo.find(
+            {
+                "settings.general.name": name,
+            },
+            {
+                state: 1,
+                settings: 1,
+            },
+        );
     }
 
     async getByIdSettingsLean(id: DBObjectId) {
         return await this.gameRepo.findById(id, {
-            'settings': 1
+            settings: 1,
         });
     }
 
@@ -120,7 +119,7 @@ export default class GameService extends EventEmitter {
             state: 1,
             galaxy: 1,
             constants: 1,
-            spectators: 1
+            spectators: 1,
         });
     }
 
@@ -138,7 +137,7 @@ export default class GameService extends EventEmitter {
 
     async getGameStateTick(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
-            'state.tick': 1
+            "state.tick": 1,
         });
 
         if (!game) {
@@ -150,7 +149,7 @@ export default class GameService extends EventEmitter {
 
     async getGameSettings(id: DBObjectId) {
         let game = await this.getByIdLean(id, {
-            'settings': 1
+            settings: 1,
         });
 
         return game?.settings;
@@ -162,22 +161,22 @@ export default class GameService extends EventEmitter {
         game.state.readyToQuitCount = undefined;
     }
 
-    async quit(game: Game, player: Player) {    
+    async quit(game: Game, player: Player, eventService: EventService) {
         if (game.state.startDate) {
-            throw new ValidationError('Cannot quit a game that has started.');
+            throw new ValidationError("Cannot quit a game that has started.");
         }
 
         if (game.state.endDate) {
-            throw new ValidationError('Cannot quit a game that has finished.');
+            throw new ValidationError("Cannot quit a game that has finished.");
         }
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
-            await this.delete(game);
+            await this.delete(game, undefined, eventService);
 
             return null;
         }
-        
+
         const alias = player.alias;
 
         if (player.userId && !this.gameTypeService.isNewPlayerGame(game)) {
@@ -189,39 +188,48 @@ export default class GameService extends EventEmitter {
         await this.playerService.resetPlayerForGameStart(game, player);
 
         this.gameStateService.updateStatePlayerCount(game);
-        
+
         await game.save();
 
         let e: InternalGamePlayerQuitEvent = {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
-            playerAlias: alias
+            playerAlias: alias,
         };
 
-        this.emit(GameServiceEvents.onPlayerQuit, e);
+        await eventService.createPlayerQuitEvent(e);
 
         return player;
     }
 
-    async concedeDefeat(game: Game, player: Player, openSlot: boolean) {
+    async concedeDefeat(
+        game: Game,
+        player: Player,
+        openSlot: boolean,
+        eventService: EventService,
+    ) {
         if (player.defeated) {
-            throw new ValidationError('The player has already been defeated.');
+            throw new ValidationError("The player has already been defeated.");
         }
 
         if (!game.state.startDate) {
-            throw new ValidationError('Cannot concede defeat in a game that has not yet started.');
+            throw new ValidationError(
+                "Cannot concede defeat in a game that has not yet started.",
+            );
         }
 
         if (game.state.endDate) {
-            throw new ValidationError('Cannot concede defeat in a game that has finished.');
+            throw new ValidationError(
+                "Cannot concede defeat in a game that has finished.",
+            );
         }
 
         const wasAI = this.playerAfkService.isAIControlled(game, player);
 
         // If its a tutorial game then straight up delete it.
         if (this.gameTypeService.isTutorialGame(game)) {
-            return this.delete(game);
+            return this.delete(game, undefined, eventService);
         }
 
         game.quitters.push(player.userId!); // We need to track this to ensure that they don't try to rejoin in another open slot.
@@ -232,13 +240,13 @@ export default class GameService extends EventEmitter {
             game.state.players--; // Deduct number of active players from the game.
         }
 
-        // NOTE: The game will check for a winner on each tick so no need to 
+        // NOTE: The game will check for a winner on each tick so no need to
         // repeat that here.
 
         // TODO: This is temporary. The advanced AI will be able to handle this.
         // In the meantime, if we're still using normal AI we should clear looped carriers.
         // TODO: Remove when basic AI is removed.
-        if (game.settings.general.advancedAI === 'disabled') {
+        if (game.settings.general.advancedAI === "disabled") {
             this.carrierService.clearPlayerCarrierWaypointsLooped(game, player);
         }
 
@@ -253,43 +261,63 @@ export default class GameService extends EventEmitter {
             gameTick: game.state.tick,
             playerId: player._id,
             playerAlias: player.alias,
-            openSlot
+            openSlot,
         };
 
-        this.emit(GameServiceEvents.onPlayerDefeated, e);
+        await eventService.createPlayerDefeatedEvent(e);
     }
 
     async fastForward(game: Game, fastForwardUserId: DBObjectId) {
-        if (!await this.gameAuthService.isGameAdmin(game, fastForwardUserId)) {
-            throw new ValidationError('You do not have permission to fast forward this game.');
+        if (
+            !(await this.gameAuthService.isGameAdmin(game, fastForwardUserId))
+        ) {
+            throw new ValidationError(
+                "You do not have permission to fast forward this game.",
+            );
         }
 
         if (!this.gameStateService.isInProgress(game)) {
-            throw new ValidationError('Cannot fast forward a game that is not in progress.');
+            throw new ValidationError(
+                "Cannot fast forward a game that is not in progress.",
+            );
         }
 
         if (game.state.forceTick) {
-            throw new ValidationError('Cannot fast forward a game that is already fast forwarding.');
+            throw new ValidationError(
+                "Cannot fast forward a game that is already fast forwarding.",
+            );
         }
 
-        await this.gameRepo.updateOne({
-            _id: game._id
-        }, {
-            $set: {
-                'state.forceTick': true
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+            },
+            {
+                $set: {
+                    "state.forceTick": true,
+                },
+            },
+        );
     }
 
-    async kickPlayer(game: Game, kickingUser: DBObjectId, playerToKick: DBObjectId) {
-        if (!await this.gameAuthService.isGameAdmin(game, kickingUser)) {
-            throw new ValidationError('You do not have permission to kick a player in this game.');
+    async kickPlayer(
+        game: Game,
+        kickingUser: DBObjectId,
+        playerToKick: DBObjectId,
+        eventService: EventService,
+    ) {
+        if (!(await this.gameAuthService.isGameAdmin(game, kickingUser))) {
+            throw new ValidationError(
+                "You do not have permission to kick a player in this game.",
+            );
         }
 
-        const player = game.galaxy.players.find(p => p._id.toString() === playerToKick.toString());
+        const player = game.galaxy.players.find(
+            (p) => p._id.toString() === playerToKick.toString(),
+        );
 
         if (!player) {
-            throw new ValidationError('Player not found');
+            throw new ValidationError("Player not found");
         }
 
         if (game.state.startDate) {
@@ -298,32 +326,48 @@ export default class GameService extends EventEmitter {
                 player.isOpenSlot = true;
                 await game.save();
             } else {
-                await this.concedeDefeat(game, player, true);
+                await this.concedeDefeat(game, player, true, eventService);
             }
         } else {
-            await this.quit(game, player);
+            await this.quit(game, player, eventService);
         }
     }
 
-    async forceStart(game: Game, forceStartingUserId: DBObjectId, withOpenSlots: boolean) {
-        if (!await this.gameAuthService.isGameAdmin(game, forceStartingUserId)) {
-            throw new ValidationError('You do not have permission to force start this game.');
+    async forceStart(
+        game: Game,
+        forceStartingUserId: DBObjectId,
+        withOpenSlots: boolean,
+    ) {
+        if (
+            !(await this.gameAuthService.isGameAdmin(game, forceStartingUserId))
+        ) {
+            throw new ValidationError(
+                "You do not have permission to force start this game.",
+            );
         }
 
         const players = game.settings.general.playerLimit;
-        const filledSlots = game.galaxy.players.filter(p => !p.isOpenSlot).length;
+        const filledSlots = game.galaxy.players.filter(
+            (p) => !p.isOpenSlot,
+        ).length;
         const aiSlots = players - filledSlots;
 
         if (filledSlots === players) {
-            throw new ValidationError('Cannot force start a game that is already full.');
+            throw new ValidationError(
+                "Cannot force start a game that is already full.",
+            );
         }
 
         if (filledSlots === 0) {
-            throw new ValidationError('Cannot force start game: at least one human player is needed');
+            throw new ValidationError(
+                "Cannot force start game: at least one human player is needed",
+            );
         }
 
         if (aiSlots > 3) {
-            throw new ValidationError("Cannot start game with more than 3 AI players");
+            throw new ValidationError(
+                "Cannot start game with more than 3 AI players",
+            );
         }
 
         this.gameJoinService.assignNonUserPlayersToAI(game, withOpenSlots);
@@ -335,103 +379,146 @@ export default class GameService extends EventEmitter {
         await game.save();
     }
 
-    async setPauseState(game: Game, pauseState: boolean, pausingUserId: DBObjectId) {
-        if (!await this.gameAuthService.isGameAdmin(game, pausingUserId)) {
-            throw new ValidationError('You do not have permission to pause/unpause this game.');
+    async setPauseState(
+        game: Game,
+        pauseState: boolean,
+        pausingUserId: DBObjectId,
+        notificationService: INotificationService,
+    ) {
+        if (!(await this.gameAuthService.isGameAdmin(game, pausingUserId))) {
+            throw new ValidationError(
+                "You do not have permission to pause/unpause this game.",
+            );
         }
 
         if (!this.gameStateService.isInProgress(game)) {
-            throw new ValidationError('Cannot pause a game that is not in progress.');
+            throw new ValidationError(
+                "Cannot pause a game that is not in progress.",
+            );
         }
 
         if (!pauseState) {
             // Reset afk timers of the players
             // Note: We do not want to update last seen of users as those
             // are separate from the game afk logic.
-            await this.gameRepo.updateOne({
-                _id: game._id,
-            }, {
-                $set: {
-                    'galaxy.players.$[].lastSeen': moment().utc(),
-                }
-            }, {
-                arrayFilters: [
-                    { 'player.defeated': false }
-                ]
-            });
+            await this.gameRepo.updateOne(
+                {
+                    _id: game._id,
+                },
+                {
+                    $set: {
+                        "galaxy.players.$[].lastSeen":
+                            DateTime.utc().toJSDate(),
+                    },
+                },
+                {
+                    arrayFilters: [{ "player.defeated": false }],
+                },
+            );
         }
-        
-        await this.gameRepo.updateOne({
-            _id: game._id
-        }, {
-            $set: {
-                'state.paused': pauseState
-            }
-        });
 
-        const generalChat = this.conversationService.getGeneralConversation(game);
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+            },
+            {
+                $set: {
+                    "state.paused": pauseState,
+                },
+            },
+        );
+
+        const generalChat =
+            this.conversationService.getGeneralConversation(game);
 
         if (generalChat) {
-            await this.conversationService.sendSystemMessage(game, generalChat, `The game has been ${pauseState ? 'paused' : 'resumed'}.`);
+            await this.conversationService.sendSystemMessage(
+                game,
+                generalChat,
+                `The game has been ${pauseState ? "paused" : "resumed"}.`,
+                notificationService,
+            );
         }
     }
 
-    async delete(game: Game, deletedByUserId?: DBObjectId) {
+    async delete(
+        game: Game,
+        deletedByUserId: DBObjectId | undefined,
+        eventService: EventService,
+    ) {
         // If being deleted by a legit user then do some validation.
         if (deletedByUserId && game.state.startDate) {
-            throw new ValidationError('Cannot delete games that are in progress or completed.');
+            throw new ValidationError(
+                "Cannot delete games that are in progress or completed.",
+            );
         }
 
-        const isAdmin = deletedByUserId && await this.userService.getUserIsAdmin(deletedByUserId);
-        const isCreator = deletedByUserId && game.settings.general.createdByUserId && game.settings.general.createdByUserId.toString() === deletedByUserId.toString();
+        const isAdmin =
+            deletedByUserId &&
+            (await this.userService.getUserIsAdmin(deletedByUserId));
+        const isCreator =
+            deletedByUserId &&
+            game.settings.general.createdByUserId &&
+            game.settings.general.createdByUserId.toString() ===
+                deletedByUserId.toString();
 
         if (deletedByUserId && !isAdmin && !isCreator) {
-            throw new ValidationError('Cannot delete this game, you did not create it.');
+            throw new ValidationError(
+                "Cannot delete this game, you did not create it.",
+            );
         }
 
         // If the game hasn't started yet, re-adjust user achievements of players
         // who joined the game.
-        if (!this.gameTypeService.isTutorialGame(game) && game.state.startDate == null) {
+        if (
+            !this.gameTypeService.isTutorialGame(game) &&
+            game.state.startDate == null
+        ) {
             // Deduct "joined" count for all players who already joined the game.
             for (let player of game.galaxy.players) {
                 if (player.userId) {
-                    await this.achievementService.incrementJoined(player.userId, -1);
+                    await this.achievementService.incrementJoined(
+                        player.userId,
+                        -1,
+                    );
                 }
             }
         }
 
-        await this.gameRepo.deleteOne({ 
-            _id: game._id 
+        await this.gameRepo.deleteOne({
+            _id: game._id,
         });
 
-        this.emit(GameServiceEvents.onGameDeleted, {
-            gameId: game._id
-        });
+        await eventService.deleteByGameId(game._id);
 
         // TODO: Cleanup any orphaned docs
     }
 
     async getPlayerUser(game: Game, playerId: DBObjectId) {
-        const isAnonymousNow = this.gameStateService.isFinished(game) ? this.gameTypeService.isAnonymousAfterEnd(game) : this.gameTypeService.isAnonymousGameDuringGame(game);
+        const isAnonymousNow = this.gameStateService.isFinished(game)
+            ? this.gameTypeService.isAnonymousAfterEnd(game)
+            : this.gameTypeService.isAnonymousGameDuringGame(game);
 
         if (isAnonymousNow) {
             return null;
         }
-        
-        const player = game.galaxy.players.find(p => p._id.toString() === playerId.toString())!;
+
+        const player = game.galaxy.players.find(
+            (p) => p._id.toString() === playerId.toString(),
+        )!;
 
         if (!player.userId) {
             return null;
         }
 
         const user = await this.userService.getInfoByIdLean(player.userId!, {
-            'achievements.level': 1,
-            'achievements.rank': 1,
-            'achievements.renown': 1,
-            'achievements.victories': 1,
-            'achievements.eloRating': 1,
+            "achievements.level": 1,
+            "achievements.rank": 1,
+            "achievements.renown": 1,
+            "achievements.victories": 1,
+            "achievements.eloRating": 1,
             roles: 1,
-            isAnonymous: 1
+            isAnonymous: 1,
         });
 
         if (user?.isAnonymous) {
@@ -446,58 +533,70 @@ export default class GameService extends EventEmitter {
         return user;
     }
 
-    async getPlayersLean(gameId: DBObjectId): Promise<{ _id: DBObjectId, userId: DBObjectId | null }[] | undefined> {
-        return (await this.gameRepo.findOne({ _id: gameId }, { 'galaxy.players._id': 1, 'galaxy.players.userId': 1 }))?.galaxy.players.map(p => { return { _id: p._id, userId: p.userId } });
+    async getPlayersLean(
+        gameId: DBObjectId,
+    ): Promise<{ _id: DBObjectId; userId: DBObjectId | null }[] | undefined> {
+        return (
+            await this.gameRepo.findOne(
+                { _id: gameId },
+                { "galaxy.players._id": 1, "galaxy.players.userId": 1 },
+            )
+        )?.galaxy.players.map((p) => {
+            return { _id: p._id, userId: p.userId };
+        });
     }
 
     async resetQuitters(game: Game, userId: DBObjectId) {
-        if (!await this.gameAuthService.isGameAdmin(game, userId)) {
-            throw new ValidationError('You do not have permission to reset quitters for this game.');
+        if (!(await this.gameAuthService.isGameAdmin(game, userId))) {
+            throw new ValidationError(
+                "You do not have permission to reset quitters for this game.",
+            );
         }
 
         game.quitters = [];
 
-        await this.gameRepo.updateOne({
-            _id: game._id
-        }, {
-            $set: {
-                quitters: []
-            }
-        });
-    }
-
-    // TODO: Move to a gameLockService
-    async lockAll(locked: boolean = true) {
-        await this.gameRepo.updateMany({
-            'state.locked': { $ne: locked }
-        }, {
-            $set: {
-                'state.locked': locked
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: game._id,
+            },
+            {
+                $set: {
+                    quitters: [],
+                },
+            },
+        );
     }
 
     listAllUndefeatedPlayers(game: Game) {
         if (this.gameTypeService.isTutorialGame(game)) {
-            return game.galaxy.players.filter(p => p.userId);
+            return game.galaxy.players.filter((p) => p.userId);
         }
 
-        return game.galaxy.players.filter(p => !p.defeated);
+        return game.galaxy.players.filter((p) => !p.defeated);
     }
 
     isAllUndefeatedPlayersReady(game: Game) {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
-        return undefeatedPlayers.filter(x => x.ready).length === undefeatedPlayers.length;
+        return (
+            undefeatedPlayers.filter((x) => x.ready).length ===
+            undefeatedPlayers.length
+        );
     }
 
     isReadyToQuitOrDefeated(game: Game, player: Player) {
-        return player.readyToQuit || player.defeated || this.playerAfkService.isAIControlled(game, player);
+        return (
+            player.readyToQuit ||
+            player.defeated ||
+            this.playerAfkService.isAIControlled(game, player)
+        );
     }
 
     isReadyToQuitImmediateEnd(game: Game) {
         // every player is defeated, RTQ or AI
-        return game.galaxy.players.every(p => this.isReadyToQuitOrDefeated(game, p));
+        return game.galaxy.players.every((p) =>
+            this.isReadyToQuitOrDefeated(game, p),
+        );
     }
 
     checkReadyToQuit(game: Game, leaderboard: LeaderboardPlayer[]) {
@@ -509,7 +608,11 @@ export default class GameService extends EventEmitter {
 
         for (const player of game.galaxy.players) {
             if (this.isReadyToQuitOrDefeated(game, player)) {
-                rtqStarsSum += leaderboard.find(x => x.player._id.toString() === player._id.toString())?.stats?.totalStars || 0;
+                rtqStarsSum +=
+                    leaderboard.find(
+                        (x) =>
+                            x.player._id.toString() === player._id.toString(),
+                    )?.stats?.totalStars || 0;
             } else {
                 allUndefeatedHaveRTQed = false;
             }
@@ -522,22 +625,26 @@ export default class GameService extends EventEmitter {
         let undefeatedPlayers = this.listAllUndefeatedPlayers(game);
 
         for (let player of undefeatedPlayers) {
-            await this.playerReadyService.declareReadyToQuit(game, player, true);
+            await this.playerReadyService.declareReadyToQuit(
+                game,
+                player,
+                true,
+            );
         }
     }
-    
+
     // TODO: Should be in a player service?
-    async quitAllActiveGames(userId: DBObjectId) {
+    async quitAllActiveGames(userId: DBObjectId, eventService: EventService) {
         let allGames = await this.gameRepo.findAsModels({
-            'galaxy.players': {
-                $elemMatch: { 
-                    userId,             // User is in game
-                    defeated: false     // User has not been defeated
-                }
+            "galaxy.players": {
+                $elemMatch: {
+                    userId, // User is in game
+                    defeated: false, // User has not been defeated
+                },
             },
             $and: [
-                { 'state.endDate': { $eq: null } } // The game hasn't ended.
-            ]
+                { "state.endDate": { $eq: null } }, // The game hasn't ended.
+            ],
         });
 
         // Find all games that are pending start and quit.
@@ -546,23 +653,24 @@ export default class GameService extends EventEmitter {
             let player = this.playerService.getByUserId(game, userId)!;
 
             if (this.gameStateService.isInProgress(game)) {
-                await this.concedeDefeat(game, player, false);
-            }
-            else {
-                await this.quit(game, player);
+                await this.concedeDefeat(game, player, false, eventService);
+            } else {
+                await this.quit(game, player, eventService);
             }
         }
     }
 
     async markAsCleaned(gameId: DBObjectId) {
-        await this.gameRepo.updateOne({
-            _id: gameId
-        }, {
-            $set: {
-                'state.cleaned': true,
-                'settings.general.timeMachine': 'disabled'
-            }
-        });
+        await this.gameRepo.updateOne(
+            {
+                _id: gameId,
+            },
+            {
+                $set: {
+                    "state.cleaned": true,
+                    "settings.general.timeMachine": "disabled",
+                },
+            },
+        );
     }
-
-};
+}

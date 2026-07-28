@@ -1,21 +1,27 @@
 <template>
-    <span v-if="isOrbitalMechanicsEnabled" class="text-warning" title="Orbital Mechanics may affect waypoint ETAs">*</span>
+  <span
+    v-if="isOrbitalMechanicsEnabled"
+    class="text-warning"
+    title="Orbital Mechanics may affect waypoint ETAs"
+    >*</span
+  >
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import GameHelper from "../../../../services/gameHelper";
+import { computed } from "vue";
+import type { Game } from "@/types/game";
 
-export default {
-  computed: {
-    isOrbitalMechanicsEnabled () {
-      return GameHelper.isOrbitalMechanicsEnabled(this.$store.state.game)
-    }
-  }
-}
+const store = useGameStore();
+
+const isOrbitalMechanicsEnabled = computed(() => {
+  return GameHelper.isOrbitalMechanicsEnabled(store.game as Game);
+});
 </script>
 
 <style scoped>
 span {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>

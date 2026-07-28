@@ -1,50 +1,90 @@
 <template>
-<tr>
-    <td><player-icon v-if="carrier.ownedByPlayerId" :playerId="carrier.ownedByPlayerId" /></td>
-    <td><a href="javascript:;" @click="clickCarrier">{{carrier.name}}</a></td>
-    <td><a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a></td>
-    <td><specialist-icon :type="'carrier'" :defaultIcon="'rocket'" :specialist="carrier.specialist" :hideDefaultIcon="true"></specialist-icon></td>
-    <td class="text-end">{{carrier.ships == null ? '???' : carrier.ships}}</td>
-    <td class="text-end" :class="{'text-warning':carrier.waypointsLooped}" :title="carrier.waypointsLooped?'Looped':'Unlooped'">{{carrier.waypoints.length}}</td>
+  <tr>
+    <td>
+      <player-icon
+        v-if="carrier.ownedByPlayerId"
+        :playerId="carrier.ownedByPlayerId"
+      />
+    </td>
+    <td>
+      <a href="javascript:;" @click="clickCarrier">{{ carrier.name }}</a>
+    </td>
+    <td>
+      <a href="javascript:;" @click="goToCarrier"><i class="far fa-eye"></i></a>
+    </td>
+    <td>
+      <specialist-icon
+        :type="'carrier'"
+        :defaultIcon="'rocket'"
+        :specialist="carrier.specialist"
+        :hideDefaultIcon="true"
+      ></specialist-icon>
+    </td>
     <td class="text-end">
-      <span class="text-small" v-if="carrier.waypoints.length && carrier.ticksEta !== null && carrier.ticksEta !== undefined">
+      {{ carrier.ships == null ? "???" : carrier.ships }}
+    </td>
+    <td
+      class="text-end"
+      :class="{ 'text-warning': carrier.waypointsLooped }"
+      :title="carrier.waypointsLooped ? 'Looped' : 'Unlooped'"
+    >
+      {{ carrier.waypoints.length }}
+    </td>
+    <td class="text-end">
+      <span
+        class="text-small"
+        v-if="
+          carrier.waypoints.length &&
+          carrier.ticksEta !== null &&
+          carrier.ticksEta !== undefined
+        "
+      >
         <timer :ticks="carrier.ticksEta" />
       </span>
     </td>
     <td class="text-end text-muted">
-      <span v-if="carrier.waypoints.length && carrier.ticksEtaTotal !== null && carrier.ticksEtaTotal !== undefined" class="text-small">
+      <span
+        v-if="
+          carrier.waypoints.length &&
+          carrier.ticksEtaTotal !== null &&
+          carrier.ticksEtaTotal !== undefined
+        "
+        class="text-small"
+      >
         <timer :ticks="carrier.ticksEtaTotal" />
       </span>
     </td>
-</tr>
+  </tr>
 </template>
 
 <script setup lang="ts">
-import PlayerIcon from '../player/PlayerIcon.vue'
-import SpecialistIcon from '../specialist/SpecialistIcon.vue'
-import {eventBusInjectionKey} from "../../../../eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
-import type {Carrier} from "@/types/game";
+import PlayerIcon from "../player/PlayerIcon.vue";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import SpecialistIcon from "../specialist/SpecialistIcon.vue";
+import { eventBusInjectionKey } from "../../../../eventBus";
+import { inject } from "vue";
+import type { Carrier } from "@/types/game";
 import Timer from "@/views/game/components/time/Timer.vue";
-import type {MapObject} from "@solaris-common";
+import type { MapObject } from "@solaris/common";
 
 const props = defineProps<{
-  carrier: Carrier,
+  carrier: Carrier;
 }>();
 
 const emit = defineEmits<{
-  onOpenCarrierDetailRequested: [carrierId: string],
+  onOpenCarrierDetailRequested: [carrierId: string];
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
 
 const clickCarrier = () => {
-  emit('onOpenCarrierDetailRequested', props.carrier._id);
+  emit("onOpenCarrierDetailRequested", props.carrier._id);
 };
 
 const goToCarrier = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, { object: props.carrier as MapObject<string> });
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
+    object: props.carrier as MapObject<string>,
+  });
 };
 </script>
 

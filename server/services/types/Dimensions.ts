@@ -3,4 +3,4 @@ export interface GalaxyDimensions {
     minY: number;
     maxX: number;
     maxY: number;
-};
+}

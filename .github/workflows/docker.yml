@@ -6,6 +6,7 @@ env:
   BASE_IMAGE_NAME: solaris-games/solaris-base-prod
   API_IMAGE_NAME: solaris-games/solaris-api-prod
   JOBS_IMAGE_NAME: solaris-games/solaris-jobs-prod
+  CLIENT_IMAGE_NAME: solaris-games/solaris-client-prod
 
 on:
   workflow_dispatch:
@@ -101,4 +102,24 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.JOBS_IMAGE_NAME}}
           subject-digest: ${{ steps.push-jobs.outputs.digest }}
+          push-to-registry: true
+
+      - name: Build and push client docker image
+        id: push-client
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          file: docker/prod/client/Dockerfile
+          push: true
+          load: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.CLIENT_IMAGE_NAME }}:${{ github.event.inputs.tag }}
+            ${{ env.REGISTRY }}/${{ env.CLIENT_IMAGE_NAME }}:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Generate jobs artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.CLIENT_IMAGE_NAME}}
+          subject-digest: ${{ steps.push-client.outputs.digest }}
           push-to-registry: true

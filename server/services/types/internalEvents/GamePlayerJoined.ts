@@ -1,5 +1,5 @@
 import { InternalGameEvent } from "./InternalGameEvent";
-import {DBObjectId} from "../DBObjectId";
+import { DBObjectId } from "../DBObjectId";
 
 export default interface InternalGamePlayerJoinedEvent extends InternalGameEvent {
     playerId: DBObjectId;

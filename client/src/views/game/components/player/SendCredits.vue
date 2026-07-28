@@ -1,83 +1,112 @@
 <template>
-<div class="row bg-dark pt-2 pb-2">
-  <div class="col-12">
-    <form-error-list v-bind:errors="errors"/>
-  </div>
+  <div class="row bg-dark pt-2 pb-2">
+    <div class="col-12">
+      <form-error-list v-bind:errors="errors" />
+    </div>
 
-  <div class="col-12">
-    <p class="mb-2">Send <strong>Credits</strong>. (You have <span class="text-warning">${{userPlayer.credits}}</span>)</p>
+    <div class="col-12">
+      <p class="mb-2">
+        Send <strong>Credits</strong>. (You have
+        <span class="text-warning">${{ userPlayer.credits }}</span
+        >)
+      </p>
 
-    <form class="row">
-      <div class="col-7">
-        <div class="input-group">
-          <span class="input-group-text">$</span>
-          <input type="number" class="form-control" v-model="amount"/>
+      <form class="row">
+        <div class="col-7">
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" v-model="amount" />
+          </div>
         </div>
-      </div>
-      <div class="col-5">
-        <div class="d-grid gap-2">
-          <modalButton modalName="sendCreditsModal" classText="btn btn-success" :disabled="$isHistoricalMode() || isSendingCredits || amount <= 0"><i class="fas fa-paper-plane"></i> Send</modalButton>
+        <div class="col-5">
+          <div class="d-grid gap-2">
+            <button
+              type="button"
+              class="btn btn-success"
+              :disabled="isHistoricalMode || isSendingCredits || amount <= 0"
+              @click="requestSendCredits"
+            >
+              <i class="fas fa-paper-plane"></i> Send
+            </button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-
-  <dialogModal modalName="sendCreditsModal" titleText="Send Credits" cancelText="No" confirmText="Yes" @onConfirm="confirmSendCredits">
-    <p>Are you sure you want to send <b>${{amount}}</b> to <b>{{player.alias}}</b>?</p>
-  </dialogModal>
-</div>
 </template>
 
-<script>
-import tradeService from '../../../../services/api/trade'
-import ModalButton from '../../../components/modal/ModalButton.vue'
-import DialogModal from '../../../components/modal/DialogModal.vue'
-import FormErrorList from '../../../components/FormErrorList.vue'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { ref, inject, computed } from "vue";
+import FormErrorList from "../../../components/FormErrorList.vue";
+import type { Game, Player } from "@/types/game";
+import {
+  extractErrors,
+  formatError,
+  httpInjectionKey,
+  isOk,
+} from "@/services/typedapi";
+import { sendCredits } from "@/services/typedapi/trade";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
-export default {
-  props: {
-    player: Object,
-    userPlayer: Object
-  },
-  components: {
-    'modalButton': ModalButton,
-    'dialogModal': DialogModal,
-    'form-error-list': FormErrorList
-  },
-  data () {
-    return {
-      errors: [],
-      isSendingCredits: false,
-      amount: 0
-    }
-  },
-  methods: {
-    async confirmSendCredits () {
-      this.errors = []
-      this.isSendingCredits = true
-      this.amount = Math.floor(this.amount)
+import { useToast } from "vue-toast-notification";
+import { useConfirm } from "@/hooks/confirm.ts";
+const props = defineProps<{
+  player: Player;
+  userPlayer: Player;
+}>();
 
-      try {
-        let response = await tradeService.sendCredits(this.$store.state.game._id, this.player._id, this.amount)
+const emit = defineEmits<{
+  onCreditsSent: [amount: number];
+}>();
 
-        if (response.status === 200) {
-          this.$emit('onCreditsSent', this.amount)
+const httpClient = inject(httpInjectionKey)!;
+const toast = useToast();
 
-          this.$toast.default(`Sent ${this.amount} credits to ${this.player.alias}.`)
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const isHistoricalMode = useIsHistoricalMode(store);
+const confirm = useConfirm();
 
-          this.userPlayer.credits -= this.amount
-          this.amount = 0
+const errors = ref<string[]>([]);
+const isSendingCredits = ref(false);
+const amount = ref(0);
 
-          this.player.reputation = response.data.reputation
-        }
-      } catch (err) {
-        this.errors = err.response.data.errors || []
-      }
+const requestSendCredits = async () => {
+  const confirmed = await confirm(
+    "Send Credits",
+    `Are you sure you want to send ${amount.value} credits to ${props.player.alias}?`,
+  );
 
-      this.isSendingCredits = false
-    }
+  if (confirmed) {
+    await confirmSendCredits();
   }
-}
+};
+
+const confirmSendCredits = async () => {
+  errors.value = [];
+  isSendingCredits.value = true;
+  amount.value = Math.floor(amount.value);
+
+  const response = await sendCredits(httpClient)(
+    game.value._id,
+    props.player._id,
+    amount.value,
+  );
+  if (isOk(response)) {
+    emit("onCreditsSent", amount.value);
+    toast.default(`Sent ${amount.value} credits to ${props.player.alias}.`);
+
+    props.userPlayer.credits -= amount.value;
+    amount.value = 0;
+    props.player.reputation = response.data.reputation;
+  } else {
+    console.error(formatError(response));
+    errors.value = extractErrors(response);
+  }
+
+  isSendingCredits.value = false;
+};
 </script>
 
 <style scoped>

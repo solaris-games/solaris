@@ -1,5 +1,5 @@
 export default class GameMutationNames {
-  private constructor() { };
+  private constructor() {}
 
-  public static readonly GameStarted: string = 'gameStarted';
+  public static readonly GameStarted: string = "gameStarted";
 }

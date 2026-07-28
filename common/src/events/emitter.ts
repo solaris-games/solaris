@@ -8,5 +8,8 @@ export abstract class Emitter<TEventType> {
     }
 
     // TData extends unknown is used to mitigate a known issue: https://github.com/microsoft/TypeScript/issues/30071
-    protected abstract emit<TEventName extends EventName<TEventType, TData>, TData extends unknown>(event: TEventName, data: TData): void;
+    protected abstract emit<
+        TEventName extends EventName<TEventType, TData>,
+        TData extends unknown,
+    >(event: TEventName, data: TData): void;
 }

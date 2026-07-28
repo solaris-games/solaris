@@ -3,9 +3,6 @@ node_modules
 dist
 build
 
-# global env files
-.env
-
 # local env files
 .env.local
 .env.*.local
@@ -32,3 +29,5 @@ yarn-error.log*
 # local db folder when using docker-compose
 database_data
 mise.toml
+
+stats.html

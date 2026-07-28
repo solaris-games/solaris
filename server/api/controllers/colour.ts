@@ -1,5 +1,5 @@
-import {DependencyContainer} from "../../services/types/DependencyContainer";
-import {parseColourOverrideRequest} from "../requests/colour";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
+import { parseColourOverrideRequest } from "../requests/colour";
 
 export default (container: DependencyContainer) => {
     return {
@@ -16,12 +16,17 @@ export default (container: DependencyContainer) => {
             try {
                 const body = parseColourOverrideRequest(req.body);
 
-                await container.playerColourService.setColourOverride(req.game, req.player, body.playerId, body.colour);
+                await container.playerColourService.setColourOverride(
+                    req.game,
+                    req.player,
+                    body.playerId,
+                    body.colour,
+                );
                 res.status(200).json({});
                 return next();
             } catch (err) {
                 return next(err);
             }
-        }
+        },
     };
 };

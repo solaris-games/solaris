@@ -1,15 +1,15 @@
-import type {DistanceService} from "./distance";
-import type {WaypointService} from "./waypoint";
-import type {StarDataService} from "./starData";
-import type {Game} from "../types/common/game";
-import type {Carrier} from "../types/common/carrier";
-import type {Player} from "../types/common/player";
-import type {Id} from "../types/id";
-import type {Star} from "../types/common/star";
-import {TechnologyService} from "./technology";
+import type { DistanceService } from "./distance";
+import type { WaypointService } from "./waypoint";
+import type { StarDataService } from "./starData";
+import type { Game } from "../types/common/game";
+import type { Carrier } from "../types/common/carrier";
+import type { Player } from "../types/common/player";
+import type { Id } from "../types/id";
+import type { Star } from "../types/common/star";
+import { TechnologyService } from "./technology";
 
 interface Node<ID> {
-    id: ID,
+    id: ID;
     cost: number;
     costFromStart: number;
     neighbors: Node<ID>[] | null;
@@ -23,37 +23,71 @@ export class PathfindingService<ID extends Id> {
     starDataService: StarDataService;
     technologyService: TechnologyService;
 
-    constructor(distanceService: DistanceService, waypointService: WaypointService<ID>, starDataService: StarDataService, technologyService: TechnologyService) {
+    constructor(
+        distanceService: DistanceService,
+        waypointService: WaypointService<ID>,
+        starDataService: StarDataService,
+        technologyService: TechnologyService,
+    ) {
         this.distanceService = distanceService;
         this.waypointService = waypointService;
         this.starDataService = starDataService;
         this.technologyService = technologyService;
     }
 
-    calculateShortestRoute(game: Game<ID>, player: Player<ID>, carrier: Carrier<ID>, sourceStarId: string, destinStarId: string): Node<ID>[] {
-        const effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
-        const hyperspaceDistance = this.distanceService.getHyperspaceDistance(game, effectiveTechs.hyperspace);
+    calculateShortestRoute(
+        game: Game<ID>,
+        player: Player<ID>,
+        carrier: Carrier<ID>,
+        sourceStarId: string,
+        destinStarId: string,
+    ): Node<ID>[] {
+        const effectiveTechs =
+            this.technologyService.getCarrierEffectiveTechnologyLevels(
+                game,
+                carrier,
+                true,
+            );
+        const hyperspaceDistance = this.distanceService.getHyperspaceDistance(
+            game,
+            effectiveTechs.hyperspace,
+        );
 
-        const graph: Node<ID>[] = game.galaxy.stars.map(star => {
+        const graph: Node<ID>[] = game.galaxy.stars.map((star) => {
             return {
                 id: star._id,
                 star,
                 cost: 0,
                 costFromStart: 0,
                 neighbors: null,
-                parent: null
-            }
-        })
+                parent: null,
+            };
+        });
 
-        const getNeighbors = (node: Node<ID>) => graph
-            .filter(s => s.star._id.toString() !== node.star._id.toString())
-            .filter(s => this.distanceService.getDistanceBetweenLocations(s.star.location, node.star.location) <= hyperspaceDistance || this.starDataService.isStarPairWormHole(s.star, node.star));
+        const getNeighbors = (node: Node<ID>) =>
+            graph
+                .filter(
+                    (s) => s.star._id.toString() !== node.star._id.toString(),
+                )
+                .filter(
+                    (s) =>
+                        this.distanceService.getDistanceBetweenLocations(
+                            s.star.location,
+                            node.star.location,
+                        ) <= hyperspaceDistance ||
+                        this.starDataService.isStarPairWormHole(
+                            s.star,
+                            node.star,
+                        ),
+                );
 
-        const start = graph.find(s => s.star._id.toString() === sourceStarId)!;
-        const end = graph.find(s => s.star._id.toString() === destinStarId)!;
+        const start = graph.find(
+            (s) => s.star._id.toString() === sourceStarId,
+        )!;
+        const end = graph.find((s) => s.star._id.toString() === destinStarId)!;
 
-        const openSet: Node<ID>[] = [start]
-        const closedSet: Node<ID>[] = []
+        const openSet: Node<ID>[] = [start];
+        const closedSet: Node<ID>[] = [];
 
         while (openSet.length) {
             // This sort makes us look at the nodes where we can get the quickest first.
@@ -92,17 +126,34 @@ export class PathfindingService<ID extends Id> {
 
             for (const neighbor of current.neighbors) {
                 // If the neighbor has already been checked, then no need to check again.
-                const isClosed = closedSet.find(n => n.star._id.toString() === neighbor.star._id.toString()) != null;
+                const isClosed =
+                    closedSet.find(
+                        (n) =>
+                            n.star._id.toString() ===
+                            neighbor.star._id.toString(),
+                    ) != null;
 
                 if (!isClosed) {
-                    neighbor.cost = this.waypointService.calculateTicksForDistance(game, player, carrier, current.star, neighbor.star);
+                    neighbor.cost =
+                        this.waypointService.calculateTicksForDistance(
+                            game,
+                            player,
+                            carrier,
+                            current.star,
+                            neighbor.star,
+                        );
 
                     // Calculate what the next cost will be, we don't want to check
                     // any paths that lead us to more cost.
                     const nextCost = current.costFromStart + neighbor.cost;
 
                     // But if we haven't tried this path, enqueue it.
-                    const isOpen = openSet.find(n => n.star._id.toString() === neighbor.star._id.toString()) != null;
+                    const isOpen =
+                        openSet.find(
+                            (n) =>
+                                n.star._id.toString() ===
+                                neighbor.star._id.toString(),
+                        ) != null;
 
                     if (!isOpen) {
                         openSet.push(neighbor);
@@ -112,8 +163,8 @@ export class PathfindingService<ID extends Id> {
 
                     // Calculate the final cost from the start to the end
                     // while updating the path taken.
-                    neighbor.costFromStart = nextCost
-                    neighbor.parent = current
+                    neighbor.costFromStart = nextCost;
+                    neighbor.parent = current;
                 }
             }
         }

@@ -1,5 +1,5 @@
 import { InternalGameEvent } from "./InternalGameEvent";
-import {DBObjectId} from "../DBObjectId";
+import { DBObjectId } from "../DBObjectId";
 
 export default interface InternalPlayerGalacticCycleCompleteEvent extends InternalGameEvent {
     playerId: DBObjectId;
@@ -13,10 +13,10 @@ export default interface InternalPlayerGalacticCycleCompleteEvent extends Intern
     experimentResearchingNext: string | null;
     carrierUpkeep: {
         carrierCount: number;
-        totalCost: number
+        totalCost: number;
     } | null;
     allianceUpkeep: {
         allianceCount: number;
         totalCost: number;
     } | null;
-};
+}

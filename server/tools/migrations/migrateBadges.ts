@@ -1,5 +1,5 @@
-import {JobParameters} from "../tool";
-import {AwardedBadge, User} from "../../services/types/User";
+import { JobParameters } from "../tool";
+import { AwardedBadge, User } from "../../services/types/User";
 import { Logger } from "pino";
 
 interface LegacyBadges {
@@ -26,13 +26,13 @@ interface LegacyBadges {
 }
 
 const PLAYER_AWARDED_BADGES_KEYS = [
-    'ally',
-    'enemy',
-    'diplomat',
-    'strategist',
-    'roleplay',
-    'dauntless',
-    'sleepless',
+    "ally",
+    "enemy",
+    "diplomat",
+    "strategist",
+    "roleplay",
+    "dauntless",
+    "sleepless",
 ];
 
 const mapBadges = (badges: LegacyBadges): AwardedBadge[] => {
@@ -55,13 +55,15 @@ const mapBadges = (badges: LegacyBadges): AwardedBadge[] => {
     }
 
     return newBadges;
-}
+};
 
 const migrateBadgesForUser = (log: Logger, user: User) => {
     const badgesO = user.achievements.badges;
 
-    if (typeof badgesO !== 'object') {
-        log.error(`User ${user._id} has invalid badges: ${badgesO}. Migration already applied?`);
+    if (typeof badgesO !== "object") {
+        log.error(
+            `User ${user._id} has invalid badges: ${badgesO}. Migration already applied?`,
+        );
         return null;
     }
 
@@ -74,12 +76,12 @@ const migrateBadgesForUser = (log: Logger, user: User) => {
             filter: { _id: user._id },
             update: {
                 $set: {
-                    'achievements.badges': newBadges,
-                }
-            }
-        }
-    }
-}
+                    "achievements.badges": newBadges,
+                },
+            },
+        },
+    };
+};
 
 // We only migrate user-awarded badges, the game-awarded badges will be handled in recalculateRankings.
 export const migrateBadges = async (ctx: JobParameters) => {
@@ -94,11 +96,19 @@ export const migrateBadges = async (ctx: JobParameters) => {
     const totalPages = Math.ceil(total / pageSize);
 
     do {
-        const users = await userRepository.find({}, {
-            'achievements': 1,
-        }, { _id: 1 }, pageSize, page * pageSize);
+        const users = await userRepository.find(
+            {},
+            {
+                achievements: 1,
+            },
+            { _id: 1 },
+            pageSize,
+            page * pageSize,
+        );
 
-        const writes = users.map((user) => migrateBadgesForUser(log, user)).filter(Boolean);
+        const writes = users
+            .map((user) => migrateBadgesForUser(log, user))
+            .filter(Boolean);
 
         console.log(JSON.stringify(writes));
 
@@ -107,5 +117,5 @@ export const migrateBadges = async (ctx: JobParameters) => {
         log.info(`Page ${page}/${totalPages}`);
 
         page++;
-    } while (page <= totalPages)
-}
+    } while (page <= totalPages);
+};

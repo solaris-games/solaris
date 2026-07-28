@@ -1,28 +1,31 @@
-import { Request } from 'express';
-import { ValidationError } from "solaris-common";
-import { DependencyContainer } from '../../services/types/DependencyContainer';
+import { Request } from "express";
+import { ValidationError } from "@solaris/common";
+import { DependencyContainer } from "../../services/types/DependencyContainer";
 import { logger } from "../../utils/logging";
 import {
     mapToGameConcedeDefeatRequest,
     mapToGameSaveNotesRequest,
-    parseGameJoinGameRequest, parseGameSettingsReq,
-    parseKickPlayerRequest
-} from '../requests/game';
-import {Player} from "../../services/types/Player";
+    parseGameJoinGameRequest,
+    parseGameSettingsReq,
+    parseKickPlayerRequest,
+} from "../requests/game";
+import { Player } from "../../services/types/Player";
 
 const log = logger("Game Controller");
 
 export default (container: DependencyContainer) => {
     return {
         getDefaultSettings: (req, res, next) => {
-            res.status(200).json(require('../../config/game/settings/user/standard.json'));
+            res.status(200).json(
+                require("../../config/game/settings/user/standard.json"),
+            );
 
             return next();
         },
         getFlux: async (req, res, next) => {
             try {
                 const flux = container.gameFluxService.getCurrentFlux();
-    
+
                 res.status(200).json(flux);
                 return next();
             } catch (err) {
@@ -33,8 +36,12 @@ export default (container: DependencyContainer) => {
             try {
                 const settings = parseGameSettingsReq(req.body);
 
-                const game = await container.gameCreateService.create(settings, req.session.userId);
-    
+                const game = await container.gameCreateService.create(
+                    container.eventService,
+                    settings,
+                    req.session.userId,
+                );
+
                 res.status(201).json({
                     gameId: game._id,
                 });
@@ -45,17 +52,27 @@ export default (container: DependencyContainer) => {
         },
         createTutorial: async (req, res, next) => {
             try {
-                const tutorial = container.tutorialService.getByKey(req.params.tutorialKey);
-                let game = await container.gameListService.getUserTutorial(req.session.userId, tutorial.key);
-    
+                const tutorial = container.tutorialService.getByKey(
+                    req.params.tutorialKey,
+                );
+                let game = await container.gameListService.getUserTutorial(
+                    req.session.userId,
+                    tutorial.key,
+                );
+
                 if (!game) {
-                    const path = '../../config/game/settings/user/' + tutorial.file;
+                    const path =
+                        "../../config/game/settings/user/" + tutorial.file;
                     const raw = require(path);
                     const settings = parseGameSettingsReq(raw);
 
-                    game = await container.gameCreateService.create(settings, req.session.userId);
+                    game = await container.gameCreateService.create(
+                        container.eventService,
+                        settings,
+                        req.session.userId,
+                    );
                 }
-    
+
                 res.status(201).json({
                     gameId: game?._id,
                 });
@@ -67,7 +84,9 @@ export default (container: DependencyContainer) => {
         },
         detailInfo: async (req, res, next) => {
             try {
-                res.status(200).json(container.gameService.getDetailInfo(req.game));
+                res.status(200).json(
+                    container.gameService.getDetailInfo(req.game),
+                );
                 return next();
             } catch (err) {
                 return next(err);
@@ -87,18 +106,28 @@ export default (container: DependencyContainer) => {
 
                 let tick: number | null;
 
-                if (tickParam === null || tickParam === undefined || tickParam === '') {
+                if (
+                    tickParam === null ||
+                    tickParam === undefined ||
+                    tickParam === ""
+                ) {
                     tick = null;
                 } else {
                     tick = Number(tickParam);
                 }
 
                 if (tick !== null && tick < 0) {
-                    throw new ValidationError(`Tick must be greater or equal to 0.`);
+                    throw new ValidationError(
+                        `Tick must be greater or equal to 0.`,
+                    );
                 }
-        
-                let game = await container.gameGalaxyService.getGalaxy(req.params.gameId, req.session.userId, tick);
-    
+
+                let game = await container.gameGalaxyService.getGalaxy(
+                    req.params.gameId,
+                    req.session.userId,
+                    tick,
+                );
+
                 res.status(200).json(game);
                 return next();
             } catch (err) {
@@ -110,16 +139,16 @@ export default (container: DependencyContainer) => {
                 const games = await Promise.all([
                     container.gameListService.listJoinableGames(),
                     container.gameListService.listInProgressGames(),
-                    container.gameListService.listRecentlyCompletedGames()
-                ])
-                
+                    container.gameListService.listRecentlyCompletedGames(),
+                ]);
+
                 let result = {
                     official: games[0].official,
                     user: games[0].custom,
                     inProgress: games[1],
-                    completed: games[2]
+                    completed: games[2],
                 };
-    
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -129,7 +158,7 @@ export default (container: DependencyContainer) => {
         listOfficial: async (req, res, next) => {
             try {
                 let games = await container.gameListService.listOfficialGames();
-    
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -139,7 +168,7 @@ export default (container: DependencyContainer) => {
         listCustom: async (req, res, next) => {
             try {
                 let games = await container.gameListService.listCustomGames();
-    
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -148,8 +177,9 @@ export default (container: DependencyContainer) => {
         },
         listInProgress: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listInProgressGames();
-    
+                let games =
+                    await container.gameListService.listInProgressGames();
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -158,8 +188,9 @@ export default (container: DependencyContainer) => {
         },
         listRecentlyCompleted: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listRecentlyCompletedGames();
-    
+                let games =
+                    await container.gameListService.listRecentlyCompletedGames();
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -168,8 +199,11 @@ export default (container: DependencyContainer) => {
         },
         listMyCompleted: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listUserCompletedGames(req.session.userId);
-    
+                let games =
+                    await container.gameListService.listUserCompletedGames(
+                        req.session.userId,
+                    );
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -178,8 +212,10 @@ export default (container: DependencyContainer) => {
         },
         listMyActiveGames: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listActiveGames(req.session.userId);
-    
+                let games = await container.gameListService.listActiveGames(
+                    req.session.userId,
+                );
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -188,7 +224,9 @@ export default (container: DependencyContainer) => {
         },
         listMyOpenGames: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listOpenGames(req.session.userId);
+                let games = await container.gameListService.listOpenGames(
+                    req.session.userId,
+                );
 
                 res.status(200).json(games);
                 return next();
@@ -198,8 +236,10 @@ export default (container: DependencyContainer) => {
         },
         listSpectating: async (req, res, next) => {
             try {
-                let games = await container.gameListService.listSpectating(req.session.userId);
-    
+                let games = await container.gameListService.listSpectating(
+                    req.session.userId,
+                );
+
                 res.status(200).json(games);
                 return next();
             } catch (err) {
@@ -209,10 +249,13 @@ export default (container: DependencyContainer) => {
         listTutorials: async (req, res, next) => {
             try {
                 const tutorials = container.tutorialService.listAllTutorials();
-                const completed = await container.userService.listTutorialsCompleted(req.session.userId);
-                tutorials.forEach(t => {
-                    t.completed = completed.includes(t.key)
-                })
+                const completed =
+                    await container.userService.listTutorialsCompleted(
+                        req.session.userId,
+                    );
+                tutorials.forEach((t) => {
+                    t.completed = completed.includes(t.key);
+                });
                 return res.status(200).json(tutorials);
             } catch (err) {
                 return next(err);
@@ -220,12 +263,20 @@ export default (container: DependencyContainer) => {
         },
         getIntel: async (req, res, next) => {
             try {
-                const startTick = req.query.startTick ? Number(req.query.startTick) : undefined;
+                const startTick = req.query.startTick
+                    ? Number(req.query.startTick)
+                    : undefined;
 
-                const endTick = req.query.endTick ? Number(req.query.endTick) : undefined;
+                const endTick = req.query.endTick
+                    ? Number(req.query.endTick)
+                    : undefined;
 
-                const result = await container.historyService.listIntel(req.params.gameId, startTick, endTick);
-    
+                const result = await container.historyService.listIntel(
+                    req.params.gameId,
+                    startTick,
+                    endTick,
+                );
+
                 res.status(200).json(result);
                 return next();
             } catch (err) {
@@ -235,19 +286,28 @@ export default (container: DependencyContainer) => {
         join: async (req, res, next) => {
             try {
                 const reqObj = parseGameJoinGameRequest(req.body);
-                
+
                 let joinResult = await container.gameJoinService.join(
                     req.game,
                     req.session.userId,
                     reqObj.playerId,
                     reqObj.alias,
                     reqObj.avatar,
-                    reqObj.password);
-    
+                    reqObj.password,
+                    container.eventService,
+                    container.notificationService,
+                    container.emailService,
+                );
+
                 res.sendStatus(200);
-    
-                container.broadcastService.gamePlayerJoined(req.game, joinResult.playerId, reqObj.alias, reqObj.avatar);
-    
+
+                container.broadcastService.gamePlayerJoined(
+                    req.game,
+                    joinResult.playerId,
+                    reqObj.alias,
+                    reqObj.avatar,
+                );
+
                 if (joinResult.gameIsFull) {
                     container.broadcastService.gameStarted(req.game);
                 }
@@ -261,10 +321,12 @@ export default (container: DependencyContainer) => {
             try {
                 let player = await container.gameService.quit(
                     req.game,
-                    req.player);
-    
+                    req.player,
+                    container.eventService,
+                );
+
                 res.sendStatus(200);
-                    
+
                 if (player) {
                     container.broadcastService.gamePlayerQuit(req.game, player);
                 }
@@ -281,11 +343,16 @@ export default (container: DependencyContainer) => {
                 await container.gameService.concedeDefeat(
                     req.game,
                     req.player,
-                    reqObj.openSlot);
-                    
+                    reqObj.openSlot,
+                    container.eventService,
+                );
+
                 res.sendStatus(200);
 
-                container.broadcastService.gamePlayerConcededDefeat(req.game, req.player);
+                container.broadcastService.gamePlayerConcededDefeat(
+                    req.game,
+                    req.player,
+                );
 
                 return next();
             } catch (err) {
@@ -296,11 +363,16 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.declareReady(
                     req.game,
-                    req.player);
-                
+                    req.player,
+                    container.notificationService,
+                );
+
                 res.sendStatus(200);
-    
-                container.broadcastService.gamePlayerReady(req.game, req.player);
+
+                container.broadcastService.gamePlayerReady(
+                    req.game,
+                    req.player,
+                );
 
                 return next();
             } catch (err) {
@@ -311,11 +383,16 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.declareReadyToCycle(
                     req.game,
-                    req.player);
-                
+                    req.player,
+                    container.notificationService,
+                );
+
                 res.sendStatus(200);
-    
-                container.broadcastService.gamePlayerReady(req.game, req.player);
+
+                container.broadcastService.gamePlayerReady(
+                    req.game,
+                    req.player,
+                );
 
                 return next();
             } catch (err) {
@@ -326,11 +403,15 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.undeclareReady(
                     req.game,
-                    req.player);
-    
+                    req.player,
+                );
+
                 res.sendStatus(200);
-                    
-                container.broadcastService.gamePlayerNotReady(req.game, req.player);
+
+                container.broadcastService.gamePlayerNotReady(
+                    req.game,
+                    req.player,
+                );
                 return next();
             } catch (err) {
                 return next(err);
@@ -340,12 +421,22 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.declareReadyToQuit(
                     req.game!,
-                    req.player!);
-                
+                    req.player!,
+                );
+
                 res.sendStatus(200);
 
-                if (req.game!.settings.general.readyToQuitVisibility !== 'hidden') {
-                    container.broadcastService.gamePlayerReadyToQuit(req.game!, req.game!.settings.general.readyToQuitVisibility === 'visible' ? req.player! : null);
+                if (
+                    req.game!.settings.general.readyToQuitVisibility !==
+                    "hidden"
+                ) {
+                    container.broadcastService.gamePlayerReadyToQuit(
+                        req.game!,
+                        req.game!.settings.general.readyToQuitVisibility ===
+                            "visible"
+                            ? req.player!
+                            : null,
+                    );
                 }
 
                 return next();
@@ -357,12 +448,22 @@ export default (container: DependencyContainer) => {
             try {
                 await container.playerReadyService.undeclareReadyToQuit(
                     req.game!,
-                    req.player!);
-    
+                    req.player!,
+                );
+
                 res.sendStatus(200);
 
-                if (req.game!.settings.general.readyToQuitVisibility !== 'hidden') {
-                    container.broadcastService.gamePlayerNotReadyToQuit(req.game!, req.game!.settings.general.readyToQuitVisibility === 'visible' ? req.player! : null);
+                if (
+                    req.game!.settings.general.readyToQuitVisibility !==
+                    "hidden"
+                ) {
+                    container.broadcastService.gamePlayerNotReadyToQuit(
+                        req.game!,
+                        req.game!.settings.general.readyToQuitVisibility ===
+                            "visible"
+                            ? req.player!
+                            : null,
+                    );
                 }
 
                 return next();
@@ -374,8 +475,9 @@ export default (container: DependencyContainer) => {
             try {
                 let notes = await container.playerService.getGameNotes(
                     req.game,
-                    req.player);
-                
+                    req.player,
+                );
+
                 res.status(200).json({ notes });
                 return next();
             } catch (err) {
@@ -389,8 +491,9 @@ export default (container: DependencyContainer) => {
                 await container.playerService.updateGameNotes(
                     req.game,
                     req.player,
-                    reqObj.notes);
-                
+                    reqObj.notes,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -401,8 +504,10 @@ export default (container: DependencyContainer) => {
             try {
                 await container.gameService.delete(
                     req.game,
-                    req.session.userId);
-                    
+                    req.session.userId,
+                    container.eventService,
+                );
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -414,13 +519,15 @@ export default (container: DependencyContainer) => {
                 const doPause = req.body?.pause;
 
                 if (doPause === null || doPause === undefined) {
-                    throw new ValidationError('Pause parameter is required.');
+                    throw new ValidationError("Pause parameter is required.");
                 }
 
                 await container.gameService.setPauseState(
                     req.game,
                     doPause,
-                    req.session.userId);
+                    req.session.userId,
+                    container.notificationService,
+                );
 
                 res.sendStatus(200);
                 return next();
@@ -430,21 +537,28 @@ export default (container: DependencyContainer) => {
         },
         forceStart: async (req, res, next) => {
             try {
-                await container.gameService.forceStart(req.game, req.session.userId, Boolean(req.query.withOpenSlots));
+                await container.gameService.forceStart(
+                    req.game,
+                    req.session.userId,
+                    Boolean(req.query.withOpenSlots),
+                );
 
                 res.sendStatus(200);
                 return next();
-            }  catch (err) {
+            } catch (err) {
                 return next(err);
             }
         },
         fastForward: async (req, res, next) => {
             try {
-                await container.gameService.fastForward(req.game, req.session.userId);
+                await container.gameService.fastForward(
+                    req.game,
+                    req.session.userId,
+                );
 
                 res.sendStatus(200);
                 return next();
-            }  catch (err) {
+            } catch (err) {
                 return next(err);
             }
         },
@@ -452,7 +566,12 @@ export default (container: DependencyContainer) => {
             try {
                 const params = parseKickPlayerRequest(req.body);
 
-                await container.gameService.kickPlayer(req.game, req.session.userId, params.playerId);
+                await container.gameService.kickPlayer(
+                    req.game,
+                    req.session.userId,
+                    params.playerId,
+                    container.eventService,
+                );
 
                 res.sendStatus(200);
                 return next();
@@ -464,9 +583,9 @@ export default (container: DependencyContainer) => {
             try {
                 const user = await container.gameService.getPlayerUser(
                     req.game,
-                    req.params.playerId
+                    req.params.playerId,
                 );
-    
+
                 res.status(200).json(user);
                 return next();
             } catch (err) {
@@ -475,12 +594,18 @@ export default (container: DependencyContainer) => {
         },
         touch: async (req, res, next) => {
             try {
-                let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    
+                let ip =
+                    req.headers["x-forwarded-for"] ||
+                    req.connection.remoteAddress;
+
                 if (!req.session.isImpersonating) {
-                    await container.playerService.updateLastSeenLean(req.params.gameId, req.session.userId, ip);
+                    await container.playerService.updateLastSeenLean(
+                        req.params.gameId,
+                        req.session.userId,
+                        ip,
+                    );
                 }
-                
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -496,13 +621,23 @@ export default (container: DependencyContainer) => {
                 }
 
                 if (player._id.toString() !== req.params.playerId) {
-                    throw new ValidationError("You can only access your own statistics.", 403);
+                    throw new ValidationError(
+                        "You can only access your own statistics.",
+                        403,
+                    );
                 }
 
-                const statistics = await container.statisticsService.getStatisticsForGame(req.params.gameId, req.params.playerId);
+                const statistics =
+                    await container.statisticsService.getStatisticsForGame(
+                        req.params.gameId,
+                        req.params.playerId,
+                    );
 
                 if (!statistics) {
-                    throw new ValidationError("Statistics not found for this game or player.", 404);
+                    throw new ValidationError(
+                        "Statistics not found for this game or player.",
+                        404,
+                    );
                 }
 
                 res.status(200).json(statistics);
@@ -513,7 +648,10 @@ export default (container: DependencyContainer) => {
         },
         resetQuitters: async (req, res, next) => {
             try {
-                await container.gameService.resetQuitters(req.game, req.session.userId);
+                await container.gameService.resetQuitters(
+                    req.game,
+                    req.session.userId,
+                );
 
                 res.sendStatus(200);
                 return next();
@@ -521,5 +659,5 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-    }
+    };
 };

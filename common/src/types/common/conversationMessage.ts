@@ -7,12 +7,14 @@ export interface ConversationMessage<ID> {
     sentTick: number | null;
     pinned: boolean;
     readBy: ID[];
-    type?: 'message'|'event';
-};
+    type?: "message" | "event";
+}
 
-export interface ConversationMessageSentResult<ID> extends ConversationMessage<ID> {
+export interface ConversationMessageSentResult<
+    ID,
+> extends ConversationMessage<ID> {
     conversationId: ID;
     toPlayerIds: ID[];
     gameId: ID;
     gameName: string;
-};
+}

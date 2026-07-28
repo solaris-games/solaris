@@ -1,32 +1,31 @@
 <template>
-  <a @click="setMenuState()"
-    :title="tooltip"
-    :class="{'active':isActive}">
-      <i :class="iconClass"></i>
+  <a @click="setMenuState()" :title="tooltip" :class="{ active: isActive }">
+    <i :class="iconClass"></i>
   </a>
 </template>
 
-<script>
-export default {
-  props: {
-    menuState: String,
-    tooltip: String,
-    iconClass: String
-  },
-  methods: {
-    setMenuState () {
-      this.$store.commit('setMenuState', {
-        state: this.menuState,
-        args: null
-      })
-    }
-  },
-  computed: {
-    isActive () {
-      return this.menuState === this.$store.state.menuState
-    }
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import type { MenuState } from "@/types/menu";
+
+const props = defineProps<{
+  menuState?: MenuState;
+  tooltip?: string;
+  iconClass?: string;
+}>();
+
+const store = useGameStore();
+
+const isActive = computed(() => {
+  return props.menuState?.state === store.menuState.state;
+});
+
+const setMenuState = () => {
+  if (props.menuState) {
+    store.setMenuState(props.menuState);
   }
-}
+};
 </script>
 
 <style scoped>

@@ -14,8 +14,14 @@
       <tbody>
         <tr v-for="game in games" v-bind:key="game._id">
           <td>
-            <router-link :to="{ path: '/game/detail', query: { id: game._id } }"
-              class="me-1">{{ game.settings.general.name }}</router-link>
+            <router-link
+              :to="{
+                path: '/game/detail',
+                query: { id: game._id },
+              }"
+              class="me-1"
+              >{{ game.settings.general.name }}</router-link
+            >
             <br />
             <small>{{ GameHelper.getGameTypeFriendlyText(game) }}</small>
           </td>
@@ -27,14 +33,26 @@
               Starting Soon
             </span>
             <span v-if="GameHelper.isGameInProgress(game)">
-              <countdown-timer :endDate="getNextCycleDate(game) || undefined" :active="true"
-                afterEndText="Pending..."></countdown-timer>
+              <countdown-timer
+                :endDate="getNextCycleDate(game) || undefined"
+                :active="true"
+                afterEndText="Pending..."
+              ></countdown-timer>
             </span>
           </td>
-          <td class="d-none d-sm-table-cell text-end">{{ game.state.players }}/{{ game.settings.general.playerLimit }}</td>
+          <td class="d-none d-sm-table-cell text-end">
+            {{ game.state.players }}/{{ game.settings.general.playerLimit }}
+          </td>
           <td>
-            <router-link :to="{ path: '/game/detail', query: { id: game._id } }" tag="button"
-              class="btn btn-outline-success float-end">View</router-link>
+            <router-link
+              :to="{
+                path: '/game/detail',
+                query: { id: game._id },
+              }"
+              tag="button"
+              class="btn btn-outline-success float-end"
+              >View</router-link
+            >
           </td>
         </tr>
       </tbody>
@@ -43,12 +61,12 @@
 </template>
 
 <script setup lang="ts">
-import GameHelper from '../../../../services/gameHelper'
-import CountdownTimer from '../time/CountdownDateTimer.vue';
-import { type Ref, ref, onMounted, inject } from 'vue';
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { listSpectating } from '@/services/typedapi/game';
-import { type UserListGame } from '@solaris-common';
+import GameHelper from "../../../../services/gameHelper";
+import CountdownTimer from "../time/CountdownDateTimer.vue";
+import { type Ref, ref, onMounted, inject } from "vue";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listSpectating } from "@/services/typedapi/game";
+import { type UserListGame } from "@solaris/common";
 import {
   getCountdownTimeForProductionCycle,
   getTurnTimeoutTime,

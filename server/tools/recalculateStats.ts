@@ -1,47 +1,61 @@
-import {makeJob} from "./tool";
-import {User} from "../services/types/User";
-import {StatsSlice} from "solaris-common";
-import {DBObjectId, objectIdFromString} from "../services/types/DBObjectId";
-import {groupBy} from "solaris-common";
+import { makeJob } from "./tool";
+import { User } from "../services/types/User";
+import { StatsSlice } from "@solaris/common";
+import { DBObjectId, objectIdFromString } from "../services/types/DBObjectId";
+import { groupBy } from "@solaris/common";
+import StatisticsService from "../services/statistics";
 
 const dbQuery = {
     closed: true,
 };
 
-const job = makeJob("Recalculate stats", async ({log, container, mongo}) => {
-    const statisticsService = container.statisticsService;
+const job = makeJob("Recalculate stats", async ({ log, container, mongo }) => {
+    const statisticsService = container.statisticsService as StatisticsService;
     const gameService = container.gameService;
     const statsSliceRepository = statisticsService.statsSliceRepository;
 
     log.info("Resetting user stats...");
 
-    const users: User[] = await container.userService.userRepo.findAsModels({}, {
+    const users: User[] = await container.userService.userRepo.findAsModels(
+        {},
+        {
             _id: 1,
-            achievements: 1
+            achievements: 1,
         },
-        { _id: 1 });
-
+        { _id: 1 },
+    );
 
     for (const user of users) {
-        user.achievements.stats = JSON.parse(JSON.stringify(user.achievements.legacyStats));
+        user.achievements.stats = JSON.parse(
+            JSON.stringify(user.achievements.legacyStats),
+        );
 
         // @ts-ignore
         await user.save();
     }
 
-    const sliceData: StatsSlice<DBObjectId>[] = await statsSliceRepository.findAsModels(dbQuery, { _id: 1, gameId: 1 }, {  });
+    const sliceData: StatsSlice<DBObjectId>[] =
+        await statsSliceRepository.findAsModels(
+            dbQuery,
+            { _id: 1, gameId: 1 },
+            {},
+        );
 
     log.info(`Found ${sliceData.length} stats slices to process.`);
 
-    const slicesByGameId = groupBy(sliceData, (slice: StatsSlice<DBObjectId>) => slice.gameId.toString());
+    const slicesByGameId = groupBy(sliceData, (slice: StatsSlice<DBObjectId>) =>
+        slice.gameId.toString(),
+    );
 
     for (let [gameId, slicesForGame] of slicesByGameId) {
-        log.info(`Processing game ${gameId} with ${slicesForGame.length} slices.`);
+        log.info(
+            `Processing game ${gameId} with ${slicesForGame.length} slices.`,
+        );
 
         const game = await gameService.getByIdLean(objectIdFromString(gameId), {
-            'galaxy.players': 1,
-            'settings': 1,
-            'state': 1,
+            "galaxy.players": 1,
+            settings: 1,
+            state: 1,
         });
 
         if (!game) {
