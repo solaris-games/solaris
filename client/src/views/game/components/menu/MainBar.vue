@@ -361,6 +361,8 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   grid-area: stacked-content;
   min-height: 0;
   max-height: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .menu-bars {
