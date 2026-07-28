@@ -1,7 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
-
 
 const schema = new Schema({
     _id: { type: Types.ObjectId, required: true },

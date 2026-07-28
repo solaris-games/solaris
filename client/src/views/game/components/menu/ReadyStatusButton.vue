@@ -1,60 +1,91 @@
 <template>
   <div class="btn-group">
-    <button v-if="player.ready" class="btn btn-danger" :class="{'btn-sm':smallButtons}" @click="unconfirmReady()"
-            title="Not ready"><i class="fas fa-times"></i></button>
-    <button v-if="!player.ready" class="btn btn-success pulse" :class="{'btn-sm':smallButtons}" @click="confirmReady()"
-            title="End your turn"><i class="fas fa-check"></i></button>
-    <button v-if="!player.ready" type="button" :class="{'btn-sm':smallButtons}"
-            class="btn btn-success dropdown-toggle dropdown-toggle-split pulse" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
+    <button
+      v-if="player.ready"
+      class="btn btn-danger"
+      :class="{ 'btn-sm': smallButtons }"
+      @click="unconfirmReady()"
+      title="Not ready"
+    >
+      <i class="fas fa-times"></i>
+    </button>
+    <button
+      v-if="!player.ready"
+      class="btn btn-success pulse"
+      :class="{ 'btn-sm': smallButtons }"
+      @click="confirmReady()"
+      title="End your turn"
+    >
+      <i class="fas fa-check"></i>
+    </button>
+    <button
+      v-if="!player.ready"
+      type="button"
+      :class="{ 'btn-sm': smallButtons }"
+      class="btn btn-success dropdown-toggle dropdown-toggle-split pulse"
+      data-bs-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
       <span class="sr-only">Toggle Dropdown</span>
     </button>
     <div v-if="!player.ready" class="dropdown-menu">
-      <a class="dropdown-item" href="javascript:;" @click="confirmReady()">Ready</a>
-      <a class="dropdown-item" href="javascript:;" @click="confirmReadyToCycle()">Ready to Cycle</a>
+      <a class="dropdown-item" href="javascript:;" @click="confirmReady()"
+        >Ready</a
+      >
+      <a
+        class="dropdown-item"
+        href="javascript:;"
+        @click="confirmReadyToCycle()"
+        >Ready to Cycle</a
+      >
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import GameHelper from '../../../../services/gameHelper'
-import {toastInjectionKey} from "@/util/keys";
+import GameHelper from "../../../../services/gameHelper";
 import { inject, computed } from "vue";
-import {httpInjectionKey, isOk} from "@/services/typedapi";
-import { useStore } from 'vuex';
-import {makeConfirm} from "@/util/confirm";
-import {notReady, ready, readyToCycle} from "@/services/typedapi/game";
+import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { useConfirm } from "@/hooks/confirm.ts";
+import { notReady, ready, readyToCycle } from "@/services/typedapi/game";
+import { useGameStore } from "@/stores/game";
 
+import { useToast } from "vue-toast-notification";
 const props = defineProps<{
-  smallButtons: boolean
+  smallButtons: boolean;
 }>();
 
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 const httpClient = inject(httpInjectionKey)!;
 
-const store = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const player = computed(() => {
-  return GameHelper.getUserPlayer(store.state.game)!;
+  return GameHelper.getUserPlayer(store.game!)!;
 });
 
 const isTutorialGame = computed(() => {
-  return GameHelper.isTutorialGame(store.state.game);
+  return GameHelper.isTutorialGame(store.game);
 });
 
 const confirmReady = async () => {
-  if (!await confirm('End Turn', 'Are you sure you want to end your turn?')) {
+  if (!(await confirm("End Turn", "Are you sure you want to end your turn?"))) {
     return;
   }
 
-  const response = await ready(httpClient)(store.state.game._id);
+  const response = await ready(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
-      toast.success(`You have confirmed your move, please wait while the game processes the tick.`);
+      toast.success(
+        `You have confirmed your move, please wait while the game processes the tick.`,
+      );
     } else {
-      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`);
+      toast.success(
+        `You have confirmed your move, once all players are ready the game will progress automatically.`,
+      );
     }
 
     player.value.ready = true;
@@ -64,17 +95,26 @@ const confirmReady = async () => {
 };
 
 const confirmReadyToCycle = async () => {
-  if (!await confirm('End Cycle', 'Are you sure you want to end your turn up to the end of the current galactic cycle?')) {
+  if (
+    !(await confirm(
+      "End Cycle",
+      "Are you sure you want to end your turn up to the end of the current galactic cycle?",
+    ))
+  ) {
     return;
   }
 
-  const response = await readyToCycle(httpClient)(store.state.game._id);
+  const response = await readyToCycle(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     if (isTutorialGame.value) {
-      toast.success(`You have confirmed your move, please wait while the game processes the tick.`);
+      toast.success(
+        `You have confirmed your move, please wait while the game processes the tick.`,
+      );
     } else {
-      toast.success(`You have confirmed your move, once all players are ready the game will progress automatically.`);
+      toast.success(
+        `You have confirmed your move, once all players are ready the game will progress automatically.`,
+      );
     }
 
     player.value.ready = true;
@@ -85,7 +125,7 @@ const confirmReadyToCycle = async () => {
 };
 
 const unconfirmReady = async () => {
-  const response = await notReady(httpClient)(store.state.game._id);
+  const response = await notReady(httpClient)(store.game!._id);
 
   if (isOk(response)) {
     player.value.ready = false;
@@ -96,6 +136,4 @@ const unconfirmReady = async () => {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

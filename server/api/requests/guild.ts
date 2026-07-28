@@ -1,74 +1,37 @@
-import { ValidationError } from "solaris-common";
-import { keyHasStringValue } from "./helpers";
+import {
+    Validator,
+    GuildRenameGuildRequest,
+    GuildCreateGuildRequest,
+    GuildInviteUserRequest,
+    object,
+    stringValue,
+    username,
+} from "@solaris/common";
 
-export interface GuildCreateGuildRequest {
-    name: string;
-    tag: string;
-};
+const guildName: Validator<string> = stringValue({
+    minLength: 4,
+    maxLength: 64,
+    trim: true,
+});
 
-export const mapToGuildCreateGuildRequest = (body: any): GuildCreateGuildRequest => {
-    let errors: string[] = [];
+const guildTag: Validator<string> = stringValue({
+    minLength: 2,
+    maxLength: 4,
+});
 
-    if (!keyHasStringValue(body, 'name')) {
-        errors.push('Name is required.');
-    }
+export const parseGuildCreateRequest: Validator<GuildCreateGuildRequest> =
+    object({
+        name: guildName,
+        tag: guildTag,
+    });
 
-    if (!keyHasStringValue(body, 'tag')) {
-        errors.push('Tag is required.');
-    }
+export const parseGuildRenameRequest: Validator<GuildRenameGuildRequest> =
+    object({
+        name: guildName,
+        tag: guildTag,
+    });
 
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        name: body.name,
-        tag: body.tag
-    }
-};
-
-export interface GuildRenameGuildRequest {
-    name: string;
-    tag: string;
-};
-
-export const mapToGuildRenameGuildRequest = (body: any): GuildRenameGuildRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'name')) {
-        errors.push('Name is required.');
-    }
-
-    if (!keyHasStringValue(body, 'tag')) {
-        errors.push('Tag is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        name: body.name,
-        tag: body.tag
-    }
-};
-
-export interface GuildInviteUserRequest {
-    username: string;
-};
-
-export const mapToGuildInviteUserRequest = (body: any): GuildInviteUserRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, 'username')) {
-        errors.push('Username is required.');
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-    
-    return {
-        username: body.username
-    }
-};
+export const parseGuildInviteUserRequest: Validator<GuildInviteUserRequest> =
+    object({
+        username: username,
+    });

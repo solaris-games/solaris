@@ -1,10 +1,15 @@
-import {InitialCarrier, InitialGameState, InitialPlayer, InitialStar} from "./types/InitialGameState";
+import {
+    InitialCarrier,
+    InitialGameState,
+    InitialPlayer,
+    InitialStar,
+} from "./types/InitialGameState";
 import Repository from "./repository";
-import {DBObjectId} from "./types/DBObjectId";
-import {Game} from "./types/Game";
-import {Star} from "./types/Star";
-import {Player} from "./types/Player";
-import {Carrier} from "./types/Carrier";
+import { DBObjectId } from "./types/DBObjectId";
+import { Game } from "./types/Game";
+import { Star } from "./types/Star";
+import { Player } from "./types/Player";
+import { Carrier } from "./types/Carrier";
 
 export default class InitialGameStateService {
     initialGameStateRepo: Repository<InitialGameState>;
@@ -65,7 +70,7 @@ export default class InitialGameStateService {
             };
         };
 
-        const state: Omit<InitialGameState, '_id'> = {
+        const state: Omit<InitialGameState, "_id"> = {
             gameId: game._id,
             galaxy: {
                 stars: game.galaxy.stars.map(mapStar),

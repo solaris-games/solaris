@@ -1,106 +1,167 @@
-import {Game} from "./types/Game";
-import {Carrier} from "./types/Carrier";
-import {Star} from "./types/Star";
-import {CarrierWaypoint, CarrierWaypointActionType} from "solaris-common";
-import {DBObjectId} from "./types/DBObjectId";
-import {CarrierActionWaypoint} from "./types/GameTick";
+import { Game } from "./types/Game";
+import { Carrier } from "./types/Carrier";
+import { Star } from "./types/Star";
+import { CarrierWaypoint, CarrierWaypointActionType } from "@solaris/common";
+import { DBObjectId } from "./types/DBObjectId";
+import { CarrierActionWaypoint } from "./types/GameTick";
 
 export default class WaypointActionService {
-    performWaypointAction(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
-        if (carrier.ownedByPlayerId!.toString() !== star.ownedByPlayerId!.toString()) {
-            throw new Error('Cannot perform waypoint action, the carrier and star are owned by different players.')
+    performWaypointAction(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
+        if (
+            carrier.ownedByPlayerId!.toString() !==
+            star.ownedByPlayerId!.toString()
+        ) {
+            throw new Error(
+                "Cannot perform waypoint action, the carrier and star are owned by different players.",
+            );
         }
 
         switch (waypoint.action) {
-            case 'dropAll':
+            case "dropAll":
                 this._performWaypointActionDropAll(carrier, star, waypoint);
                 break;
-            case 'drop':
+            case "drop":
                 this._performWaypointActionDrop(carrier, star, waypoint);
                 break;
-            case 'dropPercentage':
-                this._performWaypointActionDropPercentage(carrier, star, waypoint);
+            case "dropPercentage":
+                this._performWaypointActionDropPercentage(
+                    carrier,
+                    star,
+                    waypoint,
+                );
                 break;
-            case 'dropAllBut':
+            case "dropAllBut":
                 this._performWaypointActionDropAllBut(carrier, star, waypoint);
                 break;
-            case 'collectAll':
+            case "collectAll":
                 this._performWaypointActionCollectAll(carrier, star, waypoint);
                 break;
-            case 'collect':
+            case "collect":
                 this._performWaypointActionCollect(carrier, star, waypoint);
                 break;
-            case 'collectPercentage':
-                this._performWaypointActionCollectPercentage(carrier, star, waypoint);
+            case "collectPercentage":
+                this._performWaypointActionCollectPercentage(
+                    carrier,
+                    star,
+                    waypoint,
+                );
                 break;
-            case 'collectAllBut':
-                this._performWaypointActionCollectAllBut(carrier, star, waypoint);
+            case "collectAllBut":
+                this._performWaypointActionCollectAllBut(
+                    carrier,
+                    star,
+                    waypoint,
+                );
                 break;
-            case 'garrison':
+            case "garrison":
                 this._performWaypointActionGarrison(carrier, star, waypoint);
                 break;
         }
     }
 
-    _performWaypointActionDropAll(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
-        star.shipsActual! += (carrier.ships! - 1)
+    _performWaypointActionDropAll(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
+        star.shipsActual! += carrier.ships! - 1;
         star.ships = Math.floor(star.shipsActual!);
         carrier.ships = 1;
     }
 
-    _performWaypointActionCollectAll(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionCollectAll(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         carrier.ships! += star.ships!;
         star.shipsActual! -= star.ships!;
         star.ships = Math.floor(star.shipsActual!);
     }
 
-    _performWaypointActionDrop(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionDrop(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         // If the carrier has more ships than needs to be dropped, then drop
         // however many are configured in the waypoint.
         if (carrier.ships! - 1 >= waypoint.actionShips) {
             star.shipsActual! += waypoint.actionShips;
             star.ships = Math.floor(star.shipsActual!);
             carrier.ships! -= waypoint.actionShips;
-        }
-        else {
+        } else {
             // If there aren't enough ships, then do a drop all.
             this._performWaypointActionDropAll(carrier, star, waypoint);
         }
     }
 
-    performWaypointActionsDrops(game: Game, waypoints: CarrierActionWaypoint[]) {
-        this._performFilteredWaypointActions(game, waypoints, ['dropAll', 'drop', 'dropAllBut', 'dropPercentage']);
+    performWaypointActionsDrops(
+        game: Game,
+        waypoints: CarrierActionWaypoint[],
+    ) {
+        this._performFilteredWaypointActions(game, waypoints, [
+            "dropAll",
+            "drop",
+            "dropAllBut",
+            "dropPercentage",
+        ]);
     }
 
-    _performWaypointActionCollect(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionCollect(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         // If the star has more ships than needs to be collected, then collect
         // however many are configured in the waypoint.
         if (star.ships! >= waypoint.actionShips) {
             star.shipsActual! -= waypoint.actionShips;
             star.ships = Math.floor(star.shipsActual!);
             carrier.ships! += waypoint.actionShips;
-        }
-        else {
+        } else {
             // If there aren't enough ships, then do a collect all.
             this._performWaypointActionCollectAll(carrier, star, waypoint);
         }
     }
 
-    performWaypointActionsCollects(game: Game, waypoints: CarrierActionWaypoint[]) {
-        this._performFilteredWaypointActions(game, waypoints, ['collectAll', 'collect', 'collectAllBut', 'collectPercentage']);
+    performWaypointActionsCollects(
+        game: Game,
+        waypoints: CarrierActionWaypoint[],
+    ) {
+        this._performFilteredWaypointActions(game, waypoints, [
+            "collectAll",
+            "collect",
+            "collectAllBut",
+            "collectPercentage",
+        ]);
     }
 
-    _performWaypointActionDropPercentage(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
-        const toDrop = Math.floor(carrier.ships! * (waypoint.actionShips * 0.01))
+    _performWaypointActionDropPercentage(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
+        const toDrop = Math.floor(
+            carrier.ships! * (waypoint.actionShips * 0.01),
+        );
 
         if (toDrop >= 1 && carrier.ships! - toDrop >= 1) {
-            star.shipsActual! += toDrop
-            star.ships = Math.floor(star.shipsActual!)
-            carrier.ships! -= toDrop
+            star.shipsActual! += toDrop;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! -= toDrop;
         }
     }
 
-    _performWaypointActionDropAllBut(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionDropAllBut(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         // Calculate the difference between how many ships we currently have
         // and how many need to remain after.
         let difference = carrier.ships! - waypoint.actionShips;
@@ -114,17 +175,27 @@ export default class WaypointActionService {
         }
     }
 
-    _performWaypointActionCollectPercentage(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
-        const toTransfer = Math.floor(star.ships! * (waypoint.actionShips * 0.01))
+    _performWaypointActionCollectPercentage(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
+        const toTransfer = Math.floor(
+            star.ships! * (waypoint.actionShips * 0.01),
+        );
 
         if (toTransfer >= 1 && star.ships! - toTransfer >= 0) {
-            star.shipsActual! -= toTransfer
-            star.ships = Math.floor(star.shipsActual!)
-            carrier.ships! += toTransfer
+            star.shipsActual! -= toTransfer;
+            star.ships = Math.floor(star.shipsActual!);
+            carrier.ships! += toTransfer;
         }
     }
 
-    _performWaypointActionCollectAllBut(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionCollectAllBut(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         // Calculate the difference between how many ships we currently have
         // and how many need to remain after.
         let difference = star.ships! - waypoint.actionShips;
@@ -138,7 +209,11 @@ export default class WaypointActionService {
         }
     }
 
-    _performWaypointActionGarrison(carrier: Carrier, star: Star, waypoint: CarrierWaypoint<DBObjectId>) {
+    _performWaypointActionGarrison(
+        carrier: Carrier,
+        star: Star,
+        waypoint: CarrierWaypoint<DBObjectId>,
+    ) {
         // Calculate how many ships need to be dropped or collected
         // in order to garrison the star.
         let difference = star.ships! - waypoint.actionShips;
@@ -160,18 +235,31 @@ export default class WaypointActionService {
         star.ships = Math.floor(star.shipsActual!);
     }
 
-    performWaypointActionsGarrisons(game: Game, waypoints: CarrierActionWaypoint[]) {
-        this._performFilteredWaypointActions(game, waypoints, ['garrison']);
+    performWaypointActionsGarrisons(
+        game: Game,
+        waypoints: CarrierActionWaypoint[],
+    ) {
+        this._performFilteredWaypointActions(game, waypoints, ["garrison"]);
     }
 
-    _performFilteredWaypointActions(game: Game, waypoints: CarrierActionWaypoint[], waypointTypes: CarrierWaypointActionType[]) {
-        let actionWaypoints = waypoints.filter(w =>
-            waypointTypes.indexOf(w.waypoint.action) > -1
-            && w.carrier.ownedByPlayerId!.toString() === w.star.ownedByPlayerId!.toString() // The carrier must be owned by the player who owns the star.
+    _performFilteredWaypointActions(
+        game: Game,
+        waypoints: CarrierActionWaypoint[],
+        waypointTypes: CarrierWaypointActionType[],
+    ) {
+        let actionWaypoints = waypoints.filter(
+            (w) =>
+                waypointTypes.indexOf(w.waypoint.action) > -1 &&
+                w.carrier.ownedByPlayerId!.toString() ===
+                    w.star.ownedByPlayerId!.toString(), // The carrier must be owned by the player who owns the star.
         );
 
         for (let actionWaypoint of actionWaypoints) {
-            this.performWaypointAction(actionWaypoint.carrier, actionWaypoint.star, actionWaypoint.waypoint);
+            this.performWaypointAction(
+                actionWaypoint.carrier,
+                actionWaypoint.star,
+                actionWaypoint.waypoint,
+            );
         }
     }
 }

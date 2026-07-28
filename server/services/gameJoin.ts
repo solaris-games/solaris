@@ -1,27 +1,29 @@
 import EventEmitter from "events";
-import moment from "moment";
-import { DBObjectId } from './types/DBObjectId';
-import { ValidationError } from "solaris-common";
-import { Game } from './types/Game';
-import { Player } from './types/Player';
-import UserAchievementService from './userAchievement';
-import AvatarService from './avatar';
-import GameStateService from './gameState';
-import { GameTypeService } from 'solaris-common'
-import PasswordService from './password';
-import PlayerService from './player';
-import StarService from './star';
-import UserService from './user';
-import ConversationService from './conversation';
-import InternalGamePlayerJoinedEvent from './types/internalEvents/GamePlayerJoined';
-import { InternalGameEvent } from './types/internalEvents/InternalGameEvent';
-import RandomService from './random';
-import SpectatorService from './spectator';
+import { DateTime } from "luxon";
+import { DBObjectId } from "./types/DBObjectId";
+import { ValidationError } from "@solaris/common";
+import { Game } from "./types/Game";
+import { Player } from "./types/Player";
+import UserAchievementService from "./userAchievement";
+import AvatarService from "./avatar";
+import GameStateService from "./gameState";
+import { GameTypeService } from "@solaris/common";
+import PasswordService from "./password";
+import PlayerService from "./player";
+import StarService from "./star";
+import UserService from "./user";
+import ConversationService from "./conversation";
+import InternalGamePlayerJoinedEvent from "./types/internalEvents/GamePlayerJoined";
+import { InternalGameEvent } from "./types/internalEvents/InternalGameEvent";
+import { IEventService } from "./types/IEventService";
+import RandomService from "./random";
+import SpectatorService from "./spectator";
+import { INotificationService } from "./types/INotificationService";
+import { EmailService } from "./email";
 
 export const GameJoinServiceEvents = {
-    onPlayerJoined: 'onPlayerJoined',
-    onGameStarted: 'onGameStarted'
-}
+    onGameStarted: "onGameStarted",
+};
 
 export default class GameJoinService extends EventEmitter {
     userService: UserService;
@@ -47,10 +49,10 @@ export default class GameJoinService extends EventEmitter {
         gameStateService: GameStateService,
         conversationService: ConversationService,
         randomService: RandomService,
-        spectatorService: SpectatorService
+        spectatorService: SpectatorService,
     ) {
         super();
-        
+
         this.userService = userService;
         this.starService = starService;
         this.playerService = playerService;
@@ -64,7 +66,17 @@ export default class GameJoinService extends EventEmitter {
         this.spectatorService = spectatorService;
     }
 
-    async join(game: Game, userId: DBObjectId, playerId: DBObjectId | undefined, alias: string, avatar: number, password: string | undefined): Promise<{ gameIsFull: boolean, playerId: DBObjectId }> {
+    async join(
+        game: Game,
+        userId: DBObjectId,
+        playerId: DBObjectId | undefined,
+        alias: string,
+        avatar: number,
+        password: string | undefined,
+        eventService: IEventService,
+        notificationService: INotificationService,
+        emailService: EmailService,
+    ): Promise<{ gameIsFull: boolean; playerId: DBObjectId }> {
         // The player cannot join the game if:
         // 1. The game has finished.
         // 2. They quit the game before the game started or they conceded defeat.
@@ -78,7 +90,7 @@ export default class GameJoinService extends EventEmitter {
 
         // Only allow join if the game hasn't finished.
         if (game.state.endDate) {
-            throw new ValidationError('The game has already finished.');
+            throw new ValidationError("The game has already finished.");
         }
 
         if (game.settings.general.password) {
@@ -86,111 +98,179 @@ export default class GameJoinService extends EventEmitter {
                 throw new ValidationError("The game requires a password.");
             }
 
-            let passwordMatch = await this.passwordService.compare(password, game.settings.general.password);
+            let passwordMatch = await this.passwordService.compare(
+                password,
+                game.settings.general.password,
+            );
 
             if (!passwordMatch) {
-                throw new ValidationError('The password is invalid.');
+                throw new ValidationError("The password is invalid.");
             }
         }
 
         // Check whether a player ID was passed if it is required to join (not random-slot)
 
-        const isJoinRandomSlot = game.settings.general.joinRandomSlot === 'enabled';
+        const isJoinRandomSlot =
+            game.settings.general.joinRandomSlot === "enabled";
 
         if (isJoinRandomSlot && playerId) {
             throw new ValidationError("This game is in random-slot mode.");
         }
 
-        if (game.settings.general.joinRandomSlot === 'disabled' && !playerId) {
-            throw new ValidationError("You need to choose a player slot to join this game.");
+        if (game.settings.general.joinRandomSlot === "disabled" && !playerId) {
+            throw new ValidationError(
+                "You need to choose a player slot to join this game.",
+            );
         }
 
         // Perform a new player check if the game is for established players only.
         // If the player is new then they cannot join.
 
         if (this.gameTypeService.isForEstablishedPlayersOnly(game)) {
-            const isEstablishedPlayer = await this.userService.isEstablishedPlayer(userId);
-            
+            const isEstablishedPlayer =
+                await this.userService.isEstablishedPlayer(userId);
+
             // Disallow new players from joining non-new-player-games games if they haven't completed a game yet.
-            if (!isEstablishedPlayer && !this.gameTypeService.isNewPlayerGame(game)) {
-                throw new ValidationError('You must complete a "New Player" game or a custom game before you can join an official game.');
+            if (
+                !isEstablishedPlayer &&
+                !this.gameTypeService.isNewPlayerGame(game)
+            ) {
+                throw new ValidationError(
+                    'You must complete a "New Player" game or a custom game before you can join an official game.',
+                );
             }
         }
 
         // Verify that the user has purchased the avatar they selected.
-        const userAvatar = await this.avatarService.getUserAvatar(userId, avatar);
+        const userAvatar = await this.avatarService.getUserAvatar(
+            userId,
+            avatar,
+        );
 
         if (!userAvatar.purchased) {
-            throw new ValidationError(`You have not purchased the selected avatar.`);
+            throw new ValidationError(
+                `You have not purchased the selected avatar.`,
+            );
         }
 
         // The user cannot rejoin if they quit early or conceded defeat.
-        let isQuitter = game.quitters.find(x => x.toString() === userId.toString());
+        let isQuitter = game.quitters.find(
+            (x) => x.toString() === userId.toString(),
+        );
 
         if (isQuitter) {
-            throw new ValidationError('You cannot rejoin this game.');
+            throw new ValidationError("You cannot rejoin this game.");
         }
 
         // Disallow if they are already in the game as another player.
         // If the player they are in the game as is afk then that's fine.
-        let existing = game.galaxy.players.find(x => x.userId && x.userId.toString() === userId.toString());
+        let existing = game.galaxy.players.find(
+            (x) => x.userId && x.userId.toString() === userId.toString(),
+        );
 
         if (existing && !existing.afk) {
-            throw new ValidationError('You are already participating in this game.');
+            throw new ValidationError(
+                "You are already participating in this game.",
+            );
         }
 
         // Get the player and update it to assign the user to the player.
         let player;
-        
-        if (isJoinRandomSlot) {
-            const openSlots = game.galaxy.players.filter(p => p.isOpenSlot);
 
-            const idx = this.randomService.getRandomNumber(openSlots.length - 1);
+        if (isJoinRandomSlot) {
+            const openSlots = game.galaxy.players.filter((p) => p.isOpenSlot);
+
+            const idx = this.randomService.getRandomNumber(
+                openSlots.length - 1,
+            );
             player = openSlots[idx];
         } else {
-            player = game.galaxy.players.find(x => x._id.toString() === playerId!.toString());
+            player = game.galaxy.players.find(
+                (x) => x._id.toString() === playerId!.toString(),
+            );
 
             if (!player) {
-                throw new ValidationError('The player is not participating in this game.');
+                throw new ValidationError(
+                    "The player is not participating in this game.",
+                );
             }
         }
 
         if (!player.isOpenSlot) {
-            throw new ValidationError(`The player slot is not open to be filled.`);
+            throw new ValidationError(
+                `The player slot is not open to be filled.`,
+            );
         }
 
         // If the user was an afk-er then they are only allowed to join
         // their slot.
-        const isAfker = game.afkers.find(x => x.toString() === userId.toString());
-        const isRejoiningAfkSlot = isAfker && player.afk && userId && player.userId && player.userId.toString() === userId.toString();
+        const isAfker = game.afkers.find(
+            (x) => x.toString() === userId.toString(),
+        );
+        const isRejoiningAfkSlot =
+            isAfker &&
+            player.afk &&
+            userId &&
+            player.userId &&
+            player.userId.toString() === userId.toString();
 
         // If they have been afk'd then they are only allowed to join their slot again.
-        if (player.afk && isAfker && userId && player.userId && player.userId.toString() !== userId.toString()) {
-            throw new ValidationError('You can only rejoin this game in your own slot.');
+        if (
+            player.afk &&
+            isAfker &&
+            userId &&
+            player.userId &&
+            player.userId.toString() !== userId.toString()
+        ) {
+            throw new ValidationError(
+                "You can only rejoin this game in your own slot.",
+            );
         }
 
-        const stars = this.starService.listStarsOwnedByPlayer(game.galaxy.stars, player._id);
+        const stars = this.starService.listStarsOwnedByPlayer(
+            game.galaxy.stars,
+            player._id,
+        );
 
         if (!stars.length) {
-            throw new ValidationError('Cannot fill this slot, the player does not own any stars.');
+            throw new ValidationError(
+                "Cannot fill this slot, the player does not own any stars.",
+            );
         }
 
         const normalizedAlias = this._normalizePlayerAlias(alias);
 
-        const aliasCheckPlayer = game.galaxy.players.find(x => x.userId && this._normalizePlayerAlias(x.alias) === normalizedAlias);
+        const aliasCheckPlayer = game.galaxy.players.find(
+            (x) =>
+                x.userId &&
+                this._normalizePlayerAlias(x.alias) === normalizedAlias,
+        );
 
         if (aliasCheckPlayer && !isRejoiningAfkSlot) {
-            throw new ValidationError(`The alias '${alias}' has already been taken by another player.`);
+            throw new ValidationError(
+                `The alias '${alias}' has already been taken by another player.`,
+            );
         }
 
         // Disallow if they have the same alias as a user.
-        const aliasCheckUser = await this.userService.otherUsernameExists(alias, userId);
+        const aliasCheckUser = await this.userService.otherUsernameExists(
+            alias,
+            userId,
+        );
 
         if (aliasCheckUser) {
-            throw new ValidationError(`The alias '${alias}' is the username of another player.`);
+            throw new ValidationError(
+                `The alias '${alias}' is the username of another player.`,
+            );
         }
 
-        const gameIsFull = this.assignPlayerToUser(game, player, userId, alias, avatar);
+        const gameIsFull = this.assignPlayerToUser(
+            game,
+            player,
+            userId,
+            alias,
+            avatar,
+        );
 
         if (gameIsFull) {
             this.assignNonUserPlayersToAI(game);
@@ -206,18 +286,19 @@ export default class GameJoinService extends EventEmitter {
             gameId: game._id,
             gameTick: game.state.tick,
             playerId: player._id,
-            playerAlias: player.alias
+            playerAlias: player.alias,
         };
 
-        this.emit(GameJoinServiceEvents.onPlayerJoined, playerJoinedEvent);
+        await eventService.createPlayerJoinedEvent(playerJoinedEvent);
 
         if (gameIsFull) {
             let e: InternalGameEvent = {
                 gameId: game._id,
-                gameTick: game.state.tick
+                gameTick: game.state.tick,
             };
 
-            this.emit(GameJoinServiceEvents.onGameStarted, e);
+            await notificationService.onGameStarted(e);
+            await emailService.sendGameStartedEmail(e);
         }
 
         return {
@@ -225,17 +306,39 @@ export default class GameJoinService extends EventEmitter {
             gameIsFull,
         };
     }
-    
-    assignPlayerToUser(game: Game, player: Player, userId: DBObjectId | null, alias: string, avatar: number) {
+
+    assignPlayerToUser(
+        game: Game,
+        player: Player,
+        userId: DBObjectId | null,
+        alias: string,
+        avatar: number,
+    ) {
         if (!player.isOpenSlot) {
-            throw new ValidationError(`The player slot is not open to be filled`);
+            throw new ValidationError(
+                `The player slot is not open to be filled`,
+            );
         }
 
-        const slotHadPreviousOwner = player.userId && userId && player.userId.toString() !== userId?.toString();
-        const isAfker = userId && Boolean(game.afkers.find(x => x.toString() === userId.toString()));
-        const isFillingAfkSlot = this.gameStateService.isInProgress(game) && player.afk;
-        const isRejoiningOwnAfkSlot = isFillingAfkSlot && isAfker && (userId && player.userId && player.userId.toString() === userId.toString());
-        const hasFilledOtherPlayerAfkSlot = isFillingAfkSlot && !isRejoiningOwnAfkSlot;
+        const slotHadPreviousOwner =
+            player.userId &&
+            userId &&
+            player.userId.toString() !== userId?.toString();
+        const isAfker =
+            userId &&
+            Boolean(
+                game.afkers.find((x) => x.toString() === userId.toString()),
+            );
+        const isFillingAfkSlot =
+            this.gameStateService.isInProgress(game) && player.afk;
+        const isRejoiningOwnAfkSlot =
+            isFillingAfkSlot &&
+            isAfker &&
+            userId &&
+            player.userId &&
+            player.userId.toString() === userId.toString();
+        const hasFilledOtherPlayerAfkSlot =
+            isFillingAfkSlot && !isRejoiningOwnAfkSlot;
 
         // Assign the user to the player.
         player.userId = userId;
@@ -267,7 +370,7 @@ export default class GameJoinService extends EventEmitter {
 
         // If the max player count is reached then start the game.
         this.gameStateService.updateStatePlayerCount(game);
-        
+
         let shouldStartGame = false;
 
         // If the game hasn't started yet then check if the game is full
@@ -275,10 +378,14 @@ export default class GameJoinService extends EventEmitter {
             // Start the game if all slots have been filled
             // OR its a new player game, half or more are filled
             // OR its a tutorial game and a player has joined
-            shouldStartGame = game.state.players === game.settings.general.playerLimit ||
-                (this.gameTypeService.isNewPlayerGame(game) && game.state.players >= game.settings.general.playerLimit / 2) ||
-                (this.gameTypeService.isTutorialGame(game) && game.state.players > 0);
-    
+            shouldStartGame =
+                game.state.players === game.settings.general.playerLimit ||
+                (this.gameTypeService.isNewPlayerGame(game) &&
+                    game.state.players >=
+                        game.settings.general.playerLimit / 2) ||
+                (this.gameTypeService.isTutorialGame(game) &&
+                    game.state.players > 0);
+
             if (shouldStartGame) {
                 this.startGame(game);
             }
@@ -296,14 +403,16 @@ export default class GameJoinService extends EventEmitter {
     }
 
     startGame(game: Game) {
-        const startDate = moment().utc();
+        let startDate = DateTime.utc();
 
         if (this.gameTypeService.isRealTimeGame(game)) {
             // Add the start delay to the start date.
-            startDate.add(game.settings.gameTime.startDelay, 'minute');
+            startDate = startDate.plus({
+                minutes: game.settings.gameTime.startDelay,
+            });
         }
 
-        const startDateD = startDate.toDate();
+        const startDateD = startDate.toJSDate();
 
         game.state.paused = false;
         game.state.startDate = startDateD;
@@ -314,9 +423,12 @@ export default class GameJoinService extends EventEmitter {
         }
     }
 
-    assignNonUserPlayersToAI(game: Game, slotsOpen: boolean | undefined = undefined) {
+    assignNonUserPlayersToAI(
+        game: Game,
+        slotsOpen: boolean | undefined = undefined,
+    ) {
         // For all AI, assign a random alias and an avatar.
-        const players = game.galaxy.players.filter(p => p.userId == null);
+        const players = game.galaxy.players.filter((p) => p.userId == null);
 
         if (!players.length) {
             return;
@@ -326,15 +438,21 @@ export default class GameJoinService extends EventEmitter {
         const avatars = this.avatarService.listAllSolarisAvatars();
 
         for (const player of players) {
-            const aliasIndex = this.randomService.getRandomNumberBetween(0, aliases.length - 1);
-            const avatarIndex = this.randomService.getRandomNumberBetween(0, avatars.length - 1);
+            const aliasIndex = this.randomService.getRandomNumberBetween(
+                0,
+                aliases.length - 1,
+            );
+            const avatarIndex = this.randomService.getRandomNumberBetween(
+                0,
+                avatars.length - 1,
+            );
 
             const alias = aliases.splice(aliasIndex, 1)[0];
             const avatar = avatars.splice(avatarIndex, 1)[0].id.toString();
 
             player.alias = alias;
             player.avatar = avatar;
-            player.researchingNext = 'random';
+            player.researchingNext = "random";
             player.missedTurns = 0;
             player.hasSentTurnReminder = false;
             player.afk = false;
@@ -356,7 +474,6 @@ export default class GameJoinService extends EventEmitter {
     }
 
     _normalizePlayerAlias(alias: string): string {
-        return alias.toLowerCase().replace(/\s/, '');
+        return alias.toLowerCase().replace(/\s/, "");
     }
-
-};
+}

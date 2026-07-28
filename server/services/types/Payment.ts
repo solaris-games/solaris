@@ -7,4 +7,4 @@ export interface Payment {
     totalCost: number;
     totalQuantity: number;
     unitCost: number;
-};
+}

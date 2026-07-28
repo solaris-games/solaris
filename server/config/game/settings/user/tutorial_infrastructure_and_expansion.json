@@ -43,7 +43,7 @@
         "carrierToCarrierCombat": "enabled",
         "resourceDistribution": "random",
         "playerDistribution": "circular",
-        "splitResources":"disabled",
+        "splitResources": "disabled",
         "carrierSpeed": 10,
         "starCaptureReward": "enabled",
         "specialistBans": {

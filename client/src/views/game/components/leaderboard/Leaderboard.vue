@@ -1,14 +1,27 @@
 <template>
   <div class="menu-page container pb-2">
     <menu-title title="Leaderboard" @onCloseRequested="onCloseRequested">
-      <button title="View Settings" tag="button" class="btn btn-sm btn-outline-primary"
-        @click="onViewSettingsRequested"><i class="fas fa-cog"></i></button>
-      <a :href="documentationUrl + '/rankings.html'" target="_blank" class="btn btn-outline-info btn-sm ms-1" title="Documentation"><i class="far fa-question-circle"></i></a>
+      <button
+        title="View Settings"
+        class="btn btn-sm btn-outline-primary"
+        @click="onViewSettingsRequested"
+      >
+        <i class="fas fa-cog"></i>
+      </button>
+      <a
+        :href="documentationUrl + '/rankings.html'"
+        target="_blank"
+        class="btn btn-outline-info btn-sm ms-1"
+        title="Documentation"
+        ><i class="far fa-question-circle"></i
+      ></a>
     </menu-title>
 
     <div class="row">
       <div class="col">
-        <h4 class="text-center mt-2">{{ game.settings.general.name }}</h4>
+        <h4 class="text-center mt-2">
+          {{ game.settings.general.name }}
+        </h4>
       </div>
     </div>
 
@@ -16,16 +29,30 @@
 
     <div class="row" v-if="!game.state.endDate && almostAfkReminder">
       <div class="col text-center">
-        <p class="mt-2 mb-2 text-danger">You have missed the last {{ userPlayer?.missedTurns }} turn(s). Please
-          mark your turn as completed or you will be marked afk.</p>
+        <p class="mt-2 mb-2 text-danger">
+          You have missed the last
+          {{ userPlayer?.missedTurns }} turn(s). Please mark your turn as
+          completed or you will be marked afk.
+        </p>
       </div>
     </div>
 
-    <div class="row bg-info" v-if="!game.state.endDate && game.settings.general.flux" title="This Game's Flux">
+    <div
+      class="row bg-info"
+      v-if="!game.state.endDate && game.settings.general.flux"
+      title="This Game's Flux"
+    >
       <div class="col text-center">
-        <p class="mt-2 mb-2"><small><i class="fas fa-dice-d20 me-1"></i>{{ game.settings.general.flux.description }}
-            <help-tooltip v-if="game.settings.general.flux?.description" :tooltip="game.settings.general.flux.description" />
-          </small></p>
+        <p class="mt-2 mb-2">
+          <small
+            ><i class="fas fa-dice-d20 me-1"></i
+            >{{ game.settings.general.flux.description }}
+            <help-tooltip
+              v-if="game.settings.general.flux?.description"
+              :tooltip="game.settings.general.flux.description"
+            />
+          </small>
+        </p>
       </div>
     </div>
 
@@ -33,13 +60,20 @@
 
     <div class="row bg-dark" v-if="!game.state.endDate">
       <div class="col text-center pt-2">
-        <p class="mb-2">Galactic Cycle {{ game.state.productionTick }} - Tick {{ game.state.tick }}</p>
-        <p class="text-warning" v-if="isDarkModeExtra && userPlayer != null"><small>The leaderboard is based on
-            your scanning range.</small></p>
+        <p class="mb-2">
+          Galactic Cycle {{ game.state.productionTick }} - Tick
+          {{ game.state.tick }}
+        </p>
+        <p class="text-warning" v-if="isDarkModeExtra && userPlayer != null">
+          <small>The leaderboard is based on your scanning range.</small>
+        </p>
       </div>
     </div>
 
-    <div class="row" v-if="game.state.startDate && !game.state.endDate">
+    <div
+      class="row"
+      v-if="game.state.startDate && !game.state.endDate && !game.state.paused"
+    >
       <div class="col text-center pt-2 pb-0">
         <p class="pb-0 mb-2">{{ timeRemaining }}</p>
       </div>
@@ -47,84 +81,104 @@
 
     <div class="row" v-if="!game.state.endDate && game.state.readyToQuitCount">
       <div class="col text-center pt-2">
-        <p>{{ game.state.readyToQuitCount }} of {{ game.state.players }} active players are ready to quit.</p>
+        <p>
+          {{ game.state.readyToQuitCount }} of {{ game.state.players }} active
+          players are ready to quit.
+        </p>
       </div>
     </div>
 
     <winner :game="game" v-if="game.state.endDate" />
 
-    <leaderboards :isTeamConquest="isTeamConquest" @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"></leaderboards>
+    <leaderboards
+      :isTeamConquest="isTeamConquest"
+      @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+    ></leaderboards>
 
     <new-player-message />
 
-    <share-link v-if="!game.state.startDate" message="Invite your friends and take on the Galaxy together!" />
-    <share-link v-if="game.state.startDate && !game.state.endDate"
-      message="Share this game with your friends to spectate, no sign-up required!" />
-    <share-link v-if="game.state.endDate" message="Share this game with your friends, no sign-up required!" />
+    <share-link
+      v-if="!game.state.startDate"
+      message="Invite your friends and take on the Galaxy together!"
+    />
+    <share-link
+      v-if="game.state.startDate && !game.state.endDate"
+      message="Share this game with your friends to spectate, no sign-up required!"
+    />
+    <share-link
+      v-if="game.state.endDate"
+      message="Share this game with your friends, no sign-up required!"
+    />
 
     <div class="row" v-if="userPlayer != null && !game.state.endDate">
       <div class="col text-start m-2">
-        <modalButton v-if="!game.state.startDate" :disabled="isQuittingGame" modalName="quitGameModal"
-          classText="btn btn-sm btn-danger">
+        <button
+          v-if="!game.state.startDate"
+          class="btn btn-sm btn-danger"
+          @click="requestQuitGame"
+        >
           <i class="fas fa-sign-out-alt"></i> Quit Game
-        </modalButton>
-        <button v-if="canReadyToQuit && !userPlayer.defeated && !userPlayer.readyToQuit"
-          @click="confirmReadyToQuit(userPlayer)" class="btn btn-sm btn-outline-warning me-1">
+        </button>
+        <button
+          v-if="
+            canReadyToQuit && !userPlayer.defeated && !userPlayer.readyToQuit
+          "
+          @click="confirmReadyToQuit(userPlayer)"
+          class="btn btn-sm btn-outline-warning me-1"
+        >
           <i class="fas fa-times"></i> Declare Ready to Quit
         </button>
-        <button v-if="canReadyToQuit && !userPlayer.defeated && userPlayer.readyToQuit"
-          @click="unconfirmReadyToQuit(userPlayer)" class="btn btn-sm btn-success me-1">
+        <button
+          v-if="
+            canReadyToQuit && !userPlayer.defeated && userPlayer.readyToQuit
+          "
+          @click="unconfirmReadyToQuit(userPlayer)"
+          class="btn btn-sm btn-success me-1"
+        >
           <i class="fas fa-check"></i> Ready to Quit
         </button>
         <concede-defeat-button />
       </div>
     </div>
-
-    <!-- Modals -->
-    <dialogModal modalName="quitGameModal" titleText="Quit Game" cancelText="No" confirmText="Yes"
-      @onConfirm="quitGame">
-      <p>Are you sure you want to quit this game? Your position will be opened again and you will <b>not</b> be able to
-        rejoin.</p>
-    </dialogModal>
   </div>
 </template>
 
 <script setup lang="ts">
-import router from '../../../../router'
-import ModalButton from '../../../components/modal/ModalButton.vue'
-import DialogModal from '../../../components/modal/DialogModal.vue'
-import GameHelper from '../../../../services/gameHelper'
-import MenuTitle from '../MenuTitle.vue'
-import AudioService from '../../../../game/audio'
-import NewPlayerMessage from '../welcome/NewPlayerMessage.vue'
-import ShareLink from '../welcome/ShareLink.vue'
-import HelpTooltip from '../../../components/HelpTooltip.vue'
-import ConcedeDefeatButton from './ConcedeDefeatButton.vue'
-import { inject, ref, computed, onMounted, type Ref, onUnmounted } from 'vue';
-import { type Game, type Player } from '@solaris-common';
-import { useStore, type Store } from 'vuex';
-import type { State } from "@/store";
-import { toastInjectionKey } from '@/util/keys'
-import { makeConfirm } from '@/util/confirm'
-import { useIsHistoricalMode } from '@/util/reactiveHooks'
+import { useGameStore } from "@/stores/game";
+import router from "../../../../router";
+import GameHelper from "../../../../services/gameHelper";
+import MenuTitle from "../MenuTitle.vue";
+import AudioService from "../../../../services/audio";
+import NewPlayerMessage from "../welcome/NewPlayerMessage.vue";
+import ShareLink from "../welcome/ShareLink.vue";
+import HelpTooltip from "../../../components/HelpTooltip.vue";
+import ConcedeDefeatButton from "./ConcedeDefeatButton.vue";
+import { inject, ref, computed, onMounted, type Ref, onUnmounted } from "vue";
+import { type Game, type Player } from "@solaris/common";
+import { useConfirm } from "@/hooks/confirm.ts";
+import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 import Winner from "@/views/game/components/leaderboard/Winner.vue";
 import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
-import { notReadyToQuit, quit, readyToQuit } from '@/services/typedapi/game'
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi'
-import {getCountdownTimeStringByTicks, getCountdownTimeStringForTurnTimeout} from "@/util/time";
+import { notReadyToQuit, quit, readyToQuit } from "@/services/typedapi/game";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import {
+  getCountdownTimeStringByTicks,
+  getCountdownTimeStringForTurnTimeout,
+} from "@/util/time";
+import { useToast } from "vue-toast-notification";
 
 const emit = defineEmits<{
-  onCloseRequested: [],
-  onOpenPlayerDetailRequested: [playerId: string],
-  onViewSettingsRequested: [],
+  onCloseRequested: [];
+  onOpenPlayerDetailRequested: [playerId: string];
+  onViewSettingsRequested: [];
 }>();
 
-const store: Store<State> = useStore();
-const confirm = makeConfirm(store);
+const store = useGameStore();
+const confirm = useConfirm();
 
 const httpClient = inject(httpInjectionKey)!;
-const toast = inject(toastInjectionKey)!;
+const toast = useToast();
 
 const activeTab: Ref<string | null> = ref(null);
 const players: Ref<Player<string>[] | null> = ref(null);
@@ -135,15 +189,28 @@ const intervalFunction = ref(0);
 
 const isHistoricalMode = useIsHistoricalMode(store);
 
+const game = computed<Game<string>>(() => store.game!);
 const documentationUrl = import.meta.env.VUE_APP_DOCUMENTATION_URL;
-const game = computed<Game<string>>(() => store.state.game);
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTeamConquest = computed(() => GameHelper.isTeamConquest(game.value));
-const canReadyToQuit = computed(() => game.value.settings.general.readyToQuit === 'enabled' && GameHelper.isGameStarted(game.value) && game.value.state.productionTick > 0);
+const canReadyToQuit = computed(
+  () =>
+    game.value.settings.general.readyToQuit === "enabled" &&
+    GameHelper.isGameStarted(game.value) &&
+    game.value.state.productionTick > 0,
+);
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
-const almostAfkReminder = computed(() => Boolean(userPlayer.value && userPlayer.value.missedTurns && userPlayer.value.missedTurns === game.value.settings.gameTime.afk.turnTimeout - 1));
+const almostAfkReminder = computed(() =>
+  Boolean(
+    userPlayer.value &&
+    userPlayer.value.missedTurns &&
+    userPlayer.value.missedTurns ===
+      game.value.settings.gameTime.afk.turnTimeout - 1,
+  ),
+);
 
-const isUserPlayer = (player: Player<string>) => userPlayer.value?._id === player._id;
+const isUserPlayer = (player: Player<string>) =>
+  userPlayer.value?._id === player._id;
 
 const recalculateTimeRemaining = () => {
   if (GameHelper.isRealTimeGame(game.value)) {
@@ -153,18 +220,30 @@ const recalculateTimeRemaining = () => {
   }
 };
 
-const onCloseRequested = () => emit('onCloseRequested');
-const onViewSettingsRequested = () => emit('onViewSettingsRequested');
-const onOpenPlayerDetailRequested = (playerId: string) => emit('onOpenPlayerDetailRequested', playerId);
+const onCloseRequested = () => emit("onCloseRequested");
+const onViewSettingsRequested = () => emit("onViewSettingsRequested");
+const onOpenPlayerDetailRequested = (playerId: string) =>
+  emit("onOpenPlayerDetailRequested", playerId);
 
-const quitGame = async () => {
+const requestQuitGame = async () => {
+  const confirmed = await confirm(
+    "Quit Game",
+    `Are you sure you want to quit this game? Your position will be opened again and you will not be able to rejoin.`,
+  );
+
+  if (confirmed) {
+    await confirmQuitGame();
+  }
+};
+
+const confirmQuitGame = async () => {
   isQuittingGame.value = true;
 
   const response = await quit(httpClient)(game.value._id);
   if (isOk(response)) {
     AudioService.quit();
     toast.error(`You have quit ${game.value.settings.general.name}.`);
-    router.push({ name: 'main-menu' });
+    router.push({ name: "main-menu" });
   } else {
     console.error(formatError(response));
   }
@@ -177,14 +256,19 @@ const confirmReadyToQuit = async (player: Player<string>) => {
     return;
   }
 
-  let rtqFractionMessage = '';
+  let rtqFractionMessage = "";
   if (game.value.settings.general.readyToQuitFraction) {
     const percent = game.value.settings.general.readyToQuitFraction * 100;
     rtqFractionMessage = ` (or ${percent}% by star count out of all stars)`;
   }
 
-  if (!await confirm('Ready to Quit?', `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`)) {
-    return
+  if (
+    !(await confirm(
+      "Ready to Quit?",
+      `Are you sure you want declare that you are ready to quit? If all active players${rtqFractionMessage} declare ready to quit then the game will end early.`,
+    ))
+  ) {
+    return;
   }
 
   const response = await readyToQuit(httpClient)(game.value._id);
@@ -211,13 +295,16 @@ const unconfirmReadyToQuit = async (player: Player<string>) => {
 };
 
 onMounted(() => {
-  activeTab.value = isTeamConquest.value ? 'team': 'player';
+  activeTab.value = isTeamConquest.value ? "team" : "player";
 
   players.value = game.value.galaxy.players;
 
   recalculateTimeRemaining();
 
-  if (GameHelper.isGameInProgress(game.value) || GameHelper.isGamePendingStart(game.value)) {
+  if (
+    GameHelper.isGameInProgress(game.value) ||
+    GameHelper.isGamePendingStart(game.value)
+  ) {
     intervalFunction.value = setInterval(recalculateTimeRemaining, 250);
   }
 });

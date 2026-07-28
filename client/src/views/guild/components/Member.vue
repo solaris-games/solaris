@@ -1,316 +1,484 @@
 <template>
   <tr>
     <td>
-        <router-link :to="{ name: 'account-achievements', params: { userId: player._id }}">{{player.username}}</router-link>
+      <router-link
+        :to="{
+          name: 'account-achievements',
+          params: { userId: user._id },
+        }"
+        >{{ user.username }}</router-link
+      >
     </td>
-    <td :class="{
-      'text-warning': playerIsLeader,
-      'text-info': playerIsOfficer,
-      'text-danger': playerIsInvitee,
-      'text-success': playerIsApplicant,
-      ...getColumnClass('role')
-    }">{{roleName}}</td>
+    <td
+      :class="{
+        'text-warning': userIsLeader,
+        'text-info': userIsOfficer,
+        'text-danger': userIsInvitee,
+        'text-success': userIsApplicant,
+        ...getColumnClass('role'),
+      }"
+    >
+      {{ roleName }}
+    </td>
     <td align="right" :class="getColumnClass('rank')">
-      {{player.achievements.rank}}
-      <img v-if="player.achievements.level" class="user-level-icon" :src="levelSrc">
+      {{ user.achievements.rank }}
+      <picture style="display: contents">
+        <source :srcset="levelWebpSrc" type="image/webp" />
+        <img class="user-level-icon" :src="levelSrc" />
+      </picture>
     </td>
-    <td align="right" :class="getColumnClass('victories')">{{player.achievements.victories}}</td>
-    <td align="right" :class="getColumnClass('renown')">{{player.achievements.renown}}</td>
+    <td align="right" :class="getColumnClass('victories')">
+      {{ user.achievements.victories }}
+    </td>
+    <td align="right" :class="getColumnClass('renown')">
+      {{ user.achievements.renown }}
+    </td>
     <td class="text-end">
-      <button class="btn btn-sm btn-outline-danger ms-1" :disabled="isLoading" @click="disband()" v-if="isCurrentUser && playerIsLeader" title="Disband the guild">
+      <button
+        class="btn btn-sm btn-outline-danger ms-1"
+        :disabled="isLoading"
+        @click="disband()"
+        v-if="isCurrentUser && userIsLeader"
+        title="Disband the guild"
+      >
         <i class="fas fa-trash"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger ms-1" :disabled="isLoading" @click="leave()" v-if="isCurrentUser && !playerIsLeader" title="Leave the guild">
+      <button
+        class="btn btn-sm btn-outline-danger ms-1"
+        :disabled="isLoading"
+        @click="leave()"
+        v-if="isCurrentUser && !userIsLeader"
+        title="Leave the guild"
+      >
         <i class="fas fa-sign-out-alt"></i>
       </button>
-      <button class="btn btn-sm btn-outline-success ms-1" :disabled="isLoading" @click="promote()" v-if="canPromote" title="Promote this player">
+      <button
+        class="btn btn-sm btn-outline-success ms-1"
+        :disabled="isLoading"
+        @click="promote()"
+        v-if="canPromote"
+        title="Promote this user"
+      >
         <i class="fas fa-level-up-alt"></i>
       </button>
-      <button class="btn btn-sm btn-outline-warning ms-1" :disabled="isLoading" @click="demote()" v-if="canDemote" title="Demote this player">
+      <button
+        class="btn btn-sm btn-outline-warning ms-1"
+        :disabled="isLoading"
+        @click="demote()"
+        v-if="canDemote"
+        title="Demote this user"
+      >
         <i class="fas fa-level-down-alt"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger ms-1" :disabled="isLoading" @click="kick()" v-if="canKick" title="Kick this player from the guild">
+      <button
+        class="btn btn-sm btn-outline-danger ms-1"
+        :disabled="isLoading"
+        @click="kick()"
+        v-if="canKick"
+        title="Kick this user from the guild"
+      >
         <i class="fas fa-ban"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger ms-1" :disabled="isLoading" @click="uninvite()" v-if="canRevokeInvite" title="Revoke invitation">
+      <button
+        class="btn btn-sm btn-outline-danger ms-1"
+        :disabled="isLoading"
+        @click="uninvite()"
+        v-if="canRevokeInvite"
+        title="Revoke invitation"
+      >
         <i class="fas fa-trash"></i>
       </button>
-      <button class="btn btn-sm btn-outline-success ms-1" :disabled="isLoading" @click="accept()" v-if="canRevokeApplication" title="Accept application">
+      <button
+        class="btn btn-sm btn-outline-success ms-1"
+        :disabled="isLoading"
+        @click="accept()"
+        v-if="canRevokeApplication"
+        title="Accept application"
+      >
         <i class="fas fa-check"></i>
       </button>
-      <button class="btn btn-sm btn-outline-danger ms-1" :disabled="isLoading" @click="reject()" v-if="canRevokeApplication" title="Reject application">
+      <button
+        class="btn btn-sm btn-outline-danger ms-1"
+        :disabled="isLoading"
+        @click="reject()"
+        v-if="canRevokeApplication"
+        title="Reject application"
+      >
         <i class="fas fa-trash"></i>
       </button>
     </td>
   </tr>
 </template>
 
-<script>
-import router from '../../../router'
-import GuildApiService from '../../../services/api/guild'
+<script setup lang="ts">
+import { ref, inject, computed } from "vue";
+import router from "../../../router";
+import type { GuildWithUsers } from "@solaris/common";
+import type {
+  GuildRole,
+  GuildUser,
+} from "@/views/guild/components/MemberList.vue";
+import { useConfirm } from "@/hooks/confirm.ts";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import {
+  acceptGuildInviteForApplicant,
+  deleteGuild,
+  demoteGuildMember,
+  kickGuildMember,
+  leaveGuild,
+  promoteGuildMember,
+  rejectGuildApplication,
+  uninviteGuild,
+} from "@/services/typedapi/guild";
+import { useUserStore } from "@/stores/user";
 
-export default {
-  props: {
-    guild: Object,
-    role: String,
-    player: Object,
-    getColumnClass: Function
-  },
-  data () {
-    return {
-      isLoading: false
-    }
-  },
-  methods: {
-    async promote () {
-      if (!await this.$confirm('Promote player', `Are you sure you want to promote ${this.player.username}?`)) {
-        return
-      }
+import { useToast } from "vue-toast-notification";
+type SortingKey = "role" | "rank" | "victories" | "renown";
 
-      if (this.playerIsOfficer && !await this.$confirm('Promote to Guild Leader', `${this.player.username} will be promoted to the Guild Leader and you will be demoted to Officer, are you sure?`)) {
-        return
-      }
+const props = defineProps<{
+  guild: GuildWithUsers<string>;
+  role: GuildRole;
+  user: GuildUser<string>;
+  getColumnClass: (col: SortingKey) => Record<SortingKey, boolean>;
+}>();
 
-      this.isLoading = true
+const emit = defineEmits<{
+  onUserPromoted: [userId: string];
+  onUserDemoted: [userId: string];
+  onUserKicked: [userId: string];
+  onUserUninvited: [userId: string];
+  onUserApplicationAccepted: [userId: string];
+  onUserApplicationRejected: [userId: string];
+}>();
 
-      try {
-        let response = await GuildApiService.promote(this.guild._id, this.player._id)
+const httpClient = inject(httpInjectionKey)!;
+const toast = useToast();
 
-        if (response.status === 200) {
-          this.$emit('onPlayerPromoted', this.player._id)
+const userStore = useUserStore();
+const confirm = useConfirm();
 
-          this.$toast.default(`${this.player.username} promoted.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const isLoading = ref(false);
 
-      this.isLoading = false
-    },
-    async demote () {
-      if (!await this.$confirm('Demote player', `Are you sure you want to demote ${this.player.username}?`)) {
-        return
-      }
+const levelSrc = computed(
+  () =>
+    new URL(
+      `../../../assets/levels/${props.user.achievements.level}.png`,
+      import.meta.url,
+    ).href,
+);
+const levelWebpSrc = computed(
+  () =>
+    new URL(
+      `../../../assets/levels/${props.user.achievements.level}.webp`,
+      import.meta.url,
+    ).href,
+);
 
-      this.isLoading = true
+const roleName = computed(
+  () => props.role.charAt(0).toUpperCase() + props.role.slice(1),
+);
 
-      try {
-        let response = await GuildApiService.demote(this.guild._id, this.player._id)
+const isCurrentUser = computed(() => props.user._id === userStore.userId);
 
-        if (response.status === 200) {
-          this.$emit('onPlayerDemoted', this.player._id)
+const currentUserIsLeader = computed(
+  () =>
+    props.guild.leader != null && props.guild.leader._id === userStore.userId,
+);
 
-          this.$toast.default(`${this.player.username} demoted.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const currentUserIsOfficer = computed(
+  () => props.guild.officers?.find((x) => x._id === userStore.userId) != null,
+);
 
-      this.isLoading = false
-    },
-    async kick () {
-      if (!await this.$confirm('Kick player', `Are you sure you want to kick ${this.player.username}?`)) {
-        return
-      }
+const userIsLeader = computed(
+  () => props.guild.leader != null && props.guild.leader._id === props.user._id,
+);
 
-      this.isLoading = true
+const userIsOfficer = computed(
+  () => props.guild.officers?.find((x) => x._id === props.user._id) != null,
+);
 
-      try {
-        let response = await GuildApiService.kick(this.guild._id, this.player._id)
+const userIsMember = computed(
+  () => props.guild.members?.find((x) => x._id === props.user._id) != null,
+);
 
-        if (response.status === 200) {
-          this.$emit('onPlayerKicked', this.player._id)
+const userIsInvitee = computed(
+  () => props.guild.invitees?.find((x) => x._id === props.user._id) != null,
+);
 
-          this.$toast.default(`${this.player.username} kicked.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const userIsApplicant = computed(
+  () => props.guild.applicants?.find((x) => x._id === props.user._id) != null,
+);
 
-      this.isLoading = false
-    },
-    async uninvite () {
-      if (!await this.$confirm('Uninvite player', `Are you sure you want to uninvite ${this.player.username}?`)) {
-        return
-      }
-
-      this.isLoading = true
-
-      try {
-        let response = await GuildApiService.uninvite(this.guild._id, this.player._id)
-
-        if (response.status === 200) {
-          this.$emit('onPlayerUninvited', this.player._id)
-
-          this.$toast.default(`${this.player.username} uninvited.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
-    },
-    async accept () {
-      if (!await this.$confirm('Accept Application', `Are you sure you want to accept the application from ${this.player.username}?`)) {
-        return
-      }
-
-      this.isLoading = true
-
-      try {
-        let response = await GuildApiService.accept(this.guild._id, this.player._id)
-
-        if (response.status === 200) {
-          this.$emit('onPlayerApplicationAccepted', this.player._id)
-
-          this.$toast.default(`${this.player.username} application accepted.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
-    },
-    async reject () {
-      if (!await this.$confirm('Reject Application', `Are you sure you want to reject the application from ${this.player.username}?`)) {
-        return
-      }
-
-      this.isLoading = true
-
-      try {
-        let response = await GuildApiService.reject(this.guild._id, this.player._id)
-
-        if (response.status === 200) {
-          this.$emit('onPlayerApplicationRejected', this.player._id)
-
-          this.$toast.default(`${this.player.username} application rejected.`)
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
-    },
-    async leave () {
-      if (!await this.$confirm('Leave guild', `Are you sure you want to leave the guild?`)) {
-        return
-      }
-
-      this.isLoading = true
-
-      try {
-        let response = await GuildApiService.leave(this.guild._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`You have left ${this.guild.name}[${this.guild.tag}].`)
-
-          router.push({ name: 'main-menu' })
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
-    },
-    async disband () {
-      if (!await this.$confirm('Disband guild', `Are you sure you want to disband the guild?`)) {
-        return
-      }
-
-      if (!await this.$confirm('Disband guild', `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`)) {
-        return
-      }
-
-      this.isLoading = true
-
-      try {
-        let response = await GuildApiService.delete(this.guild._id)
-
-        if (response.status === 200) {
-          this.$toast.default(`You have disbanded ${this.guild.name}[${this.guild.tag}].`)
-
-          router.push({ name: 'main-menu' })
-        }
-      } catch (err) {
-        console.error(err)
-      }
-
-      this.isLoading = false
-    }
-  },
-  computed: {
-    levelSrc () {
-      return new URL(`../../../assets/levels/${this.player.achievements.level}.png`, import.meta.url).href;
-    },
-    roleName () {
-      return this.role.charAt(0).toUpperCase() + this.role.slice(1);
-    },
-    isCurrentUser () {
-      return this.player._id === this.$store.state.userId
-    },
-    currentUserIsLeader () {
-      return this.guild.leader != null && this.guild.leader._id === this.$store.state.userId
-    },
-    currentUserIsOfficer () {
-      return this.guild.officers.find(x => x._id === this.$store.state.userId) != null
-    },
-    playerIsLeader () {
-      return this.guild.leader != null && this.guild.leader._id === this.player._id
-    },
-    playerIsOfficer () {
-      return this.guild.officers.find(x => x._id === this.player._id) != null
-    },
-    playerIsMember () {
-      return this.guild.members.find(x => x._id === this.player._id) != null
-    },
-    playerIsInvitee () {
-      return this.guild.invitees.find(x => x._id === this.player._id) != null
-    },
-    playerIsApplicant () {
-      return this.guild.applicants.find(x => x._id === this.player._id) != null
-    },
-    canPromote () {
-      if (this.playerIsOfficer) {
-        return this.currentUserIsLeader
-      } else if (this.playerIsMember) {
-        return this.currentUserIsLeader || this.currentUserIsOfficer
-      } else {
-        return false
-      }
-    },
-    canDemote () {
-      if (this.playerIsOfficer) {
-        return this.currentUserIsLeader
-      } else {
-        return false
-      }
-    },
-    canKick () {
-      if (this.playerIsOfficer) {
-        return this.currentUserIsLeader
-      } else if (this.playerIsMember) {
-        return this.currentUserIsLeader || this.currentUserIsOfficer
-      } else {
-        return false
-      }
-    },
-    canRevokeInvite () {
-      if (this.playerIsInvitee) {
-        return this.currentUserIsLeader || this.currentUserIsOfficer
-      } else {
-        return false
-      }
-    },
-    canRevokeApplication () {
-      if (this.playerIsApplicant) {
-        return this.currentUserIsLeader || this.currentUserIsOfficer
-      } else {
-        return false
-      }
-    }
+const canPromote = computed(() => {
+  if (userIsOfficer.value) {
+    return currentUserIsLeader.value;
+  } else if (userIsMember.value) {
+    return currentUserIsLeader.value || currentUserIsOfficer.value;
+  } else {
+    return false;
   }
-}
+});
+
+const canDemote = computed(() => {
+  if (userIsOfficer.value) {
+    return currentUserIsLeader.value;
+  } else {
+    return false;
+  }
+});
+
+const canKick = computed(() => {
+  if (userIsOfficer.value) {
+    return currentUserIsLeader.value;
+  } else if (userIsMember.value) {
+    return currentUserIsLeader.value || currentUserIsOfficer.value;
+  } else {
+    return false;
+  }
+});
+
+const canRevokeInvite = computed(() => {
+  if (userIsInvitee.value) {
+    return currentUserIsLeader.value || currentUserIsOfficer.value;
+  } else {
+    return false;
+  }
+});
+
+const canRevokeApplication = computed(() => {
+  if (userIsApplicant.value) {
+    return currentUserIsLeader.value || currentUserIsOfficer.value;
+  } else {
+    return false;
+  }
+});
+
+const promote = async () => {
+  if (
+    !(await confirm(
+      "Promote user",
+      `Are you sure you want to promote ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  if (
+    props.role === "officer" &&
+    !(await confirm(
+      "Promote to Guild Leader",
+      `${props.user.username} will be promoted to the Guild Leader and you will be demoted to Officer, are you sure?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await promoteGuildMember(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserPromoted", props.user._id);
+
+    toast.default(`${props.user.username} promoted.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const demote = async () => {
+  if (
+    !(await confirm(
+      "Demote user",
+      `Are you sure you want to demote ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await demoteGuildMember(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserDemoted", props.user._id);
+
+    toast.default(`${props.user.username} demoted.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const kick = async () => {
+  if (
+    !(await confirm(
+      "Kick user",
+      `Are you sure you want to kick ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await kickGuildMember(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserKicked", props.user._id);
+
+    toast.default(`${props.user.username} kicked.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const uninvite = async () => {
+  if (
+    !(await confirm(
+      "Uninvite user",
+      `Are you sure you want to uninvite ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await uninviteGuild(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserUninvited", props.user._id);
+
+    toast.default(`${props.user.username} uninvited.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const accept = async () => {
+  if (
+    !(await confirm(
+      "Accept Application",
+      `Are you sure you want to accept the application from ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await acceptGuildInviteForApplicant(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserApplicationAccepted", props.user._id);
+
+    toast.default(`${props.user.username} application accepted.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const reject = async () => {
+  if (
+    !(await confirm(
+      "Reject Application",
+      `Are you sure you want to reject the application from ${props.user.username}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await rejectGuildApplication(httpClient)(
+    props.guild._id,
+    props.user._id,
+  );
+  if (isOk(response)) {
+    emit("onUserApplicationRejected", props.user._id);
+
+    toast.default(`${props.user.username} application rejected.`);
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const leave = async () => {
+  if (
+    !(await confirm("Leave guild", `Are you sure you want to leave the guild?`))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await leaveGuild(httpClient)(props.guild._id);
+  if (isOk(response)) {
+    toast.default(`You have left ${props.guild.name}[${props.guild.tag}].`);
+
+    router.push({ name: "main-menu" });
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const disband = async () => {
+  if (
+    !(await confirm(
+      "Disband guild",
+      `Are you sure you want to disband the guild?`,
+    ))
+  ) {
+    return;
+  }
+
+  if (
+    !(await confirm(
+      "Disband guild",
+      `Are you absolutely sure you want to disband the guild? The guild will be deleted and all members kicked, this cannot be undone.`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response = await deleteGuild(httpClient)(props.guild._id);
+  if (isOk(response)) {
+    toast.default(
+      `You have disbanded ${props.guild.name}[${props.guild.tag}].`,
+    );
+    router.push({ name: "main-menu" });
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
 </script>
 
 <style scoped>

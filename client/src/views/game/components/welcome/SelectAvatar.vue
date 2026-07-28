@@ -1,17 +1,28 @@
 <template>
   <div v-if="!isLoading">
-    <div class="row avatar-container text-center">
-      <img v-if="avatar != null" :src="getAvatarImage()" width="128" height="128">
-      <p v-if="avatar == null" class="select-avatar-warning text-warning">Select an avatar</p>
-      <p v-if="avatar && !avatar.purchased" class="select-avatar-locked"><i class="fas fa-lock"></i></p>
+    <div class="avatar-container">
+      <picture class="avatar-image" v-if="avatar != null">
+        <source :srcset="getAvatarWebpImage()" type="image/webp" />
+        <img :src="getAvatarImage()" width="128" height="128" />
+      </picture>
+      <span v-if="avatar == null" class="select-avatar-warning text-warning">
+        Select an avatar
+      </span>
+      <span v-if="avatar && !avatar.purchased" class="select-avatar-locked">
+        <i class="fas fa-lock"></i>
+      </span>
     </div>
 
     <div class="row mt-1 mb-1">
       <div class="col pe-0 ps-0">
-        <button class="btn btn-primary" @click="prevAvatar()"><i class="fas fa-chevron-left"></i></button>
+        <button class="btn btn-primary" @click="prevAvatar()">
+          <i class="fas fa-chevron-left"></i>
+        </button>
       </div>
       <div class="col-auto pe-0 ps-0">
-        <button class="btn btn-primary" @click="nextAvatar()"><i class="fas fa-chevron-right"></i></button>
+        <button class="btn btn-primary" @click="nextAvatar()">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
 
@@ -28,15 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref, inject, onMounted } from 'vue';
-import {sorterByProperty, type UserAvatar} from '@solaris-common';
-import { formatError, httpInjectionKey, isOk } from '@/services/typedapi';
-import { listMyAvatars } from '@/services/typedapi/user';
+import { ref, type Ref, inject, onMounted } from "vue";
+import { sorterByProperty, type UserAvatar } from "@solaris/common";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listMyAvatars } from "@/services/typedapi/user";
 
 const httpClient = inject(httpInjectionKey)!;
 
 const emit = defineEmits<{
-  onAvatarChanged: [avatar: UserAvatar],
+  onAvatarChanged: [avatar: UserAvatar];
 }>();
 
 const isLoading = ref(false);
@@ -49,10 +60,10 @@ const reloadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    const purchased = response.data.filter(a => a.purchased);
-    const notPurchased = response.data.filter(a => !a.purchased);
+    const purchased = response.data.filter((a) => a.purchased);
+    const notPurchased = response.data.filter((a) => !a.purchased);
 
-    const sorter = sorterByProperty('id');
+    const sorter = sorterByProperty("id");
 
     avatars.value = purchased.sort(sorter).concat(notPurchased.sort(sorter));
     console.log(avatars.value);
@@ -64,18 +75,37 @@ const reloadAvatars = async () => {
 };
 
 const onAvatarChanged = () => {
-  emit('onAvatarChanged', avatar.value!);
-}
+  emit("onAvatarChanged", avatar.value!);
+};
 
 const getAvatarImage = () => {
   try {
-    return new URL(`../../../../assets/avatars/${avatar.value!.file}`, import.meta.url).href;
+    return new URL(
+      `../../../../assets/avatars/${avatar.value!.file}`,
+      import.meta.url,
+    ).href;
   } catch (err) {
     console.error(err);
 
     return undefined;
   }
-}
+};
+
+const getAvatarWebpImage = () => {
+  if (["jpg", "png", "jpeg"].some((ext) => avatar.value!.file.endsWith(ext))) {
+    try {
+      const base = avatar.value!.file.replace(/\.[^.]+$/, "");
+      return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url)
+        .href;
+    } catch (err) {
+      console.error(err);
+
+      return undefined;
+    }
+  }
+
+  return undefined;
+};
 
 const nextAvatar = () => {
   if (!avatar.value) {
@@ -111,7 +141,7 @@ const prevAvatar = () => {
   }
 
   onAvatarChanged();
-}
+};
 
 onMounted(async () => {
   await reloadAvatars();
@@ -120,27 +150,36 @@ onMounted(async () => {
 
 <style scoped>
 .avatar-container {
+  display: grid;
+  grid-template-areas: "a";
+  width: 128px;
+  height: 128px;
+}
+
+.avatar-image {
+  grid-area: a;
   width: 128px;
   height: 128px;
 }
 
 .select-avatar-warning {
-  display: table-cell;
   width: 128px;
   height: 128px;
-  padding: 20px 0px;
+  grid-area: a;
   border: 3px dashed #fff;
-  vertical-align: middle;
+  text-align: center;
+  vertical-align: center;
+  padding-top: 24px;
 }
 
 .select-avatar-locked {
-  display: table-cell;
+  padding-top: 24px;
   width: 128px;
   height: 128px;
-  padding: 20px 0px;
-  vertical-align: middle;
-  position: absolute;
+  grid-area: a;
   font-size: 55px;
-  opacity: 0.75;
+  text-align: center;
+  vertical-align: center;
+  color: white;
 }
 </style>

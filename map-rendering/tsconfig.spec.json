@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "bundler",
+        "noEmit": true,
+        "declaration": false
+    },
+    "include": ["src/**/*", "spec/**/*"]
+}

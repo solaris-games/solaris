@@ -2,18 +2,18 @@ import { DBObjectId } from "./types/DBObjectId";
 import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import { Specialist } from 'solaris-common';
+import { Specialist } from "@solaris/common";
 import UserAchievementService from "./userAchievement";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from "@solaris/common";
 import SpecialistService from "./specialist";
 import StarService from "./star";
-import { StarDataService } from "solaris-common";
-import { ValidationError } from "solaris-common";
+import { StarDataService } from "@solaris/common";
+import { ValidationError } from "@solaris/common";
 import SpecialistBanService from "./specialistBan";
 import PlayerCreditsService from "./playerCredits";
-import { TechnologyService } from 'solaris-common';
-import StatisticsService from "./statistics";
+import { TechnologyService } from "@solaris/common";
 import CullWaypointsService from "./cullWaypoints";
+import { IStatisticsService } from "./types/IStatisticsService";
 
 export default class SpecialistHireService {
     gameRepo: Repository<Game>;
@@ -25,7 +25,6 @@ export default class SpecialistHireService {
     gameTypeService: GameTypeService;
     specialistBanService: SpecialistBanService;
     technologyService: TechnologyService;
-    statisticsService: StatisticsService;
     starDataService: StarDataService;
 
     constructor(
@@ -38,7 +37,6 @@ export default class SpecialistHireService {
         gameTypeService: GameTypeService,
         specialistBanService: SpecialistBanService,
         technologyService: TechnologyService,
-        statisticsService: StatisticsService,
         starDataService: StarDataService,
     ) {
         this.gameRepo = gameRepo;
@@ -50,66 +48,108 @@ export default class SpecialistHireService {
         this.gameTypeService = gameTypeService;
         this.specialistBanService = specialistBanService;
         this.technologyService = technologyService;
-        this.statisticsService = statisticsService;
         this.starDataService = starDataService;
     }
 
-    async hireCarrierSpecialist(game: Game, player: Player, carrierId: DBObjectId, specialistId: number) {
-        if (game.settings.specialGalaxy.specialistCost === 'none') {
-            throw new ValidationError('The game settings has disabled the hiring of specialists.');
+    async hireCarrierSpecialist(
+        game: Game,
+        player: Player,
+        carrierId: DBObjectId,
+        specialistId: number,
+        statisticsService: IStatisticsService,
+    ) {
+        if (game.settings.specialGalaxy.specialistCost === "none") {
+            throw new ValidationError(
+                "The game settings has disabled the hiring of specialists.",
+            );
         }
 
-        if (this.specialistBanService.isCarrierSpecialistBanned(game, specialistId)) {
-            throw new ValidationError('This specialist has been banned from this game.');
+        if (
+            this.specialistBanService.isCarrierSpecialistBanned(
+                game,
+                specialistId,
+            )
+        ) {
+            throw new ValidationError(
+                "This specialist has been banned from this game.",
+            );
         }
 
-        let carrier = game.galaxy.carriers.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === player._id.toString() && x._id.toString() === carrierId.toString());
+        let carrier = game.galaxy.carriers.find(
+            (x) =>
+                x.ownedByPlayerId &&
+                x.ownedByPlayerId.toString() === player._id.toString() &&
+                x._id.toString() === carrierId.toString(),
+        );
 
         if (!carrier) {
-            throw new ValidationError(`Cannot assign a specialist to a carrier that you do not own.`);
+            throw new ValidationError(
+                `Cannot assign a specialist to a carrier that you do not own.`,
+            );
         }
 
         if (!carrier.orbiting) {
-            throw new ValidationError(`Cannot assign a specialist to a carrier in transit.`);
+            throw new ValidationError(
+                `Cannot assign a specialist to a carrier in transit.`,
+            );
         }
 
         let star = this.starService.getById(game, carrier.orbiting);
 
         if (this.starDataService.isDeadStar(star)) {
-            throw new ValidationError('Cannot hire a specialist while in orbit of a dead star.');
+            throw new ValidationError(
+                "Cannot hire a specialist while in orbit of a dead star.",
+            );
         }
 
         if (!this.starDataService.isOwnedByPlayer(star, player)) {
-            throw new ValidationError('Cannot hire a specialist while in orbit of a star that you do not own.');
+            throw new ValidationError(
+                "Cannot hire a specialist while in orbit of a star that you do not own.",
+            );
         }
 
         const specialist = this.specialistService.getByIdCarrier(specialistId);
 
         if (!specialist) {
-            throw new ValidationError(`A specialist with ID ${specialistId} does not exist or is disabled.`);
+            throw new ValidationError(
+                `A specialist with ID ${specialistId} does not exist or is disabled.`,
+            );
         }
 
         if (carrier.specialistId && carrier.specialistId === specialist.id) {
-            throw new ValidationError(`The carrier already has the specialist assigned.`);
+            throw new ValidationError(
+                `The carrier already has the specialist assigned.`,
+            );
         }
-        
+
         // Calculate whether the player can afford to buy the specialist.
         if (!this._canAffordSpecialist(game, player, specialist)) {
-            throw new ValidationError(`You cannot afford to buy this specialist.`);
+            throw new ValidationError(
+                `You cannot afford to buy this specialist.`,
+            );
         }
 
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+        let cost = this.specialistService.getSpecialistActualCost(
+            game,
+            specialist,
+        );
 
         if (carrier.specialistId) {
-            let carrierSpecialist = this.specialistService.getByIdCarrier(carrier.specialistId);
+            let carrierSpecialist = this.specialistService.getByIdCarrier(
+                carrier.specialistId,
+            );
 
             if (carrierSpecialist && carrierSpecialist.oneShot) {
-                throw new ValidationError(`The current specialist cannot be replaced.`);
+                throw new ValidationError(
+                    `The current specialist cannot be replaced.`,
+                );
             }
         }
 
         carrier.specialistId = specialist.id;
-        carrier.specialistExpireTick = specialist.expireTicks ? game.state.tick + specialist.expireTicks : null;
+        carrier.specialistExpireTick = specialist.expireTicks
+            ? game.state.tick + specialist.expireTicks
+            : null;
 
         // Update the DB.
         await this.gameRepo.bulkWrite([
@@ -118,71 +158,116 @@ export default class SpecialistHireService {
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.carriers._id': carrier._id
+                        "galaxy.carriers._id": carrier._id,
                     },
                     update: {
-                        'galaxy.carriers.$.specialistId': carrier.specialistId,
-                        'galaxy.carriers.$.specialistExpireTick': carrier.specialistExpireTick
-                    }
-                }
-            }
+                        "galaxy.carriers.$.specialistId": carrier.specialistId,
+                        "galaxy.carriers.$.specialistExpireTick":
+                            carrier.specialistExpireTick,
+                    },
+                },
+            },
         ]);
 
-        if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
-                stats.infrastructure.specialistsHired += 1;
-            });
+        if (
+            player.userId &&
+            !player.defeated &&
+            !this.gameTypeService.isTutorialGame(game)
+        ) {
+            await statisticsService.modifyStats(
+                game._id,
+                player._id,
+                (stats) => {
+                    stats.infrastructure.specialistsHired += 1;
+                },
+            );
         }
 
         // TODO: Need to consider local and global effects and update the UI accordingly.
 
-        carrier.effectiveTechs = this.technologyService.getCarrierEffectiveTechnologyLevels(game, carrier, true);
+        carrier.effectiveTechs =
+            this.technologyService.getCarrierEffectiveTechnologyLevels(
+                game,
+                carrier,
+                true,
+            );
 
-        let waypoints = await this.cullWaypointsService.cullWaypointsByHyperspaceRangeDB(game, carrier);
+        let waypoints =
+            await this.cullWaypointsService.cullWaypointsByHyperspaceRangeDB(
+                game,
+                carrier,
+            );
 
         let result = {
             game,
             carrier,
             specialist,
             cost,
-            waypoints
+            waypoints,
         };
 
         return result;
     }
 
-    async hireStarSpecialist(game: Game, player: Player, starId: DBObjectId, specialistId: number) {
-        if (game.settings.specialGalaxy.specialistCost === 'none') {
-            throw new ValidationError('The game settings has disabled the hiring of specialists.');
+    async hireStarSpecialist(
+        game: Game,
+        player: Player,
+        starId: DBObjectId,
+        specialistId: number,
+        statisticsService: IStatisticsService,
+    ) {
+        if (game.settings.specialGalaxy.specialistCost === "none") {
+            throw new ValidationError(
+                "The game settings has disabled the hiring of specialists.",
+            );
         }
 
-        if (this.specialistBanService.isStarSpecialistBanned(game, specialistId)) {
-            throw new ValidationError('This specialist has been banned from this game.');
+        if (
+            this.specialistBanService.isStarSpecialistBanned(game, specialistId)
+        ) {
+            throw new ValidationError(
+                "This specialist has been banned from this game.",
+            );
         }
 
-        let star = game.galaxy.stars.find(x => x.ownedByPlayerId && x.ownedByPlayerId.toString() === player._id.toString() && x._id.toString() === starId.toString());
+        let star = game.galaxy.stars.find(
+            (x) =>
+                x.ownedByPlayerId &&
+                x.ownedByPlayerId.toString() === player._id.toString() &&
+                x._id.toString() === starId.toString(),
+        );
 
         if (!star) {
-            throw new ValidationError(`Cannot assign a specialist to a star that you do not own.`);
+            throw new ValidationError(
+                `Cannot assign a specialist to a star that you do not own.`,
+            );
         }
 
         if (this.starDataService.isDeadStar(star)) {
-            throw new ValidationError('Cannot hire a specialist on a dead star.');
+            throw new ValidationError(
+                "Cannot hire a specialist on a dead star.",
+            );
         }
 
         const specialist = this.specialistService.getByIdStar(specialistId);
 
         if (!specialist) {
-            throw new ValidationError(`A specialist with ID ${specialistId} does not exist or is disabled.`);
+            throw new ValidationError(
+                `A specialist with ID ${specialistId} does not exist or is disabled.`,
+            );
         }
 
         if (star.specialistId && star.specialistId === specialist.id) {
-            throw new ValidationError(`The star already has the specialist assigned.`);
+            throw new ValidationError(
+                `The star already has the specialist assigned.`,
+            );
         }
-        
+
         // Calculate whether the player can afford to buy the specialist.
         if (!this._canAffordSpecialist(game, player, specialist)) {
-            throw new ValidationError(`You cannot afford to buy this specialist.`);
+            throw new ValidationError(
+                `You cannot afford to buy this specialist.`,
+            );
         }
 
         // // If the specialist is one that destroys stars and the target star is a worm hole, we cannot allow
@@ -193,23 +278,37 @@ export default class SpecialistHireService {
         //     throw new ValidationError(`Cannot hire a War Machine on a Worm Hole star.`);
         // }
 
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+        let cost = this.specialistService.getSpecialistActualCost(
+            game,
+            specialist,
+        );
 
         if (star.specialistId) {
-            let starSpecialist = this.specialistService.getByIdStar(star.specialistId);
+            let starSpecialist = this.specialistService.getByIdStar(
+                star.specialistId,
+            );
 
             if (starSpecialist && starSpecialist.oneShot) {
-                throw new ValidationError(`The current specialist cannot be replaced.`);
+                throw new ValidationError(
+                    `The current specialist cannot be replaced.`,
+                );
             }
         }
 
         // If the spec hired is one that builds worm holes, validate that the star isn't already a worm hole.
-        if (star.wormHoleToStarId && specialist.modifiers.special?.wormHoleConstructor) {
-            throw new ValidationError(`The star already has a worm hole connected to another star.`);
+        if (
+            star.wormHoleToStarId &&
+            specialist.modifiers.special?.wormHoleConstructor
+        ) {
+            throw new ValidationError(
+                `The star already has a worm hole connected to another star.`,
+            );
         }
 
         star.specialistId = specialist.id;
-        star.specialistExpireTick = specialist.expireTicks ? game.state.tick + specialist.expireTicks : null;
+        star.specialistExpireTick = specialist.expireTicks
+            ? game.state.tick + specialist.expireTicks
+            : null;
 
         // Update the DB.
         await this.gameRepo.bulkWrite([
@@ -218,64 +317,100 @@ export default class SpecialistHireService {
                 updateOne: {
                     filter: {
                         _id: game._id,
-                        'galaxy.stars._id': star._id
+                        "galaxy.stars._id": star._id,
                     },
                     update: {
-                        'galaxy.stars.$.specialistId': star.specialistId,
-                        'galaxy.stars.$.specialistExpireTick': star.specialistExpireTick
-                    }
-                }
-            }
+                        "galaxy.stars.$.specialistId": star.specialistId,
+                        "galaxy.stars.$.specialistExpireTick":
+                            star.specialistExpireTick,
+                    },
+                },
+            },
         ]);
 
-        if (player.userId && !player.defeated && !this.gameTypeService.isTutorialGame(game)) {
-            await this.statisticsService.modifyStats(game._id, player._id, (stats) => {
-                stats.infrastructure.specialistsHired += 1;
-            });
+        if (
+            player.userId &&
+            !player.defeated &&
+            !this.gameTypeService.isTutorialGame(game)
+        ) {
+            await statisticsService.modifyStats(
+                game._id,
+                player._id,
+                (stats) => {
+                    stats.infrastructure.specialistsHired += 1;
+                },
+            );
         }
 
         // TODO: The star may have its manufacturing changed so return back the new manufacturing.
         // TODO: Scanning changes are done by refreshing the entire game on the UI, would be ideally better to calculate it here?
         // TODO: Need to consider local and global effects and update the UI accordingly.
 
-        star.effectiveTechs = this.technologyService.getStarEffectiveTechnologyLevels(game, star, true);
+        star.effectiveTechs =
+            this.technologyService.getStarEffectiveTechnologyLevels(
+                game,
+                star,
+                true,
+            );
 
         return {
             star,
             specialist,
-            cost
+            cost,
         };
     }
 
     _canAffordSpecialist(game: Game, player: Player, specialist: Specialist) {
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+        let cost = this.specialistService.getSpecialistActualCost(
+            game,
+            specialist,
+        );
 
         switch (game.settings.specialGalaxy.specialistsCurrency) {
-            case 'credits':
+            case "credits":
                 return player.credits >= cost.credits;
-            case 'creditsSpecialists':
+            case "creditsSpecialists":
                 return player.creditsSpecialists >= cost.creditsSpecialists;
             default:
-                throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
+                throw new Error(
+                    `Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`,
+                );
         }
     }
 
-    async _deductSpecialistCost(game: Game, player: Player, specialist: Specialist) {
-        let cost = this.specialistService.getSpecialistActualCost(game, specialist);
+    async _deductSpecialistCost(
+        game: Game,
+        player: Player,
+        specialist: Specialist,
+    ) {
+        let cost = this.specialistService.getSpecialistActualCost(
+            game,
+            specialist,
+        );
 
         switch (game.settings.specialGalaxy.specialistsCurrency) {
-            case 'credits':
+            case "credits":
                 player.credits -= cost.credits;
 
-                return await this.playerCreditsService.addCredits(game, player, -cost.credits, false);
-            case 'creditsSpecialists':
+                return await this.playerCreditsService.addCredits(
+                    game,
+                    player,
+                    -cost.credits,
+                    false,
+                );
+            case "creditsSpecialists":
                 player.creditsSpecialists -= cost.creditsSpecialists;
 
-                return await this.playerCreditsService.addCreditsSpecialists(game, player, -cost.creditsSpecialists, false);
+                return await this.playerCreditsService.addCreditsSpecialists(
+                    game,
+                    player,
+                    -cost.creditsSpecialists,
+                    false,
+                );
             default:
-                throw new Error(`Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`);
+                throw new Error(
+                    `Unsupported specialist currency type: ${game.settings.specialGalaxy.specialistsCurrency}`,
+                );
         }
-        
     }
-
-};
+}

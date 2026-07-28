@@ -1,20 +1,25 @@
-import MutexService from './mutex';
-import { Mutex } from './types/Mutex';
-import { PlayerMutexLock } from './types/PlayerMutexLock';
+import MutexService from "./mutex";
+import { Mutex } from "./types/Mutex";
+import { PlayerMutexLock } from "./types/PlayerMutexLock";
 
 export default class GamePlayerMutexService extends MutexService {
-
     private gameMutexes: { [id: string]: Mutex } = {};
 
     private buildMutexKey(gameId: string, playerId: string) {
         return `${gameId}-${playerId}`;
     }
 
-    public async acquireMutexLock(gameId: string, playerId: string): Promise<PlayerMutexLock> {
+    public async acquireMutexLock(
+        gameId: string,
+        playerId: string,
+    ): Promise<PlayerMutexLock> {
         return (await this.acquireMutexLocks(gameId, [playerId]))?.[0];
     }
 
-    public async acquireMutexLocks(gameId: string, playerIds: string[]): Promise<PlayerMutexLock[]> {
+    public async acquireMutexLocks(
+        gameId: string,
+        playerIds: string[],
+    ): Promise<PlayerMutexLock[]> {
         if (gameId == null || playerIds == null || playerIds.length === 0) {
             return [];
         }
@@ -22,19 +27,37 @@ export default class GamePlayerMutexService extends MutexService {
         let gameMutex: Mutex = this.getGameMutex(gameId);
         let gameMutexLockId: number = await gameMutex.wait();
 
-        let playerMutexLocks: PlayerMutexLock[] = await this.acquireMutexLocksInternal<PlayerMutexLock>(...playerIds.map(playerId => { return { key: this.buildMutexKey(gameId, playerId), playerId: playerId } }));
+        let playerMutexLocks: PlayerMutexLock[] =
+            await this.acquireMutexLocksInternal<PlayerMutexLock>(
+                ...playerIds.map((playerId) => {
+                    return {
+                        key: this.buildMutexKey(gameId, playerId),
+                        playerId: playerId,
+                    };
+                }),
+            );
 
         gameMutex.release(gameMutexLockId);
 
         return playerMutexLocks;
     }
 
-    public async releaseMutexLock(gameId: string, playerMutexLock: PlayerMutexLock): Promise<void> {
+    public async releaseMutexLock(
+        gameId: string,
+        playerMutexLock: PlayerMutexLock,
+    ): Promise<void> {
         return await this.releaseMutexLocks(gameId, [playerMutexLock]);
     }
 
-    public async releaseMutexLocks(gameId: string, playerMutexLocks: PlayerMutexLock[]): Promise<void> {
-        if (gameId == null || playerMutexLocks == null || playerMutexLocks.length === 0) {
+    public async releaseMutexLocks(
+        gameId: string,
+        playerMutexLocks: PlayerMutexLock[],
+    ): Promise<void> {
+        if (
+            gameId == null ||
+            playerMutexLocks == null ||
+            playerMutexLocks.length === 0
+        ) {
             return;
         }
 

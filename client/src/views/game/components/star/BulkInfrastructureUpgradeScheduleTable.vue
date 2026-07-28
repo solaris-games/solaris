@@ -1,68 +1,74 @@
 <template>
-<div class="container">
-  <div class="row"> <!-- v-if=" .length" -->
-    <div class="table-responsive ps-0 pe-0">
-      <table class="table table-striped table-hover mb-0">
+  <div class="container">
+    <div class="row">
+      <!-- v-if=" .length" -->
+      <div class="table-responsive ps-0 pe-0">
+        <table class="table table-striped table-hover mb-0">
           <thead class="table-dark">
-              <tr>
-                  <td><a href="javascript:;" @click="sort(['tick'])">Tick</a></td>
-                  <td><a href="javascript:;" @click="sort(['infrastructureType'])">Infrastructure</a></td>
-                  <td><a href="javascript:;" @click="sort(['buyType'])">Buy type</a></td>
-                  <td><a href="javascript:;" @click="sort(['amount'])">Amount</a></td>
-                  <td ></td> <!-- Toggle repeat -->
-                  <td class="last"></td> <!-- Trash & Confirm -->
-              </tr>
+            <tr>
+              <td>
+                <a href="javascript:;" @click="sort(['tick'])">Tick</a>
+              </td>
+              <td>
+                <a href="javascript:;" @click="sort(['infrastructureType'])"
+                  >Infrastructure</a
+                >
+              </td>
+              <td>
+                <a href="javascript:;" @click="sort(['buyType'])">Buy type</a>
+              </td>
+              <td>
+                <a href="javascript:;" @click="sort(['amount'])">Amount</a>
+              </td>
+              <td></td>
+              <!-- Toggle repeat -->
+              <td class="last"></td>
+              <!-- Trash & Confirm -->
+            </tr>
           </thead>
           <tbody>
-              <schedule-row v-for="action in sortedTableData"
-                            v-bind:key="action._id"
-                            :action="action"
-                            @bulkScheduleTrashed="onTrashed"/>
+            <bulk-infrastructure-upgrade-schedule-table-row
+              v-for="action in sortedTableData"
+              v-bind:key="action._id"
+              :action="action"
+              @bulkScheduleTrashed="onTrashed"
+            />
           </tbody>
-      </table>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 </template>
 
-<script>
-import BulkInfrastructureUpgradeScheduleTableRow from './BulkInfrastructureUpgradeScheduleTableRow.vue'
-import GameHelper from '../../../../services/gameHelper'
-import GridHelper from '../../../../services/gridHelper'
-import SortInfo from '../../../../services/data/sortInfo'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { ref, computed } from "vue";
+import BulkInfrastructureUpgradeScheduleTableRow from "./BulkInfrastructureUpgradeScheduleTableRow.vue";
+import GameHelper from "../../../../services/gameHelper";
+import type { Game } from "@/types/game";
+import { useSorted } from "@/util/sort";
+import { createSortInfo, swapSort } from "@/services/data/sortInfo";
 
-export default {
-  components: {
-    'schedule-row': BulkInfrastructureUpgradeScheduleTableRow
-  },
-  props: {
-      highlightIgnoredInfrastructure: String
-  },
-  data: function () {
-    return {
-      sortInfo: new SortInfo(null, true)
-    }
-  },
-  methods: {
-    onTrashed () {
-      this.$emit('bulkScheduleTrashed')
-    },
-    sort(...propertyPaths) {
-      this.swapSort(propertyPaths);
-    },
-  },
-  computed: {
-    userPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    tableData () {
-      return this.userPlayer.scheduledActions
-    },
-    sortedTableData () {
-      return GridHelper.dynamicSort(this.tableData, this.sortInfo);
-    }
-  }
-}
+const defaultSortInfo = createSortInfo([["tick"]], true);
+
+const emit = defineEmits<{
+  bulkScheduleTrashed: [actionId: string];
+}>();
+
+const onTrashed = (actionId: string) => emit("bulkScheduleTrashed", actionId);
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value)!);
+const tableData = computed(() => userPlayer.value.scheduledActions);
+
+const sortInfo = ref(defaultSortInfo);
+
+const sort = (...propertyPaths: string[][]) => {
+  sortInfo.value = swapSort(sortInfo.value, propertyPaths);
+};
+
+const sortedTableData = useSorted(game, tableData, sortInfo);
 </script>
 
 <style scoped>
@@ -71,7 +77,7 @@ td {
 }
 
 td.last {
-    width: 1px;
-    white-space: nowrap;
+  width: 1px;
+  white-space: nowrap;
 }
 </style>

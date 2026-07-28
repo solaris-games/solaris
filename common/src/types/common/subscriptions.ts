@@ -1,10 +1,10 @@
 export interface UserSubscriptions {
     settings: {
         notifyActiveGamesOnly: boolean;
-    },
+    };
     inapp?: {
         notificationsForOtherGames: boolean;
-    },
+    };
     discord?: {
         gameStarted: boolean;
         gameEnded: boolean;
@@ -16,5 +16,5 @@ export interface UserSubscriptions {
         playerCreditsSpecialistsReceived: boolean;
         playerRenownReceived: boolean;
         conversationMessageSent: boolean;
-    }
+    };
 }

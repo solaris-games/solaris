@@ -1,11 +1,12 @@
-import {makeJob} from "./tool";
-import {migrateBadges} from "./migrations/migrateBadges";
-import {migrateCombatResolution} from "./migrations/migrateCombatResolution";
-import {migrateStats} from "./migrations/migrateStats";
+import { makeJob } from "./tool";
+import { migrateBadges } from "./migrations/migrateBadges";
+import { migrateCombatResolution } from "./migrations/migrateCombatResolution";
+import { migrateStats } from "./migrations/migrateStats";
 import { migrateInitialGameState } from "./migrations/migrateInitialGameState";
-import {migrateWormholesHistory} from "./migrations/migrateWormholesHistory";
-import {migrateResearchCosts} from "./migrations/migrateResearchCosts";
-import {migrateSignupDate} from "./migrations/migrateSignupDate";
+import { migrateWormholesHistory } from "./migrations/migrateWormholesHistory";
+import { migrateResearchCosts } from "./migrations/migrateResearchCosts";
+import { migrateCombatEvents } from "./migrations/migrateCombatEvents";
+import { migrateSignupDate } from "./migrations/migrateSignupDate";
 
 const MIGRATIONS = {
     "2025-02-05-badges": migrateBadges,
@@ -14,16 +15,20 @@ const MIGRATIONS = {
     "2025-10-19-initial-game-state": migrateInitialGameState,
     "2025-11-08-wormholes-history": migrateWormholesHistory,
     "2026-03-11-research-costs": migrateResearchCosts,
+    "2026-04-22-combat-events": migrateCombatEvents,
     "2026-05-01-signup-date": migrateSignupDate,
 };
 
-const job = makeJob('Migration', async (ctx) => {
+const job = makeJob("Migration", async (ctx) => {
     const migrationName = process.argv[2];
 
     if (!migrationName || !MIGRATIONS[migrationName]) {
-        console.error('No migration name provided. Valid names are:', Object.keys(MIGRATIONS).join(', '));
+        console.error(
+            "No migration name provided. Valid names are:",
+            Object.keys(MIGRATIONS).join(", "),
+        );
 
-        throw new Error('No migration name provided');
+        throw new Error("No migration name provided");
     }
 
     console.log(`Running migration ${migrationName}...`);

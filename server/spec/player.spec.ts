@@ -1,25 +1,25 @@
-import {Player} from "../services/types/Player";
+import { Player } from "../services/types/Player";
 
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-import { DistanceService } from 'solaris-common';
-import { StarDistanceService } from 'solaris-common';
-import MapService from '../services/map';
-import RandomService from '../services/random';
-import StarService from '../services/star';
-import CarrierService from '../services/carrier';
-import PlayerService from '../services/player';
-import NameService from '../services/name';
-import { TechnologyService } from 'solaris-common';
+import { DistanceService } from "@solaris/common";
+import { StarDistanceService } from "@solaris/common";
+import MapService from "../services/map";
+import RandomService from "../services/random";
+import StarService from "../services/star";
+import CarrierService from "../services/carrier";
+import PlayerService from "../services/player";
+import NameService from "../services/name";
+import { TechnologyService } from "@solaris/common";
 import PlayerColourService from "../services/playerColour";
 
-const gameNames = require('../config/game/gameNames');
-const starNames = require('../config/game/starNames');
+const gameNames = require("../config/game/gameNames");
+const starNames = require("../config/game/starNames");
 
 const game = {
     settings: {
         general: {
-            playerLimit: 4
+            playerLimit: 4,
         },
         player: {
             startingCredits: 500,
@@ -28,13 +28,13 @@ const game = {
             startingInfrastructure: {
                 economy: 5,
                 industry: 5,
-                science: 1
+                science: 1,
             },
             developmentCost: {
-                economy: 'standard',
-                industry: 'standard',
-                science: 'standard'
-            }
+                economy: "standard",
+                industry: "standard",
+                science: "standard",
+            },
         },
         technology: {
             startingTechnologyLevel: {
@@ -45,63 +45,64 @@ const game = {
                 manufacturing: 1,
                 banking: 1,
                 weapons: 1,
-                specialists: 1
+                specialists: 1,
             },
             researchCosts: {
-                terraforming: 'standard',
-                experimentation: 'standard',
-                scanning: 'standard',
-                hyperspace: 'standard',
-                manufacturing: 'standard',
-                banking: 'standard',
-                weapons: 'standard',
-                specialists: 'standard'
-            }
+                terraforming: "standard",
+                experimentation: "standard",
+                scanning: "standard",
+                hyperspace: "standard",
+                manufacturing: "standard",
+                banking: "standard",
+                weapons: "standard",
+                specialists: "standard",
+            },
         },
         galaxy: {
-            galaxyType: 'circular'
+            galaxyType: "circular",
         },
         specialGalaxy: {
-            playerDistribution: 'circular',
-            carrierSpeed: 5
-        }
+            playerDistribution: "circular",
+            carrierSpeed: 5,
+        },
     },
     constants: {
         distances: {
             lightYear: 30,
             minDistanceBetweenStars: 30,
-            maxDistanceBetweenStars: 300
+            maxDistanceBetweenStars: 300,
         },
         star: {
             resources: {
                 minNaturalResources: 10,
-                maxNaturalResources: 50
-            }
-        }
+                maxNaturalResources: 50,
+            },
+        },
     },
     galaxy: {
         stars: [],
-        players: []
-    }
-}
+        players: [],
+    },
+};
 
 function generateStarGrid() {
     let stars: any[] = [];
     let i = 0;
 
     // Generate a grid of stars.
-    for(let x = 0; x < 100; x += 10) {
-        for(let y = 0; y < 100; y += 10) {
+    for (let x = 0; x < 100; x += 10) {
+        for (let y = 0; y < 100; y += 10) {
             i++;
 
             stars.push({
                 _id: new mongoose.Types.ObjectId(),
                 name: `Star ${i}`,
                 location: {
-                    x, y
+                    x,
+                    y,
                 },
                 infrastructure: {},
-                naturalResources: {}
+                naturalResources: {},
             });
         }
     }
@@ -119,15 +120,14 @@ function assertNewPlayer(newPlayer, colour) {
     expect(newPlayer.credits).toEqual(game.settings.player.startingCredits);
     expect(newPlayer.colour).toBe(colour);
 
-    for(var key in newPlayer.research) {
+    for (var key in newPlayer.research) {
         const res1 = newPlayer.research[key].level;
         const res2 = game.settings.technology.startingTechnologyLevel[key];
         expect(res1).toEqual(res2);
     }
 }
 
-describe('player', () => {
-
+describe("player", () => {
     let randomService;
     let distanceService;
     let starDistanceService;
@@ -151,25 +151,43 @@ describe('player', () => {
         // @ts-ignore
         nameService = new NameService(gameNames, starNames, randomService);
         // @ts-ignore
-        mapService = new MapService(randomService, starService, distanceService, starDistanceService, nameService);
+        mapService = new MapService(
+            randomService,
+            starService,
+            distanceService,
+            starDistanceService,
+            nameService,
+        );
         // @ts-ignore
         technologyService = new TechnologyService();
         // @ts-ignore
         playerColourService = new PlayerColourService(randomService);
         // @ts-ignore
-        playerService = new PlayerService(null, randomService, mapService, starService, carrierService, starDistanceService, technologyService, null, null, null, null, playerColourService);
-
+        playerService = new PlayerService(
+            null,
+            randomService,
+            mapService,
+            starService,
+            carrierService,
+            starDistanceService,
+            technologyService,
+            null,
+            null,
+            null,
+            null,
+            playerColourService,
+        );
     });
 
-    it('should create an empty player', () => {
-        const yellow = { alias: 'Yellow', value: '0xFFC000' };
+    it("should create an empty player", () => {
+        const yellow = { alias: "Yellow", value: "0xFFC000" };
 
         const newPlayer = playerService.createEmptyPlayer(game, yellow);
 
         assertNewPlayer(newPlayer, yellow);
     });
 
-    it('should create a list of empty players', () => {
+    it("should create a list of empty players", () => {
         const allStars: any[] = generateStarGrid();
         // @ts-ignore
         game.galaxy.stars = allStars;
@@ -178,26 +196,33 @@ describe('player', () => {
 
         expect(players.length).toEqual(game.settings.general.playerLimit);
 
-        for(let i = 0; i < players.length; i++) {
+        for (let i = 0; i < players.length; i++) {
             let newPlayer = players[i];
 
             assertNewPlayer(newPlayer, null);
 
             // Assert owned stars.
-            const starsOwned = allStars.filter(x => x.ownedByPlayerId === newPlayer._id);
+            const starsOwned = allStars.filter(
+                (x) => x.ownedByPlayerId === newPlayer._id,
+            );
 
-            expect(starsOwned.length).toEqual(game.settings.player.startingStars);
+            expect(starsOwned.length).toEqual(
+                game.settings.player.startingStars,
+            );
 
             // Assert non-home star ships.
-            starsOwned.filter(x => !x.homeStar).forEach(s => {
-                expect(s.ships).toEqual(game.settings.player.startingShips);
-            });
+            starsOwned
+                .filter((x) => !x.homeStar)
+                .forEach((s) => {
+                    expect(s.ships).toEqual(game.settings.player.startingShips);
+                });
 
             // Assert home star.
-            const homeStar: any = allStars.find(x => x._id === newPlayer.homeStarId);
-            
+            const homeStar: any = allStars.find(
+                (x) => x._id === newPlayer.homeStarId,
+            );
+
             expect(homeStar.ships).toEqual(game.settings.player.startingShips);
         }
     });
-
 });

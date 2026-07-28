@@ -1,22 +1,36 @@
 import {
     CarrierWaypointActionType,
     CarrierWaypointActionTypes,
-    GameSettingEnabledDisabled, number, numberAdv, SettingBlendMode, SettingCarrierLoopType, SettingNaturalResources,
+    GameSettingEnabledDisabled,
+    number,
+    numberAdv,
+    SettingBlendMode,
+    SettingCarrierLoopType,
+    SettingNaturalResources,
     SettingObjectScaling,
     SettingTerritoryStyle,
-    SettingUIType, SettingVisibility,
+    SettingUIType,
+    SettingVisibility,
     stringEnumeration,
     UserGameSettings,
-    ValidationError
-} from "solaris-common";
+    ValidationError,
+} from "@solaris/common";
 import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
-import {email, object, password, string, stringValue, username, Validator} from "solaris-common";
+import {
+    email,
+    object,
+    password,
+    string,
+    stringValue,
+    username,
+    Validator,
+} from "@solaris/common";
 
 export interface UserCreateUserRequest {
     email: string;
     username: string;
     password: string;
-};
+}
 
 export const parseCreateUserRequest: Validator<UserCreateUserRequest> = object({
     email: email,
@@ -26,13 +40,15 @@ export const parseCreateUserRequest: Validator<UserCreateUserRequest> = object({
 
 export interface UserUpdateEmailPreferenceRequest {
     enabled: boolean;
-};
+}
 
-export const mapToUserUpdateEmailPreferenceRequest = (body: any): UserUpdateEmailPreferenceRequest => {
+export const mapToUserUpdateEmailPreferenceRequest = (
+    body: any,
+): UserUpdateEmailPreferenceRequest => {
     let errors: string[] = [];
 
-    if (!keyHasBooleanValue(body, 'enabled')) {
-        errors.push('Enabled is required.');
+    if (!keyHasBooleanValue(body, "enabled")) {
+        errors.push("Enabled is required.");
     }
 
     if (errors.length) {
@@ -40,45 +56,50 @@ export const mapToUserUpdateEmailPreferenceRequest = (body: any): UserUpdateEmai
     }
 
     return {
-        enabled: body.enabled
-    }
+        enabled: body.enabled,
+    };
 };
 
 export interface UserUpdateUsernameRequest {
     username: string;
-};
+}
 
-export const parseUserUpdateUserNameRequest: Validator<UserUpdateUsernameRequest> = object({
-    username: username,
-});
+export const parseUserUpdateUserNameRequest: Validator<UserUpdateUsernameRequest> =
+    object({
+        username: username,
+    });
 
 export interface UserUpdateEmailRequest {
     email: string;
-};
+}
 
-export const parseUserUpdateEmailRequest: Validator<UserUpdateEmailRequest> = object({
-    email: email,
-});
+export const parseUserUpdateEmailRequest: Validator<UserUpdateEmailRequest> =
+    object({
+        email: email,
+    });
 
 export interface UserUpdatePasswordRequest {
     currentPassword: string;
     newPassword: string;
-};
+}
 
-export const parseUserUpdatePasswordRequest: Validator<UserUpdatePasswordRequest> = object({
-    currentPassword: string,
-    newPassword: password,
-});
+export const parseUserUpdatePasswordRequest: Validator<UserUpdatePasswordRequest> =
+    object({
+        currentPassword: string,
+        newPassword: password,
+    });
 
 export interface UserRequestPasswordResetRequest {
     email: string;
-};
+}
 
-export const mapToUserRequestPasswordResetRequest = (body: any): UserRequestPasswordResetRequest => {
+export const mapToUserRequestPasswordResetRequest = (
+    body: any,
+): UserRequestPasswordResetRequest => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
+    if (!keyHasStringValue(body, "email")) {
+        errors.push("Email is required.");
     }
 
     if (errors.length) {
@@ -86,24 +107,26 @@ export const mapToUserRequestPasswordResetRequest = (body: any): UserRequestPass
     }
 
     return {
-        email: body.email
-    }
+        email: body.email,
+    };
 };
 
 export interface UserResetPasswordResetRequest {
     token: string;
     newPassword: string;
-};
+}
 
-export const mapToUserResetPasswordResetRequest = (body: any): UserResetPasswordResetRequest => {
+export const mapToUserResetPasswordResetRequest = (
+    body: any,
+): UserResetPasswordResetRequest => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, 'token')) {
-        errors.push('Token is required.');
+    if (!keyHasStringValue(body, "token")) {
+        errors.push("Token is required.");
     }
 
-    if (!keyHasStringValue(body, 'newPassword')) {
-        errors.push('New Password is required.');
+    if (!keyHasStringValue(body, "newPassword")) {
+        errors.push("New Password is required.");
     }
 
     if (errors.length) {
@@ -112,19 +135,21 @@ export const mapToUserResetPasswordResetRequest = (body: any): UserResetPassword
 
     return {
         token: body.token,
-        newPassword: body.newPassword
-    }
+        newPassword: body.newPassword,
+    };
 };
 
 export interface UserRequestUsernameRequest {
     email: string;
-};
+}
 
-export const mapToUserRequestUsernameRequest = (body: any): UserRequestUsernameRequest => {
+export const mapToUserRequestUsernameRequest = (
+    body: any,
+): UserRequestUsernameRequest => {
     let errors: string[] = [];
 
-    if (!keyHasStringValue(body, 'email')) {
-        errors.push('Email is required.');
+    if (!keyHasStringValue(body, "email")) {
+        errors.push("Email is required.");
     }
 
     if (errors.length) {
@@ -132,11 +157,14 @@ export const mapToUserRequestUsernameRequest = (body: any): UserRequestUsernameR
     }
 
     return {
-        email: body.email
-    }
+        email: body.email,
+    };
 };
 
-const enabledDisabled = stringEnumeration<GameSettingEnabledDisabled, GameSettingEnabledDisabled[]>(['enabled', 'disabled']);
+const enabledDisabled = stringEnumeration<
+    GameSettingEnabledDisabled,
+    GameSettingEnabledDisabled[]
+>(["enabled", "disabled"]);
 
 const colour = stringValue({
     matches: /#[A-Fa-f0-9]{6}/,
@@ -146,29 +174,44 @@ export const parseUpdateSettingsRequest: Validator<UserGameSettings> = object({
     interface: object({
         audio: enabledDisabled,
         galaxyScreenUpgrades: enabledDisabled,
-        uiStyle: stringEnumeration<SettingUIType, SettingUIType[]>(['compact', 'standard']),
+        uiStyle: stringEnumeration<SettingUIType, SettingUIType[]>([
+            "compact",
+            "standard",
+        ]),
         suggestMentions: enabledDisabled,
         shiftKeyMentions: enabledDisabled,
     }),
     guild: object({
-        displayGuildTag: stringEnumeration<SettingVisibility, SettingVisibility[]>(['visible', 'hidden'])
+        displayGuildTag: stringEnumeration<
+            SettingVisibility,
+            SettingVisibility[]
+        >(["visible", "hidden"]),
     }),
     map: object({
-        naturalResources: stringEnumeration<SettingNaturalResources, SettingNaturalResources[]>(['planets', 'single-ring']),
-        carrierLoopStyle: stringEnumeration<SettingCarrierLoopType, SettingCarrierLoopType[]>(['solid', 'dashed']),
+        naturalResources: stringEnumeration<
+            SettingNaturalResources,
+            SettingNaturalResources[]
+        >(["planets", "single-ring"]),
+        carrierLoopStyle: stringEnumeration<
+            SettingCarrierLoopType,
+            SettingCarrierLoopType[]
+        >(["solid", "dashed"]),
         carrierPathWidth: numberAdv({
-            sign: 'positive',
+            sign: "positive",
         }),
         carrierPathDashLength: numberAdv({
-            sign: 'positive',
+            sign: "positive",
         }),
-        territoryStyle: stringEnumeration<SettingTerritoryStyle, SettingTerritoryStyle[]>(['disabled', 'marching-square', 'voronoi']),
+        territoryStyle: stringEnumeration<
+            SettingTerritoryStyle,
+            SettingTerritoryStyle[]
+        >(["disabled", "marching-square", "voronoi"]),
         territoryOpacity: numberAdv({
-            sign: 'positive',
+            sign: "positive",
             range: {
                 from: 0,
                 to: 1,
-            }
+            },
         }),
         marchingSquareGridSize: numberAdv({
             range: {
@@ -205,7 +248,10 @@ export const parseUpdateSettingsRequest: Validator<UserGameSettings> = object({
             },
             integer: true,
         }),
-        objectsScaling: stringEnumeration<SettingObjectScaling, SettingObjectScaling[]>(['default', 'clamped']),
+        objectsScaling: stringEnumeration<
+            SettingObjectScaling,
+            SettingObjectScaling[]
+        >(["default", "clamped"]),
         objectsMinimumScale: numberAdv({
             range: {
                 from: 0,
@@ -255,7 +301,10 @@ export const parseUpdateSettingsRequest: Validator<UserGameSettings> = object({
                     to: 1,
                 },
             }),
-            blendMode: stringEnumeration<SettingBlendMode, SettingBlendMode[]>(['ADD', 'NORMAL']),
+            blendMode: stringEnumeration<SettingBlendMode, SettingBlendMode[]>([
+                "ADD",
+                "NORMAL",
+            ]),
             nebulaColour1: colour,
             nebulaColour2: colour,
             nebulaColour3: colour,
@@ -285,7 +334,10 @@ export const parseUpdateSettingsRequest: Validator<UserGameSettings> = object({
         galaxyCenterAlwaysVisible: enabledDisabled,
     }),
     carrier: object({
-        defaultAction: stringEnumeration<CarrierWaypointActionType, CarrierWaypointActionType[]>(CarrierWaypointActionTypes),
+        defaultAction: stringEnumeration<
+            CarrierWaypointActionType,
+            CarrierWaypointActionType[]
+        >(CarrierWaypointActionTypes),
         defaultAmount: numberAdv({
             integer: true,
         }),

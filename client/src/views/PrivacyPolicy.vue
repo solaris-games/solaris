@@ -1,9 +1,6 @@
 <template>
   <view-container :hideTopBar="true" :is-auth-page="false">
-    <view-title
-      title="Privacy Policy"
-      :showSocialLinks="false"
-    />
+    <view-title title="Privacy Policy" :showSocialLinks="false" />
 
     <p>
       <a :href="providerInfoUrl" target="_blank">Provider information</a>
@@ -378,17 +375,21 @@
     </p>
     <h3>Contact Us</h3>
     <p>
-      If you have any questions about this Privacy Policy, please contact us via one of the community channels.
+      If you have any questions about this Privacy Policy, please contact us via
+      one of the community channels.
     </p>
   </view-container>
 </template>
 
 <script setup lang="ts">
-import ViewContainer from "./components/ViewContainer.vue"
-import ViewTitle from "./components/ViewTitle.vue"
+import { inject } from "vue";
+import ViewContainer from "./components/ViewContainer.vue";
+import ViewTitle from "./components/ViewTitle.vue";
+import { configInjectionKey } from "@/config";
 
-const providerInfoUrl = import.meta.env.VUE_APP_PROVIDER_INFORMATION_URL;
+const config = inject(configInjectionKey)!;
+
+const providerInfoUrl = config.appProviderInformationUrl;
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

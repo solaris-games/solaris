@@ -1,99 +1,115 @@
 <template>
   <div @click="onClick" class="player-icon text-center bg-dark">
-    <img v-if="player.avatar" :src="avatarSrc" :class="{'defeated-player': player.defeated}">
-    <i v-if="!player.avatar" class="far fa-user ms-2 me-2 mt-2 mb-2"></i>
+    <picture class="avatar-image" v-if="player.avatar">
+      <source :srcset="avatarWebpSrc" type="image/webp" />
+      <img
+        alt="defeated"
+        :src="avatarSrc"
+        :class="{ 'defeated-player': player.defeated }"
+      />
+    </picture>
+    <i v-if="!player.avatar" class="avatar-placeholder far fa-user"></i>
     <span class="shapeIcon">
-      <player-icon :playerId="player._id"/>
+      <player-icon :playerId="player._id" />
     </span>
     <i v-if="player.userId" class="userIcon fas fa-user"></i>
     <i v-if="hasPerspective()" class="userIcon fas fa-eye"></i>
-    <i v-if="showMedals && isFirstPlace()" class="medalIcon gold fas fa-medal"></i>
-    <i v-if="showMedals && isSecondPlace()" class="medalIcon silver fas fa-medal"></i>
-    <i v-if="showMedals && isThirdPlace()" class="medalIcon bronze fas fa-medal"></i>
+    <i
+      v-if="showMedals && isFirstPlace()"
+      class="medalIcon gold fas fa-medal"
+    ></i>
+    <i
+      v-if="showMedals && isSecondPlace()"
+      class="medalIcon silver fas fa-medal"
+    ></i>
+    <i
+      v-if="showMedals && isThirdPlace()"
+      class="medalIcon bronze fas fa-medal"
+    ></i>
   </div>
 </template>
 
-<script>
-import gameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon.vue'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import PlayerIcon from "../player/PlayerIcon.vue";
+import type { Game, Player } from "@/types/game";
+import GameHelper from "../../../../services/gameHelper";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    player: Object
-  },
-  data () {
-    return {
-      leaderboard: null,
-      showMedals: false
-    }
-  },
-  mounted () {
-    this.leaderboard = gameHelper.getSortedLeaderboardPlayerList(this.$store.state.game)
-    this.showMedals = gameHelper.isGameInProgress(this.$store.state.game) || gameHelper.isGameFinished(this.$store.state.game)
-  },
-  methods: {
-    isFirstPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const props = defineProps<{
+  player: Player;
+}>();
 
-      return position === 0
-    },
-    isSecondPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const emit = defineEmits<{
+  onClick: [];
+}>();
 
-      return position === 1
-    },
-    isThirdPlace () {
-      let position = this.leaderboard.indexOf(this.player)
+const onClick = () => emit("onClick");
 
-      return position === 2
-    },
-    hasPerspective () {
-      if (gameHelper.getUserPlayer(this.$store.state.game)) {
-        return false
-      }
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const leaderboard = computed(() =>
+  GameHelper.getSortedLeaderboardPlayerList(game.value),
+);
+const showMedals = computed(
+  () =>
+    GameHelper.isGameInProgress(game.value) ||
+    GameHelper.isGameFinished(game.value),
+);
 
-      return this.player.hasPerspective || false
-    },
-    onClick () {
-      this.$emit('onClick')
-    }
-  },
-  computed: {
-    avatarSrc () {
-      return new URL(`../../../../assets/avatars/${this.player.avatar}`, import.meta.url).href;
-    }
+const avatarSrc = computed(
+  () =>
+    new URL(
+      `../../../../assets/avatars/${props.player.avatar}`,
+      import.meta.url,
+    ).href,
+);
+const avatarWebpSrc = computed(() => {
+  const base = props.player.avatar!.replace(/\.[^.]+$/, "");
+  return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url)
+    .href;
+});
+
+const isFirstPlace = () => leaderboard.value.indexOf(props.player) === 0;
+const isSecondPlace = () => leaderboard.value.indexOf(props.player) === 1;
+const isThirdPlace = () => leaderboard.value.indexOf(props.player) === 2;
+
+const hasPerspective = () => {
+  if (GameHelper.getUserPlayer(game.value)) {
+    return false;
   }
-}
+
+  return props.player.hasPerspective || false;
+};
 </script>
 
 <style scoped>
-.player-icon, img {
-    width: 59px;
-    height: 59px;
+.player-icon {
+  display: grid;
+  grid-template-areas: "a";
+  width: 59px;
+  height: 59px;
 }
 
 .player-icon .userIcon {
-  position: absolute;
-  left: 3px;
-  top: 40px;
-  font-size:16px;
+  grid-area: a;
+  margin-left: 3px;
+  margin-top: 36px;
+  font-size: 16px;
 }
 
 .player-icon .shapeIcon {
-  position: absolute;
-  left: 40px;
-  top: 3px;
-  font-size:16px;
+  grid-area: a;
+  margin-left: 36px;
+  margin-top: 0;
+  font-size: 16px;
 }
 
 .player-icon .medalIcon {
-  position: absolute;
-  left: 40px;
-  top: 40px;
-  font-size:16px;
+  grid-area: a;
+  margin-left: 36px;
+  margin-top: 36px;
+  font-size: 16px;
 }
 
 .fa-user {
@@ -104,35 +120,69 @@ export default {
   opacity: 0.3;
 }
 
+.avatar-placeholder {
+  grid-area: a;
+  display: block;
+
+  padding: 2px;
+
+  height: 59px;
+  width: 59px;
+}
+
+.avatar-image {
+  grid-area: a;
+  display: block;
+
+  img {
+    height: 59px;
+    width: 59px;
+  }
+}
+
 @media screen and (max-width: 576px) {
-  .player-icon, img {
-      height: 35px;
-      width: 35px;
-  }
-
-  .player-icon .userIcon {
-    position: absolute;
-    left: 1px;
-    top: 22px;
-    font-size:10px;
-  }
-
-  .player-icon .shapeIcon {
-    position: absolute;
-    left: 22px;
-    top: 1px;
-    font-size:10px;
-  }
-
-  .player-icon .medalIcon {
-    position: absolute;
-    left: 22px;
-    top: 22px;
-    font-size:10px;
+  .player-icon {
+    height: 35px;
+    width: 35px;
   }
 
   .fa-user {
-    font-size: 30px;
+    font-size: 28px;
+  }
+
+  .avatar-image {
+    img {
+      height: 35px;
+      width: 35px;
+    }
+  }
+
+  .avatar-placeholder {
+    padding: 2px;
+
+    height: 35px;
+    width: 35px;
+  }
+
+  .player-icon .userIcon {
+    grid-area: a;
+    margin-left: 3px;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+
+  .player-icon .shapeIcon {
+    grid-area: a;
+    margin-left: 20px;
+    margin-top: 0;
+    font-size: 14px;
+  }
+
+  .player-icon .medalIcon {
+    grid-area: a;
+    margin-left: 20px;
+    margin-top: 20px;
+    font-size: 14px;
   }
 }
 

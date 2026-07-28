@@ -1,6 +1,6 @@
 import { DBObjectId } from "./DBObjectId";
 import { UserLevel } from "./UserLevel";
-import type {UserAchievements, UserGameSettings} from "solaris-common";
+import type { UserAchievements, UserGameSettings } from "@solaris/common";
 
 export interface UserRoles {
     administrator: boolean;
@@ -8,7 +8,7 @@ export interface UserRoles {
     developer: boolean;
     communityManager: boolean;
     gameMaster: boolean;
-};
+}
 
 export interface UserOAuth {
     discord?: {
@@ -19,17 +19,17 @@ export interface UserOAuth {
             expires_in: string;
             refresh_token: string;
             scope: string;
-        }
-    }
-};
+        };
+    };
+}
 
 export interface UserSubscriptions {
     settings: {
         notifyActiveGamesOnly: boolean;
-    },
+    };
     inapp?: {
         notificationsForOtherGames: boolean;
-    },
+    };
     discord?: {
         gameStarted: boolean;
         gameEnded: boolean;
@@ -41,12 +41,12 @@ export interface UserSubscriptions {
         playerCreditsSpecialistsReceived: boolean;
         playerRenownReceived: boolean;
         conversationMessageSent: boolean;
-    }
+    };
 }
 
 export interface UserWarning {
-    text: string,
-    date: Date,
+    text: string;
+    date: Date;
 }
 
 export type AwardedBadge = {
@@ -57,7 +57,7 @@ export type AwardedBadge = {
     awardedInGameName: string | null;
     playerAwarded: boolean;
     time: Date | null;
-}
+};
 
 export interface User {
     _id: DBObjectId;
@@ -77,14 +77,14 @@ export interface User {
     isEstablishedPlayer: boolean;
     hasSentReviewReminder: boolean;
     isAnonymous: boolean;
-    roles: UserRoles,
-    level?: UserLevel,
+    roles: UserRoles;
+    level?: UserLevel;
     warnings: UserWarning[];
     lastReadAnnouncement: DBObjectId | null;
-    achievements: UserAchievements<DBObjectId>,
-    gameSettings: UserGameSettings,
+    achievements: UserAchievements<DBObjectId>;
+    gameSettings: UserGameSettings;
     avatars: number[];
     oauth: UserOAuth;
     subscriptions: UserSubscriptions;
     tutorialsCompleted?: string[];
-};
+}

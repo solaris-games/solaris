@@ -1,6 +1,6 @@
 import StatsSchema from "./stats";
 
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 const Types = Schema.Types;
 
@@ -12,6 +12,6 @@ const schema = new Schema({
     stats: StatsSchema,
 });
 
-schema.index({gameId: 1, playerId: 1}, {unique: true});
+schema.index({ gameId: 1, playerId: 1 }, { unique: true });
 
 export default schema;

@@ -6,9 +6,8 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  tooltip: string,
+  tooltip: string;
 }>();
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

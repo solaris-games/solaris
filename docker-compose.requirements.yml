@@ -1,10 +1,11 @@
 services:
-
   mongo:
-    image: mongo:7
+    image: mongo:8.0
     ports:
     - "27017:27017"
     volumes:
     - "dbdata:/data/db"
+    environment:
+    - GLIBC_TUNABLES=glibc.pthread.rseq=1
 volumes:
   dbdata:

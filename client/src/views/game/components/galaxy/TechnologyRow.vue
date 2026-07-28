@@ -1,71 +1,105 @@
 <template>
-<tr :class="{'defeated':technology.defeated}">
-    <td><player-icon :playerId="technology._id"/></td>
-    <td><a href="javascript:;" @click="onOpenPlayerDetailRequested">{{technology.alias}}</a></td>
-    <td><a href="javascript:;" @click="goToEmpire"><i class="far fa-eye"></i></a></td>
-    <td class="text-end" :class="displayStyle('scanning')">{{technology.scanning}}</td>
-    <td class="text-end" :class="displayStyle('hyperspace')">{{technology.hyperspace}}</td>
-    <td class="text-end" :class="displayStyle('terraforming')">{{technology.terraforming}}</td>
-    <td class="text-end" :class="displayStyle('experimentation')">{{technology.experimentation}}</td>
-    <td class="text-end" :class="displayStyle('weapons')">{{technology.weapons}}</td>
-    <td class="text-end" :class="displayStyle('banking')">{{technology.banking}}</td>
-    <td class="text-end" :class="displayStyle('manufacturing')">{{technology.manufacturing}}</td>
-    <td class="text-end" :class="displayStyle('specialists')">{{technology.specialists}}</td>
-</tr>
+  <tr :class="{ defeated: player.defeated }">
+    <td><player-icon :playerId="player._id" /></td>
+    <td>
+      <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{
+        player.alias
+      }}</a>
+    </td>
+    <td>
+      <a href="javascript:;" @click="goToEmpire"><i class="far fa-eye"></i></a>
+    </td>
+    <td class="text-end" :class="displayStyle('scanning')">
+      {{ formatTech(player.research?.scanning?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('hyperspace')">
+      {{ formatTech(player.research?.hyperspace?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('terraforming')">
+      {{ formatTech(player.research?.terraforming?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('experimentation')">
+      {{ formatTech(player.research?.experimentation?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('weapons')">
+      {{ formatTech(player.research?.weapons?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('banking')">
+      {{ formatTech(player.research?.banking?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('manufacturing')">
+      {{ formatTech(player.research?.manufacturing?.level) }}
+    </td>
+    <td class="text-end" :class="displayStyle('specialists')">
+      {{ formatTech(player.research?.specialists?.level) }}
+    </td>
+  </tr>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
-import PlayerIconVue from '../player/PlayerIcon.vue'
-import {eventBusInjectionKey} from "@/eventBus";
-import { inject } from 'vue';
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import GameHelper from "../../../../services/gameHelper";
+import PlayerIcon from "../player/PlayerIcon.vue";
+import { eventBusInjectionKey } from "@/eventBus";
+import { inject, computed } from "vue";
+import type { Game, Player } from "@/types/game";
+import type { ResearchTypeNotRandom } from "@solaris/common";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    player: Object,
-    userPlayer: Object,
-    technology: Object
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.technology._id)
-    },
-    goToEmpire (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.technology });
-    },
-    displayStyle(research) {
-      if (this.technology._id == this.userPlayer?._id) {
-        return {
-          "text-success": this.hasHighestTechLevel(research),
-          "text-danger": this.hasLowestTechLevel(research)
-        }
-      }
-    },
-    hasHighestTechLevel (research) {
-      return GameHelper.playerHasHighestTechLevel(
-        this.$store.state.game,
-        research,
-        this.userPlayer
-      );
-    },
-    hasLowestTechLevel (research) {
-      return GameHelper.playerHasLowestTechLevel(
-        this.$store.state.game,
-        research,
-        this.userPlayer
-      );
-    }
+const props = defineProps<{
+  player: Player;
+  userPlayer: Player | null;
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+
+const onOpenPlayerDetailRequested = () =>
+  emit("onOpenPlayerDetailRequested", props.player._id);
+
+const goToEmpire = () =>
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+    player: props.player,
+  });
+
+const formatTech = (n: number | undefined | null): string => {
+  if (n !== null && n !== undefined) {
+    return n.toString();
+  } else {
+    return "-";
   }
-}
+};
+
+const hasHighestTechLevel = (research: ResearchTypeNotRandom) => {
+  return GameHelper.playerHasHighestTechLevel(
+    game.value,
+    research,
+    props.userPlayer!,
+  );
+};
+
+const hasLowestTechLevel = (research: ResearchTypeNotRandom) => {
+  return GameHelper.playerHasLowestTechLevel(
+    game.value,
+    research,
+    props.userPlayer!,
+  );
+};
+
+const displayStyle = (research: ResearchTypeNotRandom) => {
+  if (props.player._id == props.userPlayer?._id) {
+    return {
+      "text-success": hasHighestTechLevel(research),
+      "text-danger": hasLowestTechLevel(research),
+    };
+  }
+};
 </script>
 
 <style scoped>

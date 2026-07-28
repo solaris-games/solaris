@@ -1,6 +1,10 @@
-import type {RandomGen} from "./random";
+import type { RandomGen } from "./random";
 
-export function getOrInsert<K, V>(map: Map<K, V>, key: K, defaultFunc: (arg0: K) => V): V {
+export function getOrInsert<K, V>(
+    map: Map<K, V>,
+    key: K,
+    defaultFunc: (arg0: K) => V,
+): V {
     let value = map.get(key);
     if (!value) {
         value = defaultFunc(key);
@@ -10,7 +14,7 @@ export function getOrInsert<K, V>(map: Map<K, V>, key: K, defaultFunc: (arg0: K)
 }
 
 export function intersectionOfSets<T>(a: Set<T>, b: Set<T>): Set<T> {
-    return new Set(Array.from(a).filter(x => b.has(x)));
+    return new Set(Array.from(a).filter((x) => b.has(x)));
 }
 
 export const maxBy = <T>(max: (a: T) => number, list: T[]): number => {
@@ -23,7 +27,7 @@ export const maxBy = <T>(max: (a: T) => number, list: T[]): number => {
     }
 
     return lastScore;
-}
+};
 
 export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
     let lastScore = Number.MAX_SAFE_INTEGER;
@@ -35,9 +39,12 @@ export const minBy = <T>(min: (a: T) => number, list: T[]): number => {
     }
 
     return lastScore;
-}
+};
 
-export const maxOf = <T>(max: (arg0: T) => number, list: T[]): T | undefined => {
+export const maxOf = <T>(
+    max: (arg0: T) => number,
+    list: T[],
+): T | undefined => {
     let lastScore = Number.MIN_SAFE_INTEGER;
     let largest: T | undefined = undefined;
 
@@ -50,9 +57,12 @@ export const maxOf = <T>(max: (arg0: T) => number, list: T[]): T | undefined => 
     }
 
     return largest;
-}
+};
 
-export const minOf = <T>(min: (arg0: T) => number, list: T[]): T | undefined => {
+export const minOf = <T>(
+    min: (arg0: T) => number,
+    list: T[],
+): T | undefined => {
     let lastScore = Number.MAX_SAFE_INTEGER;
     let smallest: T | undefined = undefined;
 
@@ -65,9 +75,11 @@ export const minOf = <T>(min: (arg0: T) => number, list: T[]): T | undefined => 
     }
 
     return smallest;
-}
+};
 
-export function reverseSort<A>(sorter: (a: A, b: A) => number): (a: A, b: A) => number {
+export function reverseSort<A>(
+    sorter: (a: A, b: A) => number,
+): (a: A, b: A) => number {
     return (a, b) => sorter(b, a);
 }
 
@@ -77,7 +89,7 @@ export function notNull<T>(val: T | null): val is T {
 
 export const notUndefined = <T>(val: T | undefined): val is T => {
     return val !== undefined;
-}
+};
 
 export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
     return (a, b) => {
@@ -88,7 +100,7 @@ export function sorterByProperty<T>(prop: keyof T): (a: T, b: T) => number {
         } else {
             return 0;
         }
-    }
+    };
 }
 
 export function shuffle<T>(rand: RandomGen, a: Array<T>) {
@@ -99,7 +111,10 @@ export function shuffle<T>(rand: RandomGen, a: Array<T>) {
     return a;
 }
 
-export const groupBy = <T, K>(list: T[], keyFunc: (item: T) => K): Map<K, T[]> => {
+export const groupBy = <T, K>(
+    list: T[],
+    keyFunc: (item: T) => K,
+): Map<K, T[]> => {
     const map = new Map<K, T[]>();
 
     for (const item of list) {
@@ -111,4 +126,4 @@ export const groupBy = <T, K>(list: T[], keyFunc: (item: T) => K): Map<K, T[]> =
     }
 
     return map;
-}
+};

@@ -1,89 +1,137 @@
 <template>
   <div class="mention-box">
-    <div class="mention-overlay bg-dark mb-1" v-if="suggestMentions && currentMention && currentMention.suggestions && currentMention.suggestions.length">
+    <div
+      class="mention-overlay bg-dark mb-1"
+      v-if="
+        suggestMentions &&
+        currentMention &&
+        currentMention.suggestions &&
+        currentMention.suggestions.length
+      "
+    >
       <ul>
-        <li v-for="(suggestion, index) in currentMention.suggestions" :class="{ selected: index === selectedSuggestion }" :key="suggestion" @click="() => useSuggestion(suggestion)">{{suggestion}}</li>
+        <li
+          v-for="(suggestion, index) in currentMention.suggestions"
+          :class="{ selected: index === selectedSuggestion }"
+          :key="suggestion"
+          @click="() => useSuggestion(suggestion)"
+        >
+          {{ suggestion }}
+        </li>
       </ul>
     </div>
     <div class="mb-2 mb-2">
-      <textarea class="form-control" id="txtMessage" :rows="rows" :placeholder="placeholderText" ref="messageElement" :value="modelValue" @input="onMessageChange" @keydown="onKeyDown" @keyup="updateSuggestions" @select="updateSuggestions" @focus="onFocus"></textarea>
+      <textarea
+        class="form-control"
+        id="txtMessage"
+        :rows="rows"
+        :placeholder="placeholderText"
+        ref="messageElement"
+        :value="modelValue"
+        @input="onMessageChange"
+        @keydown="onKeyDown"
+        @keyup="updateSuggestions"
+        @select="updateSuggestions"
+        @focus="onFocus"
+      ></textarea>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, ref, onMounted, onUnmounted, useTemplateRef, watch, computed } from 'vue';
-import MentionHelper, {type Mention} from '@/services/mentionHelper';
-import { useStore, type Store } from 'vuex';
-import { type State } from '@/store';
+import { useGameStore } from "@/stores/game";
+import {
+  inject,
+  ref,
+  onMounted,
+  onUnmounted,
+  useTemplateRef,
+  watch,
+  computed,
+} from "vue";
+import MentionHelper, { type Mention } from "@/services/mentionHelper";
 
 const props = defineProps<{
-  placeholder: string,
-  rows: number,
-  modelValue: string,
+  placeholder: string;
+  rows: number;
+  modelValue: string;
 }>();
 
-type Replace = { mention: Mention, text: string };
+type Replace = { mention: Mention; text: string };
 
 const emit = defineEmits<{
-  onSetMessageElement: [element: HTMLTextAreaElement],
-  onReplaceInMessage: [replace: Replace],
-  'update:modelValue': [value: string],
-  onFinish: [],
+  onSetMessageElement: [element: HTMLTextAreaElement];
+  onReplaceInMessage: [replace: Replace];
+  "update:modelValue": [value: string];
+  onFinish: [];
 }>();
 
-const store: Store<State> = useStore();
+const store = useGameStore();
 
 const suggestMentions = ref(false);
-const currentMention = ref<{ suggestions: string[], mention: Mention } | null>(null);
+const currentMention = ref<{ suggestions: string[]; mention: Mention } | null>(
+  null,
+);
 const selectedSuggestion = ref<number | null>(null);
 
-const placeholderText = computed(() => !suggestMentions.value ? `${props.placeholder}...` : `${props.placeholder}\nUse @ for players and # for stars.`);
+const placeholderText = computed(() =>
+  !suggestMentions.value
+    ? `${props.placeholder}...`
+    : `${props.placeholder}\nUse @ for players and # for stars.`,
+);
 
-watch(() => props.modelValue, (v: string) => {
-  if (!v || v === '') {
-    currentMention.value = null;
-  }
-});
+watch(
+  () => props.modelValue,
+  (v: string) => {
+    if (!v || v === "") {
+      currentMention.value = null;
+    }
+  },
+);
 
-const messageElement = useTemplateRef('messageElement');
+const messageElement = useTemplateRef("messageElement");
 
 const useSuggestion = (suggestion: string) => {
   if (suggestMentions.value && currentMention.value) {
     selectedSuggestion.value = null;
 
-    emit('onReplaceInMessage', {
+    emit("onReplaceInMessage", {
       mention: currentMention.value.mention,
-      text: suggestion
+      text: suggestion,
     });
   }
 };
 
 const onMessageChange = (e: Event) => {
-  emit('update:modelValue', (e.target as HTMLTextAreaElement).value);
+  emit("update:modelValue", (e.target as HTMLTextAreaElement).value);
 };
 
 const setSelectedSuggestion = (newSelected: number) => {
   const suggestions = currentMention.value?.suggestions?.length!;
 
-  selectedSuggestion.value = ((newSelected % suggestions) + suggestions) % suggestions;
+  selectedSuggestion.value =
+    ((newSelected % suggestions) + suggestions) % suggestions;
 };
 
 const onKeyDown = (e: KeyboardEvent) => {
-  const isEnterTabKey = e.key === 'Enter' || e.key === 'Tab'
+  const isEnterTabKey = e.key === "Enter" || e.key === "Tab";
 
   if (isEnterTabKey && (e.ctrlKey || e.metaKey)) {
     e.preventDefault();
     currentMention.value = null;
-    emit('onFinish');
-  } else if (suggestMentions.value && currentMention.value && selectedSuggestion.value !== null) {
+    emit("onFinish");
+  } else if (
+    suggestMentions.value &&
+    currentMention.value &&
+    selectedSuggestion.value !== null
+  ) {
     if (isEnterTabKey) {
       e.preventDefault();
       useSuggestion(currentMention.value.suggestions[selectedSuggestion.value]);
-    } else if (e.key === 'ArrowDown' || e.key === 'Tab') {
+    } else if (e.key === "ArrowDown" || e.key === "Tab") {
       e.preventDefault();
       setSelectedSuggestion(selectedSuggestion.value + 1);
-    } else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedSuggestion(selectedSuggestion.value - 1);
     }
@@ -91,19 +139,27 @@ const onKeyDown = (e: KeyboardEvent) => {
 };
 
 const onFocus = (e: FocusEvent) => {
-  emit('onSetMessageElement', e.target as HTMLTextAreaElement);
+  emit("onSetMessageElement", e.target as HTMLTextAreaElement);
 };
 
 const updateSuggestions = () => {
   if (suggestMentions.value) {
     const oldMention = currentMention.value;
 
-    currentMention.value = MentionHelper.getCurrentMention(store.state.game, messageElement.value!);
+    currentMention.value = MentionHelper.getCurrentMention(
+      store.game!,
+      messageElement.value!,
+    );
     const newSuggestions = currentMention.value?.suggestions?.length;
 
     if (oldMention && !currentMention.value) {
       selectedSuggestion.value = null; //Mention was left
-    } else if ((!oldMention || !oldMention.suggestions || !oldMention.suggestions.length) && newSuggestions) {
+    } else if (
+      (!oldMention ||
+        !oldMention.suggestions ||
+        !oldMention.suggestions.length) &&
+      newSuggestions
+    ) {
       selectedSuggestion.value = 0; //Mention was started
     }
 
@@ -115,8 +171,9 @@ const updateSuggestions = () => {
 };
 
 onMounted(() => {
-  emit('onSetMessageElement', messageElement.value as HTMLTextAreaElement);
-  suggestMentions.value = store.state.settings.interface.suggestMentions === 'enabled';
+  emit("onSetMessageElement", messageElement.value as HTMLTextAreaElement);
+  suggestMentions.value =
+    store.settings!.interface.suggestMentions === "enabled";
 });
 </script>
 

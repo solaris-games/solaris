@@ -1,39 +1,40 @@
 <template>
   <DialogModal
-  v-if="Boolean(props.dialogSettings)"
-  :cancelText="props.dialogSettings.cancelText"
-  :confirmText="props.dialogSettings.confirmText"
-  :hideCancelButton="props.dialogSettings.hideCancelButton"
-  :cover="props.dialogSettings.cover"
-  modalName="confirmModal"
-  :titleText="props.dialogSettings.titleText"
-  @onConfirm="onConfirm"
-  @onCancel="onCancel">
-    <p style="white-space: pre-wrap">{{props.dialogSettings.text}}</p>
+    :cancelText="props.dialogSettings?.cancelText || 'Cancel'"
+    :confirmText="props.dialogSettings?.confirmText || 'Confirm'"
+    :hideCancelButton="props.dialogSettings?.hideCancelButton || false"
+    :cover="props.dialogSettings?.cover || false"
+    modalName="confirmModal"
+    :titleText="props.dialogSettings?.titleText || ''"
+    @onConfirm="onConfirm"
+    @onCancel="onCancel"
+  >
+    <p style="white-space: pre-wrap">
+      {{ props.dialogSettings?.text || "" }}
+    </p>
+    <p v-for="p in props.dialogSettings?.additionalParagraphs">{{ p }}</p>
   </DialogModal>
 </template>
 
 <script setup lang="ts">
-import DialogModal from './DialogModal.vue'
+import DialogModal from "./DialogModal.vue";
+import type { ConfirmationDialogSettings } from "@/stores/confirmationDialog.ts";
 
 const props = defineProps<{
-  dialogSettings: {
-    titleText: string,
-    text: string,
-    confirmText: string,
-    cancelText: string,
-    hideCancelButton: boolean,
-    cover: boolean,
-    onConfirm: () => void,
-    onCancel: () => void
-  }
+  dialogSettings: ConfirmationDialogSettings | null;
 }>();
 
-const onConfirm = (e) => props.dialogSettings.onConfirm();
+const onConfirm = () => {
+  if (props.dialogSettings?.onConfirm) {
+    props.dialogSettings.onConfirm();
+  }
+};
 
-const onCancel = (e) => props.dialogSettings.onCancel();
+const onCancel = () => {
+  if (props.dialogSettings?.onCancel) {
+    props.dialogSettings.onCancel();
+  }
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

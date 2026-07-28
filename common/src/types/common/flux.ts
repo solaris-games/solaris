@@ -4,4 +4,4 @@ export interface Flux {
     month: string;
     description: string;
     tooltip: string;
-};
+}

@@ -1,131 +1,206 @@
 <template>
-<tr>
-  <td :style="{'width': '8px', 'background-color': getFriendlyColour(ledger.playerId)}"></td>
-  <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
-    <player-avatar @onClick="onOpenPlayerDetailRequested(ledger.playerId)" :player="getPlayer(ledger.playerId)"/>
-  </td>
-  <td class="ps-2 pt-3 pb-2">
-    <h5 class="alias-title">{{getPlayerAlias(ledger.playerId)}}</h5>
-  </td>
-  <td class="fit pt-3 pe-4">
-    <h5 :class="{'text-success':ledger.debt>0,'text-danger':ledger.debt<0}">{{getFormattedDebtValue()}}</h5>
-  </td>
-  <td class="fit pt-2 pb-2 pe-2">
-    <button class="btn btn-danger" :class="{'btn-outline-danger':!canSettleDebt}" :disabled="!canSettleDebt" @click="settleDebt(ledger)" title="Settle your debt to this player"><i class="fas fa-money-check-alt"></i></button>
-    <button class="btn btn-success ms-1" :class="{'btn-outline-success':!canForgiveDebt}" :disabled="!canForgiveDebt" @click="forgiveDebt(ledger)" title="Forgive this player's debt to you"><i class="fas fa-hands-helping"></i></button>
-  </td>
-</tr>
+  <tr>
+    <td
+      :style="{
+        width: '8px',
+        'background-color': getFriendlyColour(ledger.playerId),
+      }"
+    ></td>
+    <td class="col-avatar" :title="getPlayerAlias(ledger.playerId)">
+      <player-avatar
+        @onClick="onOpenPlayerDetailRequested(ledger.playerId)"
+        :player="getPlayer(ledger.playerId)"
+      />
+    </td>
+    <td class="ps-2 pt-3 pb-2">
+      <h5 class="alias-title">{{ getPlayerAlias(ledger.playerId) }}</h5>
+    </td>
+    <td class="fit pt-3 pe-4">
+      <h5
+        :class="{
+          'text-success': ledger.debt > 0,
+          'text-danger': ledger.debt < 0,
+        }"
+      >
+        {{ getFormattedDebtValue() }}
+      </h5>
+    </td>
+    <td class="fit pt-2 pb-2 pe-2">
+      <button
+        class="btn btn-danger"
+        :class="{ 'btn-outline-danger': !canSettleDebt }"
+        :disabled="!canSettleDebt"
+        @click="settleDebt(ledger)"
+        title="Settle your debt to this player"
+      >
+        <i class="fas fa-money-check-alt"></i>
+      </button>
+      <button
+        class="btn btn-success ms-1"
+        :class="{ 'btn-outline-success': !canForgiveDebt }"
+        :disabled="!canForgiveDebt"
+        @click="forgiveDebt(ledger)"
+        title="Forgive this player's debt to you"
+      >
+        <i class="fas fa-hands-helping"></i>
+      </button>
+    </td>
+  </tr>
 </template>
 
-<script>
-import PlayerAvatarVue from '../menu/PlayerAvatar.vue'
-import LedgerApiService from '../../../../services/api/ledger'
-import gameHelper from '../../../../services/gameHelper'
+<script setup lang="ts">
+import { ref, computed, inject } from "vue";
+import PlayerAvatar from "../menu/PlayerAvatar.vue";
+import gameHelper from "../../../../services/gameHelper";
+import type { LedgerType, PlayerLedgerDebt } from "@solaris/common";
+import type { Game } from "@/types/game";
+import { useConfirm } from "@/hooks/confirm.ts";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import {
+  forgiveLedgerCredits,
+  forgiveLedgerSpecialistTokens,
+  settleLedgerCredits,
+  settleLedgerSpecialistTokens,
+} from "@/services/typedapi/ledger";
+import { useColourStore } from "@/stores/colour";
+import { useGameStore } from "@/stores/game";
 
-export default {
-  components: {
-    'player-avatar': PlayerAvatarVue
-  },
-  props: {
-    'ledger': Object,
-    'ledgerType': String
-  },
-  methods: {
-    getPlayer (playerId) {
-      return gameHelper.getPlayerById(this.$store.state.game, playerId)
-    },
-    getPlayerAlias (playerId) {
-      return this.getPlayer(playerId).alias
-    },
-    getFriendlyColour (playerId) {
-      return this.$store.getters.getColourForPlayer(playerId).value
-    },
-    onOpenPlayerDetailRequested(playerId) {
-      this.$emit('onOpenPlayerDetailRequested', playerId)
-    },
-    async forgiveDebt (ledger) {
-      let playerAlias = this.getPlayerAlias(ledger.playerId)
+import { useToast } from "vue-toast-notification";
+const props = defineProps<{
+  ledger: PlayerLedgerDebt<string>;
+  ledgerType: LedgerType;
+}>();
 
-      if (await this.$confirm('Forgive debt', `Are you sure you want to forgive the debt of ${this.getFormattedDebtValue(true)} that ${playerAlias} owes you?`)) {
-        try {
-          ledger.isForgivingDebt = true
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
 
-          let response = this.ledgerType === 'credits' ?
-            await LedgerApiService.forgiveDebtCredits(this.$store.state.game._id, ledger.playerId) :
-            await LedgerApiService.forgiveDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
+const httpClient = inject(httpInjectionKey)!;
+const toast = useToast();
 
-          if (response.status === 200) {
-            this.$toast.success(`The debt ${playerAlias} owes you has been forgiven.`)
-          }
+const store = useGameStore();
+const confirm = useConfirm();
+const colourStore = useColourStore();
+const game = computed<Game>(() => store.game!);
 
-          // This may not be necessary as the entire ledger appears to get reloaded when debt is forgiven.
-          ledger.debt = response.data.ledger.debt
-        } catch (err) {
-          console.error(err)
-        }
+const isLoading = ref(false);
 
-        ledger.isForgivingDebt = false
-      }
-    },
-    async settleDebt (ledger) {
-      let playerAlias = this.getPlayerAlias(ledger.playerId)
+const isGameFinished = computed(() => gameHelper.isGameFinished(game.value));
 
-      if (await this.$confirm('Settle debt', `Are you sure you want to settle the debt of ${this.getFormattedDebtValue(true)} that you owe to ${playerAlias}?`)) {
-        try {
-          ledger.isSettlingDebt = true
+const canSettleDebt = computed(
+  () =>
+    props.ledger.debt < 0 &&
+    !isLoading.value &&
+    (props.ledgerType === "credits"
+      ? gameHelper.getUserPlayer(game.value)!.credits
+      : gameHelper.getUserPlayer(game.value)!.creditsSpecialists) > 0 &&
+    !isGameFinished.value,
+);
 
-          const isCredits = this.ledgerType === 'credits'
+const canForgiveDebt = computed(
+  () => props.ledger.debt > 0 && !isGameFinished.value && !isLoading.value,
+);
 
-          let response = isCredits ?
-            await LedgerApiService.settleDebtCredits(this.$store.state.game._id, ledger.playerId) :
-            await LedgerApiService.settleDebtCreditsSpecialists(this.$store.state.game._id, ledger.playerId)
+const getPlayer = (playerId: string) =>
+  gameHelper.getPlayerById(game.value, playerId)!;
 
-          if (response.status === 200) {
-            this.$toast.success(`You have paid off ${(response.data.ledger.debt !== 0 ? 'some of the' : 'the')} debt that you owe${(response.data.ledger.debt !== 0 ? '' : 'd')} to ${playerAlias}.`)
-          }
+const getPlayerAlias = (playerId: string) => getPlayer(playerId).alias;
 
-          let debtPaidOff = Math.abs(ledger.debt) - Math.abs(response.data.ledger.debt);
+const getFriendlyColour = (playerId: string) =>
+  colourStore.getColourForPlayer(game.value, playerId)!.value;
 
-          if (isCredits) {
-            gameHelper.getUserPlayer(this.$store.state.game).credits -= debtPaidOff;
-          } else {
-            gameHelper.getUserPlayer(this.$store.state.game).creditsSpecialists -= debtPaidOff;
-          }
+const onOpenPlayerDetailRequested = (playerId: string) =>
+  emit("onOpenPlayerDetailRequested", playerId);
 
-          // This may not be necessary as the entire ledger appears to get reloaded when debt is settled.
-          ledger.debt = response.data.ledger.debt;
-        } catch (err) {
-          console.error(err)
-        }
-
-        ledger.isSettlingDebt = false
-      }
-    },
-    getFormattedDebtValue(withText = false) {
-      if (this.ledgerType === 'credits') {
-        return `$${this.ledger.debt}`
-      }
-
-      return `${this.ledger.debt}${withText ? ' specialist token(s)' : ''}`
-    }
-  },
-  computed: {
-    isGameFinished: function () {
-      return gameHelper.isGameFinished(this.$store.state.game)
-    },
-    canSettleDebt () {
-      return this.ledger.debt < 0 && (this.ledgerType === 'credits' ? gameHelper.getUserPlayer(this.$store.state.game).credits : gameHelper.getUserPlayer(this.$store.state.game).creditsSpecialists) > 0 && !this.ledger.isSettlingDebt && !this.isGameFinished
-    },
-    canForgiveDebt () {
-      return this.ledger.debt > 0 && !this.ledger.isForgivingDebt && !this.isGameFinished
-    }
+const getFormattedDebtValue = (withText = false) => {
+  if (props.ledgerType === "credits") {
+    return `$${props.ledger.debt}`;
   }
-}
+
+  return `${props.ledger.debt}${withText ? " specialist token(s)" : ""}`;
+};
+
+const forgiveDebt = async (ledger: PlayerLedgerDebt<string>) => {
+  const playerAlias = getPlayerAlias(ledger.playerId);
+
+  if (
+    !(await confirm(
+      "Forgive debt",
+      `Are you sure you want to forgive the debt of ${getFormattedDebtValue(true)} that ${playerAlias} owes you?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const response =
+    props.ledgerType === "credits"
+      ? await forgiveLedgerCredits(httpClient)(game.value._id, ledger.playerId)
+      : await forgiveLedgerSpecialistTokens(httpClient)(
+          game.value._id,
+          ledger.playerId,
+        );
+
+  if (isOk(response)) {
+    toast.success(`The debt ${playerAlias} owes you has been forgiven.`);
+    ledger.debt = response.data.ledger.debt;
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
+
+const settleDebt = async (ledger: PlayerLedgerDebt<string>) => {
+  const playerAlias = getPlayerAlias(ledger.playerId);
+
+  if (
+    !(await confirm(
+      "Settle debt",
+      `Are you sure you want to settle the debt of ${getFormattedDebtValue(true)} that you owe to ${playerAlias}?`,
+    ))
+  ) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  const isCredits = props.ledgerType === "credits";
+
+  const response = isCredits
+    ? await settleLedgerCredits(httpClient)(game.value._id, ledger.playerId)
+    : await settleLedgerSpecialistTokens(httpClient)(
+        game.value._id,
+        ledger.playerId,
+      );
+
+  if (isOk(response)) {
+    toast.success(
+      `You have paid off ${response.data.ledger.debt !== 0 ? "some of the" : "the"} debt that you owe${response.data.ledger.debt !== 0 ? "" : "d"} to ${playerAlias}.`,
+    );
+
+    const debtPaidOff =
+      Math.abs(ledger.debt) - Math.abs(response.data.ledger.debt);
+
+    if (isCredits) {
+      gameHelper.getUserPlayer(game.value)!.credits -= debtPaidOff;
+    } else {
+      gameHelper.getUserPlayer(game.value)!.creditsSpecialists -= debtPaidOff;
+    }
+
+    ledger.debt = response.data.ledger.debt;
+  } else {
+    console.error(formatError(response));
+  }
+
+  isLoading.value = false;
+};
 </script>
 
 <style scoped>
 .col-avatar {
-  position:absolute;
+  position: absolute;
   width: 59px;
   height: 59px;
   cursor: pointer;
@@ -146,8 +221,8 @@ td {
 
 .table td.fit,
 .table th.fit {
-    white-space: nowrap;
-    width: 1%;
+  white-space: nowrap;
+  width: 1%;
 }
 
 @media screen and (max-width: 576px) {

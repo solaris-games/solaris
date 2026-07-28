@@ -5,16 +5,8 @@
   </div>
 </template>
 
-<script>
-export default {
-  methods: {
-    errors () {
-      return window?._solaris?.errors || [];
-    }
-  }
-}
+<script setup lang="ts">
+const errors = () => window?._solaris?.errors || [];
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

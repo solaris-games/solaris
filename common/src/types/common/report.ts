@@ -3,7 +3,7 @@ export interface ReportReasons {
     spamming: boolean;
     multiboxing: boolean;
     inappropriateAlias: boolean;
-};
+}
 
 export interface Report<ID> {
     _id: ID;
@@ -20,4 +20,4 @@ export interface Report<ID> {
     actioned: boolean;
     actionedBy: ID | null;
     date: Date;
-};
+}

@@ -4,4 +4,4 @@ export interface UserLevel {
     rankPoints: number;
     rankPointsNext?: number | null;
     rankPointsProgress?: number | null;
-};
+}

@@ -1,107 +1,105 @@
 <template>
-<div class="container-fluid header-bar-bg pt-2 pb-2 footer-bar">
+  <div class="container-fluid header-bar-bg pt-2 pb-2 footer-bar">
     <div class="row g-0">
-        <div class="col" v-if="!userPlayer && gameIsJoinable">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.WELCOME)">
-            <i class="fas fa-handshake"></i>
-          </button>
-        </div>
-        <div class="col" v-if="userPlayer">
-          <button class="btn" @click="panToHomeStar()">
-            <i class="fas fa-home"></i>
-          </button>
-        </div>
-        <div class="col" v-if="userPlayer">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.RESEARCH)">
-            <i class="fas fa-flask"></i>
-          </button>
-        </div>
-        <div class="col">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.GALAXY)">
-            <i class="fas fa-sun"></i>
-          </button>
-        </div>
-        <div class="col" v-if="isLoggedIn && !isDarkModeExtra && !isDataCleaned && (gameIsInProgress || gameIsFinished)">
-          <button class="btn" v-on:click="setMenuState(MENU_STATES.INTEL)">
-            <i class="fas fa-chart-line"></i>
-          </button>
-        </div>
-        <div class="col">
-          <hamburger-menu :dropType="'dropup'" />
-        </div>
+      <div class="col" v-if="!userPlayer && gameIsJoinable">
+        <button class="btn" v-on:click="setMenuState({ state: 'welcome' })">
+          <i class="fas fa-handshake"></i>
+        </button>
+      </div>
+      <div class="col" v-if="userPlayer">
+        <button class="btn" @click="panToHomeStar()">
+          <i class="fas fa-home"></i>
+        </button>
+      </div>
+      <div class="col" v-if="userPlayer">
+        <button class="btn" v-on:click="setMenuState({ state: 'research' })">
+          <i class="fas fa-flask"></i>
+        </button>
+      </div>
+      <div class="col">
+        <button
+          class="btn"
+          v-on:click="setMenuState({ state: 'galaxy', menu: undefined })"
+        >
+          <i class="fas fa-sun"></i>
+        </button>
+      </div>
+      <div
+        class="col"
+        v-if="
+          isLoggedIn &&
+          !isDarkModeExtra &&
+          !isDataCleaned &&
+          (gameIsInProgress || gameIsFinished)
+        "
+      >
+        <button class="btn" v-on:click="setMenuState({ state: 'intel' })">
+          <i class="fas fa-chart-line"></i>
+        </button>
+      </div>
+      <div class="col">
+        <hamburger-menu :dropType="'dropup'" />
+      </div>
     </div>
-</div>
+  </div>
 </template>
 
-<script>
-import GameHelper from '../../../../services/gameHelper'
-import MENU_STATES from '../../../../services/data/menuStates'
-import HamburgerMenuVue from './HamburgerMenu.vue'
-import {eventBusInjectionKey} from "@/eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+<script setup lang="ts">
+import GameHelper from "../../../../services/gameHelper";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import { eventBusInjectionKey } from "@/eventBus";
+import { inject, computed } from "vue";
+import type { Game } from "@/types/game";
+import { useUserStore } from "@/stores/user";
+import HamburgerMenu from "@/views/game/components/menu/HamburgerMenu.vue";
+import { useGameStore } from "@/stores/game";
+import type { MenuState } from "@/types/menu.ts";
 
-export default {
-  components: {
-    'hamburger-menu': HamburgerMenuVue
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  data () {
-    return {
-      MENU_STATES: MENU_STATES
-    }
-  },
-  methods: {
-    setMenuState (state, args) {
-      this.$store.commit('setMenuState', {
-        state,
-        args
-      })
-    },
-    panToHomeStar () {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToUser, {});
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
 
-      if (this.userPlayer) {
-        this.$emit('onOpenPlayerDetailRequested', this.userPlayer._id)
-      }
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    gameIsInProgress () {
-      return GameHelper.isGameInProgress(this.$store.state.game)
-    },
-    gameIsFinished () {
-      return GameHelper.isGameFinished(this.$store.state.game)
-    },
-    gameIsJoinable () {
-      return !this.gameIsInProgress && !this.gameIsFinished
-    },
-    userPlayer () {
-      return GameHelper.getUserPlayer(this.$store.state.game)
-    },
-    isLoggedIn () {
-      return this.$store.state.userId != null
-    },
-    isDarkModeExtra () {
-      return GameHelper.isDarkModeExtra(this.$store.state.game)
-    },
-    isDataCleaned () {
-      return this.$store.state.game.state.cleaned
-    }
+const eventBus = inject(eventBusInjectionKey)!;
+
+const store = useGameStore();
+const userStore = useUserStore();
+const game = computed<Game>(() => store.game!);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
+const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const gameIsInProgress = computed(() =>
+  GameHelper.isGameInProgress(game.value),
+);
+const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
+const gameIsJoinable = computed(
+  () => !gameIsInProgress.value && !gameIsFinished.value,
+);
+const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
+const isDataCleaned = computed(() => game.value.state.cleaned);
+
+const setMenuState = (state: MenuState) => {
+  store.setMenuState(state);
+};
+
+const panToHomeStar = () => {
+  if (userPlayer.value) {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+      player: GameHelper.getUserPlayer(store.game!),
+    });
+
+    emit("onOpenPlayerDetailRequested", userPlayer.value._id);
   }
-}
+};
 </script>
 
 <style scoped>
+.footer-bar {
+  position: relative;
+  background-color: rgba(29, 40, 53, 0.98);
+  z-index: 200;
+}
+
 .pointer {
-  cursor:pointer;
+  cursor: pointer;
 }
 
 .col {

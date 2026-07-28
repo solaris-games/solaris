@@ -1,16 +1,16 @@
-import moment from "moment";
+import { DateTime } from "luxon";
 import CarrierService from "../services/carrier";
 import GameStateService from "../services/gameState";
-import { GameTypeService } from 'solaris-common'
+import { GameTypeService } from "@solaris/common";
 import PlayerService from "../services/player";
-import PlayerAfkService from "../services/playerAfk"
+import PlayerAfkService from "../services/playerAfk";
 import Repository from "../services/repository";
 import StarService from "../services/star";
 import { Game } from "../services/types/Game";
 import { Player } from "../services/types/Player";
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-describe('Player AFK Service', () => {
+describe("Player AFK Service", () => {
     let service: PlayerAfkService;
 
     let game: Game;
@@ -26,121 +26,138 @@ describe('Player AFK Service', () => {
         gameStateService = {
             isStarted(game: Game) {
                 return true;
-            }
+            },
         } as GameStateService;
 
         gameTypeService = {
             isTurnBasedGame(game: Game) {
                 return false;
-            }
+            },
         } as GameTypeService;
 
         game = {
             state: {
-                startDate: moment().utc().toDate()
+                startDate: DateTime.utc().toJSDate(),
             },
             settings: {
                 galaxy: {
-                    productionTicks: 20
+                    productionTicks: 20,
                 },
                 gameTime: {
                     speed: 1800,
                     afk: {
                         lastSeenTimeout: 2,
                         turnTimeout: 3,
-                        cycleTimeout: 4
-                    }
-                }
-            }
+                        cycleTimeout: 4,
+                    },
+                },
+            },
         } as Game;
 
         player = {
             defeated: false,
             afk: false,
             userId: new mongoose.Types.ObjectId(),
-            lastSeen: null
+            lastSeen: null,
         } as Player;
 
-        // @ts-ignore
-        service = new PlayerAfkService(gameRepo, playerService, starService, carrierService, gameTypeService, gameStateService);
+        service = new PlayerAfkService(
+            // @ts-ignore
+            gameRepo, // @ts-ignore
+            playerService, // @ts-ignore
+            starService, // @ts-ignore
+            carrierService,
+            gameTypeService,
+            gameStateService,
+        );
     });
 
-    describe('Is AI Controlled', () => {
-        it('should return true if the player is defeated', () => {
+    describe("Is AI Controlled", () => {
+        it("should return true if the player is defeated", () => {
             player.defeated = true;
             player.userId = new mongoose.Types.ObjectId();
 
             const result = service.isAIControlled(game, player);
-    
+
             expect(result).toBeTrue();
         });
 
-        it('should return true if the player is not controlled by a user', () => {
+        it("should return true if the player is not controlled by a user", () => {
             player.defeated = false;
             player.userId = null;
 
             const result = service.isAIControlled(game, player);
-    
+
             expect(result).toBeTrue();
         });
 
-        it('should return false if the player is controlled by a user and is not defeated', () => {
+        it("should return false if the player is controlled by a user and is not defeated", () => {
             player.defeated = false;
             player.userId = new mongoose.Types.ObjectId();
 
             const result = service.isAIControlled(game, player);
-    
+
             expect(result).toBeFalse();
         });
     });
 
-    describe('Is AFK', () => {
-        it('should return true if the player is already afk', () => {
+    describe("Is AFK", () => {
+        it("should return true if the player is already afk", () => {
             player.afk = true;
-            
+
             const result = service.isAfk(game, player);
-    
+
             expect(result).toBeTrue();
         });
 
-        it('should return true if the player has not been seen for the last seen timeout', () => {
-            player.lastSeen = moment().utc().subtract(game.settings.gameTime.afk.lastSeenTimeout, 'days').toDate();
-            
+        it("should return true if the player has not been seen for the last seen timeout", () => {
+            player.lastSeen = DateTime.utc()
+                .minus({ days: game.settings.gameTime.afk.lastSeenTimeout })
+                .toJSDate();
+
             const result = service.isAfk(game, player);
-    
+
             expect(result).toBeTrue();
         });
 
-        it('should return true if the player has missed too many turns', () => {
-            gameTypeService.isTurnBasedGame = ((game: Game) => { return true; }) as any;
+        it("should return true if the player has missed too many turns", () => {
+            gameTypeService.isTurnBasedGame = ((game: Game) => {
+                return true;
+            }) as any;
 
-            player.lastSeen = moment().utc().toDate();
+            player.lastSeen = DateTime.utc().toJSDate();
             player.missedTurns = game.settings.gameTime.afk.turnTimeout;
-            
+
             const result = service.isAfk(game, player);
 
             expect(result).toBeTrue();
         });
 
-        it('should return true if the player has missed too many cycles', () => {
-            const seconds = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
+        it("should return true if the player has missed too many cycles", () => {
+            const seconds =
+                game.settings.galaxy.productionTicks *
+                game.settings.gameTime.speed *
+                game.settings.gameTime.afk.cycleTimeout;
 
-            player.lastSeen = moment().utc().subtract(seconds, 'seconds').toDate();
-            
+            player.lastSeen = DateTime.utc().minus({ seconds }).toJSDate();
+
             const result = service.isAfk(game, player);
 
             expect(result).toBeTrue();
         });
 
-        it('should return false if the player has missed too many cycles but seen less than 12h ago', () => {
+        it("should return false if the player has missed too many cycles but seen less than 12h ago", () => {
             game.settings.galaxy.productionTicks = 1;
             game.settings.gameTime.speed = 30;
             game.settings.gameTime.afk.cycleTimeout = 1;
 
-            const seconds = game.settings.galaxy.productionTicks * game.settings.gameTime.speed * game.settings.gameTime.afk.cycleTimeout;
+            const seconds =
+                game.settings.galaxy.productionTicks *
+                game.settings.gameTime.speed *
+                game.settings.gameTime.afk.cycleTimeout;
 
-            player.lastSeen = moment().utc().subtract(seconds, 'seconds').toDate();
-            
+            player.lastSeen = DateTime.utc().minus({ seconds }).toJSDate();
+
             const result = service.isAfk(game, player);
 
             expect(result).toBeFalse();

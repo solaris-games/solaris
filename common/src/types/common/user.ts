@@ -1,11 +1,11 @@
-import {type UserGameSettings} from "./settings";
-import {type UserSubscriptions} from "./subscriptions";
-import {type Statistics} from "./stats";
+import { type UserGameSettings } from "./settings";
+import { type UserSubscriptions } from "./subscriptions";
+import { type Statistics } from "./stats";
 
 export type UserWarning = {
-    text: string,
-    date: Date,
-}
+    text: string;
+    date: Date;
+};
 
 export type UserRoles = {
     administrator: boolean;
@@ -25,7 +25,7 @@ export type AwardedBadge<ID> = {
     awardedInGameName: string | null;
     playerAwarded: boolean;
     time: Date | null;
-}
+};
 
 export interface UserLevel {
     id: number;
@@ -35,7 +35,7 @@ export interface UserLevel {
     rankPointsProgress?: number | null;
 }
 
-export type  UserAchievements<ID> = {
+export type UserAchievements<ID> = {
     victories: number;
     victories1v1: number;
     level: number;
@@ -48,20 +48,20 @@ export type  UserAchievements<ID> = {
     defeated1v1: number;
     afk: number;
     renownSent: number;
-    stats: Statistics,
-    legacyStats: Statistics,
+    stats: Statistics;
+    legacyStats: Statistics;
     badges: AwardedBadge<ID>[];
-}
+};
 
 export type UserPublic<ID> = {
-    _id: ID,
+    _id: ID;
     username: string;
     guildId: ID | null;
-    roles: UserRoles,
-    level?: UserLevel,
+    roles: UserRoles;
+    level?: UserLevel;
     achievements: UserAchievements<ID>;
     signupDate: Date | null;
-}
+};
 
 export type UserPrivate<ID> = UserPublic<ID> & {
     email: string;
@@ -77,13 +77,13 @@ export type UserPrivate<ID> = UserPublic<ID> & {
     isAnonymous: boolean;
     warnings: UserWarning[];
     lastReadAnnouncement: ID | null;
-    gameSettings: UserGameSettings,
+    gameSettings: UserGameSettings;
     avatars: number[];
     oauth: {
         discord?: {
             userId?: string;
-        }
+        };
     };
     subscriptions: UserSubscriptions;
     tutorialsCompleted?: string[];
-}
+};

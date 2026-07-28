@@ -1,9 +1,8 @@
 import { UserLevel } from "./types/UserLevel";
 
-const ranks = require('../config/game/levels.json') as UserLevel[];
+const ranks = require("../config/game/levels.json") as UserLevel[];
 
 export default class UserLevelService {
-
     getByRankPoints(rankPoints: number): UserLevel {
         const sortedRanks = ranks.sort((a, b) => a.rankPoints - b.rankPoints);
 
@@ -16,18 +15,18 @@ export default class UserLevelService {
                 let rankPointsProgress: number | null = null;
 
                 if (rankPointsNext != null) {
-                    rankPointsProgress = rankPointsNext - rankPoints - rank.rankPoints
+                    rankPointsProgress =
+                        rankPointsNext - rankPoints - rank.rankPoints;
                 }
 
                 return {
                     ...rank,
                     rankPointsNext,
-                    rankPointsProgress
+                    rankPointsProgress,
                 };
             }
         }
 
         return sortedRanks[0];
     }
-
-};
+}

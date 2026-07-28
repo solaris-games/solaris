@@ -1,10 +1,10 @@
-import type {Statistics} from "./stats";
+import type { Statistics } from "./stats";
 
 export type StatsSlice<ID> = {
-    _id: ID,
-    playerId: ID,
-    gameId: ID,
-    closed: boolean,
-    processed: boolean,
-    stats: Statistics,
-}
+    _id: ID;
+    playerId: ID;
+    gameId: ID;
+    closed: boolean;
+    processed: boolean;
+    stats: Statistics;
+};

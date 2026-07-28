@@ -1,10 +1,10 @@
-import {RandomGen} from "solaris-common";
+import { RandomGen } from "@solaris/common";
 
-const randomSeeded = require('random-seed');
+import randomSeeded from "random-seed";
 
 export class MathRandomGen implements RandomGen {
     getRandomNumber(max: number): number {
-        return Math.floor(Math.random() * (max + 1))
+        return Math.floor(Math.random() * (max + 1));
     }
 
     getRandomNumberBetween(min: number, max: number): number {
@@ -17,7 +17,7 @@ export class MathRandomGen implements RandomGen {
 }
 
 export class SeededRandomGen implements RandomGen {
-    private rg: any;
+    private rg: randomSeeded.RandomSeed;
 
     constructor(seed: string) {
         this.rg = randomSeeded.create(seed);
@@ -25,7 +25,7 @@ export class SeededRandomGen implements RandomGen {
     }
 
     getRandomNumber(max: number): number {
-        return Math.floor(this.random() * (max + 1))
+        return Math.floor(this.random() * (max + 1));
     }
 
     getRandomNumberBetween(min: number, max: number): number {

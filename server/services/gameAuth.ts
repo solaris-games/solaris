@@ -1,5 +1,5 @@
-import {Game} from "./types/Game";
-import {DBObjectId} from "./types/DBObjectId";
+import { Game } from "./types/Game";
+import { DBObjectId } from "./types/DBObjectId";
 import UserService from "./user";
 
 export default class GameAuthService {
@@ -9,7 +9,10 @@ export default class GameAuthService {
         this.userService = userService;
     }
 
-    async isGameAdmin(game: Game, userId: DBObjectId | null | undefined): Promise<boolean> {
+    async isGameAdmin(
+        game: Game,
+        userId: DBObjectId | null | undefined,
+    ): Promise<boolean> {
         if (!userId) {
             return false;
         }
@@ -19,7 +22,10 @@ export default class GameAuthService {
         }
 
         if (game.settings.general.createdByUserId) {
-            return game.settings.general.createdByUserId.toString() === userId.toString();
+            return (
+                game.settings.general.createdByUserId.toString() ===
+                userId.toString()
+            );
         }
 
         return false;

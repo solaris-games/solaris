@@ -1,9 +1,7 @@
 export default class PasswordService {
     bcrypt;
 
-    constructor(
-        bcrypt
-    ) {
+    constructor(bcrypt) {
         this.bcrypt = bcrypt;
     }
 
@@ -14,4 +12,4 @@ export default class PasswordService {
     async compare(password1: string, password2: string) {
         return await this.bcrypt.compare(password1, password2);
     }
-};
+}

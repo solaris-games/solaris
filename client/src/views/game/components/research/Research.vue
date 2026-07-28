@@ -1,47 +1,55 @@
 <template>
-<div class="menu-page container">
+  <div class="menu-page container">
     <menu-title title="Research" @onCloseRequested="onCloseRequested">
-        <a :href="documentationUrl + '/technology.html'" target="_blank" class="btn btn-outline-info btn-sm" title="Documentation"><i class="far fa-question-circle"></i></a>
+      <a
+        :href="documentationUrl + '/technology.html'"
+        target="_blank"
+        class="btn btn-outline-info btn-sm"
+        title="Documentation"
+        ><i class="far fa-question-circle"></i
+      ></a>
     </menu-title>
 
-    <p><small>Each point of science on your stars contributes <span class="text-info">{{game.constants.research.sciencePointMultiplier}} point<span v-if="game.constants.research.sciencePointMultiplier > 1">s</span></span> of research every tick towards your chosen technology.</small></p>
+    <p>
+      <small
+        >Each point of science on your stars contributes
+        <span class="text-info"
+          >{{ game.constants.research.sciencePointMultiplier }} point<span
+            v-if="game.constants.research.sciencePointMultiplier > 1"
+            >s</span
+          ></span
+        >
+        of research every tick towards your chosen technology.</small
+      >
+    </p>
 
-    <selection/>
+    <selection />
 
     <h4 class="mt-2">Research Progress</h4>
 
-    <progress-summary/>
-
-    <!-- TODO: Explanations of each research type -->
-</div>
+    <progress-summary />
+  </div>
 </template>
 
-<script>
-import MenuTitle from '../MenuTitle.vue'
-import Selection from './Selection.vue'
-import ProgressSummary from './ProgressSummary.vue'
+<script setup lang="ts">
+import { useGameStore } from "@/stores/game";
+import { computed } from "vue";
+import MenuTitle from "../MenuTitle.vue";
+import Selection from "./Selection.vue";
+import ProgressSummary from "./ProgressSummary.vue";
+import type { Game } from "@/types/game";
 
-export default {
-  components: {
-    'menu-title': MenuTitle,
-    'selection': Selection,
-    'progress-summary': ProgressSummary
-  },
-  methods: {
-    onCloseRequested (e) {
-      this.$emit('onCloseRequested', e)
-    }
-  },
-  computed: {
-    game () {
-      return this.$store.state.game
-    },
-    documentationUrl () {
-      return import.meta.env.VUE_APP_DOCUMENTATION_URL
-    }
-  }
-}
+const emit = defineEmits<{
+  onCloseRequested: [];
+}>();
+
+const onCloseRequested = () => emit("onCloseRequested");
+
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+const documentationUrl = computed(
+  () => import.meta.env.VUE_APP_DOCUMENTATION_URL,
+);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

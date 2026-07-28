@@ -1,9 +1,8 @@
 import { Config } from "../config/types/Config";
 
-const cache = require('memory-cache');
+const cache = require("memory-cache");
 
 export default class CacheService {
-    
     config: Config;
 
     constructor(config: Config) {
@@ -25,5 +24,4 @@ export default class CacheService {
 
         return null;
     }
-    
-};
+}

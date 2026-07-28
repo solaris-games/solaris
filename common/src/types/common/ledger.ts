@@ -1,4 +1,4 @@
 export enum LedgerType {
-    Credits = 'credits',
-    CreditsSpecialists = 'creditsSpecialists'
+    Credits = "credits",
+    CreditsSpecialists = "creditsSpecialists",
 }

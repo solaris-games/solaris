@@ -1,46 +1,49 @@
 <template>
-<tr :class="{'defeated':empire.defeated}">
-    <td><player-icon :playerId="empire._id"/></td>
-    <td><a href="javascript:;" @click="onOpenPlayerDetailRequested">{{empire.alias}}</a></td>
-    <td><a href="javascript:;" @click="goToEmpire"><i class="far fa-eye"></i></a></td>
-    <td class="text-end">{{empire.totalStars}}</td>
-    <td class="text-end">{{empire.totalCarriers}}</td>
-    <td class="text-end">{{empire.totalSpecialists}}</td>
-    <td class="text-end">{{empire.totalShips}}</td>
-    <td class="text-end">{{empire.newShips}}</td>
-    <td class="text-end text-success">{{empire.totalEconomy}}</td>
-    <td class="text-end text-warning">{{empire.totalIndustry}}</td>
-    <td class="text-end text-info">{{empire.totalScience}}</td>
-</tr>
+  <tr :class="{ defeated: empire.defeated }">
+    <td><player-icon :playerId="empire._id" /></td>
+    <td>
+      <a href="javascript:;" @click="onOpenPlayerDetailRequested">{{
+        empire.alias
+      }}</a>
+    </td>
+    <td>
+      <a href="javascript:;" @click="goToEmpire"><i class="far fa-eye"></i></a>
+    </td>
+    <td class="text-end">{{ empire.stats!.totalStars }}</td>
+    <td class="text-end">{{ empire.stats!.totalCarriers }}</td>
+    <td class="text-end">{{ empire.stats!.totalSpecialists }}</td>
+    <td class="text-end">{{ empire.stats!.totalShips }}</td>
+    <td class="text-end">{{ empire.stats!.newShips }}</td>
+    <td class="text-end text-success">{{ empire.stats!.totalEconomy }}</td>
+    <td class="text-end text-warning">{{ empire.stats!.totalIndustry }}</td>
+    <td class="text-end text-info">{{ empire.stats!.totalScience }}</td>
+  </tr>
 </template>
 
-<script>
-import PlayerIconVue from '../player/PlayerIcon.vue'
-import {eventBusInjectionKey} from "../../../../eventBus";
-import MapCommandEventBusEventNames from "@/eventBusEventNames/mapCommand";
-import { inject } from 'vue';
+<script setup lang="ts">
+import PlayerIcon from "../player/PlayerIcon.vue";
+import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
+import { eventBusInjectionKey } from "../../../../eventBus";
+import { inject } from "vue";
+import type { Player } from "@/types/game";
 
-export default {
-  components: {
-    'player-icon': PlayerIconVue
-  },
-  props: {
-    empire: Object
-  },
-  setup () {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  methods: {
-    onOpenPlayerDetailRequested (e) {
-      this.$emit('onOpenPlayerDetailRequested', this.empire._id)
-    },
-    goToEmpire (e) {
-      this.eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, { player: this.empire });
-    }
-  }
-}
+const props = defineProps<{
+  empire: Player;
+}>();
+
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
+
+const eventBus = inject(eventBusInjectionKey)!;
+
+const onOpenPlayerDetailRequested = (e) =>
+  emit("onOpenPlayerDetailRequested", props.empire._id);
+
+const goToEmpire = (e) =>
+  eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+    player: props.empire,
+  });
 </script>
 
 <style scoped>

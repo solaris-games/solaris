@@ -1,23 +1,23 @@
-import CarrierService from '../services/carrier';
+import CarrierService from "../services/carrier";
 
-describe('carrier', () => {
+describe("carrier", () => {
     let carrierService;
 
     beforeAll(() => {
         // @ts-ignore
         carrierService = new CarrierService();
     });
-    
-    it('should create a carrier at a star', () => {
+
+    it("should create a carrier at a star", () => {
         const star = {
-            _id: '123',
+            _id: "123",
             location: {
                 x: 10,
-                y: 15
+                y: 15,
             },
-            name: 'Super star',
+            name: "Super star",
             ships: 10,
-            shipsActual: 10
+            shipsActual: 10,
         };
 
         const ships = 1;
@@ -30,16 +30,16 @@ describe('carrier', () => {
         expect(newCarrier.name).toContain(star.name);
     });
 
-    it('should deduct the ships from the garrisoning star', () => {
+    it("should deduct the ships from the garrisoning star", () => {
         const star = {
-            _id: '123',
+            _id: "123",
             location: {
                 x: 10,
-                y: 15
+                y: 15,
             },
-            name: 'Super star',
+            name: "Super star",
             ships: 10,
-            shipsActual: 10
+            shipsActual: 10,
         };
 
         const ships = 5;
@@ -48,5 +48,4 @@ describe('carrier', () => {
         expect(newCarrier.ships).toEqual(ships);
         expect(star.ships).toEqual(5);
     });
-
 });

@@ -1,8 +1,8 @@
-import {JobParameters} from "../tool";
-import {AwardedBadge, UserAchievements} from "solaris-common";
-import {User} from "../../services/types/User";
-import {DBObjectId} from "../../services/types/DBObjectId";
-import {Statistics} from "solaris-common";
+import { JobParameters } from "../tool";
+import { AwardedBadge, UserAchievements } from "@solaris/common";
+import { User } from "../../services/types/User";
+import { DBObjectId } from "../../services/types/DBObjectId";
+import { Statistics } from "@solaris/common";
 
 type OldUserAchievements<ID> = {
     victories: number;
@@ -23,21 +23,21 @@ type OldUserAchievements<ID> = {
             ships: number;
             carriers: number;
             specialists: number;
-        },
+        };
         losses: {
             ships: number;
             carriers: number;
             specialists: number;
-        },
+        };
         stars: {
             captured: number;
             lost: number;
-        },
+        };
         homeStars: {
             captured: number;
             lost: number;
-        }
-    },
+        };
+    };
     infrastructure: {
         economy: number;
         industry: number;
@@ -46,7 +46,7 @@ type OldUserAchievements<ID> = {
         warpGatesDestroyed: number;
         carriers: number;
         specialistsHired: number;
-    },
+    };
     research: {
         scanning: number;
         hyperspace: number;
@@ -56,7 +56,7 @@ type OldUserAchievements<ID> = {
         banking: number;
         manufacturing: number;
         specialists: number;
-    },
+    };
     trade: {
         creditsSent: number;
         creditsReceived: number;
@@ -67,12 +67,13 @@ type OldUserAchievements<ID> = {
         giftsSent: number;
         giftsReceived: number;
         renownSent: number;
-    },
-}
+    };
+};
 
 const moveStats = (user: User) => {
-    // @ts-ignore
-    const oldAchievements = user.achievements as OldUserAchievements<DBObjectId>;
+    const oldAchievements =
+        // @ts-ignore
+        user.achievements as OldUserAchievements<DBObjectId>;
 
     const stats: Statistics = {
         trade: oldAchievements.trade,
@@ -83,7 +84,7 @@ const moveStats = (user: User) => {
 
     const newAchievements: UserAchievements<DBObjectId> = {
         stats,
-        legacyStats: { ... stats },
+        legacyStats: { ...stats },
         victories: oldAchievements.victories,
         victories1v1: oldAchievements.victories1v1,
         level: oldAchievements.level,
@@ -106,10 +107,10 @@ const moveStats = (user: User) => {
             },
             update: {
                 $set: {
-                    'achievements': newAchievements,
-                }
-            }
-        }
+                    achievements: newAchievements,
+                },
+            },
+        },
     };
 };
 
@@ -125,10 +126,16 @@ export const migrateStats = async (ctx: JobParameters) => {
     const totalPages = Math.ceil(total / pageSize);
 
     do {
-        const users = await userRepository.find({}, {
-            '_id': 1,
-            'achievements': 1,
-        }, { _id: 1 }, pageSize, page * pageSize);
+        const users = await userRepository.find(
+            {},
+            {
+                _id: 1,
+                achievements: 1,
+            },
+            { _id: 1 },
+            pageSize,
+            page * pageSize,
+        );
 
         const writes = users.map(moveStats);
 
@@ -137,7 +144,7 @@ export const migrateStats = async (ctx: JobParameters) => {
         log.info(`Page ${page}/${totalPages}`);
 
         page++;
-    } while (page <= totalPages)
+    } while (page <= totalPages);
 
     log.info("Finished migrating user achievements");
 };

@@ -1,8 +1,8 @@
 <template>
-<div>
-    <loading-spinner :loading="isLoadingLedger"/>
+  <div>
+    <loading-spinner :loading="isLoading" />
 
-    <div v-if="!isLoadingLedger" class="row">
+    <div v-if="!isLoading" class="row">
       <div class="table-responsive p-0" v-if="ledgers.length">
         <table class="table table-sm table-striped mb-0">
           <tbody>
@@ -11,93 +11,89 @@
               :key="ledger.playerId"
               :ledger="ledger"
               :ledgerType="ledgerType"
-              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"/>
+              @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
+            />
           </tbody>
         </table>
       </div>
 
-      <p v-if="!ledgers.length" class="col text-warning">You have not traded with any other player and have no debts or credits.</p>
+      <p v-if="!ledgers.length" class="col text-warning">
+        You have not traded with any other player and have no debts or credits.
+      </p>
     </div>
-</div>
+  </div>
 </template>
 
-<script>
-import LoadingSpinner from '../../../components/LoadingSpinner.vue'
-import LedgerApiService from '../../../../services/api/ledger'
-import LedgerRowVue from './LedgerRow.vue'
-import { inject } from 'vue'
-import { eventBusInjectionKey } from '../../../../eventBus'
-import PlayerEventBusEventNames from '../../../../eventBusEventNames/player'
+<script setup lang="ts">
+import LoadingSpinner from "../../../components/LoadingSpinner.vue";
+import LedgerRow from "./LedgerRow.vue";
+import { inject, ref, computed, onMounted, onUnmounted } from "vue";
+import { eventBusInjectionKey } from "@/eventBus";
+import PlayerEventBusEventNames from "../../../../eventBusEventNames/player";
+import { LedgerType, type PlayerLedgerDebt } from "@solaris/common";
+import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import {
+  detailLedgerCredits,
+  detailLedgerSpecialistTokens,
+} from "@/services/typedapi/ledger";
+import type { Game } from "@/types/game";
+import { useGameStore } from "@/stores/game";
 
-export default {
-  components: {
-    'loading-spinner': LoadingSpinner,
-    'ledger-row': LedgerRowVue
-  },
-  props: {
-    ledgerType: String
-  },
-  data () {
-    return {
-      isLoadingLedger: false,
-      ledgers: []
-    }
-  },
-  setup() {
-    return {
-      eventBus: inject(eventBusInjectionKey)
-    }
-  },
-  mounted () {
-    this.loadLedger();
-    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtAdded, this.onPlayerDebtAdded);
-    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtForgiven, this.onPlayerDebtForgiven);
-    this.eventBus.on(PlayerEventBusEventNames.PlayerDebtSettled, this.onPlayerDebtSettled);
-  },
-  unmounted () {
-    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtAdded, this.onPlayerDebtAdded);
-    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtForgiven, this.onPlayerDebtForgiven);
-    this.eventBus.off(PlayerEventBusEventNames.PlayerDebtSettled, this.onPlayerDebtSettled);
-  },
-  methods: {
-    onOpenPlayerDetailRequested(playerId) {
-      this.$emit('onOpenPlayerDetailRequested', playerId)
-    },
-    async loadLedger () {
-      try {
-        this.isLoadingLedger = true
+const props = defineProps<{
+  ledgerType: LedgerType;
+}>();
 
-        let response = this.ledgerType === 'credits' ?
-          await LedgerApiService.getLedgerCredits(this.$store.state.game._id) :
-          await LedgerApiService.getLedgerCreditsSpecialists(this.$store.state.game._id)
+const emit = defineEmits<{
+  onOpenPlayerDetailRequested: [playerId: string];
+}>();
 
-        if (response.status === 200) {
-          this.ledgers = response.data
-        }
-      } catch (err) {
-        console.error(err)
-      }
+const eventBus = inject(eventBusInjectionKey)!;
+const httpClient = inject(httpInjectionKey)!;
 
-      this.isLoadingLedger = false
-    },
-    // Below: Fuck it.
-    onPlayerDebtAdded (e) {
-      if (e.ledgerType === this.ledgerType) {
-        this.loadLedger()
-      }
-    },
-    onPlayerDebtForgiven (e) {
-      if (e.ledgerType === this.ledgerType) {
-        this.loadLedger()
-      }
-    },
-    onPlayerDebtSettled (e) {
-      if (e.ledgerType === this.ledgerType) {
-        this.loadLedger()
-      }
-    }
+const store = useGameStore();
+const game = computed<Game>(() => store.game!);
+
+const isLoading = ref(false);
+const ledgers = ref<PlayerLedgerDebt<string>[]>([]);
+
+const onOpenPlayerDetailRequested = (playerId: string) =>
+  emit("onOpenPlayerDetailRequested", playerId);
+
+const loadLedger = async () => {
+  isLoading.value = true;
+
+  const response =
+    props.ledgerType === "credits"
+      ? await detailLedgerCredits(httpClient)(game.value._id)
+      : await detailLedgerSpecialistTokens(httpClient)(game.value._id);
+
+  if (isOk(response)) {
+    ledgers.value = response.data;
+  } else {
+    console.error(formatError(response));
   }
-}
+
+  isLoading.value = false;
+};
+
+const onUpdate = (e: { ledgerType: LedgerType }) => {
+  if (e.ledgerType === props.ledgerType) {
+    loadLedger();
+  }
+};
+
+onMounted(() => {
+  loadLedger();
+  eventBus.on(PlayerEventBusEventNames.PlayerDebtAdded, onUpdate);
+  eventBus.on(PlayerEventBusEventNames.PlayerDebtForgiven, onUpdate);
+  eventBus.on(PlayerEventBusEventNames.PlayerDebtSettled, onUpdate);
+
+  onUnmounted(() => {
+    eventBus.off(PlayerEventBusEventNames.PlayerDebtAdded, onUpdate);
+    eventBus.off(PlayerEventBusEventNames.PlayerDebtForgiven, onUpdate);
+    eventBus.off(PlayerEventBusEventNames.PlayerDebtSettled, onUpdate);
+  });
+});
 </script>
 
 <style scoped>
@@ -111,8 +107,8 @@ table tr {
 
 .table td.fit,
 .table th.fit {
-    white-space: nowrap;
-    width: 1%;
+  white-space: nowrap;
+  width: 1%;
 }
 
 @media screen and (max-width: 576px) {
