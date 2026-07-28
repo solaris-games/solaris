@@ -175,6 +175,8 @@ onMounted(() => {
   grid-area: stacked-content;
   z-index: 100;
   pointer-events: none;
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: row-reverse;
 
