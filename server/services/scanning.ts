@@ -239,9 +239,15 @@ export default class ScanningService {
             return true;
         }
 
-        if (scannedStarSet.has(star)) return true;
+        if (star.wormHoleToStarId) {
+            const wormholeTerminus = this.starService.getById(game, star.wormHoleToStarId);
 
-        return false;
+            if (scannedStarSet.has(wormholeTerminus)) {
+                return true;
+            }
+        }
+
+        return scannedStarSet.has(star);
     }
 
     isStarAlwaysVisible(star: Star) {
@@ -287,10 +293,15 @@ export default class ScanningService {
             return true;
         }
 
-        if (this.isObjectWithinScanningRangeOfStars(star, starTreesWithRadius))
-            return true;
+        if (star.wormHoleToStarId) {
+            const wormholeTerminus = this.starService.getById(game, star.wormHoleToStarId);
 
-        return false;
+            if (this.isObjectWithinScanningRangeOfStars(wormholeTerminus, starTreesWithRadius)) {
+                return true;
+            }
+        }
+
+        return this.isObjectWithinScanningRangeOfStars(star, starTreesWithRadius);
     }
 
     isInScanningRangeOfPlayer(
