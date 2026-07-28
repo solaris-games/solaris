@@ -93,7 +93,7 @@ const schema = new Schema({
             anonymity: {
                 type: Types.String,
                 required: true,
-                enum: ["normal", "extra", "revealAtEnd"],
+                enum: ["anonymous", "normal", "extra", "revealAtEnd"],
                 default: "normal",
             },
             playerOnlineStatus: {
