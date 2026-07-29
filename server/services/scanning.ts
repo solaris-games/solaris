@@ -240,7 +240,10 @@ export default class ScanningService {
         }
 
         if (star.wormHoleToStarId) {
-            const wormholeTerminus = this.starService.getById(game, star.wormHoleToStarId);
+            const wormholeTerminus = this.starService.getById(
+                game,
+                star.wormHoleToStarId,
+            );
 
             if (scannedStarSet.has(wormholeTerminus)) {
                 return true;
@@ -294,14 +297,25 @@ export default class ScanningService {
         }
 
         if (star.wormHoleToStarId) {
-            const wormholeTerminus = this.starService.getById(game, star.wormHoleToStarId);
+            const wormholeTerminus = this.starService.getById(
+                game,
+                star.wormHoleToStarId,
+            );
 
-            if (this.isObjectWithinScanningRangeOfStars(wormholeTerminus, starTreesWithRadius)) {
+            if (
+                this.isObjectWithinScanningRangeOfStars(
+                    wormholeTerminus,
+                    starTreesWithRadius,
+                )
+            ) {
                 return true;
             }
         }
 
-        return this.isObjectWithinScanningRangeOfStars(star, starTreesWithRadius);
+        return this.isObjectWithinScanningRangeOfStars(
+            star,
+            starTreesWithRadius,
+        );
     }
 
     isInScanningRangeOfPlayer(
@@ -411,7 +425,6 @@ export default class ScanningService {
 
     calculateViewpointScanning(game: Game, players: Player[]) {
         const scannedStarSet = new Set<Star>();
-        const scannedPlayerIdSet = new Set<String>();
         const scannedCarrierSet = new Set<Carrier>();
         const unscannedWormholeSet = new Set<Star>();
 
@@ -423,6 +436,12 @@ export default class ScanningService {
         const starsWithScanning = starsOwnedOrInOrbit.filter(
             (s) => !this.starDataService.isDeadStar(s),
         );
+
+        const playerCarriers = this.carrierService.listCarriersOwnedByPlayers(
+            game.galaxy.carriers,
+            players.map((p) => p._id),
+        );
+        playerCarriers.forEach((c) => scannedCarrierSet.add(c));
 
         starsWithScanning.forEach((e) => scannedStarSet.add(e));
 
@@ -444,12 +463,6 @@ export default class ScanningService {
 
                 for (const scannedStar of starsInRange) {
                     scannedStarSet.add(scannedStar);
-
-                    if (scannedStar.ownedByPlayerId != null) {
-                        scannedPlayerIdSet.add(
-                            scannedStar.ownedByPlayerId.toString(),
-                        );
-                    }
                 }
             }
             kdTree.resetMarked();
@@ -466,13 +479,6 @@ export default class ScanningService {
                 for (const tree of treesWithRadius) {
                     if (tree[1].isWithinRadiusOfAny(star.location, tree[0])) {
                         scannedStarSet.add(star);
-
-                        if (star.ownedByPlayerId != null) {
-                            scannedPlayerIdSet.add(
-                                star.ownedByPlayerId.toString(),
-                            );
-                        }
-
                         break;
                     }
                 }
@@ -542,6 +548,25 @@ export default class ScanningService {
                 }
             }
         }
+
+        // add pulsars/always-visible
+        game.galaxy.stars
+            .filter(this.isStarAlwaysVisible)
+            .forEach(s => scannedStarSet.add(s));
+
+        // re-add dead stars owned by the players themselves
+        starsOwnedOrInOrbit
+            .filter(this.starDataService.isDeadStar)
+            .forEach(s => scannedStarSet.add(s));
+
+        const scannedPlayerIdSet = new Set<String>();
+
+        // compute visible players. Player is visible if one of their stars is visible
+        scannedStarSet.forEach((s) => {
+            if (s.ownedByPlayerId) {
+                scannedPlayerIdSet.add(s.ownedByPlayerId!.toString());
+            }
+        });
 
         return {
             stars: scannedStarSet,
