@@ -367,6 +367,7 @@ const distributeDamage = <
     const specialistsLost = groupObjects.filter(
         (c) =>
             c.type === "carrier" &&
+            c.carrier.shipsAfter <= 0 &&
             c.carrier.carrier.specialistId &&
             c.carrier.carrier.specialistId !== 0,
     );
