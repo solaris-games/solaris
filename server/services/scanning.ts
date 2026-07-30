@@ -336,6 +336,16 @@ export default class ScanningService {
             targetPlayer._id,
         );
 
+        if (
+            targetPlayerStars.some(
+                (s) =>
+                    this.isStarAlwaysVisible(s) &&
+                    this.gameStateService.isStarted(game),
+            )
+        ) {
+            return true;
+        }
+
         // If the source player is very small relative to the target player, it is generally faster to compute their viewpoint.
         if (
             targetPlayerStars.length >
@@ -552,12 +562,12 @@ export default class ScanningService {
         // add pulsars/always-visible
         game.galaxy.stars
             .filter(this.isStarAlwaysVisible)
-            .forEach(s => scannedStarSet.add(s));
+            .forEach((s) => scannedStarSet.add(s));
 
         // re-add dead stars owned by the players themselves
         starsOwnedOrInOrbit
             .filter(this.starDataService.isDeadStar)
-            .forEach(s => scannedStarSet.add(s));
+            .forEach((s) => scannedStarSet.add(s));
 
         const scannedPlayerIdSet = new Set<String>();
 

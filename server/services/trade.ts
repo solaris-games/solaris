@@ -786,7 +786,7 @@ export default class TradeService extends EventEmitter {
 
     _tradeScanningCheck(game: Game, fromPlayer: Player, toPlayer: Player) {
         if (game.settings.player.tradeScanning === "scanned") {
-            let isInRange = this.scanningService.isInScanningRangeOfPlayer(
+            const isInRange = this.scanningService.isInScanningRangeOfPlayer(
                 game,
                 fromPlayer,
                 toPlayer,
