@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import type { Carrier, Player, Star } from "@/types/game.ts";
 import { ref } from "vue";
 import type { StarClickDispatchArgs } from "@solaris/map-rendering";
-import type { CarrierClickDispatchArgs } from "@solaris/map-rendering/eventBusEventNames/map.ts";
+import type { CarrierClickDispatchArgs } from "@solaris/map-rendering";
 
 export type StarClickCallback = (
   star: Star,
