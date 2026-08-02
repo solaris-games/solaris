@@ -19,6 +19,7 @@
     "dependencies": {
         "@popperjs/core": "2.11.8",
         "@solaris/map-rendering": "*",
+        "@solaris/common": "*",
         "axios": "1.16.1",
         "bootstrap": "5.3.8",
         "chart.js": "4.5.1",

@@ -2,7 +2,6 @@
     "name": "@solaris/map-rendering",
     "version": "1.0.0",
     "scripts": {
-        "test": "tsx ../node_modules/jasmine/bin/jasmine",
         "check": "tsc",
         "build": "tsc"
     },

@@ -23,7 +23,7 @@ import {
 import { formatError, isOk } from "@/services/typedapi";
 import type { Axios } from "axios";
 import type { MenuState, MenuStateChat } from "@/types/menu";
-import GameCommandEventBusEventNames from "@solaris/map-rendering/eventBusEventNames/gameCommand";
+import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
 
 type PlayerJoinedData = {
   playerId: string;
