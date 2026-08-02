@@ -76,7 +76,7 @@ export default class DiplomacyService extends EventEmitter {
                 let playerIdA = playerIds[i];
                 let playerIdB = playerIds[ii];
 
-                let diplomaticStatus = this.getDiplomaticStatusToPlayer(
+                const diplomaticStatus = this.getDiplomaticStatusToPlayer(
                     game,
                     playerIdA,
                     playerIdB,

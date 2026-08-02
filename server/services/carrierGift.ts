@@ -153,15 +153,6 @@ export default class CarrierGiftService extends EventEmitter {
                 carrier.specialistId = null;
             }
 
-            const eventObject = {
-                gameId: game._id,
-                gameTick: game.state.tick,
-                fromPlayer: carrierPlayer,
-                toPlayer: starPlayer,
-                carrier,
-                star,
-            };
-
             eventService.createGiftReceivedEvent(
                 game._id,
                 game.state.tick,
