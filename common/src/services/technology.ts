@@ -513,11 +513,13 @@ export class TechnologyService {
         if (opponentDebuff) {
             appliedBuffs.push(opponentDebuff);
 
+            const totalAfterDebuff = Math.max(1, buff.total - opponentDebuff.amount);
+
             return {
                 weaponsLevel: baseWeapons,
                 appliedBuffs,
                 weaponsBuff: buff.weaponsBuff - opponentDebuff.amount,
-                total: buff.total - opponentDebuff.amount,
+                total: totalAfterDebuff,
                 defenderBonus,
             };
         } else {
