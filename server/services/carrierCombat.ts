@@ -228,14 +228,14 @@ export default class CarrierCombatService {
     _getDualCollisionsInPath(
         positions: CarrierPosition[],
     ): DualCarrierCollision[] {
-        let collisionList: DualCarrierCollision[] = [];
+        const collisionList: DualCarrierCollision[] = [];
 
         // In order to be able to check if carriers intersect at the same place, we need the distance to a fixed star, which must exist.
         // As the source star can be destroyed we need a destination for that. Now the distance to that star can be used to check if carriers are in the same place.
         const pathDirection = positions[0].destination.toString();
 
         for (let i = 0; i < positions.length - 1; i++) {
-            let carrierPositionA = positions[i];
+            const carrierPositionA = positions[i];
 
             // Only consider carriers with ships that are not gifts
             if (
@@ -245,7 +245,7 @@ export default class CarrierCombatService {
                 continue;
 
             for (let j = i + 1; j < positions.length; j++) {
-                let carrierPositionB = positions[j];
+                const carrierPositionB = positions[j];
 
                 // Only consider carriers with ships
                 if (
@@ -261,12 +261,12 @@ export default class CarrierCombatService {
                     continue;
 
                 // Check whether it is head_to_head (true) or by catching up (false)
-                let head_to_head =
+                const head_to_head =
                     carrierPositionA.destination.toString() ===
                     carrierPositionB.source.toString();
 
                 // If carrier are moving towards each other, the speed adds, otherwise we need the difference.
-                let relativeSpeed = head_to_head
+                const relativeSpeed = head_to_head
                     ? carrierPositionA.speed + carrierPositionB.speed
                     : Math.abs(carrierPositionA.speed - carrierPositionB.speed);
 
@@ -366,15 +366,15 @@ export default class CarrierCombatService {
             // Combat from behind:
             (cPosA.destination.toString() === cPosB.destination.toString() &&
                 // Carrier B catches up to carrier A
-                ((cPosA.distanceToDestinationCurrent <=
-                    cPosB.distanceToDestinationCurrent &&
+                ((cPosB.distanceToDestinationCurrent >=
+                    cPosA.distanceToDestinationCurrent && // B is farther away than A
                     cPosA.distanceToDestinationNext >=
-                        cPosB.distanceToDestinationNext) ||
+                        cPosB.distanceToDestinationNext) || // Next: A is farther away than B => B overtook A
                     // Carrier A catches up to B
-                    (cPosA.distanceToDestinationCurrent <=
-                        cPosB.distanceToDestinationCurrent &&
-                        cPosA.distanceToDestinationNext >=
-                            cPosB.distanceToDestinationNext)))
+                    (cPosA.distanceToDestinationCurrent >=
+                        cPosB.distanceToDestinationCurrent && // A is farther away than B
+                        cPosB.distanceToDestinationNext >=
+                            cPosA.distanceToDestinationNext))) // Next: B is farther away than A => A overtook B
         );
     }
 }
