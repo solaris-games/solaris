@@ -3,7 +3,7 @@ import { cursorMigrateBulk } from "../cursorMigration";
 import { Game } from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 
-const migrateGame = async (g: Game<DBObjectId>) => {
+const migrateGame = (g: Game<DBObjectId>) => {
     return {
         updateOne: {
             filter: { _id: g._id },
