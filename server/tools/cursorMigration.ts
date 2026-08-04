@@ -71,14 +71,14 @@ export async function cursorMigrateBulk<T>(
         batch.push(map(doc as T));
         count++;
         if (batch.length >= batchSize) {
-            await repository.bulkWrite(batch);
+            await repository.model.bulkWrite(batch, { strict: false });
             batch = [];
             log.info(`[${name}] Processed ${count} documents...`);
         }
     }
 
     if (batch.length > 0) {
-        await repository.bulkWrite(batch);
+        await repository.model.bulkWrite(batch, { strict: false });
     }
 
     log.info(`[${name}] Finished. Total: ${count} documents`);
