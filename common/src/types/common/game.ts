@@ -255,7 +255,6 @@ export const READY_TO_QUIT_VISIBILITY = [
 ] as const;
 
 export type ReadyToQuitVisibility = (typeof READY_TO_QUIT_VISIBILITY)[number];
-export type CombatResolutionMalusStrategy = "largestCarrier" | "anyCarrier";
 
 export type GameResearchProgressionStandard = {
     progression: "standard";
@@ -359,9 +358,7 @@ export type GameSettingsSpecialGalaxyBase = {
     specialistBans: SpecialistBans;
 };
 
-export type GameSettingsSpecialGalaxy = GameSettingsSpecialGalaxyBase & {
-    combatResolutionMalusStrategy: CombatResolutionMalusStrategy;
-};
+export type GameSettingsSpecialGalaxy = GameSettingsSpecialGalaxyBase;
 
 export type GameSettingsPlayer = {
     startingStars: number;

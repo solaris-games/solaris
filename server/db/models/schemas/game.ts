@@ -342,12 +342,6 @@ const schema = new Schema({
                 enum: ["enabled", "disabled"],
                 default: "enabled",
             },
-            combatResolutionMalusStrategy: {
-                type: Types.String,
-                required: false,
-                enum: ["largestCarrier", "anyCarrier"],
-                default: "largestCarrier",
-            },
             specialistBans: {
                 star: [{ type: Types.Number, required: false }],
                 carrier: [{ type: Types.Number, required: false }],

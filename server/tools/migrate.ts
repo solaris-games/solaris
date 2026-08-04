@@ -1,6 +1,4 @@
 import { makeJob } from "./tool";
-import { migrateBadges } from "./migrations/migrateBadges";
-import { migrateCombatResolution } from "./migrations/migrateCombatResolution";
 import { migrateStats } from "./migrations/migrateStats";
 import { migrateInitialGameState } from "./migrations/migrateInitialGameState";
 import { migrateWormholesHistory } from "./migrations/migrateWormholesHistory";
@@ -9,8 +7,6 @@ import { migrateCombatEvents } from "./migrations/migrateCombatEvents";
 import { migrateSignupDate } from "./migrations/migrateSignupDate";
 
 const MIGRATIONS = {
-    "2025-02-05-badges": migrateBadges,
-    "2025-03-29-combat-resolution": migrateCombatResolution,
     "2025-06-26-stats": migrateStats,
     "2025-10-19-initial-game-state": migrateInitialGameState,
     "2025-11-08-wormholes-history": migrateWormholesHistory,

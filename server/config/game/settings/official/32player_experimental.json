@@ -121,8 +121,8 @@
         "specialistTokenReward": "experimental",
         "researchCostProgressions": {
             "terraforming": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "cumulative",
+                "scalingFactor": 1.0
             },
             "experimentation": {
                 "progression": "standard"
@@ -134,19 +134,19 @@
                 "progression": "standard"
             },
             "manufacturing": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "cumulative",
+                "scalingFactor": 1.0
             },
             "banking": {
                 "progression": "standard"
             },
             "weapons": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "cumulative",
+                "scalingFactor": 1.0
             },
             "specialists": {
-                "progression": "exponential",
-                "growthFactor": "medium"
+                "progression": "cumulative",
+                "scalingFactor": 1.0
             }
         }
     },
