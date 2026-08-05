@@ -499,10 +499,6 @@ export default class GameCreateService {
                 timeMachine: isOfficialGame ? "enabled" : "disabled",
                 passwordRequired: Boolean(settings.general.password),
             },
-            specialGalaxy: {
-                ...settings.specialGalaxy,
-                combatResolutionMalusStrategy: "largestCarrier",
-            },
         };
 
         return {

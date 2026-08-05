@@ -1,5 +1,4 @@
 import { JobParameters } from "../tool";
-import EventModel from "../../db/models/Event";
 import {
     BasePlayerEvent,
     CombatResultCarrier,
@@ -12,8 +11,8 @@ import {
     WeaponsDetail,
 } from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
-import { logger } from "../../utils/logging";
 import { ActiveModel } from "../../services/types/ActiveModel";
+import { cursorMigrateModels } from "../cursorMigration";
 
 interface OldCombatWeapons {
     defender: number;
@@ -81,8 +80,6 @@ interface OldPlayerCombatCarrierEvent<ID> extends BasePlayerEvent<ID> {
     type: "playerCombatCarrier";
     data: OldCombatEventData<ID>;
 }
-
-const log = logger("Migrate combat events");
 
 const processStarCombatEvent = async (
     oldEvent: ActiveModel<OldPlayerCombatStarEvent<DBObjectId>>,
@@ -267,45 +264,22 @@ const processCarrierCombatEvent = async (
     await newEvent.save();
 };
 
-const migrateEvents = async <T>(
-    ctx: JobParameters,
-    process: (ev: ActiveModel<T>) => Promise<void>,
-    type: string,
-) => {
-    const QUERY = { type };
-
-    log.info(`Migrating events of type: ${type}`);
-
+export const migrateCombatEvents = async (ctx: JobParameters) => {
     const eventRepo = ctx.container.eventService.eventRepo;
 
-    const pageSize = 50;
-    const total = await eventRepo.count(QUERY);
-    const totalPages = Math.ceil(total / pageSize);
-    let page = 0;
+    await cursorMigrateModels(
+        eventRepo,
+        { type: "playerCombatStar" },
+        processStarCombatEvent,
+        { name: "playerCombatStar" },
+        ctx.log,
+    );
 
-    do {
-        // @ts-ignore
-        const events: ActiveModel<T>[] = (await eventRepo.findAsModels(
-            QUERY,
-            {},
-            { _id: 1 },
-            pageSize,
-            page * pageSize,
-        )) as ActiveModel<T>[];
-
-        for (let event of events) {
-            process(event);
-        }
-
-        log.info(`Page ${page}/${totalPages}`);
-
-        page++;
-    } while (page <= totalPages);
-
-    log.info(`FINISHED migrating events of type: ${type}`);
-};
-
-export const migrateCombatEvents = async (ctx: JobParameters) => {
-    await migrateEvents(ctx, processStarCombatEvent, "playerCombatStar");
-    await migrateEvents(ctx, processCarrierCombatEvent, "playerCombatCarrier");
+    await cursorMigrateModels(
+        eventRepo,
+        { type: "playerCombatCarrier" },
+        processCarrierCombatEvent,
+        { name: "playerCombatCarrier" },
+        ctx.log,
+    );
 };

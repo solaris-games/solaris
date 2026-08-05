@@ -27,6 +27,9 @@ const applyGameState = (game: Game, history: GameHistory) => {
     game.state.tick = history.tick;
     game.state.productionTick = history.productionTick;
     game.state.lastTickDate = new Date();
+    game.state.ticksToEnd = null;
+    game.state.locked = false;
+    game.state.forceTick = false;
 };
 
 const applyPlayers = (game: Game, history: GameHistory) => {
@@ -59,6 +62,7 @@ const applyPlayers = (game: Game, history: GameHistory) => {
         player.research = histPlayer.research;
         player.ready = false; // reset turn based states to ensure the game stays in that tick
         player.readyToCycle = false;
+        player.lastSeen = new Date();
     });
 };
 

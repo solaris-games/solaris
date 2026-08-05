@@ -8,6 +8,7 @@ import HistoryModel from "./models/History";
 import UserModel from "./models/User";
 import PaymentModel from "./models/Payment";
 import ReportModel from "./models/Report";
+import MigrationModel from "./models/Migration";
 import StatsSliceModel from "./models/StatsSlice";
 import type { Config } from "../config/types/Config";
 
@@ -32,6 +33,7 @@ export default async (
         await HistoryModel.syncIndexes();
         await UserModel.syncIndexes();
         await PaymentModel.syncIndexes();
+        await MigrationModel.syncIndexes();
         await ReportModel.syncIndexes();
         await StatsSliceModel.syncIndexes();
         log.info("Indexes synced.");

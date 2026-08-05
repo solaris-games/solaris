@@ -154,7 +154,8 @@ export default class CarrierMovementService {
         if (!destinationStar.ownedByPlayerId) {
             report.combatRequiredStar = true;
         } else if (
-            destinationStar.ownedByPlayerId.toString() !== carrier.ownedByPlayerId!.toString()
+            destinationStar.ownedByPlayerId.toString() !==
+            carrier.ownedByPlayerId!.toString()
         ) {
             if (carrier.isGift) {
                 this.carrierGiftService.transferGift(

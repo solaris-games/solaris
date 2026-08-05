@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-warning container" v-if="isSpectating">
-    <div class="row pt-2 pb-2">
+  <div class="bg-warning p-1" v-if="isSpectating">
+    <div class="row">
       <div class="col">
         <p class="mt-0 mb-0">You are spectating this game.</p>
       </div>
     </div>
-    <div class="row pb-2" v-if="isSpectatingDarkMode">
+    <div class="row" v-if="isSpectatingDarkMode">
       <div class="col">
         <p class="mt-0 mb-0">
           This is a <strong>dark mode</strong> game, no stars will be visible to

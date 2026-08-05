@@ -90,8 +90,7 @@ const getPlayerColour = (player: Player) => {
 
 ul {
   white-space: nowrap;
-  overflow-x: scroll;
-  scrollbar-color: #375a7f #303030;
+  overflow-x: auto;
   max-width: 100%;
 }
 

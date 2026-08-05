@@ -40,11 +40,10 @@
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
-import KEYBOARD_SHORTCUTS from "../../../../services/data/keyboardShortcuts";
 import GameHelper from "../../../../services/gameHelper";
 import ConversationCreate from "./conversations/ConversationCreate.vue";
 import ConversationDetail from "./conversations/ConversationDetail.vue";
-import { computed, onMounted, onUnmounted } from "vue";
+import { computed } from "vue";
 import type { Game } from "@/types/game";
 import { useUserStore } from "@/stores/user";
 import Inbox from "@/views/game/components/inbox/Inbox.vue";
@@ -87,60 +86,6 @@ const toggle = () => {
     store.setMenuStateChat(store.menuStateChat);
   }
 };
-
-const handleKeyDown = (e: KeyboardEvent) => {
-  // Note: We only care about the INBOX key here.
-  if (
-    /^(?:input|textarea|select|button)$/i.test(
-      (e.target as HTMLElement)?.tagName,
-    )
-  ) {
-    return;
-  }
-
-  const key = e.key;
-
-  // Check for modifier keys and ignore the keypress if there is one.
-  if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
-    return;
-  }
-
-  const isLoggedIn = userStore.isLoggedIn;
-  const isInGame = isUserInGame.value;
-
-  if (!isLoggedIn || !isInGame) {
-    return;
-  }
-
-  let menuState = KEYBOARD_SHORTCUTS.all[key];
-
-  if (menuState === null && isExpanded.value) {
-    return toggle();
-  }
-
-  menuState = KEYBOARD_SHORTCUTS.player[key];
-
-  if (!menuState) {
-    return;
-  }
-
-  // Special case for Inbox shortcut, only do this if the screen is large
-  if (menuState !== "inbox") {
-    return;
-  }
-
-  store.setMenuStateChat({ state: menuState });
-
-  toggle();
-};
-
-onMounted(() => {
-  document.addEventListener("keydown", handleKeyDown);
-
-  onUnmounted(() => {
-    document.removeEventListener("keydown", handleKeyDown);
-  });
-});
 </script>
 
 <style scoped>
