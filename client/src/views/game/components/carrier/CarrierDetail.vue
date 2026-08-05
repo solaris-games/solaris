@@ -1,6 +1,13 @@
 <template>
   <div class="menu-page container" v-if="carrier">
     <menu-title :title="carrier.name" @onCloseRequested="onCloseRequested">
+      <a
+        :href="documentationUrl + '/carriers.html'"
+        target="_blank"
+        class="btn btn-outline-info btn-sm ms-1"
+        title="Documentation"
+        ><i class="far fa-question-circle"></i
+      ></a>
       <button
         v-if="hasWaypoints"
         @click="onViewCombatCalculatorRequested"
@@ -25,13 +32,6 @@
       <button @click="viewOnMap" class="btn btn-sm btn-outline-info ms-1">
         <i class="fas fa-eye"></i>
       </button>
-      <a
-        :href="documentationUrl + '/carriers.html'"
-        target="_blank"
-        class="btn btn-outline-info btn-sm ms-1"
-        title="Documentation"
-        ><i class="far fa-question-circle"></i
-      ></a>
     </menu-title>
 
     <div class="row bg-dark" :class="{ 'bg-warning': carrier.isGift }">
