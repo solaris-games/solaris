@@ -27,6 +27,9 @@ const applyGameState = (game: Game, history: GameHistory) => {
     game.state.tick = history.tick;
     game.state.productionTick = history.productionTick;
     game.state.lastTickDate = new Date();
+    game.state.ticksToEnd = null;
+    game.state.locked = false;
+    game.state.forceTick = false;
 };
 
 const applyPlayers = (game: Game, history: GameHistory) => {
