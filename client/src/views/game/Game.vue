@@ -104,13 +104,13 @@ import type { Game } from "@/types/game";
 import { useUserStore } from "@/stores/user";
 import { useColourStore } from "@/stores/colour";
 import { useGameStore } from "@/stores/game";
-
 import { useToast } from "vue-toast-notification";
 import GameScreen from "@/views/game/GameScreen.vue";
 import HeaderBar from "@/views/game/components/menu/HeaderBar.vue";
 import SidebarMenu from "@/views/game/components/menu/SidebarMenu.vue";
 import FooterBar from "@/views/game/components/menu/FooterBar.vue";
 import StackedUI from "@/views/game/StackedUI.vue";
+import { createKeyboardShortcutHandler } from "@/services/shortcuts.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
@@ -140,8 +140,6 @@ let playerSocketHandler: PlayerClientSocketHandler | null = null;
 let gameRoomSocketHandler: GameRoomClientSocketHandler | null = null;
 
 const game = computed<Game>(() => store.game!);
-
-const gameId = computed(() => game.value._id);
 
 const hasGame = computed(() => Boolean(game.value));
 
@@ -333,6 +331,9 @@ store.clearGame();
 //A CSS class that will load only on the game screen to prevent drag-bounce behavior
 const GAME_BODY_CLASS = "game-body";
 
+// keyboard shortcut handling
+const handleKeyDown = createKeyboardShortcutHandler();
+
 onMounted(async () => {
   diplomacySocketHandler = new DiplomacyClientSocketHandler(socket, eventBus);
   gameSocketHandler = new GameClientSocketHandler(socket, store, eventBus);
@@ -342,6 +343,8 @@ onMounted(async () => {
     store,
     playerClientSocketEmitter,
   );
+
+  document.addEventListener("keydown", handleKeyDown);
 
   attemptLogin();
 
@@ -399,6 +402,8 @@ onUnmounted(() => {
   gameSocketHandler = null;
   playerSocketHandler = null;
   gameRoomSocketHandler = null;
+
+  document.removeEventListener("keydown", handleKeyDown);
 
   const userPlayer = GameHelper.getUserPlayer(store.game!);
 

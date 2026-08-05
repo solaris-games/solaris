@@ -174,7 +174,6 @@
 import GameHelper from "../../../../services/gameHelper";
 import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
 import router from "../../../../router";
-import KEYBOARD_SHORTCUTS from "../../../../services/data/keyboardShortcuts";
 import ServerConnectionStatus from "./ServerConnectionStatus.vue";
 import ResearchProgress from "./ResearchProgress.vue";
 import HamburgerMenu from "./HamburgerMenu.vue";
@@ -249,22 +248,8 @@ const unreadMessages = ref<number | null>(null);
 const unreadEvents = ref<number | null>(null);
 const intervalFunction = ref<number | null>(null);
 
-const fitGalaxy = () => {
-  eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
-};
-
 const goToMyGames = () => {
   router.push({ name: "game-active-games" });
-};
-
-const panToHomeStar = () => {
-  if (userPlayer.value) {
-    emit("onOpenPlayerDetailRequested", userPlayer.value._id);
-
-    eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
-      player: userPlayer.value,
-    });
-  }
 };
 
 const setMenuState = (newState: MenuState) => {
@@ -277,82 +262,6 @@ const onViewResearchRequested = () => {
 
 const onViewBulkUpgradeRequested = () => {
   setMenuState({ state: "bulkInfrastructureUpgrade" });
-};
-
-const handleKeyDown = (e: KeyboardEvent): void => {
-  if (
-    /^(?:input|textarea|select|button)$/i.test(
-      (e.target as HTMLElement).tagName,
-    )
-  ) {
-    return;
-  }
-
-  const key = e.key;
-
-  // Check for modifier keys and ignore the keypress if there is one.
-  if (e.altKey || e.shiftKey || e.ctrlKey || e.metaKey) {
-    return;
-  }
-
-  const isLoggedIn = userStore.isLoggedIn;
-  const isInGame = userPlayer.value != null;
-
-  let menuState = KEYBOARD_SHORTCUTS.all[key];
-
-  if (menuState === null) {
-    setMenuState({ state: "none" });
-    return;
-  }
-
-  if (isLoggedIn) {
-    menuState = menuState || KEYBOARD_SHORTCUTS.user[key];
-  }
-
-  // Handle keyboard shortcuts for screens only available for users
-  // who are players.
-  if (isInGame) {
-    menuState = menuState || KEYBOARD_SHORTCUTS.player[key];
-  }
-
-  if (!menuState) {
-    return;
-  }
-
-  // Special case for Inbox shortcut, only do this if the screen is small.
-  if (menuState === "inbox") {
-    return;
-  }
-
-  // Special case for intel, which is not accessible for dark mode extra games.
-  if (
-    menuState === "intel" &&
-    GameHelper.isDarkModeExtra(game.value) &&
-    !gameIsFinished.value
-  ) {
-    return;
-  }
-
-  switch (menuState) {
-    case null:
-      setMenuState({ state: "none" });
-      break;
-    case "HOME_STAR":
-      panToHomeStar();
-      break;
-    case "FIT_GALAXY":
-      fitGalaxy();
-      break;
-    case "ZOOM_IN":
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
-      break;
-    case "ZOOM_OUT":
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
-      break;
-    default:
-      setMenuState({ state: menuState });
-      break;
-  }
 };
 
 const recalculateTimeRemaining = () => {
@@ -477,8 +386,6 @@ watch(game, () => {
 });
 
 onMounted(async () => {
-  document.addEventListener("keydown", handleKeyDown);
-
   setupTimer();
 
   eventBus.on(GameEventBusEventNames.GameStarted, gameStarted);
@@ -506,8 +413,6 @@ onMounted(async () => {
   );
 
   onUnmounted(() => {
-    document.removeEventListener("keydown", handleKeyDown);
-
     eventBus.off(GameEventBusEventNames.GameStarted, gameStarted);
     eventBus.off(
       UserEventBusEventNames.GameMessageSent,
