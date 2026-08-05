@@ -59,6 +59,7 @@ const applyPlayers = (game: Game, history: GameHistory) => {
         player.research = histPlayer.research;
         player.ready = false; // reset turn based states to ensure the game stays in that tick
         player.readyToCycle = false;
+        player.lastSeen = new Date();
     });
 };
 
