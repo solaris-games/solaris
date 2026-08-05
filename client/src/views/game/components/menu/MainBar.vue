@@ -8,7 +8,7 @@
       <player-list @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested" />
     </div>
 
-    <div class="menu-content">
+    <div v-if="menuState.state !== 'none'" class="menu-content">
       <welcome
         v-if="menuState.state == 'welcome'"
         @onCloseRequested="onCloseRequested"
