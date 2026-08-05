@@ -2,10 +2,26 @@ import { inject, computed } from "vue";
 import { useUserStore } from "@/stores/user.ts";
 import { useGameStore } from "@/stores/game.ts";
 import { eventBusInjectionKey } from "@/eventBus.ts";
-import KEYBOARD_SHORTCUTS from "./data/keyboardShortcuts";
+import { KEYBOARD_SHORTCUTS } from "./data/keyboardShortcuts";
 import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
 import GameHelper from "@/services/gameHelper.ts";
-import type { MenuState } from "@/types/menu.ts";
+import type { MenuState, MenuStateChat } from "@/types/menu.ts";
+
+export type ShortcutCommand =
+  | { cmd: "setMenuState"; state: MenuState }
+  | { cmd: "setChatState"; state: MenuStateChat }
+  | {
+      cmd: "mapCommand";
+      command: "fitGalaxy" | "panToHomeStar" | "zoomIn" | "zoomOut";
+    };
+
+export type KeyboardShortcuts = Record<string, ShortcutCommand>;
+
+export type KeyboardShortcutsConfig = {
+  all: KeyboardShortcuts;
+  user: KeyboardShortcuts;
+  player: KeyboardShortcuts;
+};
 
 export const createKeyboardShortcutHandler = () => {
   const userStore = useUserStore();
@@ -15,12 +31,6 @@ export const createKeyboardShortcutHandler = () => {
   const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
   const game = computed(() => store.game!);
 
-  const gameIsFinished = computed(() => GameHelper.isGameFinished(game.value));
-
-  const setMenuState = (newState: MenuState) => {
-    store.setMenuState(newState);
-  };
-
   const panToHomeStar = () => {
     if (userPlayer.value) {
       const homeStarId = GameHelper.getPlayerHomeStar(
@@ -28,13 +38,17 @@ export const createKeyboardShortcutHandler = () => {
         game.value.galaxy.stars,
       )?._id;
       if (homeStarId) {
-        setMenuState({ state: "starDetail", starId: homeStarId });
+        store.setMenuState({ state: "starDetail", starId: homeStarId });
       }
 
       eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
         player: userPlayer.value,
       });
     }
+  };
+
+  const fitGalaxy = () => {
+    eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
   };
 
   return (e: KeyboardEvent) => {
@@ -54,65 +68,40 @@ export const createKeyboardShortcutHandler = () => {
     }
 
     const isLoggedIn = userStore.isLoggedIn;
-    const isInGame = userPlayer.value != null;
 
-    let menuState = KEYBOARD_SHORTCUTS.all[key];
-
-    const fitGalaxy = () => {
-      eventBus.emit(MapCommandEventBusEventNames.MapCommandFitGalaxy, {});
-    };
-
-    if (menuState === null) {
-      setMenuState({ state: "none" });
-      return;
-    }
+    let cmd = KEYBOARD_SHORTCUTS.all[key];
 
     if (isLoggedIn) {
-      menuState = menuState || KEYBOARD_SHORTCUTS.user[key];
+      cmd = cmd || KEYBOARD_SHORTCUTS.user[key];
     }
 
-    // Handle keyboard shortcuts for screens only available for users
-    // who are players.
-    if (isInGame) {
-      menuState = menuState || KEYBOARD_SHORTCUTS.player[key];
+    if (userPlayer.value) {
+      cmd = cmd || KEYBOARD_SHORTCUTS.player[key];
     }
 
-    if (!menuState) {
+    if (cmd === null) {
       return;
     }
 
-    if (menuState === "inbox") {
-      store.setMenuStateChat({ state: "inbox" });
-    }
-
-    // Special case for intel, which is not accessible for dark mode extra games.
-    if (
-      menuState === "intel" &&
-      GameHelper.isDarkModeExtra(game.value) &&
-      !gameIsFinished.value
-    ) {
-      return;
-    }
-
-    switch (menuState) {
-      case null:
-        setMenuState({ state: "none" });
-        break;
-      case "HOME_STAR":
-        panToHomeStar();
-        break;
-      case "FIT_GALAXY":
-        fitGalaxy();
-        break;
-      case "ZOOM_IN":
-        eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
-        break;
-      case "ZOOM_OUT":
-        eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
-        break;
-      default:
-        setMenuState({ state: menuState });
-        break;
+    if (cmd.cmd === "setMenuState") {
+      store.setMenuState(cmd.state);
+    } else if (cmd.cmd === "setChatState") {
+      store.setMenuStateChat(cmd.state);
+    } else if (cmd.cmd === "mapCommand") {
+      switch (cmd.command) {
+        case "fitGalaxy":
+          fitGalaxy();
+          break;
+        case "panToHomeStar":
+          panToHomeStar();
+          break;
+        case "zoomIn":
+          eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomIn, {});
+          break;
+        case "zoomOut":
+          eventBus.emit(MapCommandEventBusEventNames.MapCommandZoomOut, {});
+          break;
+      }
     }
   };
 };
