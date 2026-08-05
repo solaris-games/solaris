@@ -1033,14 +1033,12 @@ export class CombatService<ID extends Id> {
             st: CombatRoundState<ID, Player<ID>, Star<ID>, Carrier<ID>>,
         ) => void,
     ): DetailedCombatResult<ID, Player<ID>, Star<ID>, Carrier<ID>> | undefined {
-        const playerIds = new Set<ID>();
+        const playerIds = new Set<string>();
 
-        carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!));
+        carriers.forEach((c) => playerIds.add(c.ownedByPlayerId!.toString()));
 
         const players = Array.from(playerIds, (p) =>
-            game.galaxy.players.find(
-                (pl) => pl._id.toString() === p.toString(),
-            )!,
+            game.galaxy.players.find((pl) => pl._id.toString() === p)!,
         );
 
         const combatDiploGroups = this.combatGroupService.computeCombatGroups(
