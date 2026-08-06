@@ -31,6 +31,7 @@ export const useUserStore = defineStore("user", () => {
     username.value = newUser.username;
     roles.value = newUser.roles;
     credits.value = newUser.credits;
+    isEstablishedPlayer.value = newUser.isEstablishedPlayer;
   };
 
   // Individual property setters

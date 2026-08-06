@@ -26,7 +26,12 @@ const props = defineProps<{
 const store = useGameStore();
 const userStore = useUserStore();
 
-const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer);
+// Null means we do not know yet (the user request is still in flight) - do not
+// show the lock in that case, otherwise established players briefly see every
+// game as locked.
+const userIsEstablishedPlayer = computed(
+  () => userStore.isEstablishedPlayer !== false,
+);
 
 const userCanJoinGame = computed(
   () =>
