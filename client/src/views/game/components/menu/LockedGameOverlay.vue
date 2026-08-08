@@ -26,7 +26,9 @@ const props = defineProps<{
 const store = useGameStore();
 const userStore = useUserStore();
 
-const userIsEstablishedPlayer = computed(() => userStore.isEstablishedPlayer);
+const userIsEstablishedPlayer = computed(
+  () => userStore.isEstablishedPlayer !== false,
+);
 
 const userCanJoinGame = computed(
   () =>
