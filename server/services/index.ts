@@ -23,6 +23,7 @@ import {
     PathfindingService,
     CombatService,
     CombatGroupService,
+    InfrastructureCostService,
 } from "@solaris/common";
 import { EmailService } from "./email";
 import { EventService } from "./event";
@@ -328,6 +329,7 @@ export default (
         gameTypeService,
         researchProgressService,
     );
+    const infrastructureCostService = new InfrastructureCostService();
     const starUpgradeService = new StarUpgradeService(
         gameRepository,
         starService,
@@ -339,6 +341,7 @@ export default (
         gameTypeService,
         shipService,
         starDataService,
+        infrastructureCostService,
     );
     const starCaptureService = new StarCaptureService(
         specialistService,
@@ -347,7 +350,7 @@ export default (
         gameStateService,
         diplomacyService,
         technologyService,
-        starUpgradeService,
+        infrastructureCostService,
     );
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(
@@ -663,6 +666,7 @@ export default (
         saveWaypointsService,
         starDataService,
         statisticsService,
+        infrastructureCostService,
     );
     const battleRoyaleService = new BattleRoyaleService(
         starService,
@@ -961,5 +965,6 @@ export default (
         carrierTravelService,
         starDataService,
         scanningService,
+        infrastructureCostService,
     };
 };

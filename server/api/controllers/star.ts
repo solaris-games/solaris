@@ -75,7 +75,7 @@ export default (container: DependencyContainer) => {
                     req.body,
                 );
 
-                let summary = await container.starUpgradeService.upgradeBulk(
+                const summary = await container.starUpgradeService.upgradeBulk(
                     req.game,
                     req.player,
                     reqObj.upgradeStrategy,

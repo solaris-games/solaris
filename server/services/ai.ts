@@ -5,6 +5,7 @@ import CarrierService from "./carrier";
 import {
     CombatService,
     DistanceService,
+    InfrastructureCostService,
     PathfindingService,
 } from "@solaris/common";
 import PlayerService from "./player";
@@ -157,6 +158,7 @@ export default class AIService {
     saveWaypointService: SaveWaypointsService;
     starDataService: StarDataService;
     statisticsService: IStatisticsService;
+    infrastructureCostService: InfrastructureCostService<DBObjectId>;
 
     constructor(
         starUpgradeService: StarUpgradeService,
@@ -178,6 +180,7 @@ export default class AIService {
         saveWaypointService: SaveWaypointsService,
         starDataService: StarDataService,
         statisticsService: IStatisticsService,
+        infrastructureCostService: InfrastructureCostService<DBObjectId>,
     ) {
         this.starUpgradeService = starUpgradeService;
         this.carrierService = carrierService;
@@ -198,6 +201,7 @@ export default class AIService {
         this.saveWaypointService = saveWaypointService;
         this.starDataService = starDataService;
         this.statisticsService = statisticsService;
+        this.infrastructureCostService = infrastructureCostService;
     }
 
     isAIControlled(player: Player) {
@@ -1154,7 +1158,7 @@ export default class AIService {
 
         return (
             availableFunds >=
-            this.starUpgradeService.calculateCarrierCost(
+            this.infrastructureCostService.calculateCarrierCost(
                 game,
                 carrierExpenseConfig,
             )

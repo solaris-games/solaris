@@ -2,13 +2,16 @@ import { Game } from "./types/Game";
 import { Star, StarCaptureResult } from "./types/Star";
 import { Player } from "./types/Player";
 import { User } from "./types/User";
-import { Carrier, GameTypeService } from "@solaris/common";
+import {
+    Carrier,
+    GameTypeService,
+    InfrastructureCostService,
+} from "@solaris/common";
 import StarService from "./star";
 import SpecialistService from "./specialist";
 import GameStateService from "./gameState";
 import DiplomacyService from "./diplomacy";
 import { TechnologyService } from "@solaris/common";
-import StarUpgradeService from "./starUpgrade";
 import { DBObjectId } from "./types/DBObjectId";
 import { IStatisticsService } from "./types/IStatisticsService";
 
@@ -19,7 +22,7 @@ export default class StarCaptureService {
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
     technologyService: TechnologyService;
-    starUpgradeService: StarUpgradeService;
+    infrastructureCostService: InfrastructureCostService<DBObjectId>;
 
     constructor(
         specialistService: SpecialistService,
@@ -28,7 +31,7 @@ export default class StarCaptureService {
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
         technologyService: TechnologyService,
-        starUpgradeService: StarUpgradeService,
+        infrastructureCostService: InfrastructureCostService<DBObjectId>,
     ) {
         this.specialistService = specialistService;
         this.starService = starService;
@@ -36,7 +39,7 @@ export default class StarCaptureService {
         this.gameStateService = gameStateService;
         this.diplomacyService = diplomacyService;
         this.technologyService = technologyService;
-        this.starUpgradeService = starUpgradeService;
+        this.infrastructureCostService = infrastructureCostService;
     }
 
     captureStar(
@@ -171,7 +174,7 @@ export default class StarCaptureService {
         for (let i = 0; i < economy; i++) {
             // calculates for the next level of economy, therefore i < economy is correct since the last iteration is the price for the economy-th economy
             sum +=
-                this.starUpgradeService.calculateEconomyCost(
+                this.infrastructureCostService.calculateEconomyCost(
                     game,
                     expenseConfig,
                     i,
