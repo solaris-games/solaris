@@ -212,8 +212,8 @@ export type GameExperimentationReward =
     (typeof GAME_EXPERIMENTATION_REWARDS)[number];
 
 export const GAME_SPECIALIST_TOKEN_REWARDS = [
-    "standard",
-    "experimental",
+    "simplified",
+    "dependsOnStarCount",
 ] as const;
 
 export type GameSpecialistTokenReward =

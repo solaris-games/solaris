@@ -120,7 +120,7 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "experimental",
-        "specialistTokenReward": "experimental",
+        "specialistTokenReward": "dependsOnStarCount",
         "researchCostProgressions": {
             "terraforming": {
                 "progression": "exponential",

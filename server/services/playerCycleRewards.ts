@@ -124,9 +124,9 @@ export default class PlayerCycleRewardsService {
         let specialists = player.research.specialists.level;
 
         switch (game.settings.technology.specialistTokenReward) {
-            case "standard":
+            case "simplified":
                 return specialists;
-            case "experimental":
+            case "dependsOnStarCount":
                 const factor = 2 / game.settings.galaxy.starsPerPlayer;
                 return Math.ceil(
                     Math.min(starCount * specialists * factor, specialists),

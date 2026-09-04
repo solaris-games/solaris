@@ -1173,6 +1173,8 @@ const getFriendlyText = (option: string) => {
     anyCarrier: "Any carrier",
     revealAtEnd: "Anonymous, revealed at end",
     noRankLoss: "All players, no rank loss",
+    simplified: "Simplified",
+    dependsOnStarCount: "Depends on star count",
   }[option];
 
   return text || option;
