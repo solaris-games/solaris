@@ -29,7 +29,7 @@
     "author": "",
     "license": "GPL-3.0-or-later",
     "dependencies": {
-        "axios": "1.16.1",
+        "axios": "1.20.0",
         "bcrypt": "6.0.0",
         "compression": "1.8.1",
         "connect-mongo": "6.0.0",
@@ -43,7 +43,7 @@
         "express-session": "1.19.0",
         "memory-cache": "0.2.0",
         "luxon": "3.5.0",
-        "mongoose": "9.6.2",
+        "mongoose": "9.9.4",
         "mongoose-lean-defaults": "2.3.1",
         "nodemailer": "9.0.3",
         "pino": "10.3.1",
