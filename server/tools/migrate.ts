@@ -1,4 +1,5 @@
 import readline from "readline";
+import { parseArgs } from "node:util";
 import { makeJob } from "./tool";
 import { migrateStats } from "./migrations/migrateStats";
 import { migrateInitialGameState } from "./migrations/migrateInitialGameState";
@@ -27,46 +28,26 @@ const MIGRATIONS = [
     },
 ];
 
-interface ParsedArgs {
-    migrationName?: string;
-    yes: boolean;
-    remove?: string;
-    add?: string;
-    force: boolean;
-    list: boolean;
-}
+const { values, positionals } = parseArgs({
+    args: process.argv.slice(2),
+    options: {
+        yes: { type: "boolean", short: "y", default: false },
+        force: { type: "boolean", default: false },
+        list: { type: "boolean", default: false },
+        remove: { type: "string" },
+        add: { type: "string" },
+        help: { type: "boolean", short: "h", default: false },
+    },
+    allowPositionals: true,
+});
 
-function parseArgs(args: string[]): ParsedArgs {
-    const result: ParsedArgs = { yes: false, force: false, list: false };
+const migrationName = positionals[0];
+const { yes, force, list, remove, add } = values;
 
-    for (let i = 0; i < args.length; i++) {
-        const arg = args[i];
-        if (arg === "--yes" || arg === "-y") {
-            result.yes = true;
-        } else if (arg === "--force") {
-            result.force = true;
-        } else if (arg === "--list") {
-            result.list = true;
-        } else if (arg === "--remove") {
-            const value = args[i + 1];
-            if (!value || value.startsWith("--")) {
-                throw new Error("--remove requires a migration name");
-            }
-            result.remove = value;
-            i++;
-        } else if (arg === "--add") {
-            const value = args[i + 1];
-            if (!value || value.startsWith("--")) {
-                throw new Error("--add requires a migration name");
-            }
-            result.add = value;
-            i++;
-        } else {
-            result.migrationName = arg;
-        }
-    }
-
-    return result;
+if (positionals.length > 1) {
+    throw new Error(
+        `Unexpected extra arguments: ${positionals.slice(1).join(" ")}`,
+    );
 }
 
 function prompt(question: string): Promise<boolean> {
@@ -106,8 +87,6 @@ Available migrations:
 
 const job = makeJob("Migration", async (ctx) => {
     const log = ctx.log;
-    const args = parseArgs(process.argv.slice(2));
-    const { migrationName, yes, remove, add, force, list } = args;
 
     if (remove && add) {
         throw new Error("--remove and --add are mutually exclusive");
@@ -278,7 +257,7 @@ const job = makeJob("Migration", async (ctx) => {
     log.info("All outstanding migrations applied.");
 });
 
-if (process.argv.includes("-h") || process.argv.includes("--help")) {
+if (values.help) {
     printUsage();
     process.exit(0);
 }
