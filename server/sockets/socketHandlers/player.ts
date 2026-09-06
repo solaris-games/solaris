@@ -9,11 +9,13 @@ import { objectIdFromString } from "../../services/types/DBObjectId";
 import { Game } from "../../services/types/Game";
 import { ServerHandler } from "./serverHandler";
 import { ServerSocketHandler } from "./serverSocketHandler";
+import PlayerService from "../../services/player";
 
 export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketEventType> {
     constructor(
         private socketService: SocketService,
         private gameService: GameService,
+        private playerService: PlayerService,
         serverHandler: ServerHandler,
     ) {
         super(serverHandler);
@@ -31,19 +33,43 @@ export class PlayerServerSocketHandler extends ServerSocketHandler<PlayerSocketE
                     return;
                 }
 
-                let socket: Socket = e.socket;
+                const socket: Socket = e.socket;
+
+                const game: Game | null = await this.gameService.getByIdLean(
+                    objectIdFromString(e.gameId),
+                    {
+                        "settings.general.playerOnlineStatus": 1,
+                        "galaxy.players._id": 1,
+                        "galaxy.players.userId": 1,
+                    },
+                );
+
+                if (!game) {
+                    return;
+                }
 
                 socket.join(e.gameId); // Join the game room to receive game-wide messages.
 
                 if (e.playerId) {
-                    socket.join(e.playerId);
+                    // Only allow the socket to join the player room if the
+                    // logged in user actually controls that player, otherwise
+                    // anyone could subscribe to another player's private events.
+                    const userId = await this.socketService.getUserId(socket);
 
-                    let game: Game | null = await this.gameService.getByIdLean(
-                        objectIdFromString(e.gameId),
-                        {
-                            "settings.general.playerOnlineStatus": 1,
-                        },
+                    if (!userId) {
+                        return;
+                    }
+
+                    const player = this.playerService.getByUserId(
+                        game,
+                        objectIdFromString(userId),
                     );
+
+                    if (!player || player.userId?.toString() !== userId) {
+                        return;
+                    }
+
+                    socket.join(e.playerId);
 
                     if (
                         game?.settings.general.playerOnlineStatus === "visible"
