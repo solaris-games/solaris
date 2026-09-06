@@ -266,19 +266,16 @@ export default class PlayerService extends EventEmitter {
     }
 
     _distributePlayerLinkedHomeStars(game: Game, players: Player[]) {
-        let playersDistributed: Player[] = [];
-
         if (
-            game.settings.specialGalaxy.playerDistribution ===
+            game.settings.specialGalaxy.playerDistribution !==
             "circularSequential"
         ) {
-            playersDistributed = players;
-        } else {
             // circular and random are both kinds of random distributions, but the latter will not work for irregular maps, so we do the same thing and use a random circular distribution
-            playersDistributed = shuffle(new MathRandomGen(), players);
+            // This shuffle prevents the player ID order from matching inverse home star ID order.
+            shuffle(new MathRandomGen(), players);
         }
 
-        for (let player of playersDistributed) {
+        for (let player of players) {
             let homeStarId = game.galaxy.homeStars!.pop()!;
 
             // Set up the home star
@@ -290,6 +287,14 @@ export default class PlayerService extends EventEmitter {
                 player,
                 game.settings,
             );
+        }
+
+        if (
+            game.settings.specialGalaxy.playerDistribution !==
+            "circularSequential"
+        ) {
+            // We need to shuffle again to prevent the slot order from matching inverse home star ID order.
+            shuffle(new MathRandomGen(), players);
         }
     }
 

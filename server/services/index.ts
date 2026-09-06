@@ -553,6 +553,7 @@ export default (
     const playerServerSocketHandler = new PlayerServerSocketHandler(
         socketService,
         gameService,
+        playerService,
         serverHandler,
     );
     const userServerSocketHandler = new UserServerSocketHandler(
