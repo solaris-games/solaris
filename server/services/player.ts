@@ -262,6 +262,14 @@ export default class PlayerService extends EventEmitter {
             this._distributePlayerStartingStars(game, players);
         }
 
+        if (
+            game.settings.specialGalaxy.playerDistribution !==
+            "circularSequential"
+        ) {
+            // We need to shuffle again to prevent the slot order from matching inverse home star ID order.
+            shuffle(new MathRandomGen(), players);
+        }
+        
         game.galaxy.players = players;
     }
 
@@ -287,14 +295,6 @@ export default class PlayerService extends EventEmitter {
                 player,
                 game.settings,
             );
-        }
-
-        if (
-            game.settings.specialGalaxy.playerDistribution !==
-            "circularSequential"
-        ) {
-            // We need to shuffle again to prevent the slot order from matching inverse home star ID order.
-            shuffle(new MathRandomGen(), players);
         }
     }
 
