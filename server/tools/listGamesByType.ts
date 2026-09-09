@@ -27,15 +27,11 @@ const { positionals } = parseArgs({
 
 const gameType = positionals[0];
 
-if (!gameType) {
-    console.error("Usage: npm run list-games -w server -- <gameType>");
-    console.error(`Valid game types: ${GAME_TYPES.join(", ")}`);
-    process.exit(1);
-}
-
-if (!(GAME_TYPES as readonly string[]).includes(gameType)) {
+if (gameType && !(GAME_TYPES as readonly string[]).includes(gameType)) {
     console.error(`Invalid game type: ${gameType}`);
-    console.error(`Valid game types: ${GAME_TYPES.join(", ")}`);
+    console.error(
+        `Valid game types: ${GAME_TYPES.join(", ")} (or omit the game type to list all non-tutorial games)`,
+    );
     process.exit(1);
 }
 
@@ -49,17 +45,21 @@ const run = async () => {
     });
 
     try {
-        const games = (await GameModel.find(
-            {
-                "settings.general.type": gameType,
-                "state.startDate": { $ne: null },
-            },
-            {
-                "settings.general.name": 1,
-                "state.startDate": 1,
-                "galaxy.players.afk": 1,
-            },
-        )
+        const query = gameType
+            ? {
+                  "settings.general.type": gameType,
+                  "state.startDate": { $ne: null },
+              }
+            : {
+                  "settings.general.type": { $ne: "tutorial" },
+                  "state.startDate": { $ne: null },
+              };
+
+        const games = (await GameModel.find(query, {
+            "settings.general.name": 1,
+            "state.startDate": 1,
+            "galaxy.players.afk": 1,
+        })
             .sort({ "state.startDate": 1 })
             .lean()) as GameStartRow[];
 
@@ -76,7 +76,11 @@ const run = async () => {
             console.log(`${game._id},${name},${startDate},${afkPlayers}`);
         }
 
-        console.error(`Found ${games.length} game(s) of type "${gameType}".`);
+        console.error(
+            gameType
+                ? `Found ${games.length} game(s) of type "${gameType}".`
+                : `Found ${games.length} game(s) across all game types (excluding tutorial).`,
+        );
     } finally {
         await mongo.disconnect();
     }
