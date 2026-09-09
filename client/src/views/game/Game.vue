@@ -33,7 +33,7 @@
 
           <chat
             @onOpenPlayerDetailRequested="onPlayerSelected"
-            @onOpenReportPlayerRequested="onOpenReportPlayerRequested"
+            @onOpenReportPlayerRequested="onOpenReportPlayerMessageRequested"
           />
         </stacked-u-i>
       </template>
@@ -222,6 +222,21 @@ const onPlayerSelected = (playerId: string) => {
   });
 
   emit("onPlayerSelected", playerId);
+};
+
+const onOpenReportPlayerMessageRequested = (e: {
+  playerId: string;
+  conversationId: string;
+  messageId: string;
+}) => {
+  store.setMenuState({
+    state: "reportPlayer",
+    args: {
+      playerId: e.playerId,
+      conversationId: e.conversationId,
+      messageId: e.messageId,
+    },
+  });
 };
 
 const onOpenReportPlayerRequested = (e: { playerId: string }) => {

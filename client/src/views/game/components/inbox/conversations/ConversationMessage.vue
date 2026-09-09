@@ -142,9 +142,6 @@ const onOpenReportPlayerRequested = (e: {
   conversationId: string;
 }) => emit("onOpenReportPlayerRequested", e);
 
-const getFriendlyColour = (colour: string) =>
-  GameHelper.getFriendlyColour(colour);
-
 const onOpenPlayerDetailRequested = () =>
   props.message.fromPlayerId &&
   emit("onOpenPlayerDetailRequested", props.message.fromPlayerId);
