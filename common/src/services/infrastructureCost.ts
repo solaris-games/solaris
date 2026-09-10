@@ -5,14 +5,10 @@ import type { TerraformedResources } from "../types/common/star";
 export class InfrastructureCostService<ID extends Id> {
     _calculateInfrastructureCost(
         baseCost: number,
-        expenseConfig: number | null,
+        expenseConfig: number,
         current: number,
         terraformedResources: number,
     ) {
-        if (expenseConfig == null) {
-            return null;
-        }
-
         return Math.max(
             1,
             Math.floor(
@@ -56,7 +52,7 @@ export class InfrastructureCostService<ID extends Id> {
 
     calculateEconomyCost(
         game: Game<ID>,
-        expenseConfig: number | null,
+        expenseConfig: number,
         current: number,
         terraformedResources: number,
     ) {
@@ -70,7 +66,7 @@ export class InfrastructureCostService<ID extends Id> {
 
     calculateIndustryCost(
         game: Game<ID>,
-        expenseConfig: number | null,
+        expenseConfig: number,
         current: number,
         terraformedResources: number,
     ) {
@@ -84,7 +80,7 @@ export class InfrastructureCostService<ID extends Id> {
 
     calculateScienceCost(
         game: Game<ID>,
-        expenseConfig: number | null,
+        expenseConfig: number,
         current: number,
         terraformedResources: number,
     ) {

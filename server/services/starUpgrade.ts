@@ -2,7 +2,14 @@ import { Carrier } from "./types/Carrier";
 
 import EventEmitter from "events";
 import { DBObjectId } from "./types/DBObjectId";
-import { InfrastructureCostService, ValidationError } from "@solaris/common";
+import {
+    GameInfrastructureExpenseMultiplier,
+    GameTypeService,
+    InfrastructureCostService,
+    StarDataService,
+    TechnologyService,
+    ValidationError,
+} from "@solaris/common";
 import Repository from "./repository";
 import {
     BulkUpgradeReport,
@@ -15,14 +22,10 @@ import { Player } from "./types/Player";
 import { InfrastructureType, Star, TerraformedResources } from "./types/Star";
 import UserAchievementService from "./userAchievement";
 import CarrierService from "./carrier";
-import { GameTypeService } from "@solaris/common";
 import ResearchService from "./research";
 import StarService from "./star";
-import { TechnologyService } from "@solaris/common";
 import PlayerCreditsService from "./playerCredits";
 import ShipService from "./ship";
-import { GameInfrastructureExpenseMultiplier } from "@solaris/common";
-import { StarDataService } from "@solaris/common";
 import { IEventService } from "./types/IEventService";
 import { IStatisticsService } from "./types/IStatisticsService";
 
@@ -39,6 +42,13 @@ type UpgradeStarContext = {
     readonly stars: UpgradeStar[];
     readonly upgradeStar: (star: UpgradeStar) => UpgradeStar;
 };
+
+type CalculateCostFunction = (
+    game: Game,
+    expenseConfig: number,
+    infrastructure: number,
+    terraformedResources: number,
+) => number;
 
 export default class StarUpgradeService extends EventEmitter {
     gameRepo: Repository<Game>;
@@ -366,17 +376,17 @@ export default class StarUpgradeService extends EventEmitter {
         star: Star,
         expenseConfigKey: GameInfrastructureExpenseMultiplier,
         economyType: InfrastructureType,
-        calculateCostCallback,
+        calculateCostFunction: CalculateCostFunction,
     ) {
         if (this.starDataService.isDeadStar(star)) {
             return null;
         }
 
-        let effectiveTechs =
+        const effectiveTechs =
             this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         // Calculate how much the upgrade will cost.
-        const expenseConfig =
+        const expenseConfig: number =
             game.constants.star.infrastructureExpenseMultipliers[
                 expenseConfigKey
             ];
@@ -386,14 +396,12 @@ export default class StarUpgradeService extends EventEmitter {
                 effectiveTechs.terraforming,
             );
 
-        const cost = calculateCostCallback(
+        return calculateCostFunction(
             game,
             expenseConfig,
-            star.infrastructure[economyType],
+            star.infrastructure[economyType] || 0,
             terraformedResources,
         );
-
-        return cost;
     }
 
     async _upgradeInfrastructureUpdateDB(
@@ -480,7 +488,7 @@ export default class StarUpgradeService extends EventEmitter {
         starId: DBObjectId,
         expenseConfigKey: GameInfrastructureExpenseMultiplier,
         economyType: InfrastructureType,
-        calculateCostCallback,
+        calculateCostFunction: CalculateCostFunction,
         writeToDB: boolean = true,
         statisticsService: IStatisticsService,
     ): Promise<InfrastructureUpgradeReport> {
@@ -508,13 +516,17 @@ export default class StarUpgradeService extends EventEmitter {
             );
         }
 
-        let cost = this._calculateUpgradeInfrastructureCost(
+        const cost = this._calculateUpgradeInfrastructureCost(
             game,
             star,
             expenseConfigKey,
             economyType,
-            calculateCostCallback,
+            calculateCostFunction,
         );
+
+        if (cost === null) {
+            throw new ValidationError("Cannot upgrade infrastructure");
+        }
 
         if (writeToDB && player.credits < cost) {
             throw new ValidationError(
@@ -538,13 +550,13 @@ export default class StarUpgradeService extends EventEmitter {
             );
         }
 
-        let nextCost = this._calculateUpgradeInfrastructureCost(
+        const nextCost = this._calculateUpgradeInfrastructureCost(
             game,
             star,
             expenseConfigKey,
             economyType,
-            calculateCostCallback,
-        );
+            calculateCostFunction,
+        )!; // cost can only be null if the star is dead
 
         // Return a report of what just went down.
         return {
@@ -570,7 +582,13 @@ export default class StarUpgradeService extends EventEmitter {
             starId,
             game.settings.player.developmentCost.economy,
             "economy",
-            this.infrastructureCostService.calculateEconomyCost.bind(this),
+            (game, expenseConfig, current, terraformedRes) =>
+                this.infrastructureCostService.calculateEconomyCost(
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ),
             writeToDB,
             statisticsService,
         );
@@ -589,7 +607,13 @@ export default class StarUpgradeService extends EventEmitter {
             starId,
             game.settings.player.developmentCost.industry,
             "industry",
-            this.infrastructureCostService.calculateIndustryCost.bind(this),
+            (game, expenseConfig, current, terraformedRes) =>
+                this.infrastructureCostService.calculateIndustryCost(
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ),
             writeToDB,
             statisticsService,
         );
@@ -622,7 +646,13 @@ export default class StarUpgradeService extends EventEmitter {
             starId,
             game.settings.player.developmentCost.science,
             "science",
-            this.infrastructureCostService.calculateScienceCost.bind(this),
+            (game, expenseConfig, current, terraformedRes) =>
+                this.infrastructureCostService.calculateScienceCost(
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ),
             writeToDB,
             statisticsService,
         );
@@ -646,18 +676,21 @@ export default class StarUpgradeService extends EventEmitter {
         customTerraformingLevel?: number,
     ): UpgradeStarContext {
         let expenseConfig: number | null;
-        let calculateCostFunction: (
-            game: Game,
-            expenseConfig: number | null,
-            current: number,
-            terraformedResources: number,
-        ) => null | number;
+        let calculateCostFunction: CalculateCostFunction;
 
         switch (infrastructureType) {
             case "economy":
-                calculateCostFunction =
-                    this.infrastructureCostService.calculateEconomyCost.bind(
-                        this,
+                calculateCostFunction = (
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ) =>
+                    this.infrastructureCostService.calculateEconomyCost(
+                        game,
+                        expenseConfig,
+                        current,
+                        terraformedRes,
                     );
                 expenseConfig =
                     game.constants.star.infrastructureExpenseMultipliers[
@@ -665,9 +698,17 @@ export default class StarUpgradeService extends EventEmitter {
                     ] || null;
                 break;
             case "industry":
-                calculateCostFunction =
-                    this.infrastructureCostService.calculateIndustryCost.bind(
-                        this,
+                calculateCostFunction = (
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ) =>
+                    this.infrastructureCostService.calculateIndustryCost(
+                        game,
+                        expenseConfig,
+                        current,
+                        terraformedRes,
                     );
                 expenseConfig =
                     game.constants.star.infrastructureExpenseMultipliers[
@@ -675,9 +716,17 @@ export default class StarUpgradeService extends EventEmitter {
                     ] || null;
                 break;
             case "science":
-                calculateCostFunction =
-                    this.infrastructureCostService.calculateScienceCost.bind(
-                        this,
+                calculateCostFunction = (
+                    game,
+                    expenseConfig,
+                    current,
+                    terraformedRes,
+                ) =>
+                    this.infrastructureCostService.calculateScienceCost(
+                        game,
+                        expenseConfig,
+                        current,
+                        terraformedRes,
                     );
                 expenseConfig =
                     game.constants.star.infrastructureExpenseMultipliers[
@@ -690,6 +739,10 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError(
                 `Unknown infrastructure type ${infrastructureType}`,
             );
+        }
+
+        if (!expenseConfig) {
+            throw new ValidationError("Invalid expense config");
         }
 
         const upgradeStar = (star: UpgradeStar) => {
