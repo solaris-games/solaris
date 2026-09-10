@@ -269,7 +269,7 @@ export default class PlayerService extends EventEmitter {
             // We need to shuffle again to prevent the slot order from matching inverse home star ID order.
             shuffle(new MathRandomGen(), players);
         }
-        
+
         game.galaxy.players = players;
     }
 
