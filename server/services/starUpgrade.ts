@@ -126,7 +126,7 @@ export default class StarUpgradeService extends EventEmitter {
             );
         }
 
-        let effectiveTechs =
+        const effectiveTechs =
             this.technologyService.getStarEffectiveTechnologyLevels(game, star);
 
         const expenseConfig =
@@ -745,6 +745,15 @@ export default class StarUpgradeService extends EventEmitter {
             throw new ValidationError("Invalid expense config");
         }
 
+        const techs = this.technologyService.getPlayerEffectiveTechnologyLevels(
+            game,
+            player,
+        );
+
+        if (customTerraformingLevel) {
+            techs.terraforming = customTerraformingLevel;
+        }
+
         const upgradeStar = (star: UpgradeStar) => {
             const newInfra = star.infrastructureAmount + 1;
             const infrastructureCost = calculateCostFunction(
@@ -764,17 +773,18 @@ export default class StarUpgradeService extends EventEmitter {
 
         const mapStarToUpgrade = (s: Star): UpgradeStar => {
             const effectiveTechs =
-                this.technologyService.getStarEffectiveTechnologyLevels(
-                    game,
+                this.technologyService.withStarSpecificTechnology(
                     s,
+                    techs,
+                    false,
                 );
-            const terraformingLevel =
-                customTerraformingLevel ?? effectiveTechs.terraforming;
+
             const terraformedResources =
                 this.starService.calculateTerraformedResource(
                     s.naturalResources[infrastructureType],
-                    terraformingLevel,
+                    effectiveTechs.terraforming,
                 );
+
             const infrastructureCost = calculateCostFunction(
                 game,
                 expenseConfig,
