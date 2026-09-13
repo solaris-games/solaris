@@ -374,5 +374,13 @@
         "description": "A mysterious collective of wandering entities, drifting eternally through galactic matter. They remain the subject of great speculation.",
         "price": 10,
         "isPatronAvatar": true
+    },
+    {
+        "id": 47,
+        "file": "cieh.png",
+        "name": "ciEH",
+        "description": "The Canadian IntelliGENTS EHgency is home to the galaxy's finest space agents. Each is a warrior diplomat, lethal with both pen and sword. \n\nHQ hand-picks each agent for their exceptional teamwork, cunning, and tenacity. They live by one Mission Critical Directive: never surrender.",
+        "price": 10,
+        "isPatronAvatar": false
     }
 ]
