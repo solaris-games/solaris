@@ -1,16 +1,17 @@
-import { ValidationError } from "@solaris/common";
+import { ValidationError, Avatar, UserAvatar, Guild } from "@solaris/common";
 import Repository from "./repository";
 import SessionService from "./session";
-import { Avatar, UserAvatar } from "./types/Avatar";
 import { DBObjectId } from "./types/DBObjectId";
 import { User } from "./types/User";
 import UserService from "./user";
+import GuildService from "./guild";
 
 export default class AvatarService {
     constructor(
         private userRepo: Repository<User>,
         private userService: UserService,
         private sessionService: SessionService,
+        private guildService: GuildService,
     ) {}
 
     listAllAvatars(): Avatar[] {
@@ -18,7 +19,9 @@ export default class AvatarService {
     }
 
     listAllSolarisAvatars(): Avatar[] {
-        return this.listAllAvatars().filter((a) => !a.isPatronAvatar);
+        return this.listAllAvatars().filter(
+            (a) => a.avatarType === "normal" && !a.isPatronAvatar,
+        );
     }
 
     listAllAliases(): string[] {
@@ -26,23 +29,41 @@ export default class AvatarService {
     }
 
     async listUserAvatars(userId: DBObjectId): Promise<UserAvatar[]> {
-        let avatars = require("../config/game/avatars").slice();
+        const avatars = this.listAllAvatars();
 
-        let userAvatars = await this.userRepo.findById(userId, {
+        const user = await this.userRepo.findById(userId, {
             avatars: 1,
+            guildId: 1,
         });
 
-        if (!userAvatars) {
+        if (!user) {
             return [];
         }
 
-        for (let avatar of avatars) {
-            avatar.purchased =
-                avatar.price == null ||
-                (userAvatars.avatars || []).indexOf(avatar.id) > -1;
+        const unlockedAvatarIds = user.avatars || [];
+
+        let guild: Guild<DBObjectId> | null;
+        if (user.guildId) {
+            guild = await this.guildService.getInfoById(user.guildId);
         }
 
-        return avatars;
+        return avatars.map((avatar) => {
+            if (avatar.avatarType === "normal") {
+                return {
+                    ...avatar,
+                    unlocked:
+                        avatar.price === null ||
+                        unlockedAvatarIds.includes(avatar.id),
+                };
+            } else if (avatar.avatarType === "guild") {
+                return {
+                    ...avatar,
+                    unlocked: guild?.avatars?.includes(avatar.id) || false,
+                };
+            } else {
+                throw new Error("Unrecognized avatar type");
+            }
+        });
     }
 
     async getUserAvatar(
@@ -62,7 +83,13 @@ export default class AvatarService {
             throw new ValidationError(`Avatar ${avatarId} does not exist.`);
         }
 
-        if (avatar.purchased) {
+        if (avatar.avatarType !== "normal") {
+            throw new ValidationError(
+                `Avatar ${avatarId} cannot be purchased.`,
+            );
+        }
+
+        if (avatar.unlocked) {
             throw new ValidationError(
                 `You have already purchased this avatar.`,
             );

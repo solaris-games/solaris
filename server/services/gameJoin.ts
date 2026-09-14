@@ -98,7 +98,7 @@ export default class GameJoinService extends EventEmitter {
                 throw new ValidationError("The game requires a password.");
             }
 
-            let passwordMatch = await this.passwordService.compare(
+            const passwordMatch = await this.passwordService.compare(
                 password,
                 game.settings.general.password,
             );
@@ -141,20 +141,20 @@ export default class GameJoinService extends EventEmitter {
             }
         }
 
-        // Verify that the user has purchased the avatar they selected.
+        // Verify that the user has unlocked (purchased or gained via guild membership) the avatar they selected.
         const userAvatar = await this.avatarService.getUserAvatar(
             userId,
             avatar,
         );
 
-        if (!userAvatar.purchased) {
+        if (!userAvatar.unlocked) {
             throw new ValidationError(
-                `You have not purchased the selected avatar.`,
+                `You have not unlocked the selected avatar.`,
             );
         }
 
         // The user cannot rejoin if they quit early or conceded defeat.
-        let isQuitter = game.quitters.find(
+        const isQuitter = game.quitters.find(
             (x) => x.toString() === userId.toString(),
         );
 
@@ -164,7 +164,7 @@ export default class GameJoinService extends EventEmitter {
 
         // Disallow if they are already in the game as another player.
         // If the player they are in the game as is afk then that's fine.
-        let existing = game.galaxy.players.find(
+        const existing = game.galaxy.players.find(
             (x) => x.userId && x.userId.toString() === userId.toString(),
         );
 
