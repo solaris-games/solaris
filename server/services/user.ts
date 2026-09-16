@@ -9,17 +9,7 @@ import { User, UserSubscriptions } from "./types/User";
 import { DateTime } from "luxon";
 import { ActiveModel } from "./types/ActiveModel";
 import { EmailService } from "./email";
-
-function uuidv4(): string {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
-}
+import { randomUUID } from "crypto";
 
 export const UserServiceEvents = {
     onUserCreated: "onUserCreated",
@@ -473,7 +463,7 @@ export default class UserService extends EventEmitter {
             );
         }
 
-        let resetPasswordToken = uuidv4();
+        const resetPasswordToken = randomUUID();
 
         await this.userRepo.updateOne(
             {
