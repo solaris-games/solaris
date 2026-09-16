@@ -6,7 +6,7 @@ import SessionService from "./session";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { User, UserSubscriptions } from "./types/User";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import { ActiveModel } from "./types/ActiveModel";
 import { EmailService } from "./email";
 import { randomUUID } from "crypto";
@@ -483,12 +483,28 @@ export default class UserService extends EventEmitter {
             throw new ValidationError(`The token is required`);
         }
 
-        const user = await this.userRepo.findOne({
-            resetPasswordToken,
-        });
+        const user = await this.userRepo.findOne(
+            {
+                resetPasswordToken,
+            },
+            {
+                _id: 1,
+                resetPasswordToken: 1,
+                resetPasswordDate: 1,
+            },
+        );
 
-        if (user == null) {
+        if (user == null || !user.resetPasswordDate) {
             throw new ValidationError(`The token is invalid.`);
+        }
+
+        const expiryDate = DateTime.fromJSDate(user.resetPasswordDate).plus({
+            hours: 48,
+        });
+        const now = DateTime.now();
+
+        if (expiryDate < now) {
+            throw new ValidationError(`The token is expired`);
         }
 
         // Update the current password to the new password.
