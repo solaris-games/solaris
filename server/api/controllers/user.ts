@@ -164,10 +164,7 @@ export default (container: DependencyContainer) => {
                     return next();
                 }
 
-                req.session.userId = user._id;
-                req.session.username = user.username;
-                req.session.roles = user.roles;
-                req.session.userCredits = user.credits;
+                container.sessionService.refreshSession(req.session, user);
 
                 res.status(200).json(user);
                 return next();
@@ -385,14 +382,10 @@ export default (container: DependencyContainer) => {
                 await container.userService.closeAccount(req.session.userId);
 
                 // Delete the session object.
-                req.session.destroy((err) => {
-                    if (err) {
-                        return next(err);
-                    }
+                await container.sessionService.destroySession(req.session);
 
-                    res.sendStatus(200);
-                    return next();
-                });
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

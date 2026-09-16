@@ -14,7 +14,12 @@ const router = express.Router();
 
 const log = logger("express");
 
-export default async (config: Config, app, container: DependencyContainer) => {
+export default async (
+    config: Config,
+    app,
+    container: DependencyContainer,
+    sessionStore: MongoStore,
+) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
     app.use(
@@ -22,11 +27,6 @@ export default async (config: Config, app, container: DependencyContainer) => {
             limit: "1500kb", // Note: This allows large custom galaxies to be uploaded.
         }),
     );
-
-    const sessionStore = MongoStore.create({
-        mongoUrl: config.connectionString!,
-        collectionName: "sessions2", // use new sessions collection
-    });
 
     // ---------------
     // Use sessions for tracking logins
@@ -137,6 +137,5 @@ export default async (config: Config, app, container: DependencyContainer) => {
 
     return {
         app,
-        sessionStore,
     };
 };
