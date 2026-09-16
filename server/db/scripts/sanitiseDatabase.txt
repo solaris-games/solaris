@@ -7,7 +7,6 @@ db.users.updateMany({}, {
         password: null,
         resetPasswordToken: null,
         credits: 0,
-        premiumEndDate: null,
         banned: false,
         lastSeen: null,
         lastSeenIP: null,

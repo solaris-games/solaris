@@ -15,7 +15,6 @@ const schema = new Schema({
     resetPasswordToken: { type: Types.String, required: false, default: null },
     resetPasswordDate: { type: Types.Date, required: false, default: null },
     credits: { type: Types.Number, default: 0 },
-    premiumEndDate: { type: Types.Date, default: null },
     banned: { type: Types.Boolean, default: false },
     signupDate: { type: Types.Date, required: false, default: null },
     lastSeen: { type: Types.Date, required: false, default: null },
