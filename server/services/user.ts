@@ -40,6 +40,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
+            resetPasswordDate: 0,
             premiumEndDate: 0,
             banned: 0,
             lastSeen: 0,
@@ -104,6 +105,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
+            resetPasswordDate: 0,
             premiumEndDate: 0,
             banned: 0,
             credits: 0,
@@ -124,6 +126,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
+            resetPasswordDate: 0,
             premiumEndDate: 0,
             banned: 0,
             credits: 0,
@@ -481,6 +484,7 @@ export default class UserService extends EventEmitter {
             },
             {
                 resetPasswordToken,
+                resetPasswordDate: new Date(),
             },
         );
 
@@ -492,7 +496,7 @@ export default class UserService extends EventEmitter {
             throw new ValidationError(`The token is required`);
         }
 
-        let user = await this.userRepo.findOne({
+        const user = await this.userRepo.findOne({
             resetPasswordToken,
         });
 
@@ -501,7 +505,7 @@ export default class UserService extends EventEmitter {
         }
 
         // Update the current password to the new password.
-        let hash = await this.passwordService.hash(newPassword, 10);
+        const hash = await this.passwordService.hash(newPassword, 10);
 
         await this.userRepo.updateOne(
             {
@@ -510,6 +514,7 @@ export default class UserService extends EventEmitter {
             {
                 password: hash,
                 resetPasswordToken: null,
+                resetPasswordDate: null,
             },
         );
     }

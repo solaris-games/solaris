@@ -13,6 +13,7 @@ const schema = new Schema({
     emailOtherEnabled: { type: Types.Boolean, default: true },
     password: { type: Types.String, required: false, default: null },
     resetPasswordToken: { type: Types.String, required: false, default: null },
+    resetPasswordDate: { type: Types.Date, required: false, default: null },
     credits: { type: Types.Number, default: 0 },
     premiumEndDate: { type: Types.Date, default: null },
     banned: { type: Types.Boolean, default: false },

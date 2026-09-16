@@ -8,7 +8,8 @@
           <tr>
             <th>Username</th>
             <th>Email</th>
-            <th></th>
+            <th>Reset Link</th>
+            <th>Reset Date</th>
           </tr>
         </thead>
         <tbody>
@@ -24,6 +25,11 @@
                 "
                 >Reset Link</a
               >
+            </td>
+            <td v-if="user.resetPasswordDate">
+              <time :datetime="user.resetPasswordDate.toISOString()">{{
+                user.resetPasswordDate.toISOString()
+              }}</time>
             </td>
           </tr>
         </tbody>
