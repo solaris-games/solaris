@@ -19,6 +19,7 @@
         "start-db-recalc-stats:prod": "node dist/tools/recalculateStats.js",
         "start-db-sync-indices:dev": "tsx watch --inspect=9234 tools/syncIndices.ts",
         "start-db-sync-indices:prod": "node dist/tools/syncIndices.js",
+        "start-db-clear-reset-tokens:prod": "node dist/tools/clearPasswordResetTokens.js",
         "restore-game": "tsx tools/restoreGame.ts",
         "research-progress-samples": "tsx tools/researchProgressSamples.ts",
         "combat-sim": "tsx tools/oldCombatSim.ts",
