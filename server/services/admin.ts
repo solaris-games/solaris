@@ -96,7 +96,7 @@ export default class AdminService {
                 resetPasswordDate: 1,
             },
             {
-                lastSeen: -1,
+                resetPasswordDate: -1,
             },
         );
     }
