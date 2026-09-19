@@ -236,6 +236,7 @@ export default (
         userRepository,
         userService,
         sessionService,
+        guildService,
     );
     const socketService = new SocketService(config, socketServer);
     const gameServerSocketEmitter = new GameServerSocketEmitter(socketServer);

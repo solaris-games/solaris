@@ -24,6 +24,7 @@ export interface Guild<ID> {
     invitees: ID[];
     applicants: ID[];
     achievements: GuildAchievement[];
+    avatars: number[];
 }
 
 export interface GuildRank<ID> extends Guild<ID> {
