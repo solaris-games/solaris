@@ -148,7 +148,7 @@ export default class GuildService {
             throw new ValidationError("Guild ID is required.");
         }
 
-        let guild = await this.guildRepo.findOne({
+        const guild = await this.guildRepo.findOne({
             _id: guildId,
         });
 
@@ -156,14 +156,15 @@ export default class GuildService {
             throw new ValidationError("Guild not found.");
         }
 
-        let guildWithUsers: GuildWithUsers<DBObjectId> = {
+        const guildWithUsers: GuildWithUsers<DBObjectId> = {
             _id: guild._id,
             name: guild.name,
             tag: guild.tag,
             achievements: guild.achievements,
+            avatars: guild.avatars,
         };
 
-        let userSelectObject = {
+        const userSelectObject = {
             username: 1,
             "achievements.level": 1,
             "achievements.rank": 1,
@@ -172,12 +173,12 @@ export default class GuildService {
             isAnonymous: 1,
         };
 
-        let usersInGuild = await this.userService.listUsersInGuild(
+        const usersInGuild = await this.userService.listUsersInGuild(
             guildId,
             userSelectObject,
         );
 
-        const stripAnonymousData = (user) => {
+        const stripAnonymousData = (user: User) => {
             if (user.isAnonymous) {
                 user.achievements.rank = 0;
                 user.achievements.victories = 0;
@@ -202,11 +203,11 @@ export default class GuildService {
             .map(stripAnonymousData);
 
         if (withInvitationsAndApplications) {
-            let invitees = await this.userService.listUsers(
+            const invitees = await this.userService.listUsers(
                 guild.invitees,
                 userSelectObject,
             );
-            let applicants = await this.userService.listUsers(
+            const applicants = await this.userService.listUsers(
                 guild.applicants,
                 userSelectObject,
             );

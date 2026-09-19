@@ -53,6 +53,7 @@ export interface GuildWithUsers<ID> {
     invitees?: UserPublic<ID>[];
     applicants?: UserPublic<ID>[];
     totalRank?: number;
+    avatars?: number[];
 }
 
 export interface GuildUserWithTag<ID> {
