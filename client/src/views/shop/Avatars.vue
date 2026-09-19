@@ -86,7 +86,7 @@ import ViewTitle from "../components/ViewTitle.vue";
 import ViewContainer from "../components/ViewContainer.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import { computed, inject, onMounted, ref, type Ref } from "vue";
-import { type PurchasableAvatar, type UserAvatar } from "@solaris/common";
+import { type PurchasableAvatar } from "@solaris/common";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import {
   getCredits,
@@ -95,6 +95,10 @@ import {
 } from "@/services/typedapi/user";
 import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from "@/stores/user";
+import {
+  getAvatarImage,
+  getAvatarWebpImage,
+} from "@/views/game/components/avatar/avatars.ts";
 
 const httpClient = inject(httpInjectionKey)!;
 const userStore = useUserStore();
@@ -167,31 +171,6 @@ const purchaseAvatar = async (avatar: ShopAvatar) => {
   }
 
   isLoading.value = false;
-};
-
-const getAvatarImage = (avatar: UserAvatar) => {
-  try {
-    return new URL(`../../assets/avatars/${avatar.file}`, import.meta.url).href;
-  } catch (err) {
-    console.error(err);
-
-    return undefined;
-  }
-};
-
-const getAvatarWebpImage = (avatar: UserAvatar) => {
-  if (["jpg", "png", "jpeg"].some((ext) => avatar.file.endsWith(ext))) {
-    try {
-      const base = avatar.file.replace(/\.[^.]+$/, "");
-      return new URL(`../../assets/avatars/${base}.webp`, import.meta.url).href;
-    } catch (err) {
-      console.error(err);
-
-      return undefined;
-    }
-  }
-
-  return undefined;
 };
 
 onMounted(async () => {
