@@ -8,7 +8,7 @@
       <span v-if="avatar == null" class="select-avatar-warning text-warning">
         Select an avatar
       </span>
-      <span v-if="avatar && !avatar.purchased" class="select-avatar-locked">
+      <span v-if="avatar && !avatar.unlocked" class="select-avatar-locked">
         <i class="fas fa-lock"></i>
       </span>
     </div>
@@ -60,8 +60,8 @@ const reloadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    const purchased = response.data.filter((a) => a.purchased);
-    const notPurchased = response.data.filter((a) => !a.purchased);
+    const purchased = response.data.filter((a) => a.unlocked);
+    const notPurchased = response.data.filter((a) => !a.unlocked);
 
     const sorter = sorterByProperty("id");
 
