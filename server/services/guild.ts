@@ -93,6 +93,7 @@ export default class GuildService {
                 name: 1,
                 tag: 1,
                 achievements: 1,
+                avatars: 1,
             },
         );
     }
