@@ -52,6 +52,9 @@ export class RangeIndicator {
             return;
         }
 
+        this.graphics_scanningRange.x = star.location.x;
+        this.graphics_scanningRange.y = star.location.y;
+
         const radius = this.distanceService.getScanningDistance(
             this.game,
             star.effectiveTechs?.scanning || 1,
@@ -93,6 +96,9 @@ export class RangeIndicator {
         if (!player || this.starDataService.isDeadStar(star)) {
             return;
         }
+
+        this.graphics_hyperspaceRange.x = star.location.x;
+        this.graphics_hyperspaceRange.y = star.location.y;
 
         const radius = this.distanceService.getHyperspaceDistance(
             this.game,
