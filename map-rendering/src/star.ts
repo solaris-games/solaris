@@ -78,9 +78,7 @@ export class Star
     container: Container;
     graphics_shape_part: Sprite;
     graphics_shape_full: Sprite;
-    graphics_hyperspaceRange: Graphics;
     graphics_natural_resources_ring: Graphics[];
-    graphics_scanningRange: Graphics;
     graphics_star: Sprite;
     graphics_targeted: Graphics;
     graphics_selected: Graphics;
@@ -141,9 +139,7 @@ export class Star
         this.graphics_star = new Sprite();
         this.graphics_shape_part = new Sprite();
         this.graphics_shape_full = new Sprite();
-        this.graphics_hyperspaceRange = new Graphics();
         this.graphics_natural_resources_ring = new Array(Star.maxLod);
-        this.graphics_scanningRange = new Graphics();
         this.graphics_targeted = new Graphics();
         this.graphics_selected = new Graphics();
         this.graphics_kingOfTheHill = new Graphics();
@@ -154,9 +150,6 @@ export class Star
         this.container.addChild(this.graphics_targeted);
         this.container.addChild(this.graphics_selected);
         this.container.addChild(this.graphics_kingOfTheHill);
-
-        this.container.addChild(this.graphics_scanningRange);
-        this.container.addChild(this.graphics_hyperspaceRange);
 
         this.container.on("pointerup", this.onClicked.bind(this));
         this.container.on("mouseover", this.onMouseOver.bind(this));
@@ -253,8 +246,6 @@ export class Star
         this.drawPlanets();
         this.drawNaturalResourcesRing();
         this.drawColour();
-        this.drawScanningRange();
-        this.drawHyperspaceRange();
         this.drawName();
         this.drawShips();
         this.drawInfrastructure();
@@ -930,71 +921,6 @@ export class Star
         }
     }
 
-    drawScanningRange() {
-        this.graphics_scanningRange.clear();
-
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-
-        // Dead stars do not have scanning range
-        if (!player || this._isDeadStar()) {
-            return;
-        }
-
-        let radius =
-            ((this.data.effectiveTechs?.scanning || 1) + 1) *
-            this.lightYearDistance;
-
-        this.graphics_scanningRange.circle(0, 0, radius);
-        this.graphics_scanningRange.fill({
-            color: this.context.getPlayerColour(player._id),
-            alpha: 0.075,
-        });
-        this.graphics_scanningRange.stroke({
-            width: 1,
-            color: 0xffffff,
-            alpha: 0.2,
-        });
-        this.graphics_scanningRange.zIndex = -1;
-        this.container.zIndex = -1;
-
-        this.graphics_scanningRange.visible = this.isSelected;
-    }
-
-    drawHyperspaceRange() {
-        this.graphics_hyperspaceRange.clear();
-
-        if (!this.isSelected) {
-            this.container.zIndex = 0;
-        }
-
-        // Get the player who owns the star.
-        let player = this._getStarPlayer();
-
-        if (!player) {
-            return;
-        }
-
-        let radius =
-            ((this.data.effectiveTechs?.hyperspace || 1) + 1.5) *
-            this.lightYearDistance;
-
-        this.graphics_hyperspaceRange.star(0, 0, radius, radius, radius - 3);
-        this.graphics_hyperspaceRange.fill({
-            color: this.context.getPlayerColour(player._id),
-            alpha: 0.075,
-        });
-        this.graphics_hyperspaceRange.stroke({
-            width: 1,
-            color: 0xffffff,
-            alpha: 0.2,
-        });
-        this.graphics_hyperspaceRange.zIndex = -1;
-        this.container.zIndex = -1;
-
-        this.graphics_hyperspaceRange.visible = this.isSelected;
-    }
-
     drawTarget() {
         this.graphics_targeted.clear();
 
@@ -1049,13 +975,13 @@ export class Star
             (this.userSettings.map.objectsDepth === "disabled" ? 1 : 1.5);
     }
 
-    onZoomChanging(zoomPercent) {
+    onZoomChanging(zoomPercent: number) {
         this.zoomPercent = zoomPercent;
         this.setScale(zoomPercent);
         this.updateVisibility();
     }
 
-    setScale(zoomPercent) {
+    setScale(zoomPercent: number) {
         if (this.clampedScaling) {
             let currentScale = zoomPercent / 100;
             if (currentScale < this.minScale) {
@@ -1116,10 +1042,10 @@ export class Star
     }
 
     updateVisibility() {
-        //TODO compute on the map tick
-        let aparentScale = this.container.scale.x * (this.zoomPercent / 100.0);
-        let lod = Math.max(
-            Math.min(Math.floor(aparentScale) - 1, Star.maxLod - 1),
+        const apparentScale =
+            this.container.scale.x * (this.zoomPercent / 100.0);
+        const lod = Math.max(
+            Math.min(Math.floor(apparentScale) - 1, Star.maxLod - 1),
             0.0,
         );
         for (let l = 0; l < Star.maxLod; l += 1) {
@@ -1131,8 +1057,6 @@ export class Star
         }
 
         this.graphics_star.visible = !this.hasSpecialist(); //|| this.hasBlackHole()
-        this.graphics_hyperspaceRange.visible = this.isSelected;
-        this.graphics_scanningRange.visible = this.isSelected;
 
         if (this.userSettings.map.naturalResources !== "planets") {
             if (this.graphics_natural_resources_ring[lod]) {
@@ -1184,7 +1108,6 @@ export class Star
 
         this.graphics_shape_part.visible = Boolean(partial_ring);
         this.graphics_shape_full.visible = !partial_ring;
-        // this.baseScale = this.isSelected ? 1.5 : 1
     }
 
     subscribeToEvents() {

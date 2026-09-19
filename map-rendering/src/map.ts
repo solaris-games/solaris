@@ -32,6 +32,7 @@ import { Viewport } from "pixi-viewport";
 import type { TempWaypoint } from "./types/waypoint";
 import type { RulerPoint } from "./types/ruler";
 import helpers from "./helpers";
+import { RangeIndicator } from "./rangeIndicator";
 
 export enum ModeKind {
     Galaxy = "galaxy",
@@ -53,8 +54,6 @@ export type ModeWaypoints = {
 };
 
 export type Mode = ModeGalaxy | ModeRuler | ModeWaypoints;
-
-export type PreStarClickedCallback = () => void;
 
 export class Map {
     // Represents the current game mode, these are as follows:
@@ -82,6 +81,7 @@ export class Map {
     rulerPointContainer: PIXI.Container;
     highlightLocationsContainer: PIXI.Container;
     tooltipContainer: PIXI.Container;
+    rangeIndicator: RangeIndicator;
     game: Game;
     userSettings: UserGameSettings;
     waypoints: Waypoints;
@@ -141,6 +141,13 @@ export class Map {
             game,
             userSettings,
             this,
+        );
+
+        this.rangeIndicator = new RangeIndicator(
+            game,
+            services.distanceService,
+            services.starDataService,
+            context,
         );
 
         this.backgroundContainer = new PIXI.Container();
@@ -265,6 +272,7 @@ export class Map {
         );
         this.tooltipContainer!.addChild(this.tooltipLayer.container);
 
+        this.container.addChild(this.rangeIndicator.container);
         this.container.addChild(this.backgroundContainer);
         this.container.addChild(this.territoryContainer);
         this.container.addChild(this.wormHoleContainer);
@@ -1332,12 +1340,18 @@ export class Map {
         if (this._isOrbitalMapEnabled()) {
             this.orbitalLayer!.drawStar(star);
         }
+
+        this.rangeIndicator.drawHyperspaceRange(star);
+        this.rangeIndicator.drawScanningRange(star);
     }
 
     onStarUnselected(_star: StarData) {
         if (this._isOrbitalMapEnabled()) {
             this.orbitalLayer!.clear();
         }
+
+        this.rangeIndicator.undrawHyperspaceRange();
+        this.rangeIndicator.undrawScanningRange();
     }
 
     onCarrierSelected(carrier: CarrierData) {
