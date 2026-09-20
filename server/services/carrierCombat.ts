@@ -311,9 +311,9 @@ export default class CarrierCombatService {
                 // Location is the distance to the "direction star" at the location where combat occurs
                 const location =
                     carrierPositionA.destination.toString() === pathDirection
-                        ? carrierPositionA.distanceToDestinationCurrent +
+                        ? carrierPositionA.distanceToDestinationCurrent -
                           time * carrierPositionA.speed
-                        : carrierPositionA.distanceToSourceCurrent -
+                        : carrierPositionA.distanceToSourceCurrent +
                           time * carrierPositionA.speed;
 
                 collisionList.push({
