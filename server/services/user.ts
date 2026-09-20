@@ -6,20 +6,10 @@ import SessionService from "./session";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { User, UserSubscriptions } from "./types/User";
-import { DateTime } from "luxon";
+import { DateTime, Duration } from "luxon";
 import { ActiveModel } from "./types/ActiveModel";
 import { EmailService } from "./email";
-
-function uuidv4(): string {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
-        /[xy]/g,
-        function (c) {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        },
-    );
-}
+import { randomUUID } from "crypto";
 
 export const UserServiceEvents = {
     onUserCreated: "onUserCreated",
@@ -40,7 +30,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
-            premiumEndDate: 0,
+            resetPasswordDate: 0,
             banned: 0,
             lastSeen: 0,
             lastSeenIP: 0,
@@ -104,7 +94,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
-            premiumEndDate: 0,
+            resetPasswordDate: 0,
             banned: 0,
             credits: 0,
             email: 0,
@@ -124,7 +114,7 @@ export default class UserService extends EventEmitter {
             // Remove fields we don't want to send back.
             password: 0,
             resetPasswordToken: 0,
-            premiumEndDate: 0,
+            resetPasswordDate: 0,
             banned: 0,
             credits: 0,
             email: 0,
@@ -148,11 +138,11 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getUsernameByEmail(email: string) {
+    async tryGetUsernameByEmail(email: string): Promise<string | null> {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userRepo.findOne(
+        const user = await this.userRepo.findOne(
             {
                 email,
             },
@@ -162,9 +152,7 @@ export default class UserService extends EventEmitter {
         );
 
         if (!user) {
-            throw new ValidationError(
-                `An account with the email ${email} does not exist.`,
-            );
+            return null;
         }
 
         return user.username;
@@ -459,21 +447,19 @@ export default class UserService extends EventEmitter {
         }
     }
 
-    async requestResetPassword(email: string) {
+    async requestResetPassword(email: string): Promise<string | null> {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userRepo.findOne({
+        const user = await this.userRepo.findOne({
             email,
         });
 
         if (user == null) {
-            throw new ValidationError(
-                `An account does not exist with the email address: ${email}`,
-            );
+            return null;
         }
 
-        let resetPasswordToken = uuidv4();
+        const resetPasswordToken = randomUUID();
 
         await this.userRepo.updateOne(
             {
@@ -481,6 +467,7 @@ export default class UserService extends EventEmitter {
             },
             {
                 resetPasswordToken,
+                resetPasswordDate: new Date(),
             },
         );
 
@@ -492,16 +479,32 @@ export default class UserService extends EventEmitter {
             throw new ValidationError(`The token is required`);
         }
 
-        let user = await this.userRepo.findOne({
-            resetPasswordToken,
-        });
+        const user = await this.userRepo.findOne(
+            {
+                resetPasswordToken,
+            },
+            {
+                _id: 1,
+                resetPasswordToken: 1,
+                resetPasswordDate: 1,
+            },
+        );
 
-        if (user == null) {
+        if (user == null || !user.resetPasswordDate) {
             throw new ValidationError(`The token is invalid.`);
         }
 
+        const expiryDate = DateTime.fromJSDate(user.resetPasswordDate).plus({
+            hours: 48,
+        });
+        const now = DateTime.now();
+
+        if (expiryDate < now) {
+            throw new ValidationError(`The token is expired`);
+        }
+
         // Update the current password to the new password.
-        let hash = await this.passwordService.hash(newPassword, 10);
+        const hash = await this.passwordService.hash(newPassword, 10);
 
         await this.userRepo.updateOne(
             {
@@ -510,6 +513,7 @@ export default class UserService extends EventEmitter {
             {
                 password: hash,
                 resetPasswordToken: null,
+                resetPasswordDate: null,
             },
         );
     }

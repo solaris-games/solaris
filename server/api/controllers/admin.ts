@@ -275,12 +275,7 @@ export default (container: DependencyContainer) => {
                     );
                 }
 
-                req.session.originalUserId = req.session.userId;
-                req.session.userId = user._id;
-                req.session.username = user.username;
-                req.session.roles = user.roles;
-                req.session.userCredits = user.credits;
-                req.session.isImpersonating = true;
+                container.sessionService.startImpersonation(req.session, user);
 
                 res.status(200).json({
                     _originalUserId: req.session.originalUserId,
@@ -311,12 +306,7 @@ export default (container: DependencyContainer) => {
                     throw new ValidationError(`User does not exist.`);
                 }
 
-                req.session.originalUserId = undefined;
-                req.session.userId = user._id;
-                req.session.username = user.username;
-                req.session.roles = user.roles;
-                req.session.userCredits = user.credits;
-                req.session.isImpersonating = false;
+                container.sessionService.endImpersonation(req.session, user);
 
                 res.status(200).json({
                     _id: user._id,

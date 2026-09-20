@@ -6,13 +6,14 @@
 
     <div v-if="!isLoading && guild" class="mb-4">
       <guild-achievements :achievements="guild.achievements || []" />
+      <guild-avatars :avatar-ids="guild.avatars" v-if="guild.avatars" />
 
       <p class="float-end">
         Total Rank Points:
         <span class="text-warning">{{ guild.totalRank }}</span>
       </p>
 
-      <h5 class="mb-0">Guild Roster</h5>
+      <h4 class="mb-0">Guild Roster</h4>
 
       <p class="mb-2">
         <small class="text-warning"
@@ -121,6 +122,7 @@ import GuildApplication from "./components/Application.vue";
 import GuildMember from "./components/Member.vue";
 import GuildMemberList from "./components/MemberList.vue";
 import GuildAchievements from "./components/Achievements.vue";
+import GuildAvatars from "./components/Avatars.vue";
 import type {
   Guild,
   GuildWithUsers,

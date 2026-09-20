@@ -48,6 +48,7 @@ export type ListPasswordReset<ID> = {
     username: string;
     email: string;
     resetPasswordToken: string;
+    resetPasswordDate: Date;
 };
 
 export type AddWarningReq = {

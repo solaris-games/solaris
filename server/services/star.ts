@@ -305,6 +305,7 @@ export default class StarService extends EventEmitter {
         };
     }
 
+    // TODO: Terraforming specialists, also code duplication???
     calculateTerraformedResource(
         naturalResource: number,
         terraforming: number,

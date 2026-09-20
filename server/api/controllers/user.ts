@@ -164,10 +164,7 @@ export default (container: DependencyContainer) => {
                     return next();
                 }
 
-                req.session.userId = user._id;
-                req.session.username = user.username;
-                req.session.roles = user.roles;
-                req.session.userCredits = user.credits;
+                container.sessionService.refreshSession(req.session, user);
 
                 res.status(200).json(user);
                 return next();
@@ -309,21 +306,24 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = mapToUserRequestPasswordResetRequest(req.body);
 
-                let token = await container.userService.requestResetPassword(
+                const token = await container.userService.requestResetPassword(
                     reqObj.email,
                 );
 
-                try {
-                    await container.emailService.sendTemplate(
-                        reqObj.email,
-                        container.emailService.TEMPLATES.RESET_PASSWORD,
-                        [token],
-                    );
-                } catch (emailError) {
-                    log.error(emailError);
-                    res.sendStatus(500);
-                    return next(emailError);
+                if (token != null) {
+                    try {
+                        await container.emailService.sendTemplate(
+                            reqObj.email,
+                            container.emailService.TEMPLATES.RESET_PASSWORD,
+                            [token],
+                        );
+                    } catch (emailError) {
+                        log.error(emailError);
+                        res.sendStatus(500);
+                        return next(emailError);
+                    }
                 }
+
                 res.sendStatus(200);
                 return next();
             } catch (err) {
@@ -349,21 +349,24 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = mapToUserRequestUsernameRequest(req.body);
 
-                let username = await container.userService.getUsernameByEmail(
-                    reqObj.email,
-                );
-
-                try {
-                    await container.emailService.sendTemplate(
+                const username =
+                    await container.userService.tryGetUsernameByEmail(
                         reqObj.email,
-                        container.emailService.TEMPLATES.FORGOT_USERNAME,
-                        [username],
                     );
-                } catch (emailError) {
-                    log.error(emailError);
 
-                    res.sendStatus(500);
-                    return next(emailError);
+                if (username !== null) {
+                    try {
+                        await container.emailService.sendTemplate(
+                            reqObj.email,
+                            container.emailService.TEMPLATES.FORGOT_USERNAME,
+                            [username],
+                        );
+                    } catch (emailError) {
+                        log.error(emailError);
+
+                        res.sendStatus(500);
+                        return next(emailError);
+                    }
                 }
 
                 res.sendStatus(200);
@@ -385,14 +388,10 @@ export default (container: DependencyContainer) => {
                 await container.userService.closeAccount(req.session.userId);
 
                 // Delete the session object.
-                req.session.destroy((err) => {
-                    if (err) {
-                        return next(err);
-                    }
+                await container.sessionService.destroySession(req.session);
 
-                    res.sendStatus(200);
-                    return next();
-                });
+                res.sendStatus(200);
+                return next();
             } catch (err) {
                 return next(err);
             }

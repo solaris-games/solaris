@@ -49,7 +49,7 @@
             <div class="col-auto">
               <button
                 class="btn btn-sm btn-success"
-                v-if="!avatar.purchased && (userCredits || 0) >= avatar.price"
+                v-if="!avatar.unlocked && (userCredits || 0) >= avatar.price"
                 @click="purchaseAvatar(avatar)"
               >
                 <i class="fas fa-shopping-basket"></i>
@@ -58,13 +58,13 @@
               <router-link
                 :to="{ name: 'galactic-credits-shop' }"
                 class="btn btn-sm btn-outline-danger"
-                v-if="!avatar.purchased && (userCredits || 0) < avatar.price"
+                v-if="!avatar.unlocked && (userCredits || 0) < avatar.price"
               >
                 <i class="fas fa-coins"></i>
                 {{ avatar.price }} Credit<span v-if="avatar.price > 1">s</span>
               </router-link>
               <h5>
-                <span class="badge bg-primary" v-if="avatar.purchased"
+                <span class="badge bg-primary" v-if="avatar.unlocked"
                   ><i class="fas fa-check"></i> Unlocked</span
                 >
               </h5>
@@ -86,7 +86,7 @@ import ViewTitle from "../components/ViewTitle.vue";
 import ViewContainer from "../components/ViewContainer.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import { computed, inject, onMounted, ref, type Ref } from "vue";
-import type { UserAvatar } from "@solaris/common";
+import { type PurchasableAvatar } from "@solaris/common";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import {
   getCredits,
@@ -95,14 +95,20 @@ import {
 } from "@/services/typedapi/user";
 import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from "@/stores/user";
+import {
+  getAvatarImage,
+  getAvatarWebpImage,
+} from "@/views/game/components/avatar/avatars.ts";
 
 const httpClient = inject(httpInjectionKey)!;
 const userStore = useUserStore();
 const confirm = useConfirm();
 
+type ShopAvatar = PurchasableAvatar & { unlocked: boolean };
+
 const isLoading = ref(false);
 const userCredits: Ref<number | null> = ref(null);
-const avatars: Ref<UserAvatar[]> = ref([]);
+const avatars: Ref<ShopAvatar[]> = ref([]);
 
 const sortedAvatars = computed(() => {
   return new Array(...avatars.value).sort(
@@ -125,14 +131,20 @@ const loadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    avatars.value = response.data;
+    avatars.value = response.data.flatMap((av) => {
+      if (av.avatarType === "normal") {
+        return [av];
+      } else {
+        return [];
+      }
+    });
   } else {
     console.error(formatError(response));
   }
 };
 
-const purchaseAvatar = async (avatar: UserAvatar) => {
-  if (avatar.purchased) {
+const purchaseAvatar = async (avatar: ShopAvatar) => {
+  if (avatar.unlocked) {
     return;
   }
 
@@ -150,7 +162,7 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
   const response = await reqPurchaseAvatar(httpClient)(avatar.id);
 
   if (isOk(response)) {
-    avatar.purchased = true;
+    avatar.unlocked = true;
     userCredits.value! -= avatar.price;
 
     userStore.setCredits(userCredits.value!);
@@ -159,31 +171,6 @@ const purchaseAvatar = async (avatar: UserAvatar) => {
   }
 
   isLoading.value = false;
-};
-
-const getAvatarImage = (avatar: UserAvatar) => {
-  try {
-    return new URL(`../../assets/avatars/${avatar.file}`, import.meta.url).href;
-  } catch (err) {
-    console.error(err);
-
-    return undefined;
-  }
-};
-
-const getAvatarWebpImage = (avatar: UserAvatar) => {
-  if (["jpg", "png", "jpeg"].some((ext) => avatar.file.endsWith(ext))) {
-    try {
-      const base = avatar.file.replace(/\.[^.]+$/, "");
-      return new URL(`../../assets/avatars/${base}.webp`, import.meta.url).href;
-    } catch (err) {
-      console.error(err);
-
-      return undefined;
-    }
-  }
-
-  return undefined;
 };
 
 onMounted(async () => {

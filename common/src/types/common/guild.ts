@@ -24,6 +24,7 @@ export interface Guild<ID> {
     invitees: ID[];
     applicants: ID[];
     achievements: GuildAchievement[];
+    avatars: number[];
 }
 
 export interface GuildRank<ID> extends Guild<ID> {
@@ -52,6 +53,7 @@ export interface GuildWithUsers<ID> {
     invitees?: UserPublic<ID>[];
     applicants?: UserPublic<ID>[];
     totalRank?: number;
+    avatars?: number[];
 }
 
 export interface GuildUserWithTag<ID> {

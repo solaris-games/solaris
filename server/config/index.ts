@@ -9,13 +9,27 @@ const envFiles = process.env.ENV_FILE
 
 dotenv.config({ path: envFiles });
 
+const nonOptional = (name: string, allowEmpty: boolean = false) => {
+    const value = process.env[name];
+
+    if (value === undefined) {
+        throw new Error(`CONFIG FAILED: missing ${name} environment variable`);
+    }
+
+    if (!allowEmpty && value.trim() === "") {
+        throw new Error(`CONFIG FAILED: ${name} is empty`);
+    }
+
+    return value;
+};
+
 const config: Config = {
     port: process.env.PORT,
-    sessionSecret: process.env.SESSION_SECRET,
+    sessionSecret: nonOptional("SESSION_SECRET"),
     sessionSecureCookies: process.env.SESSION_SECURE_COOKIES == "true",
-    connectionString: process.env.CONNECTION_STRING,
-    serverUrl: process.env.SERVER_URL,
-    clientUrl: process.env.CLIENT_URL,
+    connectionString: nonOptional("CONNECTION_STRING"),
+    serverUrl: nonOptional("SERVER_URL"),
+    clientUrl: nonOptional("CLIENT_URL"),
     corsUrls: process.env.CORS_URLS?.split(",") || [
         process.env.CLIENT_URL || "https://solaris.games",
     ],

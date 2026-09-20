@@ -68,7 +68,6 @@ export type UserPrivate<ID> = UserPublic<ID> & {
     emailEnabled: boolean;
     emailOtherEnabled: boolean;
     credits: number;
-    premiumEndDate: Date;
     banned: boolean;
     lastSeen: Date | null;
     lastSeenIP: string | null;

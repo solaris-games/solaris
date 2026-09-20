@@ -65,7 +65,6 @@ export class Carrier
     data: CarrierData;
     context: DrawingContext;
     colour: string | undefined;
-    lightYearDistance: number;
     clampedScaling: boolean | undefined;
     baseScale: number = 0;
     minScale: number = 0;
@@ -86,7 +85,6 @@ export class Carrier
         this.data = data;
         this.userSettings = userSettings;
         this.context = context;
-        this.lightYearDistance = game.constants.distances.lightYear;
 
         this.container = new Container();
         this.container.zIndex = 1;

@@ -1,5 +1,6 @@
 <template>
   <div v-if="achievements?.length" class="mt-2 mb-1">
+    <h4>Guild Achievements</h4>
     <ul class="list-unstyled">
       <li v-for="(achievement, index) in achievements" :key="index">
         <i

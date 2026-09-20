@@ -68,8 +68,8 @@ export interface User {
     emailOtherEnabled: boolean;
     password: string | null;
     resetPasswordToken: string | null;
+    resetPasswordDate: Date | null;
     credits: number;
-    premiumEndDate: Date;
     banned: boolean;
     lastSeen: Date | null;
     lastSeenIP: string | null;

@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  mapClickStore.setStarClickCallback(null);
+  mapClickStore.setCarrierClickCallback(null);
 });
 </script>
 <style scoped></style>

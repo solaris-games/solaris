@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import config from "../config";
 import mongooseLoader from "../db";
 import containerLoader from "../services";
+import SessionService from "../services/session";
 import { logger, setupLogging } from "../utils/logging";
 import expressLoader from "./express";
 import express from "express";
@@ -35,9 +36,12 @@ async function startServer() {
 
     const container = containerLoader(config, socketServer, log);
 
-    const { sessionStore } = await expressLoader(config, app, container);
+    const sessionStore = SessionService.createSessionStore(config);
+
     container.sessionService.setSessionStorage(sessionStore);
     container.socketService.setSessionStorage(sessionStore);
+
+    await expressLoader(config, app, container, sessionStore);
 
     server.on("error", (err) => {
         if (err) {
