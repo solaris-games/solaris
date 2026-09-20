@@ -172,7 +172,7 @@ export default (container: DependencyContainer) => {
         },
         buildWarpGate: async (req, res, next) => {
             try {
-                const reqObj: StarUpgradeInfrastructureRequest = req.body;
+                const reqObj = parseStarUpgradeInfrastructureRequest(req.body);
 
                 let report = await container.starUpgradeService.buildWarpGate(
                     req.game,
