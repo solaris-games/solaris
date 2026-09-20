@@ -102,7 +102,7 @@ export class RangeIndicator {
 
         const radius = this.distanceService.getHyperspaceDistance(
             this.game,
-            star.effectiveTechs?.scanning || 1,
+            star.effectiveTechs?.hyperspace || 1,
         );
 
         this.graphics_hyperspaceRange.star(0, 0, radius, radius, radius - 3);
