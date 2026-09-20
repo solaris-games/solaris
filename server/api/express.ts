@@ -38,6 +38,7 @@ export default async (
             cookie: {
                 secure: config.sessionSecureCookies, // Requires HTTPS
                 maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year
+                sameSite: "lax",
             },
             store: sessionStore,
         }),
