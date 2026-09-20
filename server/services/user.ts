@@ -138,11 +138,11 @@ export default class UserService extends EventEmitter {
         });
     }
 
-    async getUsernameByEmail(email: string) {
+    async tryGetUsernameByEmail(email: string): Promise<string | null> {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userRepo.findOne(
+        const user = await this.userRepo.findOne(
             {
                 email,
             },
@@ -152,9 +152,7 @@ export default class UserService extends EventEmitter {
         );
 
         if (!user) {
-            throw new ValidationError(
-                `An account with the email ${email} does not exist.`,
-            );
+            return null;
         }
 
         return user.username;
@@ -449,18 +447,16 @@ export default class UserService extends EventEmitter {
         }
     }
 
-    async requestResetPassword(email: string) {
+    async requestResetPassword(email: string): Promise<string | null> {
         email = email.trim();
         email = email.toLowerCase();
 
-        let user = await this.userRepo.findOne({
+        const user = await this.userRepo.findOne({
             email,
         });
 
         if (user == null) {
-            throw new ValidationError(
-                `An account does not exist with the email address: ${email}`,
-            );
+            return null;
         }
 
         const resetPasswordToken = randomUUID();
