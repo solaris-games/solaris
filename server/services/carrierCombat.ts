@@ -269,7 +269,7 @@ export default class CarrierCombatService {
                 // Only consider carriers with ships
                 if (
                     carrierPositionB.carrier.ships! <= 0 ||
-                    carrierPositionA.carrier.isGift
+                    carrierPositionB.carrier.isGift
                 )
                     continue;
 
