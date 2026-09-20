@@ -75,7 +75,7 @@ export default (container: DependencyContainer) => {
                     req.body,
                 );
 
-                let summary = await container.starUpgradeService.upgradeBulk(
+                const summary = await container.starUpgradeService.upgradeBulk(
                     req.game,
                     req.player,
                     reqObj.upgradeStrategy,
@@ -172,7 +172,7 @@ export default (container: DependencyContainer) => {
         },
         buildWarpGate: async (req, res, next) => {
             try {
-                const reqObj: StarUpgradeInfrastructureRequest = req.body;
+                const reqObj = parseStarUpgradeInfrastructureRequest(req.body);
 
                 let report = await container.starUpgradeService.buildWarpGate(
                     req.game,

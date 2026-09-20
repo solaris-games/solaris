@@ -115,7 +115,7 @@
         "bankingReward": "standard",
         "experimentationDistribution": "random",
         "experimentationReward": "standard",
-        "specialistTokenReward": "standard",
+        "specialistTokenReward": "simplified",
         "researchCostProgressions": {
             "terraforming": {
                 "progression": "standard"

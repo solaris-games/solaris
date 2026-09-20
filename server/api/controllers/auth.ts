@@ -16,12 +16,8 @@ export default (container: DependencyContainer) => {
                     body.password,
                 );
 
-                // Store the user id in the session.
-                req.session.userId = user._id;
-                req.session.username = user.username;
-                req.session.roles = user.roles;
-                req.session.userCredits = user.credits;
-                req.session.isImpersonating = false;
+                // Store the user in the session.
+                container.sessionService.initialiseSession(req.session, user);
 
                 res.status(200).json({
                     _id: user._id,
@@ -34,20 +30,16 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        logout: (req, res, next) => {
-            if (req.session) {
-                // Delete the session object.
-                req.session.destroy((err) => {
-                    if (err) {
-                        return next(err);
-                    }
+        logout: async (req, res, next) => {
+            try {
+                if (req.session) {
+                    await container.sessionService.destroySession(req.session);
+                }
 
-                    res.sendStatus(200);
-                    return next();
-                });
-            } else {
                 res.sendStatus(200);
                 return next();
+            } catch (err) {
+                return next(err);
             }
         },
         verify: (req, res, next) => {

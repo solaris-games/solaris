@@ -8,6 +8,10 @@ import LeaderboardService from "./leaderboard";
 import { DateTime } from "luxon";
 import { EventService } from "./event";
 
+export const TIMEOUT_TUTORIAL_DAYS = 1;
+export const TIMEOUT_NORMAL_DAYS = 7;
+export const TIMEOUT_FEATURED_DAYS = 16;
+
 export default class GameListService {
     gameRepo: Repository<Game>;
     gameService: GameService;
@@ -372,9 +376,9 @@ export default class GameListService {
     }
 
     async listOldCompletedGamesNotCleaned(months: number = 1) {
-        let date = DateTime.utc().minus({ months });
+        const date = DateTime.utc().minus({ months });
 
-        let query = {
+        const query = {
             $and: [
                 { "state.winner": { $ne: null } },
                 { "state.endDate": { $lt: date } },
@@ -392,10 +396,8 @@ export default class GameListService {
         });
     }
 
-    async listGamesTimedOutWaitingForPlayers() {
-        let date = DateTime.utc().minus({ days: 7 });
-
-        let games = await this.gameRepo.find(
+    async listGamesWaitingForPlayers(): Promise<Game[]> {
+        return await this.gameRepo.find(
             {
                 "settings.general.type": {
                     $in: [
@@ -421,10 +423,6 @@ export default class GameListService {
                 "galaxy.carriers": 0,
             },
         );
-
-        return games.filter((g) => {
-            return DateTime.fromJSDate(g._id.getTimestamp()) <= date;
-        });
     }
 
     async listInProgressGames() {
@@ -509,7 +507,7 @@ export default class GameListService {
     }
 
     async listCompletedTutorials() {
-        let date = DateTime.utc().minus({ days: 1 });
+        let date = DateTime.utc().minus({ days: TIMEOUT_TUTORIAL_DAYS });
 
         let games = await this.gameRepo.find(
             {

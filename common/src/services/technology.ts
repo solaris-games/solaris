@@ -126,7 +126,6 @@ export class TechnologyService {
     getPlayerEffectiveTechnologyLevels<ID>(
         game: Game<ID>,
         player: Player<ID> | null,
-        sanitize: boolean = true,
     ): PlayerTechnologyLevels {
         // TODO: This is a plaster over a bug where in the gameGalaxy service
         // it sets research to null if its in extra dark galaxy but somehow
@@ -151,7 +150,7 @@ export class TechnologyService {
             };
         }
 
-        let techs = {
+        return {
             scanning: player.research.scanning.level,
             hyperspace: player.research.hyperspace.level,
             terraforming: player.research.terraforming.level,
@@ -161,28 +160,17 @@ export class TechnologyService {
             manufacturing: player.research.manufacturing.level,
             specialists: player.research.specialists.level,
         };
-
-        return techs;
     }
 
-    getStarEffectiveTechnologyLevels<ID extends Id>(
-        game: Game<ID>,
+    withStarSpecificTechnology<ID extends Id>(
         star: Star<ID>,
-        sanitize: boolean = true,
-    ): PlayerTechnologyLevels {
-        let player = star.ownedByPlayerId
-            ? game.galaxy.players.find(
-                  (x) => x._id.toString() === star.ownedByPlayerId!.toString(),
-              ) || null
-            : null;
-        let techs = this.getPlayerEffectiveTechnologyLevels(
-            game,
-            player,
-            false,
-        );
+        oldTechs: PlayerTechnologyLevels,
+        sanitize: boolean = false,
+    ) {
+        const techs = { ...oldTechs };
 
         if (star.specialistId) {
-            let specialist = this.specialistService.getByIdStar(
+            const specialist = this.specialistService.getByIdStar(
                 star.specialistId,
             );
 
@@ -202,6 +190,22 @@ export class TechnologyService {
         return techs;
     }
 
+    getStarEffectiveTechnologyLevels<ID extends Id>(
+        game: Game<ID>,
+        star: Star<ID>,
+        sanitize: boolean = true,
+    ): PlayerTechnologyLevels {
+        const player = star.ownedByPlayerId
+            ? game.galaxy.players.find(
+                  (x) => x._id.toString() === star.ownedByPlayerId!.toString(),
+              ) || null
+            : null;
+
+        const techs = this.getPlayerEffectiveTechnologyLevels(game, player);
+
+        return this.withStarSpecificTechnology(star, techs, sanitize);
+    }
+
     getCarrierEffectiveTechnologyLevels<ID extends Id>(
         game: Game<ID>,
         carrier: Carrier<ID>,
@@ -211,11 +215,7 @@ export class TechnologyService {
             game.galaxy.players.find(
                 (x) => x._id.toString() === carrier.ownedByPlayerId!.toString(),
             ) || null;
-        const techs = this.getPlayerEffectiveTechnologyLevels(
-            game,
-            player,
-            false,
-        );
+        const techs = this.getPlayerEffectiveTechnologyLevels(game, player);
 
         // Apply any specialist tech modifiers.
         if (carrier.specialistId) {

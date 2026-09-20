@@ -151,7 +151,7 @@
         "experimentationDistribution": "random",
         "bankingReward": "standard",
         "experimentationReward": "standard",
-        "specialistTokenReward": "experimental"
+        "specialistTokenReward": "dependsOnStarCount"
     },
     "gameTime": {
         "gameType": "realTime",

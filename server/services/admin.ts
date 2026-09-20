@@ -93,9 +93,10 @@ export default class AdminService {
                 username: 1,
                 email: 1,
                 resetPasswordToken: 1,
+                resetPasswordDate: 1,
             },
             {
-                lastSeen: -1,
+                resetPasswordDate: -1,
             },
         );
     }

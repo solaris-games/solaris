@@ -26,6 +26,7 @@ import {
     CombatGroupService,
     CombatService,
     DistanceService,
+    InfrastructureCostService,
     PathfindingService,
     ResearchProgressService,
 } from "@solaris/common";
@@ -209,4 +210,5 @@ export interface DependencyContainer {
     carrierTravelService: CarrierTravelService<DBObjectId>;
     starDataService: StarDataService;
     scanningService: ScanningService;
+    infrastructureCostService: InfrastructureCostService<DBObjectId>;
 }

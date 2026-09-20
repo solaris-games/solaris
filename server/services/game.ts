@@ -282,6 +282,27 @@ export default class GameService extends EventEmitter {
             );
         }
 
+        const now = DateTime.utc();
+        const startDate = DateTime.fromJSDate(game.state.startDate!).toUTC();
+
+        // If the game hasn't started yet but is in the start delay phase,
+        // start the game immediately instead of fast forwarding.
+        if (startDate.diff(now).milliseconds > 0) {
+            const nowDate = now.toJSDate();
+
+            game.state.forceTick = false;
+            game.state.startDate = nowDate;
+            game.state.lastTickDate = nowDate;
+
+            for (const player of game.galaxy.players) {
+                this.playerService.updateLastSeen(game, player, nowDate);
+            }
+
+            await game.save();
+
+            return;
+        }
+
         if (game.state.forceTick) {
             throw new ValidationError(
                 "Cannot fast forward a game that is already fast forwarding.",

@@ -934,8 +934,8 @@ const schema = new Schema({
             specialistTokenReward: {
                 type: Types.String,
                 required: true,
-                enum: ["standard", "experimental"],
-                default: "standard",
+                enum: ["simplified", "dependsOnStarCount"],
+                default: "dependsOnStarCount",
             },
         },
         gameTime: {

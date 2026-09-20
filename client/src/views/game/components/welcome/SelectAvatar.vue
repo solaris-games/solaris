@@ -2,13 +2,13 @@
   <div v-if="!isLoading">
     <div class="avatar-container">
       <picture class="avatar-image" v-if="avatar != null">
-        <source :srcset="getAvatarWebpImage()" type="image/webp" />
-        <img :src="getAvatarImage()" width="128" height="128" />
+        <source :srcset="getAvatarWebpImage(avatar)" type="image/webp" />
+        <img :src="getAvatarImage(avatar)" width="128" height="128" />
       </picture>
       <span v-if="avatar == null" class="select-avatar-warning text-warning">
         Select an avatar
       </span>
-      <span v-if="avatar && !avatar.purchased" class="select-avatar-locked">
+      <span v-if="avatar && !avatar.unlocked" class="select-avatar-locked">
         <i class="fas fa-lock"></i>
       </span>
     </div>
@@ -43,6 +43,10 @@ import { ref, type Ref, inject, onMounted } from "vue";
 import { sorterByProperty, type UserAvatar } from "@solaris/common";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { listMyAvatars } from "@/services/typedapi/user";
+import {
+  getAvatarImage,
+  getAvatarWebpImage,
+} from "@/views/game/components/avatar/avatars.ts";
 
 const httpClient = inject(httpInjectionKey)!;
 
@@ -60,8 +64,8 @@ const reloadAvatars = async () => {
   const response = await listMyAvatars(httpClient)();
 
   if (isOk(response)) {
-    const purchased = response.data.filter((a) => a.purchased);
-    const notPurchased = response.data.filter((a) => !a.purchased);
+    const purchased = response.data.filter((a) => a.unlocked);
+    const notPurchased = response.data.filter((a) => !a.unlocked);
 
     const sorter = sorterByProperty("id");
 
@@ -76,35 +80,6 @@ const reloadAvatars = async () => {
 
 const onAvatarChanged = () => {
   emit("onAvatarChanged", avatar.value!);
-};
-
-const getAvatarImage = () => {
-  try {
-    return new URL(
-      `../../../../assets/avatars/${avatar.value!.file}`,
-      import.meta.url,
-    ).href;
-  } catch (err) {
-    console.error(err);
-
-    return undefined;
-  }
-};
-
-const getAvatarWebpImage = () => {
-  if (["jpg", "png", "jpeg"].some((ext) => avatar.value!.file.endsWith(ext))) {
-    try {
-      const base = avatar.value!.file.replace(/\.[^.]+$/, "");
-      return new URL(`../../../../assets/avatars/${base}.webp`, import.meta.url)
-        .href;
-    } catch (err) {
-      console.error(err);
-
-      return undefined;
-    }
-  }
-
-  return undefined;
 };
 
 const nextAvatar = () => {

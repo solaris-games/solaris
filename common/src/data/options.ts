@@ -765,12 +765,12 @@ export const GAME_CREATION_OPTIONS = {
         ],
         specialistTokenReward: [
             {
-                value: "standard",
-                text: "Standard",
+                value: "simplified",
+                text: "Simplified",
             },
             {
-                value: "experimental",
-                text: "Experimental",
+                value: "dependsOnStarCount",
+                text: "Depends on star count",
             },
         ],
     },

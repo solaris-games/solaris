@@ -10,17 +10,22 @@ export default (container: DependencyContainer) => {
     return {
         purchase: async (req, res, next) => {
             try {
-                let errors: string[] = [];
+                const errors: string[] = [];
 
                 if (!req.query.amount) {
                     errors.push("Amount is a required field");
+                }
+
+                const totalQuantity = parseInt(req.query.amount);
+
+                if (!totalQuantity || totalQuantity <= 0) {
+                    errors.push("Could not parse amount");
                 }
 
                 if (errors.length) {
                     throw new ValidationError(errors);
                 }
 
-                const totalQuantity = parseInt(req.query.amount);
                 let unitCost = COST_PER_TOKEN;
 
                 // Crude, but it works.
@@ -38,7 +43,7 @@ export default (container: DependencyContainer) => {
                 const returnUrl = `${container.config.serverUrl}/api/shop/galacticcredits/purchase/process`;
                 const cancelUrl = `${container.config.clientUrl}/#/shop`;
 
-                let approvalUrl =
+                const approvalUrl =
                     await container.paypalService.authorizePayment(
                         req.session.userId,
                         totalQuantity,

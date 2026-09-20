@@ -19,6 +19,7 @@ const schema = new Schema({
     invitees: [{ type: Types.ObjectId }],
     applicants: [{ type: Types.ObjectId }],
     achievements: { type: [achievementSchema], default: [] },
+    avatars: { type: [Types.Number], default: [] },
 });
 
 export default schema;
