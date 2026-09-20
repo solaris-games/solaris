@@ -4,11 +4,11 @@ export type LoggingType = "pretty" | "stdout";
 
 export interface Config {
     port?: string;
-    sessionSecret?: string;
+    sessionSecret: string;
     sessionSecureCookies: boolean;
-    connectionString?: string;
-    serverUrl?: string;
-    clientUrl?: string;
+    connectionString: string;
+    serverUrl: string;
+    clientUrl: string;
     corsUrls: string[];
     cacheEnabled: boolean;
     logging?: LoggingType;
