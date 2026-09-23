@@ -27,7 +27,7 @@ export const cleanupGamesTimedOutJob =
             for (let i = 0; i < games.length; i++) {
                 const game = games[i];
 
-                if (isTimedOut(game)) {
+                if (!isTimedOut(game)) {
                     continue;
                 }
 
