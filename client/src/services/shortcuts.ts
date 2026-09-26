@@ -79,7 +79,7 @@ export const createKeyboardShortcutHandler = () => {
       cmd = cmd || KEYBOARD_SHORTCUTS.player[key];
     }
 
-    if (cmd === null) {
+    if (!cmd) {
       return;
     }
 
