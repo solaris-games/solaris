@@ -21,6 +21,8 @@ export const withMessages = () => {
   const handler = (e: ConversationMessageSentResult<string>) => {
     const isInGame = gameStore.game?._id === e.gameId;
 
+    console.log(`Top of handler`);
+
     if (!sendForAllGames.value && !isInGame) {
       return;
     }
@@ -33,6 +35,8 @@ export const withMessages = () => {
     });
 
     if (isInGame) {
+      console.log(`MESSAGE NOTIFICATION`);
+
       $toast.info(`New message from ${e.fromPlayerAlias}.`, {
         duration: 10000,
         onClick: () => {
@@ -43,6 +47,8 @@ export const withMessages = () => {
         },
       });
     } else {
+      console.log(`MESSAGE NOTIFICATION OUT OF GAME`);
+
       const gameName = e.gameName;
       const text = gameName
         ? `In ${gameName}, you have received a message from ${e.fromPlayerAlias}.`
