@@ -55,6 +55,7 @@
         v-if="isActionRequiresShips(waypoint.action)"
         class="form-control form-control-sm"
         type="number"
+        min="0"
         v-model="waypoint.actionShips"
       />
     </td>
