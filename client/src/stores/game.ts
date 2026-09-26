@@ -87,6 +87,11 @@ export const useGameStore = defineStore("game", () => {
     menuStateChat.value = EMPTY_MENU;
   };
 
+  const resetMenuStates = () => {
+    clearMenuState();
+    clearMenuStateChat();
+  };
+
   const setTick = (newTick: number) => {
     tick.value = newTick;
   };
@@ -491,6 +496,7 @@ export const useGameStore = defineStore("game", () => {
     setMenuStateChat,
     clearMenuStateChat,
     getSpecialist,
+    resetMenuStates,
   };
 });
 
