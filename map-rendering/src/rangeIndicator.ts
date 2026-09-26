@@ -48,7 +48,10 @@ export class RangeIndicator {
         );
 
         // Dead stars do not have scanning range
-        if (!player || this.starDataService.isDeadStar(star)) {
+        if (
+            !player ||
+            (this.starDataService.isDeadStar(star) && !star.isNebula)
+        ) {
             return;
         }
 
@@ -70,8 +73,6 @@ export class RangeIndicator {
             color: 0xffffff,
             alpha: 0.2,
         });
-        this.graphics_scanningRange.zIndex = -1;
-        this.container.zIndex = -1;
 
         this.graphics_scanningRange.visible = true;
     }
@@ -93,7 +94,10 @@ export class RangeIndicator {
         );
 
         // Dead stars do not have scanning range
-        if (!player || this.starDataService.isDeadStar(star)) {
+        if (
+            !player ||
+            (this.starDataService.isDeadStar(star) && !star.isNebula)
+        ) {
             return;
         }
 
@@ -115,9 +119,6 @@ export class RangeIndicator {
             color: 0xffffff,
             alpha: 0.2,
         });
-
-        this.graphics_hyperspaceRange.zIndex = -1;
-        this.container.zIndex = -1;
 
         this.graphics_hyperspaceRange.visible = true;
     }
