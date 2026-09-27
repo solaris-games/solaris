@@ -7,6 +7,7 @@ import { groupBy } from "../utilities/utils";
 import type { Player } from "../types/common/player";
 import { TechnologyService, type WeaponsDetail } from "./technology";
 import type { Specialist } from "../types/common/specialist";
+import { ValidationError } from "../validation/error";
 import type {
     BasicCombatResult,
     CombatBaseCarrier,
@@ -697,6 +698,65 @@ const findBound = <
     return shipsNeeded;
 };
 
+const isValidShipsValue = (value: unknown): value is number => {
+    return typeof value === "number" && Number.isFinite(value);
+};
+
+// in theory it is possible to pass masked results in. This is hard to prevent in the type system without a major refactoring
+// so instead we throw errors
+const validateEstimateInput = <
+    ID extends Id,
+    P extends CombatBasePlayer<ID>,
+    S extends CombatBaseStar<ID>,
+    C extends CombatBaseCarrier<ID>,
+>(
+    estimateForGroup: DetailedCombatResultGroup<ID, P, S, C>,
+    originalGroups: CombatGroup<ID, P, S, C>[],
+): void => {
+    const throwValidationError = (what: string) => {
+        throw new ValidationError(
+            `Cannot estimate ships needed: ${what} is not a valid number.`,
+        );
+    };
+
+    if (!isValidShipsValue(estimateForGroup.shipsAfter)) {
+        throwValidationError(`shipsAfter of group "${estimateForGroup.id}"`);
+    }
+
+    if (!isValidShipsValue(estimateForGroup.shipsLost)) {
+        throwValidationError(`shipsLost of group "${estimateForGroup.id}"`);
+    }
+
+    if (!isValidShipsValue(estimateForGroup.shipsKilled)) {
+        throwValidationError(`shipsKilled of group "${estimateForGroup.id}"`);
+    }
+
+    for (const group of originalGroups) {
+        if (
+            !isValidShipsValue(group.originalShips) ||
+            !isValidShipsValue(group.ships)
+        ) {
+            throwValidationError(
+                `ship data of group "${group.id}" in the combat result`,
+            );
+        }
+
+        if (group.star && !isValidShipsValue(group.star.ships)) {
+            throwValidationError(
+                `star ship data of group "${group.id}" in the combat result`,
+            );
+        }
+
+        for (const carrier of group.carriers) {
+            if (!isValidShipsValue(carrier.ships)) {
+                throwValidationError(
+                    `carrier ship data of group "${group.id}" in the combat result`,
+                );
+            }
+        }
+    }
+};
+
 const estimateNeeded = <
     ID extends Id,
     P extends CombatBasePlayer<ID>,
@@ -710,6 +770,8 @@ const estimateNeeded = <
         | "greaterThanZeroShips"
         | "eliminateOtherGroups" = "greaterThanZeroShips",
 ) => {
+    validateEstimateInput(estimateForGroup, originalGroups);
+
     const maxBound = findBound(
         estimateForGroup,
         combatResult,
