@@ -138,7 +138,6 @@ const userStore = useUserStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
 const config = inject(configInjectionKey)!;
-const eventBus = inject(eventBusInjectionKey)!;
 
 const game = computed<Game>(() => store.game!);
 

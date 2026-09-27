@@ -937,7 +937,82 @@ export default class AIService {
                     }
                 }
             } else if (order.type === AiAction.InvadeStar) {
-                // screw this
+                if (
+                    player.aiState &&
+                    player.aiState.invasionsInProgress &&
+                    player.aiState.invasionsInProgress.find(
+                        (iv) => order.star === iv.star,
+                    )
+                ) {
+                    continue;
+                }
+
+                const starToInvade = context.starsById.get(order.star)!;
+                const ticksLimit = game.settings.galaxy.productionTicks * 2;
+                const fittingAssignments = this._findAssignmentsWithTickLimit(
+                    game,
+                    player,
+                    context,
+                    context.allCanReachPlayerStars,
+                    assignments,
+                    order.star,
+                    ticksLimit,
+                    this._canAffordCarrier(context, game, player, false),
+                    false,
+                );
+
+                if (!fittingAssignments || !fittingAssignments.length) {
+                    continue;
+                }
+
+                for (const { assignment, trace } of fittingAssignments) {
+                    const ticksUntilArrival = this._calculateTraceDuration(
+                        context,
+                        game,
+                        trace,
+                    );
+                    const requiredShips = Math.floor(
+                        (this._calculateRequiredShipsForAttack(
+                            game,
+                            player,
+                            context,
+                            starToInvade,
+                            ticksUntilArrival,
+                        ) || 1) * INVASION_ATTACK_FACTOR,
+                    );
+
+                    if (assignment.totalShips >= requiredShips) {
+                        const carrierResult = await this._useAssignment(
+                            context,
+                            game,
+                            player,
+                            assignments,
+                            assignment,
+                            this._createWaypointsFromTrace(trace),
+                            requiredShips,
+                        );
+
+                        if (!carrierResult || !assignment.carriers[0]) {
+                            continue;
+                        }
+
+                        const ticksEtaTotal =
+                            this.waypointService.calculateWaypointTicksEta(
+                                game,
+                                assignment.carriers[0],
+                                carrierResult.waypoints[
+                                    carrierResult.waypoints.length - 1
+                                ],
+                            );
+
+                        player.aiState!.invasionsInProgress.push({
+                            star: order.star,
+                            arrivalTick: game.state.tick + (ticksEtaTotal || 0),
+                        });
+
+                        break;
+                    }
+                }
             } else if (order.type === AiAction.ClaimStar) {
                 // Skip double claiming stars that might have been claimed by an earlier action
                 if (newClaimedStars.has(order.star)) {

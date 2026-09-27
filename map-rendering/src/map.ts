@@ -1217,7 +1217,7 @@ export class Map {
         // objects on the map that are on top of eachother or very close together.
         const distance = 10;
 
-        let closeStars: {
+        const closeStars: {
             type: string;
             distance: number;
             ref: any;
@@ -1237,7 +1237,7 @@ export class Map {
             })
             .filter((s) => s.distance <= distance);
 
-        let closeCarriers = this.carriers
+        const closeCarriers = this.carriers
             .map((s) => {
                 return {
                     ref: s,
@@ -1253,7 +1253,7 @@ export class Map {
             .filter((s) => s.distance <= distance);
 
         // Combine the arrays and order by closest first.
-        let closeObjects = closeStars.concat(closeCarriers).sort((a, b) => {
+        const closeObjects = closeStars.concat(closeCarriers).sort((a, b) => {
             if (a.type !== b.type) {
                 // Sort stars first
                 return b.type.localeCompare(a.type);
@@ -1267,13 +1267,13 @@ export class Map {
         });
 
         if (closeObjects.length > 1) {
-            let star = closeObjects.find((co) => co.type === "star");
+            const star = closeObjects.find((co) => co.type === "star");
 
             if (star) {
                 star.ref.toggleSelected(); // Select to star to get the ranges drawn on the map
             }
 
-            let eventObj = closeObjects.map((co) => {
+            const eventObj = closeObjects.map((co) => {
                 return {
                     type: co.type,
                     data: co.data,

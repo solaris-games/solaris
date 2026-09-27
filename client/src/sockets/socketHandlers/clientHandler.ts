@@ -11,6 +11,16 @@ export class ClientHandler {
     socket: Socket,
     userClientSocketEmitter: UserClientSocketEmitter,
   ) {
+    // for some godforsaken reason, socketio does not have a working debug mode in the browser any more: https://github.com/socketio/socket.io/issues/5108
+    // so we hack that in.
+    socket.prependAny((eventName, ...args) => {
+      if (localStorage.getItem("debug") === "*") {
+        console.log(
+          `socket.io: event ${eventName}, (${args.map((a) => JSON.stringify(a)).join(", ")})`,
+        );
+      }
+    });
+
     this.socketOn(socket, ClientSocketEventNames.Connect, async () => {
       console.log("Socket connection established.");
       userClientSocketEmitter.emitJoined();

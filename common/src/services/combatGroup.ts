@@ -34,34 +34,70 @@ export class CombatGroupService<ID extends Id> {
         game: Game<ID>,
         players: P[],
     ): CombatPlayerGrouping<ID, P> {
-        const queue = Array.from(players);
+        const alliesMap = new Map<P, P[]>();
 
-        const groups: P[][] = [];
-        const mapping: Map<ID, number> = new Map();
+        for (let player of players) {
+            const allies = players.filter((other) =>
+                this._areAllied(game, player, other),
+            );
+            alliesMap.set(player, allies);
+        }
 
-        let groupIdx = 0;
+        let groups: P[][] = players.map((p) => [p]);
+
+        // arguably, this is not the most efficient algorithm for computing this (in big-O notation).
+        // However, we are assuming that n will be relatively small (usually <5)
+
         while (true) {
-            const next = queue.pop();
-            if (!next) {
+            let idx = 0;
+            let changed = false;
+
+            while (idx < groups.length) {
+                const group = groups[idx];
+                const candidates = group.flatMap(
+                    (p) =>
+                        alliesMap
+                            .get(p)
+                            ?.filter((ally) => !group.includes(ally)) || [],
+                );
+
+                if (candidates.length === 0) {
+                    idx++;
+                    continue;
+                }
+
+                let newGroups = [group];
+
+                for (const otherGroup of groups) {
+                    if (otherGroup === group) {
+                        continue;
+                    }
+
+                    // union
+                    if (otherGroup.find((op) => candidates.includes(op))) {
+                        group.push(...otherGroup);
+                        changed = true;
+                    } else {
+                        // group is distinct
+                        newGroups.push(otherGroup);
+                    }
+                }
+
+                groups = newGroups;
+                idx = 0;
+            }
+
+            if (!changed) {
                 break;
             }
+        }
 
-            mapping.set(next._id, groupIdx);
-            const group = [next];
-
-            for (let i = 0; i < queue.length; i++) {
-                const candidate = queue[i];
-
-                if (group.find((p) => this._areAllied(game, p, candidate))) {
-                    group.push(candidate);
-                    mapping.set(candidate._id, groupIdx);
-                    queue.splice(i, 1);
-                    i--;
-                }
+        const mapping: Map<ID, number> = new Map();
+        for (let i = 0; i < groups.length; i++) {
+            const group = groups[i];
+            for (let player of group) {
+                mapping.set(player._id, i);
             }
-
-            groups.push(group);
-            groupIdx++;
         }
 
         return {

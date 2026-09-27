@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
-import { computed, inject, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import MenuTitle from "../MenuTitle.vue";
 import GameHelper from "../../../../services/gameHelper";
 import gameHelper from "../../../../services/gameHelper";
@@ -123,14 +123,11 @@ import type {
   CarrierWaypoint,
   CarrierWaypointActionType,
   MapObject,
-  UserGameSettings,
 } from "@solaris/common";
-import { httpInjectionKey } from "@/services/typedapi";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import type { Game } from "@/types/game";
 import { getCountdownTimeStringByTicks, ticksToDuration } from "@/util/time";
 import { formatDuration } from "@/util/duration";
-import { isActionRequiresShips } from "@/util/waypoint";
 import WaypointEditRow from "@/views/game/components/carrier/WaypointEditRow.vue";
 import { saveWaypoints } from "@/views/game/components/carrier/action";
 
@@ -145,12 +142,10 @@ const emit = defineEmits<{
 }>();
 
 const eventBus = inject(eventBusInjectionKey)!;
-const httpClient = inject(httpInjectionKey)!;
 
 const store = useGameStore();
 const isHistoricalMode = useIsHistoricalMode(store);
 
-const settings = computed<UserGameSettings>(() => store.settings!);
 const game = computed<Game>(() => store.game!);
 const carrier = computed(() =>
   GameHelper.getCarrierById(game.value, props.carrierId)!,
@@ -278,17 +273,6 @@ const doSaveWaypoints = async (saveAndEdit = false) => {
     }
   }
 };
-
-watch(
-  () => currentWaypoint.value.action,
-  (newV, oldV) => {
-    if (!isActionRequiresShips(oldV) && isActionRequiresShips(newV)) {
-      currentWaypoint.value.actionShips = settings.value.carrier.defaultAmount;
-    } else if (!isActionRequiresShips(newV)) {
-      currentWaypoint.value.actionShips = 0;
-    }
-  },
-);
 
 onMounted(() => {
   recalculateWaypointDuration();

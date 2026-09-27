@@ -16,13 +16,13 @@ import { ClientHandler } from "./sockets/socketHandlers/clientHandler";
 import { httpInjectionKey } from "./services/typedapi";
 import { socketInjectionKey } from "./socket";
 import { createHttpClient } from "./util/http";
-import { UserClientSocketHandler } from "./sockets/socketHandlers/user";
 import { UserClientSocketEmitter } from "@/sockets/socketEmitters/user";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
 import type { FrontendConfig } from "@solaris/common";
 import { configInjectionKey } from "@/config";
 import { createPinia } from "pinia";
 import { useSocketStore } from "@/stores/socket.ts";
+import { UserClientSocketHandler } from "@/sockets/socketHandlers/user.ts";
 
 // Note: This was done to get around an issue where the Steam client
 // had bootstrap as undefined. This also affects the UI template we're using,
@@ -106,6 +106,9 @@ const init = (config: FrontendConfig) => {
     socket,
     userClientSocketEmitter,
   );
+
+  const userClientSocketHandler: UserClientSocketHandler =
+    new UserClientSocketHandler(socket, eventBus);
 
   app.directive("tooltip", function (el, binding) {
     new bootstrap.Tooltip($(el), {

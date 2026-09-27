@@ -15,6 +15,8 @@ export class UserClientSocketHandler extends ClientSocketHandler<UserSocketEvent
     this.on(
       UserSocketEventNames.GameMessageSent,
       (e: ConversationMessageSentResult<string>) => {
+        console.log(`GameMessageSent redirecting to event bus`);
+
         eventBus.emit(UserEventBusEventNames.GameMessageSent, e);
       },
     );

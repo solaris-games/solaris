@@ -10,7 +10,6 @@ jobs:
   build:
     env:
       directory-client: ./client
-      directory-server: ./server
 
     runs-on: ubuntu-latest
 
@@ -29,6 +28,5 @@ jobs:
     - run: npm run check
     - run: npm run build --if-present
     - run: npm test
-      working-directory: ${{ env.directory-server }}
       env:
         CI: true
