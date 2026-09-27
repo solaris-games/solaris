@@ -1,6 +1,7 @@
 import { CombatService } from "../../src/services/combat";
 import { CombatGroupService } from "../../src/services/combatGroup";
 import { TechnologyService } from "../../src/services/technology";
+import { GameTypeService } from "../../src/services/gameType";
 import type {
     CombatBaseCarrier,
     CombatBasePlayer,
@@ -9,6 +10,9 @@ import type {
     DetailedCombatResult,
     DetailedCombatResultGroup,
 } from "../../src/types/common/combat";
+import type { Star } from "../../src/types/common/star";
+import type { Carrier } from "../../src/types/common/carrier";
+import type { Id } from "../../src/types/id";
 import type { Game } from "../../src/types/common/game";
 import type { WeaponsDetail } from "../../src/services/technology";
 import { ValidationError } from "../../src/validation/error";
@@ -36,37 +40,40 @@ import { ValidationError } from "../../src/validation/error";
  */
 
 const specialistService = {
-    getByIdStar: (_id: number) => null,
-    getByIdCarrier: (_id: number) => null,
+    getByIdStar: () => null,
+    getByIdCarrier: () => null,
 };
 
+// The real GameTypeService is only consulted when a star has homeStar set,
+// which the fakes deliberately never do.
 const techService = new TechnologyService(
-    specialistService as any,
-    { isCapitalStarEliminationMode: () => false } as any,
+    specialistService,
+    new GameTypeService(),
 );
 
-const combatGroupService = new CombatGroupService({
+const combatGroupService = new CombatGroupService<Id>({
     isFormalAlliancesEnabled: () => false,
     isDiplomaticStatusToPlayersAllied: () => false,
-} as any);
+});
 
 // fakes are deliberately partial; the real services only need these members here
-const service = new CombatService(
+const service = new CombatService<Id>(
     combatGroupService,
     techService,
     specialistService,
 );
 
-type TestPlayer = CombatBasePlayer<string>;
-type TestStar = CombatBaseStar<string>;
-type TestCarrier = CombatBaseCarrier<string>;
-type TestGroup = CombatGroup<string, TestPlayer, TestStar, TestCarrier>;
+type TestPlayer = CombatBasePlayer<Id>;
+type TestStar = CombatBaseStar<Id>;
+type TestCarrier = CombatBaseCarrier<Id>;
+type TestGroup = CombatGroup<Id, TestPlayer, TestStar, TestCarrier>;
 type TestDetailedGroup = DetailedCombatResultGroup<
-    string,
+    Id,
     TestPlayer,
     TestStar,
     TestCarrier
 >;
+type TestResult = DetailedCombatResult<Id, TestPlayer, TestStar, TestCarrier>;
 
 interface SideSpec {
     ships: number;
@@ -83,7 +90,7 @@ const fakeGame = (defenderBonus: boolean) =>
             },
         },
         constants: { star: { homeStarDefenderBonusMultiplier: 1 } },
-    }) as unknown as Game<string>;
+    }) as unknown as Game<Id>;
 
 const fakeWiringGame = (defenderBonus: boolean, playerCount: number) =>
     ({
@@ -99,7 +106,7 @@ const fakeWiringGame = (defenderBonus: boolean, playerCount: number) =>
                 research: { weapons: { level: 1 + ((i * 2) % 7) } },
             })),
         },
-    }) as unknown as Game<string>;
+    }) as unknown as Game<Id>;
 
 function cloneGroups(groups: TestGroup[]): TestGroup[] {
     return groups.map((g) => ({
@@ -127,20 +134,14 @@ function setupGroups(
     isCarrierToStarCombat: boolean,
     includeDefenderBonus: boolean,
 ): TestGroup[] {
-    const mkCarrier = (
-        id: string,
-        ships: number,
-    ): CombatBaseCarrier<string> => ({
+    const mkCarrier = (id: string, ships: number): CombatBaseCarrier<Id> => ({
         _id: `${id}Carrier`,
         ships,
         specialistId: null,
         ownedByPlayerId: id,
         specialistTargetedPlayers: [],
     });
-    const mkPlayer = (
-        id: string,
-        weapons: number,
-    ): CombatBasePlayer<string> => ({
+    const mkPlayer = (id: string, weapons: number): CombatBasePlayer<Id> => ({
         _id: id,
         research: { weapons: { level: weapons } },
     });
@@ -206,7 +207,7 @@ function setGroupShips(group: TestGroup, ships: number): void {
 /** Runs a fresh simulation with `targetGroupId` set to `ships` ships. */
 function simulate(
     resultGroups: TestGroup[],
-    targetGroupId: string,
+    targetGroupId: Id,
     ships: number,
     isCarrierToStarCombat: boolean,
 ): TestDetailedGroup[] {
@@ -222,7 +223,7 @@ function simulate(
 
 function isConditionMet(
     simGroups: TestDetailedGroup[],
-    targetGroupId: string,
+    targetGroupId: Id,
     terminationCondition: TerminationCondition,
 ): boolean {
     const target = simGroups.find((g) => g.id === targetGroupId)!;
@@ -237,11 +238,11 @@ function isConditionMet(
 
 function findDetailedGroup(
     result: { groups: TestDetailedGroup[] },
-    id: string,
+    id: Id,
 ): TestDetailedGroup {
     const group = result.groups.find((g) => g.id === id);
     if (!group) {
-        throw new Error(`Group ${id} not found in combat result`);
+        throw new Error(`Group ${id.toString()} not found in combat result`);
     }
     return group;
 }
@@ -250,7 +251,7 @@ const bruteForceMax = 480;
 
 function bruteForceEstimate(
     resultGroups: TestGroup[],
-    targetGroupId: string,
+    targetGroupId: Id,
     terminationCondition: TerminationCondition,
     isCarrierToStarCombat: boolean,
 ): number | undefined {
@@ -297,8 +298,8 @@ function describeParams(state: {
 function checkEstimate(
     params: string,
     resultGroups: TestGroup[],
-    originalResult: { groups: TestDetailedGroup[] },
-    targetGroupId: string,
+    originalResult: TestResult,
+    targetGroupId: Id,
     terminationCondition: TerminationCondition,
     isCarrierToStarCombat: boolean,
     compareTruth: boolean,
@@ -309,7 +310,7 @@ function checkEstimate(
 
     try {
         estimate = service.estimateNeeded(
-            originalResult as any,
+            originalResult,
             targetResultGroup,
             terminationCondition,
         );
@@ -778,19 +779,19 @@ describe("combat estimates", () => {
                         for (const mode of ["star", "carrier"] as const) {
                             const game = fakeWiringGame(bonus, playerCount);
 
-                            const star =
+                            const star: TestStar | undefined =
                                 mode === "star"
-                                    ? ({
+                                    ? {
                                           _id: "s1",
                                           ownedByPlayerId: "p0",
                                           ships: starSideShips,
                                           specialistId: null,
                                           homeStar: false,
                                           isAsteroidField: false,
-                                      } as any)
+                                      }
                                     : undefined;
 
-                            const starSideCarriers =
+                            const starSideCarriers: TestCarrier[] =
                                 mode === "star"
                                     ? []
                                     : [
@@ -800,33 +801,35 @@ describe("combat estimates", () => {
                                               ships: starSideShips,
                                               specialistId: null,
                                               specialistTargetedPlayers: [],
-                                          } as any,
+                                          },
                                       ];
 
-                            const otherCarriers = Array.from(
+                            const otherCarriers: TestCarrier[] = Array.from(
                                 { length: playerCount - 1 },
-                                (_, i) =>
-                                    ({
-                                        _id: `cOther${i}`,
-                                        ownedByPlayerId: `p${i + 1}`,
-                                        ships: otherShips,
-                                        specialistId: null,
-                                        specialistTargetedPlayers: [],
-                                    }) as any,
+                                (_, i) => ({
+                                    _id: `cOther${i}`,
+                                    ownedByPlayerId: `p${i + 1}`,
+                                    ships: otherShips,
+                                    specialistId: null,
+                                    specialistTargetedPlayers: [],
+                                }),
                             );
 
+                            // computeStar/computeCarrier expect the fully
+                            // shaped Star/Carrier game objects; the wiring
+                            // tests only need the combat-relevant subset.
                             const result =
                                 mode === "star"
                                     ? service.computeStar(
                                           game,
-                                          star!,
-                                          otherCarriers,
+                                          star as unknown as Star<Id>,
+                                          otherCarriers as unknown as Carrier<Id>[],
                                       )
                                     : service.computeCarrier(
                                           game,
-                                          (starSideCarriers as any[]).concat(
+                                          starSideCarriers.concat(
                                               otherCarriers,
-                                          ),
+                                          ) as unknown as Carrier<Id>[],
                                       );
 
                             if (!result) {
@@ -844,7 +847,7 @@ describe("combat estimates", () => {
 
                             const params = `${mode} p${playerCount} bonus=${bonus} starSide=${starSideShips} other=${otherShips}`;
 
-                            for (const group of result.groups as unknown as TestDetailedGroup[]) {
+                            for (const group of result.groups) {
                                 for (const terminationCondition of [
                                     "greaterThanZeroShips",
                                     "eliminateOtherGroups",
@@ -853,10 +856,8 @@ describe("combat estimates", () => {
 
                                     checkEstimate(
                                         params,
-                                        result.combatGroups as unknown as TestGroup[],
-                                        result as unknown as {
-                                            groups: TestDetailedGroup[];
-                                        },
+                                        result.combatGroups,
+                                        result,
                                         group.id,
                                         terminationCondition,
                                         isC2S,
@@ -884,9 +885,16 @@ describe("combat estimate malformed input guards", () => {
     interface MaskedResult {
         defender: TestDetailedGroup;
         attacker: TestDetailedGroup;
-        result: DetailedCombatResult<string, TestPlayer, TestStar, TestCarrier>;
+        result: TestResult;
         combatGroups: TestGroup[];
     }
+
+    /**
+     * Models masked combat reports: ship fields may legitimately hold
+     * non-numeric "???" data at runtime even though the static types say
+     * number. Forces the invalid runtime value into the number field.
+     */
+    const maskAs = (value: unknown): number => value as unknown as number;
 
     const makeMasked = (mask: (target: MaskedResult) => void): MaskedResult => {
         const groups = setupGroups(
@@ -902,7 +910,7 @@ describe("combat estimate malformed input guards", () => {
             defender: findDetailedGroup(result, "defender"),
             attacker: findDetailedGroup(result, "attacker"),
             result,
-            combatGroups: result.combatGroups as unknown as TestGroup[],
+            combatGroups: result.combatGroups,
         };
 
         mask(target);
@@ -912,7 +920,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when the estimate-for group's shipsAfter is masked", () => {
         const masked = makeMasked((t) => {
-            (t.defender as any).shipsAfter = "???";
+            t.defender.shipsAfter = maskAs("???");
         });
 
         expect(() =>
@@ -926,7 +934,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when the estimate-for group's shipsLost is masked", () => {
         const masked = makeMasked((t) => {
-            (t.defender as any).shipsLost = "???";
+            t.defender.shipsLost = maskAs("???");
         });
 
         expect(() =>
@@ -940,7 +948,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when the estimate-for group's shipsKilled is masked", () => {
         const masked = makeMasked((t) => {
-            (t.defender as any).shipsKilled = "???";
+            t.defender.shipsKilled = maskAs("???");
         });
 
         expect(() =>
@@ -954,9 +962,9 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when all estimate-for fields are masked", () => {
         const masked = makeMasked((t) => {
-            (t.defender as any).shipsAfter = "???";
-            (t.defender as any).shipsLost = "???";
-            (t.defender as any).shipsKilled = "???";
+            t.defender.shipsAfter = maskAs("???");
+            t.defender.shipsLost = maskAs("???");
+            t.defender.shipsKilled = maskAs("???");
         });
 
         expect(() =>
@@ -970,7 +978,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when group ship data in the combat result is masked", () => {
         const masked = makeMasked((t) => {
-            (t.combatGroups[0] as any).originalShips = "???";
+            t.combatGroups[0].originalShips = maskAs("???");
         });
 
         expect(() =>
@@ -984,7 +992,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when star ships in the combat result are masked", () => {
         const masked = makeMasked((t) => {
-            (t.combatGroups[0].star as any).ships = "???";
+            t.combatGroups[0].star!.ships = maskAs("???");
         });
 
         expect(() =>
@@ -998,7 +1006,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws when carrier ships in the combat result are masked", () => {
         const masked = makeMasked((t) => {
-            (t.combatGroups[1].carriers[0] as any).ships = "???";
+            t.combatGroups[1].carriers[0].ships = maskAs("???");
         });
 
         expect(() =>
@@ -1012,7 +1020,7 @@ describe("combat estimate malformed input guards", () => {
 
     it("throws on non-finite numbers", () => {
         const masked = makeMasked((t) => {
-            (t.defender as any).shipsAfter = NaN;
+            t.defender.shipsAfter = NaN;
         });
 
         expect(() =>
