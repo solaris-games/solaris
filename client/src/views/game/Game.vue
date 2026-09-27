@@ -380,9 +380,11 @@ onMounted(async () => {
   //Remove scroll-bounce effect from the game screen
   document.documentElement.classList.add(GAME_BODY_CLASS);
 
+  // ensure no menu is open
+  store.resetMenuStates();
+
   // If the user is in the game then display the leaderboard.
   // Otherwise show the welcome screen if there are empty slots.
-
   if (userPlayer && !userPlayer.defeated) {
     if (GameHelper.isTutorialGame(store.game)) {
       store.setMenuState({ state: "tutorial" });

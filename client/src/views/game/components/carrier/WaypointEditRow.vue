@@ -55,6 +55,7 @@
         v-if="isActionRequiresShips(waypoint.action)"
         class="form-control form-control-sm"
         type="number"
+        min="0"
         v-model="waypoint.actionShips"
       />
     </td>
@@ -62,8 +63,8 @@
 </template>
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
-import { computed } from "vue";
-import type { CarrierWaypoint } from "@solaris/common";
+import { computed, watch } from "vue";
+import type { CarrierWaypoint, UserGameSettings } from "@solaris/common";
 import {
   formatAction,
   isActionRequiresShips,
@@ -80,8 +81,32 @@ const props = defineProps<{
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
+const settings = computed<UserGameSettings>(() => store.settings!);
 
 const onChanged = () => emit("onWaypointUpdated", props.waypoint);
+
+const lastSeen = { waypoint: props.waypoint, action: props.waypoint.action };
+
+watch(
+  () => props.waypoint.action,
+  (newAction) => {
+    if (lastSeen.waypoint === props.waypoint) {
+      const oldAction = lastSeen.action;
+
+      if (
+        !isActionRequiresShips(oldAction) &&
+        isActionRequiresShips(newAction)
+      ) {
+        props.waypoint.actionShips = settings.value.carrier.defaultAmount;
+      } else if (!isActionRequiresShips(newAction)) {
+        props.waypoint.actionShips = 0;
+      }
+    }
+
+    lastSeen.waypoint = props.waypoint;
+    lastSeen.action = props.waypoint.action;
+  },
+);
 
 const emit = defineEmits<{
   onWaypointUpdated: [waypoint: CarrierWaypoint<string>];

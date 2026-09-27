@@ -1,4 +1,4 @@
-import { CarrierPosition } from "./types/Carrier";
+import { Carrier, CarrierPosition } from "./types/Carrier";
 import { Game } from "./types/Game";
 import { User } from "./types/User";
 
@@ -162,18 +162,20 @@ export default class CarrierCombatService {
             // A collision will at this point be cleaned up to a list of carriers
             for (let collision of collisions) {
                 // It could very well be that in a previous collision, carriers were destroyed/reduced to 0 ships.
-                collision.carriers.filter((c) => c.ships! > 0);
+                const actualCarriers = collision.carriers.filter(
+                    (c) => c.ships! > 0,
+                );
 
                 // This gets all the player ids of the players involved, and removes duplicates.
                 const playersIds = [
                     ...new Set(
-                        collision.carriers.map((c) =>
+                        actualCarriers.map((c) =>
                             c.ownedByPlayerId!.toString(),
                         ),
                     ),
                 ];
 
-                const carrierNames = collision.carriers
+                const carrierNames = actualCarriers
                     .map((c) => `"${c.name}"`)
                     .join(", ");
 
@@ -190,7 +192,7 @@ export default class CarrierCombatService {
                 await this._performCarrierCombat(
                     game,
                     gameUsers,
-                    collision,
+                    actualCarriers,
                     eventService,
                     statisticsService,
                 );
@@ -201,7 +203,7 @@ export default class CarrierCombatService {
     async _performCarrierCombat(
         game: Game,
         gameUsers: User[],
-        collision: CarrierCollision,
+        collisionCarriers: Carrier[],
         eventService: IEventService,
         statisticsService: IStatisticsService,
     ) {
@@ -209,7 +211,7 @@ export default class CarrierCombatService {
             game,
             gameUsers,
             null,
-            collision.carriers,
+            collisionCarriers,
             eventService,
             statisticsService,
         );
