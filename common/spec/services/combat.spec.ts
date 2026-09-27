@@ -1060,3 +1060,115 @@ describe("combat estimate malformed input guards", () => {
         ).toThrowError(ValidationError);
     });
 });
+
+describe("combat estimate lazy-object materialization", () => {
+    /**
+     * mongoose documents expose schema paths via own accessors and the
+     * combat result carries such star/carrier objects. The estimator must
+     * materialize (re-read) the fields explicitly instead of relying on
+     * spread copies, and must not trip its own validation: accessor-shaped
+     * objects have no own value slots (see production run where a spread
+     * clone collapsed to ships=undefined).
+     */
+    const makeGetterStar = (ships: number): TestStar => {
+        const star = {} as TestStar;
+
+        Object.defineProperty(star, "_id", {
+            get: () => "star",
+            enumerable: true,
+        });
+        Object.defineProperty(star, "ships", {
+            get: () => ships,
+            enumerable: true,
+        });
+        Object.defineProperty(star, "specialistId", {
+            get: () => null,
+            enumerable: true,
+        });
+        Object.defineProperty(star, "ownedByPlayerId", {
+            get: () => "defender",
+            enumerable: true,
+        });
+        Object.defineProperty(star, "homeStar", {
+            get: () => false,
+            enumerable: true,
+        });
+        Object.defineProperty(star, "isAsteroidField", {
+            get: () => false,
+            enumerable: true,
+        });
+
+        return star;
+    };
+
+    const makeGetterCarrier = (ships: number): TestCarrier => {
+        const carrier = {} as TestCarrier;
+
+        Object.defineProperty(carrier, "_id", {
+            get: () => "attackerCarrier",
+            enumerable: true,
+        });
+        Object.defineProperty(carrier, "ships", {
+            get: () => ships,
+            enumerable: true,
+        });
+        Object.defineProperty(carrier, "specialistId", {
+            get: () => null,
+            enumerable: true,
+        });
+        Object.defineProperty(carrier, "ownedByPlayerId", {
+            get: () => "attacker",
+            enumerable: true,
+        });
+        Object.defineProperty(carrier, "specialistTargetedPlayers", {
+            get: () => [],
+            enumerable: true,
+        });
+
+        return carrier;
+    };
+
+    it("estimates correctly when the result's star/carriers are accessor-shaped", () => {
+        for (const isCarrierToStarCombat of [true, false]) {
+            const groups = setupGroups(
+                { ships: 20, weapons: 2 },
+                { ships: 8, weapons: 2 },
+                isCarrierToStarCombat,
+                false,
+            );
+
+            // reference result computed from plain numeric groups
+            const plainResult = service.calculateGroups(
+                cloneGroups(groups),
+                isCarrierToStarCombat,
+            );
+
+            const result = service.calculateGroups(
+                cloneGroups(groups),
+                isCarrierToStarCombat,
+            );
+
+            // swap the result's combatGroups' objects for accessor-shaped ones
+            result.combatGroups = result.combatGroups.map((g) => ({
+                ...g,
+                star: g.star ? makeGetterStar(g.originalShips) : undefined,
+                carriers: g.carriers.map((c) =>
+                    makeGetterCarrier(c.ships || 0),
+                ),
+            }));
+
+            const defenderAccessor = service.estimateNeeded(
+                result,
+                findDetailedGroup(result, "defender"),
+                "eliminateOtherGroups",
+            );
+            const defenderPlain = service.estimateNeeded(
+                plainResult,
+                findDetailedGroup(plainResult, "defender"),
+                "eliminateOtherGroups",
+            );
+
+            expect(defenderAccessor).toBe(defenderPlain);
+        }
+    });
+});

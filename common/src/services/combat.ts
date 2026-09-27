@@ -579,6 +579,37 @@ const chooseNext = <
     return current + neededMore;
 };
 
+/**
+ * Mongoose documents should not be spread as if they were plain objects.
+ * Object spread copies the document's own enumerable properties rather than
+ * its schema paths, which are exposed through Mongoose accessors.
+ *
+ * Explicitly reading the fields below ensures the combat engine receives a
+ * plain object containing the current values of the relevant document paths.
+ */
+const materializeStar = <ID, S extends CombatBaseStar<ID>>(star: S): S =>
+    ({
+        ...star,
+        _id: star._id,
+        ships: star.ships,
+        specialistId: star.specialistId,
+        ownedByPlayerId: star.ownedByPlayerId,
+        homeStar: star.homeStar,
+        isAsteroidField: star.isAsteroidField,
+    }) as S;
+
+const materializeCarrier = <ID, C extends CombatBaseCarrier<ID>>(
+    carrier: C,
+): C =>
+    ({
+        ...carrier,
+        _id: carrier._id,
+        ships: carrier.ships,
+        specialistId: carrier.specialistId,
+        ownedByPlayerId: carrier.ownedByPlayerId,
+        specialistTargetedPlayers: carrier.specialistTargetedPlayers,
+    }) as C;
+
 const modifyGroups = <
     ID extends Id,
     P extends CombatBasePlayer<ID>,
@@ -595,18 +626,48 @@ const modifyGroups = <
 
             const newGr: CombatGroup<ID, P, S, C> = {
                 ...gr,
-                carriers: gr.carriers.map((c) => ({ ...c }) as C),
-                star: gr.star ? ({ ...gr.star } as S) : undefined,
+                carriers: gr.carriers.map((c) => materializeCarrier(c)) as C[],
+                star: gr.star ? materializeStar(gr.star) : undefined,
                 originalShips: shipsNeeded,
                 ships: shipsNeeded,
                 shipsKilled: 0,
             };
             if (newGr.star) {
+                const starShipsBefore = newGr.star.ships as number;
+
                 newGr.star.ships =
-                    newGr.star.ships! + (shipsNeeded - grOriginalShips);
+                    starShipsBefore + (shipsNeeded - grOriginalShips);
+
+                if (
+                    !Number.isInteger(starShipsBefore) ||
+                    !Number.isInteger(grOriginalShips) ||
+                    !isValidShipsValue(newGr.star.ships)
+                ) {
+                    throw new Error(
+                        `estimate modifyGroups: invalid star ships [group=${gr.id} shipsNeeded=${shipsNeeded} grOriginalShips=${String(grOriginalShips)} star.ships=${String(starShipsBefore)}]`,
+                    );
+                }
             } else {
+                if (!newGr.carriers.length) {
+                    throw new Error(
+                        `estimate modifyGroups: group has no star or carriers [group=${gr.id} shipsNeeded=${shipsNeeded} carriers=${gr.carriers.length}]`,
+                    );
+                }
+
+                const carrierShipsBefore = newGr.carriers[0].ships as number;
+
                 newGr.carriers[0].ships =
-                    newGr.carriers[0].ships! + (shipsNeeded - grOriginalShips);
+                    carrierShipsBefore + (shipsNeeded - grOriginalShips);
+
+                if (
+                    !Number.isInteger(carrierShipsBefore) ||
+                    !Number.isInteger(grOriginalShips) ||
+                    !isValidShipsValue(newGr.carriers[0].ships)
+                ) {
+                    throw new Error(
+                        `estimate modifyGroups: invalid carrier ships [group=${gr.id} shipsNeeded=${shipsNeeded} grOriginalShips=${String(grOriginalShips)} carrier0.ships=${String(carrierShipsBefore)}]`,
+                    );
+                }
             }
             return newGr;
         } else {
