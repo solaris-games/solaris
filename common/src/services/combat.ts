@@ -1137,6 +1137,12 @@ export class CombatService<ID extends Id> {
             };
         };
 
+        if (defender.weaponsLevel <= 0 || attacker.weaponsLevel <= 0) {
+            throw new Error(
+                `Received invalid weapons levels: ${defender.weaponsLevel}, ${attacker.weaponsLevel}`,
+            );
+        }
+
         let groups: CombatGroup<
             string,
             CombatBasePlayer<string>,

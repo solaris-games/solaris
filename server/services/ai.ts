@@ -1452,7 +1452,7 @@ export default class AIService {
             this.technologyService.getStarEffectiveTechnologyLevels(
                 game,
                 starToInvade,
-                false,
+                true,
             );
         const shipsOnCarriers = defendingCarriers.reduce(
             (sum, c) => sum + (c.ships || 0),

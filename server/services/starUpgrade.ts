@@ -776,7 +776,7 @@ export default class StarUpgradeService extends EventEmitter {
                 this.technologyService.withStarSpecificTechnology(
                     s,
                     techs,
-                    false,
+                    true,
                 );
 
             const terraformedResources =

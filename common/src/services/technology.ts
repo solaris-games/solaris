@@ -165,7 +165,7 @@ export class TechnologyService {
     withStarSpecificTechnology<ID extends Id>(
         star: Star<ID>,
         oldTechs: PlayerTechnologyLevels,
-        sanitize: boolean = false,
+        sanitize: boolean = true,
     ) {
         const techs = { ...oldTechs };
 
