@@ -10,6 +10,7 @@ import PaymentModel from "./models/Payment";
 import ReportModel from "./models/Report";
 import MigrationModel from "./models/Migration";
 import StatsSliceModel from "./models/StatsSlice";
+import SessionModel from "./models/Session";
 import type { Config } from "../config/types/Config";
 
 const log = logger("Database");
@@ -36,6 +37,7 @@ export default async (
         await MigrationModel.syncIndexes();
         await ReportModel.syncIndexes();
         await StatsSliceModel.syncIndexes();
+        await SessionModel.syncIndexes();
         log.info("Indexes synced.");
     }
 

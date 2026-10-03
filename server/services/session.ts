@@ -20,7 +20,6 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = false;
     }
 
@@ -28,7 +27,6 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
     }
 
     public startImpersonation(
@@ -39,7 +37,6 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = true;
     }
 
@@ -48,7 +45,6 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = false;
     }
 

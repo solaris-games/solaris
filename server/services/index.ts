@@ -1,6 +1,6 @@
 import GameAuthService from "./gameAuth";
 
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 import GameModel from "../db/models/Game";
 import UserModel from "../db/models/User";
@@ -11,6 +11,7 @@ import PaymentModel from "../db/models/Payment";
 import ReportModel from "../db/models/Report";
 import AnnouncementModel from "../db/models/Announcement";
 import InitialGameStateModel from "../db/models/InitialGameState";
+import SessionModel from "../db/models/Session";
 
 import AdminService from "./admin";
 import PasswordService from "./password";
@@ -147,6 +148,8 @@ import CombatProcessingService from "./combatProcessing";
 const gameNames = require("../config/game/gameNames");
 const starNames = require("../config/game/starNames");
 
+import type { UserSession } from "../api/sessions/session";
+
 const log = logger("Dependency Container");
 
 const gameRepository = new Repository<Game>(GameModel);
@@ -163,6 +166,7 @@ const statsSliceRepository = new Repository<StatsSlice<DBObjectId>>(
 const initialGameStateRepository = new Repository<InitialGameState>(
     InitialGameStateModel,
 );
+const sessionRepository = new Repository<UserSession>(SessionModel);
 
 export default (
     config: Config,

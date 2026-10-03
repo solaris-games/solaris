@@ -682,10 +682,6 @@ export default class UserService extends EventEmitter {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
-            session.userCredits = credits;
-        });
-
         return credits;
     }
 
@@ -700,10 +696,6 @@ export default class UserService extends EventEmitter {
                 },
             },
         );
-
-        this.sessionService.updateUserSessions(userId, (session) => {
-            session.userCredits += credits;
-        });
     }
 
     async incrementCreditsByPurchase(userId: DBObjectId, credits: number) {
@@ -723,7 +715,6 @@ export default class UserService extends EventEmitter {
 
         this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.contributor = true;
-            session.userCredits += credits;
         });
     }
 

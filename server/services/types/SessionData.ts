@@ -1,14 +1,6 @@
 import "express-session";
-import { DBObjectId } from "./DBObjectId";
-import { UserRoles } from "./User";
+import { UserSession } from "../../api/sessions/session";
 
 declare module "express-session" {
-    interface SessionData {
-        userId: DBObjectId;
-        username: string;
-        roles: UserRoles;
-        userCredits: number;
-        isImpersonating: boolean;
-        originalUserId?: DBObjectId;
-    }
+    interface SessionData extends UserSession {}
 }

@@ -1,4 +1,4 @@
-import { Model, QueryOptions, UpdateQuery } from "mongoose";
+import { Cursor, Model, QueryOptions, UpdateQuery } from "mongoose";
 import { DBObjectId } from "./types/DBObjectId";
 import { ActiveModel } from "./types/ActiveModel";
 
