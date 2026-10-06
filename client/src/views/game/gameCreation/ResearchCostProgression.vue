@@ -89,7 +89,7 @@ const props = defineProps<{
 }>();
 
 const researchProgression = defineModel<GameResearchProgression>({
-  default: { progression: "standard" },
+  default: (): GameResearchProgression => ({ progression: "standard" }),
   required: true,
 });
 </script>
