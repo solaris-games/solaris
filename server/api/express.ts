@@ -8,7 +8,7 @@ import registerRoutes from "./routes";
 import { SingleRouter } from "./singleRoute";
 import Middleware from "./middleware";
 import { logger } from "../utils/logging";
-import MongoStore from "connect-mongo";
+import { SessionStore } from "./sessions/sessionStore";
 
 const router = express.Router();
 
@@ -18,7 +18,7 @@ export default async (
     config: Config,
     app,
     container: DependencyContainer,
-    sessionStore: MongoStore,
+    sessionStore: SessionStore,
 ) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 

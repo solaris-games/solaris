@@ -869,6 +869,7 @@ export default (
 
     return {
         config,
+        sessionRepository,
         announcementService,
         adminService,
         passwordService,

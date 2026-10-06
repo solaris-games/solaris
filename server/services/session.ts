@@ -2,12 +2,12 @@ import session from "express-session";
 import Repository from "./repository";
 import { DBObjectId } from "./types/DBObjectId";
 import { User } from "./types/User";
-import MongoStore from "connect-mongo";
-import { Config } from "../config/types/Config";
+import { SessionStore } from "../api/sessions/sessionStore";
+import { UserSession } from "../api/sessions/session";
 
 export default class SessionService {
     private userRepo: Repository<User>;
-    private sessionStorage?: MongoStore;
+    private sessionStorage?: SessionStore;
 
     constructor(userRepo: Repository<User>) {
         this.userRepo = userRepo;
@@ -54,14 +54,15 @@ export default class SessionService {
         });
     }
 
-    public static createSessionStore(config: Config): MongoStore {
-        return MongoStore.create({
-            mongoUrl: config.connectionString!,
-            collectionName: "sessions2", // use new sessions collection
+    public static createSessionStore(
+        sessionRepository: Repository<UserSession>,
+    ): SessionStore {
+        return new SessionStore(sessionRepository, {
+            ttl: 3600 * 24 * 60,
         });
     }
 
-    public setSessionStorage(sessionStorage: MongoStore) {
+    public setSessionStorage(sessionStorage: SessionStore) {
         this.sessionStorage = sessionStorage;
     }
 

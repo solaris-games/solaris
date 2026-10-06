@@ -5,17 +5,17 @@ import { Config } from "../config/types/Config";
 import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import MongoStore from "connect-mongo";
+import { SessionStore } from "../api/sessions/sessionStore";
 
 export default class SocketService {
-    private sessionStorage?: MongoStore;
+    private sessionStorage?: SessionStore;
 
     constructor(
         private config: Config,
         private socketServer: Server,
     ) {}
 
-    public setSessionStorage(sessionStorage: MongoStore) {
+    public setSessionStorage(sessionStorage: SessionStore) {
         this.sessionStorage = sessionStorage;
     }
 
