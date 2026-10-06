@@ -43,6 +43,6 @@
         "less": "4.9.1",
         "rollup-plugin-visualizer": "7.0.1",
         "vite": "8.1.5",
-        "vue-tsc": "3.3.5"
+        "vue-tsc": "3.3.12"
     }
 }
