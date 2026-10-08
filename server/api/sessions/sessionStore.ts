@@ -65,7 +65,7 @@ export class SessionStore extends Store {
     destroy(sid: string, callback?: (err?: any) => void): void {
         this.sessionRepository
             .deleteOne({
-                _id: sid,
+                sessionId: sid,
             })
             .then(() => {
                 callback && callback();
@@ -85,7 +85,7 @@ export class SessionStore extends Store {
     ): void {
         this.sessionRepository
             .findOne({
-                _id: sid,
+                sessionId: sid,
                 ...this._notExpiredQuery(),
             })
             .then((session) => {
@@ -128,7 +128,7 @@ export class SessionStore extends Store {
         this.sessionRepository
             .updateOne(
                 {
-                    _id: sid,
+                    sessionId: sid,
                 },
                 update,
                 {
@@ -164,7 +164,7 @@ export class SessionStore extends Store {
         this.sessionRepository
             .updateOne(
                 {
-                    _id: sid,
+                    sessionId: sid,
                 },
                 update,
             )

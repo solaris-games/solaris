@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 
 const Types = Schema.Types;
 const schema = new Schema({
+    sessionId: { type: Types.String, required: true },
     userId: { type: Types.ObjectId, required: true },
     username: { type: Types.String, required: true },
     roles: {
@@ -15,6 +16,19 @@ const schema = new Schema({
     originalUserId: { type: Types.ObjectId, required: false, default: null },
     expires: { type: Types.Date, required: true },
     lastModified: { type: Types.Date, required: true },
+});
+
+schema.index(
+    {
+        sessionId: 1,
+    },
+    {
+        unique: true,
+    },
+);
+
+schema.index({
+    userId: 1,
 });
 
 schema.index(
