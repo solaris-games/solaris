@@ -8,7 +8,7 @@ export type UserSession = {
     username: string;
     roles: UserRoles;
     isImpersonating: boolean;
-    originalUserId?: DBObjectId;
+    originalUserId: DBObjectId | null;
     expires: Date;
     lastModified: Date;
     cookie?: Cookie;

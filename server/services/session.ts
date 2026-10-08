@@ -43,7 +43,7 @@ export default class SessionService {
     }
 
     public endImpersonation(session: Partial<session.SessionData>, user: User) {
-        session.originalUserId = undefined;
+        session.originalUserId = null;
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
@@ -91,6 +91,7 @@ export default class SessionService {
                             (o) => o.userId.toString() === userId.toString(),
                         )) {
                             action(o);
+                            this.sessionStorage!.set(o.sessionId, o);
                         }
                     }
                 }

@@ -131,12 +131,6 @@ export class SessionStore extends Store {
                 lastModified: tSession.lastModified,
                 cookie: tSession.cookie,
             },
-            $unset:
-                tSession.isImpersonating === undefined
-                    ? {
-                          isImpersonating: "",
-                      }
-                    : {},
         };
 
         this.sessionRepository
