@@ -5,6 +5,8 @@ import { User } from "./types/User";
 import { SessionStore } from "../api/sessions/sessionStore";
 import { UserSession } from "../api/sessions/session";
 
+export const SESSION_TTL_SECONDS = 3600 * 24 * 60;
+
 export default class SessionService {
     private userRepo: Repository<User>;
     private sessionStorage?: SessionStore;
@@ -58,7 +60,7 @@ export default class SessionService {
         sessionRepository: Repository<UserSession>,
     ): SessionStore {
         return new SessionStore(sessionRepository, {
-            ttl: 3600 * 24 * 60,
+            ttl: SESSION_TTL_SECONDS,
         });
     }
 

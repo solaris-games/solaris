@@ -9,6 +9,7 @@ import { SingleRouter } from "./singleRoute";
 import Middleware from "./middleware";
 import { logger } from "../utils/logging";
 import { SessionStore } from "./sessions/sessionStore";
+import { SESSION_TTL_SECONDS } from "../services/session";
 
 const router = express.Router();
 
@@ -37,7 +38,7 @@ export default async (
             saveUninitialized: false,
             cookie: {
                 secure: config.sessionSecureCookies, // Requires HTTPS
-                maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year
+                maxAge: SESSION_TTL_SECONDS * 1000,
                 sameSite: "lax",
             },
             store: sessionStore,
