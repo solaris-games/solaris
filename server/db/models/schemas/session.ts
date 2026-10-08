@@ -3,7 +3,7 @@ import { Schema } from "mongoose";
 const Types = Schema.Types;
 const schema = new Schema({
     userId: { type: Types.ObjectId, required: true },
-    username: { type: Types.ObjectId, required: true },
+    username: { type: Types.String, required: true },
     roles: {
         administrator: { type: Types.Boolean, default: false },
         contributor: { type: Types.Boolean, default: false },
