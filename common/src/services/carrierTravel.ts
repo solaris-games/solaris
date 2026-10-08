@@ -9,6 +9,7 @@ import type { Carrier } from "../types/common/carrier";
 import type { Player } from "../types/common/player";
 import type { Star } from "../types/common/star";
 import type { Location } from "../types/common/location";
+import type { MapObject } from "../types/common/map";
 
 interface ISpecialistService {
     getByIdStar(id: number): Specialist | null;
@@ -23,6 +24,12 @@ interface IDiplomacyService<ID extends Id> {
         otherPlayerIds: ID[],
     ): boolean;
 }
+
+type TravelLocation<ID> = {
+    location: Location;
+    type: "star" | "carrier";
+    object: MapObject<ID>;
+};
 
 export class CarrierTravelService<ID extends Id> {
     specialistService: ISpecialistService;
@@ -74,7 +81,7 @@ export class CarrierTravelService<ID extends Id> {
     }
 
     getTicksToTravel(
-        locations: Location[],
+        locations: TravelLocation<ID>[],
         distancePerTick: number,
     ): null | number {
         // this needs to be iterative for precision reasons
@@ -84,30 +91,44 @@ export class CarrierTravelService<ID extends Id> {
             return null;
         }
 
-        let currentPosition = locations[0];
+        let currentPosition = locations[0].location;
         let ticks = 0;
 
         for (let i = 1; i < locations.length; i++) {
-            const location = locations[i];
+            const previousLocation = locations[i - 1];
+            const destination = locations[i];
+
+            if (
+                destination.type === "star" &&
+                previousLocation.type === "star" &&
+                this.starDataService.isStarPairWormHole(
+                    destination.object as Star<ID>,
+                    previousLocation.object as Star<ID>,
+                )
+            ) {
+                ticks++;
+                currentPosition = destination.location;
+                continue;
+            }
 
             while (true) {
                 const distanceToDestination =
                     this.distanceService.getDistanceBetweenLocations(
                         currentPosition,
-                        location,
+                        destination.location,
                     );
 
                 if (distanceToDestination === 0) {
                     break;
                 } else if (distanceToDestination <= distancePerTick) {
-                    currentPosition = location;
+                    currentPosition = destination.location;
                     ticks++;
                     break;
                 } else {
                     currentPosition =
                         this.distanceService.getNextLocationTowardsLocation(
                             currentPosition,
-                            location,
+                            destination.location,
                             distancePerTick,
                         );
                     ticks++;
@@ -145,13 +166,13 @@ export class CarrierTravelService<ID extends Id> {
             return true;
         }
 
-        let effectiveTechs =
+        const effectiveTechs =
             this.technologyService.getCarrierEffectiveTechnologyLevels(
                 game,
                 carrier,
                 true,
             );
-        let hyperspaceDistance = this.distanceService.getHyperspaceDistance(
+        const hyperspaceDistance = this.distanceService.getHyperspaceDistance(
             game,
             effectiveTechs.hyperspace,
         );
