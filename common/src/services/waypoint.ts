@@ -131,6 +131,12 @@ export class WaypointService<ID extends Id> {
         sourceStar: Star<ID>,
         destinationStar: Star<ID>,
     ): number {
+        if (
+            this.starDataService.isStarPairWormHole(sourceStar, destinationStar)
+        ) {
+            return 1;
+        }
+
         const distance = this.distanceService.getDistanceBetweenLocations(
             sourceStar.location,
             destinationStar.location,
