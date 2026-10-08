@@ -84,7 +84,7 @@ export class SessionStore extends Store {
         callback: (err: any, session?: session.SessionData | null) => void,
     ): void {
         this.sessionRepository
-            .findOne({
+            .findOneAsModel({
                 sessionId: sid,
                 ...this._notExpiredQuery(),
             })
@@ -121,8 +121,22 @@ export class SessionStore extends Store {
 
         const update = {
             $set: {
-                ...tSession,
+                sessionId: sid,
+                userId: tSession.userId,
+                username: tSession.username,
+                roles: tSession.roles,
+                isImpersonating: tSession.isImpersonating,
+                originalUserId: tSession.originalUserId,
+                expires: tSession.expires,
+                lastModified: tSession.lastModified,
+                cookie: tSession.cookie,
             },
+            $unset:
+                tSession.isImpersonating === undefined
+                    ? {
+                          isImpersonating: "",
+                      }
+                    : {},
         };
 
         this.sessionRepository
@@ -168,7 +182,11 @@ export class SessionStore extends Store {
                 },
                 update,
             )
-            .then(() => {
+            .then((res) => {
+                if (res.matchedCount === 0) {
+                    log.error(`Tried to touch non-existent session: ${sid}`);
+                }
+
                 callback && callback();
             })
             .catch((e) => {

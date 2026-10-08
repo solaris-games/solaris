@@ -1,4 +1,10 @@
-import { Cursor, Model, QueryOptions, UpdateQuery } from "mongoose";
+import {
+    Cursor,
+    Model,
+    QueryOptions,
+    UpdateQuery,
+    UpdateWriteOpResult,
+} from "mongoose";
 import { DBObjectId } from "./types/DBObjectId";
 import { ActiveModel } from "./types/ActiveModel";
 
@@ -90,12 +96,12 @@ export default class Repository<T> {
         return await this.model.estimatedDocumentCount().exec();
     }
 
-    async updateOne(query, update, options?): Promise<void> {
-        await this.model.updateOne(query, update, options).exec();
+    async updateOne(query, update, options?): Promise<UpdateWriteOpResult> {
+        return this.model.updateOne(query, update, options).exec();
     }
 
-    async updateMany(query, update, options?): Promise<void> {
-        await this.model.updateMany(query, update, options).exec();
+    async updateMany(query, update, options?): Promise<UpdateWriteOpResult> {
+        return this.model.updateMany(query, update, options).exec();
     }
 
     async bulkWrite(updates): Promise<void> {
