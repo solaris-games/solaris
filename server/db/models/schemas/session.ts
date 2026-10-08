@@ -16,6 +16,17 @@ const schema = new Schema({
     originalUserId: { type: Types.ObjectId, required: false, default: null },
     expires: { type: Types.Date, required: true },
     lastModified: { type: Types.Date, required: true },
+    cookie: {
+        originalMaxAge: { type: Types.Number, required: false, default: null },
+        maxAge: { type: Types.Number, required: false },
+        signed: { type: Types.Boolean, required: false },
+        expires: { type: Types.Date, required: false },
+        httpOnly: { type: Types.Boolean, required: false },
+        path: { type: Types.String, required: false },
+        domain: { type: Types.String, required: false },
+        secure: { type: Types.Mixed, required: false },
+        sameSite: { type: Types.Mixed, required: false },
+    },
 });
 
 schema.index(
