@@ -4,6 +4,13 @@
       :title="'Welcome to ' + game.settings.general.name"
       @onCloseRequested="() => emit('onCloseRequested')"
     >
+      <button
+        title="View Settings"
+        class="btn btn-sm btn-outline-primary"
+        @click="onViewSettingsRequested"
+      >
+        <i class="fas fa-cog"></i>
+      </button>
     </menu-title>
 
     <div
@@ -105,6 +112,8 @@ const httpClient = inject(httpInjectionKey)!;
 const emit = defineEmits<{
   onCloseRequested: [];
   onOpenPlayerDetailRequested: [playerId: string];
+  onViewSettingsRequested: [];
+  onReloadGameRequested: [];
 }>();
 
 const isJoiningGame = ref(false);
@@ -139,6 +148,8 @@ const onPasswordChanged = (newPassword: string) => {
   password.value = newPassword;
 };
 
+const onViewSettingsRequested = () => emit("onViewSettingsRequested");
+
 const onJoinRequested = async (playerId: string | undefined) => {
   errors.value = [];
 
@@ -165,7 +176,7 @@ const onJoinRequested = async (playerId: string | undefined) => {
   );
 
   if (isOk(response)) {
-    location.reload(); // todo: do we really need to do this?
+    emit("onReloadGameRequested");
   } else {
     console.error(formatError(response));
     errors.value = extractErrors(response);
