@@ -113,6 +113,7 @@ const emit = defineEmits<{
   onCloseRequested: [];
   onOpenPlayerDetailRequested: [playerId: string];
   onViewSettingsRequested: [];
+  onReloadGameRequested: [];
 }>();
 
 const isJoiningGame = ref(false);
@@ -175,7 +176,8 @@ const onJoinRequested = async (playerId: string | undefined) => {
   );
 
   if (isOk(response)) {
-    location.reload(); // todo: do we really need to do this?
+    emit("onReloadGameRequested");
+    store.setMenuState({ state: "leaderboard" });
   } else {
     console.error(formatError(response));
     errors.value = extractErrors(response);

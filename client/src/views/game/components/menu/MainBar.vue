@@ -14,6 +14,7 @@
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"
+        @onReloadGameRequested="onReloadGameRequested"
       />
       <tutorial
         v-if="menuState.state == 'tutorial'"
