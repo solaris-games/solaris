@@ -1,9 +1,10 @@
 import {
   createShopPurchaseRoutes,
+  type ShopProcessPaymentResponse,
   type ShopPurchaseResponse,
 } from "@solaris/common";
 import type { Axios } from "axios";
-import { doGet, type ResponseResult } from "@/services/typedapi/index";
+import { doGet, doPost, type ResponseResult } from "@/services/typedapi/index";
 
 const routes = createShopPurchaseRoutes();
 
@@ -14,6 +15,20 @@ export const purchaseGalacticCredits =
       routes.purchaseGalacticCredits,
       {},
       { amount },
+      { withCredentials: true },
+    );
+  };
+
+export const processGalacticCredits =
+  (axios: Axios) =>
+  async (
+    token: string,
+  ): Promise<ResponseResult<ShopProcessPaymentResponse>> => {
+    return doPost(axios)(
+      routes.processGalacticCredits,
+      {},
+      {},
+      { token },
       { withCredentials: true },
     );
   };

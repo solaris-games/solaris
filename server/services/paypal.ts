@@ -180,39 +180,75 @@ export default class PaypalService {
         return approvalUrl;
     }
 
-    async processPayment(orderId: string, userId: DBObjectId) {
+    async _getOrder(orderId: string) {
         const environment = this.config.paypal.environment;
 
+        const url = `${this.API[environment]}/v2/checkout/orders/${orderId}`;
+        const token = await this._getToken();
+
+        try {
+            return await axios.get(url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        } catch (err) {
+            this._logPaypalError(err, url);
+            throw err;
+        }
+    }
+
+    async _captureOrder(orderId: string) {
+        try {
+            const capture = await this._http(
+                `${this.API[this.config.paypal.environment]}/v2/checkout/orders/${orderId}/capture`,
+            );
+
+            if (capture.status !== 201) {
+                throw new Error(`Capture order request failed: ${orderId}`);
+            }
+
+            return capture;
+        } catch (err) {
+            // The capture may have succeeded after all: a previous attempt
+            // could have crashed before crediting the user, or a concurrent
+            // request may have captured the order first. Fetch the order
+            // state from PayPal to determine whether it was completed.
+            log.warn(
+                `Capture request failed for order ${orderId}, checking order status`,
+            );
+
+            return await this._getOrder(orderId);
+        }
+    }
+
+    async processPayment(orderId: string, userId: DBObjectId) {
         const payment = await this.paymentRepo.findOne({
             paymentId: orderId,
+            userId,
         });
 
+        // Either the payment does not exist or it belongs to another user.
         if (!payment) {
-            throw new Error(`Payment not found with id: ${orderId}`);
-        }
-
-        if (payment.userId?.toString?.() !== userId?.toString?.()) {
             throw new ValidationError("Access denied.", 401);
         }
 
-        const capture = await this._http(
-            `${this.API[environment]}/v2/checkout/orders/${orderId}/capture`,
-        );
-
-        if (capture.status !== 201) {
-            throw new Error(`Capture order request failed: ${orderId}`);
+        // Idempotent replay: the payment has already been consumed.
+        if (payment.processed) {
+            return { galacticTokens: payment.totalQuantity };
         }
 
-        if (capture.data.status !== "COMPLETED") {
+        const order = await this._captureOrder(orderId);
+
+        if (order.data?.status !== "COMPLETED") {
             throw new Error(
-                `Capture order not completed: ${orderId} (${capture.data.status})`,
+                `Capture order not completed: ${orderId} (${order.data?.status})`,
             );
         }
 
-        const capturedAmount = parseFloat(
-            capture.data.purchase_units?.[0]?.payments?.captures?.[0]?.amount
-                ?.value,
-        );
+        const capture = order.data.purchase_units?.[0]?.payments?.captures?.[0];
+        const capturedAmount = parseFloat(capture?.amount?.value);
+        const capturedCurrency = capture?.amount?.currency_code;
 
         if (
             !Number.isFinite(capturedAmount) ||
@@ -221,6 +257,29 @@ export default class PaypalService {
             throw new Error(
                 `Captured amount does not match order: ${orderId} (${capturedAmount})`,
             );
+        }
+
+        if (capturedCurrency !== CURRENCY) {
+            throw new Error(
+                `Captured currency does not match order: ${orderId} (${capturedCurrency})`,
+            );
+        }
+
+        // Atomic consumption guard: only the first request that claims the
+        // pending payment may grant credits, so replays cannot double-credit.
+        const claimed = await this.PaymentModel.findOneAndUpdate(
+            {
+                _id: payment._id,
+                processed: { $ne: true },
+            },
+            {
+                $set: { processed: true },
+            },
+        );
+
+        if (!claimed) {
+            // A concurrent request has already processed this payment.
+            return { galacticTokens: payment.totalQuantity };
         }
 
         await this.userService.incrementCreditsByPurchase(

@@ -1,4 +1,5 @@
 import { ValidationError } from "@solaris/common";
+import { parseProcessPaymentRequest } from "../requests/shop";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import { logger } from "../../utils/logging";
 
@@ -18,7 +19,11 @@ export default (container: DependencyContainer) => {
 
                 const totalQuantity = parseInt(req.query.amount);
 
-                if (!totalQuantity || totalQuantity <= 0) {
+                if (
+                    !totalQuantity ||
+                    totalQuantity <= 0 ||
+                    totalQuantity > 1_000
+                ) {
                     errors.push("Could not parse amount");
                 }
 
@@ -40,7 +45,7 @@ export default (container: DependencyContainer) => {
                 }
 
                 const totalCost = totalQuantity * unitCost;
-                const returnUrl = `${container.config.serverUrl}/api/shop/galacticcredits/purchase/process`;
+                const returnUrl = `${container.config.clientUrl}/#/shop/paymentreturn`;
                 const cancelUrl = `${container.config.clientUrl}/#/shop`;
 
                 const approvalUrl =
@@ -62,24 +67,22 @@ export default (container: DependencyContainer) => {
                 return next(err);
             }
         },
-        process: async (req, res, next) => {
+        capture: async (req, res, next) => {
             try {
+                const reqObj = parseProcessPaymentRequest(req.body);
+
                 const result = await container.paypalService.processPayment(
-                    req.query.token,
+                    reqObj.token,
                     req.session.userId,
                 );
 
-                res.redirect(
-                    `${container.config.clientUrl}/#/shop/paymentcomplete?credits=${result.galacticTokens}`,
-                );
+                res.status(200).json({
+                    credits: result.galacticTokens,
+                });
                 return next();
             } catch (err) {
                 log.error(err);
-
-                res.redirect(
-                    `${container.config.clientUrl}/#/shop/paymentfailed`,
-                );
-                return next();
+                return next(err);
             }
         },
     };
