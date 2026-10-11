@@ -36,12 +36,12 @@ export class ResearchProgressService {
                     Math.pow(growthFactor, technologyLevel - 1),
             );
         } else if (progression.progression === "cumulative") {
-            return (
+            return Math.floor(
                 0.5 *
                     progressMultiplierConfig *
                     progression.scalingFactor *
                     (technologyLevel * (technologyLevel + 1)) +
-                progressMultiplierConfig * (1 - progression.scalingFactor)
+                    progressMultiplierConfig * (1 - progression.scalingFactor),
             );
         } else {
             return technologyLevel * progressMultiplierConfig;
