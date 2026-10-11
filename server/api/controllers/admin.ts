@@ -275,7 +275,22 @@ export default (container: DependencyContainer) => {
                     );
                 }
 
-                container.sessionService.startImpersonation(req.session, user);
+                const originalUserId = req.session.userId;
+
+                if (originalUserId == null) {
+                    throw new ValidationError(
+                        `Session is not initialised for a user.`,
+                    );
+                }
+
+                // The session is regenerated to prevent session fixation.
+                await container.sessionService.regenerateSession(req.session);
+
+                container.sessionService.startImpersonation(
+                    req.session,
+                    user,
+                    originalUserId,
+                );
 
                 res.status(200).json({
                     _originalUserId: req.session.originalUserId,
@@ -305,6 +320,9 @@ export default (container: DependencyContainer) => {
                 if (!user) {
                     throw new ValidationError(`User does not exist.`);
                 }
+
+                // The session is regenerated to prevent session fixation.
+                await container.sessionService.regenerateSession(req.session);
 
                 container.sessionService.endImpersonation(req.session, user);
 

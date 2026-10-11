@@ -39,8 +39,9 @@ export default class SessionService {
     public startImpersonation(
         session: Partial<session.SessionData>,
         user: User,
+        originalUserId: DBObjectId,
     ) {
-        session.originalUserId = session.userId;
+        session.originalUserId = originalUserId;
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
@@ -58,6 +59,12 @@ export default class SessionService {
     public destroySession(session: session.Session): Promise<void> {
         return new Promise((resolve, reject) => {
             session.destroy((err) => (err ? reject(err) : resolve()));
+        });
+    }
+
+    public regenerateSession(s: session.Session): Promise<void> {
+        return new Promise((resolve, reject) => {
+            s.regenerate((err) => (err ? reject(err) : resolve()));
         });
     }
 

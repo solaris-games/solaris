@@ -30,6 +30,10 @@ export default async (
     );
 
     // ---------------
+    // App is behind a proxy in production, required for session cookie "secure: auto" mode and rate limiting
+    app.set("trust proxy", 1);
+
+    // ---------------
     // Use sessions for tracking logins
     app.use(
         session({
@@ -37,7 +41,7 @@ export default async (
             resave: false,
             saveUninitialized: false,
             cookie: {
-                secure: config.sessionSecureCookies, // Requires HTTPS
+                secure: config.sessionSecureCookies ? true : "auto",
                 maxAge: SESSION_TTL_SECONDS * 1000,
                 sameSite: "lax",
             },
@@ -98,8 +102,6 @@ export default async (
 
     // ---------------
     // Rate limiting
-    app.set("trust proxy", 1); // NOTE: App is behind a proxy in production so this is required.
-
     const limiter = rateLimit({
         windowMs: 1000, // 1 second
         limit: 10, // limit each IP to X requests per windowMs
