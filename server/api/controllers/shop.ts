@@ -66,6 +66,7 @@ export default (container: DependencyContainer) => {
             try {
                 const result = await container.paypalService.processPayment(
                     req.query.token,
+                    req.session.userId,
                 );
 
                 res.redirect(

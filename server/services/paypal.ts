@@ -4,8 +4,8 @@ import { Payment } from "./types/Payment";
 import CacheService from "./cache";
 import UserService from "./user";
 import { Config } from "../config/types/Config";
-import axios, { AxiosRequestConfig } from "axios";
-import { AxiosError } from "axios";
+import axios, { AxiosError, AxiosRequestConfig } from "axios";
+import { ValidationError } from "@solaris/common";
 import { logger } from "../utils/logging";
 
 const CURRENCY = "GBP";
@@ -180,7 +180,7 @@ export default class PaypalService {
         return approvalUrl;
     }
 
-    async processPayment(orderId: string) {
+    async processPayment(orderId: string, userId: DBObjectId) {
         const environment = this.config.paypal.environment;
 
         const payment = await this.paymentRepo.findOne({
@@ -189,6 +189,10 @@ export default class PaypalService {
 
         if (!payment) {
             throw new Error(`Payment not found with id: ${orderId}`);
+        }
+
+        if (payment.userId?.toString?.() !== userId?.toString?.()) {
+            throw new ValidationError("Access denied.", 401);
         }
 
         const capture = await this._http(

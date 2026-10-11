@@ -182,8 +182,11 @@ describe("PaypalService", () => {
     });
 
     describe("processPayment", () => {
+        const sessionUser = { toString: () => "userId" };
+        const otherUser = { toString: () => "someoneElse" };
+
         const savedPayment: Partial<Payment> = {
-            userId: "userId" as any,
+            userId: sessionUser as any,
             paymentId: "ORDER123",
             totalCost: 9,
             totalQuantity: 10,
@@ -200,7 +203,10 @@ describe("PaypalService", () => {
                 Promise.resolve(fakeCaptureResponse("9.00")) as any,
             );
 
-            const result = await service.processPayment("ORDER123");
+            const result = await service.processPayment(
+                "ORDER123",
+                sessionUser as any,
+            );
 
             expect(result).toEqual({ galacticTokens: 10 });
 
@@ -212,7 +218,23 @@ describe("PaypalService", () => {
 
             expect(
                 fakeUserService.incrementCreditsByPurchase,
-            ).toHaveBeenCalledWith("userId", 10);
+            ).toHaveBeenCalledWith(sessionUser, 10);
+        });
+
+        it("should reject the request if the payment belongs to another user", async () => {
+            const { service, fakeUserService } = createService({
+                savedPayment,
+            });
+
+            stubAxios([]);
+
+            await expectAsync(
+                service.processPayment("ORDER123", otherUser as any),
+            ).toBeRejectedWithError("Access denied.");
+
+            expect(
+                fakeUserService.incrementCreditsByPurchase,
+            ).not.toHaveBeenCalled();
         });
 
         it("should throw if the payment is not found in the database", async () => {
@@ -221,7 +243,7 @@ describe("PaypalService", () => {
             stubAxios([]);
 
             await expectAsync(
-                service.processPayment("ORDER123"),
+                service.processPayment("ORDER123", sessionUser as any),
             ).toBeRejectedWithError("Payment not found with id: ORDER123");
 
             expect(
@@ -242,7 +264,7 @@ describe("PaypalService", () => {
             ]);
 
             await expectAsync(
-                service.processPayment("ORDER123"),
+                service.processPayment("ORDER123", sessionUser as any),
             ).toBeRejectedWithError("Capture order request failed: ORDER123");
 
             expect(
@@ -263,7 +285,7 @@ describe("PaypalService", () => {
             ]);
 
             await expectAsync(
-                service.processPayment("ORDER123"),
+                service.processPayment("ORDER123", sessionUser as any),
             ).toBeRejectedWithError(
                 "Capture order not completed: ORDER123 (DECLINED)",
             );
@@ -286,7 +308,7 @@ describe("PaypalService", () => {
             ]);
 
             await expectAsync(
-                service.processPayment("ORDER123"),
+                service.processPayment("ORDER123", sessionUser as any),
             ).toBeRejectedWithError(
                 "Captured amount does not match order: ORDER123 (1)",
             );
