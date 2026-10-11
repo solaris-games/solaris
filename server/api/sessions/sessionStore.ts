@@ -35,18 +35,9 @@ export class SessionStore extends Store {
                 | null,
         ) => void,
     ): void {
-        this.sessionRepository
-            .find(this._notExpiredQuery())
-            .then((sessions) => {
-                callback(null, sessions as session.SessionData[]);
-            })
-            .catch((e) => {
-                log.error(
-                    e,
-                    `Error while iterating over sessions: ${e.toString()}`,
-                );
-                callback(e);
-            });
+        throw new Error(
+            "This is a stupid method and you should not be using it.",
+        );
     }
 
     clear(callback?: (err?: any) => void): void {

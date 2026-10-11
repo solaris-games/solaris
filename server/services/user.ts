@@ -408,7 +408,7 @@ export default class UserService extends EventEmitter {
             },
         );
 
-        this.sessionService.updateUserSessions(id, (session) => {
+        await this.sessionService.updateUserSessions(id, (session) => {
             session.username = username;
         });
     }
@@ -713,7 +713,7 @@ export default class UserService extends EventEmitter {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
+        await this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.contributor = true;
         });
     }

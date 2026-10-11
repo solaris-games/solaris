@@ -180,7 +180,10 @@ export default (
     const userLevelService = new UserLevelService();
     const authService = new AuthService(userRepository, passwordService);
     const discordService = new DiscordService(config, userRepository);
-    const sessionService = new SessionService(userRepository);
+    const sessionService = new SessionService(
+        userRepository,
+        sessionRepository,
+    );
     const userService = new UserService(
         UserModel,
         userRepository,

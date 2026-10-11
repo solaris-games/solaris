@@ -9,10 +9,15 @@ export const SESSION_TTL_SECONDS = 3600 * 24 * 60;
 
 export default class SessionService {
     private userRepo: Repository<User>;
+    private sessionRepository: Repository<UserSession>;
     private sessionStorage?: SessionStore;
 
-    constructor(userRepo: Repository<User>) {
+    constructor(
+        userRepo: Repository<User>,
+        sessionRepository: Repository<UserSession>,
+    ) {
         this.userRepo = userRepo;
+        this.sessionRepository = sessionRepository;
     }
 
     public initialiseSession(
@@ -71,31 +76,17 @@ export default class SessionService {
     /**
      * Update all the sessions for a specific user (including impersonations of that user).
      * */
-    public updateUserSessions(
+    public async updateUserSessions(
         userId: DBObjectId,
-        action: (session: session.SessionData) => void,
+        action: (session: UserSession) => void,
     ) {
-        this.sessionStorage!.all(
-            (
-                err: any,
-                obj?:
-                    | session.SessionData[]
-                    | { [sid: string]: session.SessionData }
-                    | null,
-            ) => {
-                if (err != null) {
-                    throw err;
-                } else {
-                    if (Array.isArray(obj)) {
-                        for (let o of obj.filter(
-                            (o) => o.userId.toString() === userId.toString(),
-                        )) {
-                            action(o);
-                            this.sessionStorage!.set(o.sessionId, o);
-                        }
-                    }
-                }
-            },
-        );
+        const models = await this.sessionRepository.findAsModels({
+            userId,
+        });
+
+        for (let model of models) {
+            action(model);
+            await model.save();
+        }
     }
 }
