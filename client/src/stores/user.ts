@@ -1,11 +1,8 @@
 import { computed, inject, readonly, ref } from "vue";
 import { defineStore } from "pinia";
 import type { UserPrivate, UserRoles } from "@solaris/common";
-import { httpInjectionKey, formatError, isOk } from "@/services/typedapi";
-import {
-  UserClientSocketEmitter,
-  userClientSocketEmitterInjectionKey,
-} from "@/sockets/socketEmitters/user";
+import { formatError, isOk } from "@/services/typedapi";
+import { UserClientSocketEmitter } from "@/sockets/socketEmitters/user";
 import { verify as verifyApi } from "@/services/typedapi/auth";
 import { detailMe } from "@/services/typedapi/user";
 import type { Axios } from "axios";
@@ -81,7 +78,6 @@ export const useUserStore = defineStore("user", () => {
         setUserId(response.data._id);
         setUsername(response.data.username);
         setRoles(response.data.roles);
-        setCredits(response.data.credits);
 
         if (!user.value || user.value?._id !== response.data._id) {
           const resp2 = await detailMe(httpClient)();

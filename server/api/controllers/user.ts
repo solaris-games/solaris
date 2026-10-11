@@ -388,7 +388,9 @@ export default (container: DependencyContainer) => {
                 await container.userService.closeAccount(req.session.userId);
 
                 // Delete the session object.
-                await container.sessionService.destroySession(req.session);
+                await container.sessionService.destroyUserSessions(
+                    req.session.userId,
+                );
 
                 res.sendStatus(200);
                 return next();

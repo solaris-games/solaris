@@ -8,8 +8,9 @@ const schema = new Schema({
     totalCost: { type: Types.Number, required: true },
     totalQuantity: { type: Types.Number, required: true },
     unitCost: { type: Types.Number, required: true },
+    processed: { type: Types.Boolean, required: true, default: false },
 });
 
-schema.index({ paymentId: 1 }, { unique: false });
+schema.index({ paymentId: 1 }, { unique: true });
 
 export default schema;

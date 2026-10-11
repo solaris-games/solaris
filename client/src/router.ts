@@ -160,6 +160,11 @@ export default createRouter({
       component: () => import("./views/shop/GalacticCredits.vue"),
     },
     {
+      path: "/shop/paymentreturn",
+      name: "galactic-credits-shop-payment-return",
+      component: () => import("./views/shop/PaymentReturn.vue"),
+    },
+    {
       path: "/shop/paymentcomplete",
       name: "galactic-credits-shop-payment-complete",
       component: () => import("./views/shop/PurchaseComplete.vue"),

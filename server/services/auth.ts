@@ -48,7 +48,7 @@ export default class AuthService extends EventEmitter {
         }
 
         // Compare the passwords and if they match then the user is authenticated.
-        let result = await this.passwordService.compare(
+        const result = await this.passwordService.compare(
             password,
             user.password,
         );

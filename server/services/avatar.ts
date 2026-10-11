@@ -114,9 +114,5 @@ export default class AvatarService {
                 },
             },
         );
-
-        this.sessionService.updateUserSessions(userId, (session) => {
-            session.userCredits -= avatar.price;
-        });
     }
 }

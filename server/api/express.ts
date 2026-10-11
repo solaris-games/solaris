@@ -8,7 +8,8 @@ import registerRoutes from "./routes";
 import { SingleRouter } from "./singleRoute";
 import Middleware from "./middleware";
 import { logger } from "../utils/logging";
-import MongoStore from "connect-mongo";
+import { SessionStore } from "./sessions/sessionStore";
+import { SESSION_TTL_SECONDS } from "../services/session";
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ export default async (
     config: Config,
     app,
     container: DependencyContainer,
-    sessionStore: MongoStore,
+    sessionStore: SessionStore,
 ) => {
     const idempotencyKeyCache: Map<string, number> = new Map<string, number>();
 
@@ -29,6 +30,10 @@ export default async (
     );
 
     // ---------------
+    // App is behind a proxy in production, required for session cookie "secure: auto" mode and rate limiting
+    app.set("trust proxy", 1);
+
+    // ---------------
     // Use sessions for tracking logins
     app.use(
         session({
@@ -36,8 +41,8 @@ export default async (
             resave: false,
             saveUninitialized: false,
             cookie: {
-                secure: config.sessionSecureCookies, // Requires HTTPS
-                maxAge: 1000 * 60 * 60 * 24 * 365, // 1 Year
+                secure: config.sessionSecureCookies ? true : "auto",
+                maxAge: SESSION_TTL_SECONDS * 1000,
                 sameSite: "lax",
             },
             store: sessionStore,
@@ -97,8 +102,6 @@ export default async (
 
     // ---------------
     // Rate limiting
-    app.set("trust proxy", 1); // NOTE: App is behind a proxy in production so this is required.
-
     const limiter = rateLimit({
         windowMs: 1000, // 1 second
         limit: 10, // limit each IP to X requests per windowMs

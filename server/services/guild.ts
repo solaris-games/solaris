@@ -309,10 +309,6 @@ export default class GuildService {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
-            session.userCredits -= this.CREATE_GUILD_CREDITS_COST;
-        });
-
         return guild;
     }
 
@@ -370,10 +366,6 @@ export default class GuildService {
                 },
             },
         );
-
-        this.sessionService.updateUserSessions(userId, (session) => {
-            session.userCredits -= this.RENAME_GUILD_CREDITS_COST;
-        });
     }
 
     async delete(userId: DBObjectId, guildId: DBObjectId) {
