@@ -146,7 +146,7 @@ export class SessionStore extends Store {
     touch(
         sid: string,
         session: session.SessionData,
-        callback?: () => void,
+        callback?: (e?) => void,
     ): void {
         const tSession = session as UserSession;
 
@@ -172,11 +172,12 @@ export class SessionStore extends Store {
                     log.error(`Tried to touch non-existent session: ${sid}`);
                 }
 
-                callback && callback();
+                callback &&
+                    callback(`Tried to touch non-existent session: ${sid}`);
             })
             .catch((e) => {
                 log.error(e, `Error touching session ${sid}: ${e.toString()}`);
-                callback && callback();
+                callback && callback(e);
             });
     }
 
