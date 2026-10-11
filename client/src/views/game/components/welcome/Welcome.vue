@@ -177,7 +177,6 @@ const onJoinRequested = async (playerId: string | undefined) => {
 
   if (isOk(response)) {
     emit("onReloadGameRequested");
-    store.setMenuState({ state: "leaderboard" });
   } else {
     console.error(formatError(response));
     errors.value = extractErrors(response);

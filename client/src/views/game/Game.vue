@@ -27,7 +27,7 @@
         <stacked-u-i>
           <main-bar
             @onPlayerSelected="onPlayerSelected"
-            @onReloadGameRequested="reloadGame"
+            @onReloadGameRequested="() => reloadGame(true)"
             @onViewColourOverrideRequested="onViewColourOverrideRequested"
           />
 
@@ -60,7 +60,10 @@
 
 <script setup lang="ts">
 import Logo from "../components/Logo.vue";
-import { type ObjectClicked } from "@solaris/map-rendering";
+import {
+  MapCommandEventBusEventNames,
+  type ObjectClicked,
+} from "@solaris/map-rendering";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 // GameContainer is lazy-loaded so the heavy @solaris/map-rendering / Pixi bundle
 // is split into its own chunk and only downloaded once the game view mounts.
@@ -262,18 +265,49 @@ const reloadSettings = async () => {
   }
 };
 
-const reloadGame = async () => {
+const reloadGame = async (reinitialise: boolean = false) => {
   const response = await detailGalaxy(httpClient)(route.query.id as string);
 
   if (isOk(response)) {
     // Make sure the player is still in the current game, they may have quickly
     // switched to another game.
     if (route.query.id === response.data._id) {
-      store.setGame(response.data as Game); // Persist to storage // TODO: Fix types
+      const game = response.data as Game;
+      store.setGame(game); // Persist to storage // TODO: Fix types
       store.setTick(response.data.state.tick);
       store.setProductionTick(response.data.state.productionTick);
 
       document.title = response.data.settings.general.name + " - Solaris";
+
+      if (reinitialise) {
+        // ensure no menu is open
+        store.resetMenuStates();
+
+        const userPlayer = gameHelper.getUserPlayer(game);
+
+        // If the user is in the game then display the leaderboard.
+        // Otherwise show the welcome screen if there are empty slots.
+        if (userPlayer && !userPlayer.defeated) {
+          if (GameHelper.isTutorialGame(store.game)) {
+            store.setMenuState({ state: "tutorial" });
+          } else {
+            store.setMenuState({ state: "leaderboard" });
+          }
+        } else {
+          if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
+            store.setMenuState({ state: "welcome" });
+          } else {
+            store.setMenuState({ state: "leaderboard" }); // Assume the user is spectating.
+          }
+        }
+
+        eventBus.emit(
+          MapCommandEventBusEventNames.MapCommandInitialPanForPlayer,
+          {
+            player: GameHelper.getUserPlayer(store.game!),
+          },
+        );
+      }
     }
   } else {
     console.error(formatError(response));
@@ -316,7 +350,7 @@ const reloadGameCheck = async () => {
           store.setTick(response.data.state.tick);
           store.setProductionTick(response.data.state.productionTick);
         } else {
-          await reloadGame();
+          await reloadGame(false);
         }
 
         eventBus.emit(GameEventBusEventNames.OnGameTick);
@@ -364,7 +398,7 @@ onMounted(async () => {
   attemptLogin();
 
   await reloadSettings();
-  await reloadGame();
+  await reloadGame(true);
 
   const userPlayer = GameHelper.getUserPlayer(store.game!);
 
@@ -379,25 +413,6 @@ onMounted(async () => {
 
   //Remove scroll-bounce effect from the game screen
   document.documentElement.classList.add(GAME_BODY_CLASS);
-
-  // ensure no menu is open
-  store.resetMenuStates();
-
-  // If the user is in the game then display the leaderboard.
-  // Otherwise show the welcome screen if there are empty slots.
-  if (userPlayer && !userPlayer.defeated) {
-    if (GameHelper.isTutorialGame(store.game)) {
-      store.setMenuState({ state: "tutorial" });
-    } else {
-      store.setMenuState({ state: "leaderboard" });
-    }
-  } else {
-    if (userStore.userId && GameHelper.gameHasOpenSlots(store.game)) {
-      store.setMenuState({ state: "welcome" });
-    } else {
-      store.setMenuState({ state: "leaderboard" }); // Assume the user is spectating.
-    }
-  }
 
   const reloadGameCheckInterval = 1000;
   polling.value = setInterval(reloadGameCheck, reloadGameCheckInterval);
