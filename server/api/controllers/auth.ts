@@ -2,6 +2,7 @@ import { DependencyContainer } from "../../services/types/DependencyContainer";
 import { logger } from "../../utils/logging";
 import { default as axios, AxiosError } from "axios";
 import { parseAuthLoginRequest } from "../requests/auth";
+import { UserSession } from "../sessions/session";
 
 const log = logger("Auth Controller");
 
@@ -17,6 +18,8 @@ export default (container: DependencyContainer) => {
                 );
 
                 // Store the user in the session.
+                // The session is regenerated to prevent session fixation.
+                await container.sessionService.regenerateSession(req.session);
                 container.sessionService.initialiseSession(req.session, user);
 
                 res.status(200).json({
@@ -43,13 +46,12 @@ export default (container: DependencyContainer) => {
             }
         },
         verify: (req, res, next) => {
-            const session = (req as any).session;
+            const session: UserSession = (req as any).session;
 
             res.status(200).json({
                 _id: session.userId,
                 username: session.username,
                 roles: session.roles,
-                credits: session.userCredits,
             });
             return next();
         },

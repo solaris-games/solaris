@@ -108,7 +108,6 @@ const handleSubmit = async (e: Event) => {
     userStore.setUserId(response.data._id);
     userStore.setUsername(response.data.username);
     userStore.setRoles(response.data.roles);
-    userStore.setCredits(response.data.credits);
 
     userClientSocketEmitter.emitJoined();
 

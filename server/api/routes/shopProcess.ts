@@ -10,10 +10,10 @@ export default (
 ) => {
     const controller = ShopController(container);
 
-    router.get(
+    router.post(
         "/api/shop/galacticcredits/purchase/process",
         mw.auth.authenticate(),
-        controller.process,
+        controller.capture,
     );
 
     return router;

@@ -2,15 +2,22 @@ import session from "express-session";
 import Repository from "./repository";
 import { DBObjectId } from "./types/DBObjectId";
 import { User } from "./types/User";
-import MongoStore from "connect-mongo";
-import { Config } from "../config/types/Config";
+import { SessionStore } from "../api/sessions/sessionStore";
+import { UserSession } from "../api/sessions/session";
+
+export const SESSION_TTL_SECONDS = 3600 * 24 * 60;
 
 export default class SessionService {
     private userRepo: Repository<User>;
-    private sessionStorage?: MongoStore;
+    private sessionRepository: Repository<UserSession>;
+    private sessionStorage?: SessionStore;
 
-    constructor(userRepo: Repository<User>) {
+    constructor(
+        userRepo: Repository<User>,
+        sessionRepository: Repository<UserSession>,
+    ) {
         this.userRepo = userRepo;
+        this.sessionRepository = sessionRepository;
     }
 
     public initialiseSession(
@@ -20,7 +27,6 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = false;
     }
 
@@ -28,27 +34,25 @@ export default class SessionService {
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
     }
 
     public startImpersonation(
         session: Partial<session.SessionData>,
         user: User,
+        originalUserId: DBObjectId,
     ) {
-        session.originalUserId = session.userId;
+        session.originalUserId = originalUserId;
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = true;
     }
 
     public endImpersonation(session: Partial<session.SessionData>, user: User) {
-        session.originalUserId = undefined;
+        session.originalUserId = null;
         session.userId = user._id;
         session.username = user.username;
         session.roles = user.roles;
-        session.userCredits = user.credits;
         session.isImpersonating = false;
     }
 
@@ -58,44 +62,44 @@ export default class SessionService {
         });
     }
 
-    public static createSessionStore(config: Config): MongoStore {
-        return MongoStore.create({
-            mongoUrl: config.connectionString!,
-            collectionName: "sessions2", // use new sessions collection
+    public regenerateSession(s: session.Session): Promise<void> {
+        return new Promise((resolve, reject) => {
+            s.regenerate((err) => (err ? reject(err) : resolve()));
         });
     }
 
-    public setSessionStorage(sessionStorage: MongoStore) {
+    public static createSessionStore(
+        sessionRepository: Repository<UserSession>,
+    ): SessionStore {
+        return new SessionStore(sessionRepository, {
+            ttl: SESSION_TTL_SECONDS,
+        });
+    }
+
+    public setSessionStorage(sessionStorage: SessionStore) {
         this.sessionStorage = sessionStorage;
     }
 
     /**
      * Update all the sessions for a specific user (including impersonations of that user).
      * */
-    public updateUserSessions(
+    public async updateUserSessions(
         userId: DBObjectId,
-        action: (session: session.SessionData) => void,
+        action: (session: UserSession) => void,
     ) {
-        this.sessionStorage!.all(
-            (
-                err: any,
-                obj?:
-                    | session.SessionData[]
-                    | { [sid: string]: session.SessionData }
-                    | null,
-            ) => {
-                if (err != null) {
-                    throw err;
-                } else {
-                    if (Array.isArray(obj)) {
-                        for (let o of obj.filter(
-                            (o) => o.userId.toString() === userId.toString(),
-                        )) {
-                            action(o);
-                        }
-                    }
-                }
-            },
-        );
+        const models = await this.sessionRepository.findAsModels({
+            userId,
+        });
+
+        for (let model of models) {
+            action(model);
+            await model.save();
+        }
+    }
+
+    public async destroyUserSessions(userId: DBObjectId) {
+        await this.sessionRepository.deleteMany({
+            userId,
+        });
     }
 }

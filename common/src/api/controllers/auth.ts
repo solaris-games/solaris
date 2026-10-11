@@ -10,7 +10,6 @@ export type AuthResponse<ID> = {
     _id: ID;
     username: string;
     roles: UserRoles;
-    credits: number;
 };
 
 export const createAuthRoutes = <ID>() => ({

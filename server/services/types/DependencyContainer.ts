@@ -105,8 +105,11 @@ import CarrierCombatService from "../carrierCombat";
 import CombatProcessingService from "../combatProcessing";
 import { EventService } from "../event";
 import StatisticsService from "../statistics";
+import Repository from "../repository";
+import { UserSession } from "../../api/sessions/session";
 
 export interface DependencyContainer {
+    sessionRepository: Repository<UserSession>;
     config: Config;
     adminService: AdminService;
     passwordService: PasswordService;

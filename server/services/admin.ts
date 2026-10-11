@@ -144,7 +144,7 @@ export default class AdminService {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
+        await this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.contributor = enabled;
         });
     }
@@ -159,7 +159,7 @@ export default class AdminService {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
+        await this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.developer = enabled;
         });
     }
@@ -174,7 +174,7 @@ export default class AdminService {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
+        await this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.communityManager = enabled;
         });
     }
@@ -189,7 +189,7 @@ export default class AdminService {
             },
         );
 
-        this.sessionService.updateUserSessions(userId, (session) => {
+        await this.sessionService.updateUserSessions(userId, (session) => {
             session.roles.gameMaster = enabled;
         });
     }

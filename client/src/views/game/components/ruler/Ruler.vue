@@ -278,7 +278,13 @@ const onCloseRequested = () => {
 };
 
 const recalculateETAs = () => {
-  const locations = points.value.map((p) => p.location);
+  const locations = points.value.map((p) => {
+    return {
+      location: p.location,
+      type: p.type,
+      object: p.object,
+    };
+  });
 
   const tickDistance = serviceProvider.carrierTravelService.getDistancePerTick(
     game.value,

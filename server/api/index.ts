@@ -36,7 +36,9 @@ async function startServer() {
 
     const container = containerLoader(config, socketServer, log);
 
-    const sessionStore = SessionService.createSessionStore(config);
+    const sessionStore = SessionService.createSessionStore(
+        container.sessionRepository,
+    );
 
     container.sessionService.setSessionStorage(sessionStore);
     container.socketService.setSessionStorage(sessionStore);
