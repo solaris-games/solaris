@@ -129,6 +129,20 @@ describe("PaypalService", () => {
                 "https://api-m.sandbox.paypal.com/v2/checkout/orders",
                 jasmine.objectContaining({
                     intent: "CAPTURE",
+                    purchase_units: [
+                        jasmine.objectContaining({
+                            amount: jasmine.objectContaining({
+                                currency_code: "GBP",
+                                value: "9.00",
+                                breakdown: {
+                                    item_total: {
+                                        currency_code: "GBP",
+                                        value: "9.00",
+                                    },
+                                },
+                            }),
+                        }),
+                    ],
                 }),
                 jasmine.anything(),
             );

@@ -5,9 +5,13 @@ import CacheService from "./cache";
 import UserService from "./user";
 import { Config } from "../config/types/Config";
 import axios, { AxiosRequestConfig } from "axios";
+import { AxiosError } from "axios";
+import { logger } from "../utils/logging";
 
 const CURRENCY = "GBP";
 const CACHE_KEY_TOKEN = "paypalToken";
+
+const log = logger("PaypalService");
 
 export default class PaypalService {
     PaymentModel: any;
@@ -71,14 +75,38 @@ export default class PaypalService {
     async _http(url: string, config: AxiosRequestConfig = {}) {
         const token = await this._getToken();
 
-        return axios.post(url, config.data ?? {}, {
-            ...config,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                ...config.headers,
-            },
-        });
+        try {
+            return await axios.post(url, config.data ?? {}, {
+                ...config,
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                    ...config.headers,
+                },
+            });
+        } catch (err) {
+            this._logPaypalError(err, url);
+            throw err;
+        }
+    }
+
+    _logPaypalError(err: unknown, url: string) {
+        if (err instanceof AxiosError && err.response) {
+            const data = err.response.data;
+            log.error(
+                {
+                    paypalUrl: url,
+                    status: err.response.status,
+                    paypalError: {
+                        name: data?.name,
+                        message: data?.message,
+                        details: data?.details,
+                        debugId: data?.debug_id,
+                    },
+                },
+                `PayPal request failed: ${err.response.status} on ${url}`,
+            );
+        }
     }
 
     async authorizePayment(
@@ -102,6 +130,14 @@ export default class PaypalService {
                             amount: {
                                 currency_code: CURRENCY,
                                 value: totalCost.toFixed(2),
+                                breakdown: {
+                                    item_total: {
+                                        currency_code: CURRENCY,
+                                        value: (
+                                            totalQuantity * unitCost
+                                        ).toFixed(2),
+                                    },
+                                },
                             },
                             items: [
                                 {
