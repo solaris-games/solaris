@@ -65,8 +65,7 @@ export default (container: DependencyContainer) => {
         process: async (req, res, next) => {
             try {
                 const result = await container.paypalService.processPayment(
-                    req.query.paymentId,
-                    req.query.PayerID,
+                    req.query.token,
                 );
 
                 res.redirect(

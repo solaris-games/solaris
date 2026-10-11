@@ -4,7 +4,7 @@ import { Payment } from "./types/Payment";
 import CacheService from "./cache";
 import UserService from "./user";
 import { Config } from "../config/types/Config";
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
 const CURRENCY = "GBP";
 const CACHE_KEY_TOKEN = "paypalToken";
@@ -17,22 +17,8 @@ export default class PaypalService {
     cacheService: CacheService;
 
     API = {
-        sandbox: {
-            auth: "https://api-m.sandbox.paypal.com/v1/oauth2/token",
-            payment: "https://api-m.sandbox.paypal.com/v1/payments/payment",
-            execute: (paymentId: string) =>
-                `https://api-m.sandbox.paypal.com/v1/payments/payment/${paymentId}/execute`,
-            capture: (authorizationId: string) =>
-                `https://api-m.sandbox.paypal.com/v1/payments/authorization/${authorizationId}/capture`,
-        },
-        production: {
-            auth: "https://api-m.paypal.com/v1/oauth2/token",
-            payment: "https://api-m.paypal.com/v1/payments/payment",
-            execute: (paymentId: string) =>
-                `https://api-m.paypal.com/v1/payments/payment/${paymentId}/execute`,
-            capture: (authorizationId: string) =>
-                `https://api-m.paypal.com/v1/payments/authorization/${authorizationId}/capture`,
-        },
+        sandbox: "https://api-m.sandbox.paypal.com",
+        production: "https://api-m.paypal.com",
     };
 
     constructor(
@@ -49,7 +35,7 @@ export default class PaypalService {
         this.cacheService = cacheService;
     }
 
-    async authorize() {
+    async _getToken() {
         let cached = this.cacheService.get(CACHE_KEY_TOKEN);
 
         if (cached) {
@@ -62,7 +48,7 @@ export default class PaypalService {
         params.append("grant_type", "client_credentials");
 
         let authResponse = await axios.post(
-            this.API[environment].auth,
+            `${this.API[environment]}/v1/oauth2/token`,
             params,
             {
                 headers: {
@@ -77,9 +63,22 @@ export default class PaypalService {
 
         let token = authResponse.data.access_token;
 
-        this.cacheService.put(CACHE_KEY_TOKEN, token, 3600000); // 1 hour
+        this.cacheService.put(CACHE_KEY_TOKEN, token, 3000000); // 50 minutes
 
         return token;
+    }
+
+    async _http(url: string, config: AxiosRequestConfig = {}) {
+        const token = await this._getToken();
+
+        return axios.post(url, config.data ?? {}, {
+            ...config,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                ...config.headers,
+            },
+        });
     }
 
     async authorizePayment(
@@ -92,54 +91,45 @@ export default class PaypalService {
     ) {
         const environment = this.config.paypal.environment;
 
-        // Get a token from PayPal
-        let token = await this.authorize();
-        const requestOptions = {
-            headers: {
-                Authorization: "Bearer " + token,
-            },
-        };
-
-        // Authorize a payment
-        let paymentResponse = await axios.post(
-            this.API[environment].payment,
+        const order = await this._http(
+            `${this.API[environment]}/v2/checkout/orders`,
             {
-                intent: "authorize",
-                payer: {
-                    payment_method: "paypal",
-                },
-                transactions: [
-                    {
-                        amount: {
-                            total: totalCost.toFixed(2),
-                            currency: CURRENCY,
-                        },
-                        description: `${totalQuantity} Galactic Tokens on Solaris`,
-                        item_list: {
+                data: {
+                    intent: "CAPTURE",
+                    purchase_units: [
+                        {
+                            description: `${totalQuantity} Galactic Tokens on Solaris`,
+                            amount: {
+                                currency_code: CURRENCY,
+                                value: totalCost.toFixed(2),
+                            },
                             items: [
                                 {
                                     name: "Galactic Tokens",
-                                    quantity: totalQuantity,
-                                    price: unitCost.toFixed(2),
-                                    currency: CURRENCY,
+                                    quantity: totalQuantity.toString(),
+                                    unit_amount: {
+                                        currency_code: CURRENCY,
+                                        value: unitCost.toFixed(2),
+                                    },
                                 },
                             ],
                         },
+                    ],
+                    application_context: {
+                        return_url: returnUrl,
+                        cancel_url: cancelUrl,
                     },
-                ],
-                note_to_payer: "Contact us for any questions on your order.",
-                redirect_urls: {
-                    return_url: returnUrl,
-                    cancel_url: cancelUrl,
                 },
             },
-            requestOptions,
         );
 
-        // Create a payment in the database against the user so it can be retrieved later when processing the payment.
-        let payment = new this.PaymentModel({
+        if (order.status !== 201) {
+            throw new Error(`Create order request failed`);
+        }
+
+        const payment = new this.PaymentModel({
             userId,
-            paymentId: paymentResponse.data.id,
+            paymentId: order.data.id,
             totalCost,
             totalQuantity,
             unitCost,
@@ -147,72 +137,52 @@ export default class PaypalService {
 
         await payment.save();
 
-        // Redirect the user to the authorize URL
-        let approvalUrl = paymentResponse.data.links.find(
-            (l) => l.rel === "approval_url",
+        const approvalUrl = order.data.links.find(
+            (l) => l.rel === "approve" || l.rel === "payer-action",
         ).href;
 
         return approvalUrl;
     }
 
-    async processPayment(paymentId: string, payerId: string) {
+    async processPayment(orderId: string) {
         const environment = this.config.paypal.environment;
 
-        // Get the payment from the DB to verify transaction.
         const payment = await this.paymentRepo.findOne({
-            paymentId,
+            paymentId: orderId,
         });
 
         if (!payment) {
-            throw new Error(`Payment not found with id: ${paymentId}`);
+            throw new Error(`Payment not found with id: ${orderId}`);
         }
 
-        // Get a token from PayPal
-        let token = await this.authorize();
-        const requestOptions = {
-            headers: {
-                Authorization: "Bearer " + token,
-            },
-        };
-
-        // Execute the approved payment
-        let executeResponse = await axios.post(
-            this.API[environment].execute(paymentId),
-            {
-                payer_id: payerId,
-            },
-            requestOptions,
+        const capture = await this._http(
+            `${this.API[environment]}/v2/checkout/orders/${orderId}/capture`,
         );
 
-        if (executeResponse.status !== 200) {
-            throw new Error(`Execute payment request failed: ${paymentId}`);
+        if (capture.status !== 201) {
+            throw new Error(`Capture order request failed: ${orderId}`);
         }
 
-        for (let transaction of executeResponse.data.transactions) {
-            const authorizationId = transaction.related_resources.find(
-                (r) => r.authorization != null,
-            ).authorization.id;
-
-            // Capture the payment.
-            const authResponse = await axios.post(
-                this.API[environment].capture(authorizationId),
-                {
-                    amount: {
-                        total: parseFloat(transaction.amount.total).toFixed(2),
-                        currency: transaction.amount.currency,
-                    },
-                },
-                requestOptions,
+        if (capture.data.status !== "COMPLETED") {
+            throw new Error(
+                `Capture order not completed: ${orderId} (${capture.data.status})`,
             );
-
-            if (authResponse.status !== 201) {
-                throw new Error(
-                    `Authorize payment request failed: ${authorizationId}`,
-                );
-            }
         }
 
-        // Add credits to the users account.
+        const capturedAmount = parseFloat(
+            capture.data.purchase_units?.[0]?.payments?.captures?.[0]?.amount
+                ?.value,
+        );
+
+        if (
+            !Number.isFinite(capturedAmount) ||
+            capturedAmount.toFixed(2) !== payment.totalCost.toFixed(2)
+        ) {
+            throw new Error(
+                `Captured amount does not match order: ${orderId} (${capturedAmount})`,
+            );
+        }
+
         await this.userService.incrementCreditsByPurchase(
             payment.userId,
             payment.totalQuantity,
