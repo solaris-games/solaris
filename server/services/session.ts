@@ -89,4 +89,10 @@ export default class SessionService {
             await model.save();
         }
     }
+
+    public async destroyUserSessions(userId: DBObjectId) {
+        await this.sessionRepository.deleteMany({
+            userId,
+        });
+    }
 }

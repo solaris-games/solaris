@@ -418,21 +418,21 @@ export default class UserService extends EventEmitter {
         currentPassword: string,
         newPassword: string,
     ) {
-        let user = await this.userRepo.findById(id);
+        const user = await this.userRepo.findById(id);
 
         if (!user) {
             throw new ValidationError(`Could not find user`, 404);
         }
 
         // Make sure the current password matches.
-        let result = await this.passwordService.compare(
+        const result = await this.passwordService.compare(
             currentPassword,
             user.password!,
         );
 
         if (result) {
             // Update the current password to the new password.
-            let hash = await this.passwordService.hash(newPassword, 10);
+            const hash = await this.passwordService.hash(newPassword, 10);
 
             await this.userRepo.updateOne(
                 {
@@ -442,6 +442,8 @@ export default class UserService extends EventEmitter {
                     password: hash,
                 },
             );
+
+            await this.sessionService.destroyUserSessions(user._id);
         } else {
             throw new ValidationError("The current password is incorrect.");
         }
@@ -516,6 +518,8 @@ export default class UserService extends EventEmitter {
                 resetPasswordDate: null,
             },
         );
+
+        await this.sessionService.destroyUserSessions(user._id);
     }
 
     async closeAccount(id: DBObjectId) {
