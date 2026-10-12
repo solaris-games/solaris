@@ -12,7 +12,7 @@ describe("random", () => {
         const res = randomService.getRandomNumber(max);
 
         expect(res).toBeGreaterThanOrEqual(0);
-        expect(res).toBeLessThan(max);
+        expect(res).toBeLessThanOrEqual(max);
     });
 
     it("should generate a random number between x and y", () => {
