@@ -657,14 +657,6 @@ export default class StarUpgradeService extends EventEmitter {
             statisticsService,
         );
 
-        report.currentResearchTicksEta =
-            this.researchService.calculateCurrentResearchETAInTicks(
-                game,
-                player,
-            );
-        report.nextResearchTicksEta =
-            this.researchService.calculateNextResearchETAInTicks(game, player);
-
         return report;
     }
 
@@ -954,19 +946,6 @@ export default class StarUpgradeService extends EventEmitter {
                         upgradeSummary.upgraded;
                 },
             );
-        }
-
-        if (infrastructureType === "science") {
-            upgradeSummary.currentResearchTicksEta =
-                this.researchService.calculateCurrentResearchETAInTicks(
-                    game,
-                    player,
-                );
-            upgradeSummary.nextResearchTicksEta =
-                this.researchService.calculateNextResearchETAInTicks(
-                    game,
-                    player,
-                );
         }
 
         return upgradeSummary;

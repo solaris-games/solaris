@@ -10,13 +10,13 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseUpdateResearchNowRequest(req.body);
 
-                let eta = await container.researchService.updateResearchNow(
+                await container.researchService.updateResearchNow(
                     req.game,
                     req.player,
                     reqObj.preference,
                 );
 
-                res.status(200).json(eta);
+                res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);
@@ -26,13 +26,13 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseUpdateResearchNextRequest(req.body);
 
-                let eta = await container.researchService.updateResearchNext(
+                await container.researchService.updateResearchNext(
                     req.game,
                     req.player,
                     reqObj.preference,
                 );
 
-                res.status(200).json(eta);
+                res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);

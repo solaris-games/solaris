@@ -977,14 +977,6 @@ class GameHelper {
 
     userPlayer.credits -= data.cost;
 
-    if (data.currentResearchTicksEta != null) {
-      userPlayer.currentResearchTicksEta = data.currentResearchTicksEta;
-    }
-
-    if (data.nextResearchTicksEta != null) {
-      userPlayer.nextResearchTicksEta = data.nextResearchTicksEta;
-    }
-
     const star = this.getStarById(game, data.starId)!;
 
     if (star.upgradeCosts) {

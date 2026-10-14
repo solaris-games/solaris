@@ -12,22 +12,14 @@ export type ResearchUpdateNextRequest = {
     preference: ResearchType;
 };
 
-export type ResearchUpdateResponse = {
-    ticksEta: number;
-    ticksNextEta: number;
-};
-
 export const createResearchRoutes = <ID>() => ({
-    updateNow: new PutRoute<
-        { gameId: ID },
-        {},
-        ResearchUpdateNowRequest,
-        ResearchUpdateResponse
-    >("/api/game/:gameId/research/now"),
+    updateNow: new PutRoute<{ gameId: ID }, {}, ResearchUpdateNowRequest, void>(
+        "/api/game/:gameId/research/now",
+    ),
     updateNext: new PutRoute<
         { gameId: ID },
         {},
         ResearchUpdateNextRequest,
-        ResearchUpdateResponse
+        void
     >("/api/game/:gameId/research/next"),
 });

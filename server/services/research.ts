@@ -77,14 +77,6 @@ export default class ResearchService extends EventEmitter {
                 },
             },
         );
-
-        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-
-        return {
-            ticksEta,
-            ticksNextEta,
-        };
     }
 
     async updateResearchNext(
@@ -114,14 +106,6 @@ export default class ResearchService extends EventEmitter {
                 },
             },
         );
-
-        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-
-        return {
-            ticksEta,
-            ticksNextEta,
-        };
     }
 
     async conductResearch(
@@ -209,22 +193,11 @@ export default class ResearchService extends EventEmitter {
             );
         }
 
-        const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(
-            game,
-            player,
-        );
-        const nextResearchTicksEta = this.calculateNextResearchETAInTicks(
-            game,
-            player,
-        );
-
         return {
             name: techKey,
             level: tech.level,
             progress: tech.progress,
             levelUp,
-            currentResearchTicksEta,
-            nextResearchTicksEta,
         };
     }
 
@@ -429,111 +402,5 @@ export default class ResearchService extends EventEmitter {
             key: techKey,
             technology: tech,
         };
-    }
-
-    calculateCurrentResearchETAInTicks(game: Game, player: Player) {
-        return this._calculateResearchETAInTicks(
-            game,
-            player,
-            player.researchingNow,
-        );
-    }
-
-    calculateNextResearchETAInTicks(game: Game, player: Player) {
-        if (player.researchingNext === "random") {
-            return null;
-        }
-
-        if (player.researchingNow !== player.researchingNext) {
-            const currentResearchTicksEta =
-                this.calculateCurrentResearchETAInTicks(game, player);
-            const nextResearchTicksEta = this._calculateResearchETAInTicks(
-                game,
-                player,
-                player.researchingNext,
-            );
-
-            if (
-                currentResearchTicksEta == null ||
-                nextResearchTicksEta == null
-            ) {
-                return null;
-            }
-
-            return currentResearchTicksEta + nextResearchTicksEta;
-        }
-
-        return this.calculateDoubleIdenticalResearchETAInTicks(game, player);
-    }
-
-    _calculateResearchETAInTicks(
-        game: Game,
-        player: Player,
-        researchKey: ResearchType,
-    ) {
-        if (researchKey === "random") {
-            return null;
-        }
-
-        const tech = player.research[researchKey];
-
-        const requiredProgress =
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                researchKey,
-                tech.level,
-            );
-        const remainingPoints = requiredProgress - tech.progress!;
-
-        return this._calculateResearchETAInTicksByRemainingPoints(
-            game,
-            player,
-            remainingPoints,
-        );
-    }
-
-    calculateDoubleIdenticalResearchETAInTicks(game: Game, player: Player) {
-        const tech = player.research[player.researchingNow];
-
-        const requiredProgress =
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                player.researchingNow,
-                tech.level,
-            ) +
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                player.researchingNow,
-                tech.level + 1,
-            );
-        const remainingPoints = requiredProgress - tech.progress!;
-
-        return this._calculateResearchETAInTicksByRemainingPoints(
-            game,
-            player,
-            remainingPoints,
-        );
-    }
-
-    _calculateResearchETAInTicksByRemainingPoints(
-        game: Game,
-        player: Player,
-        remainingPoints: number,
-    ) {
-        const playerStars = this.starService.listStarsOwnedByPlayer(
-            game.galaxy.stars,
-            player._id,
-        );
-        const totalScience = this.playerStatisticsService.calculateTotalScience(
-            game,
-            playerStars,
-        );
-
-        // If there is no science then there cannot be an end date to the research.
-        if (totalScience === 0) {
-            return null;
-        }
-
-        return Math.ceil(remainingPoints / totalScience);
     }
 }

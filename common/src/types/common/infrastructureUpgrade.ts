@@ -18,8 +18,6 @@ export interface BulkUpgradeReport<ID> {
     upgraded: number;
     infrastructureType: InfrastructureType;
     ignoredCount: number;
-    currentResearchTicksEta?: number | null;
-    nextResearchTicksEta?: number | null;
 }
 
 export interface InfrastructureUpgradeCosts {
@@ -38,6 +36,4 @@ export interface InfrastructureUpgradeReport<ID> {
     cost: number;
     nextCost: number;
     manufacturing?: number;
-    currentResearchTicksEta?: number | null;
-    nextResearchTicksEta?: number | null;
 }

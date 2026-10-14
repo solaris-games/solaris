@@ -134,8 +134,6 @@ export type Player<ID> = {
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
-    currentResearchTicksEta?: number | null;
-    nextResearchTicksEta?: number | null;
     hasPerspective?: boolean;
     colourMapping?: Map<String, PlayerColour>;
     reputation?: PlayerReputation<ID>;

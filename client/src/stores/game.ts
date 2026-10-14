@@ -158,14 +158,6 @@ export const useGameStore = defineStore("game", () => {
     player.stats!.newShips =
       Math.round((player.stats!.newShips + Number.EPSILON) * 100) / 100;
 
-    if (data.currentResearchTicksEta) {
-      player.currentResearchTicksEta = data.currentResearchTicksEta;
-    }
-
-    if (data.nextResearchTicksEta) {
-      player.nextResearchTicksEta = data.nextResearchTicksEta;
-    }
-
     // Update player total stats.
     switch (data.infrastructureType) {
       case "economy":

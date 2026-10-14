@@ -2,7 +2,6 @@ import {
   createResearchRoutes,
   type ResearchType,
   type ResearchTypeNotRandom,
-  type ResearchUpdateResponse,
 } from "@solaris/common";
 import { doPut, type ResponseResult } from "@/services/typedapi/index";
 import type { Axios } from "axios";
@@ -14,7 +13,7 @@ export const updateResearchNow =
   async (
     gameId: string,
     research: ResearchTypeNotRandom,
-  ): Promise<ResponseResult<ResearchUpdateResponse>> => {
+  ): Promise<ResponseResult<void>> => {
     return doPut(axios)(
       routes.updateNow,
       { gameId },
@@ -29,7 +28,7 @@ export const updateResearchNext =
   async (
     gameId: string,
     research: ResearchType,
-  ): Promise<ResponseResult<ResearchUpdateResponse>> => {
+  ): Promise<ResponseResult<void>> => {
     return doPut(axios)(
       routes.updateNext,
       { gameId },
