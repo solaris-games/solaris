@@ -37,14 +37,24 @@ export const migrateResearchQueueHistory = async (ctx: JobParameters) => {
         "players.researchingNext": { $exists: true },
     };
 
-    const seedResult = await historyRepo.updateMany(seedFilter, seedPipeline);
+    const seedResult = await historyRepo.updateMany(seedFilter, seedPipeline, {
+        updatePipeline: true,
+    });
     log.info(
         `Seeded research queue from researchingNext in ${seedResult.modifiedCount} history entries.`,
     );
 
-    const unsetResult = await historyRepo.updateMany(seedFilter, {
-        $unset: { "players.$[].researchingNext": "" },
-    });
+    const unsetFilter = {
+        "players.researchingNext": { $exists: true },
+    };
+
+    const unsetResult = await historyRepo.updateMany(
+        unsetFilter,
+        {
+            $unset: { "players.$[].researchingNext": "" },
+        },
+        { strict: false },
+    );
     log.info(
         `Removed legacy researchingNext from ${unsetResult.modifiedCount} history entries.`,
     );

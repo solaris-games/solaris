@@ -39,6 +39,7 @@ export const migrateResearchQueue = async (ctx: JobParameters) => {
             "galaxy.players.researchQueue": { $exists: false },
         },
         seedPipeline,
+        { updatePipeline: true },
     );
     log.info(
         `Seeded research queue from researchingNext in ${seedResult.modifiedCount} games.`,
@@ -51,6 +52,7 @@ export const migrateResearchQueue = async (ctx: JobParameters) => {
         {
             $unset: { "galaxy.players.$[].researchingNext": "" },
         },
+        { strict: false },
     );
     log.info(
         `Removed legacy researchingNext from ${unsetResult.modifiedCount} games.`,
@@ -61,6 +63,7 @@ export const migrateResearchQueue = async (ctx: JobParameters) => {
             "galaxy.players.researchQueue": { $exists: false },
         },
         seedPipeline,
+        { updatePipeline: true },
     );
     log.info(
         `Seeded research queue from researchingNext in ${seedResultInit.modifiedCount} initial game states.`,
@@ -73,6 +76,7 @@ export const migrateResearchQueue = async (ctx: JobParameters) => {
         {
             $unset: { "galaxy.players.$[].researchingNext": "" },
         },
+        { strict: false },
     );
     log.info(
         `Removed legacy researchingNext from ${unsetResultInit.modifiedCount} initial game states.`,
