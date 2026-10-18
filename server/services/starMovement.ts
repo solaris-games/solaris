@@ -133,7 +133,7 @@ export default class starMovementService {
                     star,
                     closestStar,
                 );
-            const starSpeed =
+            let starSpeed =
                 this.specialistService.getStarMovementPerTick(star) *
                 game.settings.specialGalaxy.carrierSpeed;
 
@@ -168,7 +168,7 @@ export default class starMovementService {
                     stars,
                     game.constants.distances.minDistanceBetweenStars,
                 );
-            const tooCloseStars =
+            let tooCloseStars =
                 this.starDistanceService.getStarsWithinRadiusOfStar(
                     star,
                     stars,
