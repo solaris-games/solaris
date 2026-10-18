@@ -358,7 +358,7 @@ export default class ResearchService extends EventEmitter {
         // to the next desired research technology.
         if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
-            researchingNext = player.researchingNext?.[0] ?? null;
+            researchingNext = player.researchQueue?.[0] ?? null;
         }
 
         return {

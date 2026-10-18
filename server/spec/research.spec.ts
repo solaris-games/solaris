@@ -45,7 +45,6 @@ const createPlayer = (): Player =>
     ({
         _id: "player1",
         researchingNow: "weapons",
-        researchingNext: "banking",
         research: {
             weapons: { level: 1, progress: 0 },
             terraforming: { level: 1, progress: 0 },

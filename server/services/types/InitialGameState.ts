@@ -29,7 +29,6 @@ export type InitialStar = {
 export type InitialPlayer = {
     playerId: DBObjectId;
     researchingNow: ResearchTypeNotRandom;
-    researchingNext: ResearchType;
     researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;

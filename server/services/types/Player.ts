@@ -91,7 +91,6 @@ export interface Player {
     lastSeenIP?: string | null;
     hasDuplicateIP?: boolean;
     researchingNow: ResearchTypeNotRandom;
-    researchingNext: ResearchType;
     researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;

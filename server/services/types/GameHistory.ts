@@ -24,7 +24,6 @@ export interface GameHistoryPlayer {
     alias: string;
     avatar: string | null;
     researchingNow: ResearchTypeNotRandom;
-    researchingNext: ResearchType;
     researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;

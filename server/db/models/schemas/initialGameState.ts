@@ -11,7 +11,6 @@ const schema = new Schema({
             {
                 playerId: { type: Types.ObjectId, required: true },
                 researchingNow: { type: Types.String, required: true },
-                researchingNext: { type: Types.String, required: true },
                 researchQueue: { type: [Types.String], required: false },
                 credits: { type: Types.Number, required: true },
                 creditsSpecialists: { type: Types.Number, required: true },

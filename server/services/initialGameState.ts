@@ -47,7 +47,6 @@ export default class InitialGameStateService {
             return {
                 playerId: player._id,
                 researchingNow: player.researchingNow,
-                researchingNext: player.researchingNext,
                 researchQueue: player.researchQueue,
                 credits: player.credits,
                 creditsSpecialists: player.creditsSpecialists,

@@ -59,7 +59,6 @@ const schema = new Schema({
             alias: { type: Types.String, required: true },
             avatar: { type: Types.String, required: false, default: null },
             researchingNow: { type: Types.String, required: true },
-            researchingNext: { type: Types.String, required: true },
             researchQueue: { type: [Types.String], required: false },
             credits: { type: Types.Number, required: true },
             creditsSpecialists: { type: Types.Number, required: true },
