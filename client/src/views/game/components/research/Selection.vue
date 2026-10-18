@@ -48,37 +48,85 @@
     </div>
     <div
       class="mb-2 row pt-2 pb-2 mb-0 mt-1"
-      v-if="!player.defeated && optionsNext.length > 1"
+      v-if="!player.defeated && optionsQueue.length"
     >
-      <label class="col-5 col-form-label">Next:</label>
-      <div class="col-7">
+      <label class="col-5 col-form-label">Queue:</label>
+      <div class="col-7 text-end">
+        <button
+          class="btn btn-outline-primary btn-sm"
+          type="button"
+          title="Add research to the end of the queue"
+          v-if="queue.length < maxQueueLength"
+          v-on:click="doAddQueueEntry"
+          :disabled="isHistoricalMode || isGameFinished || loadingQueue"
+        >
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+    </div>
+    <div
+      v-for="(entry, i) in player.defeated ? [] : queue"
+      v-bind:key="`${i}-${entry}`"
+      class="mb-2 row pt-1 pb-1 mb-0"
+      :class="i % 2 === 0 ? 'bg-dark' : ''"
+    >
+      <div class="col-7 d-flex gap-1">
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          title="Move up"
+          v-on:click="doMoveQueueEntry(i, -1)"
+          :disabled="
+            i === 0 || isHistoricalMode || isGameFinished || loadingQueue
+          "
+        >
+          <i class="fas fa-arrow-up"></i>
+        </button>
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          title="Move down"
+          v-on:click="doMoveQueueEntry(i, 1)"
+          :disabled="
+            i === queue.length - 1 ||
+            isHistoricalMode ||
+            isGameFinished ||
+            loadingQueue
+          "
+        >
+          <i class="fas fa-arrow-down"></i>
+        </button>
+        <button
+          class="btn btn-outline-secondary btn-sm"
+          type="button"
+          title="Remove from queue"
+          v-on:click="doRemoveQueueEntry(i)"
+          :disabled="isHistoricalMode || isGameFinished || loadingQueue"
+        >
+          <i class="fas fa-times"></i>
+        </button>
         <select
           class="form-select"
-          v-model="player.researchingNext"
-          v-on:change="doUpdateResearchNext"
-          v-if="!loadingNext"
-          :disabled="isHistoricalMode || isGameFinished"
+          v-model="queue[i]"
+          v-on:change="doUpdateResearchQueue"
+          :disabled="isHistoricalMode || isGameFinished || loadingQueue"
         >
           <option
-            v-for="option in optionsNext"
+            v-for="option in optionsQueue"
             v-bind:value="option.value"
             v-bind:key="option.value"
           >
             {{ option.text }}
           </option>
         </select>
-
-        <label v-if="loadingNext" class="col-form-label">Loading...</label>
       </div>
-    </div>
-    <div
-      class="mb-2 row mb-2 bg-dark"
-      v-if="!player.defeated && optionsNext.length > 1"
-    >
-      <label class="col col-form-label" title="Next research ETA">ETA:</label>
-      <div class="col text-end">
-        <label class="col-form-label">
-          <timer :showETA="true" :ticks="nextResearchTicksEta || 0" />
+      <div class="col-5 text-end">
+        <label
+          class="col-form-label"
+          :title="`Queue position ${i + 1} ETA`"
+          v-if="entryTicksEta[i] != null"
+        >
+          <timer :showETA="true" :ticks="entryTicksEta[i]" />
         </label>
       </div>
     </div>
@@ -88,13 +136,13 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
-import TechnologyHelper from "../../../../services/technologyHelper";
 import AudioService from "../../../../services/audio";
 import { ref, computed, onMounted, inject } from "vue";
 import type { Game } from "@/types/game";
+import { MAX_RESEARCH_QUEUE_LENGTH } from "@solaris/common";
 import {
   updateResearchNow,
-  updateResearchNext,
+  updateResearchQueue,
 } from "@/services/typedapi/research";
 import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
@@ -117,9 +165,11 @@ const isGameFinished = computed(() => GameHelper.isGameFinished(game.value));
 type Option = { text: string; value: ResearchType };
 
 const loadingNow = ref(false);
-const loadingNext = ref(false);
+const loadingQueue = ref(false);
 const optionsNow = ref<Option[]>([]);
-const optionsNext = ref<Option[]>([]);
+const optionsQueue = ref<Option[]>([]);
+const queue = ref<ResearchType[]>([]);
+const maxQueueLength = MAX_RESEARCH_QUEUE_LENGTH;
 
 const loadTechnologies = () => {
   const options: Option[] = [
@@ -139,20 +189,19 @@ const loadTechnologies = () => {
       services.technologyService.isTechnologyEnabled(game.value, o.value) &&
       services.technologyService.isTechnologyResearchable(game.value, o.value),
   );
-  optionsNext.value = options.filter(
-    (o) =>
-      o.value !== "random" &&
-      services.technologyService.isTechnologyEnabled(game.value, o.value) &&
-      services.technologyService.isTechnologyResearchable(game.value, o.value),
-  );
+  optionsQueue.value = [
+    ...optionsNow.value,
+    { text: "Random", value: "random" as ResearchType },
+  ];
 
-  optionsNext.value.push({ text: "Random", value: "random" });
+  if (player.value) {
+    queue.value = player.value.researchQueue?.slice() || [];
+  }
 };
 
 const researchEtaForTech = (target: ResearchTypeNotRandom): number | null => {
   const totalScience = player.value.stats?.totalScience ?? 0;
 
-  // If there is no science then there cannot be an end date to the research.
   if (!totalScience) {
     return null;
   }
@@ -173,45 +222,42 @@ const currentResearchTicksEta = computed<number | null>(() =>
   researchEtaForTech(player.value!.researchingNow),
 );
 
-const nextResearchTicksEta = computed<number | null>(() => {
-  const next = player.value!.researchingNext;
+const entryTicksEta = computed<(number | null)[]>(() => {
+  const target = player.value!;
+  const totalScience = target.stats?.totalScience ?? 0;
 
-  if (next === "random") {
-    return null;
+  if (!totalScience) {
+    return queue.value.map(() => null);
   }
 
-  if (next !== player.value!.researchingNow) {
-    const currentEta = currentResearchTicksEta.value;
-    const nextEta = researchEtaForTech(next);
+  const virtualLevels: Record<string, number> = {};
+  for (const key of Object.keys(target.research)) {
+    virtualLevels[key] = target.research[key].level;
+  }
 
-    if (currentEta == null || nextEta == null) {
+  let cumulativePoints = currentResearchTicksEta.value
+    ? (currentResearchTicksEta.value as number) * totalScience
+    : 0;
+
+  if (currentResearchTicksEta.value != null) {
+    virtualLevels[target.researchingNow]++;
+  }
+
+  return queue.value.map((entry) => {
+    if (entry === "random") {
       return null;
     }
 
-    return currentEta + nextEta;
-  }
+    cumulativePoints +=
+      services.researchProgressService.getRequiredResearchProgress(
+        game.value,
+        entry,
+        virtualLevels[entry],
+      );
+    virtualLevels[entry]++;
 
-  const totalScience = player.value!.stats?.totalScience ?? 0;
-
-  if (!totalScience) {
-    return null;
-  }
-
-  const tech = player.value!.research[player.value!.researchingNow];
-  const requiredProgress =
-    services.researchProgressService.getRequiredResearchProgress(
-      game.value,
-      next,
-      tech.level,
-    ) +
-    services.researchProgressService.getRequiredResearchProgress(
-      game.value,
-      next,
-      tech.level + 1,
-    );
-  const remainingPoints = requiredProgress - tech.progress!;
-
-  return Math.ceil(remainingPoints / totalScience);
+    return Math.ceil(cumulativePoints / totalScience);
+  });
 });
 
 const doUpdateResearchNow = async () => {
@@ -232,22 +278,48 @@ const doUpdateResearchNow = async () => {
   loadingNow.value = false;
 };
 
-const doUpdateResearchNext = async () => {
-  loadingNext.value = true;
+const doUpdateResearchQueue = async () => {
+  loadingQueue.value = true;
 
-  const response = await updateResearchNext(httpClient)(
-    game.value._id,
-    player.value.researchingNext,
-  );
+  const response = await updateResearchQueue(httpClient)(game.value._id, [
+    ...queue.value,
+  ]);
   if (isOk(response)) {
     AudioService.join();
-    toast.default("Next research updated.");
+    player.value.researchQueue = queue.value;
+    toast.default("Research queue updated.");
   } else {
     console.error(formatError(response));
-    toast.error("Failed to update research.");
+    toast.error("Failed to update research queue.");
   }
 
-  loadingNext.value = false;
+  loadingQueue.value = false;
+};
+
+const doAddQueueEntry = () => {
+  if (queue.value.length >= maxQueueLength) {
+    return;
+  }
+
+  queue.value.push("random");
+  doUpdateResearchQueue();
+};
+
+const doRemoveQueueEntry = (index: number) => {
+  queue.value.splice(index, 1);
+  doUpdateResearchQueue();
+};
+
+const doMoveQueueEntry = (index: number, delta: number) => {
+  const targetIndex = index + delta;
+
+  if (targetIndex < 0 || targetIndex >= queue.value.length) {
+    return;
+  }
+
+  const entry = queue.value.splice(index, 1)[0];
+  queue.value.splice(targetIndex, 0, entry);
+  doUpdateResearchQueue();
 };
 
 onMounted(() => {

@@ -1,6 +1,7 @@
 import EventEmitter from "events";
 import {
     GameTypeService,
+    MAX_RESEARCH_QUEUE_LENGTH,
     ResearchProgressService,
     ResearchType,
     ResearchTypeNotRandom,
@@ -79,21 +80,32 @@ export default class ResearchService extends EventEmitter {
         );
     }
 
-    async updateResearchNext(
+    async updateResearchQueue(
         game: Game,
         player: Player,
-        preference: ResearchType,
+        queue: ResearchType[],
     ) {
-        if (
-            preference !== "random" &&
-            !this.technologyService.isTechnologyResearchable(game, preference)
-        ) {
+        if (queue.length > MAX_RESEARCH_QUEUE_LENGTH) {
             throw new ValidationError(
-                `Cannot change technology, the chosen tech is not researchable.`,
+                `Cannot update research queue, it may only contain up to ${MAX_RESEARCH_QUEUE_LENGTH} entries.`,
             );
         }
 
-        player.researchingNext = preference;
+        for (const preference of queue) {
+            if (
+                preference !== "random" &&
+                !this.technologyService.isTechnologyResearchable(
+                    game,
+                    preference,
+                )
+            ) {
+                throw new ValidationError(
+                    `Cannot change research queue, the chosen tech is not researchable.`,
+                );
+            }
+        }
+
+        player.researchQueue = queue;
 
         await this.gameRepo.updateOne(
             {
@@ -102,7 +114,7 @@ export default class ResearchService extends EventEmitter {
             },
             {
                 $set: {
-                    "galaxy.players.$.researchingNext": preference,
+                    "galaxy.players.$.researchQueue": queue,
                 },
             },
         );
@@ -142,9 +154,13 @@ export default class ResearchService extends EventEmitter {
             !player.defeated &&
             !this.gameTypeService.isTutorialGame(game)
         ) {
-            statisticsService.modifyStats(game._id, player._id, (stats) => {
-                stats.research[techKey] += progressIncrease;
-            });
+            await statisticsService.modifyStats(
+                game._id,
+                player._id,
+                (stats) => {
+                    stats.research[techKey] += progressIncrease;
+                },
+            );
         }
 
         // If the current progress is greater than the required progress
@@ -342,7 +358,7 @@ export default class ResearchService extends EventEmitter {
         // to the next desired research technology.
         if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
-            researchingNext = player.researchingNext;
+            researchingNext = player.researchingNext?.[0] ?? null;
         }
 
         return {
@@ -355,19 +371,27 @@ export default class ResearchService extends EventEmitter {
     }
 
     _setNextResearch(game: Game, player: Player) {
-        if (player.researchingNext === player.researchingNow) {
-            return;
+        const queue = player.researchQueue || [];
+
+        let entry = queue.shift();
+
+        while (entry === player.researchingNow) {
+            entry = queue.shift();
         }
 
-        if (player.researchingNext === "random") {
-            const randomTech = this._getRandomTechnology(game, player);
+        if (entry !== undefined) {
+            if (entry === "random") {
+                const randomTech = this._getRandomTechnology(game, player);
 
-            if (randomTech) {
-                player.researchingNow = randomTech.key;
+                if (randomTech) {
+                    player.researchingNow = randomTech.key;
+                }
+            } else {
+                player.researchingNow = entry;
             }
-        } else {
-            player.researchingNow = player.researchingNext;
         }
+
+        player.researchQueue = queue;
 
         return player.researchingNow;
     }

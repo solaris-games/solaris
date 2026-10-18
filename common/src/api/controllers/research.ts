@@ -8,18 +8,18 @@ export type ResearchUpdateNowRequest = {
     preference: ResearchTypeNotRandom;
 };
 
-export type ResearchUpdateNextRequest = {
-    preference: ResearchType;
+export type ResearchUpdateQueueRequest = {
+    queue: ResearchType[];
 };
 
 export const createResearchRoutes = <ID>() => ({
     updateNow: new PutRoute<{ gameId: ID }, {}, ResearchUpdateNowRequest, void>(
         "/api/game/:gameId/research/now",
     ),
-    updateNext: new PutRoute<
+    updateQueue: new PutRoute<
         { gameId: ID },
         {},
-        ResearchUpdateNextRequest,
+        ResearchUpdateQueueRequest,
         void
-    >("/api/game/:gameId/research/next"),
+    >("/api/game/:gameId/research/queue"),
 });

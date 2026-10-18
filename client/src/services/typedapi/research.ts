@@ -23,17 +23,17 @@ export const updateResearchNow =
     );
   };
 
-export const updateResearchNext =
+export const updateResearchQueue =
   (axios: Axios) =>
   async (
     gameId: string,
-    research: ResearchType,
+    queue: ResearchType[],
   ): Promise<ResponseResult<void>> => {
     return doPut(axios)(
-      routes.updateNext,
+      routes.updateQueue,
       { gameId },
       {},
-      { preference: research },
+      { queue },
       { withCredentials: true },
     );
   };

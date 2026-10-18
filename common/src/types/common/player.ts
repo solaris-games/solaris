@@ -92,6 +92,8 @@ export interface PlayerScheduledActions<ID> {
     active: boolean;
 }
 
+export const MAX_RESEARCH_QUEUE_LENGTH = 10;
+
 export type Player<ID> = {
     _id: ID;
     userId: ID | null;
@@ -112,6 +114,7 @@ export type Player<ID> = {
     hasDuplicateIP?: boolean;
     researchingNow: ResearchTypeNotRandom;
     researchingNext: ResearchType;
+    researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;
     isOpenSlot: boolean;

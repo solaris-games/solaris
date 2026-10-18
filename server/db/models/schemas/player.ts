@@ -24,6 +24,11 @@ const schema = new Schema({
     lastSeenIP: { type: Types.String, required: false, default: null },
     researchingNow: { type: Types.String, required: true, default: "weapons" },
     researchingNext: { type: Types.String, required: true, default: "weapons" },
+    researchQueue: {
+        type: [Types.String],
+        required: false,
+        default: undefined,
+    },
     credits: { type: Types.Number, required: true },
     creditsSpecialists: { type: Types.Number, required: true },
     isOpenSlot: { type: Types.Boolean, required: true, default: true },

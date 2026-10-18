@@ -37,7 +37,7 @@ export default (
     );
 
     answer(
-        routes.updateNext,
+        routes.updateQueue,
         mw.auth.authenticate(),
         mw.playerMutex.wait(),
         mw.game.loadGame({
@@ -53,7 +53,7 @@ export default (
         }),
         mw.player.loadPlayer,
         mw.player.validatePlayerState({ isPlayerUndefeated: true }),
-        controller.updateNext,
+        controller.updateQueue,
         mw.playerMutex.release(),
     );
 

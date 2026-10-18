@@ -92,6 +92,7 @@ export interface Player {
     hasDuplicateIP?: boolean;
     researchingNow: ResearchTypeNotRandom;
     researchingNext: ResearchType;
+    researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;
     isOpenSlot: boolean;

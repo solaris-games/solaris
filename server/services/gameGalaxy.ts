@@ -1074,6 +1074,7 @@ export default class GameGalaxyService {
                     gamePlayer.avatar = historyPlayer.avatar;
                     gamePlayer.researchingNow = historyPlayer.researchingNow;
                     gamePlayer.researchingNext = historyPlayer.researchingNext;
+                    gamePlayer.researchQueue = historyPlayer.researchQueue;
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists =
                         historyPlayer.creditsSpecialists;

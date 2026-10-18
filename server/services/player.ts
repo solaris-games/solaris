@@ -117,6 +117,7 @@ export default class PlayerService extends EventEmitter {
             lastSeenIP: null,
             researchingNow,
             researchingNext,
+            researchQueue: [researchingNext],
             credits: game.settings.player.startingCredits,
             creditsSpecialists: game.settings.player.startingCreditsSpecialists,
             isOpenSlot: true,
@@ -439,6 +440,7 @@ export default class PlayerService extends EventEmitter {
         player.creditsSpecialists = initialPlayer.creditsSpecialists;
         player.researchingNow = initialPlayer.researchingNow;
         player.researchingNext = initialPlayer.researchingNext;
+        player.researchQueue = initialPlayer.researchQueue;
         player.research = initialPlayer.research;
         player.diplomacy = initialPlayer.diplomacy;
 
@@ -786,6 +788,7 @@ export default class PlayerService extends EventEmitter {
         player.defeatedDate = DateTime.utc().toJSDate();
 
         player.researchingNext = "random"; // Set up the AI for random research.
+        player.researchQueue = ["random"];
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === "turnBased") {

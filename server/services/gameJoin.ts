@@ -454,6 +454,7 @@ export default class GameJoinService extends EventEmitter {
             player.alias = alias;
             player.avatar = avatar;
             player.researchingNext = "random";
+            player.researchQueue = ["random"];
             player.missedTurns = 0;
             player.hasSentTurnReminder = false;
             player.afk = false;

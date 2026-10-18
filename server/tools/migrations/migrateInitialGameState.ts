@@ -14,6 +14,7 @@ const mapPlayer = (player: Player): InitialPlayer => {
         playerId: player._id,
         researchingNow: player.researchingNow,
         researchingNext: player.researchingNext,
+        researchQueue: player.researchQueue,
         credits: player.credits,
         creditsSpecialists: player.creditsSpecialists,
         research: player.research,
