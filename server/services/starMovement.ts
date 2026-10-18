@@ -109,29 +109,31 @@ export default class starMovementService {
     }
 
     moveStellarEngines(game: Game) {
-        const beaconStars = game.galaxy.stars.filter((s) =>
-            this.specialistService.getStarAttract(s),
+        const beaconStars = game.galaxy.stars.filter(
+            (s) =>
+                s.ownedByPlayerId && this.specialistService.getStarAttract(s),
         );
 
         if (beaconStars.length === 0) {
             return;
         }
 
-        const engineStars = game.galaxy.stars.filter((s) =>
-            this.specialistService.getStarMovement(s),
+        const engineStars = game.galaxy.stars.filter(
+            (s) =>
+                s.ownedByPlayerId && this.specialistService.getStarMovement(s),
         );
 
         for (let star of engineStars) {
-            let closestStar = this.starDistanceService.getClosestStar(
+            const closestStar = this.starDistanceService.getClosestStar(
                 star,
                 beaconStars,
             );
-            let distanceToClosestStar =
+            const distanceToClosestStar =
                 this.starDistanceService.getDistanceBetweenStars(
                     star,
                     closestStar,
                 );
-            let starSpeed =
+            const starSpeed =
                 this.specialistService.getStarMovementPerTick(star) *
                 game.settings.specialGalaxy.carrierSpeed;
 
@@ -160,13 +162,13 @@ export default class starMovementService {
 
     maintainDistance(game: Game, movedStars: Star[], stars: Star[]) {
         for (let star of movedStars) {
-            let nearbyStars =
+            const nearbyStars =
                 this.starDistanceService.getStarsWithinRadiusOfStar(
                     star,
                     stars,
                     game.constants.distances.minDistanceBetweenStars,
                 );
-            let tooCloseStars =
+            const tooCloseStars =
                 this.starDistanceService.getStarsWithinRadiusOfStar(
                     star,
                     stars,
