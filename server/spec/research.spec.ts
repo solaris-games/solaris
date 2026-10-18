@@ -201,20 +201,8 @@ describe("research", () => {
             expect(player.researchQueue).toEqual([]);
         });
 
-        it("should fall back to the legacy researchingNext field when no queue exists", async () => {
+        it("should keep the current research when no queue exists", async () => {
             const player = createPlayer();
-
-            service._setNextResearch(game, player);
-
-            // researchingNext is "banking", so the player moves to it and
-            // the (legacy-backed) queue becomes empty.
-            expect(player.researchingNow).toBe("banking");
-            expect(player.researchQueue).toEqual([]);
-        });
-
-        it("should keep the current research when the legacy researchingNext equals researchingNow", async () => {
-            const player = createPlayer();
-            player.researchingNext = "weapons";
 
             service._setNextResearch(game, player);
 
