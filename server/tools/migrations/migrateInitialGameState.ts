@@ -13,7 +13,6 @@ const mapPlayer = (player: Player): InitialPlayer => {
     return {
         playerId: player._id,
         researchingNow: player.researchingNow,
-        researchingNext: player.researchingNext,
         researchQueue: player.researchQueue,
         credits: player.credits,
         creditsSpecialists: player.creditsSpecialists,
