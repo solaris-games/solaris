@@ -876,7 +876,7 @@ class GameHelper {
   }
 
   getDateString(date: Date | string) {
-    return DateTime.fromJSDate(new Date(date)).toFormat("ccc d LLL HH mm");
+    return DateTime.fromJSDate(new Date(date)).toFormat("ccc d LLL HH:mm");
   }
 
   getGamePlayerShapesCount(game) {
