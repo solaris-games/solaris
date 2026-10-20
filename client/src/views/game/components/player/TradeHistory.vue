@@ -214,8 +214,9 @@ import {
   type ResearchTypeNotRandom,
   type TradeEvent,
 } from "@solaris/common";
-import { listTradeEvents } from "@/services/typedapi/trade";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listTradeEvents } from "@solaris/api-client/trade";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const props = defineProps<{
   toPlayerId: string;

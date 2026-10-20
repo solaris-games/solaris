@@ -71,8 +71,9 @@ import { ref, inject, computed, type Ref, onMounted } from "vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import SortableLeaderboard from "./SortableLeaderboard.vue";
 import type { GuildLeaderboard, GuildSortingKey } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { listGuildLeaderboard } from "@/services/typedapi/guild";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { listGuildLeaderboard } from "@solaris/api-client/guild";
 
 const httpClient = inject(httpInjectionKey)!;
 

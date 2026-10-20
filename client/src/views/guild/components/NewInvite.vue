@@ -36,13 +36,9 @@
 import { ref, inject } from "vue";
 import FormErrorList from "../../components/FormErrorList.vue";
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
-import { inviteGuild } from "@/services/typedapi/guild";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { inviteGuild } from "@solaris/api-client/guild";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

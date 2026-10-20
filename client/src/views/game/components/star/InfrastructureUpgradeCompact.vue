@@ -99,7 +99,7 @@
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
 import type { Star } from "@/types/game";
-import { httpInjectionKey } from "@/services/typedapi";
+import { httpInjectionKey } from "@/services/http";
 
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import {
@@ -110,7 +110,7 @@ import {
   upgradeEconomy as upgradeEconomyReq,
   upgradeIndustry as upgradeIndustryReq,
   upgradeScience as upgradeScienceReq,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 import { ref, computed, inject } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
 

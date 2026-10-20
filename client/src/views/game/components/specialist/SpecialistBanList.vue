@@ -41,8 +41,9 @@
 import SpecialistBanListTable from "./SpecialistBanListTable.vue";
 import { ref, onMounted, inject } from "vue";
 import type { GameSettings, Specialist } from "@solaris/common";
-import { listCarrier, listStar } from "@/services/typedapi/specialist";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listCarrier, listStar } from "@solaris/api-client/specialist";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const props = defineProps<{
   game: {

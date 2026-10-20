@@ -134,8 +134,9 @@ import EventsListItem from "./events/EventsListItem.vue";
 import { inject, ref, computed, onMounted } from "vue";
 import type { GameEvent } from "@solaris/common";
 import type { Game } from "@/types/game";
-import { listEvents, markAllAsRead } from "@/services/typedapi/event";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listEvents, markAllAsRead } from "@solaris/api-client/event";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const emit = defineEmits<{
   onCloseRequested: [];

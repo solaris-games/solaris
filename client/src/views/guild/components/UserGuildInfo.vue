@@ -51,8 +51,9 @@
 import { ref, computed, onMounted, inject } from "vue";
 import LoadingSpinner from "../../components/LoadingSpinner.vue";
 import type { AchievementsUser, GuildWithUsers } from "@solaris/common";
-import { detailMyGuild, inviteGuild } from "@/services/typedapi/guild";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { detailMyGuild, inviteGuild } from "@solaris/api-client/guild";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from "@/stores/user";
 

@@ -109,8 +109,9 @@ import GameHelper from "../../../../services/gameHelper";
 import { ref, computed, inject } from "vue";
 
 import { useConfirm } from "@/hooks/confirm.ts";
-import { createReport } from "@/services/typedapi/report";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { createReport } from "@solaris/api-client/report";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ReportPlayerArgs } from "@/types/menu";
 
 import { useToast } from "vue-toast-notification";

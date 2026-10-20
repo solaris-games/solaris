@@ -13,7 +13,7 @@ import {
   playerClientSocketEmitterInjectionKey,
 } from "./sockets/socketEmitters/player";
 import { ClientHandler } from "./sockets/socketHandlers/clientHandler";
-import { httpInjectionKey } from "./services/typedapi";
+import { httpInjectionKey } from "./services/http";
 import { socketInjectionKey } from "./socket";
 import { createHttpClient } from "./util/http";
 import { UserClientSocketEmitter } from "@/sockets/socketEmitters/user";

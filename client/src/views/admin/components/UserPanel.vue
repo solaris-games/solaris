@@ -125,11 +125,11 @@
 import AddWarning from "@/views/admin/components/AddWarning.vue";
 import {
   formatError,
-  httpInjectionKey,
   isError,
   isOk,
   type ResponseResult,
-} from "@/services/typedapi";
+} from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm.ts";
 import { inject, computed } from "vue";
 import type {
@@ -148,7 +148,7 @@ import {
   setRoleDeveloper,
   setRoleGameMaster,
   unban,
-} from "@/services/typedapi/admin";
+} from "@solaris/api-client/admin";
 import router from "@/router";
 import { DateTime } from "luxon";
 import { useUserStore } from "@/stores/user";

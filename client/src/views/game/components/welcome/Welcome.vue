@@ -96,13 +96,9 @@ import ShareLink from "./ShareLink.vue";
 import gameHelper from "@/services/gameHelper";
 import { ref, computed, inject, type Ref } from "vue";
 import type { Game } from "@/types/game";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { join } from "@/services/typedapi/game";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { join } from "@solaris/api-client/game";
 import PlayerLeaderboard from "@/views/game/components/leaderboard/PlayerLeaderboard.vue";
 import { useGameServices } from "@/util/gameServices";
 import GameHelper from "@/services/gameHelper";

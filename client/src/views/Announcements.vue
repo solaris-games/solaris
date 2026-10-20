@@ -37,13 +37,9 @@ import {
   getAnnouncementState,
   getCurrentAnnouncements,
   markAsRead,
-} from "@/services/typedapi/announcement";
-import {
-  formatError,
-  httpInjectionKey,
-  isError,
-  isOk,
-} from "@/services/typedapi";
+} from "@solaris/api-client/announcement";
+import { formatError, isError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;

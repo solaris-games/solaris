@@ -37,14 +37,10 @@ import { useGameStore } from "@/stores/game";
 import { inject, ref, computed } from "vue";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game, Player } from "@/types/game";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
-import { sendRenown } from "@/services/typedapi/trade";
+import { sendRenown } from "@solaris/api-client/trade";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

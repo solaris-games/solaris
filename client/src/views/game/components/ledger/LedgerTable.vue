@@ -31,11 +31,12 @@ import { inject, ref, computed, onMounted, onUnmounted } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
 import PlayerEventBusEventNames from "../../../../eventBusEventNames/player";
 import { LedgerType, type PlayerLedgerDebt } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   detailLedgerCredits,
   detailLedgerSpecialistTokens,
-} from "@/services/typedapi/ledger";
+} from "@solaris/api-client/ledger";
 import type { Game } from "@/types/game";
 import { useGameStore } from "@/stores/game";
 

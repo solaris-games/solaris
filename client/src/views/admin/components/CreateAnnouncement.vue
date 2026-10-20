@@ -57,13 +57,9 @@
 <script setup lang="ts">
 import FormErrorList from "../../components/FormErrorList.vue";
 import { ref, computed, inject, type Ref } from "vue";
-import {
-  httpInjectionKey,
-  isError,
-  formatError,
-  extractErrors,
-} from "@/services/typedapi";
-import { createAnnouncement } from "@/services/typedapi/admin";
+import { isError, formatError, extractErrors } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { createAnnouncement } from "@solaris/api-client/admin";
 
 import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;

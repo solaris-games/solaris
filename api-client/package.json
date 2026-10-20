@@ -1,0 +1,24 @@
+{
+    "name": "@solaris/api-client",
+    "version": "1.0.0",
+    "private": true,
+    "license": "GPL-3.0-or-later",
+    "type": "module",
+    "description": "Typed HTTP API client for Solaris",
+    "engines": {
+        "node": ">=24"
+    },
+    "scripts": {
+        "check": "tsc",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "@solaris/common": "*",
+        "axios": "1.20.0"
+    },
+    "files": [
+        "/dist"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts"
+}

@@ -34,9 +34,10 @@ import MenuTitle from "../MenuTitle.vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import InviteSpectator from "./InviteSpectator.vue";
 import Spectator from "./Spectator.vue";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { inject, ref, onMounted, type Ref } from "vue";
-import { listSpectators } from "@/services/typedapi/spectator";
+import { listSpectators } from "@solaris/api-client/spectator";
 import type { GameSpectator } from "@solaris/common";
 
 const store = useGameStore();

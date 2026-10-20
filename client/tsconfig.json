@@ -7,6 +7,8 @@
             "@solaris/common": ["../common/src/index.ts"],
             "@solaris/map-rendering": ["../map-rendering/src/index.ts"],
             "@solaris/map-rendering/*": ["../map-rendering/src/*"],
+            "@solaris/api-client": ["../api-client/src/index.ts"],
+            "@solaris/api-client/*": ["../api-client/src/*"],
             "@/*": ["./src/*"]
         },
         "lib": ["es2024", "DOM", "DOM.Iterable"]

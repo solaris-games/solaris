@@ -20,6 +20,7 @@
         "@popperjs/core": "2.11.8",
         "@solaris/map-rendering": "*",
         "@solaris/common": "*",
+        "@solaris/api-client": "*",
         "axios": "1.20.0",
         "bootstrap": "5.3.8",
         "chart.js": "4.5.1",

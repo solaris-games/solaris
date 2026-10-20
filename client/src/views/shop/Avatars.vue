@@ -87,12 +87,13 @@ import ViewContainer from "../components/ViewContainer.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import { computed, inject, onMounted, ref, type Ref } from "vue";
 import { type PurchasableAvatar } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   getCredits,
   listMyAvatars,
   purchaseAvatar as reqPurchaseAvatar,
-} from "@/services/typedapi/user";
+} from "@solaris/api-client/user";
 import { useConfirm } from "@/hooks/confirm";
 import { useUserStore } from "@/stores/user";
 import {

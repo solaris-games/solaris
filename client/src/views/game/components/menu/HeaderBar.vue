@@ -184,12 +184,13 @@ import { inject, ref, computed, onMounted, onUnmounted, watch } from "vue";
 import GameEventBusEventNames from "../../../../eventBusEventNames/game";
 import PlayerEventBusEventNames from "../../../../eventBusEventNames/player";
 import UserEventBusEventNames from "../../../../eventBusEventNames/user";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { getUnreadCount } from "@/services/typedapi/conversation";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { getUnreadCount } from "@solaris/api-client/conversation";
 import type { TradeEventTechnology } from "@solaris/common";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import type { Game } from "@/types/game";
-import { unreadCount } from "@/services/typedapi/event";
+import { unreadCount } from "@solaris/api-client/event";
 import {
   getCountdownTimeString,
   getCountdownTimeStringByTicks,

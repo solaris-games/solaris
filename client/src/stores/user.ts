@@ -1,10 +1,10 @@
 import { computed, inject, readonly, ref } from "vue";
 import { defineStore } from "pinia";
 import type { UserPrivate, UserRoles } from "@solaris/common";
-import { formatError, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
 import { UserClientSocketEmitter } from "@/sockets/socketEmitters/user";
-import { verify as verifyApi } from "@/services/typedapi/auth";
-import { detailMe } from "@/services/typedapi/user";
+import { verify as verifyApi } from "@solaris/api-client/auth";
+import { detailMe } from "@solaris/api-client/user";
 import type { Axios } from "axios";
 
 export const useUserStore = defineStore("user", () => {

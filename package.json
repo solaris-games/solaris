@@ -11,6 +11,7 @@
     "workspaces": [
         "common/",
         "map-rendering/",
+        "api-client/",
         "client/",
         "server/"
     ],

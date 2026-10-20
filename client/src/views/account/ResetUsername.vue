@@ -41,13 +41,9 @@ import ViewContainer from "../components/ViewContainer.vue";
 import router from "../../router";
 import ViewTitle from "../components/ViewTitle.vue";
 import FormErrorList from "../components/FormErrorList.vue";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { updateUsername } from "@/services/typedapi/user";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { updateUsername } from "@solaris/api-client/user";
 import { ref, inject } from "vue";
 import { useUserStore } from "@/stores/user";
 

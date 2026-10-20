@@ -10,10 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import { httpInjectionKey, isOk, formatError } from "@/services/typedapi";
+import { isOk, formatError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { AnnouncementState } from "@solaris/common";
 import { ref, inject, onMounted, type Ref } from "vue";
-import { getAnnouncementState } from "@/services/typedapi/announcement";
+import { getAnnouncementState } from "@solaris/api-client/announcement";
 import router from "@/router";
 
 const httpClient = inject(httpInjectionKey)!;

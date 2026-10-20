@@ -73,14 +73,14 @@
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
 import type { Star } from "@/types/game";
-import { httpInjectionKey } from "@/services/typedapi";
+import { httpInjectionKey } from "@/services/http";
 
 import { ref, computed, inject } from "vue";
 import {
   upgradeEconomy as upgradeEconomyReq,
   upgradeIndustry as upgradeIndustryReq,
   upgradeScience as upgradeScienceReq,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import { makeUpgrade } from "@/views/game/components/star/upgrade";
 import { eventBusInjectionKey } from "@/eventBus";

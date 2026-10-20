@@ -32,9 +32,10 @@ import MentionHelper, {
 import AudioService from "../../../../../services/audio";
 import MentionBox from "../../shared/MentionBox.vue";
 import { inject, ref, computed } from "vue";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game, Player, Star } from "@/types/game";
-import { sendMessage } from "@/services/typedapi/conversation";
+import { sendMessage } from "@solaris/api-client/conversation";
 import type { ConversationMessageSentResult } from "@solaris/common";
 import { useMentionStore } from "@/stores/mention";
 import { useConversationStore } from "@/stores/conversation.ts";

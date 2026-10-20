@@ -86,9 +86,10 @@ import solarisLogo from "../../assets/solaris_logo_small.png";
 import router from "../../router";
 import { ref, computed, inject } from "vue";
 import type { UserRoles } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { endImpersonate } from "@/services/typedapi/admin";
-import { logout } from "@/services/typedapi/auth";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { endImpersonate } from "@solaris/api-client/admin";
+import { logout } from "@solaris/api-client/auth";
 import { useUserStore } from "@/stores/user";
 import { useToast } from "vue-toast-notification";
 

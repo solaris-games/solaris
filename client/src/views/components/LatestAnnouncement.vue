@@ -16,8 +16,9 @@ import AnnouncementPanel from "./Announcement.vue";
 import LoadingSpinner from "./LoadingSpinner.vue";
 import type { Announcement } from "@solaris/common";
 import { ref, onMounted, computed, inject, type Ref } from "vue";
-import { getLatestAnnouncement } from "@/services/typedapi/announcement";
-import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
+import { getLatestAnnouncement } from "@solaris/api-client/announcement";
+import { isOk, formatError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const httpClient = inject(httpInjectionKey)!;
 

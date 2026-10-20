@@ -9,8 +9,9 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import type { PlayerScheduledActions } from "@solaris/common";
-import { trashBulk } from "@/services/typedapi/star";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { trashBulk } from "@solaris/api-client/star";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { inject } from "vue";
 
 import { useToast } from "vue-toast-notification";

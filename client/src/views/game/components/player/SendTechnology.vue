@@ -57,18 +57,14 @@ import TechnologyHelper from "../../../../services/technologyHelper";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game } from "@/types/game";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ResearchType, TradeTechnology } from "@solaris/common";
 import GameHelper from "../../../../services/gameHelper";
 import {
   listTradeableTechnologies,
   sendTechnology,
-} from "@/services/typedapi/trade";
+} from "@solaris/api-client/trade";
 
 import { useToast } from "vue-toast-notification";
 import { useConfirm } from "@/hooks/confirm.ts";

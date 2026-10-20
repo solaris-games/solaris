@@ -213,8 +213,9 @@ import GameDiplomacyPeaceDeclared from "./GameDiplomacyPeaceDeclared.vue";
 import GameDiplomacyWarDeclared from "./GameDiplomacyWarDeclared.vue";
 import PlayerDiplomacyStatusChanged from "./PlayerDiplomacyStatusChanged.vue";
 import type { GameEvent } from "@solaris/common";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
-import { markAsRead } from "@/services/typedapi/event";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { markAsRead } from "@solaris/api-client/event";
 import type { Game } from "@/types/game";
 
 const props = defineProps<{

@@ -42,9 +42,10 @@ import GameHelper from "../../../../services/gameHelper";
 import AudioService from "../../../../services/audio";
 import { ref, computed, inject } from "vue";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game } from "../../../../types/game";
-import { concedeDefeat } from "@/services/typedapi/game";
+import { concedeDefeat } from "@solaris/api-client/game";
 
 import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;

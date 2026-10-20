@@ -47,12 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import HelpTooltip from "../../../components/HelpTooltip.vue";
 import { ref, inject, type Ref, onMounted } from "vue";
-import { getCurrentFlux } from "@/services/typedapi/game";
+import { getCurrentFlux } from "@solaris/api-client/game";
 import type { Flux, MonthlyBans } from "@solaris/common";
-import { listBans } from "@/services/typedapi/specialist";
+import { listBans } from "@solaris/api-client/specialist";
 
 const httpClient = inject(httpInjectionKey)!;
 

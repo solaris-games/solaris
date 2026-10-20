@@ -18,9 +18,10 @@ import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import { useRoute } from "vue-router";
 import { inject, onMounted, ref, computed, type Ref } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ListUser, AdminSpecificUserInfo } from "@solaris/common";
-import { getUsers } from "@/services/typedapi/admin";
+import { getUsers } from "@solaris/api-client/admin";
 import UserPanel from "@/views/admin/components/UserPanel.vue";
 import { useUserStore } from "@/stores/user";
 

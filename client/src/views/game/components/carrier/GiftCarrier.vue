@@ -25,10 +25,11 @@ import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
 import GameHelper from "../../../../services/gameHelper";
 import { inject, computed, ref } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game, Carrier } from "@/types/game";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { gift } from "@/services/typedapi/carrier";
+import { gift } from "@solaris/api-client/carrier";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
 import { useToast } from "vue-toast-notification";

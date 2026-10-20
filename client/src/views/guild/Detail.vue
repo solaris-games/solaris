@@ -60,9 +60,10 @@ import ViewContainer from "../components/ViewContainer.vue";
 import ViewTitle from "../components/ViewTitle.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import GuildMemberList from "./components/MemberList.vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useRoute } from "vue-router";
-import { detailGuild } from "@/services/typedapi/guild";
+import { detailGuild } from "@solaris/api-client/guild";
 import type { GuildWithUsers } from "@solaris/common";
 import GuildAchievements from "./components/Achievements.vue";
 

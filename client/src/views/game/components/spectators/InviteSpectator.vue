@@ -36,13 +36,9 @@ import FormErrorList from "../../../components/FormErrorList.vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import { ref, inject, type Ref } from "vue";
 import { useConfirm } from "@/hooks/confirm.ts";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { inviteSpectators } from "@/services/typedapi/spectator";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { inviteSpectators } from "@solaris/api-client/spectator";
 
 import { useToast } from "vue-toast-notification";
 const store = useGameStore();

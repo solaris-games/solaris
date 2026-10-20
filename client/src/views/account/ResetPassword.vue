@@ -65,13 +65,9 @@ import router from "../../router";
 import ViewTitle from "../components/ViewTitle.vue";
 import FormErrorList from "../components/FormErrorList.vue";
 import { ref, inject, type Ref } from "vue";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { updatePassword } from "@/services/typedapi/user";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { updatePassword } from "@solaris/api-client/user";
 import { useToast } from "vue-toast-notification";
 
 const httpClient = inject(httpInjectionKey)!;

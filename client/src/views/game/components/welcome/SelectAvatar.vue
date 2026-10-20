@@ -41,8 +41,9 @@
 <script setup lang="ts">
 import { ref, type Ref, inject, onMounted } from "vue";
 import { sorterByProperty, type UserAvatar } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { listMyAvatars } from "@/services/typedapi/user";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { listMyAvatars } from "@solaris/api-client/user";
 import {
   getAvatarImage,
   getAvatarWebpImage,

@@ -2564,13 +2564,9 @@ import {
   type GameSettingsSpec,
   type SpecialistBans,
 } from "@solaris/common";
-import { createGame, getDefaultSettings } from "@/services/typedapi/game";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { createGame, getDefaultSettings } from "@solaris/api-client/game";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import CustomGalaxy from "@/views/game/gameCreation/CustomGalaxy.vue";
 import ResearchCostProgression from "@/views/game/gameCreation/ResearchCostProgression.vue";
 

@@ -7,8 +7,9 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { inject, computed } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { pinMessage, unpinMessage } from "@/services/typedapi/conversation";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { pinMessage, unpinMessage } from "@solaris/api-client/conversation";
 import type { Game } from "@/types/game";
 
 const props = defineProps<{

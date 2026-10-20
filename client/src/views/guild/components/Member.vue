@@ -119,7 +119,8 @@ import type {
   GuildUser,
 } from "@/views/guild/components/MemberList.vue";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   acceptGuildInviteForApplicant,
   deleteGuild,
@@ -129,7 +130,7 @@ import {
   promoteGuildMember,
   rejectGuildApplication,
   uninviteGuild,
-} from "@/services/typedapi/guild";
+} from "@solaris/api-client/guild";
 import { useUserStore } from "@/stores/user";
 
 import { useToast } from "vue-toast-notification";

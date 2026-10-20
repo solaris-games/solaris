@@ -26,6 +26,9 @@ export default defineConfig({
       "@solaris/map-rendering": fileURLToPath(
         new URL("../map-rendering/src", import.meta.url),
       ),
+      "@solaris/api-client": fileURLToPath(
+        new URL("../api-client/src", import.meta.url),
+      ),
     },
   },
   build: {

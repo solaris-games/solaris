@@ -16,9 +16,10 @@ import PlayerEventBusEventNames from "../../../../eventBusEventNames/player";
 import { inject, ref, computed, onMounted, onUnmounted } from "vue";
 import { eventBusInjectionKey } from "../../../../eventBus";
 import UserEventBusEventNames from "@/eventBusEventNames/user";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game } from "@/types/game";
-import { getUnreadCount } from "@/services/typedapi/conversation";
+import { getUnreadCount } from "@solaris/api-client/conversation";
 
 const emit = defineEmits<{
   onCloseRequested: [];

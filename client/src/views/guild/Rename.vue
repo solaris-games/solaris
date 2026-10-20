@@ -73,14 +73,10 @@ import ViewContainer from "../components/ViewContainer.vue";
 import ViewTitle from "../components/ViewTitle.vue";
 import FormErrorList from "../components/FormErrorList.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm";
-import { renameGuild } from "@/services/typedapi/guild";
+import { renameGuild } from "@solaris/api-client/guild";
 
 import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;

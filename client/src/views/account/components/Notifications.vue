@@ -269,13 +269,9 @@ import LoadingSpinner from "../../components/LoadingSpinner.vue";
 import HelpTooltip from "../../components/HelpTooltip.vue";
 import { onMounted, ref, type Ref, inject } from "vue";
 import type { UserSubscriptions } from "@solaris/common";
-import { getSubscriptions, saveSubscriptions } from "@/services/typedapi/user";
-import {
-  extractErrors,
-  httpInjectionKey,
-  isOk,
-  ResponseResultKind,
-} from "@/services/typedapi";
+import { getSubscriptions, saveSubscriptions } from "@solaris/api-client/user";
+import { extractErrors, isOk, ResponseResultKind } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useToast } from "vue-toast-notification";
 
 const httpClient = inject(httpInjectionKey)!;

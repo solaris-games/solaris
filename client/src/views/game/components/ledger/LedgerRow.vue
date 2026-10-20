@@ -55,13 +55,14 @@ import gameHelper from "../../../../services/gameHelper";
 import type { LedgerType, PlayerLedgerDebt } from "@solaris/common";
 import type { Game } from "@/types/game";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   forgiveLedgerCredits,
   forgiveLedgerSpecialistTokens,
   settleLedgerCredits,
   settleLedgerSpecialistTokens,
-} from "@/services/typedapi/ledger";
+} from "@solaris/api-client/ledger";
 import { useColourStore } from "@/stores/colour";
 import { useGameStore } from "@/stores/game";
 

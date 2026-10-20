@@ -46,9 +46,10 @@
 <script setup lang="ts">
 import GameHelper from "../../../../services/gameHelper";
 import { inject, computed } from "vue";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { notReady, ready, readyToCycle } from "@/services/typedapi/game";
+import { notReady, ready, readyToCycle } from "@solaris/api-client/game";
 import { useGameStore } from "@/stores/game";
 
 import { useToast } from "vue-toast-notification";

@@ -19,8 +19,8 @@ import GameHelper from "@/services/gameHelper";
 import {
   listCarrierForGame,
   listStarForGame,
-} from "@/services/typedapi/specialist";
-import { formatError, isOk } from "@/services/typedapi";
+} from "@solaris/api-client/specialist";
+import { formatError, isOk } from "@solaris/api-client";
 import type { Axios } from "axios";
 import type { MenuState, MenuStateChat } from "@/types/menu";
 import { GameCommandEventBusEventNames } from "@solaris/map-rendering";

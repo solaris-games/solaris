@@ -1094,8 +1094,9 @@ import GameSettingValue from "./GameSettingValue.vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import type { GameInfoDetail, GameSettingsSpec } from "@solaris/common";
 import { ref, inject, type Ref, onMounted } from "vue";
-import { getDefaultSettings } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getDefaultSettings } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import ResearchCostProgressionSetting from "@/views/game/components/settings/ResearchCostProgressionSetting.vue";
 
 const props = defineProps<{

@@ -132,8 +132,9 @@ import {
   detailMyGuild,
   listMyGuildApplications,
   listMyGuildInvites,
-} from "@/services/typedapi/guild";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+} from "@solaris/api-client/guild";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useUserStore } from "@/stores/user";
 
 const httpClient = inject(httpInjectionKey)!;

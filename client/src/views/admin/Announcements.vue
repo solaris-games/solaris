@@ -37,8 +37,9 @@ import type { Announcement } from "@solaris/common";
 import {
   getAllAnnouncements,
   deleteAnnouncement,
-} from "@/services/typedapi/admin";
-import { isOk, formatError, httpInjectionKey } from "@/services/typedapi";
+} from "@solaris/api-client/admin";
+import { isOk, formatError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm";
 
 import { useToast } from "vue-toast-notification";

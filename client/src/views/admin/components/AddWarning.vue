@@ -20,8 +20,9 @@
 
 <script setup lang="ts">
 import { ref, inject } from "vue";
-import { addWarning } from "@/services/typedapi/admin";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { addWarning } from "@solaris/api-client/admin";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

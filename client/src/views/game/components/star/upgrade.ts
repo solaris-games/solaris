@@ -2,7 +2,7 @@ import type {
   InfrastructureType,
   InfrastructureUpgradeReport,
 } from "@solaris/common";
-import { formatError, isOk, type ResponseResult } from "@/services/typedapi";
+import { formatError, isOk, type ResponseResult } from "@solaris/api-client";
 import AudioService from "../../../../services/audio";
 
 import { type ToastPluginApi } from "vue-toast-notification";
@@ -12,7 +12,7 @@ import { type Ref } from "vue";
 import {
   buildWarpGate as buildWarpGateReq,
   destroyWarpGate as destroyWarpGateReq,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 import { type Axios } from "axios";
 import type { GameStore } from "@/stores/game";
 import type { EventBus } from "@/eventBus";

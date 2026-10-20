@@ -79,13 +79,9 @@ import { inject, computed } from "vue";
 import type { DiplomaticStatus } from "@solaris/common";
 import { useConfirm } from "@/hooks/confirm.ts";
 import type { Game } from "@/types/game";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { ally, enemy, neutral } from "@/services/typedapi/diplomacy";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { ally, enemy, neutral } from "@solaris/api-client/diplomacy";
 import { useColourStore } from "@/stores/colour";
 
 import { useToast } from "vue-toast-notification";

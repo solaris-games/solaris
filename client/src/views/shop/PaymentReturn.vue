@@ -13,8 +13,9 @@ import { useRoute, useRouter } from "vue-router";
 import ViewTitle from "../components/ViewTitle.vue";
 import ViewContainer from "../components/ViewContainer.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import { processGalacticCredits } from "@/services/typedapi/shopPurchase";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { processGalacticCredits } from "@solaris/api-client/shopPurchase";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { inject } from "vue";
 
 const route = useRoute();

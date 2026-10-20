@@ -155,19 +155,15 @@ import {
 import { eventBusInjectionKey } from "../../../../../eventBus";
 import PlayerEventBusEventNames from "../../../../../eventBusEventNames/player";
 import UserEventBusEventNames from "../../../../../eventBusEventNames/user";
-import {
-  formatError,
-  httpInjectionKey,
-  isError,
-  isOk,
-} from "@/services/typedapi";
+import { formatError, isError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   detailConversation,
   leave,
   markAsRead,
   mute,
   unmute,
-} from "@/services/typedapi/conversation";
+} from "@solaris/api-client/conversation";
 import { useConfirm } from "@/hooks/confirm.ts";
 import type {
   Conversation,

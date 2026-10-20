@@ -61,8 +61,9 @@ import {
   useTemplateRef,
   onUnmounted,
 } from "vue";
-import { getNotes, writeNotes } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getNotes, writeNotes } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useMentionStore } from "@/stores/mention.ts";
 
 import { useToast } from "vue-toast-notification";

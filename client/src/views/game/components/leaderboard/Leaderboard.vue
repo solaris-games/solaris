@@ -160,8 +160,9 @@ import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import WinCondition from "@/views/game/components/leaderboard/WinCondition.vue";
 import Winner from "@/views/game/components/leaderboard/Winner.vue";
 import Leaderboards from "@/views/game/components/leaderboard/Leaderboards.vue";
-import { notReadyToQuit, quit, readyToQuit } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { notReadyToQuit, quit, readyToQuit } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   getCountdownTimeStringByTicks,
   getCountdownTimeStringForTurnTimeout,

@@ -53,9 +53,10 @@ import {
   type ConversationMessageSentResult,
   type ConversationOverview,
 } from "@solaris/common";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game } from "@/types/game";
-import { listConversations } from "@/services/typedapi/conversation";
+import { listConversations } from "@solaris/api-client/conversation";
 
 const eventBus = inject(eventBusInjectionKey)!;
 const httpClient = inject(httpInjectionKey)!;

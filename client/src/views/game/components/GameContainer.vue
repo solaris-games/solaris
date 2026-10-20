@@ -25,8 +25,9 @@ import {
 } from "@solaris/map-rendering";
 import { mapTextureUrls } from "./textureUrls";
 import { StoreDrawingContext } from "./StoreDrawingContext";
-import { touch } from "@/services/typedapi/game";
-import { httpInjectionKey, isError } from "@/services/typedapi";
+import { touch } from "@solaris/api-client/game";
+import { isError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useGameServices } from "@/util/gameServices";
 import { useUserStore } from "@/stores/user";
 import { useGameStore } from "@/stores/game";

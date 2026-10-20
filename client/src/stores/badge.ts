@@ -1,8 +1,8 @@
 import { computed, readonly, ref } from "vue";
 import { defineStore } from "pinia";
 import type { Badge } from "@solaris/common";
-import { formatError, isOk } from "@/services/typedapi";
-import { getBadges } from "@/services/typedapi/badge";
+import { formatError, isOk } from "@solaris/api-client";
+import { getBadges } from "@solaris/api-client/badge";
 import type { Axios } from "axios";
 
 export const useBadgeStore = defineStore("badge", () => {

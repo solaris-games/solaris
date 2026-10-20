@@ -112,10 +112,11 @@ import PlayerTitle from "./PlayerTitle.vue";
 import DiplomacyHelper from "../../../../services/diplomacyHelper";
 import { ref, inject, computed, onMounted } from "vue";
 import type { Game } from "@/types/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ConversationOverview } from "@solaris/common";
 import GameHelper from "../../../../services/gameHelper";
-import { listPrivate } from "@/services/typedapi/conversation";
+import { listPrivate } from "@solaris/api-client/conversation";
 
 const props = defineProps<{
   playerId: string;

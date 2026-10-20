@@ -43,8 +43,9 @@ import DiplomacyHelper from "../../../../services/diplomacyHelper";
 import { ref, inject, computed, onMounted } from "vue";
 import type { Game, Player } from "@/types/game";
 import type { DiplomaticStatus } from "@solaris/common";
-import { detailDiplomacy } from "@/services/typedapi/diplomacy";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { detailDiplomacy } from "@solaris/api-client/diplomacy";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const props = defineProps<{
   playerId: string;
