@@ -245,7 +245,7 @@ export const numberEnumeration = <A extends number, M extends A[]>(
     };
 };
 
-type NumberValidationProps = {
+export type NumberValidationProps = {
     sign?: "positive" | "negative";
     integer?: boolean;
     range?: {

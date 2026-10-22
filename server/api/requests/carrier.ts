@@ -1,9 +1,4 @@
-import {
-    CarrierCalculateCombatRequest,
-    CarrierSaveWaypointsRequest,
-    TransferShipsReq,
-    ValidationError,
-} from "@solaris/common";
+import { CarrierSaveWaypointsRequest, TransferShipsReq } from "@solaris/common";
 import {
     CarrierWaypointActionType,
     CarrierWaypointActionTypes,
@@ -21,12 +16,6 @@ import {
     Validator,
     withDefault,
 } from "@solaris/common";
-import {
-    keyHasBooleanValue,
-    keyHasNumberValue,
-    keyHasObjectValue,
-    keyHasStringValue,
-} from "./helpers";
 import { objectId } from "../../utils/validation";
 
 export const parseCarrierSaveWaypointsRequest: Validator<

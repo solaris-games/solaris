@@ -1,7 +1,7 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
-    mapToTradeSendTechnologyToPlayerRequest,
-    mapToTradeSendToPlayerRequest,
+    parseTradeSendTechnologyToPlayerRequest,
+    parseTradeSendToPlayerRequest,
 } from "../requests/trade";
 import { objectIdFromString } from "../../services/types/DBObjectId";
 
@@ -9,7 +9,7 @@ export default (container: DependencyContainer) => {
     return {
         sendCredits: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(
+                const reqObj = parseTradeSendToPlayerRequest(
                     req.body,
                     req.session.userId,
                 );
@@ -42,7 +42,7 @@ export default (container: DependencyContainer) => {
         },
         sendCreditsSpecialists: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(
+                const reqObj = parseTradeSendToPlayerRequest(
                     req.body,
                     req.session.userId,
                 );
@@ -75,7 +75,7 @@ export default (container: DependencyContainer) => {
         },
         sendRenown: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendToPlayerRequest(
+                const reqObj = parseTradeSendToPlayerRequest(
                     req.body,
                     req.session.userId,
                 );
@@ -105,7 +105,7 @@ export default (container: DependencyContainer) => {
         },
         sendTechnology: async (req, res, next) => {
             try {
-                const reqObj = mapToTradeSendTechnologyToPlayerRequest(
+                const reqObj = parseTradeSendTechnologyToPlayerRequest(
                     req.body,
                 );
 

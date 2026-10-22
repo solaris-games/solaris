@@ -3,10 +3,13 @@ import { ValidationError } from "@solaris/common";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import { logger } from "../../utils/logging";
 import {
-    mapToGameConcedeDefeatRequest,
-    mapToGameSaveNotesRequest,
+    parseGameConcedeDefeatRequest,
+    parseGameGalaxyRequest,
+    parseGameIntelRequest,
     parseGameJoinGameRequest,
+    parseGameSaveNotesRequest,
     parseGameSettingsReq,
+    parseGameTogglePauseRequest,
     parseKickPlayerRequest,
 } from "../requests/game";
 import { Player } from "../../services/types/Player";
@@ -102,30 +105,12 @@ export default (container: DependencyContainer) => {
         },
         detailGalaxy: async (req, res, next) => {
             try {
-                const tickParam: string = req.query.tick;
-
-                let tick: number | null;
-
-                if (
-                    tickParam === null ||
-                    tickParam === undefined ||
-                    tickParam === ""
-                ) {
-                    tick = null;
-                } else {
-                    tick = Number(tickParam);
-                }
-
-                if (tick !== null && tick < 0) {
-                    throw new ValidationError(
-                        `Tick must be greater or equal to 0.`,
-                    );
-                }
+                const reqObj = parseGameGalaxyRequest(req.query);
 
                 let game = await container.gameGalaxyService.getGalaxy(
                     req.params.gameId,
                     req.session.userId,
-                    tick,
+                    reqObj.tick,
                 );
 
                 res.status(200).json(game);
@@ -263,18 +248,12 @@ export default (container: DependencyContainer) => {
         },
         getIntel: async (req, res, next) => {
             try {
-                const startTick = req.query.startTick
-                    ? Number(req.query.startTick)
-                    : undefined;
-
-                const endTick = req.query.endTick
-                    ? Number(req.query.endTick)
-                    : undefined;
+                const reqObj = parseGameIntelRequest(req.query);
 
                 const result = await container.historyService.listIntel(
                     req.params.gameId,
-                    startTick,
-                    endTick,
+                    reqObj.startTick,
+                    reqObj.endTick,
                 );
 
                 res.status(200).json(result);
@@ -338,7 +317,7 @@ export default (container: DependencyContainer) => {
         },
         concede: async (req, res, next) => {
             try {
-                const reqObj = mapToGameConcedeDefeatRequest(req.body);
+                const reqObj = parseGameConcedeDefeatRequest(req.body);
 
                 await container.gameService.concedeDefeat(
                     req.game,
@@ -486,7 +465,7 @@ export default (container: DependencyContainer) => {
         },
         saveNotes: async (req, res, next) => {
             try {
-                const reqObj = mapToGameSaveNotesRequest(req.body);
+                const reqObj = parseGameSaveNotesRequest(req.body);
 
                 await container.playerService.updateGameNotes(
                     req.game,
@@ -516,15 +495,11 @@ export default (container: DependencyContainer) => {
         },
         togglePaused: async (req, res, next) => {
             try {
-                const doPause = req.body?.pause;
-
-                if (doPause === null || doPause === undefined) {
-                    throw new ValidationError("Pause parameter is required.");
-                }
+                const reqObj = parseGameTogglePauseRequest(req.body);
 
                 await container.gameService.setPauseState(
                     req.game,
-                    doPause,
+                    reqObj.pause,
                     req.session.userId,
                     container.notificationService,
                 );
