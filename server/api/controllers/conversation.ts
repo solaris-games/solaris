@@ -1,7 +1,7 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
-    mapToConversationCreateConversationRequest,
-    mapToConversationSendMessageRequest,
+    parseConversationCreateConversationRequest,
+    parseConversationSendMessageRequest,
 } from "../requests/conversation";
 
 export default (container: DependencyContainer) => {
@@ -65,7 +65,7 @@ export default (container: DependencyContainer) => {
         },
         create: async (req, res, next) => {
             try {
-                const reqObj = mapToConversationCreateConversationRequest(
+                const reqObj = parseConversationCreateConversationRequest(
                     req.body,
                 );
 
@@ -85,7 +85,7 @@ export default (container: DependencyContainer) => {
         },
         sendMessage: async (req, res, next) => {
             try {
-                const reqObj = mapToConversationSendMessageRequest(req.body);
+                const reqObj = parseConversationSendMessageRequest(req.body);
 
                 let message = await container.conversationService.send(
                     req.game,
