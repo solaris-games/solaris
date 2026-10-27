@@ -150,6 +150,13 @@ export interface IEventService {
         starId: DBObjectId,
         starName: string,
     ): Promise<void>;
+    createStarDestroyedEvent(
+        gameId: DBObjectId,
+        gameTick: number,
+        playerId: DBObjectId,
+        starId: DBObjectId,
+        starName: string,
+    ): Promise<void>;
     createStarReignitedEvent(
         gameId: DBObjectId,
         gameTick: number,

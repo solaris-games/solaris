@@ -787,7 +787,10 @@ export default class GameTickService extends EventEmitter {
 
             // Destroy stars for battle royale mode.
             if (game.settings.general.mode === "battleRoyale") {
-                this.battleRoyaleService.performBattleRoyaleTick(game);
+                await this.battleRoyaleService.performBattleRoyaleTick(
+                    game,
+                    eventService,
+                );
             }
 
             // Stars can be looted once per cycle, so reset that

@@ -223,6 +223,14 @@ type ProcessingEvent =
           starName: string;
       }
     | {
+          kind: "starDestroyed";
+          gameId: DBObjectId;
+          gameTick: number;
+          playerId: DBObjectId;
+          starId: DBObjectId;
+          starName: string;
+      }
+    | {
           kind: "starReignited";
           gameId: DBObjectId;
           gameTick: number;
@@ -718,6 +726,24 @@ export class ProcessingEventService implements IEventService {
         return Promise.resolve();
     }
 
+    createStarDestroyedEvent(
+        gameId: DBObjectId,
+        gameTick: number,
+        playerId: DBObjectId,
+        starId: DBObjectId,
+        starName: string,
+    ): Promise<void> {
+        this._events.push({
+            kind: "starDestroyed",
+            gameId,
+            gameTick,
+            playerId,
+            starId,
+            starName,
+        });
+        return Promise.resolve();
+    }
+
     createStarReignitedEvent(
         gameId: DBObjectId,
         gameTick: number,
@@ -1027,6 +1053,15 @@ export class ProcessingEventService implements IEventService {
                     break;
                 case "starDied":
                     await eventService.createStarDiedEvent(
+                        event.gameId,
+                        event.gameTick,
+                        event.playerId,
+                        event.starId,
+                        event.starName,
+                    );
+                    break;
+                case "starDestroyed":
+                    await eventService.createStarDestroyedEvent(
                         event.gameId,
                         event.gameTick,
                         event.playerId,
