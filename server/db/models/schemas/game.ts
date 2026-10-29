@@ -201,7 +201,7 @@ const schema = new Schema({
                 type: Types.Number,
                 required: true,
                 min: 1,
-                max: 50,
+                max: 200,
                 default: 20,
             },
             productionTicks: {

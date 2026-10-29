@@ -18,7 +18,6 @@ import {
     maybeNull,
     maybeUndefined,
     numberEnumeration,
-    map,
 } from "@solaris/common";
 import { integerFromQueryStringOrDefault } from "../../utils/validation";
 import {
@@ -180,7 +179,7 @@ const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyReq> = object({
         integer: true,
         range: {
             from: 1,
-            to: 50,
+            to: 200,
         },
     }),
     productionTicks: numberAdv({
