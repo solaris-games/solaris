@@ -41,7 +41,7 @@
             class="btn btn-outline-primary ps-3 pe-3"
             data-bs-dismiss="modal"
           >
-            <i class="fas fa-times"></i> Ignore
+            Ignore
           </button>
           <button
             @click="onReload"
@@ -66,7 +66,6 @@ declare var bootstrap: any;
 
 const eventBus = inject(eventBusInjectionKey)!;
 
-// Module-scoped so it survives component remounts when navigating between views, resets on full page reload.
 let isIgnored = false;
 
 const modal = ref<any>(null);
@@ -108,5 +107,4 @@ onUnmounted(() => {
   );
 });
 </script>
-
 <style scoped></style>

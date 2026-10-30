@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { useConfirmationDialogStore } from "@/stores/confirmationDialog";
 import ConfirmationDialog from "./views/components/modal/ConfirmationDialog.vue";
-import Status from "@/views/components/Status.vue";
+import Status from "./views/components/Status.vue";
 
 const confirmStore = useConfirmationDialogStore();
 </script>
