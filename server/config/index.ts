@@ -58,9 +58,9 @@ const config: Config = {
     },
     frontend: {
         appSocketsHost:
-            process.env.FRONTEND_APP_SOCKETS_HOST || "api.solaris.games",
+            process.env.FRONTEND_APP_SOCKETS_HOST || "solaris.games",
         appApiHost:
-            process.env.FRONTEND_APP_API_HOST || "https://api.solaris.games",
+            process.env.FRONTEND_APP_API_HOST || "https://solaris.games",
         appDocumentationUrl:
             process.env.FRONTEND_APP_DOCUMENTATION_URL ||
             "https://solaris-games.github.io/solaris-docs/",
