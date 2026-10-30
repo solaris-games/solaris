@@ -70,7 +70,7 @@ const init = (config: FrontendConfig) => {
 
   const eventBus: EventBus = new ClientEventBus();
 
-  const httpClient = createHttpClient(config);
+  const httpClient = createHttpClient(config, eventBus);
 
   const socketUrl: string = config.appSocketsHost;
 
