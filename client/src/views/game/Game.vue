@@ -7,6 +7,12 @@
       @onColourOverrideConfirmed="onColourOverrideConfirmed"
     />
 
+    <concede-defeat-modal
+      v-if="concedeDialogOpen"
+      @onConcedeCompleted="onConcedeDefeatCompleted"
+      @onCancelled="onConcedeDefeatCancelled"
+    />
+
     <logo v-if="!hasGame"></logo>
 
     <loading-spinner :loading="!hasGame" />
@@ -29,6 +35,7 @@
             @onPlayerSelected="onPlayerSelected"
             @onReloadGameRequested="() => reloadGame(true)"
             @onViewColourOverrideRequested="onViewColourOverrideRequested"
+            @onViewConcedeDefeatRequested="onViewConcedeDefeatRequested"
           />
 
           <chat
@@ -77,6 +84,7 @@ import GameHelper from "../../services/gameHelper";
 import AudioService from "../../services/audio";
 import gameHelper from "../../services/gameHelper";
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
+import ConcedeDefeatModal from "./components/leaderboard/ConcedeDefeatModal.vue";
 import { eventBusInjectionKey } from "@/eventBus";
 import {
   inject,
@@ -164,6 +172,20 @@ const onColourOverrideCancelled = () => {
 
 const onViewColourOverrideRequested = (e: string) => {
   colourOverride.value = { playerId: e };
+};
+
+const concedeDialogOpen = ref(false);
+
+const onViewConcedeDefeatRequested = () => {
+  concedeDialogOpen.value = true;
+};
+
+const onConcedeDefeatCompleted = () => {
+  concedeDialogOpen.value = false;
+};
+
+const onConcedeDefeatCancelled = () => {
+  concedeDialogOpen.value = false;
 };
 
 const onStarSelected = (starId: string) => {
