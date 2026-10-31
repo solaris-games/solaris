@@ -25,6 +25,16 @@ const nonOptional = (name: string, allowEmpty: boolean = false) => {
 
 const config: Config = {
     port: process.env.PORT,
+    http: {
+        keepAliveTimeout: parseInt(
+            process.env.HTTP_KEEP_ALIVE_TIMEOUT || "120000",
+            10,
+        ),
+        headersTimeout: parseInt(
+            process.env.HTTP_HEADERS_TIMEOUT || "125000",
+            10,
+        ),
+    },
     sessionSecret: nonOptional("SESSION_SECRET"),
     sessionSecureCookies: process.env.SESSION_SECURE_COOKIES == "true",
     connectionString: nonOptional("CONNECTION_STRING"),

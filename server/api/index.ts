@@ -23,6 +23,9 @@ async function startServer() {
     const app = express();
     const server: http.Server = http.createServer(app);
 
+    server.keepAliveTimeout = config.http.keepAliveTimeout;
+    server.headersTimeout = config.http.headersTimeout;
+
     const socketServer = new Server(server, {
         cors: {
             origin: config.corsUrls,
