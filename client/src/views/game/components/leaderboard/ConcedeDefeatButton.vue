@@ -4,10 +4,10 @@
       class="btn btn-danger btn-sm"
       :disabled="isConceding"
       @click="onConcedeDefeatRequested"
-      title="Concede"
+      title="Concede Defeat"
     >
       <i class="fas fa-skull-crossbones"></i>
-      {{ isTutorialGame ? "Quit Tutorial" : "Concede" }}
+      {{ isTutorialGame ? "Quit Tutorial" : "Concede Defeat" }}
     </button>
   </div>
 </template>
