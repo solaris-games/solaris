@@ -36,10 +36,13 @@ import { useToast } from "vue-toast-notification";
 import GameHelper from "@/services/gameHelper.ts";
 import { GameTooltips } from "@/views/game/components/tooltips.ts";
 import type { CarrierClickDispatchArgs } from "@solaris/map-rendering";
+import type { MapObject } from "@solaris/common";
 import { useMapClickStore } from "@/stores/mapClick.ts";
+import { useRoute } from "vue-router";
 const store = useGameStore();
 const userStore = useUserStore();
 const mapClickStore = useMapClickStore();
+const route = useRoute();
 
 const eventBus = inject(eventBusInjectionKey)!;
 const toast = useToast();
@@ -53,6 +56,7 @@ const emit = defineEmits<{
   onCarrierSelected: [carrierId: string];
   onCarrierRightSelected: [carrierId: string];
   onObjectsClicked: [objects: ObjectClicked[]];
+  onOpenPlayerDetailRequested: [playerId: string];
 }>();
 
 const polling = ref(0);
@@ -107,6 +111,37 @@ onMounted(() => {
           player: GameHelper.getUserPlayer(store.game!),
         },
       );
+
+      handleDeepLinks();
+    };
+
+    const handleDeepLinks = () => {
+      const normalizeParam = (value: unknown) =>
+        typeof value === "string" ? value : undefined;
+
+      const starId = normalizeParam(route.query.starid);
+      const playerId = normalizeParam(route.query.playerid);
+
+      const star =
+        (starId && GameHelper.getStarById(store.game!, starId)) || undefined;
+
+      if (star) {
+        const panTarget: MapObject<string> = star;
+
+        eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToObject, {
+          object: panTarget,
+        });
+        eventBus.emit(MapCommandEventBusEventNames.MapCommandClickStar, {
+          starId: star._id,
+        });
+      } else if (playerId && GameHelper.getPlayerById(store.game!, playerId)) {
+        const player = GameHelper.getPlayerById(store.game!, playerId)!;
+
+        eventBus.emit(MapCommandEventBusEventNames.MapCommandPanToPlayer, {
+          player,
+        });
+        emit("onOpenPlayerDetailRequested", player._id);
+      }
     };
 
     const touchPlayer = async () => {
@@ -182,14 +217,8 @@ onMounted(() => {
       },
     ); // watcher is created async, so we have to do the cleanup ourselves
 
-    checkPerformance();
-
-    const canvas = gameContainer.app!.canvas;
-    drawGame();
-
-    const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
-    attachEventDeduplication(gameRoot, canvas);
-
+    // Register bus handlers before the first draw so the deep-link handling
+    // in drawGame() can drive the star click -> select -> detail flow.
     eventBus.on(
       MapEventBusEventNames.MapOnStarClickDispatched,
       onStarClickDispatchHandler,
@@ -223,6 +252,14 @@ onMounted(() => {
       MapEventBusEventNames.MapOnObjectsClicked,
       onObjectsClickedHandler,
     );
+
+    checkPerformance();
+
+    const canvas = gameContainer.app!.canvas;
+    drawGame();
+
+    const gameRoot = document.getElementById("gameRoot"); // Defined in Game component
+    attachEventDeduplication(gameRoot, canvas);
 
     if (userStore.userId) {
       polling.value = setInterval(touchPlayer, 60000);

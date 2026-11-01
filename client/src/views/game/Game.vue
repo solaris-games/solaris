@@ -52,6 +52,7 @@
           @onCarrierSelected="onCarrierSelected"
           @onCarrierRightSelected="onCarrierRightSelected"
           @onObjectsClicked="onObjectsClicked"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         />
       </template>
 
