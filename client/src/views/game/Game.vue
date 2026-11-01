@@ -124,6 +124,7 @@ import SidebarMenu from "@/views/game/components/menu/SidebarMenu.vue";
 import FooterBar from "@/views/game/components/menu/FooterBar.vue";
 import StackedUI from "@/views/game/StackedUI.vue";
 import { createKeyboardShortcutHandler } from "@/services/shortcuts.ts";
+import GameCommandEventBusEventNames from "@solaris/map-rendering/eventBusEventNames/gameCommand.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
@@ -302,6 +303,11 @@ const reloadGame = async (reinitialise: boolean = false) => {
       store.setProductionTick(response.data.state.productionTick);
 
       document.title = response.data.settings.general.name + " - Solaris";
+
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
+        game,
+        settings: store.settings,
+      });
 
       if (reinitialise) {
         // ensure no menu is open
