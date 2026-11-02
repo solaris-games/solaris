@@ -38,17 +38,9 @@
 
     <div
       class="row pt-2 pb-2 bg-dark"
-      v-if="gameHasStarted && !player.userId && userPlayer"
+      v-if="gameHasStarted && !isUserPlayer && userPlayer"
     >
       <div class="col">
-        <button
-          class="btn btn-outline-secondary me-1"
-          @click="onOpenDiplomacyRequested"
-          title="Open Diplomacy"
-          v-if="isFormalAlliancesEnabled"
-        >
-          <i class="fas fa-globe-americas"></i>
-        </button>
         <button
           class="btn btn-outline-secondary me-1"
           @click="onOpenLedgerRequested"
@@ -65,6 +57,9 @@
         >
           <i class="fas fa-chart-line"></i>
         </button>
+        <div class="ms-2 d-inline">
+          <single-diplomacy :player-id="playerId" />
+        </div>
       </div>
       <div class="col-auto">
         <button
@@ -117,6 +112,7 @@ import { httpInjectionKey } from "@/services/http";
 import type { ConversationOverview } from "@solaris/common";
 import GameHelper from "../../../../services/gameHelper";
 import { listPrivate } from "@solaris/api-client/conversation";
+import SingleDiplomacy from "@/views/game/components/diplomacy/SingleDiplomacy.vue";
 
 const props = defineProps<{
   playerId: string;
@@ -154,6 +150,9 @@ const player = computed(() =>
   GameHelper.getPlayerById(game.value, props.playerId)!,
 );
 const userPlayer = computed(() => GameHelper.getUserPlayer(game.value));
+const isUserPlayer = computed(
+  () => userPlayer.value && userPlayer.value._id === player.value._id,
+);
 
 const conversation = ref<ConversationOverview<string> | null>(null);
 
