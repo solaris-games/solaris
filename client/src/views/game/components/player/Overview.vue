@@ -89,7 +89,7 @@
           v-if="!gameHasFinished && isTradeEnabled"
           @click="onOpenTradeRequested"
         >
-          <i class="fas fa-handshake" />
+          <i class="fas fa-money-bill-transfer" />
           <span v-if="!isCompactUIStyle" class="d-none d-md-inline-block ms-1"
             >Trade</span
           >
