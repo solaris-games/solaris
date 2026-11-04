@@ -365,6 +365,8 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   max-height: 100%;
   min-width: 0;
   max-width: 100%;
+  justify-self: start;
+  align-self: start;
 }
 
 .menu-bars {

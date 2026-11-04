@@ -124,6 +124,8 @@ const toggle = () => {
   max-width: 100%;
   display: flex;
   flex-direction: row-reverse;
+  justify-self: end;
+  align-self: start;
 
   * {
     pointer-events: auto;
