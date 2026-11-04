@@ -20,6 +20,7 @@ export type DbOptions = {
     syncIndexes?: boolean;
     unlockJobs?: boolean;
     poolSize?: number;
+    timeoutMs?: number;
 };
 
 export default async (
@@ -87,7 +88,7 @@ export default async (
         options.connectionString,
         {
             maxPoolSize: options.poolSize,
-            socketTimeoutMS: 120000,
+            socketTimeoutMS: options.timeoutMs || 120000,
         },
     );
 
