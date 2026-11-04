@@ -4,6 +4,10 @@ export type LoggingType = "pretty" | "stdout";
 
 export interface Config {
     port?: string;
+    http: {
+        keepAliveTimeout: number;
+        headersTimeout: number;
+    };
     sessionSecret: string;
     sessionSecureCookies: boolean;
     connectionString: string;

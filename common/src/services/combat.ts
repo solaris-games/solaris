@@ -417,7 +417,7 @@ const computeKills = <
                 if (oI === i) {
                     return 0;
                 } else {
-                    return og.carriersKilled;
+                    return og.carriersLost;
                 }
             })
             .reduce((sum, c) => sum + c, 0);
@@ -427,7 +427,7 @@ const computeKills = <
                 if (oI === i) {
                     return 0;
                 } else {
-                    return og.specialistsKilled;
+                    return og.specialistsLost;
                 }
             })
             .reduce((sum, c) => sum + c, 0);

@@ -1,61 +1,32 @@
 <template>
-  <div class="btn-group" v-if="isGameInProgress && !userPlayer.defeated">
+  <div class="d-inline" v-if="isGameInProgress && !userPlayer.defeated">
     <button
       class="btn btn-danger btn-sm"
-      @click="doConcedeDefeat(false)"
+      :disabled="isConceding"
+      @click="onConcedeDefeatRequested"
       title="Concede Defeat"
     >
       <i class="fas fa-skull-crossbones"></i>
       {{ isTutorialGame ? "Quit Tutorial" : "Concede Defeat" }}
     </button>
-    <button
-      type="button"
-      class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split pulse"
-      data-bs-toggle="dropdown"
-      aria-haspopup="true"
-      aria-expanded="false"
-      v-if="!isTutorialGame"
-    >
-      <span class="sr-only">Toggle Dropdown</span>
-    </button>
-    <div class="dropdown-menu" v-if="!isTutorialGame">
-      <a
-        class="dropdown-item"
-        href="javascript:;"
-        @click="doConcedeDefeat(false)"
-        >Concede Defeat</a
-      >
-      <a
-        class="dropdown-item"
-        href="javascript:;"
-        @click="doConcedeDefeat(true)"
-        >Concede Defeat + Open Slot</a
-      >
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
-import router from "../../../../router";
 import GameHelper from "../../../../services/gameHelper";
-import AudioService from "../../../../services/audio";
-import { ref, computed, inject } from "vue";
+import { computed } from "vue";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { isOk } from "@solaris/api-client";
-import { httpInjectionKey } from "@/services/http";
-import type { Game } from "../../../../types/game";
-import { concedeDefeat } from "@solaris/api-client/game";
+import { useConcedeGame } from "@/hooks/useConcedeGame.ts";
 
-import { useToast } from "vue-toast-notification";
-const httpClient = inject(httpInjectionKey)!;
-const toast = useToast();
+const emit = defineEmits<{
+  onViewConcedeDefeatRequested: [];
+}>();
 
 const store = useGameStore();
 const confirm = useConfirm();
-const game = computed<Game>(() => store.game!);
 
-const isConcedingDefeat = ref(false);
+const { isConceding, concede } = useConcedeGame();
 
 const userPlayer = computed(() => GameHelper.getUserPlayer(store.game!)!);
 const isTutorialGame = computed(() => GameHelper.isTutorialGame(store.game!));
@@ -65,41 +36,22 @@ const isGameInProgress = computed(
     !GameHelper.isGameFinished(store.game!),
 );
 
-const doConcedeDefeat = async (openSlot: boolean) => {
-  let message = "Are you sure you want to concede defeat in this game?";
-
+const onConcedeDefeatRequested = async () => {
   if (isTutorialGame.value) {
-    message =
-      "Are you sure you want to exit the tutorial? All progress will be lost.";
-  }
+    if (
+      !(await confirm(
+        "Quit Tutorial",
+        "Are you sure you want to exit the tutorial? All progress will be lost.",
+      ))
+    ) {
+      return;
+    }
 
-  if (openSlot) {
-    message += " Your slot will be open for another player to fill.";
-  }
-
-  if (!(await confirm("Concede Defeat", message))) {
+    await concede(false, true);
     return;
   }
 
-  isConcedingDefeat.value = true;
-
-  try {
-    const response = await concedeDefeat(httpClient)(game.value._id, openSlot);
-
-    if (isOk(response)) {
-      AudioService.quit();
-
-      if (!isTutorialGame.value) {
-        toast.error(`You have conceded defeat, better luck next time.`);
-      }
-
-      router.push({ name: "main-menu" });
-    }
-  } catch (err) {
-    console.error(err);
-  }
-
-  isConcedingDefeat.value = false;
+  emit("onViewConcedeDefeatRequested");
 };
 </script>
 

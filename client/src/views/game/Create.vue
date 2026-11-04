@@ -930,7 +930,7 @@
             <input
               type="range"
               min="3"
-              max="50"
+              max="200"
               step="1"
               class="form-range w-100"
               id="starsPerPlayer"

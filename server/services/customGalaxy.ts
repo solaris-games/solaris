@@ -52,8 +52,13 @@ export default class CustomGalaxyService {
     ) {
         const customGalaxy = settings.galaxy.customGalaxy!;
 
-        const starIdSet = new Set<string>(customGalaxy.stars.map((s) => s.id));
-        if (starIdSet.size !== customGalaxy.stars.length) {
+        const starsById = new Map<string, CustomGalaxyStar>();
+
+        for (let star of customGalaxy.stars) {
+            starsById.set(star.id, star);
+        }
+
+        if (starsById.size !== customGalaxy.stars.length) {
             throw new ValidationError(
                 `Multiple stars cannot have the same ID.`,
             );
@@ -74,9 +79,22 @@ export default class CustomGalaxyService {
                     );
                 }
 
-                if (!starIdSet.has(star.wormHoleToStarId)) {
+                if (!starsById.has(star.wormHoleToStarId)) {
                     throw new ValidationError(
                         `A star with ID '${star.wormHoleToStarId}' does not exist.`,
+                    );
+                }
+
+                const otherStar = starsById.get(star.wormHoleToStarId)!;
+                if (!otherStar.wormHoleToStarId) {
+                    throw new ValidationError(
+                        `Star ${star.id} has a wormhole to ${otherStar.id}, but that star does not have a wormhole`,
+                    );
+                }
+
+                if (otherStar.wormHoleToStarId !== star.id) {
+                    throw new ValidationError(
+                        `Star ${star.id} has a wormhole to ${otherStar.id}, but that star has a wormhole with a different destination`,
                     );
                 }
             }
@@ -88,6 +106,22 @@ export default class CustomGalaxyService {
                 throw new ValidationError(
                     `A star specialist with ID '${star.specialistId}' does not exist.`,
                 );
+            }
+
+            if (star.specialistId != null) {
+                const specialist = this.specialistService.getById(
+                    star.specialistId,
+                    "star",
+                );
+
+                if (
+                    specialist.modifiers.special?.wormHoleConstructor &&
+                    star.wormHoleToStarId !== null
+                ) {
+                    throw new ValidationError(
+                        `Cannot place a wormhole constructor on a star with a wormhole`,
+                    );
+                }
             }
 
             if (star.playerId == null) {
@@ -127,7 +161,7 @@ export default class CustomGalaxyService {
         if (isAdvancedCustomGalaxy) {
             this._validateAdvancedCustomGalaxy(
                 customGalaxy,
-                starIdSet,
+                starsById,
                 settings,
             );
         }
@@ -169,7 +203,7 @@ export default class CustomGalaxyService {
 
     private _validateAdvancedCustomGalaxy(
         customGalaxy: CustomGalaxy,
-        starIdSet: Set<string>,
+        starsById: Map<string, CustomGalaxyStar>,
         settings: GameSettingsReq,
     ) {
         if (!customGalaxy.players) {
@@ -190,7 +224,7 @@ export default class CustomGalaxyService {
         const homeStarPlayerIdMap = new Map<string, string>();
 
         for (const player of customGalaxy.players) {
-            if (!starIdSet.has(player.homeStarId)) {
+            if (!starsById.has(player.homeStarId)) {
                 throw new ValidationError(
                     `A star with ID '${player.homeStarId}' does not exist.`,
                 );
@@ -294,7 +328,7 @@ export default class CustomGalaxyService {
 
                 if (
                     carrier.orbiting != null &&
-                    !starIdSet.has(carrier.orbiting)
+                    !starsById.has(carrier.orbiting)
                 ) {
                     throw new ValidationError(
                         `A star with ID '${carrier.orbiting}' does not exist.`,
@@ -335,13 +369,13 @@ export default class CustomGalaxyService {
                 }
 
                 for (let wi = 0; wi < carrier.waypoints.length; wi++) {
-                    if (!starIdSet.has(carrier.waypoints[wi].source)) {
+                    if (!starsById.has(carrier.waypoints[wi].source)) {
                         throw new ValidationError(
                             `A star with ID '${carrier.waypoints[wi].source}' does not exist.`,
                         );
                     }
 
-                    if (!starIdSet.has(carrier.waypoints[wi].destination)) {
+                    if (!starsById.has(carrier.waypoints[wi].destination)) {
                         throw new ValidationError(
                             `A star with ID '${carrier.waypoints[wi].destination}' does not exist.`,
                         );

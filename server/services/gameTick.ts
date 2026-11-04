@@ -65,6 +65,21 @@ export const GameTickServiceEvents = {
     onGameEnded: "onGameEnded",
 };
 
+const MAX_TICK_SCHEDULE_CORRECTION_FRACTION = 0.25;
+
+// Correct for up to MAX_TICK_SCHEDULE_CORRECTION_FRACTION * "time between ticks/turns" of delay that was caused by scheduling and latency
+export const applyTickScheduleCorrection = (
+    lastTick: DateTime,
+    now: DateTime,
+    durationMs: number,
+): DateTime =>
+    now.minus({
+        milliseconds: Math.min(
+            Math.max(now.diff(lastTick).milliseconds - durationMs, 0),
+            MAX_TICK_SCHEDULE_CORRECTION_FRACTION * durationMs,
+        ),
+    });
+
 export default class GameTickService extends EventEmitter {
     distanceService: DistanceService;
     starService: StarService;
@@ -203,7 +218,22 @@ export default class GameTickService extends EventEmitter {
             `[${game.settings.general.name}] - Game tick started at ${new Date().toISOString()}`,
         );
 
-        game.state.lastTickDate = DateTime.utc().toJSDate();
+        const now = DateTime.utc();
+
+        if (game.state.lastTickDate) {
+            const durationMs = this.gameTypeService.isRealTimeGame(game)
+                ? game.settings.gameTime.speed * 1000 // speed is in seconds
+                : game.settings.gameTime.maxTurnWait * 60000; // maxTurnWait is in minutes
+
+            game.state.lastTickDate = applyTickScheduleCorrection(
+                DateTime.fromJSDate(game.state.lastTickDate).toUTC(),
+                now,
+                durationMs,
+            ).toJSDate();
+        } else {
+            game.state.lastTickDate = now.toJSDate();
+        }
+
         game.state.forceTick = false;
 
         let taskTime = process.hrtime();
@@ -787,7 +817,10 @@ export default class GameTickService extends EventEmitter {
 
             // Destroy stars for battle royale mode.
             if (game.settings.general.mode === "battleRoyale") {
-                this.battleRoyaleService.performBattleRoyaleTick(game);
+                await this.battleRoyaleService.performBattleRoyaleTick(
+                    game,
+                    eventService,
+                );
             }
 
             // Stars can be looted once per cycle, so reset that

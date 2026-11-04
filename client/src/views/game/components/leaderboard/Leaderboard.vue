@@ -137,7 +137,9 @@
         >
           <i class="fas fa-check"></i> Ready to Quit
         </button>
-        <concede-defeat-button />
+        <concede-defeat-button
+          @onViewConcedeDefeatRequested="emit('onViewConcedeDefeatRequested')"
+        />
       </div>
     </div>
   </div>
@@ -173,6 +175,7 @@ const emit = defineEmits<{
   onCloseRequested: [];
   onOpenPlayerDetailRequested: [playerId: string];
   onViewSettingsRequested: [];
+  onViewConcedeDefeatRequested: [];
 }>();
 
 const store = useGameStore();

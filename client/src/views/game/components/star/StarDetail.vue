@@ -19,6 +19,11 @@
       >
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
       </button>
+      <copy-link-button
+        class="ms-1"
+        paramName="starid"
+        :paramValue="star._id"
+      />
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1">
         <i class="fas fa-eye"></i>
       </button>
@@ -800,6 +805,7 @@ import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
 import AudioService from "../../../../services/audio";
 import GameHelper from "../../../../services/gameHelper";
 import MenuTitle from "../MenuTitle.vue";
+import CopyLinkButton from "../shared/CopyLinkButton.vue";
 import Infrastructure from "../shared/Infrastructure.vue";
 import InfrastructureUpgrade from "./InfrastructureUpgrade.vue";
 import InfrastructureUpgradeCompact from "./InfrastructureUpgradeCompact.vue";

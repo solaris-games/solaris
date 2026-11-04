@@ -12,6 +12,22 @@ export const TIMEOUT_TUTORIAL_DAYS = 1;
 export const TIMEOUT_NORMAL_DAYS = 7;
 export const TIMEOUT_FEATURED_DAYS = 16;
 
+const GAME_TYPES_CAN_TIMEOUT = [
+    "custom",
+    "special_dark",
+    "special_fog",
+    "special_ultraDark",
+    "special_orbital",
+    "special_battleRoyale",
+    "special_homeStar",
+    "special_homeStarElimination",
+    "special_anonymous",
+    "special_kingOfTheHill",
+    "special_tinyGalaxy",
+    "special_freeForAll",
+    "special_arcade",
+];
+
 export default class GameListService {
     gameRepo: Repository<Game>;
     gameService: GameService;
@@ -396,25 +412,11 @@ export default class GameListService {
         });
     }
 
-    async listGamesWaitingForPlayers(): Promise<Game[]> {
+    async listGamesWaitingForPlayersAffectedByTimeout(): Promise<Game[]> {
         return await this.gameRepo.find(
             {
                 "settings.general.type": {
-                    $in: [
-                        "custom",
-                        "special_dark",
-                        "special_fog",
-                        "special_ultraDark",
-                        "special_orbital",
-                        "special_battleRoyale",
-                        "special_homeStar",
-                        "special_homeStarElimination",
-                        "special_anonymous",
-                        "special_kingOfTheHill",
-                        "special_tinyGalaxy",
-                        "special_freeForAll",
-                        "special_arcade",
-                    ],
+                    $in: GAME_TYPES_CAN_TIMEOUT,
                 },
                 "state.startDate": { $eq: null },
             },
