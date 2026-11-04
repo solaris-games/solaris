@@ -1,6 +1,8 @@
-import { ValidationError } from "@solaris/common";
-import { parseProcessPaymentRequest } from "../requests/shop";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
+import {
+    parseProcessPaymentRequest,
+    parseShopPurchaseRequest,
+} from "../requests/shop";
 import { logger } from "../../utils/logging";
 
 const COST_PER_TOKEN = 1;
@@ -11,25 +13,9 @@ export default (container: DependencyContainer) => {
     return {
         purchase: async (req, res, next) => {
             try {
-                const errors: string[] = [];
+                const reqObj = parseShopPurchaseRequest(req.query);
 
-                if (!req.query.amount) {
-                    errors.push("Amount is a required field");
-                }
-
-                const totalQuantity = parseInt(req.query.amount);
-
-                if (
-                    !totalQuantity ||
-                    totalQuantity <= 0 ||
-                    totalQuantity > 1_000
-                ) {
-                    errors.push("Could not parse amount");
-                }
-
-                if (errors.length) {
-                    throw new ValidationError(errors);
-                }
+                const totalQuantity = reqObj.amount;
 
                 let unitCost = COST_PER_TOKEN;
 

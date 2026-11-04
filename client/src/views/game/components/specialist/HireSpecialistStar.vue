@@ -98,11 +98,12 @@ import GameHelper from "../../../../services/gameHelper";
 import SpecialistIcon from "../specialist/SpecialistIcon.vue";
 import { inject, ref, computed } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Game } from "@/types/game";
 import type { Specialist } from "@solaris/common";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { hireStar } from "@/services/typedapi/specialist";
+import { hireStar } from "@solaris/api-client/specialist";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
 import { useToast } from "vue-toast-notification";

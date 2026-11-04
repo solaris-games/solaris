@@ -24,6 +24,12 @@
         ></i>
       </span>
       <elo-rating v-if="user && is1v1Game" :user="user" class="me-2" />
+      <copy-link-button
+        v-if="player"
+        class="ms-1"
+        paramName="playerid"
+        :paramValue="player._id"
+      />
       <button
         @click="onOpenPrevPlayerDetailRequested"
         class="btn btn-sm btn-outline-info"
@@ -85,6 +91,7 @@
 import { useGameStore } from "@/stores/game";
 import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
 import MenuTitle from "../MenuTitle.vue";
+import CopyLinkButton from "../shared/CopyLinkButton.vue";
 import Overview from "./Overview.vue";
 import Infrastructure from "../shared/Infrastructure.vue";
 import YourInfrastructure from "./YourInfrastructure.vue";
@@ -97,8 +104,9 @@ import { inject, ref, computed, type Ref, onMounted } from "vue";
 import type { InGameUser, Player, UserPublic } from "@solaris/common";
 import PlayerUserInfo from "@/views/game/components/player/PlayerUserInfo.vue";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
-import { getPlayerUser } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getPlayerUser } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useGameServices } from "@/util/gameServices";
 import type { Game } from "@/types/game";
 import { useUserStore } from "@/stores/user";

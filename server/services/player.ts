@@ -102,7 +102,6 @@ export default class PlayerService extends EventEmitter {
     ): Player {
         const defaultTech = this.technologyService.getDefaultTechnology(game);
         const researchingNow: ResearchTypeNotRandom = defaultTech;
-        const researchingNext: ResearchTypeNotRandom = defaultTech;
 
         let player: Player = {
             _id: new mongoose.Types.ObjectId(),
@@ -116,7 +115,7 @@ export default class PlayerService extends EventEmitter {
             lastSeen: null,
             lastSeenIP: null,
             researchingNow,
-            researchingNext,
+            researchQueue: [defaultTech],
             credits: game.settings.player.startingCredits,
             creditsSpecialists: game.settings.player.startingCreditsSpecialists,
             isOpenSlot: true,
@@ -438,7 +437,7 @@ export default class PlayerService extends EventEmitter {
         player.credits = initialPlayer.credits;
         player.creditsSpecialists = initialPlayer.creditsSpecialists;
         player.researchingNow = initialPlayer.researchingNow;
-        player.researchingNext = initialPlayer.researchingNext;
+        player.researchQueue = initialPlayer.researchQueue;
         player.research = initialPlayer.research;
         player.diplomacy = initialPlayer.diplomacy;
 
@@ -785,7 +784,7 @@ export default class PlayerService extends EventEmitter {
         player.defeated = true;
         player.defeatedDate = DateTime.utc().toJSDate();
 
-        player.researchingNext = "random"; // Set up the AI for random research.
+        player.researchQueue = ["random"]; // Set up the AI for random research.
 
         // Auto-ready the player so they don't hold up the game.
         if (game.settings.gameTime.gameType === "turnBased") {

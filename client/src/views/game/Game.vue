@@ -7,6 +7,12 @@
       @onColourOverrideConfirmed="onColourOverrideConfirmed"
     />
 
+    <concede-defeat-modal
+      v-if="concedeDialogOpen"
+      @onConcedeCompleted="onConcedeDefeatCompleted"
+      @onCancelled="onConcedeDefeatCancelled"
+    />
+
     <logo v-if="!hasGame"></logo>
 
     <loading-spinner :loading="!hasGame" />
@@ -29,6 +35,7 @@
             @onPlayerSelected="onPlayerSelected"
             @onReloadGameRequested="() => reloadGame(true)"
             @onViewColourOverrideRequested="onViewColourOverrideRequested"
+            @onViewConcedeDefeatRequested="onViewConcedeDefeatRequested"
           />
 
           <chat
@@ -45,6 +52,7 @@
           @onCarrierSelected="onCarrierSelected"
           @onCarrierRightSelected="onCarrierRightSelected"
           @onObjectsClicked="onObjectsClicked"
+          @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         />
       </template>
 
@@ -77,6 +85,7 @@ import GameHelper from "../../services/gameHelper";
 import AudioService from "../../services/audio";
 import gameHelper from "../../services/gameHelper";
 import ColourOverrideDialog from "./components/player/ColourOverrideDialog.vue";
+import ConcedeDefeatModal from "./components/leaderboard/ConcedeDefeatModal.vue";
 import { eventBusInjectionKey } from "@/eventBus";
 import {
   inject,
@@ -98,10 +107,11 @@ import GameEventBusEventNames from "../../eventBusEventNames/game";
 import router from "../../router";
 import { withMessages } from "../../util/messages";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { getSettings } from "@/services/typedapi/user";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { getSettings } from "@solaris/api-client/user";
 import { useRoute } from "vue-router";
-import { detailGalaxy, detailState } from "@/services/typedapi/game";
+import { detailGalaxy, detailState } from "@solaris/api-client/game";
 import { createGameServices, gameServicesKey } from "@/util/gameServices";
 import type { Game } from "@/types/game";
 import { useUserStore } from "@/stores/user";
@@ -114,6 +124,7 @@ import SidebarMenu from "@/views/game/components/menu/SidebarMenu.vue";
 import FooterBar from "@/views/game/components/menu/FooterBar.vue";
 import StackedUI from "@/views/game/StackedUI.vue";
 import { createKeyboardShortcutHandler } from "@/services/shortcuts.ts";
+import GameCommandEventBusEventNames from "@solaris/map-rendering/eventBusEventNames/gameCommand.ts";
 const store = useGameStore();
 const userStore = useUserStore();
 const colourStore = useColourStore();
@@ -163,6 +174,20 @@ const onColourOverrideCancelled = () => {
 
 const onViewColourOverrideRequested = (e: string) => {
   colourOverride.value = { playerId: e };
+};
+
+const concedeDialogOpen = ref(false);
+
+const onViewConcedeDefeatRequested = () => {
+  concedeDialogOpen.value = true;
+};
+
+const onConcedeDefeatCompleted = () => {
+  concedeDialogOpen.value = false;
+};
+
+const onConcedeDefeatCancelled = () => {
+  concedeDialogOpen.value = false;
 };
 
 const onStarSelected = (starId: string) => {
@@ -278,6 +303,11 @@ const reloadGame = async (reinitialise: boolean = false) => {
       store.setProductionTick(response.data.state.productionTick);
 
       document.title = response.data.settings.general.name + " - Solaris";
+
+      eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
+        game,
+        settings: store.settings,
+      });
 
       if (reinitialise) {
         // ensure no menu is open

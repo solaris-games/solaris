@@ -55,8 +55,9 @@ import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import Badge from "./Badge.vue";
 import GameHelper from "../../../../services/gameHelper";
 import type { AwardedBadge, Badge as TBadge } from "@solaris/common";
-import { getBadgesForPlayer } from "../../../../services/typedapi/badge";
-import { httpInjectionKey, isError } from "../../../../services/typedapi";
+import { getBadgesForPlayer } from "@solaris/api-client/badge";
+import { isError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useBadgeStore } from "../../../../stores/badge";
 
 const props = defineProps<{ playerId: string }>();

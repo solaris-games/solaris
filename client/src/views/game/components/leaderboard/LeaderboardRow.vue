@@ -102,8 +102,9 @@ import { inject, computed } from "vue";
 import type { Player } from "@/types/game";
 
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
-import { notReadyToQuit } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { notReadyToQuit } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useColourStore } from "@/stores/colour";
 import LeaderboardPlayer from "@/views/game/components/leaderboard/LeaderboardPlayer.vue";
 

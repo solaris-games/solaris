@@ -40,8 +40,9 @@ import { useConfirm } from "@/hooks/confirm.ts";
 import {
   applyToGuild,
   withdrawGuildApplication,
-} from "@/services/typedapi/guild";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+} from "@solaris/api-client/guild";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useToast } from "vue-toast-notification";
 
 const props = defineProps<{

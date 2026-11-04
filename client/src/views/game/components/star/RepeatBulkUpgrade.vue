@@ -24,9 +24,10 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import type { PlayerScheduledActions } from "@solaris/common";
-import { toggleScheduledBulk } from "@/services/typedapi/star";
+import { toggleScheduledBulk } from "@solaris/api-client/star";
 import { inject } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

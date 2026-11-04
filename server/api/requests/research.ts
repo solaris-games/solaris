@@ -1,9 +1,11 @@
 import {
+    MAX_RESEARCH_QUEUE_LENGTH,
     object,
     RESEARCH_TYPES,
     RESEARCH_TYPES_NOT_RANDOM,
-    ResearchUpdateNextRequest,
+    ResearchUpdateQueueRequest,
     ResearchUpdateNowRequest,
+    sizedArray,
     stringEnumeration,
     Validator,
 } from "@solaris/common";
@@ -17,9 +19,11 @@ export const parseUpdateResearchNowRequest: Validator<ResearchUpdateNowRequest> 
         >(RESEARCH_TYPES_NOT_RANDOM),
     });
 
-export const parseUpdateResearchNextRequest: Validator<ResearchUpdateNextRequest> =
+export const parseUpdateResearchQueueRequest: Validator<ResearchUpdateQueueRequest> =
     object({
-        preference: stringEnumeration<ResearchType, ResearchType[]>(
-            RESEARCH_TYPES,
+        queue: sizedArray(
+            0,
+            MAX_RESEARCH_QUEUE_LENGTH,
+            stringEnumeration<ResearchType, ResearchType[]>(RESEARCH_TYPES),
         ),
     });

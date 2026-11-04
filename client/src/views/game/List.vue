@@ -886,12 +886,13 @@ import LockedGameOverlay from "./components/menu/LockedGameOverlay.vue";
 import CommunityGuidelinesBar from "./components/menu/CommunityGuidelinesBar.vue";
 import { type ListGame, type Tutorial } from "@solaris/common";
 import { ref, computed, inject, onMounted, type Ref } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   createTutorial,
   listSummary,
   listTutorials,
-} from "@/services/typedapi/game";
+} from "@solaris/api-client/game";
 import gameHelper from "@/services/gameHelper";
 import { DateTime } from "luxon";
 import { useTutorialStore } from "@/stores/tutorial";

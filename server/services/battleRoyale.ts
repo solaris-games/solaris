@@ -1,5 +1,6 @@
 import { Game } from "./types/Game";
 import { Star } from "./types/Star";
+import { IEventService } from "./types/IEventService";
 import CarrierService from "./carrier";
 import CarrierMovementService from "./carrierMovement";
 import MapService from "./map";
@@ -33,12 +34,12 @@ export default class BattleRoyaleService {
         this.carrierMovementService = carrierMovementService;
     }
 
-    performBattleRoyaleTick(game: Game) {
+    async performBattleRoyaleTick(game: Game, eventService: IEventService) {
         // Calculate which stars need to be destroyed.
         let starsToDestroy = this.getStarsToDestroyNow(game);
 
         for (let star of starsToDestroy) {
-            this._destroyStar(game, star);
+            await this._destroyStar(game, star, eventService);
         }
     }
 
@@ -76,7 +77,19 @@ export default class BattleRoyaleService {
         );
     }
 
-    _destroyStar(game: Game, star: Star) {
+    async _destroyStar(game: Game, star: Star, eventService: IEventService) {
+        // Creating events requires the star to be intact, so create them
+        // before the star is destroyed and removed from the galaxy.
+        if (star.ownedByPlayerId) {
+            await eventService.createStarDestroyedEvent(
+                game._id,
+                game.state.tick,
+                star.ownedByPlayerId,
+                star._id,
+                star.name,
+            );
+        }
+
         this.starService.destroyStar(game, star);
 
         const carriersEnRoute =

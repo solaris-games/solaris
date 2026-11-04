@@ -223,10 +223,11 @@
 import ViewTitle from "../components/ViewTitle.vue";
 import ViewContainer from "../components/ViewContainer.vue";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
-import { getCredits } from "@/services/typedapi/user";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { getCredits } from "@solaris/api-client/user";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { inject, ref, onMounted } from "vue";
-import { purchaseGalacticCredits } from "@/services/typedapi/shopPurchase";
+import { purchaseGalacticCredits } from "@solaris/api-client/shopPurchase";
 import { useUserStore } from "@/stores/user";
 
 import { useToast } from "vue-toast-notification";

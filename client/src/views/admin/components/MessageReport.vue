@@ -30,14 +30,9 @@
 
 <script setup lang="ts">
 import { ref, inject, type Ref } from "vue";
-import {
-  httpInjectionKey,
-  isError,
-  formatError,
-  extractErrors,
-  isOk,
-} from "@/services/typedapi";
-import { getConversationForReport } from "@/services/typedapi/admin";
+import { isError, formatError, extractErrors, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { getConversationForReport } from "@solaris/api-client/admin";
 import type {
   Report,
   Conversation,

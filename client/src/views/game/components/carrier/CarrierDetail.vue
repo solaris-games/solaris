@@ -427,7 +427,8 @@ import OrbitalMechanicsETAWarning from "../shared/OrbitalMechanicsETAWarning.vue
 import HelpTooltip from "../../../components/HelpTooltip.vue";
 import { formatLocation } from "client/src/util/format";
 import { eventBusInjectionKey } from "../../../../eventBus";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Carrier, Game, Player } from "@/types/game";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import type {
@@ -435,7 +436,7 @@ import type {
   MapObject,
   UserGameSettings,
 } from "@solaris/common";
-import { gift, loop, scuttle } from "@/services/typedapi/carrier";
+import { gift, loop, scuttle } from "@solaris/api-client/carrier";
 import { useConfirm } from "@/hooks/confirm.ts";
 import Timer from "@/views/game/components/time/Timer.vue";
 import { useToast } from "vue-toast-notification";

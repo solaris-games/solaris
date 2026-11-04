@@ -68,8 +68,9 @@ import router from "../../../router";
 import FormErrorList from "../../components/FormErrorList.vue";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user";
 import { inject, ref, type Ref } from "vue";
-import { login } from "@/services/typedapi/auth";
-import { extractErrors, httpInjectionKey, isOk } from "@/services/typedapi";
+import { login } from "@solaris/api-client/auth";
+import { extractErrors, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useUserStore } from "@/stores/user";
 
 const userClientSocketEmitter = inject(userClientSocketEmitterInjectionKey)!;

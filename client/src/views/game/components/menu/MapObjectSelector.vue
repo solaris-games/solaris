@@ -154,8 +154,9 @@ import {
 import gameHelper from "../../../../services/gameHelper";
 import { eventBusInjectionKey } from "@/eventBus";
 import { inject } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { distributeAllShips, garrisonAllShips } from "@/services/typedapi/star";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { distributeAllShips, garrisonAllShips } from "@solaris/api-client/star";
 import type { Player } from "@/types/game";
 import { useColourStore } from "@/stores/colour";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";

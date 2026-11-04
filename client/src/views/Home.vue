@@ -90,7 +90,7 @@ import LatestAnnouncement from "./components/LatestAnnouncement.vue";
 import { ref, inject, onMounted } from "vue";
 import { configInjectionKey } from "@/config";
 import { useUserStore } from "@/stores/user";
-import { httpInjectionKey } from "@/services/typedapi";
+import { httpInjectionKey } from "@/services/http";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user.ts";
 
 const config = inject(configInjectionKey)!;

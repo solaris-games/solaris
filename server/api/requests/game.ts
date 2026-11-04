@@ -1,4 +1,4 @@
-import { customGalaxyValidator, ValidationError } from "@solaris/common";
+import { customGalaxyValidator } from "@solaris/common";
 import { DBObjectId } from "../../services/types/DBObjectId";
 import {
     object,
@@ -18,9 +18,8 @@ import {
     maybeNull,
     maybeUndefined,
     numberEnumeration,
-    map,
 } from "@solaris/common";
-import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
+import { integerFromQueryStringOrDefault } from "../../utils/validation";
 import {
     GAME_ALLIANCE_UPKEEP_COST,
     GAME_AWARD_RANK_TO,
@@ -180,7 +179,7 @@ const parseGameSettingsGalaxy: Validator<GameSettingsGalaxyReq> = object({
         integer: true,
         range: {
             from: 1,
-            to: 50,
+            to: 200,
         },
     }),
     productionTicks: numberAdv({
@@ -635,45 +634,19 @@ export interface GameSaveNotesRequest {
     notes: string;
 }
 
-export const mapToGameSaveNotesRequest = (body: any): GameSaveNotesRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, "notes", 0, 5000)) {
-        errors.push(
-            "Notes is required and must not be greater than 5000 characters.",
-        );
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        notes: body.notes,
-    };
-};
+export const parseGameSaveNotesRequest: Validator<GameSaveNotesRequest> =
+    object({
+        notes: stringValue({ maxLength: 5000 }),
+    });
 
 export interface GameConcedeDefeatRequest {
     openSlot: boolean;
 }
 
-export const mapToGameConcedeDefeatRequest = (
-    body: any,
-): GameConcedeDefeatRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasBooleanValue(body, "openSlot")) {
-        errors.push("Open Slot is required.");
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        openSlot: body.openSlot,
-    };
-};
+export const parseGameConcedeDefeatRequest: Validator<GameConcedeDefeatRequest> =
+    object({
+        openSlot: boolean,
+    });
 
 export type KickPlayerRequest = {
     playerId: DBObjectId;
@@ -682,3 +655,39 @@ export type KickPlayerRequest = {
 export const parseKickPlayerRequest: Validator<KickPlayerRequest> = object({
     playerId: objectId,
 });
+
+export interface GameGalaxyRequest {
+    tick: number | null;
+}
+
+export const parseGameGalaxyRequest: Validator<GameGalaxyRequest> = object({
+    tick: integerFromQueryStringOrDefault(null, {
+        range: { from: 0 },
+        integer: true,
+    }),
+});
+
+export interface GameIntelRequest {
+    startTick?: number;
+    endTick?: number;
+}
+
+export const parseGameIntelRequest: Validator<GameIntelRequest> = object({
+    startTick: integerFromQueryStringOrDefault(undefined, {
+        range: { from: 0 },
+        integer: true,
+    }),
+    endTick: integerFromQueryStringOrDefault(undefined, {
+        range: { from: 0 },
+        integer: true,
+    }),
+});
+
+export interface GameTogglePauseRequest {
+    pause: boolean;
+}
+
+export const parseGameTogglePauseRequest: Validator<GameTogglePauseRequest> =
+    object({
+        pause: boolean,
+    });

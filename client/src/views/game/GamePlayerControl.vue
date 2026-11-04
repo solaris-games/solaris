@@ -22,14 +22,10 @@ import { useGameStore } from "@/stores/game";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import type { GameGalaxyDetail, Player } from "@solaris/common";
 import { computed, inject } from "vue";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { useConfirm } from "@/hooks/confirm.ts";
-import { kick } from "@/services/typedapi/game";
+import { kick } from "@solaris/api-client/game";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

@@ -56,8 +56,9 @@ import { type Ref, ref, onMounted, inject } from "vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import GameHelper from "../../../../services/gameHelper";
 import HelpTooltip from "../../../components/HelpTooltip.vue";
-import { listMyOpen } from "@/services/typedapi/game";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { listMyOpen } from "@solaris/api-client/game";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ListGame } from "@solaris/common";
 
 const httpClient = inject(httpInjectionKey)!;

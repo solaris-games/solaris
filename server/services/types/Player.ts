@@ -91,7 +91,7 @@ export interface Player {
     lastSeenIP?: string | null;
     hasDuplicateIP?: boolean;
     researchingNow: ResearchTypeNotRandom;
-    researchingNext: ResearchType;
+    researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;
     isOpenSlot: boolean;
@@ -114,8 +114,6 @@ export interface Player {
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
-    currentResearchTicksEta?: number | null;
-    nextResearchTicksEta?: number | null;
     aiState?: AiState | null;
     hasPerspective?: boolean;
     colourMapping?: Map<String, PlayerColour>;

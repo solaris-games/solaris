@@ -19,6 +19,11 @@
       >
         <i class="fas fa-star"></i> <i class="fas fa-trash ms-1"></i>
       </button>
+      <copy-link-button
+        class="ms-1"
+        paramName="starid"
+        :paramValue="star._id"
+      />
       <button @click="viewOnMap(star)" class="btn btn-sm btn-outline-info ms-1">
         <i class="fas fa-eye"></i>
       </button>
@@ -800,6 +805,7 @@ import { MapCommandEventBusEventNames } from "@solaris/map-rendering";
 import AudioService from "../../../../services/audio";
 import GameHelper from "../../../../services/gameHelper";
 import MenuTitle from "../MenuTitle.vue";
+import CopyLinkButton from "../shared/CopyLinkButton.vue";
 import Infrastructure from "../shared/Infrastructure.vue";
 import InfrastructureUpgrade from "./InfrastructureUpgrade.vue";
 import InfrastructureUpgradeCompact from "./InfrastructureUpgradeCompact.vue";
@@ -812,10 +818,11 @@ import HelpTooltip from "../../../components/HelpTooltip.vue";
 import { formatLocation } from "client/src/util/format";
 import { eventBusInjectionKey } from "@/eventBus";
 import { inject, computed } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Carrier, Game, Player } from "@/types/game";
 import type { MapObject } from "@solaris/common";
-import { abandon } from "@/services/typedapi/star";
+import { abandon } from "@solaris/api-client/star";
 import { makeWarpgateActions } from "@/views/game/components/star/upgrade";
 import { makeShipTransferActions } from "@/views/game/components/star/shipTransfer";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";

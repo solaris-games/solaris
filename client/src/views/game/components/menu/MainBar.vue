@@ -26,6 +26,7 @@
         @onCloseRequested="onCloseRequested"
         @onOpenPlayerDetailRequested="onOpenPlayerDetailRequested"
         @onViewSettingsRequested="onViewSettingsRequested"
+        @onViewConcedeDefeatRequested="onViewConcedeDefeatRequested"
       />
       <player
         v-if="menuState.state == 'player'"
@@ -272,6 +273,7 @@ import SelectCarrier from "@/views/game/components/select/SelectCarrier.vue";
 
 const emit = defineEmits<{
   onViewColourOverrideRequested: [playerId: string];
+  onViewConcedeDefeatRequested: [];
   onReloadGameRequested: [];
 }>();
 
@@ -348,6 +350,8 @@ const onOpenReportPlayerRequested = (args: ReportPlayerArgs) =>
 const onViewColourOverrideRequested = (e: string) =>
   emit("onViewColourOverrideRequested", e);
 
+const onViewConcedeDefeatRequested = () => emit("onViewConcedeDefeatRequested");
+
 const onReloadGameRequested = () => emit("onReloadGameRequested");
 </script>
 <style scoped>
@@ -361,6 +365,8 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   max-height: 100%;
   min-width: 0;
   max-width: 100%;
+  justify-self: start;
+  align-self: start;
 }
 
 .menu-bars {

@@ -1,10 +1,11 @@
 import { ValidationError } from "@solaris/common";
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
-    mapToUserRequestPasswordResetRequest,
-    mapToUserRequestUsernameRequest,
-    mapToUserResetPasswordResetRequest,
-    mapToUserUpdateEmailPreferenceRequest,
+    parseUserRequestPasswordResetRequest,
+    parseUserRequestUsernameRequest,
+    parseUserResetPasswordResetRequest,
+    parseUserUpdateEmailPreferenceRequest,
+    parseUserLeaderboardRequest,
     parseUserUpdateEmailRequest,
     parseUserUpdatePasswordRequest,
     parseUserUpdateUserNameRequest,
@@ -19,22 +20,13 @@ export default (container: DependencyContainer) => {
     return {
         listLeaderboard: async (req, res, next) => {
             try {
-                const limit = +req.query.limit || null;
-                const skip = +req.query.skip || 0;
-
-                if (limit !== null && limit > 1000) {
-                    throw new ValidationError("Limit cannot exceed 1000.");
-                }
-
-                if (skip > 1000) {
-                    throw new ValidationError("Skip cannot exceed 1000.");
-                }
+                const reqObj = parseUserLeaderboardRequest(req.query);
 
                 const result =
                     await container.userLeaderboardService.getUserLeaderboard(
-                        limit,
+                        reqObj.limit,
                         req.query.sortingKey,
-                        skip,
+                        reqObj.skip,
                     );
 
                 res.status(200).json(result);
@@ -213,7 +205,7 @@ export default (container: DependencyContainer) => {
         },
         updateEmailPreference: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+                const reqObj = parseUserUpdateEmailPreferenceRequest(req.body);
 
                 await container.userService.updateEmailPreference(
                     req.session.userId,
@@ -228,7 +220,7 @@ export default (container: DependencyContainer) => {
         },
         updateEmailOtherPreference: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+                const reqObj = parseUserUpdateEmailPreferenceRequest(req.body);
 
                 await container.userService.updateEmailOtherPreference(
                     req.session.userId,
@@ -243,7 +235,7 @@ export default (container: DependencyContainer) => {
         },
         updateIsAnonymous: async (req, res, next) => {
             try {
-                const reqObj = mapToUserUpdateEmailPreferenceRequest(req.body);
+                const reqObj = parseUserUpdateEmailPreferenceRequest(req.body);
 
                 await container.userService.updateIsAnonymous(
                     req.session.userId,
@@ -304,7 +296,7 @@ export default (container: DependencyContainer) => {
         },
         requestPasswordReset: async (req, res, next) => {
             try {
-                const reqObj = mapToUserRequestPasswordResetRequest(req.body);
+                const reqObj = parseUserRequestPasswordResetRequest(req.body);
 
                 const token = await container.userService.requestResetPassword(
                     reqObj.email,
@@ -332,7 +324,7 @@ export default (container: DependencyContainer) => {
         },
         resetPassword: async (req, res, next) => {
             try {
-                const reqObj = mapToUserResetPasswordResetRequest(req.body);
+                const reqObj = parseUserResetPasswordResetRequest(req.body);
 
                 await container.userService.resetPassword(
                     reqObj.token,
@@ -347,7 +339,7 @@ export default (container: DependencyContainer) => {
         },
         requestUsername: async (req, res, next) => {
             try {
-                const reqObj = mapToUserRequestUsernameRequest(req.body);
+                const reqObj = parseUserRequestUsernameRequest(req.body);
 
                 const username =
                     await container.userService.tryGetUsernameByEmail(

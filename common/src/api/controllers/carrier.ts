@@ -19,18 +19,6 @@ export type TransferShipsReq<ID> = {
     starId: ID;
 };
 
-export type CarrierCalculateCombatRequest = {
-    defender: {
-        ships: number;
-        weaponsLevel: number;
-    };
-    attacker: {
-        ships: number;
-        weaponsLevel: number;
-    };
-    isTurnBased: boolean;
-};
-
 export const createCarrierRoutes = <ID>() => ({
     saveWaypoints: new PutRoute<
         { gameId: ID; carrierId: ID },

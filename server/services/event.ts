@@ -34,6 +34,7 @@ import {
     PlayerSpecialistTokensReceivedEvent,
     PlayerSpecialistTokensSentEvent,
     PlayerStarAbandonedEvent,
+    PlayerStarDestroyedEvent,
     PlayerStarDiedEvent,
     PlayerStarReignitedEvent,
     PlayerStarSpecialistHiredEvent,
@@ -680,6 +681,27 @@ export class EventService implements IEventService {
             gameTick,
             playerId,
             "playerStarDied",
+            data,
+        );
+    }
+
+    async createStarDestroyedEvent(
+        gameId: DBObjectId,
+        gameTick: number,
+        playerId: DBObjectId,
+        starId: DBObjectId,
+        starName: string,
+    ) {
+        const data = {
+            starId,
+            starName,
+        };
+
+        await this.createPlayerEvent<PlayerStarDestroyedEvent<DBObjectId>>(
+            gameId,
+            gameTick,
+            playerId,
+            "playerStarDestroyed",
             data,
         );
     }

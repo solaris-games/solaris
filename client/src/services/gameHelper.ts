@@ -876,7 +876,7 @@ class GameHelper {
   }
 
   getDateString(date: Date | string) {
-    return DateTime.fromJSDate(new Date(date)).toFormat("ccc d LLL HH mm");
+    return DateTime.fromJSDate(new Date(date)).toFormat("ccc d LLL HH:mm");
   }
 
   getGamePlayerShapesCount(game) {
@@ -976,14 +976,6 @@ class GameHelper {
     const userPlayer = this.getUserPlayer(game)!;
 
     userPlayer.credits -= data.cost;
-
-    if (data.currentResearchTicksEta != null) {
-      userPlayer.currentResearchTicksEta = data.currentResearchTicksEta;
-    }
-
-    if (data.nextResearchTicksEta != null) {
-      userPlayer.nextResearchTicksEta = data.nextResearchTicksEta;
-    }
 
     const star = this.getStarById(game, data.starId)!;
 

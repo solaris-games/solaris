@@ -20,6 +20,7 @@ import type {
     PlayerSpecialistTokensReceivedEvent,
     PlayerSpecialistTokensSentEvent,
     PlayerStarAbandonedEvent,
+    PlayerStarDestroyedEvent,
     PlayerStarDiedEvent,
     PlayerStarReignitedEvent,
     PlayerStarSpecialistHiredEvent,
@@ -64,6 +65,7 @@ export const EVENT_TYPES = {
     PLAYER_GIFT_SENT: "playerGiftSent",
     PLAYER_STAR_ABANDONED: "playerStarAbandoned",
     PLAYER_STAR_DIED: "playerStarDied",
+    PLAYER_STAR_DESTROYED: "playerStarDestroyed",
     PLAYER_STAR_REIGNITED: "playerStarReignited",
     PLAYER_BULK_INFRASTRUCTURE_UPGRADED: "playerBulkInfrastructureUpgraded",
     PLAYER_DEBT_SETTLED: "playerDebtSettled",
@@ -109,6 +111,7 @@ export type GameEvent<ID> =
     | PlayerResearchCompleteEvent<ID>
     | PlayerStarAbandonedEvent<ID>
     | PlayerStarDiedEvent<ID>
+    | PlayerStarDestroyedEvent<ID>
     | PlayerStarReignitedEvent<ID>
     | PlayerTechnologyReceivedEvent<ID>
     | PlayerTechnologySentEvent<ID>;
@@ -137,6 +140,7 @@ export type PlayerEvent<ID> =
     | PlayerResearchCompleteEvent<ID>
     | PlayerStarAbandonedEvent<ID>
     | PlayerStarDiedEvent<ID>
+    | PlayerStarDestroyedEvent<ID>
     | PlayerStarReignitedEvent<ID>
     | PlayerTechnologyReceivedEvent<ID>
     | PlayerTechnologySentEvent<ID>;

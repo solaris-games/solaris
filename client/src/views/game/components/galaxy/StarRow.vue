@@ -92,7 +92,8 @@ import PlayerIcon from "../player/PlayerIcon.vue";
 import SpecialistIcon from "../specialist/SpecialistIcon.vue";
 import { eventBusInjectionKey } from "../../../../eventBus";
 import { ref, inject, computed } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Star, Player } from "@solaris/common";
 
 import { useConfirm } from "@/hooks/confirm.ts";
@@ -100,7 +101,7 @@ import {
   upgradeEconomy as upgradeEconomyReq,
   upgradeIndustry as upgradeIndustryReq,
   upgradeScience as upgradeScienceReq,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 import { makeUpgrade } from "@/views/game/components/star/upgrade";
 

@@ -1,6 +1,7 @@
 import EventEmitter from "events";
 import {
     GameTypeService,
+    MAX_RESEARCH_QUEUE_LENGTH,
     ResearchProgressService,
     ResearchType,
     ResearchTypeNotRandom,
@@ -77,31 +78,34 @@ export default class ResearchService extends EventEmitter {
                 },
             },
         );
-
-        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-
-        return {
-            ticksEta,
-            ticksNextEta,
-        };
     }
 
-    async updateResearchNext(
+    async updateResearchQueue(
         game: Game,
         player: Player,
-        preference: ResearchType,
+        queue: ResearchType[],
     ) {
-        if (
-            preference !== "random" &&
-            !this.technologyService.isTechnologyResearchable(game, preference)
-        ) {
+        if (queue.length > MAX_RESEARCH_QUEUE_LENGTH) {
             throw new ValidationError(
-                `Cannot change technology, the chosen tech is not researchable.`,
+                `Cannot update research queue, it may only contain up to ${MAX_RESEARCH_QUEUE_LENGTH} entries.`,
             );
         }
 
-        player.researchingNext = preference;
+        for (const preference of queue) {
+            if (
+                preference !== "random" &&
+                !this.technologyService.isTechnologyResearchable(
+                    game,
+                    preference,
+                )
+            ) {
+                throw new ValidationError(
+                    `Cannot change research queue, the chosen tech is not researchable.`,
+                );
+            }
+        }
+
+        player.researchQueue = queue;
 
         await this.gameRepo.updateOne(
             {
@@ -110,18 +114,10 @@ export default class ResearchService extends EventEmitter {
             },
             {
                 $set: {
-                    "galaxy.players.$.researchingNext": preference,
+                    "galaxy.players.$.researchQueue": queue,
                 },
             },
         );
-
-        const ticksEta = this.calculateCurrentResearchETAInTicks(game, player);
-        const ticksNextEta = this.calculateNextResearchETAInTicks(game, player);
-
-        return {
-            ticksEta,
-            ticksNextEta,
-        };
     }
 
     async conductResearch(
@@ -158,9 +154,13 @@ export default class ResearchService extends EventEmitter {
             !player.defeated &&
             !this.gameTypeService.isTutorialGame(game)
         ) {
-            statisticsService.modifyStats(game._id, player._id, (stats) => {
-                stats.research[techKey] += progressIncrease;
-            });
+            await statisticsService.modifyStats(
+                game._id,
+                player._id,
+                (stats) => {
+                    stats.research[techKey] += progressIncrease;
+                },
+            );
         }
 
         // If the current progress is greater than the required progress
@@ -209,22 +209,11 @@ export default class ResearchService extends EventEmitter {
             );
         }
 
-        const currentResearchTicksEta = this.calculateCurrentResearchETAInTicks(
-            game,
-            player,
-        );
-        const nextResearchTicksEta = this.calculateNextResearchETAInTicks(
-            game,
-            player,
-        );
-
         return {
             name: techKey,
             level: tech.level,
             progress: tech.progress,
             levelUp,
-            currentResearchTicksEta,
-            nextResearchTicksEta,
         };
     }
 
@@ -369,7 +358,7 @@ export default class ResearchService extends EventEmitter {
         // to the next desired research technology.
         if (levelUp && tech.key === player.researchingNow) {
             this._setNextResearch(game, player);
-            researchingNext = player.researchingNext;
+            researchingNext = player.researchQueue?.[0] ?? null;
         }
 
         return {
@@ -382,19 +371,27 @@ export default class ResearchService extends EventEmitter {
     }
 
     _setNextResearch(game: Game, player: Player) {
-        if (player.researchingNext === player.researchingNow) {
-            return;
+        const queue = player.researchQueue || [];
+
+        let entry = queue.shift();
+
+        while (entry === player.researchingNow) {
+            entry = queue.shift();
         }
 
-        if (player.researchingNext === "random") {
-            const randomTech = this._getRandomTechnology(game, player);
+        if (entry !== undefined) {
+            if (entry === "random") {
+                const randomTech = this._getRandomTechnology(game, player);
 
-            if (randomTech) {
-                player.researchingNow = randomTech.key;
+                if (randomTech) {
+                    player.researchingNow = randomTech.key;
+                }
+            } else {
+                player.researchingNow = entry;
             }
-        } else {
-            player.researchingNow = player.researchingNext;
         }
+
+        player.researchQueue = queue;
 
         return player.researchingNow;
     }
@@ -429,111 +426,5 @@ export default class ResearchService extends EventEmitter {
             key: techKey,
             technology: tech,
         };
-    }
-
-    calculateCurrentResearchETAInTicks(game: Game, player: Player) {
-        return this._calculateResearchETAInTicks(
-            game,
-            player,
-            player.researchingNow,
-        );
-    }
-
-    calculateNextResearchETAInTicks(game: Game, player: Player) {
-        if (player.researchingNext === "random") {
-            return null;
-        }
-
-        if (player.researchingNow !== player.researchingNext) {
-            const currentResearchTicksEta =
-                this.calculateCurrentResearchETAInTicks(game, player);
-            const nextResearchTicksEta = this._calculateResearchETAInTicks(
-                game,
-                player,
-                player.researchingNext,
-            );
-
-            if (
-                currentResearchTicksEta == null ||
-                nextResearchTicksEta == null
-            ) {
-                return null;
-            }
-
-            return currentResearchTicksEta + nextResearchTicksEta;
-        }
-
-        return this.calculateDoubleIdenticalResearchETAInTicks(game, player);
-    }
-
-    _calculateResearchETAInTicks(
-        game: Game,
-        player: Player,
-        researchKey: ResearchType,
-    ) {
-        if (researchKey === "random") {
-            return null;
-        }
-
-        const tech = player.research[researchKey];
-
-        const requiredProgress =
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                researchKey,
-                tech.level,
-            );
-        const remainingPoints = requiredProgress - tech.progress!;
-
-        return this._calculateResearchETAInTicksByRemainingPoints(
-            game,
-            player,
-            remainingPoints,
-        );
-    }
-
-    calculateDoubleIdenticalResearchETAInTicks(game: Game, player: Player) {
-        const tech = player.research[player.researchingNow];
-
-        const requiredProgress =
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                player.researchingNow,
-                tech.level,
-            ) +
-            this.researchProgressService.getRequiredResearchProgress(
-                game,
-                player.researchingNow,
-                tech.level + 1,
-            );
-        const remainingPoints = requiredProgress - tech.progress!;
-
-        return this._calculateResearchETAInTicksByRemainingPoints(
-            game,
-            player,
-            remainingPoints,
-        );
-    }
-
-    _calculateResearchETAInTicksByRemainingPoints(
-        game: Game,
-        player: Player,
-        remainingPoints: number,
-    ) {
-        const playerStars = this.starService.listStarsOwnedByPlayer(
-            game.galaxy.stars,
-            player._id,
-        );
-        const totalScience = this.playerStatisticsService.calculateTotalScience(
-            game,
-            playerStars,
-        );
-
-        // If there is no science then there cannot be an end date to the research.
-        if (totalScience === 0) {
-            return null;
-        }
-
-        return Math.ceil(remainingPoints / totalScience);
     }
 }

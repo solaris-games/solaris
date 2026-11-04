@@ -1,9 +1,4 @@
-import {
-    CarrierCalculateCombatRequest,
-    CarrierSaveWaypointsRequest,
-    TransferShipsReq,
-    ValidationError,
-} from "@solaris/common";
+import { CarrierSaveWaypointsRequest, TransferShipsReq } from "@solaris/common";
 import {
     CarrierWaypointActionType,
     CarrierWaypointActionTypes,
@@ -21,12 +16,6 @@ import {
     Validator,
     withDefault,
 } from "@solaris/common";
-import {
-    keyHasBooleanValue,
-    keyHasNumberValue,
-    keyHasObjectValue,
-    keyHasStringValue,
-} from "./helpers";
 import { objectId } from "../../utils/validation";
 
 export const parseCarrierSaveWaypointsRequest: Validator<
@@ -78,101 +67,3 @@ export const parseCarrierRenameCarrierRequest: Validator<CarrierRenameCarrierReq
             ignoreForLengthCheck: UNICODE_INVISIBLE_CHARACTERS,
         }),
     });
-
-export const mapToCarrierCalculateCombatRequest = (
-    body: any,
-): CarrierCalculateCombatRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasBooleanValue(body, "isTurnBased")) {
-        errors.push("Is Turn Based is required.");
-    }
-
-    if (!keyHasObjectValue(body, "defender")) {
-        errors.push("Defender is required.");
-    }
-
-    if (body.defender) {
-        if (!keyHasNumberValue(body.defender, "ships")) {
-            errors.push("Defender Ships is required.");
-        }
-
-        if (body.defender.ships != null && +body.defender.ships < 0) {
-            errors.push("Defender Ships must be greater than or equal to 0.");
-        }
-
-        if (body.defender.ships != null && +body.defender.ships % 1 != 0) {
-            errors.push("Defender Ships must be an integer.");
-        }
-
-        if (!keyHasNumberValue(body.defender, "weaponsLevel")) {
-            errors.push("Defender Weapons Level is required.");
-        }
-
-        if (
-            body.defender.weaponsLevel != null &&
-            +body.defender.weaponsLevel <= 0
-        ) {
-            errors.push("Defender Weapons Level must be greater than 0.");
-        }
-
-        if (
-            body.defender.weaponsLevel != null &&
-            +body.defender.weaponsLevel % 1 != 0
-        ) {
-            errors.push("Defender Weapons Level must be an integer.");
-        }
-
-        body.defender.ships = +body.defender.ships;
-        body.defender.weaponsLevel = +body.defender.weaponsLevel;
-    }
-
-    if (!keyHasObjectValue(body, "attacker")) {
-        errors.push("Attacker is required.");
-    }
-
-    if (body.attacker) {
-        if (!keyHasNumberValue(body.attacker, "ships")) {
-            errors.push("Attacker Ships is required.");
-        }
-
-        if (body.attacker.ships != null && +body.attacker.ships < 0) {
-            errors.push("Attacker Ships must be greater than or equal to 0.");
-        }
-
-        if (body.attacker.ships != null && +body.attacker.ships % 1 != 0) {
-            errors.push("Attacker Ships must be an integer.");
-        }
-
-        if (!keyHasNumberValue(body.attacker, "weaponsLevel")) {
-            errors.push("Attacker Weapons Level is required.");
-        }
-
-        if (
-            body.attacker.weaponsLevel != null &&
-            +body.attacker.weaponsLevel <= 0
-        ) {
-            errors.push("Attacker Weapons Level must be greater than 0.");
-        }
-
-        if (
-            body.attacker.weaponsLevel != null &&
-            +body.attacker.weaponsLevel % 1 != 0
-        ) {
-            errors.push("Attacker Weapons Level must be an integer.");
-        }
-
-        body.attacker.ships = +body.attacker.ships;
-        body.attacker.weaponsLevel = +body.attacker.weaponsLevel;
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        defender: body.defender,
-        attacker: body.attacker,
-        isTurnBased: body.isTurnBased,
-    };
-};

@@ -10,6 +10,8 @@ import { migrateSignupDate } from "./migrations/migrateSignupDate";
 import { migrateCombatMalusStrategy } from "./migrations/migrateCombatMalusStrategy";
 import MigrationModel from "../db/models/Migration";
 import { migrateSpecialistTokenRewards } from "./migrations/migrateSpecialistTokenRewards";
+import { migrateResearchQueue } from "./migrations/migrateResearchQueue";
+import { migrateResearchQueueHistory } from "./migrations/migrateResearchQueueHistory";
 
 const MIGRATIONS = [
     { name: "2025-06-26-stats", fn: migrateStats },
@@ -25,6 +27,14 @@ const MIGRATIONS = [
     {
         name: "2026-09-04-specialist-token-rewards",
         fn: migrateSpecialistTokenRewards,
+    },
+    {
+        name: "2026-10-18-research-queue",
+        fn: migrateResearchQueue,
+    },
+    {
+        name: "2026-10-18-research-queue-history",
+        fn: migrateResearchQueueHistory,
     },
 ];
 

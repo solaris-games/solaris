@@ -35,8 +35,9 @@ import { useConfirm } from "@/hooks/confirm.ts";
 import {
   acceptGuildInvite,
   declineGuildInvite,
-} from "@/services/typedapi/guild";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+} from "@solaris/api-client/guild";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const props = defineProps<{
   invite: Guild<string>;

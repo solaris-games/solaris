@@ -46,7 +46,7 @@
         "splitResources": "enabled",
         "resourceDistribution": "random",
         "playerDistribution": "circular",
-        "carrierSpeed": 20,
+        "carrierSpeed": 25,
         "starCaptureReward": "enabled",
         "specialistBans": {
             "star": [15],
@@ -75,7 +75,7 @@
         "developmentCost": {
             "economy": "standard",
             "industry": "standard",
-            "science": "standard"
+            "science": "cheap"
         },
         "tradeCredits": true,
         "tradeCreditsSpecialists": false,
@@ -107,11 +107,11 @@
         },
         "researchCosts": {
             "terraforming": "standard",
-            "experimentation": "standard",
-            "scanning": "standard",
-            "hyperspace": "standard",
+            "experimentation": "cheap",
+            "scanning": "cheap",
+            "hyperspace": "cheap",
             "manufacturing": "standard",
-            "banking": "standard",
+            "banking": "cheap",
             "weapons": "expensive",
             "specialists": "expensive"
         },
@@ -125,20 +125,24 @@
                 "scalingFactor": 1.0
             },
             "experimentation": {
-                "progression": "standard"
+                "progression": "cumulative",
+                "scalingFactor": 0.75
             },
             "scanning": {
-                "progression": "standard"
+                "progression": "cumulative",
+                "scalingFactor": 0.75
             },
             "hyperspace": {
-                "progression": "standard"
+                "progression": "cumulative",
+                "scalingFactor": 0.75
             },
             "manufacturing": {
                 "progression": "cumulative",
                 "scalingFactor": 1.0
             },
             "banking": {
-                "progression": "standard"
+                "progression": "cumulative",
+                "scalingFactor": 0.75
             },
             "weapons": {
                 "progression": "cumulative",

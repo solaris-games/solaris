@@ -13,9 +13,8 @@ import {
     SettingVisibility,
     stringEnumeration,
     UserGameSettings,
-    ValidationError,
+    boolean,
 } from "@solaris/common";
-import { keyHasBooleanValue, keyHasStringValue } from "./helpers";
 import {
     email,
     object,
@@ -25,6 +24,7 @@ import {
     username,
     Validator,
 } from "@solaris/common";
+import { integerFromQueryStringOrDefault } from "../../utils/validation";
 
 export interface UserCreateUserRequest {
     email: string;
@@ -38,27 +38,37 @@ export const parseCreateUserRequest: Validator<UserCreateUserRequest> = object({
     password: password,
 });
 
+export interface UserLeaderboardRequest {
+    limit: number | null;
+    skip: number;
+}
+
+const maxPaginationLimit = 1000;
+
+export const parseUserLeaderboardRequest: Validator<UserLeaderboardRequest> =
+    object({
+        limit: integerFromQueryStringOrDefault(null, {
+            range: {
+                from: 1,
+                to: maxPaginationLimit,
+            },
+        }),
+        skip: integerFromQueryStringOrDefault(0, {
+            range: {
+                from: 0,
+                to: maxPaginationLimit,
+            },
+        }),
+    });
+
 export interface UserUpdateEmailPreferenceRequest {
     enabled: boolean;
 }
 
-export const mapToUserUpdateEmailPreferenceRequest = (
-    body: any,
-): UserUpdateEmailPreferenceRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasBooleanValue(body, "enabled")) {
-        errors.push("Enabled is required.");
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        enabled: body.enabled,
-    };
-};
+export const parseUserUpdateEmailPreferenceRequest: Validator<UserUpdateEmailPreferenceRequest> =
+    object({
+        enabled: boolean,
+    });
 
 export interface UserUpdateUsernameRequest {
     username: string;
@@ -93,73 +103,30 @@ export interface UserRequestPasswordResetRequest {
     email: string;
 }
 
-export const mapToUserRequestPasswordResetRequest = (
-    body: any,
-): UserRequestPasswordResetRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, "email")) {
-        errors.push("Email is required.");
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email,
-    };
-};
+export const parseUserRequestPasswordResetRequest: Validator<UserRequestPasswordResetRequest> =
+    object({
+        email: email,
+    });
 
 export interface UserResetPasswordResetRequest {
     token: string;
     newPassword: string;
 }
 
-export const mapToUserResetPasswordResetRequest = (
-    body: any,
-): UserResetPasswordResetRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, "token")) {
-        errors.push("Token is required.");
-    }
-
-    if (!keyHasStringValue(body, "newPassword")) {
-        errors.push("New Password is required.");
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        token: body.token,
-        newPassword: body.newPassword,
-    };
-};
+export const parseUserResetPasswordResetRequest: Validator<UserResetPasswordResetRequest> =
+    object({
+        token: string,
+        newPassword: password,
+    });
 
 export interface UserRequestUsernameRequest {
     email: string;
 }
 
-export const mapToUserRequestUsernameRequest = (
-    body: any,
-): UserRequestUsernameRequest => {
-    let errors: string[] = [];
-
-    if (!keyHasStringValue(body, "email")) {
-        errors.push("Email is required.");
-    }
-
-    if (errors.length) {
-        throw new ValidationError(errors);
-    }
-
-    return {
-        email: body.email,
-    };
-};
+export const parseUserRequestUsernameRequest: Validator<UserRequestUsernameRequest> =
+    object({
+        email: email,
+    });
 
 const enabledDisabled = stringEnumeration<
     GameSettingEnabledDisabled,
