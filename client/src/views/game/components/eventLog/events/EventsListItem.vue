@@ -121,6 +121,10 @@
         v-if="event.type === 'playerStarAbandoned'"
       />
       <player-star-died :event="event" v-if="event.type === 'playerStarDied'" />
+      <player-star-destroyed
+        :event="event"
+        v-if="event.type === 'playerStarDestroyed'"
+      />
       <player-star-reignited
         :event="event"
         v-if="event.type === 'playerStarReignited'"
@@ -199,6 +203,7 @@ import PlayerRenownSent from "./PlayerRenownSent.vue";
 import PlayerResearchComplete from "./PlayerResearchComplete.vue";
 import PlayerStarAbandoned from "./PlayerStarAbandoned.vue";
 import PlayerStarDied from "./PlayerStarDied.vue";
+import PlayerStarDestroyed from "./PlayerStarDestroyed.vue";
 import PlayerStarReignited from "./PlayerStarReignited.vue";
 import PlayerTechnologyReceived from "./PlayerTechnologyReceived.vue";
 import PlayerTechnologySent from "./PlayerTechnologySent.vue";
@@ -213,8 +218,9 @@ import GameDiplomacyPeaceDeclared from "./GameDiplomacyPeaceDeclared.vue";
 import GameDiplomacyWarDeclared from "./GameDiplomacyWarDeclared.vue";
 import PlayerDiplomacyStatusChanged from "./PlayerDiplomacyStatusChanged.vue";
 import type { GameEvent } from "@solaris/common";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
-import { markAsRead } from "@/services/typedapi/event";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { markAsRead } from "@solaris/api-client/event";
 import type { Game } from "@/types/game";
 
 const props = defineProps<{

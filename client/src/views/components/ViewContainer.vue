@@ -16,7 +16,7 @@ import { withMessages } from "../../util/messages";
 import { onMounted, inject } from "vue";
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
-import { httpInjectionKey } from "@/services/typedapi";
+import { httpInjectionKey } from "@/services/http";
 import { userClientSocketEmitterInjectionKey } from "@/sockets/socketEmitters/user.ts";
 import ViewContainerFooter from "@/views/components/ViewContainerFooter.vue";
 

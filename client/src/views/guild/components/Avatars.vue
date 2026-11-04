@@ -13,8 +13,9 @@
 </template>
 
 <script setup lang="ts">
-import { listMyAvatars } from "@/services/typedapi/user.ts";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listMyAvatars } from "@solaris/api-client/user.ts";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { inject, onMounted, ref } from "vue";
 import type { UserAvatar } from "@solaris/common";
 import {

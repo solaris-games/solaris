@@ -69,7 +69,7 @@ import gameHelper from "../../../../services/gameHelper";
 import type { Game } from "@/types/game";
 import { useColourStore } from "@/stores/colour";
 import { eventBusInjectionKey } from "@/eventBus";
-import { httpInjectionKey } from "@/services/typedapi";
+import { httpInjectionKey } from "@/services/http";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

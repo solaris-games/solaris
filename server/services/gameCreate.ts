@@ -598,6 +598,14 @@ export default class GameCreateService {
             );
         }
 
+        const totalStars =
+            settings.general.playerLimit * settings.galaxy.starsPerPlayer;
+        if (totalStars > 750 && !userIsGameMaster) {
+            throw new ValidationError(
+                `Games with more than 750 stars are reserved for official games or can be created by GMs.`,
+            );
+        }
+
         const isEstablishedPlayer =
             await this.userService.isEstablishedPlayer(userId);
 

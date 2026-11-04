@@ -812,17 +812,6 @@ export default class GameGalaxyService {
             // If the user is in the game and it is the current
             // player we are looking at then return everything.
             if (isCurrentUserPlayer) {
-                userPlayer!.currentResearchTicksEta =
-                    this.researchService.calculateCurrentResearchETAInTicks(
-                        doc,
-                        userPlayer!,
-                    );
-                userPlayer!.nextResearchTicksEta =
-                    this.researchService.calculateNextResearchETAInTicks(
-                        doc,
-                        userPlayer!,
-                    );
-
                 delete p.notes; // Don't need to send this back.
                 delete p.lastSeenIP; // Super sensitive data.
 
@@ -1084,7 +1073,7 @@ export default class GameGalaxyService {
                     gamePlayer.alias = historyPlayer.alias;
                     gamePlayer.avatar = historyPlayer.avatar;
                     gamePlayer.researchingNow = historyPlayer.researchingNow;
-                    gamePlayer.researchingNext = historyPlayer.researchingNext;
+                    gamePlayer.researchQueue = historyPlayer.researchQueue;
                     gamePlayer.credits = historyPlayer.credits;
                     gamePlayer.creditsSpecialists =
                         historyPlayer.creditsSpecialists;

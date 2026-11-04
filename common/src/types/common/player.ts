@@ -92,6 +92,8 @@ export interface PlayerScheduledActions<ID> {
     active: boolean;
 }
 
+export const MAX_RESEARCH_QUEUE_LENGTH = 10;
+
 export type Player<ID> = {
     _id: ID;
     userId: ID | null;
@@ -111,7 +113,7 @@ export type Player<ID> = {
     lastSeenIP?: string | null;
     hasDuplicateIP?: boolean;
     researchingNow: ResearchTypeNotRandom;
-    researchingNext: ResearchType;
+    researchQueue?: ResearchType[];
     credits: number;
     creditsSpecialists: number;
     isOpenSlot: boolean;
@@ -134,8 +136,6 @@ export type Player<ID> = {
     stats?: PlayerStatistics;
     isKingOfTheHill?: boolean;
     isInScanningRange?: boolean;
-    currentResearchTicksEta?: number | null;
-    nextResearchTicksEta?: number | null;
     hasPerspective?: boolean;
     colourMapping?: Map<String, PlayerColour>;
     reputation?: PlayerReputation<ID>;

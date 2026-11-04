@@ -258,22 +258,14 @@ export default class CarrierCombatService {
         for (let i = 0; i < positions.length - 1; i++) {
             const carrierPositionA = positions[i];
 
-            // Only consider carriers with ships that are not gifts
-            if (
-                carrierPositionA.carrier.ships! <= 0 ||
-                carrierPositionA.carrier.isGift
-            )
-                continue;
+            // Only consider carriers with ships
+            if (carrierPositionA.carrier.ships! <= 0) continue;
 
             for (let j = i + 1; j < positions.length; j++) {
                 const carrierPositionB = positions[j];
 
                 // Only consider carriers with ships
-                if (
-                    carrierPositionB.carrier.ships! <= 0 ||
-                    carrierPositionB.carrier.isGift
-                )
-                    continue;
+                if (carrierPositionB.carrier.ships! <= 0) continue;
 
                 // Check if carriers collide in this tick, if not, continue
                 if (

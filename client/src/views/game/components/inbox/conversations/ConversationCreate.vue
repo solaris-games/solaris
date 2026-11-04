@@ -66,8 +66,9 @@ import MenuTitle from "../../MenuTitle.vue";
 import FormErrorList from "../../../../components/FormErrorList.vue";
 import { inject, ref, computed, onMounted } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { createConversation } from "@/services/typedapi/conversation";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { createConversation } from "@solaris/api-client/conversation";
 import type { Game, Player } from "@/types/game";
 
 const props = defineProps<{

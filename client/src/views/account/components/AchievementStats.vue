@@ -325,7 +325,7 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
-    <div class="d-none d-md-block col-4">
+    <div class="chart-col d-md-block col-12 col-md-4">
       <polar-area-chart
         v-if="gamesChartData"
         :chart-data="gamesChartData"
@@ -402,7 +402,7 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
-    <div class="d-none d-md-block col-4">
+    <div class="chart-col d-md-block col-12 col-md-4">
       <pie-chart
         v-if="militaryChartData"
         :chart-data="militaryChartData"
@@ -455,7 +455,7 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
-    <div class="d-none d-md-block col-4">
+    <div class="chart-col d-md-block col-12 col-md-4">
       <pie-chart
         v-if="infrastructureChartData"
         :chart-data="infrastructureChartData"
@@ -520,7 +520,7 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
-    <div class="d-none d-md-block col-4">
+    <div class="chart-col d-md-block col-12 col-md-4">
       <pie-chart
         v-if="researchChartData"
         :chart-data="researchChartData"
@@ -595,7 +595,7 @@ onMounted(async () => {
         </tbody>
       </table>
     </div>
-    <div class="d-none d-md-block col-4">
+    <div class="chart-col d-md-block col-12 col-md-4">
       <pie-chart
         v-if="tradeChartData"
         :chart-data="tradeChartData"
@@ -608,5 +608,10 @@ onMounted(async () => {
 <style scoped>
 .user-level-icon {
   height: 28px;
+}
+
+.chart-col > * {
+  max-width: 320px;
+  margin-inline: auto;
 }
 </style>

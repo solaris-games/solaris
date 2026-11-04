@@ -102,13 +102,14 @@ import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
 import GameHelper from "../../../../services/gameHelper";
 import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 import type { InfrastructureType } from "@solaris/common";
 import {
   toggleBulkIgnore as toggleBulkIgnoreReq,
   toggleBulkIgnoreAll as toggleBulkIgnoreAllReq,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

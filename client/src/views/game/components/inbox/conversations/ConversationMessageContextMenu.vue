@@ -33,8 +33,9 @@ import { inject, computed } from "vue";
 import { eventBusInjectionKey } from "../../../../../eventBus";
 import type { ConversationMessage, Conversation } from "@solaris/common";
 import type { Game, Player } from "@/types/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { listPrivate } from "@/services/typedapi/conversation";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { listPrivate } from "@solaris/api-client/conversation";
 
 const props = defineProps<{
   message: ConversationMessage<string>;

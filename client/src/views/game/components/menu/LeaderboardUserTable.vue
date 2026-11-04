@@ -129,8 +129,9 @@ import { useGameStore } from "@/stores/game";
 import SortableLeaderboard from "./SortableLeaderboard.vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import { computed, inject, onMounted, ref } from "vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { getLeaderboard } from "@/services/typedapi/user";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { getLeaderboard } from "@solaris/api-client/user";
 import type { LeaderboardUser, UserLeaderboard } from "@solaris/common";
 import { useUserStore } from "@/stores/user";
 

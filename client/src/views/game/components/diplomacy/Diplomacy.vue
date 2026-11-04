@@ -100,13 +100,9 @@ import { eventBusInjectionKey } from "../../../../eventBus";
 import DiplomacyEventBusEventNames from "../../../../eventBusEventNames/diplomacy";
 import { type DiplomaticStatus, sorterByProperty } from "@solaris/common";
 import type { Game } from "@/types/game";
-import { listDiplomacy } from "@/services/typedapi/diplomacy";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { listDiplomacy } from "@solaris/api-client/diplomacy";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 
 const emit = defineEmits<{
   onOpenPlayerDetailRequested: [playerId: string];

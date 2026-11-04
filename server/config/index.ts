@@ -25,6 +25,16 @@ const nonOptional = (name: string, allowEmpty: boolean = false) => {
 
 const config: Config = {
     port: process.env.PORT,
+    http: {
+        keepAliveTimeout: parseInt(
+            process.env.HTTP_KEEP_ALIVE_TIMEOUT || "120000",
+            10,
+        ),
+        headersTimeout: parseInt(
+            process.env.HTTP_HEADERS_TIMEOUT || "125000",
+            10,
+        ),
+    },
     sessionSecret: nonOptional("SESSION_SECRET"),
     sessionSecureCookies: process.env.SESSION_SECURE_COOKIES == "true",
     connectionString: nonOptional("CONNECTION_STRING"),
@@ -58,9 +68,9 @@ const config: Config = {
     },
     frontend: {
         appSocketsHost:
-            process.env.FRONTEND_APP_SOCKETS_HOST || "api.solaris.games",
+            process.env.FRONTEND_APP_SOCKETS_HOST || "solaris.games",
         appApiHost:
-            process.env.FRONTEND_APP_API_HOST || "https://api.solaris.games",
+            process.env.FRONTEND_APP_API_HOST || "https://solaris.games",
         appDocumentationUrl:
             process.env.FRONTEND_APP_DOCUMENTATION_URL ||
             "https://solaris-games.github.io/solaris-docs/",

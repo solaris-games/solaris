@@ -40,13 +40,9 @@ import { useGameStore } from "@/stores/game";
 import { ref, inject, computed } from "vue";
 import FormErrorList from "../../../components/FormErrorList.vue";
 import type { Game, Player } from "@/types/game";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { sendCredits } from "@/services/typedapi/trade";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { sendCredits } from "@solaris/api-client/trade";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 
 import { useToast } from "vue-toast-notification";

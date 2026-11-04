@@ -8,26 +8,18 @@ export type ResearchUpdateNowRequest = {
     preference: ResearchTypeNotRandom;
 };
 
-export type ResearchUpdateNextRequest = {
-    preference: ResearchType;
-};
-
-export type ResearchUpdateResponse = {
-    ticksEta: number;
-    ticksNextEta: number;
+export type ResearchUpdateQueueRequest = {
+    queue: ResearchType[];
 };
 
 export const createResearchRoutes = <ID>() => ({
-    updateNow: new PutRoute<
+    updateNow: new PutRoute<{ gameId: ID }, {}, ResearchUpdateNowRequest, void>(
+        "/api/game/:gameId/research/now",
+    ),
+    updateQueue: new PutRoute<
         { gameId: ID },
         {},
-        ResearchUpdateNowRequest,
-        ResearchUpdateResponse
-    >("/api/game/:gameId/research/now"),
-    updateNext: new PutRoute<
-        { gameId: ID },
-        {},
-        ResearchUpdateNextRequest,
-        ResearchUpdateResponse
-    >("/api/game/:gameId/research/next"),
+        ResearchUpdateQueueRequest,
+        void
+    >("/api/game/:gameId/research/queue"),
 });

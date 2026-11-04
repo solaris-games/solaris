@@ -80,13 +80,9 @@ import GameHelper from "../../services/gameHelper";
 import { ref, inject, computed, type Ref, onMounted } from "vue";
 import type { GameInfoDetail } from "@solaris/common";
 import { useRoute } from "vue-router";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
-import { detailInfo } from "@/services/typedapi/game";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { detailInfo } from "@solaris/api-client/game";
 
 const httpClient = inject(httpInjectionKey)!;
 

@@ -226,23 +226,19 @@ import router from "../../router";
 import Roles from "../game/components/player/Roles.vue";
 import Notifications from "./components/Notifications.vue";
 import { inject, onMounted, ref, computed, type Ref } from "vue";
-import {
-  formatError,
-  httpInjectionKey,
-  isOk,
-  unwrapOk,
-} from "@/services/typedapi";
+import { formatError, isOk, unwrapOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   deleteUser,
   detailMe,
   updateEmailOtherPreference,
   updateEmailPreference,
   updateIsAnonymous,
-} from "@/services/typedapi/user";
+} from "@solaris/api-client/user";
 import type { UserPrivate } from "@solaris/common";
 import { useConfirm } from "@/hooks/confirm";
 import { useRoute } from "vue-router";
-import { unauthoriseDiscord } from "@/services/typedapi/auth";
+import { unauthoriseDiscord } from "@solaris/api-client/auth";
 import { configInjectionKey } from "@/config";
 
 import { useToast } from "vue-toast-notification";

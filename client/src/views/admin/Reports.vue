@@ -82,8 +82,9 @@ import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import MessageReport from "./components/MessageReport.vue";
 import { type Report } from "@solaris/common";
-import { httpInjectionKey, isOk, formatError } from "@/services/typedapi";
-import { actionReport, listReports } from "@/services/typedapi/admin";
+import { isOk, formatError } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { actionReport, listReports } from "@solaris/api-client/admin";
 import { useConfirm } from "@/hooks/confirm";
 
 import { useToast } from "vue-toast-notification";

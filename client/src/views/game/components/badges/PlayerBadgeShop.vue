@@ -61,17 +61,13 @@ import MenuTitle from "../../components/MenuTitle.vue";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import GameHelper from "../../../../services/gameHelper";
 import BadgeShopList from "./BadgeShopList.vue";
-import {
-  formatError,
-  httpInjectionKey,
-  isError,
-  isOk,
-} from "../../../../services/typedapi";
+import { formatError, isError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { ToastPluginApi } from "vue-toast-notification";
 import type { Badge } from "@solaris/common";
 import type { Player } from "../../../../types/game";
-import { purchaseBadgeForPlayer } from "../../../../services/typedapi/badge";
-import { getCredits } from "../../../../services/typedapi/user";
+import { purchaseBadgeForPlayer } from "@solaris/api-client/badge";
+import { getCredits } from "@solaris/api-client/user";
 import { useUserStore } from "../../../../stores/user";
 import { useBadgeStore } from "../../../../stores/badge";
 

@@ -51,7 +51,7 @@ const applyPlayers = (game: Game, history: GameHistory) => {
         player.alias = histPlayer.alias;
         player.avatar = histPlayer.avatar;
         player.researchingNow = histPlayer.researchingNow;
-        player.researchingNext = histPlayer.researchingNext;
+        player.researchQueue = histPlayer.researchQueue;
         player.credits = histPlayer.credits;
         player.creditsSpecialists = histPlayer.creditsSpecialists;
         player.isOpenSlot = histPlayer.isOpenSlot;

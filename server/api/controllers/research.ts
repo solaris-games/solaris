@@ -1,6 +1,6 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
-    parseUpdateResearchNextRequest,
+    parseUpdateResearchQueueRequest,
     parseUpdateResearchNowRequest,
 } from "../requests/research";
 
@@ -10,29 +10,29 @@ export default (container: DependencyContainer) => {
             try {
                 const reqObj = parseUpdateResearchNowRequest(req.body);
 
-                let eta = await container.researchService.updateResearchNow(
+                await container.researchService.updateResearchNow(
                     req.game,
                     req.player,
                     reqObj.preference,
                 );
 
-                res.status(200).json(eta);
+                res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);
             }
         },
-        updateNext: async (req, res, next) => {
+        updateQueue: async (req, res, next) => {
             try {
-                const reqObj = parseUpdateResearchNextRequest(req.body);
+                const reqObj = parseUpdateResearchQueueRequest(req.body);
 
-                let eta = await container.researchService.updateResearchNext(
+                await container.researchService.updateResearchQueue(
                     req.game,
                     req.player,
-                    reqObj.preference,
+                    reqObj.queue,
                 );
 
-                res.status(200).json(eta);
+                res.sendStatus(200);
                 return next();
             } catch (err) {
                 return next(err);

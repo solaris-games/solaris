@@ -1,6 +1,5 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
-    mapToCarrierCalculateCombatRequest,
     parseCarrierLoopWaypointsRequest,
     parseCarrierSaveWaypointsRequest,
     parseCarrierTransferShipsRequest,

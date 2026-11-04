@@ -248,16 +248,12 @@
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
 import { ref, inject, computed, onMounted, type Ref } from "vue";
-import {
-  formatError,
-  httpInjectionKey,
-  isOk,
-  ResponseResultKind,
-} from "@/services/typedapi";
+import { formatError, isOk, ResponseResultKind } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Statistics } from "@solaris/common";
 import LoadingSpinner from "@/views/components/LoadingSpinner.vue";
 import MenuTitle from "@/views/game/components/MenuTitle.vue";
-import { getGameStatistics } from "@/services/typedapi/game";
+import { getGameStatistics } from "@solaris/api-client/game";
 import GameHelper from "@/services/gameHelper";
 
 const httpClient = inject(httpInjectionKey)!;

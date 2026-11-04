@@ -219,6 +219,14 @@ export interface PlayerStarDiedEvent<ID> extends BasePlayerEvent<ID> {
     };
 }
 
+export interface PlayerStarDestroyedEvent<ID> extends BasePlayerEvent<ID> {
+    type: "playerStarDestroyed";
+    data: {
+        starId: ID;
+        starName: string;
+    };
+}
+
 export interface PlayerStarReignitedEvent<ID> extends BasePlayerEvent<ID> {
     type: "playerStarReignited";
     data: {

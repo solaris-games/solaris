@@ -26,12 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 import AdministrationPage from "./AdministrationPage.vue";
 import { inject, ref, onMounted, type Ref } from "vue";
 import type { GetInsight } from "@solaris/common";
-import { getInsights } from "@/services/typedapi/admin";
+import { getInsights } from "@solaris/api-client/admin";
 
 import { useToast } from "vue-toast-notification";
 const httpClient = inject(httpInjectionKey)!;

@@ -83,12 +83,8 @@ import GamePlayerControl from "./GamePlayerControl.vue";
 import router from "../../router";
 import { ref, inject, computed, type Ref } from "vue";
 import type { GameInfoDetail, GameGalaxyDetail } from "@solaris/common";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   detailGalaxy,
   fastForward,
@@ -96,7 +92,7 @@ import {
   pause,
   deleteGame as delGame,
   resetQuitters as resetQuittersReq,
-} from "@/services/typedapi/game";
+} from "@solaris/api-client/game";
 import { useConfirm } from "@/hooks/confirm.ts";
 
 import { useToast } from "vue-toast-notification";

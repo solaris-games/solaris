@@ -19,8 +19,9 @@ import { ref, onMounted, type Ref, inject, watch } from "vue";
 import type { Axios } from "axios";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import type { AwardedBadge, Badge as TBadge } from "@solaris/common";
-import { getBadgesForUser } from "../../../../services/typedapi/badge";
-import { httpInjectionKey, isOk } from "../../../../services/typedapi";
+import { getBadgesForUser } from "@solaris/api-client/badge";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import BadgeWithHistory from "@/views/game/components/badges/BadgeWithHistory.vue";
 import { useBadgeStore } from "../../../../stores/badge";
 

@@ -22,9 +22,10 @@
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
 import type { GameSpectator } from "@solaris/common";
-import { uninviteSpectator } from "@/services/typedapi/spectator";
+import { uninviteSpectator } from "@solaris/api-client/spectator";
 
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { ref, inject, computed } from "vue";
 
 import { useToast } from "vue-toast-notification";

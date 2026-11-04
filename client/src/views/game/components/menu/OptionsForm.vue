@@ -1006,12 +1006,12 @@ import { eventBusInjectionKey } from "@/eventBus";
 import {
   extractErrors,
   formatError,
-  httpInjectionKey,
   isOk,
   ResponseResultKind,
-} from "@/services/typedapi";
+} from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import { DEFAULT_SETTINGS, type UserGameSettings } from "@solaris/common";
-import { getSettings, saveSettings } from "@/services/typedapi/user";
+import { getSettings, saveSettings } from "@solaris/api-client/user";
 
 import { useToast } from "vue-toast-notification";
 const props = defineProps<{

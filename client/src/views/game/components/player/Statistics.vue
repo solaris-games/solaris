@@ -88,7 +88,7 @@
 
     <p
       class="text-warning text-center mb-2"
-      v-if="isDarkModeExtra && userIsInGame && isUserPlayer"
+      v-if="isDarkModeExtra && userIsInGame && !isUserPlayer"
     >
       <small>Based on your scanning range.</small>
     </p>

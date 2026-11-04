@@ -1,5 +1,5 @@
-import { distributeAllShips, garrisonAllShips } from "@/services/typedapi/star";
-import { formatError, isOk } from "@/services/typedapi";
+import { distributeAllShips, garrisonAllShips } from "@solaris/api-client/star";
+import { formatError, isOk } from "@solaris/api-client";
 import { type Axios } from "axios";
 
 import { type ToastPluginApi } from "vue-toast-notification";

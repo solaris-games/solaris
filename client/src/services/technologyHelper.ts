@@ -1,4 +1,5 @@
-import type { ResearchType } from "@solaris/common";
+import type { ResearchType, ResearchTypeNotRandom } from "@solaris/common";
+import type { Game } from "@/types/game";
 
 class TechnologyHelper {
   FRIENDLY_NAMES = {
@@ -14,6 +15,25 @@ class TechnologyHelper {
 
   getFriendlyName(technologyKey: ResearchType) {
     return this.FRIENDLY_NAMES[technologyKey];
+  }
+
+  getResearchableOptions(
+    game: Game,
+    technologyService: {
+      isTechnologyEnabled: (game: Game, key: ResearchTypeNotRandom) => boolean;
+      isTechnologyResearchable: (
+        game: Game,
+        key: ResearchTypeNotRandom,
+      ) => boolean;
+    },
+  ): { text: string; value: ResearchTypeNotRandom }[] {
+    return (Object.keys(this.FRIENDLY_NAMES) as ResearchTypeNotRandom[])
+      .filter(
+        (key) =>
+          technologyService.isTechnologyEnabled(game, key) &&
+          technologyService.isTechnologyResearchable(game, key),
+      )
+      .map((key) => ({ text: this.FRIENDLY_NAMES[key], value: key }));
   }
 
   getIcon(technologyKey: ResearchType) {

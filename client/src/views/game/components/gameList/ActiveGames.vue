@@ -176,8 +176,9 @@ import {
 } from "@/util/localPreference";
 import type { UserActiveListGame } from "@solaris/common";
 import { ref, computed, type Ref, inject, onMounted, watch } from "vue";
-import { listActive } from "@/services/typedapi/game";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
+import { listActive } from "@solaris/api-client/game";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import {
   getCountdownTimeForProductionCycle,
   getTurnTimeoutTime,

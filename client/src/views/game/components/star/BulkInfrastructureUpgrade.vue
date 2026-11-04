@@ -273,12 +273,8 @@ import BulkInfrastructureUpgradeStarTable from "./BulkInfrastructureUpgradeStarT
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import { eventBusInjectionKey } from "@/eventBus";
 import BulkInfrastructureUpgradeReport from "@/views/game/components/star/BulkInfrastructureUpgradeReport.vue";
-import {
-  extractErrors,
-  formatError,
-  httpInjectionKey,
-  isOk,
-} from "@/services/typedapi";
+import { extractErrors, formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type {
   BulkUpgradeReport,
   InfrastructureType,
@@ -288,7 +284,7 @@ import {
   scheduleBulk,
   upgradeBulk,
   upgradeBulkCheck,
-} from "@/services/typedapi/star";
+} from "@solaris/api-client/star";
 import { useConfirm } from "@/hooks/confirm.ts";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";
 

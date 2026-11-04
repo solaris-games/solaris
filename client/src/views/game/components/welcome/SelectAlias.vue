@@ -55,8 +55,9 @@
 <script setup lang="ts">
 import { inject, ref, onMounted, watch } from "vue";
 import SelectAvatar from "./SelectAvatar.vue";
-import { formatError, httpInjectionKey, isOk } from "@/services/typedapi";
-import { detailMe } from "@/services/typedapi/user";
+import { formatError, isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
+import { detailMe } from "@solaris/api-client/user";
 import type { UserAvatar } from "@solaris/common";
 
 const props = defineProps<{

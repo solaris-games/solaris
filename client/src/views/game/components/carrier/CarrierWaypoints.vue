@@ -153,7 +153,8 @@ import {
   MapEventBusEventNames,
   MapCommandEventBusEventNames,
 } from "@solaris/map-rendering";
-import { httpInjectionKey, isOk } from "@/services/typedapi";
+import { isOk } from "@solaris/api-client";
+import { httpInjectionKey } from "@/services/http";
 import type { Carrier, Game, Player } from "@/types/game";
 import type { CarrierWaypoint } from "@solaris/common";
 import { useIsHistoricalMode } from "@/util/reactiveHooks";

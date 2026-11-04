@@ -19,11 +19,12 @@ import GameHelper from "@/services/gameHelper";
 import {
   listCarrierForGame,
   listStarForGame,
-} from "@/services/typedapi/specialist";
-import { formatError, isOk } from "@/services/typedapi";
+} from "@solaris/api-client/specialist";
+import { formatError, isOk } from "@solaris/api-client";
 import type { Axios } from "axios";
 import type { MenuState, MenuStateChat } from "@/types/menu";
 import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
+import { isMobile } from "@/util/mobile.ts";
 
 type PlayerJoinedData = {
   playerId: string;
@@ -32,6 +33,10 @@ type PlayerJoinedData = {
 };
 
 const EMPTY_MENU: MenuState = { state: "none" };
+
+const isModalMenus = () => {
+  return isMobile();
+};
 
 const menuStatesEqual = <T extends { state: K }, K extends string>(
   a: T,
@@ -68,6 +73,9 @@ export const useGameStore = defineStore("game", () => {
       menuState.value = EMPTY_MENU;
     } else {
       menuState.value = newMenuState;
+      if (isModalMenus()) {
+        menuStateChat.value = EMPTY_MENU;
+      }
     }
   };
 
@@ -80,6 +88,9 @@ export const useGameStore = defineStore("game", () => {
       menuStateChat.value = EMPTY_MENU;
     } else {
       menuStateChat.value = newState;
+      if (isModalMenus()) {
+        menuState.value = EMPTY_MENU;
+      }
     }
   };
 
@@ -157,14 +168,6 @@ export const useGameStore = defineStore("game", () => {
     player.credits -= data.cost;
     player.stats!.newShips =
       Math.round((player.stats!.newShips + Number.EPSILON) * 100) / 100;
-
-    if (data.currentResearchTicksEta) {
-      player.currentResearchTicksEta = data.currentResearchTicksEta;
-    }
-
-    if (data.nextResearchTicksEta) {
-      player.nextResearchTicksEta = data.nextResearchTicksEta;
-    }
 
     // Update player total stats.
     switch (data.infrastructureType) {

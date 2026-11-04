@@ -22,7 +22,7 @@ export const cleanupGamesTimedOutJob =
 
         try {
             const games =
-                await container.gameListService.listGamesWaitingForPlayers();
+                await container.gameListService.listGamesWaitingForPlayersAffectedByTimeout();
 
             for (let i = 0; i < games.length; i++) {
                 const game = games[i];
