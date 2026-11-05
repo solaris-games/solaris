@@ -88,7 +88,10 @@ import GameHelper from "../../../../services/gameHelper";
 import AudioService from "../../../../services/audio";
 import { ref, computed, onMounted, inject } from "vue";
 import type { Game } from "@/types/game";
-import { MAX_RESEARCH_QUEUE_LENGTH } from "@solaris/common";
+import {
+  MAX_RESEARCH_QUEUE_LENGTH,
+  type ResearchTypeNotRandom,
+} from "@solaris/common";
 import type { ResearchType } from "@solaris/common";
 import { updateResearchQueue } from "@solaris/api-client/research";
 import { formatError, isOk } from "@solaris/api-client";
@@ -130,7 +133,7 @@ const loadOptions = () => {
   }
 };
 
-const currentResearchTicksEta = computed<number | null>(() => {
+const currentResearchRequiredProgress = computed<number | null>(() => {
   const target = player.value!;
   const totalScience = target.stats?.totalScience ?? 0;
 
@@ -145,30 +148,37 @@ const currentResearchTicksEta = computed<number | null>(() => {
       target.researchingNow,
       tech.level,
     );
-  const remainingPoints = requiredProgress - tech.progress!;
+  return requiredProgress - tech.progress!;
+});
+
+const currentResearchTicksEta = computed<number | null>(() => {
+  const remainingPoints = currentResearchRequiredProgress.value || 0;
+  const totalScience = player.value!.stats?.totalScience ?? 0;
+
+  if (!totalScience) {
+    return null;
+  }
 
   return Math.ceil(remainingPoints / totalScience);
 });
 
 const entryTicksEta = computed<(number | null)[]>(() => {
-  const target = player.value!;
-  const totalScience = target.stats?.totalScience ?? 0;
+  const p = player.value!;
+  const totalScience = p.stats?.totalScience ?? 0;
 
   if (!totalScience) {
     return queue.value.map(() => null);
   }
 
-  const virtualLevels: Record<string, number> = {};
-  for (const key of Object.keys(target.research)) {
-    virtualLevels[key] = target.research[key].level;
+  const virtualLevels: Record<ResearchTypeNotRandom, number> = {} as any; // fine since we set values next
+  for (const key of Object.keys(p.research)) {
+    virtualLevels[key] = p.research[key].level;
   }
 
-  let cumulativePoints = currentResearchTicksEta.value
-    ? (currentResearchTicksEta.value as number) * totalScience
-    : 0;
+  let cumulativePoints = currentResearchRequiredProgress.value || 0;
 
   if (currentResearchTicksEta.value != null) {
-    virtualLevels[target.researchingNow]++;
+    virtualLevels[p.researchingNow]++;
   }
 
   return queue.value.map((entry) => {
@@ -176,12 +186,19 @@ const entryTicksEta = computed<(number | null)[]>(() => {
       return null;
     }
 
-    cumulativePoints +=
+    const actualTech = p.research[entry];
+    const currentProgress =
+      virtualLevels[entry] === actualTech.level ? actualTech.progress! : 0;
+
+    const pointsForResearch =
       services.researchProgressService.getRequiredResearchProgress(
         game.value,
         entry,
         virtualLevels[entry],
       );
+
+    cumulativePoints += pointsForResearch - currentProgress;
+
     virtualLevels[entry]++;
 
     return Math.ceil(cumulativePoints / totalScience);
