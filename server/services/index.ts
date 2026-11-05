@@ -149,6 +149,7 @@ const gameNames = require("../config/game/gameNames");
 const starNames = require("../config/game/starNames");
 
 import type { UserSession } from "../api/sessions/session";
+import TradeEventService from "./tradeEvent";
 
 const log = logger("Dependency Container");
 
@@ -435,6 +436,13 @@ export default (
         gameRepository,
         gameTypeService,
     );
+    const tradeEventService = new TradeEventService(eventRepository);
+    const conversationService = new ConversationService(
+        gameRepository,
+        tradeEventService,
+        diplomacyService,
+        broadcastService,
+    );
     const teamService = new TeamService(diplomacyService);
     const playerService = new PlayerService(
         gameRepository,
@@ -450,6 +458,7 @@ export default (
         teamService,
         playerColourService,
         initialGameStateService,
+        conversationService,
     );
     const carrierMovementService = new CarrierMovementService(
         gameRepository,
@@ -506,7 +515,6 @@ export default (
     );
     const tradeService = new TradeService(
         gameRepository,
-        eventRepository,
         userService,
         playerService,
         diplomacyService,
@@ -519,12 +527,6 @@ export default (
         playerAfkService,
         scanningService,
         distanceService,
-    );
-    const conversationService = new ConversationService(
-        gameRepository,
-        tradeService,
-        diplomacyService,
-        broadcastService,
     );
     const gameAuthService = new GameAuthService(userService);
     const gameJoinService = new GameJoinService(
@@ -976,5 +978,6 @@ export default (
         starDataService,
         scanningService,
         infrastructureCostService,
+        tradeEventService,
     };
 };

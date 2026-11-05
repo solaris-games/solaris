@@ -24,6 +24,7 @@ import PlayerColourService from "./playerColour";
 import { MathRandomGen } from "../utils/randomGen";
 import InitialGameStateService from "./initialGameState";
 import { logger } from "../utils/logging";
+import ConversationService from "./conversation";
 
 const log = logger("Player Service");
 
@@ -41,6 +42,7 @@ export default class PlayerService extends EventEmitter {
     teamService: TeamService;
     playerColourService: PlayerColourService;
     initialGameStateService: InitialGameStateService;
+    conversationService: ConversationService;
 
     constructor(
         gameRepo: Repository<Game>,
@@ -56,6 +58,7 @@ export default class PlayerService extends EventEmitter {
         teamService: TeamService,
         playerColourService: PlayerColourService,
         initialGameStateService: InitialGameStateService,
+        conversationService: ConversationService,
     ) {
         super();
 
@@ -72,6 +75,7 @@ export default class PlayerService extends EventEmitter {
         this.teamService = teamService;
         this.playerColourService = playerColourService;
         this.initialGameStateService = initialGameStateService;
+        this.conversationService = conversationService;
     }
 
     getById(game: Game, playerId: DBObjectId) {
@@ -506,6 +510,8 @@ export default class PlayerService extends EventEmitter {
 
             game.galaxy.carriers.push(newCarrier);
         }
+
+        this.conversationService.leaveAll(game, player._id);
     }
 
     _getNewPlayerHomeStar(
