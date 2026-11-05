@@ -32,7 +32,6 @@ import { INotificationService } from "./types/INotificationService";
 
 export default class TradeService extends EventEmitter {
     gameRepo: Repository<Game>;
-    eventRepo: Repository<BaseGameEvent<DBObjectId>>;
     userService: UserService;
     playerService: PlayerService;
     diplomacyService: DiplomacyService;
@@ -48,7 +47,6 @@ export default class TradeService extends EventEmitter {
 
     constructor(
         gameRepo: Repository<Game>,
-        eventRepo: Repository<BaseGameEvent<DBObjectId>>,
         userService: UserService,
         playerService: PlayerService,
         diplomacyService: DiplomacyService,
@@ -65,7 +63,6 @@ export default class TradeService extends EventEmitter {
         super();
 
         this.gameRepo = gameRepo;
-        this.eventRepo = eventRepo;
         this.userService = userService;
         this.playerService = playerService;
         this.diplomacyService = diplomacyService;
@@ -798,50 +795,6 @@ export default class TradeService extends EventEmitter {
                 );
             }
         }
-    }
-
-    async listTradeEventsBetweenPlayers(
-        game: Game,
-        playerId: DBObjectId,
-        playerIds: DBObjectId[],
-    ): Promise<TradeEvent<DBObjectId>[]> {
-        const events = await this.eventRepo.find({
-            gameId: game._id,
-            playerId: playerId,
-            type: {
-                $in: [
-                    "playerCreditsReceived",
-                    "playerCreditsSpecialistsReceived",
-                    "playerRenownReceived",
-                    "playerTechnologyReceived",
-                    "playerGiftReceived",
-                    "playerCreditsSent",
-                    "playerCreditsSpecialistsSent",
-                    "playerRenownSent",
-                    "playerTechnologySent",
-                    "playerGiftSent",
-                    "playerDebtSettled",
-                    "playerDebtForgiven",
-                ],
-            },
-            $or: [
-                { "data.fromPlayerId": { $in: playerIds } },
-                { "data.toPlayerId": { $in: playerIds } },
-                {
-                    $and: [
-                        { "data.debtorPlayerId": { $in: playerIds } },
-                        { "data.creditorPlayerId": { $in: playerIds } },
-                    ],
-                },
-            ],
-        });
-
-        return events.map((ev) => {
-            return {
-                ...ev,
-                sentDate: ev._id.getTimestamp(),
-            } as TradeEvent<DBObjectId>;
-        });
     }
 
     async tryTradeBack(

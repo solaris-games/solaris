@@ -365,7 +365,7 @@ const onReloadGameRequested = () => emit("onReloadGameRequested");
   max-height: 100%;
   min-width: 0;
   max-width: 100%;
-  justify-self: start;
+  justify-self: stretch;
   align-self: start;
 }
 

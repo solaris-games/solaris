@@ -107,6 +107,7 @@ import { EventService } from "../event";
 import StatisticsService from "../statistics";
 import Repository from "../repository";
 import { UserSession } from "../../api/sessions/session";
+import TradeEventService from "../tradeEvent";
 
 export interface DependencyContainer {
     sessionRepository: Repository<UserSession>;
@@ -214,4 +215,5 @@ export interface DependencyContainer {
     starDataService: StarDataService;
     scanningService: ScanningService;
     infrastructureCostService: InfrastructureCostService<DBObjectId>;
+    tradeEventService: TradeEventService;
 }

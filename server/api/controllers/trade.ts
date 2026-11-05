@@ -138,7 +138,7 @@ export default (container: DependencyContainer) => {
         },
         listTradeableTechnologies: async (req, res, next) => {
             try {
-                let techs =
+                const techs =
                     await container.tradeService.listTradeableTechnologies(
                         req.game,
                         req.player,
@@ -153,8 +153,8 @@ export default (container: DependencyContainer) => {
         },
         listTradeEvents: async (req, res, next) => {
             try {
-                let events =
-                    await container.tradeService.listTradeEventsBetweenPlayers(
+                const events =
+                    await container.tradeEventService.listTradeEventsBetweenPlayers(
                         req.game,
                         req.player._id,
                         [

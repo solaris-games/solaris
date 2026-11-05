@@ -2,22 +2,22 @@ import BroadcastService from "./broadcast";
 
 import { DateTime } from "luxon";
 import { DBObjectId } from "./types/DBObjectId";
-import { ValidationError } from "@solaris/common";
-import Repository from "./repository";
 import {
     Conversation,
     ConversationMessage,
     ConversationMessageSentResult,
+    ValidationError,
 } from "@solaris/common";
+import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
-import TradeService from "./trade";
 import InternalConversationMessageSentEvent from "./types/internalEvents/ConversationMessageSent";
 import DiplomacyService from "./diplomacy";
 import mongoose from "mongoose";
 import EventEmitter from "events";
 import { IEventService } from "./types/IEventService";
 import { INotificationService } from "./types/INotificationService";
+import TradeEventService from "./tradeEvent";
 
 function arrayIsEqual(a, b): boolean {
     if (a.length !== b.length) return false;
@@ -78,7 +78,7 @@ function getNewConversation(
 
     const convoId = new mongoose.Types.ObjectId();
 
-    const newConvo: Conversation<DBObjectId> = {
+    return {
         _id: convoId,
         name,
         createdBy: playerId,
@@ -86,26 +86,24 @@ function getNewConversation(
         mutedBy: [],
         messages: [],
     };
-
-    return newConvo;
 }
 
 export default class ConversationService extends EventEmitter {
     gameRepo: Repository<Game>;
-    tradeService: TradeService;
+    tradeEventService: TradeEventService;
     diplomacyService: DiplomacyService;
     broadcastService: BroadcastService;
 
     constructor(
         gameRepo: Repository<Game>,
-        tradeService: TradeService,
+        tradeEventService: TradeEventService,
         diplomacyService: DiplomacyService,
         broadcastService: BroadcastService,
     ) {
         super();
 
         this.gameRepo = gameRepo;
-        this.tradeService = tradeService;
+        this.tradeEventService = tradeEventService;
         this.diplomacyService = diplomacyService;
         this.broadcastService = broadcastService;
     }
@@ -315,7 +313,7 @@ export default class ConversationService extends EventEmitter {
             // TODO: This needs to be refactored like the diplomacy service diplo events function as to not pass in an array of participants
             // because it doesnt make sense to do so, instead just pass in player A and player B.
             let tradeEvents =
-                await this.tradeService.listTradeEventsBetweenPlayers(
+                await this.tradeEventService.listTradeEventsBetweenPlayers(
                     game,
                     playerId,
                     convo.participants,

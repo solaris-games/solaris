@@ -210,6 +210,8 @@ export default class GameGalaxyService {
 
         await this._maskGalaxy(game, userPlayer, isHistorical, tick);
 
+        this._setKingOfTheHillState(game);
+
         // Append the player stats to each player.
         this._setPlayerStats(game);
 
@@ -361,26 +363,28 @@ export default class GameGalaxyService {
         );
     }
 
-    _setPlayerStats(doc: Game) {
+    _setKingOfTheHillState(doc: Game) {
         const isKingOfTheHillMode =
             this.gameTypeService.isKingOfTheHillMode(doc);
 
-        let kingOfTheHillPlayer: Player | null = null;
-
-        if (isKingOfTheHillMode) {
-            kingOfTheHillPlayer =
-                this.playerService.getKingOfTheHillPlayer(doc);
+        if (!isKingOfTheHillMode) {
+            return;
         }
 
+        const kingOfTheHillPlayer: Player | null =
+            this.playerService.getKingOfTheHillPlayer(doc);
+
+        doc.galaxy.players.forEach((p) => {
+            p.isKingOfTheHill =
+                kingOfTheHillPlayer != null &&
+                kingOfTheHillPlayer._id.toString() === p._id.toString();
+        });
+    }
+
+    _setPlayerStats(doc: Game) {
         // Get all of the player's statistics.
         doc.galaxy.players.forEach((p) => {
             p.stats = this.playerStatisticsService.getStats(doc, p);
-
-            if (isKingOfTheHillMode) {
-                p.isKingOfTheHill =
-                    kingOfTheHillPlayer != null &&
-                    kingOfTheHillPlayer._id.toString() === p._id.toString();
-            }
         });
     }
 
