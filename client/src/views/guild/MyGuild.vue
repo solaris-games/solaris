@@ -5,14 +5,14 @@
     <loading-spinner :loading="isLoading" />
 
     <div v-if="!isLoading && guild" class="mb-4">
-      <guild-achievements :achievements="guild.achievements || []" />
-      <guild-avatars :avatar-ids="guild.avatars" v-if="guild.avatars" />
-
       <guild-edit-description
         :description="guild.description"
         :canEdit="isLeader || isOfficer"
         @onDescriptionUpdated="onUpdate"
       />
+
+      <guild-achievements :achievements="guild.achievements || []" />
+      <guild-avatars :avatar-ids="guild.avatars" v-if="guild.avatars" />
 
       <p class="float-end">
         Total Rank Points:

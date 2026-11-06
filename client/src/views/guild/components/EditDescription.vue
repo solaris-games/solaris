@@ -1,44 +1,46 @@
 <template>
-  <div v-if="!isEditing">
-    <markdown-content :markdown="description" />
-    <button v-if="canEdit" class="btn btn-primary" @click="startEdit">
-      <i class="fas fa-pencil-alt"></i> Edit Description
-    </button>
-  </div>
-
-  <form v-else class="mb-3" @submit.prevent="save">
-    <div class="mb-2">
-      <label for="guild-description">Guild Description</label>
-      <textarea
-        id="guild-description"
-        class="form-control"
-        rows="4"
-        maxlength="2048"
-        name="description"
-        v-model="draft"
-        :disabled="isSaving"
-      ></textarea>
+  <div class="mb-3">
+    <div v-if="!isEditing">
+      <guild-description :markdown="description" />
+      <button v-if="canEdit" class="btn btn-primary" @click="startEdit">
+        <i class="fas fa-pencil-alt"></i> Edit Description
+      </button>
     </div>
 
-    <form-error-list :errors="errors" />
+    <form v-else class="mb-3" @submit.prevent="save">
+      <div class="mb-2">
+        <label for="guild-description">Guild Description (Markdown)</label>
+        <textarea
+          id="guild-description"
+          class="form-control"
+          rows="12"
+          maxlength="2048"
+          name="description"
+          v-model="draft"
+          :disabled="isSaving"
+        ></textarea>
+      </div>
 
-    <button
-      type="button"
-      class="btn btn-sm btn-danger"
-      :disabled="isSaving"
-      @click="cancel"
-    >
-      Cancel
-    </button>
-    <button type="submit" class="btn btn-sm btn-info" :disabled="isSaving">
-      <i class="fas fa-check"></i> Save
-    </button>
-  </form>
+      <form-error-list :errors="errors" />
+
+      <button
+        type="button"
+        class="btn btn-sm btn-danger"
+        :disabled="isSaving"
+        @click="cancel"
+      >
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-sm btn-info" :disabled="isSaving">
+        <i class="fas fa-check"></i> Save
+      </button>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject } from "vue";
-import MarkdownContent from "../../components/MarkdownContent.vue";
+import GuildDescription from "./GuildDescription.vue";
 import FormErrorList from "../../components/FormErrorList.vue";
 import { extractErrors, formatError, isOk } from "@solaris/api-client";
 import { updateGuildDescription } from "@solaris/api-client/guild";
