@@ -162,6 +162,7 @@ export default class GuildService {
             tag: guild.tag,
             achievements: guild.achievements,
             avatars: guild.avatars,
+            description: guild.description,
         };
 
         const userSelectObject = {

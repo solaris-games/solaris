@@ -7,6 +7,8 @@
     <div v-if="!isLoading && guild" class="mb-4">
       <guild-achievements :achievements="guild.achievements || []" />
 
+      <markdown-content :markdown="guild.description" />
+
       <p class="float-end">
         Total Rank Points:
         <span class="text-warning">{{ guild.totalRank }}</span>
@@ -66,6 +68,7 @@ import { useRoute } from "vue-router";
 import { detailGuild } from "@solaris/api-client/guild";
 import type { GuildWithUsers } from "@solaris/common";
 import GuildAchievements from "./components/Achievements.vue";
+import MarkdownContent from "../components/MarkdownContent.vue";
 
 type SortingKey = "rank" | "victories" | "renown" | "role";
 

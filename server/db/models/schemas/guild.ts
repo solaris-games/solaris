@@ -20,6 +20,12 @@ const schema = new Schema({
     applicants: [{ type: Types.ObjectId }],
     achievements: { type: [achievementSchema], default: [] },
     avatars: { type: [Types.Number], default: [] },
+    description: {
+        type: Types.String,
+        required: true,
+        maxlength: 2048,
+        default: "",
+    },
 });
 
 export default schema;

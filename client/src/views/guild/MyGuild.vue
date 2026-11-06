@@ -8,6 +8,8 @@
       <guild-achievements :achievements="guild.achievements || []" />
       <guild-avatars :avatar-ids="guild.avatars" v-if="guild.avatars" />
 
+      <markdown-content :markdown="guild.description" />
+
       <p class="float-end">
         Total Rank Points:
         <span class="text-warning">{{ guild.totalRank }}</span>
@@ -123,6 +125,7 @@ import GuildMember from "./components/Member.vue";
 import GuildMemberList from "./components/MemberList.vue";
 import GuildAchievements from "./components/Achievements.vue";
 import GuildAvatars from "./components/Avatars.vue";
+import MarkdownContent from "../components/MarkdownContent.vue";
 import type {
   Guild,
   GuildWithUsers,
