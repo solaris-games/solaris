@@ -369,6 +369,35 @@ export default class GuildService {
         );
     }
 
+    async updateDescription(userId: DBObjectId, description: string) {
+        let user = await this.userService.getById(userId, {
+            guildId: 1,
+        });
+
+        if (!user!.guildId) {
+            throw new ValidationError("You are not a member of a guild.");
+        }
+
+        let guild = await this.detail(user!.guildId!);
+
+        if (!this._isLeader(guild, userId) && !this._isOfficer(guild, userId)) {
+            throw new ValidationError(
+                "Only guild leaders and officers can edit the guild description.",
+            );
+        }
+
+        await this.guildRepo.updateOne(
+            {
+                _id: guild._id,
+            },
+            {
+                $set: {
+                    description,
+                },
+            },
+        );
+    }
+
     async delete(userId: DBObjectId, guildId: DBObjectId) {
         let guild = await this.detail(guildId);
 

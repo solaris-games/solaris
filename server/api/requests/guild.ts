@@ -3,6 +3,7 @@ import {
     GuildRenameGuildRequest,
     GuildCreateGuildRequest,
     GuildInviteUserRequest,
+    GuildUpdateDescriptionRequest,
     object,
     stringValue,
     username,
@@ -29,6 +30,14 @@ export const parseGuildRenameRequest: Validator<GuildRenameGuildRequest> =
     object({
         name: guildName,
         tag: guildTag,
+    });
+
+export const parseGuildDescriptionRequest: Validator<GuildUpdateDescriptionRequest> =
+    object({
+        description: stringValue({
+            maxLength: 2048,
+            trim: true,
+        }),
     });
 
 export const parseGuildInviteUserRequest: Validator<GuildInviteUserRequest> =

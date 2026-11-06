@@ -8,7 +8,11 @@
       <guild-achievements :achievements="guild.achievements || []" />
       <guild-avatars :avatar-ids="guild.avatars" v-if="guild.avatars" />
 
-      <markdown-content :markdown="guild.description" />
+      <guild-edit-description
+        :description="guild.description"
+        :canEdit="isLeader || isOfficer"
+        @onDescriptionUpdated="onUpdate"
+      />
 
       <p class="float-end">
         Total Rank Points:
@@ -125,7 +129,7 @@ import GuildMember from "./components/Member.vue";
 import GuildMemberList from "./components/MemberList.vue";
 import GuildAchievements from "./components/Achievements.vue";
 import GuildAvatars from "./components/Avatars.vue";
-import MarkdownContent from "../components/MarkdownContent.vue";
+import GuildEditDescription from "./components/EditDescription.vue";
 import type {
   Guild,
   GuildWithUsers,

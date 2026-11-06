@@ -110,6 +110,18 @@ export const renameGuild =
         );
     };
 
+export const updateGuildDescription =
+    (axios: Axios) =>
+    async (description: string): PRR<{}> => {
+        return doPatch(axios)(
+            routes.updateGuildDescription,
+            {},
+            {},
+            { description },
+            { withCredentials: true },
+        );
+    };
+
 export const deleteGuild =
     (axios: Axios) =>
     async (guildId: string): PRR<{}> => {
