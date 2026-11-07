@@ -1,4 +1,4 @@
-import { computed, readonly, ref } from "vue";
+import { computed, readonly, ref, toRaw } from "vue";
 import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
 import { defineStore } from "pinia";
 import type { PlayerColour } from "@solaris/common";
@@ -27,8 +27,8 @@ export const useColourStore = defineStore("colour", () => {
 
     if (game) {
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
-        game,
-        settings,
+        game: toRaw(game),
+        settings: settings ? toRaw(settings) : null,
       });
     }
   };
@@ -74,8 +74,8 @@ export const useColourStore = defineStore("colour", () => {
       };
 
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
-        game,
-        settings,
+        game: toRaw(game),
+        settings: settings ? toRaw(settings) : null,
       });
     } else {
       console.error(formatError(resp));

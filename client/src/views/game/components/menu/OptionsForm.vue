@@ -1001,7 +1001,7 @@ import { useGameStore } from "@/stores/game";
 import { GameCommandEventBusEventNames } from "@solaris/map-rendering";
 import LoadingSpinner from "../../../components/LoadingSpinner.vue";
 import FormErrorList from "../../../components/FormErrorList.vue";
-import { inject, onMounted, ref, type Ref } from "vue";
+import { inject, onMounted, ref, toRaw, type Ref } from "vue";
 import { eventBusInjectionKey } from "@/eventBus";
 import {
   extractErrors,
@@ -1064,8 +1064,8 @@ const handleSubmit = async (e: Event) => {
 
     if (props.isInGame) {
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
-        game: store.game,
-        settings: store.settings,
+        game: toRaw(store.game!),
+        settings: toRaw(store.settings!),
       });
     }
 

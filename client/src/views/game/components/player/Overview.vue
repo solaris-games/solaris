@@ -101,10 +101,8 @@
 
 <script setup lang="ts">
 import { useGameStore } from "@/stores/game";
-import { eventBusInjectionKey } from "../../../../eventBus";
 import Statistics from "./Statistics.vue";
 import PlayerTitle from "./PlayerTitle.vue";
-import DiplomacyHelper from "../../../../services/diplomacyHelper";
 import { ref, inject, computed, onMounted } from "vue";
 import type { Game } from "@/types/game";
 import { formatError, isOk } from "@solaris/api-client";
@@ -125,7 +123,6 @@ const emit = defineEmits<{
 }>();
 
 const httpClient = inject(httpInjectionKey)!;
-const eventBus = inject(eventBusInjectionKey)!;
 
 const store = useGameStore();
 const game = computed<Game>(() => store.game!);
@@ -134,9 +131,7 @@ const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
 const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
-const isFormalAlliancesEnabled = computed(() =>
-  DiplomacyHelper.isFormalAlliancesEnabled(game.value),
-);
+
 const isCompactUIStyle = computed(
   () => store.settings!.interface.uiStyle !== "standard",
 );

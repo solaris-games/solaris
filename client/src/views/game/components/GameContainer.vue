@@ -11,6 +11,7 @@ import {
   type Ref,
   watch,
   computed,
+  toRaw,
 } from "vue";
 import { eventBusInjectionKey } from "@/eventBus.ts";
 import type { Carrier, Game, Star } from "@/types/game.ts";
@@ -74,11 +75,12 @@ onMounted(() => {
     technologyService: serviceProvider.technologyService,
   };
 
+  // we use toRaw since the renderer does not use reactivity
   createGameContainer(
     services,
     new StoreDrawingContext(store),
-    store.game!,
-    store.settings!,
+    toRaw(store.game!),
+    toRaw(store.settings!),
     (msg) => toast.error(msg),
     eventBus,
     mapTextureUrls,
@@ -160,7 +162,8 @@ onMounted(() => {
 
     const updateGame = (game: Game | null) => {
       if (game) {
-        gameContainer.reloadGame(game, store.settings!);
+        // we use toRaw since the renderer does not use reactivity
+        gameContainer.reloadGame(toRaw(game), toRaw(store.settings!));
       }
     };
 
