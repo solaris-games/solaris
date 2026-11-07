@@ -52,6 +52,7 @@ import StarUpgradeService from "./starUpgrade";
 import { TechnologyService, ResearchProgressService } from "@solaris/common";
 import TradeService from "./trade";
 import { WaypointService } from "@solaris/common";
+import { PlayerCycleRewardsService } from "@solaris/common";
 import ShipTransferService from "./shipTransfer";
 import UserService from "./user";
 import HistoryService from "./history";
@@ -86,7 +87,7 @@ import PlayerCreditsService from "./playerCredits";
 import PlayerStatisticsService from "./playerStatistics";
 import CarrierMovementService from "./carrierMovement";
 import CarrierGiftService from "./carrierGift";
-import PlayerCycleRewardsService from "./playerCycleRewards";
+import RewardAwardingService from "./playerRewardAwarding";
 import StarContestedService from "./starContested";
 import GameFluxService from "./gameFlux";
 import { NotificationService } from "./notification";
@@ -311,10 +312,15 @@ export default (
         specialistService,
         shipService,
     );
-    const playerCycleRewardsService = new PlayerCycleRewardsService(
+    const playerCycleRewardsService = new PlayerCycleRewardsService<DBObjectId>(
         starService,
         technologyService,
         playerStatisticsService,
+        starDataService,
+    );
+    const rewardAwardingService = new RewardAwardingService(
+        playerCycleRewardsService,
+        starService,
         specialistService,
         starDataService,
     );
@@ -778,7 +784,7 @@ export default (
         diplomacyService,
         gameTypeService,
         gameStateService,
-        playerCycleRewardsService,
+        rewardAwardingService,
         diplomacyUpkeepService,
         carrierMovementService,
         carrierGiftService,
@@ -954,6 +960,7 @@ export default (
         carrierGiftService,
         carrierMovementService,
         playerCycleRewardsService,
+        rewardAwardingService,
         gameMaskingService,
         starContestedService,
         gameFluxService,

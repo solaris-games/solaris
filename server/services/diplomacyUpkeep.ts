@@ -1,16 +1,16 @@
-import { ValidationError } from "@solaris/common";
+import { PlayerCycleRewardsService, ValidationError } from "@solaris/common";
+import { DBObjectId } from "./types/DBObjectId";
 import { Game } from "./types/Game";
 import { Player } from "./types/Player";
 import PlayerCreditsService from "./playerCredits";
-import PlayerCycleRewardsService from "./playerCycleRewards";
 
 export default class DiplomacyUpkeepService {
     playerCreditsService: PlayerCreditsService;
-    playerCycleRewardsService: PlayerCycleRewardsService;
+    playerCycleRewardsService: PlayerCycleRewardsService<DBObjectId>;
 
     constructor(
         playerCreditsService: PlayerCreditsService,
-        playerCycleRewardsService: PlayerCycleRewardsService,
+        playerCycleRewardsService: PlayerCycleRewardsService<DBObjectId>,
     ) {
         this.playerCycleRewardsService = playerCycleRewardsService;
         this.playerCreditsService = playerCreditsService;

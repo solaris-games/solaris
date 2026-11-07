@@ -82,3 +82,4 @@ export * from "./services/combatGroup";
 export * from "./services/combat";
 export * from "./services/researchProgress";
 export * from "./services/infrastructureCost";
+export * from "./services/playerCycleRewards";
