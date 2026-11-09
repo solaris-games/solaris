@@ -6,6 +6,7 @@ import {
     Graphics,
     Sprite,
     FederatedPointerEvent,
+    Ticker,
 } from "pixi.js";
 import TextureService from "./texture";
 import seededRandom from "random-seed";
@@ -81,21 +82,17 @@ export class Star
     data: StarData;
     context: DrawingContext;
     userSettings: UserGameSettings;
-    clampedScaling: boolean = false;
-    baseScale: number = 0;
-    minScale: number = 0;
-    maxScale: number = 0;
     pulsarGraphics: Graphics | null = null;
     nebulaSprite: Sprite | null = null;
     wormHoleSprite: Sprite | null = null;
     asteroidFieldSprite: Sprite | null = null;
     specialistSprite: Sprite | null = null;
-    container_planets: Container | null = null;
-    text_name: BitmapText | null = null;
-    text_ships_small: BitmapText | null = null;
-    text_ships_big: BitmapText | null = null;
-    text_infrastructure: BitmapText | null = null;
-    text_infrastructureBulkIgnored: BitmapText | null = null;
+    planetsContainer: Container | null = null;
+    nameText: BitmapText | null = null;
+    shipsSmallText: BitmapText | null = null;
+    shipsBigText: BitmapText | null = null;
+    infrastructureText: BitmapText | null = null;
+    infrastructureBulkIgnoredText: BitmapText | null = null;
     starDataService: StarDataService;
 
     constructor(
@@ -203,13 +200,6 @@ export class Star
         this.container.hitArea = new Circle(0, 0, 15);
 
         this.userSettings = userSettings;
-
-        // TODO maybe all these could be static variables since these are all the same for every star
-        this.clampedScaling = this.userSettings.map.objectsScaling == "clamped";
-        this.baseScale = 1; //TODO add user setting for this independent of clamped or default
-        //divide these by 4 to allow more control while keeping the UI as int
-        this.minScale = this.userSettings.map.objectsMinimumScale / 4.0;
-        this.maxScale = this.userSettings.map.objectsMaximumScale / 4.0;
     }
 
     draw() {
@@ -233,7 +223,6 @@ export class Star
         this.drawShips();
         this.drawInfrastructure();
         this.drawInfrastructureBulkIgnored();
-        this.drawDepth();
     }
 
     drawStar() {
@@ -496,10 +485,10 @@ export class Star
     }
 
     drawPlanets() {
-        if (this.container_planets) {
+        if (this.planetsContainer) {
             this.unsubscribeToEvents();
-            this.container.removeChild(this.container_planets);
-            this.container_planets = null;
+            this.container.removeChild(this.planetsContainer);
+            this.planetsContainer = null;
             this.planets = null;
         }
 
@@ -507,7 +496,7 @@ export class Star
             return;
         }
 
-        this.container_planets = new Container();
+        this.planetsContainer = new Container();
 
         // The more resources a star has the more planets it has.
         let planetCount = this._getPlanetsCount();
@@ -533,14 +522,14 @@ export class Star
                     1.5) +
                 0.5;
 
-            let orbitGraphics = new Graphics();
+            const orbitGraphics = new Graphics();
             orbitGraphics.circle(0, 0, distanceToStar - planetSize / 2);
             orbitGraphics.stroke({
                 width: 0.3,
                 color: 0xffffff,
                 alpha: this.userSettings.map.naturalResourcesRingOpacity,
             });
-            this.container_planets.addChild(orbitGraphics);
+            this.planetsContainer.addChild(orbitGraphics);
 
             const planetGraphics = new Graphics();
 
@@ -560,7 +549,7 @@ export class Star
 
             let rotationSpeed = (planetCount - i) / rotationSpeedModifier;
 
-            this.container_planets.addChild(planetContainer);
+            this.planetsContainer.addChild(planetContainer);
 
             this.planets.push({
                 index: i,
@@ -572,10 +561,10 @@ export class Star
 
         this.subscribeToEvents();
 
-        this.container.addChild(this.container_planets);
+        this.container.addChild(this.planetsContainer);
     }
 
-    orbitPlanetsStep(ticker) {
+    orbitPlanetsStep(ticker: Ticker) {
         if (!this.planets) {
             return;
         }
@@ -721,18 +710,18 @@ export class Star
     }
 
     drawName() {
-        if (!this.text_name) {
+        if (!this.nameText) {
             const bitmapFont = {
                 fontFamily: "chakrapetch",
                 fontSize: NAME_SIZE,
             };
-            this.text_name = new BitmapText({
+            this.nameText = new BitmapText({
                 text: this.data.name,
                 style: bitmapFont,
             });
-            this.text_name.x = 5;
+            this.nameText.x = 5;
 
-            this.container.addChild(this.text_name);
+            this.container.addChild(this.nameText);
         }
 
         let totalKnownShips =
@@ -745,20 +734,20 @@ export class Star
                 carriersOrbiting.length > 0 ||
                 this._hasUnknownShips())
         ) {
-            this.text_name.y = (NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE;
+            this.nameText.y = (NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE;
         } else {
-            this.text_name.y = -(this.text_name.height / 2);
+            this.nameText.y = -(this.nameText.height / 2);
         }
     }
 
     drawShips() {
-        if (this.text_ships_small) {
-            this.container.removeChild(this.text_ships_small);
-            this.text_ships_small = null;
+        if (this.shipsSmallText) {
+            this.container.removeChild(this.shipsSmallText);
+            this.shipsSmallText = null;
         }
-        if (this.text_ships_big) {
-            this.container.removeChild(this.text_ships_big);
-            this.text_ships_big = null;
+        if (this.shipsBigText) {
+            this.container.removeChild(this.shipsBigText);
+            this.shipsBigText = null;
         }
 
         let totalKnownShips =
@@ -805,44 +794,44 @@ export class Star
         }
 
         if (shipsText) {
-            if (!this.text_ships_small) {
+            if (!this.shipsSmallText) {
                 let bitmapFont = {
                     fontFamily: "chakrapetch",
                     fontSize: SHIPS_SMALL_SIZE,
                 };
-                this.text_ships_small = new BitmapText({
+                this.shipsSmallText = new BitmapText({
                     text: this.data.name,
                     style: bitmapFont,
                 });
-                this.container.addChild(this.text_ships_small);
-                this.text_ships_small.x = 5;
-                this.text_ships_small.y =
-                    -this.text_ships_small.height +
+                this.container.addChild(this.shipsSmallText);
+                this.shipsSmallText.x = 5;
+                this.shipsSmallText.y =
+                    -this.shipsSmallText.height +
                     ((NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE);
             }
 
-            if (!this.text_ships_big) {
+            if (!this.shipsBigText) {
                 let bitmapFont = {
                     fontFamily: "chakrapetch",
                     fontSize: SHIPS_BIG_SIZE,
                 };
-                this.text_ships_big = new BitmapText({
+                this.shipsBigText = new BitmapText({
                     text: this.data.name,
                     style: bitmapFont,
                 });
-                this.container.addChild(this.text_ships_big);
-                this.text_ships_big.x = 5;
-                this.text_ships_big.y = -this.text_ships_big.height / 2.0;
+                this.container.addChild(this.shipsBigText);
+                this.shipsBigText.x = 5;
+                this.shipsBigText.y = -this.shipsBigText.height / 2.0;
             }
-            this.text_ships_small.text = shipsText;
-            this.text_ships_big.text = shipsText;
+            this.shipsSmallText.text = shipsText;
+            this.shipsBigText.text = shipsText;
         }
     }
 
     drawInfrastructure() {
-        if (this.text_infrastructure) {
-            this.container.removeChild(this.text_infrastructure);
-            this.text_infrastructure = null;
+        if (this.infrastructureText) {
+            this.container.removeChild(this.infrastructureText);
+            this.infrastructureText = null;
         }
 
         if (
@@ -854,52 +843,52 @@ export class Star
             return;
         }
 
-        if (!this.text_infrastructure) {
+        if (!this.infrastructureText) {
             if (this.data.ownedByPlayerId && this.data.infrastructure) {
                 let displayInfrastructure = `${this.data.infrastructure.economy} ${this.data.infrastructure.industry} ${this.data.infrastructure.science}`;
 
                 let bitmapFont = { fontFamily: "chakrapetch", fontSize: 4 };
-                this.text_infrastructure = new BitmapText({
+                this.infrastructureText = new BitmapText({
                     text: displayInfrastructure,
                     style: bitmapFont,
                 });
-                this.text_infrastructure.x = -(
-                    this.text_infrastructure.width / 2.0
+                this.infrastructureText.x = -(
+                    this.infrastructureText.width / 2.0
                 );
-                this.text_infrastructure.y = -15;
-                this.text_infrastructure.alpha = 0.75;
+                this.infrastructureText.y = -15;
+                this.infrastructureText.alpha = 0.75;
 
-                this.container.addChild(this.text_infrastructure);
+                this.container.addChild(this.infrastructureText);
             }
         }
     }
 
     drawInfrastructureBulkIgnored() {
-        if (this.text_infrastructureBulkIgnored) {
-            this.container.removeChild(this.text_infrastructureBulkIgnored);
-            this.text_infrastructureBulkIgnored = null;
+        if (this.infrastructureBulkIgnoredText) {
+            this.container.removeChild(this.infrastructureBulkIgnoredText);
+            this.infrastructureBulkIgnoredText = null;
         }
 
         if (this.data.ignoreBulkUpgrade == null) {
             return;
         }
 
-        if (!this.text_infrastructureBulkIgnored) {
+        if (!this.infrastructureBulkIgnoredText) {
             let displayInfrastructure = `${this.data.ignoreBulkUpgrade.economy ? " " : "E"} ${this.data.ignoreBulkUpgrade.industry ? " " : "I"} ${this.data.ignoreBulkUpgrade.science ? " " : "S"}`;
 
             let bitmapFont = { fontFamily: "chakrapetch", fontSize: 8 };
-            this.text_infrastructureBulkIgnored = new BitmapText({
+            this.infrastructureBulkIgnoredText = new BitmapText({
                 text: displayInfrastructure,
                 style: bitmapFont,
             });
-            this.text_infrastructureBulkIgnored.x = -(
-                this.text_infrastructureBulkIgnored.width / 2.0
+            this.infrastructureBulkIgnoredText.x = -(
+                this.infrastructureBulkIgnoredText.width / 2.0
             );
-            this.text_infrastructureBulkIgnored.y = 12;
-            this.text_infrastructureBulkIgnored.visible =
+            this.infrastructureBulkIgnoredText.y = 12;
+            this.infrastructureBulkIgnoredText.visible =
                 this.showIgnoreBulkUpgradeInfrastructure;
 
-            this.container.addChild(this.text_infrastructureBulkIgnored);
+            this.container.addChild(this.infrastructureBulkIgnoredText);
         }
     }
 
@@ -945,18 +934,6 @@ export class Star
         }
     }
 
-    drawDepth() {
-        const depth = Helpers.calculateDepthModifier(
-            this.userSettings,
-            this.data._id,
-        );
-
-        this.container.alpha = depth;
-        this.baseScale =
-            depth *
-            (this.userSettings.map.objectsDepth === "disabled" ? 1 : 1.5);
-    }
-
     onZoomChanging(zoomPercent: number) {
         this.zoomPercent = zoomPercent;
         this.setScale(zoomPercent);
@@ -964,21 +941,37 @@ export class Star
     }
 
     setScale(zoomPercent: number) {
-        if (this.clampedScaling) {
-            let currentScale = zoomPercent / 100;
-            if (currentScale < this.minScale) {
-                this.container.scale.x = (1 / currentScale) * this.minScale;
-                this.container.scale.y = (1 / currentScale) * this.minScale;
-            } else if (currentScale > this.maxScale) {
-                this.container.scale.x = (1 / currentScale) * this.maxScale;
-                this.container.scale.y = (1 / currentScale) * this.maxScale;
+        const depth = Helpers.calculateDepthModifier(
+            this.userSettings,
+            this.data._id,
+        );
+
+        this.container.alpha = depth;
+        const baseScale =
+            depth *
+            (this.userSettings.map.objectsDepth === "disabled" ? 1 : 1.5);
+
+        const clampedScaling =
+            this.userSettings.map.objectsScaling == "clamped";
+        //divide these by 4 to allow more control while keeping the UI as int
+        const minScale = this.userSettings.map.objectsMinimumScale / 4.0;
+        const maxScale = this.userSettings.map.objectsMaximumScale / 4.0;
+
+        if (clampedScaling) {
+            const currentScale = zoomPercent / 100;
+            if (currentScale < minScale) {
+                this.container.scale.x = (1 / currentScale) * minScale;
+                this.container.scale.y = (1 / currentScale) * minScale;
+            } else if (currentScale > maxScale) {
+                this.container.scale.x = (1 / currentScale) * maxScale;
+                this.container.scale.y = (1 / currentScale) * maxScale;
             } else {
-                this.container.scale.x = this.baseScale;
-                this.container.scale.y = this.baseScale;
+                this.container.scale.x = baseScale;
+                this.container.scale.y = baseScale;
             }
         } else {
-            this.container.scale.x = this.baseScale;
-            this.container.scale.y = this.baseScale;
+            this.container.scale.x = baseScale;
+            this.container.scale.y = baseScale;
         }
     }
 
@@ -1050,22 +1043,22 @@ export class Star
             }
         }
 
-        if (this.text_name) {
-            this.text_name.visible =
+        if (this.nameText) {
+            this.nameText.visible =
                 this.isSelected ||
                 this.zoomPercent >= this.userSettings.map.zoomLevels.star.name;
         }
 
-        if (this.container_planets) {
-            this.container_planets.visible = Boolean(
+        if (this.planetsContainer) {
+            this.planetsContainer.visible = Boolean(
                 this.data.isInScanningRange &&
                 this.zoomPercent >=
                     this.userSettings.map.zoomLevels.star.naturalResources,
             );
         }
 
-        if (this.text_infrastructure)
-            this.text_infrastructure.visible =
+        if (this.infrastructureText)
+            this.infrastructureText.visible =
                 this.isSelected ||
                 this.zoomPercent >=
                     this.userSettings.map.zoomLevels.star.infrastructure;
@@ -1081,28 +1074,28 @@ export class Star
                     this.userSettings.map.zoomLevels.star.shipCount)
         );
 
-        if (this.text_ships_small)
-            this.text_ships_small.visible = small_ships && visible_ships;
-        if (this.text_ships_big)
-            this.text_ships_big.visible = !small_ships && visible_ships;
+        if (this.shipsSmallText)
+            this.shipsSmallText.visible = small_ships && visible_ships;
+        if (this.shipsBigText)
+            this.shipsBigText.visible = !small_ships && visible_ships;
 
         let partial_ring =
-            (this.text_ships_big && this.text_ships_big.visible) ||
-            (this.text_ships_small && this.text_ships_small.visible) ||
-            (this.text_name && this.text_name.visible);
+            (this.shipsBigText && this.shipsBigText.visible) ||
+            (this.shipsSmallText && this.shipsSmallText.visible) ||
+            (this.nameText && this.nameText.visible);
 
         this.graphics_shape_part.visible = Boolean(partial_ring);
         this.graphics_shape_full.visible = !partial_ring;
     }
 
     subscribeToEvents() {
-        if (this.container_planets) {
+        if (this.planetsContainer) {
             this.app.ticker.add(this.orbitPlanetsStep);
         }
     }
 
     unsubscribeToEvents() {
-        if (this.container_planets) {
+        if (this.planetsContainer) {
             this.app.ticker.remove(this.orbitPlanetsStep);
         }
     }
@@ -1186,8 +1179,8 @@ export class Star
     showIgnoreBulkUpgrade() {
         this.showIgnoreBulkUpgradeInfrastructure = true;
 
-        if (this.text_infrastructureBulkIgnored) {
-            this.text_infrastructureBulkIgnored.visible =
+        if (this.infrastructureBulkIgnoredText) {
+            this.infrastructureBulkIgnoredText.visible =
                 this.showIgnoreBulkUpgradeInfrastructure;
         }
     }
@@ -1195,8 +1188,8 @@ export class Star
     hideIgnoreBulkUpgrade() {
         this.showIgnoreBulkUpgradeInfrastructure = false;
 
-        if (this.text_infrastructureBulkIgnored) {
-            this.text_infrastructureBulkIgnored.visible =
+        if (this.infrastructureBulkIgnoredText) {
+            this.infrastructureBulkIgnoredText.visible =
                 this.showIgnoreBulkUpgradeInfrastructure;
         }
     }
