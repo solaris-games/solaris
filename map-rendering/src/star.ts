@@ -24,6 +24,11 @@ import helpers from "./helpers";
 
 const NAME_SIZE = 4;
 
+const CULLING_MARGIN = 16;
+const SHIPS_SMALL_SIZE = 6;
+const SHIPS_BIG_SIZE = 10;
+const MAX_LOD = 4;
+
 export type BasicStarClickEvent = {
     eventData?: FederatedPointerEvent;
     starData: StarData;
@@ -55,24 +60,7 @@ export class Star
     extends EventEmitter<keyof Events, Events>
     implements MapObject
 {
-    static culling_margin = 16;
-    static shipsSmallSize = 6;
-    static shipsBigSize = 10;
-    static maxLod = 4;
     static seededRNG = seededRandom.create();
-
-    /*
-    Defines what zoompercentage correspond to what
-    depth level.
-    This is something you can tinker with
-    Potentially even make user defined.
-  */
-    static zoomLevelDefinitions = {
-        infrastructure: 200,
-        name: 160,
-        naturalResources: 160,
-        shipCount: 120,
-    };
 
     app: Application;
     container: Container;
@@ -92,7 +80,6 @@ export class Star
     game: Game;
     data: StarData;
     context: DrawingContext;
-    lightYearDistance: number = 0;
     userSettings: UserGameSettings;
     clampedScaling: boolean = false;
     baseScale: number = 0;
@@ -126,7 +113,6 @@ export class Star
         this.game = game;
         this.data = data;
         this.context = context;
-        this.lightYearDistance = game.constants.distances.lightYear;
         this.userSettings = userSettings;
 
         this.app = app;
@@ -139,7 +125,7 @@ export class Star
         this.graphics_star = new Sprite();
         this.graphics_shape_part = new Sprite();
         this.graphics_shape_full = new Sprite();
-        this.graphics_natural_resources_ring = new Array(Star.maxLod);
+        this.graphics_natural_resources_ring = new Array(MAX_LOD);
         this.graphics_targeted = new Graphics();
         this.graphics_selected = new Graphics();
         this.graphics_kingOfTheHill = new Graphics();
@@ -212,7 +198,6 @@ export class Star
     update(game: Game, data: StarData, userSettings: UserGameSettings) {
         this.game = game;
         this.data = data;
-        this.lightYearDistance = game.constants.distances.lightYear;
         this.container.position.x = this.data.location.x;
         this.container.position.y = this.data.location.y;
         this.container.hitArea = new Circle(0, 0, 15);
@@ -225,8 +210,6 @@ export class Star
         //divide these by 4 to allow more control while keeping the UI as int
         this.minScale = this.userSettings.map.objectsMinimumScale / 4.0;
         this.maxScale = this.userSettings.map.objectsMaximumScale / 4.0;
-
-        Star.zoomLevelDefinitions = userSettings.map.zoomLevels.star;
     }
 
     draw() {
@@ -438,8 +421,8 @@ export class Star
         this.asteroidFieldSprite.rotation =
             Star.seededRNG.random() * Math.PI * 2.0;
 
-        let player = this._getStarPlayer();
-        let playerColour = player
+        const player = this._getStarPlayer();
+        const playerColour = player
             ? this.context.getPlayerColour(player._id)
             : 0xffffff;
         this.asteroidFieldSprite.tint = playerColour;
@@ -612,7 +595,7 @@ export class Star
         if (!this.data.naturalResources) {
             return;
         }
-        for (let lod = 0; lod < Star.maxLod; lod += 1) {
+        for (let lod = 0; lod < MAX_LOD; lod += 1) {
             if (!this.graphics_natural_resources_ring[lod]) {
                 this.graphics_natural_resources_ring[lod] = new Graphics();
                 this.graphics_natural_resources_ring[lod].alpha = 0.5;
@@ -624,7 +607,7 @@ export class Star
                 return;
             }
 
-            let averageNaturalResources =
+            const averageNaturalResources =
                 this._calculateAverageNaturalResources(
                     this.data.naturalResources,
                 );
@@ -762,8 +745,7 @@ export class Star
                 carriersOrbiting.length > 0 ||
                 this._hasUnknownShips())
         ) {
-            this.text_name.y =
-                (NAME_SIZE + Star.shipsSmallSize) / 2.0 - NAME_SIZE;
+            this.text_name.y = (NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE;
         } else {
             this.text_name.y = -(this.text_name.height / 2);
         }
@@ -826,7 +808,7 @@ export class Star
             if (!this.text_ships_small) {
                 let bitmapFont = {
                     fontFamily: "chakrapetch",
-                    fontSize: Star.shipsSmallSize,
+                    fontSize: SHIPS_SMALL_SIZE,
                 };
                 this.text_ships_small = new BitmapText({
                     text: this.data.name,
@@ -836,13 +818,13 @@ export class Star
                 this.text_ships_small.x = 5;
                 this.text_ships_small.y =
                     -this.text_ships_small.height +
-                    ((NAME_SIZE + Star.shipsSmallSize) / 2.0 - NAME_SIZE);
+                    ((NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE);
             }
 
             if (!this.text_ships_big) {
                 let bitmapFont = {
                     fontFamily: "chakrapetch",
-                    fontSize: Star.shipsBigSize,
+                    fontSize: SHIPS_BIG_SIZE,
                 };
                 this.text_ships_big = new BitmapText({
                     text: this.data.name,
@@ -1045,11 +1027,11 @@ export class Star
         const apparentScale =
             this.container.scale.x * (this.zoomPercent / 100.0);
         const lod = Math.max(
-            Math.min(Math.floor(apparentScale) - 1, Star.maxLod - 1),
+            Math.min(Math.floor(apparentScale) - 1, MAX_LOD - 1),
             0.0,
         );
-        for (let l = 0; l < Star.maxLod; l += 1) {
-            let ring = this.graphics_natural_resources_ring[l];
+        for (let l = 0; l < MAX_LOD; l += 1) {
+            const ring = this.graphics_natural_resources_ring[l];
 
             if (ring) {
                 ring.visible = false;
@@ -1063,7 +1045,7 @@ export class Star
                 this.graphics_natural_resources_ring[lod].visible = Boolean(
                     this.data.isInScanningRange &&
                     this.zoomPercent >=
-                        Star.zoomLevelDefinitions.naturalResources,
+                        this.userSettings.map.zoomLevels.star.naturalResources,
                 );
             }
         }
@@ -1071,29 +1053,32 @@ export class Star
         if (this.text_name) {
             this.text_name.visible =
                 this.isSelected ||
-                this.zoomPercent >= Star.zoomLevelDefinitions.name;
+                this.zoomPercent >= this.userSettings.map.zoomLevels.star.name;
         }
 
         if (this.container_planets) {
             this.container_planets.visible = Boolean(
                 this.data.isInScanningRange &&
-                this.zoomPercent >= Star.zoomLevelDefinitions.naturalResources,
+                this.zoomPercent >=
+                    this.userSettings.map.zoomLevels.star.naturalResources,
             );
         }
 
         if (this.text_infrastructure)
             this.text_infrastructure.visible =
                 this.isSelected ||
-                this.zoomPercent >= Star.zoomLevelDefinitions.infrastructure;
+                this.zoomPercent >=
+                    this.userSettings.map.zoomLevels.star.infrastructure;
 
         let small_ships =
-            this.zoomPercent >= Star.zoomLevelDefinitions.name ||
+            this.zoomPercent >= this.userSettings.map.zoomLevels.star.name ||
             this.isSelected;
         let visible_ships = !!(
             this.data.isInScanningRange &&
             (this.isSelected ||
                 this.isMouseOver ||
-                this.zoomPercent >= Star.zoomLevelDefinitions.shipCount)
+                this.zoomPercent >=
+                    this.userSettings.map.zoomLevels.star.shipCount)
         );
 
         if (this.text_ships_small)
@@ -1151,9 +1136,11 @@ export class Star
     _updateDepthLevel() {
         let old = this.zoomDepth;
         this.zoomDepth = 1;
-        for (let depth in Star.zoomLevelDefinitions) {
-            if (Star.zoomLevelDefinitions[depth] < this.zoomPercent) {
-                this.zoomDepth = Star.zoomLevelDefinitions[depth];
+        for (let depth in this.userSettings.map.zoomLevels.star) {
+            if (
+                this.userSettings.map.zoomLevels.star[depth] < this.zoomPercent
+            ) {
+                this.zoomDepth = this.userSettings.map.zoomLevels.star[depth];
             }
         }
 
