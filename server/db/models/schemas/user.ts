@@ -337,6 +337,18 @@ const schema = new Schema({
                 enum: ["enabled", "disabled"],
                 default: "disabled",
             },
+            displayNaturalResources: {
+                type: Types.String,
+                required: false,
+                enum: ["enabled", "disabled"],
+                default: "enabled",
+            },
+            displayOrbitingSpecialists: {
+                type: Types.String,
+                required: false,
+                enum: ["enabled", "disabled"],
+                default: "enabled",
+            },
         },
         carrier: {
             defaultAction: {

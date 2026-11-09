@@ -61,6 +61,8 @@ export const DEFAULT_SETTINGS: UserGameSettings = {
         },
         naturalResourcesRingOpacity: 0.1,
         galaxyCenterAlwaysVisible: "disabled",
+        displayNaturalResources: "enabled",
+        displayOrbitingSpecialists: "enabled",
     },
     carrier: {
         defaultAction: "collectAll",

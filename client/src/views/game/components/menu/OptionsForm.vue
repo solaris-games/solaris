@@ -787,6 +787,48 @@
         </div>
       </div>
 
+      <div class="mb-1 pb-1">
+        <div class="row pt-1 pb-1">
+          <label
+            for="displayNaturalResources"
+            class="col-12 col-sm-6 col-form-label"
+            >Display Natural Resources on the map</label
+          >
+          <div class="col-12 col-sm-6">
+            <select
+              class="form-select"
+              id="displayNaturalResources"
+              v-model="settings.map.displayNaturalResources"
+              :disabled="isSavingSettings"
+            >
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-1 pb-1">
+        <div class="row pt-1 pb-1">
+          <label
+            for="displayOrbitingSpecialists"
+            class="col-12 col-sm-6 col-form-label"
+            >Display Orbiting Specialists on the map</label
+          >
+          <div class="col-12 col-sm-6">
+            <select
+              class="form-select"
+              id="displayOrbitingSpecialists"
+              v-model="settings.map.displayOrbitingSpecialists"
+              :disabled="isSavingSettings"
+            >
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <h5 class="pt-2">Carriers</h5>
 
       <div class="row pt-1 pb-1">

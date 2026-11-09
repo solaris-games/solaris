@@ -299,6 +299,8 @@ export const parseUpdateSettingsRequest: Validator<UserGameSettings> = object({
         }),
         objectsDepth: enabledDisabled,
         galaxyCenterAlwaysVisible: enabledDisabled,
+        displayNaturalResources: enabledDisabled,
+        displayOrbitingSpecialists: enabledDisabled,
     }),
     carrier: object({
         defaultAction: stringEnumeration<
