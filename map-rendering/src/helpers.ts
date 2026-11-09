@@ -4,9 +4,9 @@ import { Container } from "pixi.js";
 import {
     DistanceService,
     type Location,
+    type NaturalResources,
     type UserGameSettings,
 } from "@solaris/common";
-import type { RulerPoint } from "./types/ruler";
 
 export class Helpers {
     rotateCarrierTowardsWaypoint(
@@ -282,6 +282,15 @@ export class Helpers {
     getCarrierOwningPlayer(game: Game, carrierData: Carrier) {
         return game.galaxy.players.find(
             (x) => x._id === carrierData.ownedByPlayerId,
+        );
+    }
+
+    calculateAverageNaturalResources(naturalResources: NaturalResources) {
+        return Math.floor(
+            (naturalResources.economy +
+                naturalResources.industry +
+                naturalResources.science) /
+                3,
         );
     }
 }

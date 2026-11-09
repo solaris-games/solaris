@@ -22,6 +22,7 @@ import {
 import type { DrawingContext } from "./container";
 import { EventEmitter } from "./eventEmitter";
 import helpers from "./helpers";
+import { Planets } from "./planets";
 
 const NAME_SIZE = 4;
 
@@ -50,13 +51,6 @@ type Events = {
     onStarClicked: StarClickEvent;
 };
 
-type Planet = {
-    index: number;
-    container: Container;
-    rotationSpeed: number;
-    rotationDirection: boolean;
-};
-
 export class Star
     extends EventEmitter<keyof Events, Events>
     implements MapObject
@@ -65,14 +59,13 @@ export class Star
 
     app: Application;
     container: Container;
-    graphics_shape_part: Sprite;
-    graphics_shape_full: Sprite;
-    graphics_natural_resources_ring: Graphics[];
-    graphics_star: Sprite;
-    graphics_targeted: Graphics;
-    graphics_selected: Graphics;
-    graphics_kingOfTheHill: Graphics;
-    planets: Planet[] | null;
+    shapePartGraphics: Sprite;
+    shapeFullGraphics: Sprite;
+    naturalResourcesRingGraphics: Graphics[];
+    starGraphics: Sprite;
+    targetedGraphics: Graphics;
+    selectedGraphics: Graphics;
+    kingOfTheHillGraphics: Graphics;
     isSelected: boolean;
     isMouseOver: boolean;
     zoomPercent: number;
@@ -82,12 +75,12 @@ export class Star
     data: StarData;
     context: DrawingContext;
     userSettings: UserGameSettings;
+    planets: Planets;
     pulsarGraphics: Graphics | null = null;
     nebulaSprite: Sprite | null = null;
     wormHoleSprite: Sprite | null = null;
     asteroidFieldSprite: Sprite | null = null;
     specialistSprite: Sprite | null = null;
-    planetsContainer: Container | null = null;
     nameText: BitmapText | null = null;
     shipsSmallText: BitmapText | null = null;
     shipsBigText: BitmapText | null = null;
@@ -119,34 +112,31 @@ export class Star
         this.container.cursor = "pointer";
         this.container.eventMode = "static";
 
-        this.graphics_star = new Sprite();
-        this.graphics_shape_part = new Sprite();
-        this.graphics_shape_full = new Sprite();
-        this.graphics_natural_resources_ring = new Array(MAX_LOD);
-        this.graphics_targeted = new Graphics();
-        this.graphics_selected = new Graphics();
-        this.graphics_kingOfTheHill = new Graphics();
+        this.planets = new Planets(app, userSettings, context, game, data);
+        this.starGraphics = new Sprite();
+        this.shapePartGraphics = new Sprite();
+        this.shapeFullGraphics = new Sprite();
+        this.naturalResourcesRingGraphics = new Array(MAX_LOD);
+        this.targetedGraphics = new Graphics();
+        this.selectedGraphics = new Graphics();
+        this.kingOfTheHillGraphics = new Graphics();
 
-        this.container.addChild(this.graphics_star);
-        this.container.addChild(this.graphics_shape_part);
-        this.container.addChild(this.graphics_shape_full);
-        this.container.addChild(this.graphics_targeted);
-        this.container.addChild(this.graphics_selected);
-        this.container.addChild(this.graphics_kingOfTheHill);
+        this.container.addChild(this.starGraphics);
+        this.container.addChild(this.shapePartGraphics);
+        this.container.addChild(this.shapeFullGraphics);
+        this.container.addChild(this.targetedGraphics);
+        this.container.addChild(this.selectedGraphics);
+        this.container.addChild(this.kingOfTheHillGraphics);
+        this.container.addChild(this.planets.container);
 
         this.container.on("pointerup", this.onClicked.bind(this));
         this.container.on("mouseover", this.onMouseOver.bind(this));
         this.container.on("mouseout", this.onMouseOut.bind(this));
 
-        this.planets = null;
-
         this.isSelected = false;
         this.isMouseOver = false;
         this.zoomPercent = 100;
         this.showIgnoreBulkUpgradeInfrastructure = false;
-
-        this.orbitPlanetsStep = this.orbitPlanetsStep.bind(this);
-
         /**
       Zoomdepth
       I'd make this an enum if I could...
@@ -226,48 +216,48 @@ export class Star
     }
 
     drawStar() {
-        this.container.removeChild(this.graphics_star);
+        this.container.removeChild(this.starGraphics);
 
         if (this.data.isInScanningRange) {
             // ---- Binary stars ----
             if (this.isBinaryStar()) {
                 if (this.hasBlackHole()) {
-                    this.graphics_star = new Sprite(
+                    this.starGraphics = new Sprite(
                         TextureService.STAR_SYMBOLS["black_hole_binary"],
                     );
                 } else if (this._isDeadStar()) {
-                    this.graphics_star = new Sprite(
+                    this.starGraphics = new Sprite(
                         TextureService.STAR_SYMBOLS["binary_unscannable"],
                     );
                 } else {
-                    this.graphics_star = new Sprite(
+                    this.starGraphics = new Sprite(
                         TextureService.STAR_SYMBOLS["binary_scannable"],
                     );
                 }
             }
             // ---- Non binary stars ----
             else if (this.hasBlackHole()) {
-                this.graphics_star = new Sprite(
+                this.starGraphics = new Sprite(
                     TextureService.STAR_SYMBOLS["black_hole"],
                 );
             } else if (this._isDeadStar()) {
-                this.graphics_star = new Sprite(
+                this.starGraphics = new Sprite(
                     TextureService.STAR_SYMBOLS["unscannable"],
                 );
             } else if (this.data.homeStar) {
-                this.graphics_star = new Sprite(
+                this.starGraphics = new Sprite(
                     TextureService.STAR_SYMBOLS["home"],
                 );
             } else {
-                this.graphics_star = new Sprite(
+                this.starGraphics = new Sprite(
                     TextureService.STAR_SYMBOLS["scannable"],
                 );
             }
         } else {
-            this.graphics_star = new Sprite(
+            this.starGraphics = new Sprite(
                 TextureService.STAR_SYMBOLS["unscannable"],
             );
-            this.graphics_star.tint = 0xa0a0a0;
+            this.starGraphics.tint = 0xa0a0a0;
         }
 
         if (
@@ -276,18 +266,18 @@ export class Star
                 this.data,
             )
         ) {
-            this.graphics_star.tint = 0xff0000;
+            this.starGraphics.tint = 0xff0000;
         } else if (
             this.starDataService.isCapitalCaptureCapital(this.game, this.data)
         ) {
-            this.graphics_star.tint = 0xffa500;
+            this.starGraphics.tint = 0xffa500;
         }
 
-        this.graphics_star.anchor.set(0.5);
-        this.graphics_star.width = 24.0 / 2.0;
-        this.graphics_star.height = 24.0 / 2.0;
+        this.starGraphics.anchor.set(0.5);
+        this.starGraphics.width = 24.0 / 2.0;
+        this.starGraphics.height = 24.0 / 2.0;
 
-        this.container.addChild(this.graphics_star);
+        this.container.addChild(this.starGraphics);
     }
 
     drawPulsar() {
@@ -450,7 +440,7 @@ export class Star
         } else if (
             this.starDataService.isCapitalCaptureCapital(this.game, this.data)
         ) {
-            this.graphics_star.tint = 0xffa500;
+            this.starGraphics.tint = 0xffa500;
         }
 
         this.container.addChild(this.specialistSprite);
@@ -485,99 +475,7 @@ export class Star
     }
 
     drawPlanets() {
-        if (this.planetsContainer) {
-            this.unsubscribeToEvents();
-            this.container.removeChild(this.planetsContainer);
-            this.planetsContainer = null;
-            this.planets = null;
-        }
-
-        if (this.userSettings.map.naturalResources !== "planets") {
-            return;
-        }
-
-        this.planetsContainer = new Container();
-
-        // The more resources a star has the more planets it has.
-        let planetCount = this._getPlanetsCount();
-
-        if (planetCount === 0) {
-            return;
-        }
-
-        let player = this._getStarPlayer();
-        let playerColour = player
-            ? this.context.getPlayerColour(player._id)
-            : 0xffffff;
-
-        let rotationDirection = this._getPlanetOrbitDirection();
-        let rotationSpeedModifier = this._getPlanetOrbitSpeed();
-
-        this.planets = [];
-
-        for (let i = 0; i < planetCount; i++) {
-            let distanceToStar = 15 + 5 * i;
-            let planetSize =
-                (Math.floor(Math.abs(this.data.location.y) + distanceToStar) %
-                    1.5) +
-                0.5;
-
-            const orbitGraphics = new Graphics();
-            orbitGraphics.circle(0, 0, distanceToStar - planetSize / 2);
-            orbitGraphics.stroke({
-                width: 0.3,
-                color: 0xffffff,
-                alpha: this.userSettings.map.naturalResourcesRingOpacity,
-            });
-            this.planetsContainer.addChild(orbitGraphics);
-
-            const planetGraphics = new Graphics();
-
-            const planetAlpha = this.data.isInScanningRange ? 1.0 : 0.3;
-
-            planetGraphics.circle(planetSize / 2, 0, planetSize);
-            planetGraphics.fill({
-                color: playerColour,
-                alpha: planetAlpha,
-            });
-
-            const planetContainer = new Container();
-
-            planetContainer.addChild(planetGraphics);
-
-            planetContainer.pivot.set(distanceToStar, 0);
-
-            let rotationSpeed = (planetCount - i) / rotationSpeedModifier;
-
-            this.planetsContainer.addChild(planetContainer);
-
-            this.planets.push({
-                index: i,
-                container: planetContainer,
-                rotationSpeed,
-                rotationDirection,
-            });
-        }
-
-        this.subscribeToEvents();
-
-        this.container.addChild(this.planetsContainer);
-    }
-
-    orbitPlanetsStep(ticker: Ticker) {
-        if (!this.planets) {
-            return;
-        }
-
-        const delta = ticker.deltaTime;
-
-        for (let planet of this.planets) {
-            if (planet.rotationDirection) {
-                planet.container.rotation += planet.rotationSpeed * delta;
-            } else {
-                planet.container.rotation -= planet.rotationSpeed * delta;
-            }
-        }
+        this.planets.draw();
     }
 
     drawNaturalResourcesRing() {
@@ -585,19 +483,19 @@ export class Star
             return;
         }
         for (let lod = 0; lod < MAX_LOD; lod += 1) {
-            if (!this.graphics_natural_resources_ring[lod]) {
-                this.graphics_natural_resources_ring[lod] = new Graphics();
-                this.graphics_natural_resources_ring[lod].alpha = 0.5;
-                this.graphics_natural_resources_ring[lod].zIndex = -1;
+            if (!this.naturalResourcesRingGraphics[lod]) {
+                this.naturalResourcesRingGraphics[lod] = new Graphics();
+                this.naturalResourcesRingGraphics[lod].alpha = 0.5;
+                this.naturalResourcesRingGraphics[lod].zIndex = -1;
             }
-            this.graphics_natural_resources_ring[lod].clear();
+            this.naturalResourcesRingGraphics[lod].clear();
 
             if (this.userSettings.map.naturalResources !== "single-ring") {
                 return;
             }
 
             const averageNaturalResources =
-                this._calculateAverageNaturalResources(
+                Helpers.calculateAverageNaturalResources(
                     this.data.naturalResources,
                 );
 
@@ -614,57 +512,30 @@ export class Star
             let lineWidth = 1.0 / 8.0;
             ringRadius *= lod + 1;
             lineWidth *= lod + 1;
-            this.graphics_natural_resources_ring[lod].clear();
-            this.graphics_natural_resources_ring[lod].circle(
+            this.naturalResourcesRingGraphics[lod].clear();
+            this.naturalResourcesRingGraphics[lod].circle(
                 0,
                 0,
                 ringRadius * 0.75,
             );
-            this.graphics_natural_resources_ring[lod].stroke({
+            this.naturalResourcesRingGraphics[lod].stroke({
                 width: lineWidth,
                 color: 0xffffff,
                 alpha: this.userSettings.map.naturalResourcesRingOpacity,
             });
-            this.graphics_natural_resources_ring[lod].scale.x =
+            this.naturalResourcesRingGraphics[lod].scale.x =
                 1.0 / ((1.0 / 8.0) * (lod + 1));
-            this.graphics_natural_resources_ring[lod].scale.y =
+            this.naturalResourcesRingGraphics[lod].scale.y =
                 1.0 / ((1.0 / 8.0) * (lod + 1));
-            this.graphics_natural_resources_ring[lod].zIndex = 9;
-            this.container.addChild(this.graphics_natural_resources_ring[lod]);
+            this.naturalResourcesRingGraphics[lod].zIndex = 9;
+            this.container.addChild(this.naturalResourcesRingGraphics[lod]);
         }
-    }
-
-    _calculateAverageNaturalResources(naturalResources: NaturalResources) {
-        return Math.floor(
-            (naturalResources.economy +
-                naturalResources.industry +
-                naturalResources.science) /
-                3,
-        );
-    }
-
-    _getPlanetsCount() {
-        if (!this.data.naturalResources) {
-            return 0;
-        }
-        let averageNaturalResources = this._calculateAverageNaturalResources(
-            this.data.naturalResources,
-        );
-        return Math.min(Math.floor((averageNaturalResources / 45) * 3), 5); // Anything over 45 gets 3 planets
-    }
-
-    _getPlanetOrbitDirection() {
-        return Math.floor(Math.abs(this.data.location.y)) % 2 === 0;
-    }
-
-    _getPlanetOrbitSpeed() {
-        return Math.floor(Math.random() * (1000 - 500 + 1) + 500); // Random number between 500 and 1000
     }
 
     drawColour() {
-        if (this.graphics_shape_part) {
-            this.container.removeChild(this.graphics_shape_part);
-            this.container.removeChild(this.graphics_shape_full);
+        if (this.shapePartGraphics) {
+            this.container.removeChild(this.shapePartGraphics);
+            this.container.removeChild(this.shapeFullGraphics);
         }
 
         // Get the player who owns the star.
@@ -677,26 +548,26 @@ export class Star
         if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
             const wgFlag = this.data.warpGate ? 1 : 0;
 
-            this.graphics_shape_part = new Sprite(
+            this.shapePartGraphics = new Sprite(
                 TextureService.PLAYER_SYMBOLS[player.shape][2 + wgFlag],
             );
-            this.graphics_shape_full = new Sprite(
+            this.shapeFullGraphics = new Sprite(
                 TextureService.PLAYER_SYMBOLS[player.shape][0 + wgFlag],
             );
         }
 
         const playerColour = this.context.getPlayerColour(player._id);
 
-        this.graphics_shape_part.tint = playerColour;
-        this.graphics_shape_full.tint = playerColour;
-        this.graphics_shape_part.anchor.set(0.5);
-        this.graphics_shape_full.anchor.set(0.5);
-        this.graphics_shape_part.width = 28.0;
-        this.graphics_shape_part.height = 28.0;
-        this.graphics_shape_full.width = 28.0;
-        this.graphics_shape_full.height = 28.0;
-        this.container.addChild(this.graphics_shape_part);
-        this.container.addChild(this.graphics_shape_full);
+        this.shapePartGraphics.tint = playerColour;
+        this.shapeFullGraphics.tint = playerColour;
+        this.shapePartGraphics.anchor.set(0.5);
+        this.shapeFullGraphics.anchor.set(0.5);
+        this.shapePartGraphics.width = 28.0;
+        this.shapePartGraphics.height = 28.0;
+        this.shapeFullGraphics.width = 28.0;
+        this.shapeFullGraphics.height = 28.0;
+        this.container.addChild(this.shapePartGraphics);
+        this.container.addChild(this.shapeFullGraphics);
     }
 
     _hasUnknownShips() {
@@ -893,15 +764,15 @@ export class Star
     }
 
     drawTarget() {
-        this.graphics_targeted.clear();
+        this.targetedGraphics.clear();
 
         if (this.data.targeted) {
-            this.graphics_targeted.moveTo(9, -9);
-            this.graphics_targeted.lineTo(-9, 9);
-            this.graphics_targeted.moveTo(-9, -9);
-            this.graphics_targeted.lineTo(9, 9);
-            this.graphics_targeted.closePath();
-            this.graphics_targeted.stroke({
+            this.targetedGraphics.moveTo(9, -9);
+            this.targetedGraphics.lineTo(-9, 9);
+            this.targetedGraphics.moveTo(-9, -9);
+            this.targetedGraphics.lineTo(9, 9);
+            this.targetedGraphics.closePath();
+            this.targetedGraphics.stroke({
                 width: 2,
                 color: 0xff0000,
             });
@@ -909,11 +780,11 @@ export class Star
     }
 
     drawSelectedCircle() {
-        this.graphics_selected.clear();
+        this.selectedGraphics.clear();
 
         if (this.isSelected) {
-            this.graphics_selected.circle(0, 0, 20);
-            this.graphics_selected.stroke({
+            this.selectedGraphics.circle(0, 0, 20);
+            this.selectedGraphics.stroke({
                 width: 0.5,
                 color: 0xffffff,
                 alpha: 0.3,
@@ -922,11 +793,11 @@ export class Star
     }
 
     drawKingOfTheHillCircle() {
-        this.graphics_kingOfTheHill.clear();
+        this.kingOfTheHillGraphics.clear();
 
         if (this.data.isKingOfTheHillStar) {
-            this.graphics_kingOfTheHill.circle(0, 0, 20);
-            this.graphics_kingOfTheHill.stroke({
+            this.kingOfTheHillGraphics.circle(0, 0, 20);
+            this.kingOfTheHillGraphics.stroke({
                 width: 0.5,
                 color: 0xffffff,
                 alpha: 0.5,
@@ -1024,18 +895,18 @@ export class Star
             0.0,
         );
         for (let l = 0; l < MAX_LOD; l += 1) {
-            const ring = this.graphics_natural_resources_ring[l];
+            const ring = this.naturalResourcesRingGraphics[l];
 
             if (ring) {
                 ring.visible = false;
             }
         }
 
-        this.graphics_star.visible = !this.hasSpecialist(); //|| this.hasBlackHole()
+        this.starGraphics.visible = !this.hasSpecialist(); //|| this.hasBlackHole()
 
         if (this.userSettings.map.naturalResources !== "planets") {
-            if (this.graphics_natural_resources_ring[lod]) {
-                this.graphics_natural_resources_ring[lod].visible = Boolean(
+            if (this.naturalResourcesRingGraphics[lod]) {
+                this.naturalResourcesRingGraphics[lod].visible = Boolean(
                     this.data.isInScanningRange &&
                     this.zoomPercent >=
                         this.userSettings.map.zoomLevels.star.naturalResources,
@@ -1049,13 +920,7 @@ export class Star
                 this.zoomPercent >= this.userSettings.map.zoomLevels.star.name;
         }
 
-        if (this.planetsContainer) {
-            this.planetsContainer.visible = Boolean(
-                this.data.isInScanningRange &&
-                this.zoomPercent >=
-                    this.userSettings.map.zoomLevels.star.naturalResources,
-            );
-        }
+        this.planets.updateVisibility(this.zoomPercent);
 
         if (this.infrastructureText)
             this.infrastructureText.visible =
@@ -1084,20 +949,8 @@ export class Star
             (this.shipsSmallText && this.shipsSmallText.visible) ||
             (this.nameText && this.nameText.visible);
 
-        this.graphics_shape_part.visible = Boolean(partial_ring);
-        this.graphics_shape_full.visible = !partial_ring;
-    }
-
-    subscribeToEvents() {
-        if (this.planetsContainer) {
-            this.app.ticker.add(this.orbitPlanetsStep);
-        }
-    }
-
-    unsubscribeToEvents() {
-        if (this.planetsContainer) {
-            this.app.ticker.remove(this.orbitPlanetsStep);
-        }
+        this.shapePartGraphics.visible = Boolean(partial_ring);
+        this.shapeFullGraphics.visible = !partial_ring;
     }
 
     deselectAllText() {
