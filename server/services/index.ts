@@ -317,6 +317,7 @@ export default (
         technologyService,
         playerStatisticsService,
         starDataService,
+        specialistService,
     );
     const rewardAwardingService = new RewardAwardingService(
         playerCycleRewardsService,

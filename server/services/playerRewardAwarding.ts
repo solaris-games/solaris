@@ -24,7 +24,7 @@ export default class RewardAwardingService {
     }
 
     givePlayerCreditsEndOfCycleRewards(game: Game, player: Player) {
-        let rewards =
+        const rewards =
             this.playerCycleRewardsService.calculatePlayerCreditsEndOfCycleRewards(
                 game,
                 player,
@@ -38,17 +38,13 @@ export default class RewardAwardingService {
 
     giveFinancialAnalystCredits(game: Game) {
         for (let player of game.galaxy.players) {
-            let playerStars = this.starService
-                .listStarsOwnedByPlayer(game.galaxy.stars, player._id)
-                .filter((s) => !this.starDataService.isDeadStar(s));
+            const credits =
+                this.playerCycleRewardsService.calculatePerTickIncome(
+                    game,
+                    player,
+                );
 
-            for (let star of playerStars) {
-                let creditsByScience =
-                    this.specialistService.getCreditsPerTickByScience(star);
-
-                player.credits +=
-                    creditsByScience * star.infrastructure.science!;
-            }
+            player.credits += credits;
         }
     }
 }

@@ -5,12 +5,16 @@ import type { Id } from "../types/id";
 import type { TechnologyService } from "./technology";
 import type { StarDataService } from "./starData";
 
-export interface IStarService<ID> {
+interface IStarService<ID> {
     listStarsOwnedByPlayer(stars: Star<ID>[], playerId: ID): Star<ID>[];
 }
 
-export interface IPlayerStatisticsService<ID> {
+interface IPlayerStatisticsService<ID> {
     calculateTotalEconomy(playerStars: Star<ID>[]): number;
+}
+
+interface ISpecialistService<ID> {
+    getCreditsPerTickByScience(star: Star<ID>): number;
 }
 
 export type PlayerCycleCreditsRewards = {
@@ -25,17 +29,20 @@ export class PlayerCycleRewardsService<ID extends Id> {
     technologyService: TechnologyService;
     playerStatisticsService: IPlayerStatisticsService<ID>;
     starDataService: StarDataService;
+    specialistService: ISpecialistService<ID>;
 
     constructor(
         starService: IStarService<ID>,
         technologyService: TechnologyService,
         playerStatisticsService: IPlayerStatisticsService<ID>,
         starDataService: StarDataService,
+        specialistService: ISpecialistService<ID>,
     ) {
         this.starService = starService;
         this.technologyService = technologyService;
         this.playerStatisticsService = playerStatisticsService;
         this.starDataService = starDataService;
+        this.specialistService = specialistService;
     }
 
     calculatePlayerCreditsEndOfCycleRewards(
@@ -129,5 +136,26 @@ export class PlayerCycleRewardsService<ID extends Id> {
                     Math.min(starCount * specialists * factor, specialists),
                 );
         }
+    }
+
+    calculatePerTickIncome(game: Game<ID>, player: Player<ID>) {
+        const playerStars = this.starService
+            .listStarsOwnedByPlayer(game.galaxy.stars, player._id)
+            .filter((s) => !this.starDataService.isDeadStar(s));
+
+        let credits = 0;
+
+        for (let star of playerStars) {
+            if (!star.infrastructure.science) {
+                continue;
+            }
+
+            const creditsByScience =
+                this.specialistService.getCreditsPerTickByScience(star);
+
+            credits += creditsByScience * star.infrastructure.science!;
+        }
+
+        return credits;
     }
 }

@@ -83,6 +83,18 @@
           :isPlayerStatAlwaysUncertain="true"
         >
         </statistic-row>
+        <statistic-row
+          v-if="
+            game.settings.technology.specialistTokenReward ===
+            'dependsOnStarCount'
+          "
+          :player-id="playerId"
+          header="Specialist Token Income"
+          scanning-range-tooltip="This is based on stars and technology in your scanning range."
+          :playerStat="playerTokenIncome"
+          :userPlayerStat="userPlayerTokenIncome"
+          :isPlayerStatAlwaysUncertain="false"
+        />
       </tbody>
     </table>
 
@@ -101,12 +113,14 @@ import { computed } from "vue";
 import GameHelper from "../../../../services/gameHelper";
 import StatisticRow from "./StatisticRow.vue";
 import type { Player } from "@/types/game.ts";
+import { useGameServices } from "@/util/gameServices.ts";
 
 const props = defineProps<{
   playerId: string;
 }>();
 
 const store = useGameStore();
+const services = useGameServices();
 const game = computed(() => store.game!);
 const player = computed(() =>
   GameHelper.getPlayerById(game.value, props.playerId)!,
@@ -139,6 +153,10 @@ const userPlayerTickIncome = computed(
     userPlayer.value &&
     GameHelper.calculateTickIncome(game.value, userPlayer.value),
 );
+
+const playerTokenIncome = computed(() => 0);
+
+const userPlayerTokenIncome = computed(() => 0);
 
 const formatCreditsValue = (player: Player, value: number) => `$${value}`;
 
