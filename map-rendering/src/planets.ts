@@ -97,6 +97,8 @@ export class Planets {
 
             const rotationSpeed = (planetCount - i) / rotationSpeedModifier;
 
+            planetContainer.rotation = this._getPlanetInitialRotation();
+
             this.container.addChild(planetContainer);
 
             this.planets.push({
@@ -155,6 +157,10 @@ export class Planets {
             zoomPercent >=
                 this.userSettings.map.zoomLevels.star.naturalResources,
         );
+    }
+
+    _getPlanetInitialRotation() {
+        return Math.random() * 2 * Math.PI;
     }
 
     _getPlanetOrbitDirection() {
