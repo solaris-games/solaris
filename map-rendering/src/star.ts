@@ -86,6 +86,8 @@ export class Star
     shipsBigText: BitmapText | null = null;
     infrastructureText: BitmapText | null = null;
     infrastructureBulkIgnoredText: BitmapText | null = null;
+    naturalResourcesText: BitmapText | null = null;
+    orbitingSpecialistsContainer: Container | null = null;
     starDataService: StarDataService;
 
     constructor(
@@ -213,6 +215,8 @@ export class Star
         this.drawShips();
         this.drawInfrastructure();
         this.drawInfrastructureBulkIgnored();
+        this.drawNaturalResources();
+        this.drawOrbitingSpecialists();
     }
 
     drawStar() {
@@ -1045,6 +1049,85 @@ export class Star
             this.infrastructureBulkIgnoredText.visible =
                 this.showIgnoreBulkUpgradeInfrastructure;
         }
+    }
+
+    private drawNaturalResources() {
+        if (this.naturalResourcesText) {
+            this.container.removeChild(this.naturalResourcesText);
+            this.naturalResourcesText = null;
+        }
+
+        if (this.userSettings.map.displayNaturalResources === "disabled") {
+            return;
+        }
+
+        // TODO: Check visibility
+
+        const nr = this.data.naturalResources as NaturalResources | undefined; //this can actually be undefined, limitation of the type definitions right now
+        let displayText: string;
+        if (this.game.settings.specialGalaxy.splitResources === "enabled") {
+            if (nr) {
+                displayText = `${nr.economy} ${nr.industry} ${nr.science}`;
+            } else {
+                displayText = "? ? ?";
+            }
+        } else {
+            if (nr) {
+                displayText = `${nr.economy}`; // identical for all types
+            } else {
+                displayText = "?";
+            }
+        }
+
+        const bitmapFont = { fontFamily: "chakrapetch", fontSize: 4 };
+
+        this.naturalResourcesText = new BitmapText({
+            text: displayText,
+            style: bitmapFont,
+        });
+
+        this.naturalResourcesText.x = -(this.naturalResourcesText.width * 0.5);
+        this.naturalResourcesText.y = 15;
+        this.naturalResourcesText.alpha = 0.75;
+
+        this.container.addChild(this.naturalResourcesText);
+    }
+
+    private drawOrbitingSpecialists() {
+        if (this.orbitingSpecialistsContainer) {
+            this.orbitingSpecialistsContainer.removeChildren();
+            this.container.removeChild(this.orbitingSpecialistsContainer);
+            this.orbitingSpecialistsContainer = null;
+        }
+
+        // TODO: Check visibility
+
+        this.orbitingSpecialistsContainer = new Container();
+        this.orbitingSpecialistsContainer.x = 32;
+
+        const orbiting = Helpers.getCarriersOrbitingStar(this.game, this.data);
+
+        let offset = 0;
+
+        for (let carrier of orbiting) {
+            if (!carrier.specialist) {
+                continue;
+            }
+
+            const specialistTexture = TextureService.getSpecialistTexture(
+                carrier.specialist!.key,
+            );
+            const specialistSprite = new Sprite(specialistTexture);
+            specialistSprite.width = 6;
+            specialistSprite.height = 6;
+            specialistSprite.x = offset;
+
+            offset += 6;
+
+            this.orbitingSpecialistsContainer.addChild(specialistSprite);
+        }
+
+        this.container.addChild(this.orbitingSpecialistsContainer);
     }
 }
 

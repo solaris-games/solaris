@@ -50,11 +50,11 @@ export class Carrier
     static zoomLevel = 140;
 
     container: Container;
-    graphics_colour: Sprite | null;
-    graphics_selected: Graphics;
-    graphics_ship: Sprite;
-    graphics_scuttled: Graphics;
-    text_ships: BitmapText | null = null;
+    colourGraphics: Sprite | null;
+    selectedGraphics: Graphics;
+    shipsGraphics: Sprite;
+    scuttledGraphics: Graphics;
+    shipsText: BitmapText | null = null;
     pathManager: PathManager;
     sharedPathsIDs: Array<string>;
     uniquePaths: Array<GraphicsWithChunk>;
@@ -92,15 +92,15 @@ export class Carrier
         this.container.interactiveChildren = false;
         this.container.cursor = "pointer";
 
-        this.graphics_colour = new Sprite();
-        this.graphics_selected = new Graphics();
-        this.graphics_ship = new Sprite();
-        this.graphics_scuttled = new Graphics();
+        this.colourGraphics = new Sprite();
+        this.selectedGraphics = new Graphics();
+        this.shipsGraphics = new Sprite();
+        this.scuttledGraphics = new Graphics();
 
-        this.container.addChild(this.graphics_colour);
-        this.container.addChild(this.graphics_selected);
-        this.container.addChild(this.graphics_ship);
-        this.container.addChild(this.graphics_scuttled);
+        this.container.addChild(this.colourGraphics);
+        this.container.addChild(this.selectedGraphics);
+        this.container.addChild(this.shipsGraphics);
+        this.container.addChild(this.scuttledGraphics);
 
         this.container.on("pointerup", this.onClicked.bind(this));
         this.container.on("mouseover", this.onMouseOver.bind(this));
@@ -163,61 +163,61 @@ export class Carrier
     }
 
     drawScuttled() {
-        this.graphics_scuttled.clear();
+        this.scuttledGraphics.clear();
 
         if (this.data.isScuttled) {
-            this.graphics_scuttled.moveTo(
+            this.scuttledGraphics.moveTo(
                 SCUTTLE_CROSS_SIZE,
                 -SCUTTLE_CROSS_SIZE,
             );
-            this.graphics_scuttled.lineTo(
+            this.scuttledGraphics.lineTo(
                 -SCUTTLE_CROSS_SIZE,
                 SCUTTLE_CROSS_SIZE,
             );
-            this.graphics_scuttled.moveTo(
+            this.scuttledGraphics.moveTo(
                 -SCUTTLE_CROSS_SIZE,
                 -SCUTTLE_CROSS_SIZE,
             );
-            this.graphics_scuttled.lineTo(
+            this.scuttledGraphics.lineTo(
                 SCUTTLE_CROSS_SIZE,
                 SCUTTLE_CROSS_SIZE,
             );
-            this.graphics_scuttled.closePath();
-            this.graphics_scuttled.stroke({
+            this.scuttledGraphics.closePath();
+            this.scuttledGraphics.stroke({
                 width: 2,
                 color: 0xff0000,
             });
 
-            this.graphics_scuttled.visible = !this.data.orbiting;
+            this.scuttledGraphics.visible = !this.data.orbiting;
         }
     }
 
     drawShape() {
-        if (this.graphics_colour) {
-            this.container.removeChild(this.graphics_colour);
-            this.graphics_colour = null;
+        if (this.colourGraphics) {
+            this.container.removeChild(this.colourGraphics);
+            this.colourGraphics = null;
         }
 
         const player = this._getPlayer();
 
         if (Object.keys(TextureService.PLAYER_SYMBOLS).includes(player.shape)) {
-            this.graphics_colour = new Sprite(
+            this.colourGraphics = new Sprite(
                 TextureService.PLAYER_SYMBOLS[player.shape][4],
             );
         }
 
-        this.graphics_colour!.anchor.set(0.5);
-        this.graphics_colour!.width = 12;
-        this.graphics_colour!.height = 12;
-        this.graphics_colour!.tint = this.colour || "#FFFFFF";
+        this.colourGraphics!.anchor.set(0.5);
+        this.colourGraphics!.width = 12;
+        this.colourGraphics!.height = 12;
+        this.colourGraphics!.tint = this.colour || "#FFFFFF";
 
-        this.container.addChild(this.graphics_colour!);
+        this.container.addChild(this.colourGraphics!);
     }
 
     drawColour() {
-        if (this.graphics_colour) {
-            this.container.removeChild(this.graphics_colour);
-            this.graphics_colour = null;
+        if (this.colourGraphics) {
+            this.container.removeChild(this.colourGraphics);
+            this.colourGraphics = null;
         }
 
         if (!this.data!.orbiting) {
@@ -226,45 +226,45 @@ export class Carrier
     }
 
     drawCarrier() {
-        if (this.graphics_ship) {
-            this.container.removeChild(this.graphics_ship);
+        if (this.shipsGraphics) {
+            this.container.removeChild(this.shipsGraphics);
         }
 
-        this.graphics_ship = new Sprite(TextureService.CARRIER_TEXTURE);
-        this.graphics_ship.anchor.set(0.5);
-        this.graphics_ship.width = 10;
-        this.graphics_ship.height = 10;
-        this.container.addChild(this.graphics_ship);
+        this.shipsGraphics = new Sprite(TextureService.CARRIER_TEXTURE);
+        this.shipsGraphics.anchor.set(0.5);
+        this.shipsGraphics.width = 10;
+        this.shipsGraphics.height = 10;
+        this.container.addChild(this.shipsGraphics);
 
         Helpers.rotateCarrierTowardsWaypoint(
             this.data!,
             this.game.galaxy.stars,
-            this.graphics_ship,
+            this.shipsGraphics,
         );
     }
 
     drawShips() {
-        if (this.text_ships) {
-            this.container.removeChild(this.text_ships);
-            this.text_ships = null;
+        if (this.shipsText) {
+            this.container.removeChild(this.shipsText);
+            this.shipsText = null;
         }
 
-        if (!this.text_ships) {
+        if (!this.shipsText) {
             let totalShips =
                 this.data!.ships == null ? "???" : this.data!.ships;
 
             let shipsText = totalShips.toString();
 
             let bitmapFont = { fontFamily: "chakrapetch", fontSize: 4 };
-            this.text_ships = new BitmapText({
+            this.shipsText = new BitmapText({
                 text: shipsText,
                 style: bitmapFont,
             });
 
-            this.text_ships.x = -(this.text_ships.width / 2.0);
-            this.text_ships.y = 5;
+            this.shipsText.x = -(this.shipsText.width / 2.0);
+            this.shipsText.y = 5;
 
-            this.container.addChild(this.text_ships);
+            this.container.addChild(this.shipsText);
             if (this.data!.isGift) {
                 let style = new TextStyle({
                     fontFamily: `Chakra Petch,sans-serif;`,
@@ -278,9 +278,9 @@ export class Carrier
                     style,
                 });
                 giftText.resolution = 12;
-                giftText.position.x = this.text_ships.width;
+                giftText.position.x = this.shipsText.width;
                 giftText.position.y = -1;
-                this.text_ships.addChild(giftText);
+                this.shipsText.addChild(giftText);
             }
         }
     }
@@ -407,11 +407,11 @@ export class Carrier
     }
 
     drawSelectedCircle() {
-        this.graphics_selected.clear();
+        this.selectedGraphics.clear();
 
         if (this.isSelected) {
-            this.graphics_selected.circle(0, 0, 15);
-            this.graphics_selected.stroke({
+            this.selectedGraphics.circle(0, 0, 15);
+            this.selectedGraphics.stroke({
                 width: 0.5,
                 color: 0xffffff,
                 alpha: 0.3,
@@ -503,17 +503,17 @@ export class Carrier
     }
 
     updateVisibility() {
-        if (this.graphics_selected) {
-            this.graphics_selected.visible = !this.data.orbiting;
+        if (this.selectedGraphics) {
+            this.selectedGraphics.visible = !this.data.orbiting;
         }
 
-        if (this.graphics_ship) {
-            this.graphics_ship.visible =
+        if (this.shipsGraphics) {
+            this.shipsGraphics.visible =
                 !this.data!.orbiting && !this.hasSpecialist();
         }
 
-        if (this.text_ships) {
-            this.text_ships.visible =
+        if (this.shipsText) {
+            this.shipsText.visible =
                 !this.data!.orbiting &&
                 (this.zoomPercent >= Carrier.zoomLevel ||
                     (this.isSelected && this.zoomPercent > Carrier.zoomLevel) ||
