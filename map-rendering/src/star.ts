@@ -23,12 +23,9 @@ import type { DrawingContext } from "./container";
 import { EventEmitter } from "./eventEmitter";
 import helpers from "./helpers";
 import { Planets } from "./planets";
-
-const NAME_SIZE = 4;
+import { StarLabels } from "./starLabels";
 
 const CULLING_MARGIN = 16;
-const SHIPS_SMALL_SIZE = 6;
-const SHIPS_BIG_SIZE = 10;
 const MAX_LOD = 4;
 
 export type BasicStarClickEvent = {
@@ -81,9 +78,7 @@ export class Star
     wormHoleSprite: Sprite | null = null;
     asteroidFieldSprite: Sprite | null = null;
     specialistSprite: Sprite | null = null;
-    nameText: BitmapText | null = null;
-    shipsSmallText: BitmapText | null = null;
-    shipsBigText: BitmapText | null = null;
+    labels: StarLabels;
     infrastructureText: BitmapText | null = null;
     infrastructureBulkIgnoredText: BitmapText | null = null;
     naturalResourcesText: BitmapText | null = null;
@@ -115,6 +110,7 @@ export class Star
         this.container.eventMode = "static";
 
         this.planets = new Planets(app, userSettings, context, game, data);
+        this.labels = new StarLabels(game, data, userSettings);
         this.starGraphics = new Sprite();
         this.shapePartGraphics = new Sprite();
         this.shapeFullGraphics = new Sprite();
@@ -130,6 +126,7 @@ export class Star
         this.container.addChild(this.selectedGraphics);
         this.container.addChild(this.kingOfTheHillGraphics);
         this.container.addChild(this.planets.container);
+        this.container.addChild(this.labels.container);
 
         this.container.on("pointerup", this.onClicked.bind(this));
         this.container.on("mouseover", this.onMouseOver.bind(this));
@@ -171,19 +168,6 @@ export class Star
         );
     }
 
-    _getStarCarriers() {
-        return this.game.galaxy.carriers.filter(
-            (x) => x.orbiting === this.data._id,
-        );
-    }
-
-    _getStarCarrierShips() {
-        return this._getStarCarriers().reduce(
-            (sum, c) => sum + (c.ships || 0),
-            0,
-        );
-    }
-
     update(game: Game, data: StarData, userSettings: UserGameSettings) {
         this.game = game;
         this.data = data;
@@ -192,6 +176,7 @@ export class Star
         this.container.hitArea = new Circle(0, 0, 15);
 
         this.userSettings = userSettings;
+        this.labels.update(game, data, userSettings);
     }
 
     draw() {
@@ -211,8 +196,7 @@ export class Star
         this.drawPlanets();
         this.drawNaturalResourcesRing();
         this.drawColour();
-        this.drawName();
-        this.drawShips();
+        this.labels.draw();
         this.drawInfrastructure();
         this.drawInfrastructureBulkIgnored();
         this.drawNaturalResources();
@@ -574,135 +558,6 @@ export class Star
         this.container.addChild(this.shapeFullGraphics);
     }
 
-    _hasUnknownShips() {
-        let carriersOrbiting = this._getStarCarriers();
-        let scramblers = carriersOrbiting.reduce(
-            (sum, c) => sum + (c.ships === null ? 1 : 0),
-            0,
-        );
-        let scrambler = this.data.ships == null;
-        return (scramblers || scrambler) && this.data.isInScanningRange;
-    }
-
-    drawName() {
-        if (!this.nameText) {
-            const bitmapFont = {
-                fontFamily: "chakrapetch",
-                fontSize: NAME_SIZE,
-            };
-            this.nameText = new BitmapText({
-                text: this.data.name,
-                style: bitmapFont,
-            });
-            this.nameText.x = 5;
-
-            this.container.addChild(this.nameText);
-        }
-
-        let totalKnownShips =
-            (this.data.ships || 0) + this._getStarCarrierShips();
-        let carriersOrbiting = this._getStarCarriers();
-
-        if (
-            (this.data.ownedByPlayerId || carriersOrbiting) &&
-            (totalKnownShips > 0 ||
-                carriersOrbiting.length > 0 ||
-                this._hasUnknownShips())
-        ) {
-            this.nameText.y = (NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE;
-        } else {
-            this.nameText.y = -(this.nameText.height / 2);
-        }
-    }
-
-    drawShips() {
-        if (this.shipsSmallText) {
-            this.container.removeChild(this.shipsSmallText);
-            this.shipsSmallText = null;
-        }
-        if (this.shipsBigText) {
-            this.container.removeChild(this.shipsBigText);
-            this.shipsBigText = null;
-        }
-
-        let totalKnownShips =
-            (this.data.ships || 0) + this._getStarCarrierShips();
-
-        let carriersOrbiting = this._getStarCarriers();
-        let carrierCount = carriersOrbiting.length;
-
-        let shipsText: string | undefined = undefined;
-
-        if (this.data.ownedByPlayerId || carriersOrbiting.length) {
-            let scramblers = 0;
-
-            if (carriersOrbiting) {
-                scramblers = carriersOrbiting.reduce(
-                    (sum, c) => sum + (c.ships === null ? 1 : 0),
-                    0,
-                );
-            }
-
-            if (scramblers == carrierCount && this.data.ships == null) {
-                shipsText = "???";
-            } else if (totalKnownShips > 0 || scramblers > 0) {
-                shipsText = totalKnownShips.toString();
-
-                if (scramblers > 0 || this.data.ships == null) {
-                    shipsText += "*";
-                }
-            }
-
-            if (carrierCount) {
-                shipsText += "/";
-                shipsText += carrierCount.toString();
-
-                if (
-                    helpers.isStarHasMultiplePlayersInOrbit(
-                        this.game,
-                        this.data,
-                    )
-                ) {
-                    shipsText += "+";
-                }
-            }
-        }
-
-        if (shipsText) {
-            if (!this.shipsSmallText) {
-                let bitmapFont = {
-                    fontFamily: "chakrapetch",
-                    fontSize: SHIPS_SMALL_SIZE,
-                };
-                this.shipsSmallText = new BitmapText({
-                    text: this.data.name,
-                    style: bitmapFont,
-                });
-                this.container.addChild(this.shipsSmallText);
-                this.shipsSmallText.x = 5;
-                this.shipsSmallText.y =
-                    -this.shipsSmallText.height +
-                    ((NAME_SIZE + SHIPS_SMALL_SIZE) / 2.0 - NAME_SIZE);
-            }
-
-            if (!this.shipsBigText) {
-                let bitmapFont = {
-                    fontFamily: "chakrapetch",
-                    fontSize: SHIPS_BIG_SIZE,
-                };
-                this.shipsBigText = new BitmapText({
-                    text: this.data.name,
-                    style: bitmapFont,
-                });
-                this.container.addChild(this.shipsBigText);
-                this.shipsBigText.x = 5;
-                this.shipsBigText.y = -this.shipsBigText.height / 2.0;
-            }
-            this.shipsSmallText.text = shipsText;
-            this.shipsBigText.text = shipsText;
-        }
-    }
-
     drawInfrastructure() {
         if (this.infrastructureText) {
             this.container.removeChild(this.infrastructureText);
@@ -918,11 +773,11 @@ export class Star
             }
         }
 
-        if (this.nameText) {
-            this.nameText.visible =
-                this.isSelected ||
-                this.zoomPercent >= this.userSettings.map.zoomLevels.star.name;
-        }
+        this.labels.updateVisibility(
+            this.zoomPercent,
+            this.isSelected,
+            this.isMouseOver,
+        );
 
         this.planets.updateVisibility(this.zoomPercent);
 
@@ -932,28 +787,9 @@ export class Star
                 this.zoomPercent >=
                     this.userSettings.map.zoomLevels.star.infrastructure;
 
-        let small_ships =
-            this.zoomPercent >= this.userSettings.map.zoomLevels.star.name ||
-            this.isSelected;
-        let visible_ships = !!(
-            this.data.isInScanningRange &&
-            (this.isSelected ||
-                this.isMouseOver ||
-                this.zoomPercent >=
-                    this.userSettings.map.zoomLevels.star.shipCount)
-        );
+        let partial_ring = this.labels.partialTextVisible;
 
-        if (this.shipsSmallText)
-            this.shipsSmallText.visible = small_ships && visible_ships;
-        if (this.shipsBigText)
-            this.shipsBigText.visible = !small_ships && visible_ships;
-
-        let partial_ring =
-            (this.shipsBigText && this.shipsBigText.visible) ||
-            (this.shipsSmallText && this.shipsSmallText.visible) ||
-            (this.nameText && this.nameText.visible);
-
-        this.shapePartGraphics.visible = Boolean(partial_ring);
+        this.shapePartGraphics.visible = partial_ring;
         this.shapeFullGraphics.visible = !partial_ring;
     }
 
