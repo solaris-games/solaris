@@ -759,7 +759,7 @@ export class Star
             this.infrastructureBulkIgnoredText.x = -(
                 this.infrastructureBulkIgnoredText.width / 2.0
             );
-            this.infrastructureBulkIgnoredText.y = 12;
+            this.infrastructureBulkIgnoredText.y = 14;
             this.infrastructureBulkIgnoredText.visible =
                 this.showIgnoreBulkUpgradeInfrastructure;
 
@@ -1064,22 +1064,23 @@ export class Star
         // TODO: Check visibility
 
         const nr = this.data.naturalResources as NaturalResources | undefined; //this can actually be undefined, limitation of the type definitions right now
-        let displayText: string;
+        let nrText: string;
         if (this.game.settings.specialGalaxy.splitResources === "enabled") {
             if (nr) {
-                displayText = `${nr.economy} ${nr.industry} ${nr.science}`;
+                nrText = `${nr.economy} ${nr.industry} ${nr.science}`;
             } else {
-                displayText = "? ? ?";
+                nrText = "? ? ?";
             }
         } else {
             if (nr) {
-                displayText = `${nr.economy}`; // identical for all types
+                nrText = `${nr.economy}`; // identical for all types
             } else {
-                displayText = "?";
+                nrText = "?";
             }
         }
 
         const bitmapFont = { fontFamily: "chakrapetch", fontSize: 4 };
+        const displayText = `${nrText} NR`;
 
         this.naturalResourcesText = new BitmapText({
             text: displayText,
@@ -1087,7 +1088,7 @@ export class Star
         });
 
         this.naturalResourcesText.x = -(this.naturalResourcesText.width * 0.5);
-        this.naturalResourcesText.y = 15;
+        this.naturalResourcesText.y = 10;
         this.naturalResourcesText.alpha = 0.75;
 
         this.container.addChild(this.naturalResourcesText);
