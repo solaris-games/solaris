@@ -14,67 +14,61 @@ Solaris is a slow-burn browser game heavily inspired by [Neptune's Pride](https:
 - Fight other players and capture stars to win the game.
 - Games last around 2-3 weeks, and you don't need to commit a lot of time to play!
 - Play on any device that has a web browser.
-- Its completely free!
+- It's completely free!
 
 Visit [solaris.games](https://solaris.games) to play now!
 
-### Server
-The server uses the following tech:
-- [Node.js](https://nodejs.org/en/)
-- [Express](https://expressjs.com/)
-- [MongoDB](https://www.mongodb.com/)
-    - [Mongoose](https://mongoosejs.com/)
+## Running Solaris
 
-### Client
-The client uses the following tech:
-- [Vue.js](https://vuejs.org/)
-- [PixiJS](https://www.pixijs.com/)
+Solaris requires at minimum NodeJS 24 and MongoDB 8.
 
-## Development Environment Setup
-1. Install the prerequisites.
-    - [Node.js](https://nodejs.org/en/) v22
-    - [MongoDB](https://www.mongodb.com/) v7.0
-2. Clone the repository.
-3. Checkout `master`.
-4. `npm install` in the root directory
-5. `npm run build` in the root directory (do not skip this even when running the dev server)
-6. Create a `.env` file in `server/` (See `.env.example`).
-7. Create a `.env` file in `client/` (See `.env.example`).
-8. `npm run start-jobs:dev` in `server/` to start the automated jobs and setup new games.
-9. `npm run start-api:dev` in `server/` to start the API.
-10. `npm run dev` in `client/` to start the client application.
-11. Browse to the site locally (default [http://localhost:8080](http://localhost:8080)).
+### For Development
 
-*Note: Development work is to be based on the `dev` branch, for a new feature or bug fix, create a branch from `dev`.*
+For development, it is recommended to run the actual servers locally for ease of debugging. 
+However, a docker-based development workflow is also possible, although that means hot reloading is not supported out of the box.
+
+*Note: it is recommended that you deactivate the Vue Devtools browser extension when developing Solaris unless strictly necessary. Otherwise, the size of the game state causes extreme slowdowns.*
+
+#### Locally
+
+You need a MongoDB instance for Solaris. With `docker compose -f docker-compose.requirements.yml up` you can start one.
+
+1. `npm install`
+2. `npm run build`
+3. Copy `client/.env.example` to `client/.env` (and make adaptions if needed) 
+4. Copy `server/.env.example` to `server/.env` (and make adaptions if needed)
+5. In `server/`: `npm run start-api:dev` to start the API server
+6. In `server/`: `npm run start-jobs:dev` to start the jobs processor
+7. In `client/`: `npm run dev` to start the frontend dev server
+8. Solaris is running on `http://localhost:8080/`(default)
+
+#### With Docker
+
+The images can be built by running `build-images.sh` in `docker/dev/`.
+
+### In Production
+
+For production usage Docker is the recommended way, although the server scripts can be called directly.
+
+The file `docker-compose.prod.yml` provides an example for running Solaris in production using docker-compose.
+
+The images can be built by running `build-images.sh` in `docker/prod/`.
 
 ### Database Migrations
-To keep up to date with the latest changes, you must run the database migations to ensure that your database is compatible.
 
-1. `npm run start-db-migrate:dev` in `server/` to update your local database to the latest schema.
+Database migrations can be applied with the scripts `start-db-migrate:dev` / `start-db-migrate:prod`.
+The database automatically tracks which migrations were applied and the script asks for confirmation.
 
-*Note: This script assumes that you have a `solaris` database on your system. If not, perform the **Development Environment Setup** above first.*
-
-### Development Environment Automation (Optional)
-To automate the development environment, it is recommended to use [PM2](https://pm2.keymetrics.io/).
-
-1. Install `pm2`.
-2. `pm2 start pm2.config.js` to register `pm2` apps.
-
-The above script will create the server jobs, API and client applications, watch for changes and restart those applications when necessary. 
-
-You can make use of debugger attach for VS Code defined in the `.vscode/launch.json` configuration file to easily attach the debugger to running apps.
-
-Once configured, you can browse to the site locally (default [http://localhost:8080](http://localhost:8080)) as using the normal way detailed in the section above and any changes you make will automatically restart the applications.
-
-
-## Run with docker
-
-A docker compose config for development use can be found in `docker-compose.yml`. These images are **not** suitable for production usage.
-The `docker/prod/` directory contains definitions for prod images, but no docker-compose is provided, it needs to be adapted from the dev version. 
-The images can also possibly be found in the GitHub Registry but there is no guarantee that they are up-to-date.
+## License
+See [here](LICENSE).
 
 ## Contributing
 See [here](CONTRIBUTING.md).
 
-## License
-See [here](LICENSE).
+## Project Structure
+
+`common/`: Common library, defines types and implements some logic, defines the API
+`map-rendering/`: Map rendering implementation based on PixiJS
+`api-client/`: Axios client to access the API
+`client/`: Frontend
+`server/`: API Backend and jobs processing
