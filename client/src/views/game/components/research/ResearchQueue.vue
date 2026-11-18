@@ -86,7 +86,7 @@
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
 import AudioService from "../../../../services/audio";
-import { ref, computed, onMounted, inject } from "vue";
+import { ref, computed, onMounted, inject, watch } from "vue";
 import type { Game } from "@/types/game";
 import {
   MAX_RESEARCH_QUEUE_LENGTH,
@@ -180,9 +180,6 @@ const entryTicksEta = computed<(number | null)[]>(() => {
   let cumulativePoints = currentResearchRequiredProgress.value || 0;
 
   if (currentResearchTicksEta.value != null) {
-    // The current research is assumed to complete. The level-up remainder
-    // carries over to the next level, but is unknown client-side (bounded
-    // by one tick of science), so model it as 0 for a conservative ETA.
     virtualLevels[p.researchingNow]++;
     virtualProgress[p.researchingNow] = 0;
   }
@@ -201,8 +198,6 @@ const entryTicksEta = computed<(number | null)[]>(() => {
 
     cumulativePoints += pointsForResearch - virtualProgress[entry];
 
-    // Completing this virtual level carries the remainder over to the next
-    // level; again modeled as 0.
     virtualLevels[entry]++;
     virtualProgress[entry] = 0;
 
@@ -253,6 +248,18 @@ const doMoveQueueEntry = (index: number, delta: number) => {
   queue.value.splice(targetIndex, 0, entry);
   doUpdateResearchQueue();
 };
+
+watch(
+  () => player.value?.researchQueue,
+  (newQueue) => {
+    if (loading.value) {
+      return;
+    }
+
+    queue.value = newQueue?.slice() ?? [];
+  },
+  { deep: true },
+);
 
 onMounted(() => {
   loadOptions();
