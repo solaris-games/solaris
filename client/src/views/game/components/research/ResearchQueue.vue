@@ -170,25 +170,27 @@ const entryTicksEta = computed<(number | null)[]>(() => {
     return queue.value.map(() => null);
   }
 
-  const virtualLevels: Record<ResearchTypeNotRandom, number> = {} as any; // fine since we set values next
-  for (const key of Object.keys(p.research)) {
+  const virtualLevels = {} as Record<ResearchTypeNotRandom, number>; // fine since we set values next
+  const virtualProgress = {} as Record<ResearchTypeNotRandom, number>;
+  for (const key of Object.keys(p.research) as ResearchTypeNotRandom[]) {
     virtualLevels[key] = p.research[key].level;
+    virtualProgress[key] = p.research[key].progress ?? 0;
   }
 
   let cumulativePoints = currentResearchRequiredProgress.value || 0;
 
   if (currentResearchTicksEta.value != null) {
+    // The current research is assumed to complete. The level-up remainder
+    // carries over to the next level, but is unknown client-side (bounded
+    // by one tick of science), so model it as 0 for a conservative ETA.
     virtualLevels[p.researchingNow]++;
+    virtualProgress[p.researchingNow] = 0;
   }
 
   return queue.value.map((entry) => {
     if (entry === "random") {
       return null;
     }
-
-    const actualTech = p.research[entry];
-    const currentProgress =
-      virtualLevels[entry] === actualTech.level ? actualTech.progress! : 0;
 
     const pointsForResearch =
       services.researchProgressService.getRequiredResearchProgress(
@@ -197,9 +199,12 @@ const entryTicksEta = computed<(number | null)[]>(() => {
         virtualLevels[entry],
       );
 
-    cumulativePoints += pointsForResearch - currentProgress;
+    cumulativePoints += pointsForResearch - virtualProgress[entry];
 
+    // Completing this virtual level carries the remainder over to the next
+    // level; again modeled as 0.
     virtualLevels[entry]++;
+    virtualProgress[entry] = 0;
 
     return Math.ceil(cumulativePoints / totalScience);
   });
