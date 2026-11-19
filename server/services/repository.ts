@@ -84,8 +84,10 @@ export default class Repository<T> {
             .exec()) as T;
     }
 
-    async findOneAsModel(query, select?): Promise<T | null> {
-        return await this.model.findOne(query, select).exec();
+    async findOneAsModel(query, select?): Promise<ActiveModel<T> | null> {
+        return (await this.model
+            .findOne(query, select)
+            .exec()) as ActiveModel<T>;
     }
 
     async count(query): Promise<number> {

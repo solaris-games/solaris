@@ -119,7 +119,7 @@ export default class PlayerService extends EventEmitter {
             lastSeen: null,
             lastSeenIP: null,
             researchingNow,
-            researchQueue: [defaultTech],
+            researchQueue: ["terraforming"],
             credits: game.settings.player.startingCredits,
             creditsSpecialists: game.settings.player.startingCreditsSpecialists,
             isOpenSlot: true,
