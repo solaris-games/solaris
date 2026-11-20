@@ -86,7 +86,7 @@
 import { useGameStore } from "@/stores/game";
 import GameHelper from "../../../../services/gameHelper";
 import AudioService from "../../../../services/audio";
-import { ref, computed, onMounted, inject } from "vue";
+import { ref, computed, onMounted, inject, watch } from "vue";
 import type { Game } from "@/types/game";
 import {
   MAX_RESEARCH_QUEUE_LENGTH,
@@ -133,34 +133,43 @@ const loadOptions = () => {
   }
 };
 
-const currentResearchRequiredProgress = computed<number | null>(() => {
-  const target = player.value!;
-  const totalScience = target.stats?.totalScience ?? 0;
+const simulateResearchPhase = (
+  key: ResearchTypeNotRandom,
+  virtualLevels: Record<ResearchTypeNotRandom, number>,
+  virtualProgress: Record<ResearchTypeNotRandom, number>,
+  totalScience: number,
+): number => {
+  const level = virtualLevels[key];
+  const required = services.researchProgressService.getRequiredResearchProgress(
+    game.value,
+    key,
+    level,
+  );
+  // At least one tick: the server only pops one queue entry per tick.
+  const ticks = Math.max(
+    Math.ceil((required - virtualProgress[key]) / totalScience),
+    1,
+  );
 
-  if (!totalScience) {
-    return null;
+  let accrued = virtualProgress[key] + ticks * totalScience;
+  let newLevel = level;
+  let nextRequirement = required;
+  while (accrued >= nextRequirement) {
+    accrued -= nextRequirement;
+    newLevel++;
+    nextRequirement =
+      services.researchProgressService.getRequiredResearchProgress(
+        game.value,
+        key,
+        newLevel,
+      );
   }
 
-  const tech = target.research[target.researchingNow];
-  const requiredProgress =
-    services.researchProgressService.getRequiredResearchProgress(
-      game.value,
-      target.researchingNow,
-      tech.level,
-    );
-  return requiredProgress - tech.progress!;
-});
+  virtualLevels[key] = newLevel;
+  virtualProgress[key] = accrued;
 
-const currentResearchTicksEta = computed<number | null>(() => {
-  const remainingPoints = currentResearchRequiredProgress.value || 0;
-  const totalScience = player.value!.stats?.totalScience ?? 0;
-
-  if (!totalScience) {
-    return null;
-  }
-
-  return Math.ceil(remainingPoints / totalScience);
-});
+  return ticks;
+};
 
 const entryTicksEta = computed<(number | null)[]>(() => {
   const p = player.value!;
@@ -170,38 +179,32 @@ const entryTicksEta = computed<(number | null)[]>(() => {
     return queue.value.map(() => null);
   }
 
-  const virtualLevels: Record<ResearchTypeNotRandom, number> = {} as any; // fine since we set values next
-  for (const key of Object.keys(p.research)) {
+  const virtualLevels = {} as Record<ResearchTypeNotRandom, number>; // fine since we set values next
+  const virtualProgress = {} as Record<ResearchTypeNotRandom, number>;
+  for (const key of Object.keys(p.research) as ResearchTypeNotRandom[]) {
     virtualLevels[key] = p.research[key].level;
+    virtualProgress[key] = p.research[key].progress ?? 0;
   }
 
-  let cumulativePoints = currentResearchRequiredProgress.value || 0;
-
-  if (currentResearchTicksEta.value != null) {
-    virtualLevels[p.researchingNow]++;
-  }
+  let cumulativeTicks = simulateResearchPhase(
+    p.researchingNow,
+    virtualLevels,
+    virtualProgress,
+    totalScience,
+  );
 
   return queue.value.map((entry) => {
     if (entry === "random") {
-      return null;
+      return null; // tech is only chosen when the entry is popped
     }
 
-    const actualTech = p.research[entry];
-    const currentProgress =
-      virtualLevels[entry] === actualTech.level ? actualTech.progress! : 0;
-
-    const pointsForResearch =
-      services.researchProgressService.getRequiredResearchProgress(
-        game.value,
-        entry,
-        virtualLevels[entry],
-      );
-
-    cumulativePoints += pointsForResearch - currentProgress;
-
-    virtualLevels[entry]++;
-
-    return Math.ceil(cumulativePoints / totalScience);
+    cumulativeTicks += simulateResearchPhase(
+      entry,
+      virtualLevels,
+      virtualProgress,
+      totalScience,
+    );
+    return cumulativeTicks;
   });
 });
 
@@ -248,6 +251,18 @@ const doMoveQueueEntry = (index: number, delta: number) => {
   queue.value.splice(targetIndex, 0, entry);
   doUpdateResearchQueue();
 };
+
+watch(
+  () => player.value?.researchQueue,
+  (newQueue) => {
+    if (loading.value) {
+      return;
+    }
+
+    queue.value = newQueue?.slice() ?? [];
+  },
+  { deep: true },
+);
 
 onMounted(() => {
   loadOptions();

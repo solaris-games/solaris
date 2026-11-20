@@ -373,11 +373,7 @@ export default class ResearchService extends EventEmitter {
     _setNextResearch(game: Game, player: Player) {
         const queue = player.researchQueue || [];
 
-        let entry = queue.shift();
-
-        while (entry === player.researchingNow) {
-            entry = queue.shift();
-        }
+        const entry = queue.shift();
 
         if (entry !== undefined) {
             if (entry === "random") {
