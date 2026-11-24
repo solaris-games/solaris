@@ -29,6 +29,7 @@ import {
     InfrastructureCostService,
     PathfindingService,
     ResearchProgressService,
+    SpecialistValueService,
 } from "@solaris/common";
 import { EmailService } from "../email";
 import GameService from "../game";
@@ -60,9 +61,9 @@ import PlayerAfkService from "../playerAfk";
 import PlayerColourService from "../playerColour";
 import PlayerCreditsService from "../playerCredits";
 import RewardAwardingService from "../playerRewardAwarding";
-import { PlayerCycleRewardsService } from "@solaris/common";
+import { PlayerIncomeService } from "@solaris/common";
 import PlayerReadyService from "../playerReady";
-import PlayerStatisticsService from "../playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
 import RandomService from "../random";
 import RatingService from "../rating";
 import ReportService from "../report";
@@ -71,7 +72,7 @@ import ResearchService from "../research";
 import ScanningService from "../scanning";
 import ScheduleBuyService from "../scheduleBuy";
 import SessionService from "../session";
-import ShipService from "../ship";
+import { ShipService } from "@solaris/common";
 import ShipTransferService from "../shipTransfer";
 import SocketService from "../socket";
 import SpecialStarBanService from "../specialStarBan";
@@ -185,12 +186,12 @@ export interface DependencyContainer {
     paypalService: PaypalService;
     badgeService: BadgeService;
     reportService: ReportService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     playerCreditsService: PlayerCreditsService;
     diplomacyUpkeepService: DiplomacyUpkeepService;
     carrierGiftService: CarrierGiftService;
     carrierMovementService: CarrierMovementService;
-    playerCycleRewardsService: PlayerCycleRewardsService<DBObjectId>;
+    playerIncomeService: PlayerIncomeService<DBObjectId>;
     rewardAwardingService: RewardAwardingService;
     starContestedService: StarContestedService;
     gameFluxService: GameFluxService;
@@ -218,4 +219,5 @@ export interface DependencyContainer {
     scanningService: ScanningService;
     infrastructureCostService: InfrastructureCostService<DBObjectId>;
     tradeEventService: TradeEventService;
+    specialistValueService: SpecialistValueService;
 }

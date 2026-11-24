@@ -4,17 +4,11 @@ import type { Star } from "../types/common/star";
 import type { Id } from "../types/id";
 import type { TechnologyService } from "./technology";
 import type { StarDataService } from "./starData";
+import { SpecialistValueService } from "./specialistValue";
+import { PlayerStatisticsService } from "./playerStatistics";
 
 interface IStarService<ID> {
     listStarsOwnedByPlayer(stars: Star<ID>[], playerId: ID): Star<ID>[];
-}
-
-interface IPlayerStatisticsService<ID> {
-    calculateTotalEconomy(playerStars: Star<ID>[]): number;
-}
-
-interface ISpecialistService<ID> {
-    getCreditsPerTickByScience(star: Star<ID>): number;
 }
 
 export type PlayerCycleCreditsRewards = {
@@ -24,26 +18,14 @@ export type PlayerCycleCreditsRewards = {
     creditsFromSpecialistsTechnology: number;
 };
 
-export class PlayerCycleRewardsService<ID extends Id> {
-    starService: IStarService<ID>;
-    technologyService: TechnologyService;
-    playerStatisticsService: IPlayerStatisticsService<ID>;
-    starDataService: StarDataService;
-    specialistService: ISpecialistService<ID>;
-
+export class PlayerIncomeService<ID extends Id> {
     constructor(
-        starService: IStarService<ID>,
-        technologyService: TechnologyService,
-        playerStatisticsService: IPlayerStatisticsService<ID>,
-        starDataService: StarDataService,
-        specialistService: ISpecialistService<ID>,
-    ) {
-        this.starService = starService;
-        this.technologyService = technologyService;
-        this.playerStatisticsService = playerStatisticsService;
-        this.starDataService = starDataService;
-        this.specialistService = specialistService;
-    }
+        private starService: IStarService<ID>,
+        private technologyService: TechnologyService,
+        private playerStatisticsService: PlayerStatisticsService<ID>,
+        private starDataService: StarDataService,
+        private specialistValueService: SpecialistValueService,
+    ) {}
 
     calculatePlayerCreditsEndOfCycleRewards(
         game: Game<ID>,
@@ -151,7 +133,7 @@ export class PlayerCycleRewardsService<ID extends Id> {
             }
 
             const creditsByScience =
-                this.specialistService.getCreditsPerTickByScience(star);
+                this.specialistValueService.getCreditsPerTickByScience(star);
 
             credits += creditsByScience * star.infrastructure.science!;
         }

@@ -1,10 +1,8 @@
-import CarrierService from "./carrier";
-import StarService from "./star";
-import { TechnologyService } from "@solaris/common";
-import { Carrier } from "./types/Carrier";
-import { DBObjectId } from "./types/DBObjectId";
-import { Game } from "./types/Game";
-import { Star } from "./types/Star";
+import type { TechnologyService } from "./technology";
+import type { Game } from "../types/common/game";
+import type { Star } from "../types/common/star";
+import type { Carrier } from "../types/common/carrier";
+import type { Id } from "../types/id";
 
 export interface IPlayerPopulationCap {
     shipsCurrent: number;
@@ -13,26 +11,29 @@ export interface IPlayerPopulationCap {
     isPopulationCapped: boolean;
 }
 
-export default class ShipService {
-    starService: StarService;
-    technologyService: TechnologyService;
-    carrierService: CarrierService;
+interface IStarService<ID> {
+    listStarsOwnedByPlayer(stars: Star<ID>[], playerId: ID): Star<ID>[];
+}
 
+interface ICarrierService<ID> {
+    listCarriersOwnedByPlayer(
+        carriers: Carrier<ID>[],
+        playerId: ID,
+    ): Carrier<ID>[];
+}
+
+export class ShipService<ID extends Id> {
     constructor(
-        starService: StarService,
-        technologyService: TechnologyService,
-        carrierService: CarrierService,
-    ) {
-        this.starService = starService;
-        this.technologyService = technologyService;
-        this.carrierService = carrierService;
-    }
+        private starService: IStarService<ID>,
+        private technologyService: TechnologyService,
+        private carrierService: ICarrierService<ID>,
+    ) {}
 
-    isPopulationRestricted(game: Game) {
+    isPopulationRestricted(game: Game<ID>) {
         return game.settings.player.populationCap.enabled === "enabled";
     }
 
-    calculateTotalShips(ownedStars: Star[], ownedCarriers: Carrier[]) {
+    calculateTotalShips(ownedStars: Star<ID>[], ownedCarriers: Carrier<ID>[]) {
         return (
             ownedStars
                 .filter((s) => s.ships != null)
@@ -44,8 +45,8 @@ export default class ShipService {
     }
 
     calculatePopulationCap(
-        game: Game,
-        playerId: DBObjectId,
+        game: Game<ID>,
+        playerId: ID,
     ): IPlayerPopulationCap | null {
         if (!this.isPopulationRestricted(game)) {
             return null;
@@ -79,41 +80,9 @@ export default class ShipService {
         };
     }
 
-    produceShips(game: Game) {
-        const starsToProduce = game.galaxy.stars.filter(
-            (s) => s.infrastructure.industry! > 0,
-        );
-
-        for (let i = 0; i < starsToProduce.length; i++) {
-            let star = starsToProduce[i];
-
-            if (star.ownedByPlayerId) {
-                // Note: We recalculate the pop cap every time we produce ships so that it is always up to date.
-                const cap = this.calculatePopulationCap(
-                    game,
-                    star.ownedByPlayerId!,
-                );
-
-                if (cap?.isPopulationCapped) {
-                    continue;
-                }
-
-                const productionShips = this.calculateStarShipProduction(
-                    game,
-                    star,
-                    cap,
-                );
-
-                // Increase the number of ships garrisoned by how many are manufactured this tick.
-                star.shipsActual! += productionShips;
-                star.ships = Math.floor(star.shipsActual!);
-            }
-        }
-    }
-
     calculateStarShipProduction(
-        game: Game,
-        star: Star,
+        game: Game<ID>,
+        star: Star<ID>,
         populationCap: IPlayerPopulationCap | null,
     ) {
         const starEffectiveTechs =
@@ -152,8 +121,8 @@ export default class ShipService {
     }
 
     calculateManufacturingForIndustry(
-        game: Game,
-        star: Star,
+        game: Game<ID>,
+        star: Star<ID>,
         industry: number,
     ) {
         const effectiveTechs =
@@ -167,7 +136,7 @@ export default class ShipService {
         );
     }
 
-    calculateStarManufacturing(game: Game, star: Star) {
+    calculateStarManufacturing(game: Game<ID>, star: Star<ID>) {
         const effectiveTechs =
             this.technologyService.getStarEffectiveTechnologyLevels(game, star);
         const ind = star.infrastructure?.industry ?? 0;

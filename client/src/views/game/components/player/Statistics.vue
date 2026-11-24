@@ -137,26 +137,49 @@ const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isConquestHomeStars = computed(() =>
   GameHelper.isConquestHomeStars(game.value),
 );
-const playerIncome = computed(
-  () => GameHelper.calculateIncome(game.value, player.value) || 0, // no stats -> assume zero
+
+const playerCycleRewards = computed(() =>
+  services.playerIncomeService.calculatePlayerCreditsEndOfCycleRewards(
+    game.value,
+    player.value,
+  ),
 );
-const userPlayerIncome = computed(
+
+const userPlayerCycleRewards = computed(
   () =>
     userPlayer.value &&
-    GameHelper.calculateIncome(game.value, userPlayer.value),
+    services.playerIncomeService.calculatePlayerCreditsEndOfCycleRewards(
+      game.value,
+      userPlayer.value,
+    ),
+);
+
+const playerIncome = computed(
+  () => playerCycleRewards.value.creditsTotal || 0, // no stats -> assume zero
+);
+const userPlayerIncome = computed(
+  () => userPlayerCycleRewards.value?.creditsTotal || 0,
 );
 const playerTickIncome = computed(() =>
-  GameHelper.calculateTickIncome(game.value, player.value),
+  services.playerIncomeService.calculatePerTickIncome(game.value, player.value),
 );
+
 const userPlayerTickIncome = computed(
   () =>
     userPlayer.value &&
-    GameHelper.calculateTickIncome(game.value, userPlayer.value),
+    services.playerIncomeService.calculatePerTickIncome(
+      game.value,
+      userPlayer.value,
+    ),
 );
 
-const playerTokenIncome = computed(() => 0);
+const playerTokenIncome = computed(
+  () => playerCycleRewards.value.creditsFromSpecialistsTechnology,
+);
 
-const userPlayerTokenIncome = computed(() => 0);
+const userPlayerTokenIncome = computed(
+  () => userPlayerCycleRewards.value?.creditsFromSpecialistsTechnology,
+);
 
 const formatCreditsValue = (player: Player, value: number) => `$${value}`;
 

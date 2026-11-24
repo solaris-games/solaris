@@ -11,7 +11,11 @@ import {
     CarrierCollision,
     DualCarrierCollision,
 } from "./types/CarrierCollision";
-import { CarrierTravelService, DistanceService } from "@solaris/common";
+import {
+    CarrierTravelService,
+    DistanceService,
+    SpecialistValueService,
+} from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
 import CombatProcessingService from "./combatProcessing";
 import { IEventService } from "./types/IEventService";
@@ -28,7 +32,7 @@ export default class CarrierCombatService {
     diplomacyService: DiplomacyService;
     distanceService: DistanceService;
     playerService: PlayerService;
-    specialistService: SpecialistService;
+    specialistValueService: SpecialistValueService;
     starService: StarService;
     combatProcessingService: CombatProcessingService;
 
@@ -38,7 +42,7 @@ export default class CarrierCombatService {
         diplomacyService: DiplomacyService,
         distanceService: DistanceService,
         playerService: PlayerService,
-        specialistService: SpecialistService,
+        specialistValueService: SpecialistValueService,
         starService: StarService,
         combatProcessingService: CombatProcessingService,
     ) {
@@ -47,7 +51,7 @@ export default class CarrierCombatService {
         this.diplomacyService = diplomacyService;
         this.distanceService = distanceService;
         this.playerService = playerService;
-        this.specialistService = specialistService;
+        this.specialistValueService = specialistValueService;
         this.starService = starService;
         this.combatProcessingService = combatProcessingService;
     }
@@ -65,7 +69,9 @@ export default class CarrierCombatService {
                 (x) =>
                     (this.carrierTravelService.isInTransit(x) || // Carrier is already in transit
                         this.carrierTravelService.isLaunching(x)) && // Or the carrier is just about to launch (this prevent carrier from hopping over attackers)
-                    !this.specialistService.getAvoidCombatCarrierToCarrier(x), // Check if the carrier is eligable for c2cc.
+                    !this.specialistValueService.getAvoidCombatCarrierToCarrier(
+                        x,
+                    ), // Check if the carrier is eligable for c2cc.
             )
             .map((c) => {
                 const waypoint = c.waypoints[0];

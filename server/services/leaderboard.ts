@@ -18,7 +18,7 @@ import GameService from "./game";
 import GameStateService from "./gameState";
 import { GameTypeService } from "@solaris/common";
 import PlayerService from "./player";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
 import RatingService from "./rating";
 import PlayerAfkService from "./playerAfk";
 import UserLevelService from "./userLevel";
@@ -95,7 +95,7 @@ export default class LeaderboardService {
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
     badgeService: BadgeService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     teamService: TeamService;
 
     constructor(

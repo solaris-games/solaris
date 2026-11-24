@@ -3,26 +3,24 @@ import { Game } from "./types/Game";
 import { Location } from "./types/Location";
 import { Star } from "./types/Star";
 import MapService from "./map";
-import { StarDistanceService } from "@solaris/common";
-import SpecialistService from "./specialist";
-import { WaypointService } from "@solaris/common";
+import { SpecialistValueService, StarDistanceService } from "@solaris/common";
 import CullWaypointsService from "./cullWaypoints";
 
 export default class starMovementService {
     mapService: MapService;
     starDistanceService: StarDistanceService;
-    specialistService: SpecialistService;
+    specialistValueService: SpecialistValueService;
     cullWaypointsService: CullWaypointsService;
 
     constructor(
         mapService: MapService,
         starDistanceService: StarDistanceService,
-        specialistService: SpecialistService,
+        specialistValueService: SpecialistValueService,
         cullWaypointsService: CullWaypointsService,
     ) {
         this.mapService = mapService;
         this.starDistanceService = starDistanceService;
-        this.specialistService = specialistService;
+        this.specialistValueService = specialistValueService;
         this.cullWaypointsService = cullWaypointsService;
     }
 
@@ -111,7 +109,8 @@ export default class starMovementService {
     moveStellarEngines(game: Game) {
         const beaconStars = game.galaxy.stars.filter(
             (s) =>
-                s.ownedByPlayerId && this.specialistService.getStarAttract(s),
+                s.ownedByPlayerId &&
+                this.specialistValueService.getStarAttract(s),
         );
 
         if (beaconStars.length === 0) {
@@ -120,7 +119,8 @@ export default class starMovementService {
 
         const engineStars = game.galaxy.stars.filter(
             (s) =>
-                s.ownedByPlayerId && this.specialistService.getStarMovement(s),
+                s.ownedByPlayerId &&
+                this.specialistValueService.getStarMovement(s),
         );
 
         for (let star of engineStars) {
@@ -134,7 +134,7 @@ export default class starMovementService {
                     closestStar,
                 );
             let starSpeed =
-                this.specialistService.getStarMovementPerTick(star) *
+                this.specialistValueService.getStarMovementPerTick(star) *
                 game.settings.specialGalaxy.carrierSpeed;
 
             // This line makes sure the Stellar Engine never moves too close to the target star
@@ -154,7 +154,7 @@ export default class starMovementService {
         }
 
         const nonEngineStars = game.galaxy.stars.filter(
-            (s) => !this.specialistService.getStarMovement(s),
+            (s) => !this.specialistValueService.getStarMovement(s),
         );
 
         this.maintainDistance(game, engineStars, nonEngineStars);

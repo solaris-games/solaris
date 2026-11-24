@@ -37,7 +37,7 @@ import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDe
 import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
 import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
-import ShipService from "./ship";
+import { ShipService } from "@solaris/common";
 import ScheduleBuyService from "./scheduleBuy";
 import { DateTime } from "luxon";
 import GameLockService from "./gameLock";
@@ -107,7 +107,7 @@ export default class GameTickService extends EventEmitter {
     carrierGiftService: CarrierGiftService;
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
-    shipService: ShipService;
+    shipService: ShipService<DBObjectId>;
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
     waypointActionService: WaypointActionService;

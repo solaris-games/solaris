@@ -2,7 +2,8 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerReputation } from "./types/Player";
 import DiplomacyService from "./diplomacy";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
+import { DBObjectId } from "./types/DBObjectId";
 import PlayerAfkService from "./playerAfk";
 
 import EventEmitter from "events";

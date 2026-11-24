@@ -1,4 +1,3 @@
-import { Carrier } from "./types/Carrier";
 import { Game } from "./types/Game";
 import {
     Specialist,
@@ -6,7 +5,6 @@ import {
     ValidationError,
     GameTypeService,
 } from "@solaris/common";
-import { Star } from "./types/Star";
 
 const specialists = require("../config/game/specialists.json") as Specialist[];
 
@@ -109,14 +107,6 @@ export default class SpecialistService {
         return specs.sort((a, b) => a.name - b.name);
     }
 
-    listCarrier(game: Game | null): Specialist[] {
-        return this.list(game, "carrier");
-    }
-
-    listStar(game: Game | null): Specialist[] {
-        return this.list(game, "star");
-    }
-
     getSpecialistActualCost(game: Game, specialist: Specialist) {
         let result = {
             credits: 0,
@@ -135,114 +125,12 @@ export default class SpecialistService {
         return result;
     }
 
-    getAvoidCombatCarrierToCarrier(carrier: Carrier) {
-        return this._getCarrierSpecialValue(
-            carrier,
-            "avoidCombatCarrierToCarrier",
-            false,
-        );
+    listCarrier(game: Game | null): Specialist[] {
+        return this.list(game, "carrier");
     }
 
-    _getCarrierSpecialValue(carrier: Carrier, name: string, defaultValue) {
-        if (!carrier.specialistId) {
-            return defaultValue;
-        }
-
-        let specialist = this.getByIdCarrier(carrier.specialistId);
-
-        if (specialist == null || !specialist.modifiers.special) {
-            return defaultValue;
-        }
-
-        let val = specialist.modifiers.special[name];
-
-        return val == null ? defaultValue : val;
-    }
-
-    _getStarSpecialValue(star: Star, name: string, defaultValue) {
-        if (!star.specialistId) {
-            return defaultValue;
-        }
-
-        let specialist = this.getByIdStar(star.specialistId);
-
-        if (specialist == null || !specialist.modifiers.special) {
-            return defaultValue;
-        }
-
-        let val = specialist.modifiers.special[name];
-
-        return val == null ? defaultValue : val;
-    }
-
-    getStarCaptureRewardMultiplier(carrier: Carrier) {
-        return this._getCarrierSpecialValue(
-            carrier,
-            "starCaptureRewardMultiplier",
-            1,
-        );
-    }
-
-    hasAwardDoubleCaptureRewardSpecialist(carriers: Carrier[]) {
-        return carriers
-            .map((c) => this.getStarCaptureRewardMultiplier(c))
-            .sort((a, b) => b - a)[0];
-    }
-
-    getEconomyInfrastructureMultiplier(star: Star) {
-        return this._getStarSpecialValue(
-            star,
-            "economyInfrastructureMultiplier",
-            1,
-        );
-    }
-
-    getScienceInfrastructureMultiplier(star: Star) {
-        return this._getStarSpecialValue(
-            star,
-            "scienceInfrastructureMultiplier",
-            1,
-        );
-    }
-
-    getCreditsPerTickByScience(star: Star) {
-        return this._getStarSpecialValue(star, "creditsPerTickByScience", 0);
-    }
-
-    getReigniteDeadStar(carrier: Carrier) {
-        return this._getCarrierSpecialValue(carrier, "reigniteDeadStar", false);
-    }
-
-    getReigniteDeadStarNaturalResources(carrier: Carrier) {
-        return this._getCarrierSpecialValue(
-            carrier,
-            "reigniteDeadStarNaturalResources",
-            {
-                economy: 25,
-                industry: 25,
-                science: 25,
-            },
-        );
-    }
-
-    getStarHideShips(star: Star): boolean {
-        return this._getStarSpecialValue(star, "hideShips", false);
-    }
-
-    getCarrierHideShips(carrier: Carrier): boolean {
-        return this._getCarrierSpecialValue(carrier, "hideShips", false);
-    }
-
-    getStarMovement(star: Star) {
-        return this._getStarSpecialValue(star, "moveStar", false);
-    }
-
-    getStarMovementPerTick(star: Star) {
-        return this._getStarSpecialValue(star, "starMovementPerTick", 0.2);
-    }
-
-    getStarAttract(star: Star) {
-        return this._getStarSpecialValue(star, "attractStar", false);
+    listStar(game: Game | null): Specialist[] {
+        return this.list(game, "star");
     }
 
     clearExpiredSpecialists(game: Game) {

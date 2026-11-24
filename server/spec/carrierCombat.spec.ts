@@ -4,6 +4,7 @@ import {
     CarrierTravelService,
     DistanceService,
     GameTypeService,
+    SpecialistValueService,
     StarDataService,
     StarDistanceService,
     TechnologyService,
@@ -137,6 +138,10 @@ describe("carrierCombat", () => {
 
     const playerServiceStub = unconfigured(PlayerService);
 
+    const specialistValueService = new SpecialistValueService(
+        specialistService,
+    );
+
     const carrierMovementService = new CarrierMovementService(
         gameRepoStub,
         distanceService,
@@ -149,6 +154,7 @@ describe("carrierCombat", () => {
         starDistanceService,
         carrierTravelService,
         starDataService,
+        specialistValueService,
     );
 
     describe("_mergeCollisionsInPath", () => {
@@ -183,7 +189,7 @@ describe("carrierCombat", () => {
             diplomacyService,
             distanceService,
             playerServiceStub,
-            specialistService,
+            specialistValueService,
             starService,
             unconfigured(CombatProcessingService),
         );
@@ -406,7 +412,7 @@ describe("carrierCombat", () => {
                 diplomacyService,
                 distanceService,
                 playerServiceStub,
-                specialistService,
+                specialistValueService,
                 starService,
                 combatProcessingService,
             );
@@ -439,7 +445,7 @@ describe("carrierCombat", () => {
                 diplomacyService,
                 distanceService,
                 playerServiceStub,
-                specialistService,
+                specialistValueService,
                 starService,
                 combatProcessingService,
             );

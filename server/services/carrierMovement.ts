@@ -4,6 +4,7 @@ import {
     CarrierTravelService,
     CarrierWaypoint,
     DistanceService,
+    SpecialistValueService,
     StarDataService,
     StarDistanceService,
     TechnologyService,
@@ -43,6 +44,7 @@ export default class CarrierMovementService {
     starService: StarService;
     playerService: PlayerService;
     specialistService: SpecialistService;
+    specialistValueService: SpecialistValueService;
     diplomacyService: DiplomacyService;
     carrierGiftService: CarrierGiftService;
     technologyService: TechnologyService;
@@ -62,6 +64,7 @@ export default class CarrierMovementService {
         starDistanceService: StarDistanceService,
         carrierTravelService: CarrierTravelService<DBObjectId>,
         starDataService: StarDataService,
+        specialistValueService: SpecialistValueService,
     ) {
         this.gameRepo = gameRepo;
         this.distanceService = distanceService;
@@ -74,6 +77,7 @@ export default class CarrierMovementService {
         this.starDistanceService = starDistanceService;
         this.carrierTravelService = carrierTravelService;
         this.starDataService = starDataService;
+        this.specialistValueService = specialistValueService;
     }
 
     moveCarrierToCurrentWaypoint(
@@ -124,12 +128,12 @@ export default class CarrierMovementService {
             !carrier.isGift &&
             destinationStar.ownedByPlayerId &&
             this.starDataService.isDeadStar(destinationStar) &&
-            this.specialistService.getReigniteDeadStar(carrier)
+            this.specialistValueService.getReigniteDeadStar(carrier)
         ) {
             const reigniteSpecialistNaturalResources =
-                this.specialistService.getReigniteDeadStarNaturalResources(
+                this.specialistValueService.getReigniteDeadStarNaturalResources(
                     carrier,
-                );
+                )!;
 
             // Double resources for binary stars.
             const modifier = destinationStar.isBinaryStar ? 2 : 1;
