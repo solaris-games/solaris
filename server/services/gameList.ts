@@ -315,7 +315,7 @@ export default class GameListService {
         userId: DBObjectId,
         includeTurnWaiting: boolean = true,
         includeUnreadEvents: boolean = true,
-        includeUnreadConversastions: boolean = true,
+        includeUnreadConversations: boolean = true,
         includePosition: boolean = true,
     ): Promise<GameUserNotification> {
         const player = game.galaxy.players.find(
@@ -333,7 +333,7 @@ export default class GameListService {
         // Note: The player may have gone afk and been replaced by another player so we need to
         // double check that the player is actually in the game to retrieve conversation counts etc.
         if (player) {
-            if (includeUnreadConversastions)
+            if (includeUnreadConversations)
                 unreadConversations = this.conversationService.getUnreadCount(
                     game,
                     player._id,
@@ -376,7 +376,7 @@ export default class GameListService {
             }
         }
 
-        let notification: GameUserNotification = {
+        return {
             unreadConversations,
             unreadEvents,
             unread: totalUnread,
@@ -384,11 +384,13 @@ export default class GameListService {
             turnReadyCount,
             turnTotalCount,
             defeated: player?.defeated || null,
-            afk: player?.afk || null,
+            afk:
+                player?.afk ||
+                Boolean(
+                    game.afkers.find((i) => i.toString() === userId.toString()),
+                ),
             position,
         };
-
-        return notification;
     }
 
     async listOldCompletedGamesNotCleaned(months: number = 1) {

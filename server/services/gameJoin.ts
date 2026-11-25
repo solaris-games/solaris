@@ -207,6 +207,7 @@ export default class GameJoinService extends EventEmitter {
         const isAfker = game.afkers.find(
             (x) => x.toString() === userId.toString(),
         );
+
         const isRejoiningAfkSlot =
             isAfker &&
             player.afk &&
@@ -224,6 +225,12 @@ export default class GameJoinService extends EventEmitter {
         ) {
             throw new ValidationError(
                 "You can only rejoin this game in your own slot.",
+            );
+        }
+
+        if (isAfker && !isRejoiningAfkSlot) {
+            throw new ValidationError(
+                "You cannot rejoin your slot, it is filled already.",
             );
         }
 
@@ -367,6 +374,15 @@ export default class GameJoinService extends EventEmitter {
         if (userId) {
             // Clear out any players the user may be spectating.
             this.spectatorService.clearSpectating(game, userId);
+        }
+
+        if (isRejoiningOwnAfkSlot) {
+            // remove from afkers list
+            game.afkers.splice(
+                game.afkers.findIndex(
+                    (a) => a.toString() === userId.toString(),
+                ),
+            );
         }
 
         // If the max player count is reached then start the game.
