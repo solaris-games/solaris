@@ -27,6 +27,10 @@ export class PlayerIncomeService<ID extends Id> {
         private specialistValueService: SpecialistValueService,
     ) {}
 
+    calculateEconomyCredits(economy: number) {
+        return economy * 10;
+    }
+
     calculatePlayerCreditsEndOfCycleRewards(
         game: Game<ID>,
         player: Player<ID>,
@@ -39,16 +43,16 @@ export class PlayerIncomeService<ID extends Id> {
         const totalEco =
             this.playerStatisticsService.calculateTotalEconomy(playerStars);
 
-        const creditsFromEconomy = totalEco * 10;
-        const creditsFromBanking = this._getBankingReward(
+        const creditsFromEconomy = this.calculateEconomyCredits(totalEco);
+        const creditsFromBanking = this.getBankingReward(
             game,
             player,
-            playerStars,
+            playerStars.length,
             totalEco,
         );
         const creditsTotal = creditsFromEconomy + creditsFromBanking;
         const creditsFromSpecialistsTechnology =
-            this._getCreditsSpecialistsReward(game, player, playerStars);
+            this.getCreditsSpecialistsReward(game, player, playerStars.length);
 
         return {
             creditsFromEconomy,
@@ -58,18 +62,18 @@ export class PlayerIncomeService<ID extends Id> {
         };
     }
 
-    _getBankingReward(
+    getBankingReward(
         game: Game<ID>,
         player: Player<ID>,
-        playerStars: Star<ID>[],
+        playerStarCount: number,
         totalEco: number,
     ) {
-        let isBankingEnabled = this.technologyService.isTechnologyEnabled(
+        const isBankingEnabled = this.technologyService.isTechnologyEnabled(
             game,
             "banking",
         );
 
-        if (!isBankingEnabled || !playerStars.length) {
+        if (!isBankingEnabled || playerStarCount === 0) {
             // Players must have stars in order to get credits from banking.
             return 0;
         }
@@ -87,12 +91,12 @@ export class PlayerIncomeService<ID extends Id> {
         }
     }
 
-    _getCreditsSpecialistsReward(
+    getCreditsSpecialistsReward(
         game: Game<ID>,
         player: Player<ID>,
-        playerStars: Star<ID>[],
+        playerStarCount: number,
     ) {
-        if (!playerStars.length) {
+        if (playerStarCount === 0) {
             return 0;
         }
 
@@ -106,7 +110,6 @@ export class PlayerIncomeService<ID extends Id> {
             return 0;
         }
 
-        const starCount = playerStars.length;
         const specialists = player.research.specialists.level;
 
         switch (game.settings.technology.specialistTokenReward) {
@@ -115,7 +118,10 @@ export class PlayerIncomeService<ID extends Id> {
             case "dependsOnStarCount":
                 const factor = 2 / game.settings.galaxy.starsPerPlayer;
                 return Math.ceil(
-                    Math.min(starCount * specialists * factor, specialists),
+                    Math.min(
+                        playerStarCount * specialists * factor,
+                        specialists,
+                    ),
                 );
         }
     }
