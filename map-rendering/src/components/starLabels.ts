@@ -1,7 +1,7 @@
 import { BitmapText, Container } from "pixi.js";
 import type { UserGameSettings } from "@solaris/common";
-import Helpers from "./helpers";
-import type { Game, Star as StarData } from "./types/game";
+import Helpers from "../helpers";
+import type { Game, Star as StarData } from "../types/game";
 
 const NAME_SIZE = 4;
 const SHIPS_SMALL_SIZE = 6;

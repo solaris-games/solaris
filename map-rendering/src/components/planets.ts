@@ -1,8 +1,8 @@
 import { Application, Container, Graphics, Ticker } from "pixi.js";
 import type { UserGameSettings } from "@solaris/common";
-import type { DrawingContext } from "./container";
-import Helpers from "./helpers";
-import type { Game, Star } from "./types/game";
+import type { DrawingContext } from "../container";
+import Helpers from "../helpers";
+import type { Game, Star } from "../types/game";
 
 type Planet = {
     index: number;

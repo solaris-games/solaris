@@ -1,7 +1,7 @@
 import { Container, Graphics } from "pixi.js";
-import { type Game, type Star } from "./types/game";
+import { type Game, type Star } from "../types/game";
 import { DistanceService, StarDataService } from "@solaris/common";
-import type { DrawingContext } from "./container";
+import type { DrawingContext } from "../container";
 
 export class RangeIndicator {
     container: Container;

@@ -32,7 +32,7 @@ import { Viewport } from "pixi-viewport";
 import type { TempWaypoint } from "./types/waypoint";
 import type { RulerPoint } from "./types/ruler";
 import helpers from "./helpers";
-import { RangeIndicator } from "./rangeIndicator";
+import { RangeIndicator } from "./components/rangeIndicator";
 
 export enum ModeKind {
     Galaxy = "galaxy",

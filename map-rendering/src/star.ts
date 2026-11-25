@@ -21,12 +21,11 @@ import {
 } from "@solaris/common";
 import type { DrawingContext } from "./container";
 import { EventEmitter } from "./eventEmitter";
-import helpers from "./helpers";
-import { Planets } from "./planets";
-import { StarLabels } from "./starLabels";
+import { Planets } from "./components/planets";
+import { StarLabels } from "./components/starLabels";
+import { NaturalResourcesRing } from "./components/naturalResourcesRing";
 
 const CULLING_MARGIN = 16;
-const MAX_LOD = 4;
 
 export type BasicStarClickEvent = {
     eventData?: FederatedPointerEvent;
@@ -58,7 +57,6 @@ export class Star
     container: Container;
     shapePartGraphics: Sprite;
     shapeFullGraphics: Sprite;
-    naturalResourcesRingGraphics: Graphics[];
     starGraphics: Sprite;
     targetedGraphics: Graphics;
     selectedGraphics: Graphics;
@@ -73,6 +71,7 @@ export class Star
     context: DrawingContext;
     userSettings: UserGameSettings;
     planets: Planets;
+    naturalResourcesRing: NaturalResourcesRing;
     pulsarGraphics: Graphics | null = null;
     nebulaSprite: Sprite | null = null;
     wormHoleSprite: Sprite | null = null;
@@ -110,11 +109,14 @@ export class Star
         this.container.eventMode = "static";
 
         this.planets = new Planets(app, userSettings, context, game, data);
+        this.naturalResourcesRing = new NaturalResourcesRing(
+            userSettings,
+            data,
+        );
         this.labels = new StarLabels(game, data, userSettings);
         this.starGraphics = new Sprite();
         this.shapePartGraphics = new Sprite();
         this.shapeFullGraphics = new Sprite();
-        this.naturalResourcesRingGraphics = new Array(MAX_LOD);
         this.targetedGraphics = new Graphics();
         this.selectedGraphics = new Graphics();
         this.kingOfTheHillGraphics = new Graphics();
@@ -126,6 +128,7 @@ export class Star
         this.container.addChild(this.selectedGraphics);
         this.container.addChild(this.kingOfTheHillGraphics);
         this.container.addChild(this.planets.container);
+        this.container.addChild(this.naturalResourcesRing.container);
         this.container.addChild(this.labels.container);
 
         this.container.on("pointerup", this.onClicked.bind(this));
@@ -193,8 +196,8 @@ export class Star
         this.drawSelectedCircle();
         this.drawStar();
         this.drawSpecialist();
-        this.drawPlanets();
-        this.drawNaturalResourcesRing();
+        this.planets.draw();
+        this.naturalResourcesRing.draw();
         this.drawColour();
         this.labels.draw();
         this.drawInfrastructure();
@@ -462,64 +465,6 @@ export class Star
         );
     }
 
-    drawPlanets() {
-        this.planets.draw();
-    }
-
-    drawNaturalResourcesRing() {
-        if (!this.data.naturalResources) {
-            return;
-        }
-        for (let lod = 0; lod < MAX_LOD; lod += 1) {
-            if (!this.naturalResourcesRingGraphics[lod]) {
-                this.naturalResourcesRingGraphics[lod] = new Graphics();
-                this.naturalResourcesRingGraphics[lod].alpha = 0.5;
-                this.naturalResourcesRingGraphics[lod].zIndex = -1;
-            }
-            this.naturalResourcesRingGraphics[lod].clear();
-
-            if (this.userSettings.map.naturalResources !== "single-ring") {
-                return;
-            }
-
-            const averageNaturalResources =
-                Helpers.calculateAverageNaturalResources(
-                    this.data.naturalResources,
-                );
-
-            // let ringRadius = this.data.naturalResources > 100 ? 100 : this.data.naturalResources
-            // TODO: Experimental:
-            let ringRadius =
-                averageNaturalResources <= 50
-                    ? averageNaturalResources
-                    : averageNaturalResources > 400
-                      ? 100
-                      : 12.5 * Math.log2(averageNaturalResources / 50) + 50;
-
-            ringRadius /= 8.0;
-            let lineWidth = 1.0 / 8.0;
-            ringRadius *= lod + 1;
-            lineWidth *= lod + 1;
-            this.naturalResourcesRingGraphics[lod].clear();
-            this.naturalResourcesRingGraphics[lod].circle(
-                0,
-                0,
-                ringRadius * 0.75,
-            );
-            this.naturalResourcesRingGraphics[lod].stroke({
-                width: lineWidth,
-                color: 0xffffff,
-                alpha: this.userSettings.map.naturalResourcesRingOpacity,
-            });
-            this.naturalResourcesRingGraphics[lod].scale.x =
-                1.0 / ((1.0 / 8.0) * (lod + 1));
-            this.naturalResourcesRingGraphics[lod].scale.y =
-                1.0 / ((1.0 / 8.0) * (lod + 1));
-            this.naturalResourcesRingGraphics[lod].zIndex = 9;
-            this.container.addChild(this.naturalResourcesRingGraphics[lod]);
-        }
-    }
-
     drawColour() {
         if (this.shapePartGraphics) {
             this.container.removeChild(this.shapePartGraphics);
@@ -749,29 +694,8 @@ export class Star
     updateVisibility() {
         const apparentScale =
             this.container.scale.x * (this.zoomPercent / 100.0);
-        const lod = Math.max(
-            Math.min(Math.floor(apparentScale) - 1, MAX_LOD - 1),
-            0.0,
-        );
-        for (let l = 0; l < MAX_LOD; l += 1) {
-            const ring = this.naturalResourcesRingGraphics[l];
-
-            if (ring) {
-                ring.visible = false;
-            }
-        }
 
         this.starGraphics.visible = !this.hasSpecialist(); //|| this.hasBlackHole()
-
-        if (this.userSettings.map.naturalResources !== "planets") {
-            if (this.naturalResourcesRingGraphics[lod]) {
-                this.naturalResourcesRingGraphics[lod].visible = Boolean(
-                    this.data.isInScanningRange &&
-                    this.zoomPercent >=
-                        this.userSettings.map.zoomLevels.star.naturalResources,
-                );
-            }
-        }
 
         this.labels.updateVisibility(
             this.zoomPercent,
@@ -780,6 +704,10 @@ export class Star
         );
 
         this.planets.updateVisibility(this.zoomPercent);
+        this.naturalResourcesRing.updateVisibility(
+            this.zoomPercent,
+            apparentScale,
+        );
 
         if (this.infrastructureText)
             this.infrastructureText.visible =
@@ -787,10 +715,10 @@ export class Star
                 this.zoomPercent >=
                     this.userSettings.map.zoomLevels.star.infrastructure;
 
-        let partial_ring = this.labels.partialTextVisible;
+        const partialRing = this.labels.partialTextVisible;
 
-        this.shapePartGraphics.visible = partial_ring;
-        this.shapeFullGraphics.visible = !partial_ring;
+        this.shapePartGraphics.visible = partialRing;
+        this.shapeFullGraphics.visible = !partialRing;
     }
 
     deselectAllText() {
