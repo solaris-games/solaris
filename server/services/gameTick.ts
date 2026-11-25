@@ -444,10 +444,10 @@ export default class GameTickService extends EventEmitter {
         await game.save();
         logTime("Save game");
 
+        await this._emitEvents(game, context.getNotificationService());
+
         await context.save();
         logTime("Save context");
-
-        await this._emitEvents(game, context.getNotificationService());
 
         const endTime = process.hrtime(startTime);
 
