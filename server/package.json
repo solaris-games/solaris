@@ -43,7 +43,7 @@
         "express-session": "1.19.0",
         "memory-cache": "0.2.0",
         "luxon": "3.5.0",
-        "mongoose": "9.9.4",
+        "mongoose": "9.12.2",
         "mongoose-lean-defaults": "2.3.1",
         "nodemailer": "10.2.1",
         "pino": "10.3.1",

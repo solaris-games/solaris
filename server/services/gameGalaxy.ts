@@ -15,10 +15,10 @@ import HistoryService from "./history";
 import MapService from "./map";
 import PlayerService from "./player";
 import PlayerAfkService from "./playerAfk";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
 import ReputationService from "./reputation";
 import ResearchService from "./research";
-import ShipService from "./ship";
+import { ShipService } from "@solaris/common";
 import SocketService from "./socket";
 import SpecialistService from "./specialist";
 import SpectatorService from "./spectator";
@@ -68,7 +68,7 @@ export default class GameGalaxyService {
     playerService: PlayerService;
     playerAfkService: PlayerAfkService;
     starService: StarService;
-    shipService: ShipService;
+    shipService: ShipService<DBObjectId>;
     distanceService: DistanceService;
     starDistanceService: StarDistanceService;
     starUpgradeService: StarUpgradeService;
@@ -86,7 +86,7 @@ export default class GameGalaxyService {
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
     avatarService: AvatarService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
     gameMaskingService: GameMaskingService;
@@ -101,7 +101,7 @@ export default class GameGalaxyService {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         starService: StarService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
         distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
@@ -119,7 +119,7 @@ export default class GameGalaxyService {
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
         avatarService: AvatarService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         gameFluxService: GameFluxService,
         spectatorService: SpectatorService,
         gameMaskingService: GameMaskingService,

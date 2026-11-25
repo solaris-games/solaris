@@ -2,7 +2,8 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, PlayerReputation } from "./types/Player";
 import DiplomacyService from "./diplomacy";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
+import { DBObjectId } from "./types/DBObjectId";
 import PlayerAfkService from "./playerAfk";
 
 import EventEmitter from "events";
@@ -16,13 +17,13 @@ const ENEMY_REPUTATION_THRESHOLD = -1;
 
 export default class ReputationService extends EventEmitter {
     gameRepo: Repository<Game>;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     diplomacyService: DiplomacyService;
     playerAfkService: PlayerAfkService;
 
     constructor(
         gameRepo: Repository<Game>,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         diplomacyService: DiplomacyService,
         playerAfkService: PlayerAfkService,
     ) {

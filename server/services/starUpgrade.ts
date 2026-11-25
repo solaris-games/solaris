@@ -25,7 +25,7 @@ import CarrierService from "./carrier";
 import ResearchService from "./research";
 import StarService from "./star";
 import PlayerCreditsService from "./playerCredits";
-import ShipService from "./ship";
+import { ShipService } from "@solaris/common";
 import { IEventService } from "./types/IEventService";
 import { IStatisticsService } from "./types/IStatisticsService";
 
@@ -59,7 +59,7 @@ export default class StarUpgradeService extends EventEmitter {
     technologyService: TechnologyService;
     playerCreditsService: PlayerCreditsService;
     gameTypeService: GameTypeService;
-    shipService: ShipService;
+    shipService: ShipService<DBObjectId>;
     starDataService: StarDataService;
     infrastructureCostService: InfrastructureCostService<DBObjectId>;
 
@@ -72,7 +72,7 @@ export default class StarUpgradeService extends EventEmitter {
         technologyService: TechnologyService,
         playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
         starDataService: StarDataService,
         infrastructureCostService: InfrastructureCostService<DBObjectId>,
     ) {

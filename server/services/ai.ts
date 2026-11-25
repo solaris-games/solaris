@@ -19,11 +19,11 @@ import { getOrInsert, maxBy, notNull, reverseSort } from "@solaris/common";
 import { CarrierWaypoint, CarrierWaypointActionType } from "@solaris/common";
 import ReputationService from "./reputation";
 import DiplomacyService from "./diplomacy";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
 import { DBObjectId } from "./types/DBObjectId";
 import BasicAIService from "./basicAi";
 import PlayerAfkService from "./playerAfk";
-import ShipService from "./ship";
+import { ShipService } from "@solaris/common";
 import { logger } from "../utils/logging";
 import mongoose from "mongoose";
 import SaveWaypointsService from "./saveWaypoints";
@@ -151,8 +151,8 @@ export default class AIService {
     playerAfkService: PlayerAfkService;
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
-    playerStatisticsService: PlayerStatisticsService;
-    shipService: ShipService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
+    shipService: ShipService<DBObjectId>;
     basicAIService: BasicAIService;
     pathfindingService: PathfindingService<DBObjectId>;
     saveWaypointService: SaveWaypointsService;
@@ -173,8 +173,8 @@ export default class AIService {
         playerAfkService: PlayerAfkService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
-        shipService: ShipService,
-        playerStatisticsService: PlayerStatisticsService,
+        shipService: ShipService<DBObjectId>,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         basicAIService: BasicAIService,
         pathfindingService: PathfindingService<DBObjectId>,
         saveWaypointService: SaveWaypointsService,

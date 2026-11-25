@@ -28,6 +28,10 @@ export interface GuildRenameGuildRequest {
     tag: string;
 }
 
+export interface GuildUpdateDescriptionRequest {
+    description: string;
+}
+
 export interface GuildInviteUserRequest {
     username: string;
 }
@@ -62,6 +66,12 @@ export const createGuildRoutes = <ID>() => ({
     renameGuild: new PatchRoute<{}, {}, GuildRenameGuildRequest, Guild<ID>>(
         "/api/guild",
     ),
+    updateGuildDescription: new PatchRoute<
+        {},
+        {},
+        GuildUpdateDescriptionRequest,
+        {}
+    >("/api/guild/description"),
     deleteGuild: new DeleteRoute<{ guildId: ID }, {}, {}>(
         "/api/guild/:guildId",
     ),

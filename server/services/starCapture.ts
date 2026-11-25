@@ -6,6 +6,7 @@ import {
     Carrier,
     GameTypeService,
     InfrastructureCostService,
+    SpecialistValueService,
 } from "@solaris/common";
 import StarService from "./star";
 import SpecialistService from "./specialist";
@@ -23,6 +24,7 @@ export default class StarCaptureService {
     diplomacyService: DiplomacyService;
     technologyService: TechnologyService;
     infrastructureCostService: InfrastructureCostService<DBObjectId>;
+    specialistValueService: SpecialistValueService;
 
     constructor(
         specialistService: SpecialistService,
@@ -32,6 +34,7 @@ export default class StarCaptureService {
         diplomacyService: DiplomacyService,
         technologyService: TechnologyService,
         infrastructureCostService: InfrastructureCostService<DBObjectId>,
+        specialistValueService: SpecialistValueService,
     ) {
         this.specialistService = specialistService;
         this.starService = starService;
@@ -40,6 +43,7 @@ export default class StarCaptureService {
         this.diplomacyService = diplomacyService;
         this.technologyService = technologyService;
         this.infrastructureCostService = infrastructureCostService;
+        this.specialistValueService = specialistValueService;
     }
 
     captureStar(
@@ -203,7 +207,7 @@ export default class StarCaptureService {
 
             // Check to see whether to double the capture reward.
             const captureRewardMultiplier =
-                this.specialistService.hasAwardDoubleCaptureRewardSpecialist(
+                this.specialistValueService.hasAwardDoubleCaptureRewardSpecialist(
                     newStarPlayerCarriers as any,
                 ); //todo: types
 

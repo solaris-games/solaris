@@ -162,6 +162,7 @@ export default class GuildService {
             tag: guild.tag,
             achievements: guild.achievements,
             avatars: guild.avatars,
+            description: guild.description,
         };
 
         const userSelectObject = {
@@ -363,6 +364,35 @@ export default class GuildService {
             {
                 $inc: {
                     credits: -this.RENAME_GUILD_CREDITS_COST,
+                },
+            },
+        );
+    }
+
+    async updateDescription(userId: DBObjectId, description: string) {
+        let user = await this.userService.getById(userId, {
+            guildId: 1,
+        });
+
+        if (!user!.guildId) {
+            throw new ValidationError("You are not a member of a guild.");
+        }
+
+        let guild = await this.detail(user!.guildId!);
+
+        if (!this._isLeader(guild, userId) && !this._isOfficer(guild, userId)) {
+            throw new ValidationError(
+                "Only guild leaders and officers can edit the guild description.",
+            );
+        }
+
+        await this.guildRepo.updateOne(
+            {
+                _id: guild._id,
+            },
+            {
+                $set: {
+                    description,
                 },
             },
         );

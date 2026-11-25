@@ -170,14 +170,25 @@ describe("research", () => {
             expect(player.researchQueue).toEqual(["banking"]);
         });
 
-        it("should skip queue entries identical to the current research", async () => {
+        it("should continue the current research when the queue head matches it", async () => {
             const player = createPlayer();
             player.researchQueue = ["weapons", "terraforming"];
 
             service._setNextResearch(game, player);
 
-            expect(player.researchingNow).toBe("terraforming");
-            expect(player.researchQueue).toEqual([]);
+            expect(player.researchingNow).toBe("weapons");
+            expect(player.researchQueue).toEqual(["terraforming"]);
+        });
+
+        it("should research consecutive levels when the queue contains duplicates of the current research", async () => {
+            const player = createPlayer();
+            player.researchingNow = "banking";
+            player.researchQueue = ["banking", "banking", "terraforming"];
+
+            service._setNextResearch(game, player);
+
+            expect(player.researchingNow).toBe("banking");
+            expect(player.researchQueue).toEqual(["banking", "terraforming"]);
         });
 
         it("should resolve random queue entries", async () => {

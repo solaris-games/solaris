@@ -39,6 +39,12 @@ export default (
 
     answer(routes.renameGuild, mw.auth.authenticate(), controller.rename);
 
+    answer(
+        routes.updateGuildDescription,
+        mw.auth.authenticate(),
+        controller.updateDescription,
+    );
+
     answer(routes.deleteGuild, mw.auth.authenticate(), controller.delete);
 
     answer(routes.inviteGuild, mw.auth.authenticate(), controller.invite);

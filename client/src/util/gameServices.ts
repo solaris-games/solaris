@@ -3,7 +3,12 @@ import type { InjectionKey } from "vue";
 import { inject } from "vue";
 import { initialize, type ServiceProvider } from "@/services/services";
 import GameHelper from "@/services/gameHelper";
-import type { Game } from "@solaris/common";
+import {
+  type Carrier,
+  type Game,
+  ShipService,
+  type Star,
+} from "@solaris/common";
 import type { GameStore } from "@/stores/game";
 
 export const gameServicesKey: InjectionKey<ServiceProvider> =
@@ -13,6 +18,8 @@ export const createGameServices = (store: GameStore) => {
   const starService = {
     getById: (game: Game<string>, id: string) =>
       GameHelper.getStarById(game, id)!,
+    listStarsOwnedByPlayer: (stars: Star<string>[], playerId: string) =>
+      stars.filter((st) => st.ownedByPlayerId === playerId),
   };
 
   const specialistService = {
@@ -40,7 +47,19 @@ export const createGameServices = (store: GameStore) => {
     },
   };
 
-  return initialize(starService, specialistService, diplomacyService);
+  const carrierService = {
+    listCarriersOwnedByPlayer: (
+      carriers: Carrier<string>[],
+      playerId: string,
+    ) => carriers.filter((c) => c.ownedByPlayerId === playerId),
+  };
+
+  return initialize(
+    starService,
+    specialistService,
+    diplomacyService,
+    carrierService,
+  );
 };
 
 export const useGameServices = () => {

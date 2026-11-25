@@ -6,7 +6,8 @@ import GameService from "../services/game";
 import { GameTypeService } from "@solaris/common";
 import GameStateService from "../services/gameState";
 import BadgeService from "../services/badge";
-import PlayerStatisticsService from "../services/playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
+import { DBObjectId } from "../services/types/DBObjectId";
 import { Player } from "../services/types/Player";
 import { LeaderboardPlayer } from "../services/types/Leaderboard";
 import PlayerAfkService from "../services/playerAfk";
@@ -23,7 +24,7 @@ describe("Leaderboard - Last man standing", () => {
     let gameTypeService: GameTypeService;
     let gameStateService: GameStateService;
     let badgeService: BadgeService;
-    let playerStatisticsService: PlayerStatisticsService;
+    let playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     let teamService: TeamService;
 
     let service: LeaderboardService;
@@ -65,7 +66,7 @@ describe("Leaderboard - Last man standing", () => {
                     totalSpecialists: 2,
                 };
             },
-        } as PlayerStatisticsService;
+        } as PlayerStatisticsService<DBObjectId>;
 
         // @ts-ignore
         service = new LeaderboardService(

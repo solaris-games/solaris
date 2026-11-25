@@ -6,13 +6,18 @@ import {
   type Game,
   GameTypeService,
   PathfindingService,
+  PlayerIncomeService,
   ResearchProgressService,
   type Specialist,
+  SpecialistValueService,
+  PlayerStatisticsService,
   type Star,
   StarDataService,
   StarDistanceService,
   TechnologyService,
   WaypointService,
+  type Carrier,
+  ShipService,
 } from "@solaris/common";
 
 export type ServiceProvider = {
@@ -26,10 +31,17 @@ export type ServiceProvider = {
   pathfindingService: PathfindingService<string>;
   combatService: CombatService<string>;
   researchProgressService: ResearchProgressService;
+  playerIncomeService: PlayerIncomeService<string>;
+  playerStatisticsService: PlayerStatisticsService<string>;
+  shipService: ShipService<string>;
 };
 
 interface IStarService {
   getById(game: Game<string>, id: string): Star<string>;
+  listStarsOwnedByPlayer(
+    stars: Star<string>[],
+    playerId: string,
+  ): Star<string>[];
 }
 
 interface ISpecialistService {
@@ -46,10 +58,18 @@ interface IDiplomacyService {
   ): boolean;
 }
 
+interface ICarrierService<ID> {
+  listCarriersOwnedByPlayer(
+    carriers: Carrier<ID>[],
+    playerId: ID,
+  ): Carrier<ID>[];
+}
+
 export const initialize = (
   starService: IStarService,
   specialistService: ISpecialistService,
   diplomacyService: IDiplomacyService,
+  carrierService: ICarrierService<string>,
 ): ServiceProvider => {
   const gameTypeService = new GameTypeService();
   const distanceService = new DistanceService();
@@ -60,6 +80,7 @@ export const initialize = (
   );
   const starDataService = new StarDataService(gameTypeService);
   const researchProgressService = new ResearchProgressService();
+  const specialistValueService = new SpecialistValueService(specialistService);
   const carrierTravelService = new CarrierTravelService(
     specialistService,
     technologyService,
@@ -91,6 +112,27 @@ export const initialize = (
     specialistService,
   );
 
+  const shipService = new ShipService(
+    starService,
+    technologyService,
+    carrierService,
+  );
+
+  const playerStatisticsService = new PlayerStatisticsService(
+    starService,
+    carrierService,
+    specialistValueService,
+    shipService,
+  );
+
+  const playerIncomeService = new PlayerIncomeService(
+    starService,
+    technologyService,
+    playerStatisticsService,
+    starDataService,
+    specialistValueService,
+  );
+
   return {
     starDataService,
     carrierTravelService,
@@ -102,5 +144,8 @@ export const initialize = (
     pathfindingService,
     combatService,
     researchProgressService,
+    playerIncomeService,
+    playerStatisticsService,
+    shipService,
   };
 };

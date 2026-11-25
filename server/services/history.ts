@@ -8,20 +8,20 @@ import { Game } from "./types/Game";
 import { GameHistory, GameHistoryCarrier } from "./types/GameHistory";
 import GameService from "./game";
 import PlayerService from "./player";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
 
 export default class HistoryService {
     historyRepo: Repository<GameHistory>;
     playerService: PlayerService;
     gameService: GameService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     gameStateService: GameStateService;
 
     constructor(
         historyRepo: Repository<GameHistory>,
         playerService: PlayerService,
         gameService: GameService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         gameStateService: GameStateService,
     ) {
         this.historyRepo = historyRepo;

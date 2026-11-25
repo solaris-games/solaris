@@ -1,36 +1,32 @@
-import { Carrier } from "./types/Carrier";
-import { Game } from "./types/Game";
-import { Player } from "./types/Player";
-import { Star } from "./types/Star";
-import CarrierService from "./carrier";
-import SpecialistService from "./specialist";
-import StarService from "./star";
-import { TechnologyService } from "@solaris/common";
-import { PlayerStatistics } from "./types/Leaderboard";
-import ShipService from "./ship";
+import type { SpecialistValueService } from "./specialistValue";
+import type { Game } from "../types/common/game";
+import type { Player } from "../types/common/player";
+import type { PlayerStatistics } from "../types/common/leaderboard";
+import type { Star } from "../types/common/star";
+import type { Carrier } from "../types/common/carrier";
+import { ShipService } from "./ship";
+import type { Id } from "../types/id";
 
-export default class PlayerStatisticsService {
-    starService: StarService;
-    carrierService: CarrierService;
-    technologyService: TechnologyService;
-    specialistService: SpecialistService;
-    shipService: ShipService;
+interface IStarService<ID> {
+    listStarsOwnedByPlayer(stars: Star<ID>[], playerId: ID): Star<ID>[];
+}
 
+interface ICarrierService<ID> {
+    listCarriersOwnedByPlayer(
+        carriers: Carrier<ID>[],
+        playerId: ID,
+    ): Carrier<ID>[];
+}
+
+export class PlayerStatisticsService<ID extends Id> {
     constructor(
-        starService: StarService,
-        carrierService: CarrierService,
-        technologyService: TechnologyService,
-        specialistService: SpecialistService,
-        shipService: ShipService,
-    ) {
-        this.starService = starService;
-        this.carrierService = carrierService;
-        this.technologyService = technologyService;
-        this.specialistService = specialistService;
-        this.shipService = shipService;
-    }
+        private starService: IStarService<ID>,
+        private carrierService: ICarrierService<ID>,
+        private specialistValueService: SpecialistValueService,
+        private shipService: ShipService<ID>,
+    ) {}
 
-    getStats(game: Game, player: Player): PlayerStatistics {
+    getStats(game: Game<ID>, player: Player<ID>): PlayerStatistics {
         const playerStars = this.starService.listStarsOwnedByPlayer(
             game.galaxy.stars,
             player._id,
@@ -70,7 +66,7 @@ export default class PlayerStatisticsService {
         };
     }
 
-    calculateTotalStars(player: Player, stars: Star[]) {
+    calculateTotalStars(player: Player<ID>, stars: Star<ID>[]) {
         const playerStars = this.starService.listStarsOwnedByPlayer(
             stars,
             player._id,
@@ -79,36 +75,36 @@ export default class PlayerStatisticsService {
         return playerStars.length;
     }
 
-    calculateTotalHomeStars(playerStars: Star[]) {
+    calculateTotalHomeStars(playerStars: Star<ID>[]) {
         return playerStars.filter((s) => s.homeStar).length;
     }
 
-    calculateTotalEconomy(playerStars: Star[]) {
-        const totalEconomy = playerStars.reduce((sum, s) => {
+    calculateTotalEconomy(playerStars: Star<ID>[]) {
+        return playerStars.reduce((sum, s) => {
             const multiplier =
-                this.specialistService.getEconomyInfrastructureMultiplier(s);
+                this.specialistValueService.getEconomyInfrastructureMultiplier(
+                    s,
+                );
             const eco = s.infrastructure?.economy ?? 0;
 
             return sum + eco * multiplier;
         }, 0);
-
-        return totalEconomy;
     }
 
-    calculateTotalIndustry(playerStars: Star[]) {
-        const totalIndustry = playerStars.reduce((sum, s) => {
+    calculateTotalIndustry(playerStars: Star<ID>[]) {
+        return playerStars.reduce((sum, s) => {
             const ind = s.infrastructure?.industry ?? 0;
 
             return sum + ind;
         }, 0);
-
-        return totalIndustry;
     }
 
-    calculateTotalScience(game: Game, playerStars: Star[]) {
-        const totalScience = playerStars.reduce((sum, s) => {
+    calculateTotalScience(game: Game<ID>, playerStars: Star<ID>[]) {
+        return playerStars.reduce((sum, s) => {
             const specialistMultiplier =
-                this.specialistService.getScienceInfrastructureMultiplier(s);
+                this.specialistValueService.getScienceInfrastructureMultiplier(
+                    s,
+                );
             const sci = s.infrastructure?.science ?? 0;
 
             return (
@@ -120,11 +116,9 @@ export default class PlayerStatisticsService {
                 )
             );
         }, 0);
-
-        return totalScience;
     }
 
-    calculateTotalManufacturing(game: Game, playerStars: Star[]) {
+    calculateTotalManufacturing(game: Game<ID>, playerStars: Star<ID>[]) {
         // Calculate the manufacturing level for all of the stars the player owns.
         const totalManufacturing = playerStars.reduce((sum, s) => {
             return sum + this.shipService.calculateStarManufacturing(game, s);
@@ -133,11 +127,11 @@ export default class PlayerStatisticsService {
         return Math.round((totalManufacturing + Number.EPSILON) * 100) / 100;
     }
 
-    calculateWarpgates(playerStars: Star[]) {
+    calculateWarpgates(playerStars: Star<ID>[]) {
         return playerStars.reduce((sum, s) => (s.warpGate ? sum + 1 : sum), 0);
     }
 
-    calculateTotalCarriers(player: Player, carriers: Carrier[]) {
+    calculateTotalCarriers(player: Player<ID>, carriers: Carrier<ID>[]) {
         const playerCarriers = this.carrierService.listCarriersOwnedByPlayer(
             carriers,
             player._id,
@@ -146,11 +140,11 @@ export default class PlayerStatisticsService {
         return playerCarriers.length;
     }
 
-    calculateTotalStarSpecialists(playerStars: Star[]) {
+    calculateTotalStarSpecialists(playerStars: Star<ID>[]) {
         return playerStars.filter((s) => s.specialistId).length;
     }
 
-    calculateTotalCarrierSpecialists(playerCarriers: Carrier[]) {
+    calculateTotalCarrierSpecialists(playerCarriers: Carrier<ID>[]) {
         return playerCarriers.filter((c) => c.specialistId).length;
     }
 }

@@ -75,7 +75,7 @@ import {
 import LoadingSpinner from "../components/LoadingSpinner.vue";
 // GameContainer is lazy-loaded so the heavy @solaris/map-rendering / Pixi bundle
 // is split into its own chunk and only downloaded once the game view mounts.
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent, toRaw } from "vue";
 const GameContainer = defineAsyncComponent(
   () => import("./components/GameContainer.vue"),
 );
@@ -305,8 +305,8 @@ const reloadGame = async (reinitialise: boolean = false) => {
       document.title = response.data.settings.general.name + " - Solaris";
 
       eventBus.emit(GameCommandEventBusEventNames.GameCommandReloadGame, {
-        game,
-        settings: store.settings,
+        game: toRaw(game),
+        settings: toRaw(store.settings),
       });
 
       if (reinitialise) {

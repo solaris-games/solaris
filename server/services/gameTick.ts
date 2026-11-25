@@ -29,7 +29,7 @@ import CarrierGiftService from "./carrierGift";
 import CarrierMovementService, {
     CarrierMovementReport,
 } from "./carrierMovement";
-import PlayerCycleRewardsService from "./playerCycleRewards";
+import RewardAwardingService from "./playerRewardAwarding";
 import StarContestedService from "./starContested";
 import PlayerReadyService from "./playerReady";
 import PlayerGalacticCycleCompletedEvent from "./types/internalEvents/PlayerGalacticCycleComplete";
@@ -37,7 +37,8 @@ import InternalGamePlayerDefeatedEvent from "./types/internalEvents/GamePlayerDe
 import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
 import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
-import ShipService from "./ship";
+import { ShipService } from "@solaris/common";
+import { ShipProductionService } from "./shipProduction";
 import ScheduleBuyService from "./scheduleBuy";
 import { DateTime } from "luxon";
 import GameLockService from "./gameLock";
@@ -101,13 +102,14 @@ export default class GameTickService extends EventEmitter {
     diplomacyService: DiplomacyService;
     gameTypeService: GameTypeService;
     gameStateService: GameStateService;
-    playerCycleRewardsService: PlayerCycleRewardsService;
+    rewardAwardingService: RewardAwardingService;
     diplomacyUpkeepService: DiplomacyUpkeepService;
     carrierMovementService: CarrierMovementService;
     carrierGiftService: CarrierGiftService;
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
-    shipService: ShipService;
+    shipService: ShipService<DBObjectId>;
+    shipProductionService: ShipProductionService;
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
     waypointActionService: WaypointActionService;
@@ -137,13 +139,14 @@ export default class GameTickService extends EventEmitter {
         diplomacyService: DiplomacyService,
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
-        playerCycleRewardsService: PlayerCycleRewardsService,
+        rewardAwardingService: RewardAwardingService,
         diplomacyUpkeepService: DiplomacyUpkeepService,
         carrierMovementService: CarrierMovementService,
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
+        shipProductionService: ShipProductionService,
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
         waypointActionService: WaypointActionService,
@@ -174,13 +177,14 @@ export default class GameTickService extends EventEmitter {
         this.diplomacyService = diplomacyService;
         this.gameTypeService = gameTypeService;
         this.gameStateService = gameStateService;
-        this.playerCycleRewardsService = playerCycleRewardsService;
+        this.rewardAwardingService = rewardAwardingService;
         this.diplomacyUpkeepService = diplomacyUpkeepService;
         this.carrierMovementService = carrierMovementService;
         this.carrierGiftService = carrierGiftService;
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.shipProductionService = shipProductionService;
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
         this.waypointActionService = waypointActionService;
@@ -406,7 +410,7 @@ export default class GameTickService extends EventEmitter {
             this._countdownToEndCheck(game);
             logTime("Countdown to end check");
 
-            let hasWinner = await this._gameWinCheck(
+            const hasWinner = await this._gameWinCheck(
                 game,
                 context.getGameUsers(),
                 context.getEventService(),
@@ -440,10 +444,10 @@ export default class GameTickService extends EventEmitter {
         await game.save();
         logTime("Save game");
 
+        await this._emitEvents(game, context.getNotificationService());
+
         await context.save();
         logTime("Save context");
-
-        await this._emitEvents(game, context.getNotificationService());
 
         const endTime = process.hrtime(startTime);
 
@@ -686,7 +690,7 @@ export default class GameTickService extends EventEmitter {
         );
 
         // 4b. Build ships at star.
-        this.shipService.produceShips(game);
+        this.shipProductionService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
         this.waypointActionService.performWaypointActionsCollects(
@@ -755,18 +759,16 @@ export default class GameTickService extends EventEmitter {
             // Give each player money.
             // Conduct experiments.
             for (let i = 0; i < game.galaxy.players.length; i++) {
-                let player = game.galaxy.players[i];
+                const player = game.galaxy.players[i];
 
-                let creditsResult =
-                    this.playerCycleRewardsService.givePlayerCreditsEndOfCycleRewards(
+                const creditsResult =
+                    this.rewardAwardingService.givePlayerCreditsEndOfCycleRewards(
                         game,
                         player,
                     );
-                let experimentResult = this.researchService.conductExperiments(
-                    game,
-                    player,
-                );
-                let carrierUpkeepResult =
+                const experimentResult =
+                    this.researchService.conductExperiments(game, player);
+                const carrierUpkeepResult =
                     this.playerService.deductCarrierUpkeepCost(game, player);
                 let allianceUpkeepResult: {
                     allianceCount: number;
@@ -774,10 +776,11 @@ export default class GameTickService extends EventEmitter {
                 } | null = null;
 
                 if (this.diplomacyUpkeepService.isAllianceUpkeepEnabled(game)) {
-                    let allianceCount = this.diplomacyService.getAlliesOfPlayer(
-                        game,
-                        player,
-                    ).length;
+                    const allianceCount =
+                        this.diplomacyService.getAlliesOfPlayer(
+                            game,
+                            player,
+                        ).length;
 
                     allianceUpkeepResult =
                         this.diplomacyUpkeepService.deductTotalUpkeep(
@@ -790,7 +793,7 @@ export default class GameTickService extends EventEmitter {
 
                 // Raise an event if the player isn't defeated, AI doesn't care about events.
                 if (!player.defeated) {
-                    let e: PlayerGalacticCycleCompletedEvent = {
+                    const e: PlayerGalacticCycleCompletedEvent = {
                         gameId: game._id,
                         gameTick: game.state.tick,
                         playerId: player._id,
@@ -1101,7 +1104,7 @@ export default class GameTickService extends EventEmitter {
             game,
             eventService,
         );
-        this.playerCycleRewardsService.giveFinancialAnalystCredits(game);
+        this.rewardAwardingService.giveFinancialAnalystCredits(game);
         this.starMovementService.moveStellarEngines(game);
         this.starService.pairWormHoleConstructors(game);
     }

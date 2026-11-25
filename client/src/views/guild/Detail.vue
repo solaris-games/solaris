@@ -5,6 +5,8 @@
     <loading-spinner :loading="isLoading" />
 
     <div v-if="!isLoading && guild" class="mb-4">
+      <guild-description :markdown="guild.description" />
+
       <guild-achievements :achievements="guild.achievements || []" />
 
       <p class="float-end">
@@ -66,6 +68,7 @@ import { useRoute } from "vue-router";
 import { detailGuild } from "@solaris/api-client/guild";
 import type { GuildWithUsers } from "@solaris/common";
 import GuildAchievements from "./components/Achievements.vue";
+import GuildDescription from "./components/GuildDescription.vue";
 
 type SortingKey = "rank" | "victories" | "renown" | "role";
 

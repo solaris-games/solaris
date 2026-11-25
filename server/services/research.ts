@@ -12,7 +12,8 @@ import Repository from "./repository";
 import { Game } from "./types/Game";
 import { Player, ResearchProgress } from "./types/Player";
 import { User } from "./types/User";
-import PlayerStatisticsService from "./playerStatistics";
+import { PlayerStatisticsService } from "@solaris/common";
+import { DBObjectId } from "./types/DBObjectId";
 import RandomService from "./random";
 import StarService from "./star";
 import UserService from "./user";
@@ -24,7 +25,7 @@ export default class ResearchService extends EventEmitter {
     gameRepo: Repository<Game>;
     technologyService: TechnologyService;
     randomService: RandomService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     starService: StarService;
     userService: UserService;
     gameTypeService: GameTypeService;
@@ -34,7 +35,7 @@ export default class ResearchService extends EventEmitter {
         gameRepo: Repository<Game>,
         technologyService: TechnologyService,
         randomService: RandomService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         starService: StarService,
         userService: UserService,
         gameTypeService: GameTypeService,
@@ -373,11 +374,7 @@ export default class ResearchService extends EventEmitter {
     _setNextResearch(game: Game, player: Player) {
         const queue = player.researchQueue || [];
 
-        let entry = queue.shift();
-
-        while (entry === player.researchingNow) {
-            entry = queue.shift();
-        }
+        const entry = queue.shift();
 
         if (entry !== undefined) {
             if (entry === "random") {

@@ -25,6 +25,9 @@ import {
     CombatService,
     CombatGroupService,
     InfrastructureCostService,
+    SpecialistValueService,
+    PlayerStatisticsService,
+    ShipService,
 } from "@solaris/common";
 import { EmailService } from "./email";
 import { EventService } from "./event";
@@ -52,6 +55,7 @@ import StarUpgradeService from "./starUpgrade";
 import { TechnologyService, ResearchProgressService } from "@solaris/common";
 import TradeService from "./trade";
 import { WaypointService } from "@solaris/common";
+import { PlayerIncomeService } from "@solaris/common";
 import ShipTransferService from "./shipTransfer";
 import UserService from "./user";
 import HistoryService from "./history";
@@ -83,15 +87,13 @@ import DoughnutMapService from "./maps/doughnut";
 import IrregularMapService from "./maps/irregular";
 import DiplomacyUpkeepService from "./diplomacyUpkeep";
 import PlayerCreditsService from "./playerCredits";
-import PlayerStatisticsService from "./playerStatistics";
 import CarrierMovementService from "./carrierMovement";
 import CarrierGiftService from "./carrierGift";
-import PlayerCycleRewardsService from "./playerCycleRewards";
+import RewardAwardingService from "./playerRewardAwarding";
 import StarContestedService from "./starContested";
 import GameFluxService from "./gameFlux";
 import { NotificationService } from "./notification";
 import DiscordService from "./discord";
-import ShipService from "./ship";
 import SpectatorService from "./spectator";
 import ScheduleBuyService from "./scheduleBuy";
 import { DependencyContainer } from "./types/DependencyContainer";
@@ -144,6 +146,7 @@ import ScanningService from "./scanning";
 import CarrierCombatService from "./carrierCombat";
 import { CombatMaskingService } from "./combatMasking";
 import CombatProcessingService from "./combatProcessing";
+import { ShipProductionService } from "./shipProduction";
 
 const gameNames = require("../config/game/gameNames");
 const starNames = require("../config/game/starNames");
@@ -237,6 +240,9 @@ export default (
     const gameTypeService = new GameTypeService();
     const playerColourService = new PlayerColourService(randomService);
     const specialistService = new SpecialistService(gameTypeService);
+    const specialistValueService = new SpecialistValueService(
+        specialistService,
+    );
     const gameStateService = new GameStateService();
     const gameFluxService = new GameFluxService();
     const playerCreditsService = new PlayerCreditsService(gameRepository);
@@ -304,23 +310,29 @@ export default (
         technologyService,
         carrierService,
     );
+    const shipProductionService = new ShipProductionService(shipService);
     const playerStatisticsService = new PlayerStatisticsService(
         starService,
         carrierService,
-        technologyService,
-        specialistService,
+        specialistValueService,
         shipService,
     );
-    const playerCycleRewardsService = new PlayerCycleRewardsService(
+    const playerIncomeService = new PlayerIncomeService<DBObjectId>(
         starService,
         technologyService,
         playerStatisticsService,
+        starDataService,
+        specialistValueService,
+    );
+    const rewardAwardingService = new RewardAwardingService(
+        playerIncomeService,
+        starService,
         specialistService,
         starDataService,
     );
     const diplomacyUpkeepService = new DiplomacyUpkeepService(
         playerCreditsService,
-        playerCycleRewardsService,
+        playerIncomeService,
     );
     const diplomacyService = new DiplomacyService(
         gameRepository,
@@ -360,6 +372,7 @@ export default (
         diplomacyService,
         technologyService,
         infrastructureCostService,
+        specialistValueService,
     );
     const starContestedService = new StarContestedService(diplomacyService);
     const carrierGiftService = new CarrierGiftService(
@@ -472,6 +485,7 @@ export default (
         starDistanceService,
         carrierTravelService,
         starDataService,
+        specialistValueService,
     );
     const spectatorService = new SpectatorService(
         gameRepository,
@@ -690,7 +704,7 @@ export default (
     const starMovementService = new StarMovementService(
         mapService,
         starDistanceService,
-        specialistService,
+        specialistValueService,
         cullWaypointsService,
     );
     const gameGalaxyService = new GameGalaxyService(
@@ -753,7 +767,7 @@ export default (
         diplomacyService,
         distanceService,
         playerService,
-        specialistService,
+        specialistValueService,
         starService,
         combatProcessingService,
     );
@@ -778,13 +792,14 @@ export default (
         diplomacyService,
         gameTypeService,
         gameStateService,
-        playerCycleRewardsService,
+        rewardAwardingService,
         diplomacyUpkeepService,
         carrierMovementService,
         carrierGiftService,
         starContestedService,
         playerReadyService,
         shipService,
+        shipProductionService,
         scheduleBuyService,
         gameLockService,
         waypointActionService,
@@ -953,12 +968,14 @@ export default (
         diplomacyUpkeepService,
         carrierGiftService,
         carrierMovementService,
-        playerCycleRewardsService,
+        playerIncomeService,
+        rewardAwardingService,
         gameMaskingService,
         starContestedService,
         gameFluxService,
         notificationService,
         shipService,
+        shipProductionService,
         spectatorService,
         scheduleBuyService,
         teamService,
@@ -979,5 +996,6 @@ export default (
         scanningService,
         infrastructureCostService,
         tradeEventService,
+        specialistValueService,
     };
 };

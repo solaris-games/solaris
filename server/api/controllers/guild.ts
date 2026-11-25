@@ -1,6 +1,7 @@
 import { DependencyContainer } from "../../services/types/DependencyContainer";
 import {
     parseGuildCreateRequest,
+    parseGuildDescriptionRequest,
     parseGuildInviteUserRequest,
     parseGuildRenameRequest,
 } from "../requests/guild";
@@ -106,6 +107,21 @@ export default (container: DependencyContainer) => {
                     req.session.userId,
                     reqObj.name,
                     reqObj.tag,
+                );
+
+                res.sendStatus(200);
+                return next();
+            } catch (err) {
+                return next(err);
+            }
+        },
+        updateDescription: async (req, res, next) => {
+            try {
+                const reqObj = parseGuildDescriptionRequest(req.body);
+
+                await container.guildService.updateDescription(
+                    req.session.userId,
+                    reqObj.description,
                 );
 
                 res.sendStatus(200);
