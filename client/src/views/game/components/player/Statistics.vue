@@ -64,8 +64,8 @@
           :playerId="playerId"
           header="Cycle Income"
           scanningRangeTooltip="This figure is based on the stars in your scanning range."
-          :playerStat="playerIncome"
-          :userPlayerStat="userPlayerIncome"
+          :playerStat="playerCycleIncome"
+          :userPlayerStat="userPlayerCycleIncome"
           :formatFunction="formatCreditsValue"
         >
         </statistic-row>
@@ -93,7 +93,6 @@
           scanning-range-tooltip="This is based on stars and technology in your scanning range."
           :playerStat="playerTokenIncome"
           :userPlayerStat="userPlayerTokenIncome"
-          :isPlayerStatAlwaysUncertain="false"
         />
       </tbody>
     </table>
@@ -154,12 +153,28 @@ const userPlayerCycleRewards = computed(
     ),
 );
 
-const playerIncome = computed(
-  () => playerCycleRewards.value.creditsTotal || 0, // no stats -> assume zero
-);
-const userPlayerIncome = computed(
+// Logic here is tricky, we need to account for sometimes knowing statistics that are not known from the star data
+
+const playerCycleIncome = computed(() => {
+  if (player.value.stats?.totalEconomy && player.value.stats?.totalStars) {
+    const economyCredits = services.playerIncomeService.calculateEconomyCredits(
+      player.value.stats.totalEconomy,
+    );
+    const bankingCredits = services.playerIncomeService.getBankingReward(
+      game.value,
+      player.value,
+      player.value.stats.totalStars,
+      player.value.stats.totalEconomy,
+    );
+
+    return economyCredits + bankingCredits;
+  }
+  return playerCycleRewards.value.creditsTotal || 0;
+});
+const userPlayerCycleIncome = computed(
   () => userPlayerCycleRewards.value?.creditsTotal || 0,
 );
+
 const playerTickIncome = computed(() =>
   services.playerIncomeService.calculatePerTickIncome(game.value, player.value),
 );
@@ -173,9 +188,17 @@ const userPlayerTickIncome = computed(
     ),
 );
 
-const playerTokenIncome = computed(
-  () => playerCycleRewards.value.creditsFromSpecialistsTechnology,
-);
+const playerTokenIncome = computed(() => {
+  if (player.value.stats?.totalStars) {
+    return services.playerIncomeService.getCreditsSpecialistsReward(
+      game.value,
+      player.value,
+      player.value.stats.totalStars,
+    );
+  }
+
+  return playerCycleRewards.value.creditsFromSpecialistsTechnology;
+});
 
 const userPlayerTokenIncome = computed(
   () => userPlayerCycleRewards.value?.creditsFromSpecialistsTechnology,

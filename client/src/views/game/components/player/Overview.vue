@@ -58,7 +58,10 @@
           <i class="fas fa-chart-line"></i>
         </button>
         <div class="ms-2 d-inline">
-          <single-diplomacy :player-id="playerId" />
+          <single-diplomacy
+            v-if="isFormalAlliancesEnabled"
+            :player-id="playerId"
+          />
         </div>
       </div>
       <div class="col-auto">
@@ -111,6 +114,7 @@ import type { ConversationOverview } from "@solaris/common";
 import GameHelper from "../../../../services/gameHelper";
 import { listPrivate } from "@solaris/api-client/conversation";
 import SingleDiplomacy from "@/views/game/components/diplomacy/SingleDiplomacy.vue";
+import DiplomacyHelper from "@/services/diplomacyHelper.ts";
 
 const props = defineProps<{
   playerId: string;
@@ -131,6 +135,9 @@ const gameHasStarted = computed(() => GameHelper.isGameStarted(game.value));
 const gameHasFinished = computed(() => GameHelper.isGameFinished(game.value));
 const isDarkModeExtra = computed(() => GameHelper.isDarkModeExtra(game.value));
 const isTradeEnabled = computed(() => GameHelper.isTradeEnabled(game.value));
+const isFormalAlliancesEnabled = computed(() =>
+  DiplomacyHelper.isFormalAlliancesEnabled(game.value),
+);
 
 const isCompactUIStyle = computed(
   () => store.settings!.interface.uiStyle !== "standard",
