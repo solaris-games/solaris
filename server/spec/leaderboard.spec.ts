@@ -7,6 +7,7 @@ import { GameTypeService } from "@solaris/common";
 import GameStateService from "../services/gameState";
 import BadgeService from "../services/badge";
 import { PlayerStatisticsService } from "@solaris/common";
+import { DBObjectId } from "../services/types/DBObjectId";
 import { Player } from "../services/types/Player";
 import { LeaderboardPlayer } from "../services/types/Leaderboard";
 import PlayerAfkService from "../services/playerAfk";

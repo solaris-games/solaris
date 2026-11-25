@@ -73,6 +73,7 @@ import ScanningService from "../scanning";
 import ScheduleBuyService from "../scheduleBuy";
 import SessionService from "../session";
 import { ShipService } from "@solaris/common";
+import { ShipProductionService } from "../shipProduction";
 import ShipTransferService from "../shipTransfer";
 import SocketService from "../socket";
 import SpecialStarBanService from "../specialStarBan";
@@ -196,7 +197,8 @@ export interface DependencyContainer {
     starContestedService: StarContestedService;
     gameFluxService: GameFluxService;
     notificationService: NotificationService;
-    shipService: ShipService;
+    shipService: ShipService<DBObjectId>;
+    shipProductionService: ShipProductionService;
     spectatorService: SpectatorService;
     teamService: TeamService;
     pathfindingService: PathfindingService<DBObjectId>;

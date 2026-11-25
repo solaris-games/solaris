@@ -86,7 +86,7 @@ export default class GameGalaxyService {
     gameStateService: GameStateService;
     diplomacyService: DiplomacyService;
     avatarService: AvatarService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     gameFluxService: GameFluxService;
     spectatorService: SpectatorService;
     gameMaskingService: GameMaskingService;
@@ -101,7 +101,7 @@ export default class GameGalaxyService {
         playerService: PlayerService,
         playerAfkService: PlayerAfkService,
         starService: StarService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
         distanceService: DistanceService,
         starDistanceService: StarDistanceService,
         starUpgradeService: StarUpgradeService,
@@ -119,7 +119,7 @@ export default class GameGalaxyService {
         gameStateService: GameStateService,
         diplomacyService: DiplomacyService,
         avatarService: AvatarService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         gameFluxService: GameFluxService,
         spectatorService: SpectatorService,
         gameMaskingService: GameMaskingService,

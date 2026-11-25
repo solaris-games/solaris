@@ -151,7 +151,7 @@ export default class AIService {
     playerAfkService: PlayerAfkService;
     reputationService: ReputationService;
     diplomacyService: DiplomacyService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     shipService: ShipService<DBObjectId>;
     basicAIService: BasicAIService;
     pathfindingService: PathfindingService<DBObjectId>;
@@ -173,8 +173,8 @@ export default class AIService {
         playerAfkService: PlayerAfkService,
         reputationService: ReputationService,
         diplomacyService: DiplomacyService,
-        shipService: ShipService,
-        playerStatisticsService: PlayerStatisticsService,
+        shipService: ShipService<DBObjectId>,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         basicAIService: BasicAIService,
         pathfindingService: PathfindingService<DBObjectId>,
         saveWaypointService: SaveWaypointsService,

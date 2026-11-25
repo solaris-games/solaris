@@ -72,7 +72,7 @@ export default class StarUpgradeService extends EventEmitter {
         technologyService: TechnologyService,
         playerCreditsService: PlayerCreditsService,
         gameTypeService: GameTypeService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
         starDataService: StarDataService,
         infrastructureCostService: InfrastructureCostService<DBObjectId>,
     ) {

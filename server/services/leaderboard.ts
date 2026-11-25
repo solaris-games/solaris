@@ -107,7 +107,7 @@ export default class LeaderboardService {
         gameTypeService: GameTypeService,
         gameStateService: GameStateService,
         badgeService: BadgeService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         teamService: TeamService,
     ) {
         this.playerService = playerService;

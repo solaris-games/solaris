@@ -38,6 +38,7 @@ import InternalGamePlayerAFKEvent from "./types/internalEvents/GamePlayerAFK";
 import InternalGameEndedEvent from "./types/internalEvents/GameEnded";
 import PlayerAfkService from "./playerAfk";
 import { ShipService } from "@solaris/common";
+import { ShipProductionService } from "./shipProduction";
 import ScheduleBuyService from "./scheduleBuy";
 import { DateTime } from "luxon";
 import GameLockService from "./gameLock";
@@ -108,6 +109,7 @@ export default class GameTickService extends EventEmitter {
     starContestedService: StarContestedService;
     playerReadyService: PlayerReadyService;
     shipService: ShipService<DBObjectId>;
+    shipProductionService: ShipProductionService;
     scheduleBuyService: ScheduleBuyService;
     gameLockService: GameLockService;
     waypointActionService: WaypointActionService;
@@ -143,7 +145,8 @@ export default class GameTickService extends EventEmitter {
         carrierGiftService: CarrierGiftService,
         starContestedService: StarContestedService,
         playerReadyService: PlayerReadyService,
-        shipService: ShipService,
+        shipService: ShipService<DBObjectId>,
+        shipProductionService: ShipProductionService,
         scheduleBuyService: ScheduleBuyService,
         gameLockService: GameLockService,
         waypointActionService: WaypointActionService,
@@ -181,6 +184,7 @@ export default class GameTickService extends EventEmitter {
         this.starContestedService = starContestedService;
         this.playerReadyService = playerReadyService;
         this.shipService = shipService;
+        this.shipProductionService = shipProductionService;
         this.gameLockService = gameLockService;
         this.scheduleBuyService = scheduleBuyService;
         this.waypointActionService = waypointActionService;
@@ -686,7 +690,7 @@ export default class GameTickService extends EventEmitter {
         );
 
         // 4b. Build ships at star.
-        this.shipService.produceShips(game);
+        this.shipProductionService.produceShips(game);
 
         // 4c. Do the rest of the waypoint actions.
         this.waypointActionService.performWaypointActionsCollects(

@@ -21,7 +21,7 @@ export default class HistoryService {
         historyRepo: Repository<GameHistory>,
         playerService: PlayerService,
         gameService: GameService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         gameStateService: GameStateService,
     ) {
         this.historyRepo = historyRepo;

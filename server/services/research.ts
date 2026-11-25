@@ -25,7 +25,7 @@ export default class ResearchService extends EventEmitter {
     gameRepo: Repository<Game>;
     technologyService: TechnologyService;
     randomService: RandomService;
-    playerStatisticsService: PlayerStatisticsService;
+    playerStatisticsService: PlayerStatisticsService<DBObjectId>;
     starService: StarService;
     userService: UserService;
     gameTypeService: GameTypeService;
@@ -35,7 +35,7 @@ export default class ResearchService extends EventEmitter {
         gameRepo: Repository<Game>,
         technologyService: TechnologyService,
         randomService: RandomService,
-        playerStatisticsService: PlayerStatisticsService,
+        playerStatisticsService: PlayerStatisticsService<DBObjectId>,
         starService: StarService,
         userService: UserService,
         gameTypeService: GameTypeService,

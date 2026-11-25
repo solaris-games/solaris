@@ -146,6 +146,7 @@ import ScanningService from "./scanning";
 import CarrierCombatService from "./carrierCombat";
 import { CombatMaskingService } from "./combatMasking";
 import CombatProcessingService from "./combatProcessing";
+import { ShipProductionService } from "./shipProduction";
 
 const gameNames = require("../config/game/gameNames");
 const starNames = require("../config/game/starNames");
@@ -309,6 +310,7 @@ export default (
         technologyService,
         carrierService,
     );
+    const shipProductionService = new ShipProductionService(shipService);
     const playerStatisticsService = new PlayerStatisticsService(
         starService,
         carrierService,
@@ -797,6 +799,7 @@ export default (
         starContestedService,
         playerReadyService,
         shipService,
+        shipProductionService,
         scheduleBuyService,
         gameLockService,
         waypointActionService,
@@ -972,6 +975,7 @@ export default (
         gameFluxService,
         notificationService,
         shipService,
+        shipProductionService,
         spectatorService,
         scheduleBuyService,
         teamService,
