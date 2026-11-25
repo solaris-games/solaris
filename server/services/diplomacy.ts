@@ -344,11 +344,17 @@ export default class DiplomacyService extends EventEmitter {
         playerIdTarget: DBObjectId,
         saveToDB: boolean = true,
     ) {
-        let oldStatus = this.getDiplomaticStatusToPlayer(
+        const oldStatus = this.getDiplomaticStatusToPlayer(
             game,
             playerId,
             playerIdTarget,
         );
+
+        if (!this.isFormalAlliancesEnabled(game)) {
+            throw new ValidationError(
+                "Cannot change diplomatic status in this game",
+            );
+        }
 
         if (oldStatus.statusTo === "allies") {
             throw new ValidationError(
@@ -452,11 +458,17 @@ export default class DiplomacyService extends EventEmitter {
         playerIdTarget: DBObjectId,
         saveToDB: boolean = true,
     ) {
-        let oldStatus = this.getDiplomaticStatusToPlayer(
+        const oldStatus = this.getDiplomaticStatusToPlayer(
             game,
             playerId,
             playerIdTarget,
         );
+
+        if (!this.isFormalAlliancesEnabled(game)) {
+            throw new ValidationError(
+                "Cannot change diplomatic status in this game",
+            );
+        }
 
         if (
             this.isAllianceLocked(game) &&
@@ -524,11 +536,17 @@ export default class DiplomacyService extends EventEmitter {
         playerIdTarget: DBObjectId,
         saveToDB: boolean = true,
     ) {
-        let oldStatus = this.getDiplomaticStatusToPlayer(
+        const oldStatus = this.getDiplomaticStatusToPlayer(
             game,
             playerId,
             playerIdTarget,
         );
+
+        if (!this.isFormalAlliancesEnabled(game)) {
+            throw new ValidationError(
+                "Cannot change diplomatic status in this game",
+            );
+        }
 
         if (
             this.isAllianceLocked(game) &&
@@ -567,13 +585,13 @@ export default class DiplomacyService extends EventEmitter {
             );
         }
 
-        let newStatus = this.getDiplomaticStatusToPlayer(
+        const newStatus = this.getDiplomaticStatusToPlayer(
             game,
             playerId,
             playerIdTarget,
         );
 
-        let isNeutral = newStatus.actualStatus === "neutral";
+        const isNeutral = newStatus.actualStatus === "neutral";
 
         await eventService.createPlayerDiplomacyStatusChanged(
             game._id,
@@ -583,7 +601,7 @@ export default class DiplomacyService extends EventEmitter {
 
         // Create a global event for peace reached if both players were at war.
         if (this.isGlobalEventsEnabled(game) && wasAtWar && isNeutral) {
-            let e: InternalGameDiplomacyPeaceDeclaredEvent = {
+            const e: InternalGameDiplomacyPeaceDeclaredEvent = {
                 gameId: game._id,
                 gameTick: game.state.tick,
                 status: newStatus,
@@ -600,7 +618,7 @@ export default class DiplomacyService extends EventEmitter {
         playerIdA: DBObjectId,
         playerIdB: DBObjectId,
     ): Promise<DiplomacyEvent<DBObjectId>[]> {
-        let events = await this.eventRepo.find({
+        const events = await this.eventRepo.find({
             gameId: game._id,
             playerId: playerIdA,
             type: "playerDiplomacyStatusChanged",
