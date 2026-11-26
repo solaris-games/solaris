@@ -9,6 +9,22 @@ export type SettingTerritoryStyle = "disabled" | "marching-square" | "voronoi";
 export type SettingObjectScaling = "default" | "clamped";
 export type SettingBlendMode = "ADD" | "NORMAL";
 
+export type MapZoomLevels = {
+    territories: number;
+    playerNames: number;
+    carrierShips: number;
+    star: {
+        shipCount: number;
+        name: number;
+        naturalResources: number;
+        infrastructure: number;
+    };
+    background: {
+        nebulas: number;
+        stars: number;
+    };
+};
+
 export type UserGameSettings = {
     interface: {
         audio: SettingEnabledDisabled;
@@ -48,21 +64,7 @@ export type UserGameSettings = {
             nebulaColour2: string;
             nebulaColour3: string;
         };
-        zoomLevels: {
-            territories: number;
-            playerNames: number;
-            carrierShips: number;
-            star: {
-                shipCount: number;
-                name: number;
-                naturalResources: number;
-                infrastructure: number;
-            };
-            background: {
-                nebulas: number;
-                stars: number;
-            };
-        };
+        zoomLevels: MapZoomLevels;
         naturalResourcesRingOpacity: number;
         objectsDepth: SettingEnabledDisabled;
         galaxyCenterAlwaysVisible: SettingEnabledDisabled;

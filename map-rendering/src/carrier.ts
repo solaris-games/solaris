@@ -25,6 +25,7 @@ import type { DrawingContext } from "./container";
 import type { MapObject } from "./mapObject";
 import { EventEmitter } from "./eventEmitter";
 import type { GraphicsWithChunk } from "./PathManager";
+import { isVisible } from "./util/zoom";
 
 export type CarrierClickEvent = {
     carrierData: CarrierData;
@@ -456,7 +457,7 @@ export class Carrier
     onZoomChanging(zoomPercent: number) {
         this.zoomPercent = zoomPercent;
         this.setScale(zoomPercent);
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
     setScale(zoomPercent: number) {
@@ -502,7 +503,7 @@ export class Carrier
         }
     }
 
-    updateVisibility() {
+    _updateVisibility() {
         if (this.selectedGraphics) {
             this.selectedGraphics.visible = !this.data.orbiting;
         }
@@ -515,9 +516,7 @@ export class Carrier
         if (this.shipsText) {
             this.shipsText.visible =
                 !this.data!.orbiting &&
-                (this.zoomPercent >= Carrier.zoomLevel ||
-                    (this.isSelected && this.zoomPercent > Carrier.zoomLevel) ||
-                    (this.isMouseOver && this.zoomPercent > Carrier.zoomLevel));
+                isVisible(Carrier.zoomLevel, "micro", this.zoomPercent);
         }
     }
 
@@ -567,14 +566,14 @@ export class Carrier
         this.isSelected = true;
         this.drawSelectedCircle();
         this.emit("onSelected", this.data!);
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
     unselect() {
         this.isSelected = false;
         this.drawSelectedCircle();
         this.emit("onUnselected", this.data);
-        this.updateVisibility();
+        this._updateVisibility();
     }
 
     toggleSelected() {

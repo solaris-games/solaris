@@ -361,7 +361,7 @@ export class GameContainer {
             this.userSettings,
             carrier,
         );
-        carrierObject.updateVisibility();
+        carrierObject._updateVisibility();
         this.map.drawCarrier(carrierObject);
     }
 

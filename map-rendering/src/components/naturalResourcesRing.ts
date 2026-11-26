@@ -1,6 +1,6 @@
 import Helpers from "../helpers";
-import { UserGameSettings } from "@solaris/common";
-import { Star } from "../types/game";
+import type { UserGameSettings } from "@solaris/common";
+import type { Star } from "../types/game";
 import { Container, Graphics } from "pixi.js";
 
 const MAX_LOD = 4;
